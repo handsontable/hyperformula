@@ -45,14 +45,14 @@ import {Statistics, StatType} from './statistics'
  *
  * ## Iterative Calculation Algorithm
  *
- * When circular references exist and `iterativeCalculationEnable` is true:
+ * When circular references exist and `enableIterativeCalculation` is true:
  *
  * 1. Initialize all cycle cells to `iterativeCalculationInitialValue`
- * 2. Repeat up to `iterativeCalculationMaxIterations` times:
+ * 2. Repeat up to `iterativeCalculationLimit` times:
  *    a. Clear caches for ranges containing cycle cells
  *    b. Store current values
  *    c. Recompute all cycle cells in address order (Gauss-Seidel style)
- *    d. Check convergence: |new - old| < `iterativeCalculationConvergenceThreshold`
+ *    d. Check convergence: |new - old| < `iterativeCalculationThreshold`
  * 3. If all cells converge, stop early; otherwise continue to max iterations
  *
  * ## Entry Points
@@ -336,15 +336,15 @@ export class Evaluator {
       return changes
     }
 
-    if (!this.config.iterativeCalculationEnable) {
+    if (!this.config.enableIterativeCalculation) {
       this.blockCircularDependencies(cycled)
       // Still need to update dependents (they'll see #CYCLE! errors)
       const dependentChanges = this.updateNonCyclicDependents(cycled)
       changes.addAll(dependentChanges)
       return changes
     }
-    const maxIterations = this.config.iterativeCalculationMaxIterations
-    const threshold = this.config.iterativeCalculationConvergenceThreshold
+    const maxIterations = this.config.iterativeCalculationLimit
+    const threshold = this.config.iterativeCalculationThreshold
     const initialValue = this.config.iterativeCalculationInitialValue
 
     // Extract formula vertices and cache their addresses to avoid repeated getAddress() calls

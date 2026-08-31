@@ -37,7 +37,7 @@ All cells in the cycle must converge for iteration to stop early.
 
 ## Enabling iterative calculation
 
-To enable iterative calculation, set the [`iterativeCalculationEnable`](../api/interfaces/configparams.html#iterativecalculationenable) option to `true`:
+To enable iterative calculation, set the [`enableIterativeCalculation`](../api/interfaces/configparams.html#enableiterativecalculation) option to `true`:
 
 ```javascript
 const hfInstance = HyperFormula.buildFromArray(
@@ -46,7 +46,7 @@ const hfInstance = HyperFormula.buildFromArray(
   ],
   {
     licenseKey: 'gpl-v3',
-    iterativeCalculationEnable: true,
+    enableIterativeCalculation: true,
   }
 );
 
@@ -63,9 +63,9 @@ Iterative calculation settings are configured at engine initialization and apply
 
 | Option | Type | Default | Description |
 |:-------|:-----|:--------|:------------|
-| [`iterativeCalculationEnable`](../api/interfaces/configparams.html#iterativecalculationenable) | `boolean` | `false` | Enable iterative calculation for circular references |
-| [`iterativeCalculationMaxIterations`](../api/interfaces/configparams.html#iterativecalculationmaxiterations) | `number` | `100` | Maximum number of iterations before stopping |
-| [`iterativeCalculationConvergenceThreshold`](../api/interfaces/configparams.html#iterativecalculationconvergencethreshold) | `number` | `0.001` | Values must change by less than this to be considered converged |
+| [`enableIterativeCalculation`](../api/interfaces/configparams.html#enableiterativecalculation) | `boolean` | `false` | Enable iterative calculation for circular references |
+| [`iterativeCalculationLimit`](../api/interfaces/configparams.html#iterativecalculationlimit) | `number` | `100` | Maximum number of iterations before stopping |
+| [`iterativeCalculationThreshold`](../api/interfaces/configparams.html#iterativecalculationthreshold) | `number` | `0.001` | Values must change by less than this to be considered converged |
 | [`iterativeCalculationInitialValue`](../api/interfaces/configparams.html#iterativecalculationinitialvalue) | `number \| string \| boolean \| Date` | `0` | Starting value for cells in circular references |
 
 ## Example
@@ -79,8 +79,8 @@ const hf = HyperFormula.buildFromArray(
   ],
   {
     licenseKey: 'gpl-v3',
-    iterativeCalculationEnable: true,
-    iterativeCalculationConvergenceThreshold: 0.0001,
+    enableIterativeCalculation: true,
+    iterativeCalculationThreshold: 0.0001,
   }
 );
 
@@ -93,7 +93,7 @@ console.log(hf.getCellValue({ sheet: 0, row: 0, col: 1 })); // ~2 (B1)
 
 ### Non-converging formulas
 
-Some formulas never converge (e.g., `=A1+1` always increases). In these cases, iteration runs until `iterativeCalculationMaxIterations` is reached, and the final value is used.
+Some formulas never converge (e.g., `=A1+1` always increases). In these cases, iteration runs until `iterativeCalculationLimit` is reached, and the final value is used.
 
 ### Error handling
 

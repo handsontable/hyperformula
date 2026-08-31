@@ -455,7 +455,7 @@ export interface ConfigParams {
    * @default false
    * @category Engine
    */
-  iterativeCalculationEnable: boolean,
+  enableIterativeCalculation: boolean,
   /**
    * Sets the maximum number of iterations for iterative calculation.
    *
@@ -464,7 +464,7 @@ export interface ConfigParams {
    * @default 100
    * @category Engine
    */
-  iterativeCalculationMaxIterations: number,
+  iterativeCalculationLimit: number,
   /**
    * Sets the convergence threshold for iterative calculation.
    *
@@ -475,7 +475,7 @@ export interface ConfigParams {
    * @default 0.001
    * @category Engine
    */
-  iterativeCalculationConvergenceThreshold: number,
+  iterativeCalculationThreshold: number,
   /**
    * Sets the initial value used for cells in circular references during iterative calculation.
    *
