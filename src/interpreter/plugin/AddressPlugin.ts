@@ -28,7 +28,7 @@ export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypec
         {argumentType: FunctionArgumentType.NUMBER},
         {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 1, minValue: 1, maxValue: 4, emptyAsDefault: true},
         {argumentType: FunctionArgumentType.BOOLEAN, optionalArg: true, defaultValue: true, emptyAsDefault: true},
-        {argumentType: FunctionArgumentType.STRING, optionalArg: true},
+        {argumentType: FunctionArgumentType.STRING, optionalArg: true, emptyAsAbsent: true},
       ]
     },
   }
@@ -67,7 +67,7 @@ export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypec
       const colLetter = columnIndexToLabel(col - 1)
       let sheetPrefix = ''
 
-      if (sheetName !== undefined && sheetName !== null && sheetName !== '') {
+      if (sheetName !== undefined && sheetName !== null) {
         sheetPrefix = `${sheetName}!`
       }
 

@@ -11,7 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
 - Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
-- Fixed the `ADDRESS` function to omit the sheet separator (`!`) when the `sheetName` argument is an empty string, consistently with Excel, in both A1 and R1C1 styles. [#1739](https://github.com/handsontable/hyperformula/pull/1739)
+- Fixed the `ADDRESS` function to omit the sheet separator (`!`) when the `sheetName` argument is left out of the formula — whether omitted entirely (`=ADDRESS(2,3,1,FALSE())`) or written as an empty argument slot (`=ADDRESS(2,3,1,FALSE(),)`) — in both A1 and R1C1 styles, matching Microsoft Excel. A `sheetName` that is present but empty (an explicit `""`, or a reference to an empty cell) keeps the separator, which also matches Excel. [#1739](https://github.com/handsontable/hyperformula/pull/1739)
+
+### Added
+
+- Added the `emptyAsAbsent` argument-validation option for [custom functions](https://hyperformula.handsontable.com/docs/guide/custom-functions.html): an empty argument slot is passed to the implementation as `undefined` instead of the zero-value for its type, which lets a function tell an absent argument apart from one whose value is empty. [#1739](https://github.com/handsontable/hyperformula/pull/1739)
 
 ## [3.4.0] - 2026-08-10
 
