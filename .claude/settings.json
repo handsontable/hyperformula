@@ -1,5 +1,7 @@
 {
-  "enabledPlugins": ["typescript-lsp@claude-plugins-official"],
+  "enabledPlugins": [
+    "typescript-lsp@claude-plugins-official"
+  ],
   "permissions": {
     "deny": [
       "Read(./lib/**)",
@@ -23,6 +25,22 @@
     ]
   },
   "worktree": {
-    "symlinkDirectories": ["node_modules"]
+    "symlinkDirectories": [
+      "node_modules"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/script/claude/post-tool-use.mjs\"",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
   }
 }

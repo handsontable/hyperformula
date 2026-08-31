@@ -110,5 +110,6 @@ This section is maintained by the team. Skills, MCP servers, and other tools vet
 - **Name** &mdash; What it provides and when to use it.
 -->
 
-- **`.claude/skills/`** &mdash; Repository skills, scoped by a `path` glob in their frontmatter. `hyperformula-dev` is the entry point for engine work; `hyperformula-function-dev` for adding or changing a built-in function; `pr-creation` before opening a pull request.
+- **`.claude/skills/`** &mdash; Repository skills, scoped by a `paths` glob in their frontmatter. `hyperformula-dev` is the entry point for engine work; `hyperformula-function-dev` for adding or changing a built-in function; `pr-creation` before opening a pull request.
 - **`typescript-lsp` plugin** &mdash; Language-server-backed go-to-definition and find-references. Use it instead of grepping for a symbol's definition or callers; grep stays right for text searches. Enabled repository-wide in `.claude/settings.json`.
+- **`PostToolUse` lint hook** &mdash; After every `Edit` or `Write`, [`script/claude/post-tool-use.mjs`](script/claude/post-tool-use.mjs) runs `eslint --fix` on that file and reports the remaining **errors** back to the agent. Fix them in the same turn. Warnings are deliberately not reported. See [`script/AGENTS.md`](script/AGENTS.md).

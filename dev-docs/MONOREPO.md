@@ -25,8 +25,8 @@ hyperformula/                              # repository root — private, worksp
 ├── CLAUDE.md -> AGENTS.md
 ├── DEV_DOCS.md                            # pointer into dev-docs/
 ├── README.md  CONTRIBUTING.md  CHANGELOG.md  LICENSE.txt
-├── package.json                           # private: true, workspaces, fan-out scripts
-├── pnpm-workspace.yaml
+├── package.json                           # private: true, npm workspaces, fan-out scripts
+├── package-lock.json
 ├── .worktreeinclude
 ├── .changelogs/                           # one JSON fragment per PR (see below)
 ├── .claude/
@@ -88,23 +88,23 @@ hyperformula/                              # repository root — private, worksp
 ## Why this shape
 
 - **Flat, name-matched top-level directories.** A directory is named after the package it holds, so a path in a stack trace, a CI job name, and a changelog entry all say the same word. No `packages/` wrapper at the root — it adds a level that carries no information.
-- **`hyperformula-ui/` keeps its own `packages/`** because it genuinely holds four published packages that version together. Its workspace glob is `hyperformula-ui/packages/*`.
+- **`hyperformula-ui/` keeps its own `packages/`** because it genuinely holds four published packages that share a source tree and a test setup. They still version independently, like every other package here. Its entry in the root `workspaces` array is `hyperformula-ui/packages/*`.
 - **`AGENTS.md` travels with the code.** Every file listed above stays with its directory through the move, so the agent instructions survive the migration unchanged.
-- **One `.claude/skills/` at the root.** Skills are scoped by a `path` glob in their frontmatter rather than by placement, so there is one place to look and one place to keep them consistent.
+- **Every package versions and releases on its own cadence.** No lockstep version, no shared release train. Consequences to build in from the start: one `CHANGELOG.md` per package rather than one at the root, git tags namespaced by package (`hyperformula@3.5.0`, `@hyperformula/ui-core@0.2.0`), a changelog fragment that names its package, and a release workflow parameterised by package instead of one that ships everything. Cross-package dependencies are declared as ordinary semver ranges, so the UI packages pin an engine range and are not forced to re-release when the engine does.
+- **One `.claude/skills/` at the root.** Skills are scoped by a `paths` glob in their frontmatter rather than by placement, so there is one place to look and one place to keep them consistent.
 
 ## Migration steps
 
-1. **Pick the package manager.** The engine uses npm with `package-lock.json` today; `hyperformula-ui` and the Handsontable monorepo both use pnpm. Converging on pnpm makes the incoming package a straight move and matches the sibling repository; it costs one lockfile migration and a CI update.
+1. **Stay on npm.** The engine uses npm with a committed `package-lock.json`, and it keeps doing so: `workspaces` in the root `package.json` covers what this repository needs, and a package-manager migration is a risk the monorepo move does not need to carry at the same time. The cost lands on the way in — `hyperformula-ui` arrives as a pnpm workspace, so its `pnpm-workspace.yaml` and `pnpm-lock.yaml` are dropped and its package globs fold into the root `workspaces` array. Reconsider pnpm only if npm's hoisting turns out to break the wrapper packages.
 2. **Move `src/` and `test/` into `hyperformula/`.** Mechanical, but it invalidates every path in CI, in `tsconfig.json`, in `jest.config.js`, in `karma.conf.js`, in `.eslintignore`, and in the docs generator scripts.
 3. **Give `docs/` its own `package.json`** and take it out of the root dependency tree.
 4. **Move the root build scripts down into `hyperformula/package.json`**, leaving fan-out scripts at the root.
 5. **Bring in `hyperformula-ui`** from the formula-builder repository, preserving its history. Decide the published scope (`@hfe/*` today) before the first release from here.
 6. **Bring in `hyperformula-skill`** from the shared skills repository. Its marketplace entry has to keep resolving — either the plugin build publishes from here, or the old repository keeps pointing at this one.
-7. **Split `CHANGELOG.md` into `.changelogs/*.json` fragments.** One `CHANGELOG.md` edited by every package's pull requests conflicts on every merge. A per-PR JSON fragment plus a `consume` step removes the conflict entirely.
-8. **Path-filter CI.** Each package's jobs run only when its paths change; full runs on `develop`, `master`, and release branches.
+7. **Split `CHANGELOG.md` into `.changelogs/*.json` fragments.** One `CHANGELOG.md` edited by every package's pull requests conflicts on every merge. A per-PR JSON fragment plus a `consume` step removes the conflict entirely. Each fragment names the package it belongs to, so `consume` can compile one package's changelog without touching the others.
+8. **Keep the private test suite branch-matched.** `hyperformula-tests` stays keyed to this repository's branch name; only its checkout path moves, from `test/hyperformula-tests/` to `hyperformula/test/hyperformula-tests/`. Update `fetch-tests.sh`, the `test:setup-private` script, and `.gitignore` together, and re-check `.worktreeinclude`, which names the old path.
+9. **Path-filter CI.** Each package's jobs run only when its paths change; full runs on `develop`, `master`, and release branches.
 
 ## Open questions
 
-- Does the private `hyperformula-tests` repository stay branch-matched to this repository once the engine sits one level down? Its `fetch-tests.sh` target path changes with the move.
-- Do the UI packages ship on the engine's release cadence, or their own?
 - Which scope do the UI packages publish under, and does renaming them break existing consumers?
