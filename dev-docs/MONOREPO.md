@@ -7,10 +7,10 @@ This repository is becoming a monorepo (HF-359). This file is the target: what t
 | Package | Directory | Purpose | Published |
 |---|---|---|---|
 | `hyperformula` | `hyperformula/` | The calculation engine. Everything in `src/` and `test/` today. | yes |
-| `@hyperformula/ui-core` | `hyperformula-ui/packages/core/` | Formula editor UI: reference highlighting, inline editor, function help. | yes |
-| `@hyperformula/handsontable-adapter` | `hyperformula-ui/packages/handsontable-adapter/` | Binds the editor to Handsontable. | yes |
-| `@hyperformula/plain-table-adapter` | `hyperformula-ui/packages/plain-table-adapter/` | Binds the editor to a plain HTML table. | yes |
-| `@hyperformula/tanstack-table-adapter` | `hyperformula-ui/packages/tanstack-table-adapter/` | Binds the editor to TanStack Table. | yes |
+| `@hfe/core` | `hyperformula-ui/packages/core/` | Formula editor UI: reference highlighting, inline editor, function help. | yes |
+| `@hfe/handsontable-adapter` | `hyperformula-ui/packages/handsontable-adapter/` | Binds the editor to Handsontable. | yes |
+| `@hfe/plain-table-adapter` | `hyperformula-ui/packages/plain-table-adapter/` | Binds the editor to a plain HTML table. | yes |
+| `@hfe/tanstack-table-adapter` | `hyperformula-ui/packages/tanstack-table-adapter/` | Binds the editor to TanStack Table. | yes |
 | `hyperformula-skill` | `hyperformula-skill/` | The agent skill that teaches coding agents to use HyperFormula. | as a plugin/zip |
 | `hyperformula-docs` | `docs/` | The VuePress documentation portal. | no |
 | — | `hyperformula-ui/demo/`, `hyperformula-ui/e2e/` | Demo app and end-to-end tests for the UI packages. | no |
@@ -90,7 +90,7 @@ hyperformula/                              # repository root — private, worksp
 - **Flat, name-matched top-level directories.** A directory is named after the package it holds, so a path in a stack trace, a CI job name, and a changelog entry all say the same word. No `packages/` wrapper at the root — it adds a level that carries no information.
 - **`hyperformula-ui/` keeps its own `packages/`** because it genuinely holds four published packages that share a source tree and a test setup. They still version independently, like every other package here. Its entry in the root `workspaces` array is `hyperformula-ui/packages/*`.
 - **`AGENTS.md` travels with the code.** Every file listed above stays with its directory through the move, so the agent instructions survive the migration unchanged.
-- **Every package versions and releases on its own cadence.** No lockstep version, no shared release train. Consequences to build in from the start: one `CHANGELOG.md` per package rather than one at the root, git tags namespaced by package (`hyperformula@3.5.0`, `@hyperformula/ui-core@0.2.0`), a changelog fragment that names its package, and a release workflow parameterised by package instead of one that ships everything. Cross-package dependencies are declared as ordinary semver ranges, so the UI packages pin an engine range and are not forced to re-release when the engine does.
+- **Every package versions and releases on its own cadence.** No lockstep version, no shared release train. Consequences to build in from the start: one `CHANGELOG.md` per package rather than one at the root, git tags namespaced by package (`hyperformula@3.5.0`, `@hfe/core@0.2.0`), a changelog fragment that names its package, and a release workflow parameterised by package instead of one that ships everything. Cross-package dependencies are declared as ordinary semver ranges, so the UI packages pin an engine range and are not forced to re-release when the engine does.
 - **One `.claude/skills/` at the root.** Skills are scoped by a `paths` glob in their frontmatter rather than by placement, so there is one place to look and one place to keep them consistent.
 
 ## Migration steps
@@ -99,7 +99,7 @@ hyperformula/                              # repository root — private, worksp
 2. **Move `src/` and `test/` into `hyperformula/`.** Mechanical, but it invalidates every path in CI, in `tsconfig.json`, in `jest.config.js`, in `karma.conf.js`, in `.eslintignore`, and in the docs generator scripts.
 3. **Give `docs/` its own `package.json`** and take it out of the root dependency tree.
 4. **Move the root build scripts down into `hyperformula/package.json`**, leaving fan-out scripts at the root.
-5. **Bring in `hyperformula-ui`** from the formula-builder repository, preserving its history. Decide the published scope (`@hfe/*` today) before the first release from here.
+5. **Bring in `hyperformula-ui`** from the formula-builder repository, preserving its history. It keeps the `@hfe/*` scope it publishes under today — moving the packages between repositories is already enough change for one migration, and a rename would break every existing consumer's imports for no benefit the move itself delivers. Revisit the scope as its own decision, not as a side effect of this one.
 6. **Bring in `hyperformula-skill`** from the shared skills repository. Its marketplace entry has to keep resolving — either the plugin build publishes from here, or the old repository keeps pointing at this one.
 7. **Split `CHANGELOG.md` into `.changelogs/*.json` fragments.** One `CHANGELOG.md` edited by every package's pull requests conflicts on every merge. A per-PR JSON fragment plus a `consume` step removes the conflict entirely. Each fragment names the package it belongs to, so `consume` can compile one package's changelog without touching the others.
 8. **Keep the private test suite branch-matched.** `hyperformula-tests` stays keyed to this repository's branch name; only its checkout path moves, from `test/hyperformula-tests/` to `hyperformula/test/hyperformula-tests/`. Update `fetch-tests.sh`, the `test:setup-private` script, and `.gitignore` together, and re-check `.worktreeinclude`, which names the old path.
@@ -107,4 +107,4 @@ hyperformula/                              # repository root — private, worksp
 
 ## Open questions
 
-- Which scope do the UI packages publish under, and does renaming them break existing consumers?
+None outstanding. Decisions taken so far are recorded above; add new questions here as the migration turns them up.
