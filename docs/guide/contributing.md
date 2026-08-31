@@ -1,3 +1,13 @@
+---
+tags:
+  - CLA
+  - Contributor License Agreement
+  - pull request
+  - bug report
+  - feature request
+  - develop branch
+---
+
 # Contributing
 
 You are welcome to contribute to HyperFormula's development. Your help
