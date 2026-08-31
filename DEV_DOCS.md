@@ -126,7 +126,7 @@ Adding a built-in function is similar to adding a [custom function](docs/guide/c
 3. Implement the function method.
 4. Add a catalogue entry to `src/interpreter/functionMetadata/categories/<category>.ts` (see below).
 5. Add translations to all language files in `src/i18n/languages/`.
-6. Add tests in `test/unit/interpreter/`.
+6. Add tests in `test/hyperformula-tests/unit/interpreter/` — that's the private `hyperformula-tests` repo checked out under `test/`. Interpreter and function specs don't live in this public repo; a copy under `test/unit/` would run twice and leave `develop` red if only one of the paired PRs lands.
 
 ### The function metadata catalogue
 

@@ -13,6 +13,11 @@ karma.*
 doc
 test/_setupFiles/*.js
 
+# Private tests repo, checked out by CI under test/hyperformula-tests. Not part of
+# tsconfig.json's "include" (src only), so type-aware rules have no project to run
+# against here -- linting it is the private repo's own job, not this workflow's.
+test/hyperformula-tests
+
 # Auto-generated directories
 commonjs
 coverage
