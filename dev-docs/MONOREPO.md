@@ -11,9 +11,10 @@ This repository is becoming a monorepo (HF-359). This file is the target: what t
 | `@hfe/handsontable-adapter` | `hyperformula-ui/packages/handsontable-adapter/` | Binds the editor to Handsontable. | yes |
 | `@hfe/plain-table-adapter` | `hyperformula-ui/packages/plain-table-adapter/` | Binds the editor to a plain HTML table. | yes |
 | `@hfe/tanstack-table-adapter` | `hyperformula-ui/packages/tanstack-table-adapter/` | Binds the editor to TanStack Table. | yes |
-| `hyperformula-skill` | `hyperformula-skill/` | The agent skill that teaches coding agents to use HyperFormula. | as a plugin/zip |
 | `hyperformula-docs` | `docs/` | The VuePress documentation portal. | no |
 | — | `hyperformula-ui/demo/`, `hyperformula-ui/e2e/` | Demo app and end-to-end tests for the UI packages. | no |
+
+The HyperFormula agent skill stays in the shared `handsontable-skills` repository for now. Bringing it here is a separate decision, taken later and on its own terms; nothing in this layout depends on it.
 
 `docs/` is deliberately **not** a workspace member: the portal drags in a large, old dependency tree (VuePress, `--openssl-legacy-provider`) that must not reach an engine install. It keeps its own `package.json` and is installed separately. This mirrors how the Handsontable monorepo isolates its documentation site.
 
@@ -28,11 +29,9 @@ hyperformula/                              # repository root — private, worksp
 ├── package.json                           # private: true, npm workspaces, fan-out scripts
 ├── package-lock.json
 ├── .worktreeinclude
-├── .changelogs/                           # one JSON fragment per PR (see below)
 ├── .claude/
 │   ├── settings.json                      # hooks, enabledPlugins, worktree settings
-│   ├── skills/                            # ALL skills, scoped by frontmatter path
-│   └── agents/
+│   └── skills/                            # ALL skills, scoped by the `paths` frontmatter field
 ├── dev-docs/                              # monorepo-scope reference
 │   ├── README.md  STRUCTURE.md  BUILD.md  TESTING.md
 │   ├── DEFINITION-OF-DONE.md  CODE-STYLE.md  DOC-STANDARDS.md
@@ -69,17 +68,13 @@ hyperformula/                              # repository root — private, worksp
 │   ├── demo/
 │   └── e2e/
 │
-├── hyperformula-skill/                    # ── agent skill
-│   ├── AGENTS.md  CLAUDE.md -> AGENTS.md
-│   ├── skills/hyperformula/SKILL.md
-│   └── scripts/
-│
 ├── docs/                                  # ── documentation portal (NOT a workspace member)
 │   ├── AGENTS.md  CLAUDE.md -> AGENTS.md
-│   ├── package.json
+│   ├── package.json  .nvmrc               # .nvmrc says 22, like every other one here
+│   ├── wrangler.jsonc                     # deploy config for the portal
+│   ├── worker/index.js                    # Cloudflare Worker serving the built portal
 │   ├── guide/  api/  .vuepress/
 │
-├── worker/                                # Cloudflare Worker serving the built docs
 ├── examples/                              # images and CSV fixtures used by the docs
 ├── script/                                AGENTS.md
 └── .github/workflows/                     # path-filtered per-package jobs
@@ -90,7 +85,10 @@ hyperformula/                              # repository root — private, worksp
 - **Flat, name-matched top-level directories.** A directory is named after the package it holds, so a path in a stack trace, a CI job name, and a changelog entry all say the same word. No `packages/` wrapper at the root — it adds a level that carries no information.
 - **`hyperformula-ui/` keeps its own `packages/`** because it genuinely holds four published packages that share a source tree and a test setup. They still version independently, like every other package here. Its entry in the root `workspaces` array is `hyperformula-ui/packages/*`.
 - **`AGENTS.md` travels with the code.** Every file listed above stays with its directory through the move, so the agent instructions survive the migration unchanged.
-- **Every package versions and releases on its own cadence.** No lockstep version, no shared release train. Consequences to build in from the start: one `CHANGELOG.md` per package rather than one at the root, git tags namespaced by package (`hyperformula@3.5.0`, `@hfe/core@0.2.0`), a changelog fragment that names its package, and a release workflow parameterised by package instead of one that ships everything. Cross-package dependencies are declared as ordinary semver ranges, so the UI packages pin an engine range and are not forced to re-release when the engine does.
+- **Every package versions and releases on its own cadence.** No lockstep version, no shared release train. Consequences to build in from the start: one `CHANGELOG.md` per package rather than one at the root, git tags namespaced by package (`hyperformula@3.5.0`, `@hfe/core@0.2.0`), and a release workflow parameterised by package instead of one that ships everything. Cross-package dependencies are declared as ordinary semver ranges, so the UI packages pin an engine range and are not forced to re-release when the engine does.
+- **The Cloudflare Worker belongs to `docs/`.** `wrangler.jsonc` and `worker/index.js` exist only to serve the built portal, and `docs/` is leaving the workspace anyway. Moving them under `docs/` keeps the whole deployment path in one directory that installs and versions on its own, instead of leaving two root-level files whose only consumer lives elsewhere. `wrangler.jsonc`'s `main` and `script/prepare-cf-assets.js` change with them.
+- **Every `.nvmrc` says `22`.** One Node version across the repository, including `docs/` once it has its own. A package that needs a different one is a problem to fix, not a version to pin around.
+- **`CHANGELOG.md` keeps its current form** — Keep a Changelog, an `## [Unreleased]` block, one bullet per change with a link to the pull request or issue. One file per package rather than one at the root, and no fragment mechanism. Fragments solve merge conflicts this repository does not have yet; introducing them now would cost a tool, a CI gate, and a habit change for a problem that has not arrived.
 - **One `.claude/skills/` at the root.** Skills are scoped by a `paths` glob in their frontmatter rather than by placement, so there is one place to look and one place to keep them consistent.
 
 ## Migration steps
@@ -100,11 +98,12 @@ hyperformula/                              # repository root — private, worksp
 3. **Give `docs/` its own `package.json`** and take it out of the root dependency tree.
 4. **Move the root build scripts down into `hyperformula/package.json`**, leaving fan-out scripts at the root.
 5. **Bring in `hyperformula-ui`** from the formula-builder repository, preserving its history. It keeps the `@hfe/*` scope it publishes under today — moving the packages between repositories is already enough change for one migration, and a rename would break every existing consumer's imports for no benefit the move itself delivers. Revisit the scope as its own decision, not as a side effect of this one.
-6. **Bring in `hyperformula-skill`** from the shared skills repository. Its marketplace entry has to keep resolving — either the plugin build publishes from here, or the old repository keeps pointing at this one.
-7. **Split `CHANGELOG.md` into `.changelogs/*.json` fragments.** One `CHANGELOG.md` edited by every package's pull requests conflicts on every merge. A per-PR JSON fragment plus a `consume` step removes the conflict entirely. Each fragment names the package it belongs to, so `consume` can compile one package's changelog without touching the others.
-8. **Keep the private test suite branch-matched.** `hyperformula-tests` stays keyed to this repository's branch name; only its checkout path moves, from `test/hyperformula-tests/` to `hyperformula/test/hyperformula-tests/`. Update `fetch-tests.sh`, the `test:setup-private` script, and `.gitignore` together, and re-check `.worktreeinclude`, which names the old path.
-9. **Path-filter CI.** Each package's jobs run only when its paths change; full runs on `develop`, `master`, and release branches.
+6. **Move `wrangler.jsonc` and `worker/` under `docs/`.** Update `wrangler.jsonc`'s `main`, the `docs:*:cf` scripts in `package.json`, and `script/prepare-cf-assets.js` in the same change. Verify with `npm run docs:preview:cf` before merging — a broken `main` path fails only at deploy time.
+7. **Split `CHANGELOG.md` per package**, each keeping the current Keep a Changelog form. No fragment mechanism.
+8. **Give every package an `.nvmrc` saying `22`**, `docs/` included.
+9. **Keep the private test suite branch-matched.** `hyperformula-tests` stays keyed to this repository's branch name; only its checkout path moves, from `test/hyperformula-tests/` to `hyperformula/test/hyperformula-tests/`. Update `fetch-tests.sh`, the `test:setup-private` script, and `.gitignore` together, and re-check `.worktreeinclude`, which names the old path.
+10. **Path-filter CI.** Each package's jobs run only when its paths change; full runs on `develop`, `master`, and release branches.
 
 ## Open questions
 
-None outstanding. Decisions taken so far are recorded above; add new questions here as the migration turns them up.
+- Does `examples/` move under `docs/` as well? Every reference to it comes from a guide in `docs/guide/`, so it has no other consumer, but it is not part of the deployment path the way the Worker is.

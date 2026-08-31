@@ -14,7 +14,7 @@ When editing the docs, you can use features described [here](https://vuepress.vu
 
 To start a local HyperFormula docs server:
 
-1. Make sure you're running [Node.js](https://nodejs.org/en/) 14+.
+1. Make sure you're running the [Node.js](https://nodejs.org/en/) version pinned in [`.nvmrc`](../.nvmrc) (22).
 2. From the main `hyperformula` directory, install the docs dependencies:
     ```bash
     npm install

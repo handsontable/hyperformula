@@ -2,7 +2,10 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+# The directory that holds test/. That is the repository root today, and will be
+# the hyperformula package root once this repository becomes a monorepo. Either
+# way it sits inside the git working tree, which is all `git rev-parse` needs.
+PACKAGE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 HYPERFORMULA_TESTS_DIR="$SCRIPT_DIR/hyperformula-tests"
 
 # 1. Check if hyperformula-tests exists
@@ -15,8 +18,9 @@ if [ ! -d "$HYPERFORMULA_TESTS_DIR" ]; then
   fi
 fi
 
-# 2. Get current branch from root repo (GitHub Actions uses detached HEAD, so use env vars in CI)
-cd "$REPO_ROOT"
+# 2. Get the current branch of the hyperformula working tree (GitHub Actions uses a
+#    detached HEAD, so prefer the env vars there)
+cd "$PACKAGE_ROOT"
 if [ -n "$GITHUB_HEAD_REF" ]; then
   CURRENT_BRANCH="$GITHUB_HEAD_REF"
 elif [ -n "$GITHUB_REF_NAME" ] && [[ "$GITHUB_REF_NAME" != *"/merge" ]]; then
