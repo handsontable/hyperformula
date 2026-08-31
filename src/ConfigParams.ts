@@ -312,6 +312,22 @@ export interface ConfigParams {
    */
   stringifyDuration: (time: SimpleTime, timeFormat: string) => Maybe<string>,
   /**
+   * Sets a function that converts numeric values into currency-formatted strings.
+   *
+   * The function receives the raw value and the format string passed to `TEXT`
+   * and should return a string or `undefined`. The formatter calls this for
+   * every format string that reaches it, not only currency-shaped ones — return
+   * `undefined` for any format your callback does not handle and HyperFormula
+   * will fall through to the built-in number formatter.
+   *
+   * For more information, see the [Currency handling guide](/guide/currency-handling.md).
+   *
+   * @default defaultStringifyCurrency
+   *
+   * @category Number
+   */
+  stringifyCurrency: (value: number, currencyFormat: string) => Maybe<string>,
+  /**
    * When set to `false`, no rounding happens, and numbers are equal if and only if they are of truly identical value.
    *
    * For more information, see [precisionEpsilon](/api/interfaces/configparams.md#precisionepsilon).
@@ -404,6 +420,21 @@ export interface ConfigParams {
    */
   undoLimit: number,
   /**
+   * Controls memory usage for long-running instances by limiting the number of
+   * pending lazy transformations before cleanup occurs.
+   *
+   * Structural operations (adding/removing rows/columns, moving cells) create
+   * transformations that are applied lazily to formulas. This setting determines
+   * how many can accumulate before they are flushed and memory is reclaimed.
+   *
+   * Lower values reduce peak memory usage but may slightly increase CPU overhead.
+   * Higher values reduce overhead but allow more memory accumulation.
+   *
+   * @default 50
+   * @category Engine
+   */
+  maxPendingLazyTransformations: number,
+  /**
    * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) are allowed to use regular expressions.
    * @default false
    * @category String
@@ -424,7 +455,7 @@ export interface ConfigParams {
    * @default false
    * @category Engine
    */
-  iterativeCalculationEnable: boolean,
+  enableIterativeCalculation: boolean,
   /**
    * Sets the maximum number of iterations for iterative calculation.
    *
@@ -433,7 +464,7 @@ export interface ConfigParams {
    * @default 100
    * @category Engine
    */
-  iterativeCalculationMaxIterations: number,
+  iterativeCalculationLimit: number,
   /**
    * Sets the convergence threshold for iterative calculation.
    *
@@ -444,7 +475,7 @@ export interface ConfigParams {
    * @default 0.001
    * @category Engine
    */
-  iterativeCalculationConvergenceThreshold: number,
+  iterativeCalculationThreshold: number,
   /**
    * Sets the initial value used for cells in circular references during iterative calculation.
    *

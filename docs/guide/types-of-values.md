@@ -103,7 +103,7 @@ operations such as calculating the number of days between two dates.
 
 When working with text values directly inside formulas, you must enclose them in double quotes (`"`). This is different from entering text into cells, where quotes are not required. E.g.:
 
-```excel
+```
 =IF(B1="Active", "Status OK", "Check Status")
 ```
 

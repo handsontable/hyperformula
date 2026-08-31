@@ -15,7 +15,7 @@ import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {ConfigValueEmpty, ExpectedValueOfTypeError} from './errors'
-import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
+import {defaultStringifyCurrency, defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
 import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
@@ -60,17 +60,19 @@ export class Config implements ConfigParams, ParserConfig {
     smartRounding: true,
     stringifyDateTime: defaultStringifyDateTime,
     stringifyDuration: defaultStringifyDuration,
+    stringifyCurrency: defaultStringifyCurrency,
     timeFormats: ['hh:mm', 'hh:mm:ss.sss'],
     thousandSeparator: '',
     undoLimit: 20,
+    maxPendingLazyTransformations: 50,
     useRegularExpressions: false,
     useWildcards: true,
     useColumnIndex: false,
     useStats: false,
     useArrayArithmetic: false,
-    iterativeCalculationEnable: false,
-    iterativeCalculationMaxIterations: 100,
-    iterativeCalculationConvergenceThreshold: 0.001,
+    enableIterativeCalculation: false,
+    iterativeCalculationLimit: 100,
+    iterativeCalculationThreshold: 0.001,
     iterativeCalculationInitialValue: 0,
   }
 
@@ -124,6 +126,8 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly stringifyDuration: (time: SimpleTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */
+  public readonly stringifyCurrency: (value: number, currencyFormat: string) => Maybe<string>
+  /** @inheritDoc */
   public readonly precisionEpsilon: number
   /** @inheritDoc */
   public readonly precisionRounding: number
@@ -139,6 +143,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly currencySymbol: string[]
   /** @inheritDoc */
   public readonly undoLimit: number
+  /** @inheritDoc */
+  public readonly maxPendingLazyTransformations: number
   /** @inheritDoc */
   public readonly context: unknown
 
@@ -166,11 +172,11 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly matchWholeCell: boolean
   /** @inheritDoc */
-  public readonly iterativeCalculationEnable: boolean
+  public readonly enableIterativeCalculation: boolean
   /** @inheritDoc */
-  public readonly iterativeCalculationMaxIterations: number
+  public readonly iterativeCalculationLimit: number
   /** @inheritDoc */
-  public readonly iterativeCalculationConvergenceThreshold: number
+  public readonly iterativeCalculationThreshold: number
   /** @inheritDoc */
   public readonly iterativeCalculationInitialValue: RawCellContent
 
@@ -205,18 +211,20 @@ export class Config implements ConfigParams, ParserConfig {
       precisionRounding,
       stringifyDateTime,
       stringifyDuration,
+      stringifyCurrency,
       smartRounding,
       timeFormats,
       thousandSeparator,
       useArrayArithmetic,
       useStats,
       undoLimit,
+      maxPendingLazyTransformations,
       useColumnIndex,
       useRegularExpressions,
       useWildcards,
-      iterativeCalculationEnable,
-      iterativeCalculationMaxIterations,
-      iterativeCalculationConvergenceThreshold,
+      enableIterativeCalculation,
+      iterativeCalculationLimit,
+      iterativeCalculationThreshold,
       iterativeCalculationInitialValue,
     } = options
 
@@ -256,15 +264,18 @@ export class Config implements ConfigParams, ParserConfig {
     this.parseDateTime = configValueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = configValueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
     this.stringifyDuration = configValueFromParam(stringifyDuration, 'function', 'stringifyDuration')
+    this.stringifyCurrency = configValueFromParam(stringifyCurrency, 'function', 'stringifyCurrency')
     this.translationPackage = HyperFormula.getLanguage(this.language)
     this.errorMapping = this.translationPackage.buildErrorMapping()
     this.nullDate = configValueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = configValueFromParam(leapYear1900, 'boolean', 'leapYear1900')
     this.undoLimit = configValueFromParam(undoLimit, 'number', 'undoLimit')
+    this.maxPendingLazyTransformations = configValueFromParam(maxPendingLazyTransformations, 'number', 'maxPendingLazyTransformations')
     this.useRegularExpressions = configValueFromParam(useRegularExpressions, 'boolean', 'useRegularExpressions')
     this.useWildcards = configValueFromParam(useWildcards, 'boolean', 'useWildcards')
     this.matchWholeCell = configValueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
     validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)
+    validateNumberToBeAtLeast(this.maxPendingLazyTransformations, 'maxPendingLazyTransformations', 1)
     this.maxRows = configValueFromParam(maxRows, 'number', 'maxRows')
     validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')
@@ -273,11 +284,11 @@ export class Config implements ConfigParams, ParserConfig {
     this.context = context
 
     // Iterative calculation config
-    this.iterativeCalculationEnable = configValueFromParam(iterativeCalculationEnable, 'boolean', 'iterativeCalculationEnable')
-    this.iterativeCalculationMaxIterations = configValueFromParam(iterativeCalculationMaxIterations, 'number', 'iterativeCalculationMaxIterations')
-    this.validateIterativeCalculationMaxIterations(this.iterativeCalculationMaxIterations)
-    this.iterativeCalculationConvergenceThreshold = configValueFromParam(iterativeCalculationConvergenceThreshold, 'number', 'iterativeCalculationConvergenceThreshold')
-    validateNumberToBeAtLeast(this.iterativeCalculationConvergenceThreshold, 'iterativeCalculationConvergenceThreshold', 0)
+    this.enableIterativeCalculation = configValueFromParam(enableIterativeCalculation, 'boolean', 'enableIterativeCalculation')
+    this.iterativeCalculationLimit = configValueFromParam(iterativeCalculationLimit, 'number', 'iterativeCalculationLimit')
+    this.validateIterativeCalculationLimit(this.iterativeCalculationLimit)
+    this.iterativeCalculationThreshold = configValueFromParam(iterativeCalculationThreshold, 'number', 'iterativeCalculationThreshold')
+    validateNumberToBeAtLeast(this.iterativeCalculationThreshold, 'iterativeCalculationThreshold', 0)
     this.iterativeCalculationInitialValue = this.validateIterativeCalculationInitialValue(iterativeCalculationInitialValue)
 
     privatePool.set(this, {
@@ -312,9 +323,9 @@ export class Config implements ConfigParams, ParserConfig {
     return valueAfterCheck as string[]
   }
 
-  private validateIterativeCalculationMaxIterations(value: number): void {
+  private validateIterativeCalculationLimit(value: number): void {
     if (!Number.isInteger(value) || value < 1) {
-      throw new ExpectedValueOfTypeError('positive integer', 'iterativeCalculationMaxIterations')
+      throw new ExpectedValueOfTypeError('positive integer', 'iterativeCalculationLimit')
     }
   }
 

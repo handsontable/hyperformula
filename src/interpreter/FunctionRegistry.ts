@@ -233,6 +233,24 @@ export class FunctionRegistry {
     return this.instancePlugins.get(functionId)
   }
 
+  /**
+   * Returns the ids of all functions the function-metadata API (`getAvailableFunctions`/`getFunctionDetails`)
+   * should describe: every function registered in this instance (aliases and any custom/user-registered functions
+   * included), plus the protected ids (e.g. `VERSION`, `OFFSET`). `instancePlugins` already contains `VERSION`
+   * (the constructor loads any protected id that has a plugin, unprotected, so it can be executed), but not
+   * `OFFSET` (it has no plugin at all — it is transformed at parse time). Appending
+   * `FunctionRegistry._protectedPlugins`'s keys explicitly covers both uniformly instead of relying on the
+   * constructor's incidental loading; de-duplicated via `Set` because `VERSION` would otherwise be listed twice
+   * (once from `instancePlugins`, once from `_protectedPlugins`). A user can see these ids via
+   * `getAvailableFunctions`/`getFunctionDetails` even though they can never be unregistered (HF-249).
+   *
+   * Callability is the whole rule: omitting an id would hide a working function from a function picker. Whether a
+   * listed id is *described as* a built-in depends on whether a catalogue entry exists for that id.
+   */
+  public getListableFunctionIds(): string[] {
+    return Array.from(new Set([...this.instancePlugins.keys(), ...FunctionRegistry._protectedPlugins.keys()]))
+  }
+
   public getFunction(functionId: string): Maybe<PluginFunctionType> {
     const pluginEntry = this.functions.get(functionId)
     if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {

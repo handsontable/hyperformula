@@ -23,7 +23,7 @@ import {Statistics, StatType} from './statistics'
  * Responsible for computing cell values based on their formulas and dependencies.
  *
  * Uses topological sorting for acyclic portions and iterative calculation for cycles.
- * Maintains integration with column search index for VLOOKUP/MATCH optimization
+ * Maintains integration with column search index for VLOOKUP/MATCH optimization.
  *
  * ## Evaluation Workflow
  *
@@ -37,7 +37,7 @@ import {Statistics, StatType} from './statistics'
  *
  * 3. **Cycle Resolution** (if cycles exist)
  *    - If iterative calculation disabled: sets #CYCLE! error on all cycle members
- *    - If enabled: iteratates the cycle calculation until convergence or max iterations
+ *    - If enabled: iterates the cycle calculation until convergence or max iterations
  *
  * 4. **Post-cycle Evaluation**
  *    - Recomputes vertices that depend on cycle results
@@ -45,21 +45,21 @@ import {Statistics, StatType} from './statistics'
  *
  * ## Iterative Calculation Algorithm
  *
- * When circular references exist and `iterativeCalculationEnable` is true:
+ * When circular references exist and `enableIterativeCalculation` is true:
  *
  * 1. Initialize all cycle cells to `iterativeCalculationInitialValue`
- * 2. Repeat up to `iterativeCalculationMaxIterations` times:
+ * 2. Repeat up to `iterativeCalculationLimit` times:
  *    a. Clear caches for ranges containing cycle cells
  *    b. Store current values
  *    c. Recompute all cycle cells in address order (Gauss-Seidel style)
- *    d. Check convergence: |new - old| < `iterativeCalculationConvergenceThreshold`
+ *    d. Check convergence: |new - old| < `iterativeCalculationThreshold`
  * 3. If all cells converge, stop early; otherwise continue to max iterations
  *
  * ## Entry Points
  *
- * - `run()`: Full evaluation from scratch (initial load or major changes)
- * - `partialRun()`: Incremental evaluation starting from changed vertices
- * - `runAndForget()`: One-off formula evaluation without side effects
+ * - `recomputeWholeGraph()`: Full evaluation from scratch (initial load or major changes)
+ * - `recomputeSubgraph()`: Incremental evaluation starting from changed vertices
+ * - `evaluateSingleFormula()`: One-off formula evaluation without side effects
  */
 export class Evaluator {
   /**
@@ -336,15 +336,15 @@ export class Evaluator {
       return changes
     }
 
-    if (!this.config.iterativeCalculationEnable) {
+    if (!this.config.enableIterativeCalculation) {
       this.blockCircularDependencies(cycled)
       // Still need to update dependents (they'll see #CYCLE! errors)
       const dependentChanges = this.updateNonCyclicDependents(cycled)
       changes.addAll(dependentChanges)
       return changes
     }
-    const maxIterations = this.config.iterativeCalculationMaxIterations
-    const threshold = this.config.iterativeCalculationConvergenceThreshold
+    const maxIterations = this.config.iterativeCalculationLimit
+    const threshold = this.config.iterativeCalculationThreshold
     const initialValue = this.config.iterativeCalculationInitialValue
 
     // Extract formula vertices and cache their addresses to avoid repeated getAddress() calls

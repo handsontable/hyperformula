@@ -10,7 +10,36 @@ import {RawScalarValue} from '../interpreter/InterpreterValue'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
+/**
+ * Detects Excel LCID-tagged currency tags (`[$SYMBOL-LCID]` with a non-empty
+ * SYMBOL portion). Shared by `defaultStringifyDateTime` and
+ * `defaultStringifyDuration` so a format string carrying such a tag short-
+ * circuits both date and duration dispatch and falls through to the
+ * number formatter (or the user-supplied `stringifyCurrency` callback).
+ *
+ * The pattern is intentionally unanchored: any occurrence of `[$SYMBOL-`
+ * in the format string triggers the guard. Excel does not mix date/time
+ * tokens with a currency tag in the same format string, so a mid-string
+ * match cannot misclassify a legitimate composite — every observed
+ * format string with a currency tag is currency-only.
+ */
+const LCID_CURRENCY_TAG = /\[\$[^\-\]]+-/
+
 export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): RawScalarValue {
+  // Currency callback runs first so a user-supplied stringifyCurrency can
+  // intercept LCID-tagged or bare-letter currency formats before the
+  // date/time parser greedily consumes characters like 'D', 'M', 'S', 'Y'
+  // (e.g. '[$USD-409] #,##0.00' would otherwise become '[$US9-409] #,##0.00').
+  // The default callback returns undefined for every input. For non-currency
+  // formats (dates, durations, $#,##0.00, etc.) this preserves the existing
+  // dispatch path bit-for-bit. For LCID-tagged currency formats (`[$SYMBOL-LCID] ...`)
+  // the LCID guards in defaultStringifyDateTime/Duration also short-circuit,
+  // so the value falls through to parseForNumberFormat — a deliberate change
+  // versus pre-HF-24 behavior, where the date parser would mangle the symbol.
+  const tryCurrency = config.stringifyCurrency(value, formatArg)
+  if (tryCurrency !== undefined) {
+    return tryCurrency
+  }
   const tryDateTime = config.stringifyDateTime(dateHelper.numberToSimpleDateTime(value), formatArg) // default points to defaultStringifyDateTime()
   if (tryDateTime !== undefined) {
     return tryDateTime
@@ -80,7 +109,30 @@ function numberFormat(tokens: FormatToken[], value: number): RawScalarValue {
   return result
 }
 
+/**
+ * Default `stringifyDuration` callback — formats a duration value against an
+ * Excel-style time format string (e.g. `[hh]:mm:ss`).
+ *
+ * Returns `undefined` for format strings that are not duration formats so the
+ * dispatcher in `format()` can fall through to other handlers.
+ *
+ * **LCID currency-tag guard** — sibling to the same guard in
+ * `defaultStringifyDateTime`; explicitly returns `undefined` for Excel
+ * currency tags `[$SYMBOL-LCID]` because the SYMBOL portion contains
+ * duration-token letters (`H` in CHF/HUF, `m` in AMD/HMD) that
+ * `parseForDateTimeFormat` would otherwise interpret as time tokens and
+ * mangle the output. See `defaultStringifyDateTime` for the full
+ * symbol-vs-locale-modifier rationale and the historical pre-HF-24
+ * behaviour the guard corrects.
+ *
+ * @param time parsed duration value to render
+ * @param formatArg Excel-style format string
+ * @returns formatted string, or `undefined` to defer to the next dispatch step
+ */
 export function defaultStringifyDuration(time: SimpleTime, formatArg: string): Maybe<string> {
+  if (LCID_CURRENCY_TAG.test(formatArg)) {
+    return undefined
+  }
   const expression = parseForDateTimeFormat(formatArg)
   if (expression === undefined) {
     return undefined
@@ -142,7 +194,37 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
   return result
 }
 
+/**
+ * Default `stringifyDateTime` callback — formats a date/time value against an
+ * Excel-style format string (e.g. `YYYY-MM-DD HH:mm:ss`).
+ *
+ * Returns `undefined` for format strings that are not date/time formats so the
+ * dispatcher in `format()` can fall through to `parseForNumberFormat` (or to a
+ * user-supplied `stringifyCurrency` callback for currency-tagged formats).
+ *
+ * **LCID currency-tag guard** — explicitly returns `undefined` for Excel
+ * currency tags `[$SYMBOL-LCID]` (non-empty SYMBOL portion). Without the
+ * guard, `parseForDateTimeFormat` greedily consumes letters like `D`/`M`/`S`/`Y`/`H`
+ * inside the currency code (e.g. `D` in USD, `H` in CHF, `M`+`D` in AMD),
+ * mangling the output of an `[$USD-409] #,##0.00` format into
+ * `[$US9-409] #,##0.00` because `D` is read as a day token. The pre-HF-24
+ * behaviour was to mis-format; the guarded return is the deliberate
+ * correction, not a regression. Bit-for-bit compatibility is preserved for
+ * every non-currency format (dates, durations, `$#,##0.00`, etc.).
+ *
+ * The guard pattern (`/\[\$[^\-\]]+-/`) requires ≥1 character between `[$`
+ * and `-` so it distinguishes currency tags (`[$USD-409]`, `[$€-2]`) from
+ * Excel's locale-only modifier (`[$-409]`, `[$-F800]`), which is valid on
+ * date/time formats and must continue to flow through this function.
+ *
+ * @param dateTime parsed date/time value to render
+ * @param formatArg Excel-style format string
+ * @returns formatted string, or `undefined` to defer to the next dispatch step
+ */
 export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: string): Maybe<string> {
+  if (LCID_CURRENCY_TAG.test(formatArg)) {
+    return undefined
+  }
   const expression = parseForDateTimeFormat(formatArg)
   if (expression === undefined) {
     return undefined
@@ -228,4 +310,21 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
   }
 
   return result
+}
+
+/**
+ * Default implementation of the `stringifyCurrency` config option.
+ *
+ * Returning `undefined` instructs the formatter to fall through to the
+ * built-in number formatter, preserving HyperFormula's zero-dependency
+ * default behavior. Replace this default by setting the
+ * [`stringifyCurrency`](../../api/interfaces/configparams.md#stringifycurrency)
+ * config option.
+ *
+ * @param _value - the numeric value to format (unused in default).
+ * @param _formatArg - the format string passed to `TEXT` (unused in default).
+ * @returns `undefined` — caller should fall through to the built-in formatter.
+ */
+export function defaultStringifyCurrency(_value: number, _formatArg: string): Maybe<string> {
+  return undefined
 }
