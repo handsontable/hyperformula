@@ -52,6 +52,8 @@ All skills live in `.claude/skills/`, at the repository root, and are scoped by 
 
 A skill holds the **steps**: what to do, in what order, and what to check. It does not restate the rules those steps enforce — it links to the `dev-docs/` page that owns them.
 
+**Step 1 of every skill is "Read the relevant files from `dev-docs/`", and it names them.** Not a general pointer at the directory: a table of the specific pages, each with one line saying why that page matters for this task. Where a task's reference depends on what it touches, the step lists the always-read pages first and then the conditional ones. A skill whose first step is anything else is missing it.
+
 | Skill | For |
 |---|---|
 | `hyperformula-dev` | Any work in `src/` — the entry point |

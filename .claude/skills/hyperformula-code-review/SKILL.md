@@ -3,35 +3,47 @@ name: hyperformula-code-review
 description: Use when reviewing a diff, a branch, or a pull request in the HyperFormula repository. Covers correctness for a calculation engine, performance on the hot paths, the five places a function change must touch, API stability, and what the definition of done requires.
 ---
 
-Review in this order, and stop to report the first serious finding rather than burying it under style notes. The rules each check enforces are in [`dev-docs/`](../../../dev-docs/README.md); this skill is what to look at, in what order.
+## 1. Read the relevant files from `dev-docs/`
 
-## 1. Correctness
+Always:
 
-- **Would the test fail without the fix?** Ask it of every bug-fix pull request. See [`TESTING.md`](../../../dev-docs/TESTING.md#a-test-must-prove-behaviour).
+| File | Why |
+|---|---|
+| [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md) | What the change was required to contain |
+| [`CODE-STYLE.md`](../../../dev-docs/CODE-STYLE.md) | Style, and which paths are hot enough that complexity matters |
+| [`TESTING.md`](../../../dev-docs/TESTING.md#a-test-must-prove-behaviour) | Whether the tests prove anything, or only execute code |
+
+Then the page covering what the diff touches: [`ARCHITECTURE.md`](../../../dev-docs/ARCHITECTURE.md), [`PARSER.md`](../../../dev-docs/PARSER.md), [`INTERPRETER.md`](../../../dev-docs/INTERPRETER.md), [`DEPENDENCY-GRAPH.md`](../../../dev-docs/DEPENDENCY-GRAPH.md), [`FUNCTION-CATALOGUE.md`](../../../dev-docs/FUNCTION-CATALOGUE.md), [`I18N.md`](../../../dev-docs/I18N.md).
+
+Review in the order below, and stop to report the first serious finding rather than burying it under style notes.
+
+## 2. Correctness
+
+- **Would the test fail without the fix?** Ask it of every bug-fix pull request.
 - **Any `throw` reachable from evaluation**, instead of a returned `CellError`.
 - **Hand-rolled coercion** instead of `ArithmeticHelper`.
 - **Empty cells, empty ranges, and error arguments** — the most common gap in a function change.
-- **A parser change without a matching `Unparser` change** — see [`PARSER.md`](../../../dev-docs/PARSER.md).
-- **A structural change that does not assert the formula text afterwards** — see [`DEPENDENCY-GRAPH.md`](../../../dev-docs/DEPENDENCY-GRAPH.md).
+- **A parser change without a matching `Unparser` change.**
+- **A structural change that does not assert the formula text afterwards.**
 - **A new mutation missing one of `CrudOperations`, `Operations`, `UndoRedo`** — undo diverges silently.
 
-## 2. Completeness of a function change
+## 3. Completeness of a function change
 
-All five places, and three of them fail silently: implementation, catalogue entry with a matching parameter count, every language file, tests, changelog. Plus `sizeOfResultArrayMethod` for anything array-returning, and an explicit `optionalArg` where arity does not express the valid call. See skill `hyperformula-function-dev`.
+All five places, three of which fail silently: implementation, catalogue entry with a matching parameter count, every language file, tests, changelog. Plus `sizeOfResultArrayMethod` for anything array-returning, and an explicit `optionalArg` where arity does not express the valid call. Skill `hyperformula-function-dev`.
 
-## 3. Performance
+## 4. Performance
 
-Allocation in a per-cell or per-vertex loop; work that could be hoisted out of the broadcast path; a range expanded into per-cell iteration; anything that widens what a change invalidates; a `ParserWithCaching` change that makes the result depend on something outside the cache key. Ask for `npm run test:performance` on hot-path changes. See [`CODE-STYLE.md`](../../../dev-docs/CODE-STYLE.md#performance).
+Allocation in a per-cell or per-vertex loop; work that could be hoisted out of the broadcast path; a range expanded into per-cell iteration; anything that widens what a change invalidates; a `ParserWithCaching` change that makes the result depend on something outside the cache key. Ask for `npm run test:performance` on hot-path changes.
 
-## 4. Public API
+## 5. Public API
 
 `src/HyperFormula.ts` and its exported types are the contract. A signature, return-type, or behaviour change is breaking and needs a migration-guide section and an explicit note. JSDoc here is published output — review it as documentation.
 
-## 5. Process
+## 6. Process
 
-[`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md), and one atomic change per pull request. Say so when unrelated refactors have been folded in, rather than approving them through.
+One atomic change per pull request. Say so when unrelated refactors have been folded in, rather than approving them through.
 
-## 6. Style, last and briefly
+## 7. Style, last and briefly
 
 ESLint owns formatting. Comment only on what it cannot check: a misleading name, a function doing two things, duplicated logic an existing helper already covers.
 
