@@ -1,3 +1,17 @@
+---
+tags:
+  - boolean
+  - logical
+  - DateTime
+  - percentage
+  - scientific notation
+  - apostrophe
+  - leading zeros
+  - empty cell
+  - type detection
+  - serial number
+---
+
 # Types of values
 
 In HyperFormula, values can be of type Number, Text, Logical, Date, Time, DateTime, Error, Currency, or Percentage depending on the data.

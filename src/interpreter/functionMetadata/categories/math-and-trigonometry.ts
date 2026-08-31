@@ -278,8 +278,8 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   MOD: {
     category: 'Math and trigonometry',
-    shortDescription: 'Returns the remainder when one number is divided by another.',
-    parameters: [{name: 'dividend', description: 'The number to be divided.'}, {name: 'divisor', description: 'The non-zero number to divide by. The result has the same sign as the dividend.'}],
+    shortDescription: 'Returns the remainder when one number is divided by another. The result has the same sign as divisor.',
+    parameters: [{name: 'dividend', description: 'The number to be divided.'}, {name: 'divisor', description: 'The non-zero number to divide by.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=MOD(10, 3)', '=MOD(-7, 2)'],
   },
