@@ -1,0 +1,19 @@
+{
+  "enabledPlugins": ["typescript-lsp@claude-plugins-official"],
+  "permissions": {
+    "deny": [
+      "Read(./dist/**)",
+      "Read(./lib/**)",
+      "Read(./es/**)",
+      "Read(./commonjs/**)",
+      "Read(./typings/**)",
+      "Read(./languages/**)",
+      "Read(./coverage/**)",
+      "Read(./docs/.vuepress/dist/**)",
+      "Read(./docs/api/**)"
+    ]
+  },
+  "worktree": {
+    "symlinkDirectories": ["node_modules"]
+  }
+}
