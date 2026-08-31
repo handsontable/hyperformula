@@ -1,4 +1,4 @@
-import {HyperFormula} from '../src'
+import {HyperFormula, Sheet} from '../src'
 import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 
 const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
@@ -100,6 +100,29 @@ describe('HyperFormula', () => {
     hf.removeRows(0, [1, 1])
 
     expect(hf.getCellValue(adr('A4'))).toBe(6)
+
+    hf.destroy()
+  })
+
+  it('should allow VLOOKUP over IF array-constructed table', () => {
+    const data: Sheet = Array.from({length: 112}, () => Array<null>(64).fill(null))
+
+    data[108][55] = 'K1'
+    data[109][55] = 'K2'
+    data[110][55] = 'K3'
+    data[111][55] = 'K4'
+
+    data[108][47] = 100
+    data[109][47] = 200
+    data[110][47] = 300
+    data[111][47] = 400
+
+    data[108][57] = 'K2'
+    data[108][63] = '=VLOOKUP(BF109,IF({1,0},BD109:BD112,AV109:AV112),2,0)'
+
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue({sheet: 0, row: 108, col: 63})).toBe(200)
 
     hf.destroy()
   })
