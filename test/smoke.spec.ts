@@ -56,6 +56,16 @@ describe('HyperFormula', () => {
     hf.destroy()
   })
 
+  it('should not evaluate IFS branches after the first true condition', () => {
+    const hf = HyperFormula.buildFromArray([
+      ['=IFS(TRUE(), 1, 1/0, 2)'],
+    ], {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('A1'))).toBe(1)
+
+    hf.destroy()
+  })
+
   it('should handle common spreadsheet functions', () => {
     const data = [
       [1, 2, 3, 4, 5],

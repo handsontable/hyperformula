@@ -6,6 +6,7 @@
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {InterpreterState} from '../InterpreterState'
 import {InternalNoErrorScalarValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
@@ -147,14 +148,58 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    * @param state
    */
   public ifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('IFS'), (...args) => {
-      for (let idx = 0; idx < args.length; idx += 2) {
-        if (args[idx]) {
-          return args[idx+1]
-        }
+    const metadata = this.metadata('IFS')
+    const argumentsMetadata = this.buildMetadataForEachArgumentValue(ast.args.length, metadata)
+
+    if (!this.isNumberOfArgumentValuesValid(argumentsMetadata, ast.args.length)) {
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+    }
+
+    for (let idx = 0; idx < ast.args.length; idx += 2) {
+      const condition = this.evaluateAst(ast.args[idx], state)
+
+      if (condition instanceof SimpleRangeValue && state.arraysFlag) {
+        return this.runFunction(ast.args, state, metadata, (...args: InterpreterValue[]) => this.evaluateIfsArguments(args))
       }
-      return new CellError(ErrorType.NA, ErrorMessage.NoConditionMet)
-    })
+
+      const coercedCondition = this.coerceToType(condition, argumentsMetadata[idx], state)
+      if (coercedCondition === undefined) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+      }
+      if (coercedCondition instanceof CellError) {
+        return coercedCondition
+      }
+      if (coercedCondition) {
+        const value = this.evaluateAst(ast.args[idx + 1], state)
+        if (value instanceof SimpleRangeValue && state.arraysFlag) {
+          return this.runFunction(ast.args, state, metadata, (...args: InterpreterValue[]) => this.evaluateIfsArguments(args))
+        }
+
+        const coercedValue = this.coerceToType(value, argumentsMetadata[idx + 1], state)
+        if (coercedValue === undefined) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+        }
+
+        return coercedValue as InterpreterValue
+      }
+    }
+
+    return new CellError(ErrorType.NA, ErrorMessage.NoConditionMet)
+  }
+
+  /**
+   * Preserves the previous vectorized IFS implementation for array arithmetic.
+   *
+   * @param {InterpreterValue[]} args evaluated IFS arguments
+   */
+  private evaluateIfsArguments(args: InterpreterValue[]): InterpreterValue {
+    for (let idx = 0; idx < args.length; idx += 2) {
+      if (args[idx]) {
+        return args[idx + 1]
+      }
+    }
+
+    return new CellError(ErrorType.NA, ErrorMessage.NoConditionMet)
   }
 
   /**
