@@ -133,7 +133,13 @@ export class Evaluator {
 
   private recomputeFormulaVertexValue(vertex: FormulaVertex): InterpreterValue {
     const address = vertex.getAddress(this.lazilyTransformingAstService)
-    if (vertex instanceof ArrayFormulaVertex && (vertex.array.size.isRef || (!this.dependencyGraph.isThereSpaceForArray(vertex) && !this.dependencyGraph.canOverwriteArrayResult(vertex)))) {
+    // No `canOverwriteArrayResult` bypass here: when `arrayFunctionResultOverwritesData` resolves
+    // a collision, the overwrite has already claimed the whole spill range in the address mapping
+    // (`DependencyGraph.exchangeOrAddFormulaVertex`) BEFORE evaluation, so `isThereSpaceForArray`
+    // is true by the time the array is recomputed. An array that still lacks space at this point
+    // was never overwrite-resolved (blocked at build time, an unrepresentable spill range, another
+    // array in the way) and must surface `#SPILL!` instead of silently truncating to its anchor.
+    if (vertex instanceof ArrayFormulaVertex && (vertex.array.size.isRef || !this.dependencyGraph.isThereSpaceForArray(vertex))) {
       return vertex.setNoSpace()
     } else {
       const formula = vertex.getFormula(this.lazilyTransformingAstService)

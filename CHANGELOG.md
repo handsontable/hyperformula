@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added the `arrayFunctionResultOverwritesData` configuration option (default `false`). When enabled, an array function whose result spills onto occupied cells overwrites them instead of returning a `#SPILL!` error. This is an opt-in, destructive behavior; a collision with another array still yields `#SPILL!`. [#1714](https://github.com/handsontable/hyperformula/pull/1714)
+- Added the `arrayFunctionResultOverwritesData` configuration option (default `false`). When enabled, an array function whose result spills onto occupied cells overwrites them instead of returning a `#SPILL!` error. This is an opt-in, destructive behavior; a collision with another array, or a spill range that cannot be represented on the sheet, still yields `#SPILL!`. [#1714](https://github.com/handsontable/hyperformula/pull/1714)
 
 ### Fixed
 

@@ -487,8 +487,15 @@ export class DependencyGraph {
    * (i.e. `arrayFunctionResultOverwritesData` is on) AND doing so would not clobber
    * another array. Array-vs-array collisions always keep `#SPILL!` (matches Excel and
    * avoids corrupting the pre-existing array), even in overwrite mode.
+   *
+   * An unrepresentable spill range (e.g. an infinite-height array anchored outside row 1)
+   * can never be overwrite-resolved: overwrite mode bypasses occupancy collisions only,
+   * never a range that cannot be spanned at all, so those keep `#SPILL!` too.
    */
   public canOverwriteArrayResult(arrayVertex: ArrayFormulaVertex): boolean {
+    if (arrayVertex.getRangeOrUndef() === undefined) {
+      return false
+    }
     return this.config.arrayFunctionResultOverwritesData && !this.overwriteWouldHitArray(arrayVertex)
   }
 
@@ -1196,7 +1203,12 @@ export class DependencyGraph {
     }
     this.setArray(range, vertex)
 
-    if (!this.isThereSpaceForArray(vertex) && !this.canOverwriteArrayResult(vertex)) {
+    // No `canOverwriteArrayResult` bypass here: this is the build path (`GraphBuilder` via
+    // `addArrayVertex`), which is deliberately outside the `arrayFunctionResultOverwritesData`
+    // feature — an occupant declared in the same build wins, and the array keeps `#SPILL!`.
+    // Claiming occupied cells here would silently overwrite them with no undo snapshot and
+    // no column-index change records.
+    if (!this.isThereSpaceForArray(vertex)) {
       return
     }
 
