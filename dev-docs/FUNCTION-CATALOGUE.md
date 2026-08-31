@@ -48,3 +48,15 @@ It does **not** turn ordinary English into identifiers. A parameter's own descri
 ## Behaviour, not Excel
 
 Descriptions must describe **HyperFormula's** behaviour, not Excel's. Much of the catalogue was seeded from a hand-written page that documented Excel, and HyperFormula deliberately deviates in places (`INT` truncates toward zero, `ISEVEN`/`ISODD` do not truncate, `CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1). Verify a claim against the implementation before authoring it, and record any deviation in [the list of differences](../docs/guide/list-of-differences.md).
+
+## The rules, in short
+
+- **Keyed by function id, not by implementation.** Remove or rename a stale entry in the same change as the function.
+- **Every field is required**, `documentationUrl` included.
+- **Parameter count must match `implementedFunctions`**, or the authored names and descriptions are discarded at run time with only a console warning.
+- **A missing entry fails the docs build.**
+- **`'Custom'` must never appear** in a catalogue file or in `FUNCTION_CATEGORIES`.
+- **Optionality is not cross-checked** — declare `optionalArg` explicitly on the plugin.
+- **Name a different argument by its exact `snake_case` name.**
+- **No docs-page-local markup in `shortDescription`.**
+- **Describe HyperFormula, not Excel.**

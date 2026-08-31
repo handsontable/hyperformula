@@ -3,60 +3,38 @@ name: hyperformula-code-review
 description: Use when reviewing a diff, a branch, or a pull request in the HyperFormula repository. Covers correctness for a calculation engine, performance on the hot paths, the five places a function change must touch, API stability, and what the definition of done requires.
 ---
 
-Review in this order. Stop at the first category that finds something serious and report it — do not bury a correctness bug under style notes.
+Review in this order, and stop to report the first serious finding rather than burying it under style notes. The rules each check enforces are in [`dev-docs/`](../../../dev-docs/README.md); this skill is what to look at, in what order.
 
 ## 1. Correctness
 
-- **Does the test actually fail without the fix?** Ask it of every bug-fix PR. A test added alongside a fix, written from the implementation, proves nothing.
-- **Errors returned, never thrown.** Any `throw` reachable from formula evaluation takes down the whole recalculation. It must be a `CellError` with a message from `src/error-message.ts`.
-- **Coercion through `ArithmeticHelper`.** Hand-rolled string-to-number or value-to-boolean conversion inside a function is a bug waiting for a locale or an empty cell.
-- **Empty cells and empty ranges.** The most common gap in a function change. So are error arguments — an error must propagate, not be coerced.
-- **Round-tripping.** A parser change without a matching `Unparser` change means `getCellFormula` returns something the user never typed.
-- **Structural changes.** Adding or removing rows or columns must leave the address mapping, range mapping, and array mapping consistent. Assert the formula **text** afterwards, not just the value.
-- **Undo.** A new mutation needs `CrudOperations` (validate), `Operations` (mutate), and `UndoRedo` (record). Missing the third diverges silently.
+- **Would the test fail without the fix?** Ask it of every bug-fix pull request. See [`TESTING.md`](../../../dev-docs/TESTING.md#a-test-must-prove-behaviour).
+- **Any `throw` reachable from evaluation**, instead of a returned `CellError`.
+- **Hand-rolled coercion** instead of `ArithmeticHelper`.
+- **Empty cells, empty ranges, and error arguments** — the most common gap in a function change.
+- **A parser change without a matching `Unparser` change** — see [`PARSER.md`](../../../dev-docs/PARSER.md).
+- **A structural change that does not assert the formula text afterwards** — see [`DEPENDENCY-GRAPH.md`](../../../dev-docs/DEPENDENCY-GRAPH.md).
+- **A new mutation missing one of `CrudOperations`, `Operations`, `UndoRedo`** — undo diverges silently.
 
-## 2. The five places a function change must touch
+## 2. Completeness of a function change
 
-Check all five; the failures are silent:
-
-1. the plugin implementation;
-2. `implementedFunctions` metadata;
-3. the catalogue entry in `src/interpreter/functionMetadata/categories/` — **parameter count must match**, or authored names and descriptions are discarded at run time with only a console warning;
-4. **every** file in `src/i18n/languages/`;
-5. tests.
-
-Also: a function that can return an array needs `sizeOfResultArrayMethod`. A function with a zero-argument or omitted-argument form needs an explicit `optionalArg: true` — nothing cross-checks optionality.
+All five places, and three of them fail silently: implementation, catalogue entry with a matching parameter count, every language file, tests, changelog. Plus `sizeOfResultArrayMethod` for anything array-returning, and an explicit `optionalArg` where arity does not express the valid call. See skill `hyperformula-function-dev`.
 
 ## 3. Performance
 
-The engine's performance is a feature. Flag:
-
-- allocation inside a per-cell or per-vertex loop;
-- work that could be hoisted out of the broadcast path;
-- a range expanded into per-cell edges or per-cell iteration where the range vertex would do;
-- anything that widens what a change invalidates, forcing a larger recalculation;
-- a change to `ParserWithCaching` that makes the parse result depend on something outside the cache key.
-
-Ask for `npm run test:performance` on changes to evaluation or CRUD hot paths.
+Allocation in a per-cell or per-vertex loop; work that could be hoisted out of the broadcast path; a range expanded into per-cell iteration; anything that widens what a change invalidates; a `ParserWithCaching` change that makes the result depend on something outside the cache key. Ask for `npm run test:performance` on hot-path changes. See [`CODE-STYLE.md`](../../../dev-docs/CODE-STYLE.md#performance).
 
 ## 4. Public API
 
-`src/HyperFormula.ts` and the types it exports are the contract.
+`src/HyperFormula.ts` and its exported types are the contract. A signature, return-type, or behaviour change is breaking and needs a migration-guide section and an explicit note. JSDoc here is published output — review it as documentation.
 
-- A signature, return-type, or behaviour change is breaking. It needs a migration-guide section and an explicit note in the PR.
-- JSDoc here is published output. Review it as documentation, not as a comment.
-- A new config option needs a default, validation, and a guide entry.
+## 5. Process
 
-## 5. Definition of done
+[`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md), and one atomic change per pull request. Say so when unrelated refactors have been folded in, rather than approving them through.
 
-Production change, tests, documentation, JSDoc, changelog entry, current PR description. See [`dev-docs/DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md).
+## 6. Style, last and briefly
 
-One pull request, one atomic change. Unrelated refactors and reformatting belong in a separate PR — say so rather than approving them through.
-
-## 6. Style
-
-Last, and briefly. ESLint owns formatting. Comment only on what it cannot check: a name that misleads, a function doing two things, duplicated logic that an existing helper already covers, a clever one-liner where an obvious three lines would read better.
+ESLint owns formatting. Comment only on what it cannot check: a misleading name, a function doing two things, duplicated logic an existing helper already covers.
 
 ## Reporting
 
-One line per finding: what is wrong, where, and what to do instead. No praise, no summary of what the PR does — the author knows. Separate "this is a bug" from "I would have done this differently", and do not present the second as the first.
+One line per finding: what is wrong, where, and what to do instead. No praise, no summary of what the pull request does. Separate "this is a bug" from "I would have done it differently", and never present the second as the first.

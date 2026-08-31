@@ -25,6 +25,7 @@ The layout as it stands today. For the monorepo layout this repository is moving
 │   ├── Lookup/                       # Lookup/search strategies used by lookup functions
 │   └── statistics/                   # Instrumentation counters
 ├── test/                             # Smoke tests; the full suite is fetched here
+│   ├── README.md                     # How to attach the private suite
 │   ├── smoke.spec.ts                 # Public smoke tests
 │   ├── fetch-tests.sh                # Clones/updates the private test repository
 │   └── hyperformula-tests/           # Private suite (git-ignored, branch-matched)
@@ -40,7 +41,6 @@ The layout as it stands today. For the monorepo layout this repository is moving
 ├── .github/                          # CI workflows, issue and PR templates
 ├── AGENTS.md                         # Always-loaded agent rules and routing map
 ├── CLAUDE.md                         # Symlink to AGENTS.md
-├── DEV_DOCS.md                       # Pointer to dev-docs/
 ├── CONTRIBUTING.md                   # Guide for external contributors
 ├── DOCS_CONTENT_GUIDE.md             # Writing style and structure for docs content
 ├── README.md                         # Project overview

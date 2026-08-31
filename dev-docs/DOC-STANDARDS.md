@@ -27,3 +27,40 @@ Both are git-ignored. A missing `docs/api/` folder means it has not been built y
 ## Describing behaviour
 
 Describe **HyperFormula's** behaviour, not Excel's. HyperFormula deliberately deviates in places, and much of the existing prose was seeded from Excel documentation. Verify a claim against the implementation before writing it down, and record any deviation in [the list of differences](../docs/guide/list-of-differences.md).
+
+## The changelog
+
+`CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Entries go under `## [Unreleased]`, in the section matching the change — create the `### ` heading if it is not there yet.
+
+| Section | For |
+|---|---|
+| `Added` | A wholly new capability — a function, an option, a language pack, an API method |
+| `Changed` | Modified behaviour of something that already existed |
+| `Fixed` | A bug fix |
+| `Deprecated` | Scheduled for removal |
+| `Removed` | Already removed in this release |
+| `Security` | A vulnerability fix |
+
+One bullet per change, ending with a link to the public issue where one exists, otherwise to the pull request:
+
+```markdown
+- Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
+```
+
+Writing the entry:
+
+- **From the user's perspective.** What changed for someone using HyperFormula, not what changed in the code. No class names, no file paths.
+- **Past tense, verb first**: "Added…", "Fixed…", "Changed…", "Removed…".
+- **Specific.** Name the function, option, or operation, and say what it does now. Show the difference when a value changed.
+- **Nothing sensitive.** No client, customer, or partner names, and nothing that identifies them indirectly.
+- End with a period, then the link.
+
+A breaking change says what breaks and what to do instead, and still needs a migration-guide section — the entry is not a substitute.
+
+**No entry is needed** for documentation-only, test-only, or CI and tooling changes, or for a bug that was introduced and never released.
+
+## The documentation portal
+
+`docs/` is a VuePress site. How to run it, what is generated, and how to add a page are in [`docs/README.md`](../docs/README.md).
+
+Two rules from above bear repeating there, because they are the ones most often broken while writing a guide: do not restate the API reference, and describe HyperFormula rather than Excel.

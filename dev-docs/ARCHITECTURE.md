@@ -79,7 +79,30 @@ HyperFormula is a headless spreadsheet calculation engine. No UI, no DOM, no ser
 
 ## Invariants
 
-- **Headless.** No DOM, no network, no filesystem access in `src/`.
-- **Incremental.** A change recalculates the affected subgraph, never the whole sheet. Anything that forces a full recalculation is a performance regression.
-- **Language-dependent parsing.** Function names, argument separators, and error literals all vary by language. Never hard-code an English function name in the parser or interpreter.
-- **Public API stability.** `src/HyperFormula.ts` is the contract. See [`DEFINITION-OF-DONE.md`](DEFINITION-OF-DONE.md) for what a breaking change requires.
+Everything in `src/` ships, runs in the browser and in Node, and sits on the hot path of a calculation engine. These hold everywhere in it.
+
+- **Headless.** No DOM, no network, no filesystem. A dependency that reaches for `window`, `document`, or `fs` does not belong in `src/`.
+- **Incremental.** A change recalculates the affected subgraph, never the whole sheet. Anything that forces a full recalculation is a performance regression, not an implementation detail.
+- **Language-dependent parsing.** Function names, argument separators, and error literals all vary by language. Never hard-code an English function name in the parser or the interpreter.
+- **Errors are values.** Return a `CellError` with a message from `src/error-message.ts`. A throw reachable from evaluation escapes one cell and takes the whole recalculation with it.
+- **Coercion goes through `ArithmeticHelper`.** Spreadsheet coercion is not JavaScript coercion, and it is already implemented once.
+- **Public API stability.** `src/HyperFormula.ts` and the types it exports are the contract. The JSDoc on it **is** the published API reference — write it for the reader of the docs portal. See [`DEFINITION-OF-DONE.md`](DEFINITION-OF-DONE.md) for what a breaking change requires.
+- **Tests, always.** Every change here ships a test in `test/`; a bug fix ships one that fails against the unfixed code. See [`TESTING.md`](TESTING.md).
+
+## Subsystem references
+
+| Subsystem | Page |
+|---|---|
+| `src/parser/` | [`PARSER.md`](PARSER.md) |
+| `src/interpreter/`, including `plugin/` | [`INTERPRETER.md`](INTERPRETER.md) |
+| `src/interpreter/functionMetadata/` | [`FUNCTION-CATALOGUE.md`](FUNCTION-CATALOGUE.md) |
+| `src/DependencyGraph/` | [`DEPENDENCY-GRAPH.md`](DEPENDENCY-GRAPH.md) |
+| `src/i18n/` | [`I18N.md`](I18N.md) |
+
+## Everything else in `src/`
+
+- `HyperFormula.ts` — the public API. Every method here is documented output.
+- `CrudOperations.ts` / `Operations.ts` / `UndoRedo.ts` — CRUD validates, `Operations` mutates, `UndoRedo` records. A new mutation needs all three, or undo silently diverges.
+- `Config.ts` / `ConfigParams.ts` — a new option needs a default, validation, and a guide entry.
+- `dependencyTransformers/` — AST rewrites when rows, columns, or sheets move. Paired with `LazilyTransformingAstService.ts`, which defers them until a formula is read.
+- `format/`, `helpers/`, `Lookup/`, `statistics/` — number and date formats, shared utilities, lookup strategies, instrumentation counters.
