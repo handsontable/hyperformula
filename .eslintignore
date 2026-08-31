@@ -5,24 +5,44 @@ node_modules
 docs/examples/
 
 # 3rd party
-src/interpreter/plugin/3rdparty
+hyperformula/src/interpreter/plugin/3rdparty
 
 # Configurations
 *.config.js
-karma.*
+hyperformula/*.config.js
+hyperformula/.config/
+hyperformula/karma.*
 doc
-test/_setupFiles/*.js
+hyperformula/test/_setupFiles/*.js
+
+# Scripts, not linted
+script
+
+# The source language packs, deliberately, and only for now.
+#
+# The old ignore list carried a bare `languages` entry, meant for the build
+# output. An unanchored pattern matches a directory of that name at ANY depth,
+# so it also excluded hyperformula/src/i18n/languages/ - and the `sort-keys`
+# override that targets those files has therefore never run. Anchoring the
+# build-output entry below exposed 881 pre-existing violations in them.
+#
+# Sorting 19 translation files is a change of its own, not a side effect of
+# moving directories around. Delete this entry in that change.
+hyperformula/src/i18n/languages
 
 # Auto-generated directories
-commonjs
-coverage
-dist
+hyperformula/commonjs
+hyperformula/coverage
+hyperformula/dist
+hyperformula/es
+hyperformula/languages
+hyperformula/lib
+hyperformula/test-jasmine
+hyperformula/test-jest
+hyperformula/typings
+docs/.vuepress/dist
 doc
-es
-languages
-lib
-script
-test-jasmine
-test-jest
 typedoc
-typings
+
+# The docs generator, like the rest of script/
+docs/script

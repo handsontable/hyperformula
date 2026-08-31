@@ -1,9 +1,10 @@
+const path = require('path');
 const highlight = require('./highlight');
 const regexPlugin = require('markdown-it-regex').default;
 const footnotePlugin = require('markdown-it-footnote');
 const searchBoxPlugin = require('./plugins/search-box');
 const examples = require('./plugins/examples/examples');
-const HyperFormula = require('../../dist/hyperformula.full');
+const HyperFormula = require('../../hyperformula/dist/hyperformula.full');
 const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet');
 const mdCompanions = require('./plugins/md-companions');
 
@@ -31,7 +32,7 @@ const normalizeBase = (b) => {
 };
 
 const DOCS_BASE = normalizeBase(process.env.DOCS_BASE || buildConfigOverrides.base || '/');
-const DOCS_DEST = process.env.DOCS_DEST || buildConfigOverrides.dest || 'docs/.vuepress/dist';
+const DOCS_DEST = process.env.DOCS_DEST || buildConfigOverrides.dest || '.vuepress/dist';
 const DOCS_HOSTNAME = process.env.DOCS_HOSTNAME || buildConfigOverrides.hostname || 'https://hyperformula.handsontable.com';
 
 module.exports = {
@@ -149,7 +150,11 @@ module.exports = {
         replace: () => `'${HyperFormula.releaseDate}'`
       })
       md.use(footnotePlugin)
-      md.use(includeCodeSnippet)
+      // The snippet paths in the guides are written from the repository root
+      // (`@/docs/examples/...`). Anchor the plugin there explicitly rather than
+      // letting it fall back to `process.cwd()`, which is this directory now that
+      // the portal builds as its own package.
+      md.use(includeCodeSnippet, { root: path.resolve(__dirname, '../..') })
     }
   },
   // TODO: It doesn't work. It's seems that this option is bugged. Documentation says that this option is configurable,

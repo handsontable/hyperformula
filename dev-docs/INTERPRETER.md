@@ -1,6 +1,6 @@
 # The interpreter
 
-`src/interpreter/` evaluates an AST node against an `InterpreterState` and returns an `InterpreterValue`.
+`hyperformula/src/interpreter/` evaluates an AST node against an `InterpreterState` and returns an `InterpreterValue`.
 
 ## The pieces
 
@@ -19,13 +19,13 @@
 ## Rules
 
 - **Coerce through `ArithmeticHelper`.** Never write ad-hoc string-to-number or value-to-boolean conversion inside a function; the coercion rules are spreadsheet semantics, not JavaScript semantics, and they are already implemented once.
-- **Errors are values.** Return a `CellError` with a message from `src/error-message.ts`. Do not throw: a thrown error escapes the evaluation of one cell and takes the recalculation with it.
+- **Errors are values.** Return a `CellError` with a message from `hyperformula/src/error-message.ts`. Do not throw: a thrown error escapes the evaluation of one cell and takes the recalculation with it.
 - **The registry is keyed by id, not by implementation.** A custom plugin can be registered over a built-in id. Do not assume the plugin you are reading is the one that will answer for that id at run time.
 - **This is the hot path.** `Interpreter.evaluateAst` runs once per formula, and once per cell for array-broadcast arguments. Allocation inside a per-cell loop is measurable.
 
 ## Built-in functions
 
-Every built-in function lives in a plugin class under `src/interpreter/plugin/` extending `FunctionPlugin`. One file per plugin; a plugin holds one function or a family of related ones.
+Every built-in function lives in a plugin class under `hyperformula/src/interpreter/plugin/` extending `FunctionPlugin`. One file per plugin; a plugin holds one function or a family of related ones.
 
 ```ts
 export class AbsPlugin extends FunctionPlugin implements FunctionPluginTypecheck<AbsPlugin> {
@@ -77,7 +77,7 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 
 ### Never
 
-- **Never throw.** Return a `CellError` with a message from `src/error-message.ts`.
+- **Never throw.** Return a `CellError` with a message from `hyperformula/src/error-message.ts`.
 - **Never hand-roll coercion.** Declare the `argumentType` and let `runFunction` coerce, or use `ArithmeticHelper`.
 - **Never describe Excel's behaviour when HyperFormula deviates.** Implement what is specified, then record the deviation in [`docs/guide/list-of-differences.md`](../docs/guide/list-of-differences.md).
 - **Never allocate inside a per-cell loop** when the value can be hoisted.
@@ -86,10 +86,10 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 
 All five, or the failure is silent:
 
-1. the plugin implementation in `src/interpreter/plugin/`;
+1. the plugin implementation in `hyperformula/src/interpreter/plugin/`;
 2. its `implementedFunctions` metadata;
-3. the catalogue entry in `src/interpreter/functionMetadata/categories/` — see [`FUNCTION-CATALOGUE.md`](FUNCTION-CATALOGUE.md);
-4. **every** language file in `src/i18n/languages/` — see [`I18N.md`](I18N.md);
+3. the catalogue entry in `hyperformula/src/interpreter/functionMetadata/categories/` — see [`FUNCTION-CATALOGUE.md`](FUNCTION-CATALOGUE.md);
+4. **every** language file in `hyperformula/src/i18n/languages/` — see [`I18N.md`](I18N.md);
 5. tests — see [`TESTING.md`](TESTING.md).
 
 Skill: `hyperformula-function-dev`.

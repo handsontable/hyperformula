@@ -1,29 +1,29 @@
 .idea/
 .vscode
-/commonjs/
-/coverage/
-/dist/
-/doc/
+/hyperformula/commonjs/
+/hyperformula/coverage/
+/hyperformula/dist/
+/hyperformula/doc/
 /docs/api/
 /docs/functions/
 /docs/.vuepress/dist/
 /docs/.vuepress/api-sidebar-relative.json
 /docs/.vuepress/api-sidebar.json
-/typedoc/
-/es/
-/languages/
-/lib/
-/test-jasmine/
-/test-jest/
+/hyperformula/typedoc/
+/hyperformula/es/
+/hyperformula/languages/
+/hyperformula/lib/
+/hyperformula/test-jasmine/
+/hyperformula/test-jest/
 node_modules/
-/typings/
-/storage/
+/hyperformula/typings/
+/hyperformula/storage/
 
 *.iml
 dev*.html
 .DS_Store
 
-/test/hyperformula-tests/
+/hyperformula/test/hyperformula-tests/
 
 # Generated at docs:build from built-in-functions.tmpl.md (HF-249 single-source); do not commit.
 docs/guide/built-in-functions.md

@@ -18,7 +18,7 @@
   "preview_urls": true,
   "main": "./worker/index.js",
   "assets": {
-    "directory": "./docs/.vuepress/dist",
+    "directory": "./.vuepress/dist",
     "binding": "ASSETS",
     // Both left at their defaults on purpose:
     // - `html_handling: "none"` keeps `.html` URLs from being redirected to extensionless ones,

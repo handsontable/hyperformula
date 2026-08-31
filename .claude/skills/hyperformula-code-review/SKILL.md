@@ -37,7 +37,7 @@ Allocation in a per-cell or per-vertex loop; work that could be hoisted out of t
 
 ## 5. Public API
 
-`src/HyperFormula.ts` and its exported types are the contract. A signature, return-type, or behaviour change is breaking and needs a migration-guide section and an explicit note. JSDoc here is published output — review it as documentation.
+`hyperformula/src/HyperFormula.ts` and its exported types are the contract. A signature, return-type, or behaviour change is breaking and needs a migration-guide section and an explicit note. JSDoc here is published output — review it as documentation.
 
 ## 6. Process
 

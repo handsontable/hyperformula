@@ -1,6 +1,6 @@
 ---
 name: i18n-translations
-paths: src/i18n/**
+paths: hyperformula/src/i18n/**
 description: Use when adding a built-in function that needs translated names, adding a language pack, or fixing a function name that is wrong in one language. Covers the translation sources, the rules, and what breaks when a key is missing.
 ---
 
@@ -32,4 +32,4 @@ npm run lint
 
 ## Adding a whole language pack
 
-The file, its export in `src/i18n/languages/index.ts`, a key set identical to the other packs, a changelog entry, and `npm run bundle:languages` for the standalone UMD build.
+The file, its export in `hyperformula/src/i18n/languages/index.ts`, a key set identical to the other packs, a changelog entry, and `npm run bundle:languages` for the standalone UMD build.

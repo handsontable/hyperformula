@@ -1,7 +1,7 @@
 const { resolve } = require('path')
 const assert = require('assert')
 const fs = require('fs')
-const htConfig = require('../ht.config')
+const htConfig = require('../hyperformula/ht.config')
 
 const [ /* node bin */ , /* path to this script */ , fileToCheck] = process.argv;
 

@@ -19,8 +19,8 @@ And [`docs/README.md`](../../../docs/README.md), for what the portal contains an
 
 | To change | Edit | Then run |
 |---|---|---|
-| What the functions page says about a function | its catalogue entry in `src/interpreter/functionMetadata/categories/` | `npm run docs:generate-function-docs` |
-| The API reference | the JSDoc in `src/` | `npm run typedoc:build-api` |
+| What the functions page says about a function | its catalogue entry in `hyperformula/src/interpreter/functionMetadata/categories/` | `npm run docs:generate-function-docs` |
+| The API reference | the JSDoc in `hyperformula/src/` | `npm run typedoc:build-api` |
 | A guide | the file in `docs/guide/` | `npm run docs:dev` |
 
 `docs/guide/built-in-functions.md` and `docs/api/` are git-ignored build output. Editing them is always wrong, and the edit disappears on the next build.

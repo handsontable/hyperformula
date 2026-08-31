@@ -1,75 +1,25 @@
-# Target monorepo layout
+# The monorepo migration
 
-This repository is becoming a monorepo (HF-359). The layout it stands at today is [`STRUCTURE.md`](STRUCTURE.md).
+The move landed in HF-359. The layout as it now stands is [`STRUCTURE.md`](STRUCTURE.md); this page records what the migration decided, what it deliberately left alone, and what is still outstanding.
 
-## Packages
+## Still outstanding
 
-| Package | Directory | Purpose | Published |
-|---|---|---|---|
-| `hyperformula` | `hyperformula/` | The calculation engine. Everything in `src/` and `test/` today. | yes |
-| `hyperformula-ui` | `hyperformula-ui/` | UI components for working with HyperFormula: reference highlighting, inline formula editor, function help. | yes |
-| `hyperformula-docs` | `docs/` | The VuePress documentation portal. | no |
+1. **Import `hyperformula-ui`.** The directory exists and is listed in the root `workspaces` array; the package itself is imported from the formula-builder repository in a separate change, preserving its history. It keeps the scope it publishes under today. When it lands it needs an `.nvmrc` saying `22`, a `CHANGELOG.md`, and an `AGENTS.md` with a `CLAUDE.md` symlink.
+2. **Path-filter CI.** Each package's jobs should run only when its own paths change, with full runs on `develop`, `master`, and release branches. Not done here on purpose: a naive `paths:` filter on a workflow that branch protection lists as a required check leaves the check permanently pending, and pull requests become unmergeable. Doing it safely needs the required-checks list, which lives in repository settings rather than in the tree, and the `dorny/paths-filter`-plus-single-gate shape that the Handsontable monorepo uses.
 
-`docs/` is not a workspace member: the portal drags in a large, old dependency tree (VuePress, `--openssl-legacy-provider`) that must not reach an engine install. It keeps its own `package.json` and is installed separately.
+## What the migration decided
 
-## Tree
+- **npm workspaces, not pnpm.** A package-manager migration is a risk the move did not need to carry at the same time.
+- **`docs/` is not a workspace member.** VuePress 1.x and its `--openssl-legacy-provider` dependency tree must never reach an engine install. It installs on its own with `npm run docs:install`, and CI installs it before building the portal.
+- **One `dev-docs/`, at the root.** The original plan put an engine-scope copy inside `hyperformula/`. That was dropped: two directories fragment the single source of truth, and every page would have to know which scope it was written from. The engine's subsystem pages live here alongside the repository-wide ones.
+- **Every package versions and releases on its own cadence**, with its own `CHANGELOG.md` in the existing Keep a Changelog form. No fragment mechanism.
+- **Every `.nvmrc` says `22`.**
+- **Linting stays at the root**, run once over the whole repository, so nothing between packages falls through the gap.
+- **The private test suite stays branch-matched.** Only its checkout path moved, to `hyperformula/test/hyperformula-tests/`. Its specs needed no change: they import the engine relatively, and the depth from a spec to the package root is unchanged.
 
-```
-hyperformula/                              # repository root — private, workspace root
-├── AGENTS.md                              # monorepo-wide rules + routing map
-├── CLAUDE.md -> AGENTS.md
-├── README.md  CONTRIBUTING.md  CHANGELOG.md  LICENSE.txt
-├── package.json                           # private: true, npm workspaces, fan-out scripts
-├── package-lock.json
-├── .nvmrc                                 # 22, like every other one here
-├── .worktreeinclude
-├── .claude/
-│   ├── settings.json                      # hooks, enabledPlugins, worktree settings
-│   └── skills/                            # ALL skills, scoped by the `paths` frontmatter field
-├── dev-docs/                              # monorepo-scope reference
-│
-├── hyperformula/                          # ── package: the engine
-│   ├── AGENTS.md  CLAUDE.md -> AGENTS.md
-│   ├── package.json  .nvmrc  CHANGELOG.md
-│   ├── dev-docs/                          # engine-scope reference
-│   ├── src/
-│   │   ├── AGENTS.md  CLAUDE.md -> AGENTS.md
-│   │   ├── parser/                        AGENTS.md
-│   │   ├── interpreter/                   AGENTS.md
-│   │   │   ├── plugin/                    AGENTS.md
-│   │   │   └── functionMetadata/          AGENTS.md
-│   │   ├── DependencyGraph/               AGENTS.md
-│   │   ├── i18n/languages/                AGENTS.md
-│   │   └── dependencyTransformers/  format/  helpers/  Lookup/  statistics/
-│   └── test/                              AGENTS.md  README.md
-│       └── hyperformula-tests/            # private suite, git-ignored, branch-matched
-│
-├── hyperformula-ui/                       # ── package: the UI components
-│   ├── AGENTS.md  CLAUDE.md -> AGENTS.md
-│   ├── package.json  .nvmrc  CHANGELOG.md
-│   ├── dev-docs/
-│   └── src/  test/
-│
-├── docs/                                  # ── documentation portal (NOT a workspace member)
-│   ├── AGENTS.md  CLAUDE.md -> AGENTS.md  README.md
-│   ├── package.json  .nvmrc
-│   ├── wrangler.jsonc                     # deploy config for the portal
-│   ├── worker/index.js                    # Cloudflare Worker serving the built portal
-│   └── guide/  api/  .vuepress/
-│
-├── examples/                              # images and CSV fixtures used by the docs
-├── script/                                AGENTS.md  README.md
-└── .github/workflows/                     # path-filtered per-package jobs
-```
+## Two things the move uncovered
 
-## Migration steps
+Both were pre-existing, and both are recorded here because the next person will otherwise rediscover them the hard way.
 
-1. **Move `src/` and `test/` into `hyperformula/`.** Mechanical, but it invalidates every path in CI, in `tsconfig.json`, `jest.config.js`, `karma.conf.js`, `.eslintignore`, and the docs generator scripts. The private suite's specs need no change: they import the engine relatively, and the depth from a spec to the package root is unchanged.
-2. **Add `workspaces` to the root `package.json`** and make it `private: true`. Move the build scripts down into `hyperformula/package.json`, leaving fan-out scripts at the root.
-3. **Give `docs/` its own `package.json`** and take it out of the root dependency tree.
-4. **Move `wrangler.jsonc` and `worker/` under `docs/`.** Update `wrangler.jsonc`'s `main`, the `docs:*:cf` scripts, and `script/prepare-cf-assets.js` in the same change. Verify with `npm run docs:preview:cf` — a broken `main` path fails only at deploy time.
-5. **Bring in `hyperformula-ui`**, preserving its history.
-6. **Split `CHANGELOG.md` per package**, each keeping the current Keep a Changelog form.
-7. **Give every package an `.nvmrc` saying `22`.**
-8. **Update the private test suite's checkout path**, from `test/hyperformula-tests/` to `hyperformula/test/hyperformula-tests/`, in `fetch-tests.sh`, `.gitignore`, the three workflows that check it out, and `.worktreeinclude`. It stays branch-matched.
-9. **Path-filter CI.** Each package's jobs run only when its paths change; full runs on `develop`, `master`, and release branches.
+- **The source language packs were never linted.** The old ignore list carried a bare `languages` entry meant for the build output. An unanchored pattern matches a directory of that name at any depth, so it also excluded `src/i18n/languages/`, and the `sort-keys` override targeting those files never ran. Anchoring the build-output entry exposed 881 violations. They are excluded again, deliberately and with a comment, in [`.eslintignore`](../.eslintignore); sorting 19 translation files is a change of its own.
+- **`@vuepress/shared-utils` only works inside a full VuePress dependency tree.** It requires `markdown-it-emoji` and a `lru-cache` major it does not declare, and relied on `vuepress` hoisting them. That is why the built-in-functions generator moved into `docs/script/`, where that tree exists, rather than staying beside the engine build scripts.

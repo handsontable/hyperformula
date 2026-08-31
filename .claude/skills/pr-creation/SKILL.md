@@ -23,7 +23,7 @@ npm run lint
 npm run test:jest
 ```
 
-A green Jest run without `test/hyperformula-tests/` covers only the smoke tests. Confirm the suite is attached before calling it green. Do not open a pull request on a red run and describe it as ready.
+A green Jest run without `hyperformula/test/hyperformula-tests/` covers only the smoke tests. Confirm the suite is attached before calling it green. Do not open a pull request on a red run and describe it as ready.
 
 ## 4. Push and open the pull request
 

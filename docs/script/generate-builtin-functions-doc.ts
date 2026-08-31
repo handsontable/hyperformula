@@ -16,12 +16,12 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
-import {HyperFormula} from '../src'
+import {HyperFormula} from '../../hyperformula/src'
 import {renderBuiltinFunctionsMarkdown, spliceBuiltinFunctionsMarkdown} from './renderBuiltinFunctionsTable'
 
-const REPO_ROOT = path.resolve(__dirname, '..')
-const TEMPLATE_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.tmpl.md')
-const DOC_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.md')
+const DOCS_ROOT = path.resolve(__dirname, '..')
+const TEMPLATE_PATH = path.join(DOCS_ROOT, 'guide/built-in-functions.tmpl.md')
+const DOC_PATH = path.join(DOCS_ROOT, 'guide/built-in-functions.md')
 const LANGUAGE = 'enGB'
 /**
  * The GPLv3 key. Two reasons to name a key here, one current and one not yet:

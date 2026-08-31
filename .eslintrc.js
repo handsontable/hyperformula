@@ -15,7 +15,7 @@ module.exports = {
   },
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: './tsconfig.json',
+    project: './hyperformula/tsconfig.json',
     createDefaultProgram: true,
   },
   extends: [
@@ -134,7 +134,7 @@ module.exports = {
     {
       files: ['**/src/**/*.ts'],
       rules: {
-        'license-header/header': [ 'error', './.config/source-license-header.js' ],
+        'license-header/header': [ 'error', './hyperformula/.config/source-license-header.js' ],
       }
     },
     {

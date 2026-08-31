@@ -21,7 +21,7 @@ Committed, so every developer gets the same setup.
 | Key | Why |
 |---|---|
 | `enabledPlugins` | `typescript-lsp` — language-server go-to-definition and find-references. Use it instead of grepping for a symbol's definition or callers; grep stays right for text searches. |
-| `permissions.deny` | Blocks agent reads of every generated and built path. The build outputs are git-ignored, so content searches already skip them, but nothing otherwise stops an agent opening `dist/hyperformula.js` or answering a behaviour question from `typings/` instead of `src/`. |
+| `permissions.deny` | Blocks agent reads of every generated and built path. The build outputs are git-ignored, so content searches already skip them, but nothing otherwise stops an agent opening `dist/hyperformula.js` or answering a behaviour question from `typings/` instead of `hyperformula/src/`. |
 | `worktree.symlinkDirectories` | Symlinks `node_modules` into each worktree rather than duplicating it. See [`WORKTREES.md`](WORKTREES.md). |
 | `hooks` | The `PostToolUse` lint hook below. |
 
@@ -56,7 +56,7 @@ A skill holds the **steps**: what to do, in what order, and what to check. It do
 
 | Skill | For |
 |---|---|
-| `hyperformula-dev` | Any work in `src/` — the entry point |
+| `hyperformula-dev` | Any work in `hyperformula/src/` — the entry point |
 | `hyperformula-function-dev` | Adding or changing a built-in function |
 | `hyperformula-unit-testing` | Writing or modifying tests |
 | `test-writing-discipline` | Any red test, and any test that might be going green for the wrong reason |

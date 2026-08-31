@@ -6,17 +6,17 @@ Claude Code can run a session — or an isolated subagent — in a `git worktree
 
 | Missing | Why it matters | Fix |
 |---|---|---|
-| `node_modules/` | Nothing runs. | `npm ci` in the worktree, or symlink it — see below |
-| `test/hyperformula-tests/` | The private suite is git-ignored, so every `npm run test:jest` run covers only the smoke tests | `npm run test:setup-private` |
+| `node_modules/` | Nothing runs. | `npm ci` in the worktree |
+| `hyperformula/test/hyperformula-tests/` | The private suite is git-ignored, so every `npm run test:jest` run covers only the smoke tests | `npm run test:setup-private` |
 | `lib/`, `dist/`, `es/`, `commonjs/`, `typings/`, `languages/` | `npm run test:browser` and the bundle checks have nothing to run against | `npm run bundle-all` |
 | `docs/api/`, `docs/guide/built-in-functions.md` | The docs build fails, or serves nothing | `npm run docs:build` |
 | `.dev.vars*` | `wrangler` commands fail | Copied automatically — see [`.worktreeinclude`](../.worktreeinclude) |
 
 ## The branch-matched test suite is the trap
 
-`test/fetch-tests.sh` checks out the branch of the **same name** in the private test repository. Two consequences in a worktree:
+`hyperformula/test/fetch-tests.sh` checks out the branch of the **same name** in the private test repository. Two consequences in a worktree:
 
-1. Copying `test/hyperformula-tests/` from the main checkout brings the *other* branch's tests. They will run, and they will report results that have nothing to do with the code in front of you. `.worktreeinclude` deliberately does not copy it.
+1. Copying `hyperformula/test/hyperformula-tests/` from the main checkout brings the *other* branch's tests. They will run, and they will report results that have nothing to do with the code in front of you. `.worktreeinclude` deliberately does not copy it.
 2. Run `npm run test:setup-private` once per worktree, and again after any branch switch inside it.
 
 ## Symlinking `node_modules`
@@ -35,4 +35,4 @@ This is safe while HyperFormula is a single package: there is exactly one `node_
 
 ## Sparse checkouts
 
-`worktree.sparsePaths` limits what git writes to disk. It buys little today — this repository is small and `src/` is needed by everything. It becomes worth setting once the packages in [`MONOREPO.md`](MONOREPO.md) exist and a task can be scoped to one of them.
+`worktree.sparsePaths` limits what git writes to disk. It buys little today — this repository is small and `hyperformula/src/` is needed by everything. It becomes worth setting once the packages in [`MONOREPO.md`](MONOREPO.md) exist and a task can be scoped to one of them.

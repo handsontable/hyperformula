@@ -12,7 +12,7 @@ Read [`dev-docs/README.md`](dev-docs/README.md) first. It indexes the rest.
 
 | You are working on | Read |
 |---|---|
-| Anything in `src/` | [`dev-docs/ARCHITECTURE.md`](dev-docs/ARCHITECTURE.md) |
+| Anything in `hyperformula/src/` | [`dev-docs/ARCHITECTURE.md`](dev-docs/ARCHITECTURE.md) |
 | Formula parsing | [`dev-docs/PARSER.md`](dev-docs/PARSER.md) |
 | Formula evaluation, or a built-in function | [`dev-docs/INTERPRETER.md`](dev-docs/INTERPRETER.md) |
 | Function descriptions in the API and the docs | [`dev-docs/FUNCTION-CATALOGUE.md`](dev-docs/FUNCTION-CATALOGUE.md) |

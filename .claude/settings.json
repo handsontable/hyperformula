@@ -4,29 +4,23 @@
   ],
   "permissions": {
     "deny": [
-      "Read(./lib/**)",
-      "Read(./es/**)",
-      "Read(./commonjs/**)",
-      "Read(./dist/**)",
-      "Read(./languages/**)",
-      "Read(./typings/**)",
+      "Read(./hyperformula/lib/**)",
+      "Read(./hyperformula/es/**)",
+      "Read(./hyperformula/commonjs/**)",
+      "Read(./hyperformula/dist/**)",
+      "Read(./hyperformula/languages/**)",
+      "Read(./hyperformula/typings/**)",
+      "Read(./hyperformula/coverage/**)",
+      "Read(./hyperformula/test-jest/**)",
+      "Read(./hyperformula/test-jasmine/**)",
+      "Read(./hyperformula/typedoc/**)",
+      "Read(./hyperformula/storage/**)",
       "Read(./docs/api/**)",
       "Read(./docs/functions/**)",
       "Read(./docs/guide/built-in-functions.md)",
       "Read(./docs/.vuepress/dist/**)",
       "Read(./docs/.vuepress/api-sidebar.json)",
-      "Read(./docs/.vuepress/api-sidebar-relative.json)",
-      "Read(./typedoc/**)",
-      "Read(./doc/**)",
-      "Read(./coverage/**)",
-      "Read(./test-jest/**)",
-      "Read(./test-jasmine/**)",
-      "Read(./storage/**)"
-    ]
-  },
-  "worktree": {
-    "symlinkDirectories": [
-      "node_modules"
+      "Read(./docs/.vuepress/api-sidebar-relative.json)"
     ]
   },
   "hooks": {

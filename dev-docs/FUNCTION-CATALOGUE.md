@@ -1,6 +1,6 @@
 # The function metadata catalogue
 
-`src/interpreter/functionMetadata/categories/` holds the human-readable metadata for every built-in function: `shortDescription`, `parameters` (`snake_case` names, each with a description), `examples`, `documentationUrl`, and the category.
+`hyperformula/src/interpreter/functionMetadata/categories/` holds the human-readable metadata for every built-in function: `shortDescription`, `parameters` (`snake_case` names, each with a description), `examples`, `documentationUrl`, and the category.
 
 It is the single source of truth for two consumers:
 

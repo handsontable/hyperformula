@@ -26,13 +26,13 @@ Hot paths worth knowing about before touching them:
 
 | Path | Why it is hot |
 |---|---|
-| `src/interpreter/` function implementations | Runs once per formula, and once per cell for array-broadcast arguments |
-| `src/DependencyGraph/` vertex and range mapping | Every read and every structural change goes through it |
-| `src/Evaluator.ts` | Walks the whole recalculation order |
-| `src/parser/ParserWithCaching.ts` | Cache misses reparse; a change that defeats the cache is a regression |
-| `src/LazilyTransformingAstService.ts` | Deferred AST rewrites after row/column/sheet operations |
+| `hyperformula/src/interpreter/` function implementations | Runs once per formula, and once per cell for array-broadcast arguments |
+| `hyperformula/src/DependencyGraph/` vertex and range mapping | Every read and every structural change goes through it |
+| `hyperformula/src/Evaluator.ts` | Walks the whole recalculation order |
+| `hyperformula/src/parser/ParserWithCaching.ts` | Cache misses reparse; a change that defeats the cache is a regression |
+| `hyperformula/src/LazilyTransformingAstService.ts` | Deferred AST rewrites after row/column/sheet operations |
 
 ## TypeScript
 
-- The public API surface is `src/HyperFormula.ts` and the types it exports; `npm run bundle:typings` emits them into `typings/`.
+- The public API surface is `hyperformula/src/HyperFormula.ts` and the types it exports; `npm run bundle:typings` emits them into `typings/`.
 - `npm run verify:typings` (`tsc --noEmit`) must pass. A change that only compiles because of an `as` cast usually has a modelling problem behind it.

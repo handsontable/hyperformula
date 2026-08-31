@@ -1,6 +1,6 @@
 ---
 name: hyperformula-function-dev
-paths: src/interpreter/**
+paths: hyperformula/src/interpreter/**
 description: Use when adding a new built-in spreadsheet function to HyperFormula, changing an existing one's signature, arguments, return type, or error behaviour, or when a function returns the wrong value or the wrong error. Covers the FunctionPlugin contract, runFunction and argument metadata, the function metadata catalogue, translations, and the full end-to-end checklist.
 ---
 
@@ -18,10 +18,10 @@ description: Use when adding a new built-in spreadsheet function to HyperFormula
 
 A function is not done until all five agree. Each omission fails differently, and three of them fail silently.
 
-1. **Implementation** — the plugin class in `src/interpreter/plugin/`, plus its `implementedFunctions` entry keyed by the canonical English id.
-2. **Catalogue entry** — `src/interpreter/functionMetadata/categories/<category>.ts`. Parameter **count** must match `implementedFunctions`, or the authored names and descriptions are discarded at run time with only a console warning. A missing entry fails the docs build.
-3. **Translations** — every file in `src/i18n/languages/`.
-4. **Tests** — in `test/`.
+1. **Implementation** — the plugin class in `hyperformula/src/interpreter/plugin/`, plus its `implementedFunctions` entry keyed by the canonical English id.
+2. **Catalogue entry** — `hyperformula/src/interpreter/functionMetadata/categories/<category>.ts`. Parameter **count** must match `implementedFunctions`, or the authored names and descriptions are discarded at run time with only a console warning. A missing entry fails the docs build.
+3. **Translations** — every file in `hyperformula/src/i18n/languages/`.
+4. **Tests** — in `hyperformula/test/`.
 5. **Changelog** — skill `changelog-creation`.
 
 ## 3. Declare the two things nothing cross-checks

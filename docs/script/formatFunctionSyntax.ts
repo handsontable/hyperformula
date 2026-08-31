@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {clampRepeatLastArgs} from '../src/interpreter/functionMetadata/buildFunctionDescriptions'
+import {clampRepeatLastArgs} from '../../hyperformula/src/interpreter/functionMetadata/buildFunctionDescriptions'
 
 /**
  * Builds the human-readable syntax string for a function from its parameter list, e.g. `SUM(number1, ...)`.

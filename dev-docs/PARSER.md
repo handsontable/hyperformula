@@ -1,6 +1,6 @@
 # The parser
 
-`src/parser/` turns a formula string into an AST plus its relative dependencies, and turns an AST back into a string. It wraps the [Chevrotain](https://chevrotain.io/) parser generator.
+`hyperformula/src/parser/` turns a formula string into an AST plus its relative dependencies, and turns an AST back into a string. It wraps the [Chevrotain](https://chevrotain.io/) parser generator.
 
 ## The pieces
 

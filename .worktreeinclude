@@ -19,7 +19,7 @@
 #                         builds do not survive it. Run `npm ci`, or symlink it
 #                         with `worktree.symlinkDirectories`.
 #
-#   test/hyperformula-tests/
+#   hyperformula/test/hyperformula-tests/
 #                         The private suite is BRANCH-MATCHED to this repository
 #                         (test/fetch-tests.sh checks out the branch of the same
 #                         name). A copy carries the source branch's tests and
@@ -27,7 +27,7 @@
 #                         suite at all. Run `npm run test:setup-private` in the
 #                         worktree instead.
 #
-#   lib/ dist/ es/ commonjs/ typings/ languages/
+#   hyperformula/{lib,dist,es,commonjs,typings,languages}/
 #                         Build outputs. A stale copy makes `npm run test:browser`
 #                         and the bundle checks pass or fail against the other
 #                         branch's build. Run `npm run bundle-all`.
