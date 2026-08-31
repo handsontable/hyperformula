@@ -8,11 +8,12 @@ description: Use when creating or editing a page in the HyperFormula documentati
 
 | File | Why |
 |---|---|
-| [`DOC-STANDARDS.md`](../../../dev-docs/DOC-STANDARDS.md) | When documentation is required, what must not duplicate the API reference, and describing HyperFormula rather than Excel |
+| [`DOCS-CONTENT-GUIDE.md`](../../../dev-docs/DOCS-CONTENT-GUIDE.md) | How to write the page: structure, chunking, language, code examples, VuePress conventions, and the self-review checklist to run before finishing |
+| [`DOC-STANDARDS.md`](../../../dev-docs/DOC-STANDARDS.md) | When documentation is required, and describing HyperFormula rather than Excel |
 | [`FUNCTION-CATALOGUE.md`](../../../dev-docs/FUNCTION-CATALOGUE.md) | Only when the change concerns the built-in functions page, which is generated from the catalogue |
 | [`BUILD.md`](../../../dev-docs/BUILD.md) | Which documentation files are generated, by which command |
 
-And two files outside `dev-docs/`: [`docs/README.md`](../../../docs/README.md) for what the portal contains and how to run it, and [`DOCS_CONTENT_GUIDE.md`](../../../DOCS_CONTENT_GUIDE.md) for writing style and guide structure.
+And [`docs/README.md`](../../../docs/README.md), for what the portal contains and how to run it.
 
 ## 2. Change the source, not the output
 
@@ -36,3 +37,4 @@ npm run docs:dev     # http://localhost:8080/hyperformula/
 - A new page needs a sidebar entry under `docs/.vuepress/`, or it builds and is unreachable.
 - Link to the API reference for detail rather than restating it.
 - Verify any behavioural claim against the implementation. Where HyperFormula deviates from Excel, record it in [`docs/guide/list-of-differences.md`](../../../docs/guide/list-of-differences.md).
+- Run the self-review checklist at the end of [`DOCS-CONTENT-GUIDE.md`](../../../dev-docs/DOCS-CONTENT-GUIDE.md#self-review-checklist-run-before-finishing-any-page).

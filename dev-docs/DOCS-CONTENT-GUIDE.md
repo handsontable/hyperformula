@@ -16,8 +16,6 @@ helps humans and search. You are not gaming an algorithm — you are writing cle
 
 ---
 
-
-
 ## Project context
 
 - **Product:** HyperFormula — an open-source, headless spreadsheet and formula
@@ -35,8 +33,6 @@ frontmatter, `::: tip / warning / danger` containers, and fenced code blocks.
 linked per version branch (e.g. `3.3.x`).
 
 ---
-
-
 
 ## What to write (coverage & gap prioritization)
 
@@ -69,8 +65,6 @@ Optimization cannot recover a page that doesn't exist. Coverage comes first.
 
 ---
 
-
-
 ## How to structure a page
 
 Treat **every page as page one.**
@@ -102,8 +96,6 @@ Treat **every page as page one.**
 
 ---
 
-
-
 ## How to structure sections (chunking)
 
 1. **One purpose per section.** Each `##`/`###` answers exactly one question. Don't
@@ -132,8 +124,6 @@ Treat **every page as page one.**
 
 ---
 
-
-
 ## Language & terminology
 
 1. **Write plainly.** Aim for a ~6th–7th-grade reading level: short sentences, one
@@ -156,8 +146,6 @@ Treat **every page as page one.**
     didn't write.
 
 ---
-
-
 
 ## Code examples
 
@@ -184,8 +172,6 @@ and hallucinate the parts you omit.
 
 ---
 
-
-
 ## Visuals, tables & the "why"
 
 1. **Never put information only in an image, diagram, or video.** Assistants can't
@@ -208,8 +194,6 @@ and hallucinate the parts you omit.
     references, precision/rounding caveats).
 
 ---
-
-
 
 ## VuePress conventions (so your output fits the site)
 
@@ -237,33 +221,18 @@ VuePress — don't hand-write navigation.
 
 ---
 
-
-
-
 ## Self-review checklist (run before finishing any page)
 
-- [ ] **Stands alone:** a reader who lands here cold, seeing only this page, can
-  ```
-  finish the task without opening another page.
-  ```
+- [ ] **Stands alone:** a reader who lands here cold, seeing only this page, can finish the task without opening another page.
 - [ ] **One question per section**, descriptive headings, hierarchy in order.
-- [ ] **No walls of text:** long prose is broken into granular H2/H3 subsections,
-  ```
-  each short enough that its heading covers everything under it.
-  ```
+- [ ] **No walls of text:** long prose is broken into granular H2/H3 subsections, each short enough that its heading covers everything under it.
 - [ ] **Product named** in the body; no bare "the library/the method/the grid."
 - [ ] **No backward references** ("as above," "now that you've…").
 - [ ] **Prerequisites stated explicitly**; nothing assumed.
 - [ ] **Terminology consistent** with the canonical terms; acronyms expanded once.
-- [ ] **Every code block** is language-tagged, complete, includes the `licenseKey`,
-  ```
-  and would actually run; cell-address property order is `{ sheet, row, col }`.
-  ```
+- [ ] **Every code block** is language-tagged, complete, includes the `licenseKey`, and would actually run; cell-address property order is `{ sheet, row, col }`.
 - [ ] **No info trapped in images/tables**; visuals have text equivalents and captions.
 - [ ] **Frontmatter** has a specific `title` and a one-sentence `description`.
 - [ ] **No contradiction** with other pages; old facts updated everywhere.
 - [ ] **"Why" is covered:** intent, when-to-use, and known gotchas — not just syntax.
-- [ ] Would an AI assistant quoting *only this page* give a correct, complete answer?
-  ```
-  If not, fix the page.
-  ```
+- [ ] Would an AI assistant quoting *only this page* give a correct, complete answer? If not, fix the page.

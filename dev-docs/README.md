@@ -41,7 +41,8 @@ In every directory, `CLAUDE.md` is a symlink to its sibling `AGENTS.md`. Edit `A
 | [`DEFINITION-OF-DONE.md`](DEFINITION-OF-DONE.md) | What every change must include before review. |
 | [`CODE-STYLE.md`](CODE-STYLE.md) | Code style, and the performance rules that apply to engine code. |
 | [`TESTING.md`](TESTING.md) | Test suites, the private test repository, and how to write a case. |
-| [`DOC-STANDARDS.md`](DOC-STANDARDS.md) | Documentation rules across guides, API reference, JSDoc, and the changelog. |
+| [`DOC-STANDARDS.md`](DOC-STANDARDS.md) | When documentation is required, and the rules it must satisfy — guides, API reference, JSDoc, and the changelog. |
+| [`DOCS-CONTENT-GUIDE.md`](DOCS-CONTENT-GUIDE.md) | How to write a documentation page: structure, chunking, language, code examples, VuePress conventions, and the self-review checklist. |
 | [`BUILD.md`](BUILD.md) | What the public [building guide](../docs/guide/building.md) does not cover: the intermediate build, generated docs, deployment, and release. |
 | [`PULL-REQUESTS.md`](PULL-REQUESTS.md) | Branch naming, the pre-flight gate, and the pull request template. |
 | [`WORKTREES.md`](WORKTREES.md) | Working in a linked git worktree: what is missing and how to bootstrap it. |
@@ -54,7 +55,6 @@ In every directory, `CLAUDE.md` is a symlink to its sibling `AGENTS.md`. Edit `A
 | [`docs/README.md`](../docs/README.md) | Running and extending the documentation portal |
 | [`test/README.md`](../test/README.md) | Attaching the private test suite |
 | [`script/README.md`](../script/README.md) | What each build and release script does |
-| [`DOCS_CONTENT_GUIDE.md`](../DOCS_CONTENT_GUIDE.md) | Writing style and structure for docs content |
 | [`CHANGELOG.md`](../CHANGELOG.md) | Release history |
 | [`.github/pull_request_template.md`](../.github/pull_request_template.md) | The pull request template |
 

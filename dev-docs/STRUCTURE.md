@@ -42,7 +42,6 @@ The layout as it stands today. For the monorepo layout this repository is moving
 ├── AGENTS.md                         # Always-loaded agent rules and routing map
 ├── CLAUDE.md                         # Symlink to AGENTS.md
 ├── CONTRIBUTING.md                   # Guide for external contributors
-├── DOCS_CONTENT_GUIDE.md             # Writing style and structure for docs content
 ├── README.md                         # Project overview
 └── CHANGELOG.md
 ```

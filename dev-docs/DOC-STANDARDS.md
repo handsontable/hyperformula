@@ -2,7 +2,7 @@
 
 These apply across the whole repository: guides, the API reference, JSDoc inside `src/`, the changelog, migration guides, and README files.
 
-Writing style, language, and guide structure live in [`DOCS_CONTENT_GUIDE.md`](../DOCS_CONTENT_GUIDE.md). Follow it when creating or editing docs content.
+*How* to write a page — structure, chunking, language, code examples, and the self-review checklist — is [`DOCS-CONTENT-GUIDE.md`](DOCS-CONTENT-GUIDE.md). This page is *when* documentation is required and what it must be true about.
 
 ## When documentation is required
 
@@ -11,9 +11,11 @@ Writing style, language, and guide structure live in [`DOCS_CONTENT_GUIDE.md`](.
 - Any breaking change adds a migration-guide section.
 - Documentation-only changes (guides, JSDoc, README) need no changelog entry.
 
-## Do not duplicate
+## The API reference is the source of truth
 
-The API reference — generated from JSDoc — holds all the detail about each function and class, and is the primary source of truth. Guides give a high-level overview. A guide may repeat something from the API reference where it is relevant to the context, but above all it should **link** to the API reference for the detail.
+The API reference, generated from JSDoc, holds all the detail about each function and class. A guide gives the overview and links to the reference for the detail.
+
+This is not a licence to make a guide unreadable on its own. A guide page repeats the small essential context a reader needs to finish the task in front of them, and links out only for depth. [`DOCS-CONTENT-GUIDE.md`](DOCS-CONTENT-GUIDE.md#how-to-structure-a-page) owns that trade-off and states the rule of thumb: if removing a link would make the current task impossible to finish, that information belongs on the page.
 
 ## Generated files
 
