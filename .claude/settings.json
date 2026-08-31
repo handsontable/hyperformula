@@ -2,15 +2,24 @@
   "enabledPlugins": ["typescript-lsp@claude-plugins-official"],
   "permissions": {
     "deny": [
-      "Read(./dist/**)",
       "Read(./lib/**)",
       "Read(./es/**)",
       "Read(./commonjs/**)",
-      "Read(./typings/**)",
+      "Read(./dist/**)",
       "Read(./languages/**)",
-      "Read(./coverage/**)",
+      "Read(./typings/**)",
+      "Read(./docs/api/**)",
+      "Read(./docs/functions/**)",
+      "Read(./docs/guide/built-in-functions.md)",
       "Read(./docs/.vuepress/dist/**)",
-      "Read(./docs/api/**)"
+      "Read(./docs/.vuepress/api-sidebar.json)",
+      "Read(./docs/.vuepress/api-sidebar-relative.json)",
+      "Read(./typedoc/**)",
+      "Read(./doc/**)",
+      "Read(./coverage/**)",
+      "Read(./test-jest/**)",
+      "Read(./test-jasmine/**)",
+      "Read(./storage/**)"
     ]
   },
   "worktree": {
