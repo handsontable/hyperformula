@@ -2,7 +2,7 @@
 
 How the workspace installs, and the repository-level steps: generating the documentation, deploying the portal, and cutting a release.
 
-The engine's own build — the intermediate `lib/`, the bundles, and packaging — is in [`hyperformula/dev-docs/BUILD.md`](BUILD.md).
+The engine's own build — the intermediate `lib/`, the bundles, and packaging — is in [`hyperformula/dev-docs/BUILD.md`](../hyperformula/dev-docs/BUILD.md).
 
 ## Install
 
@@ -32,7 +32,7 @@ The portal is served by a Cloudflare Worker, and **deployment is driven by Worke
 
 | Command | Does |
 |---|---|
-| `npm run docs:build:cf` | Full portal build, then composes the Worker asset tree through `script/prepare-cf-assets.js` |
+| `npm run docs:build:cf` | Full portal build, then composes the Worker asset tree through `docs/script/prepare-cf-assets.js` |
 | `npm run docs:deploy:cf` | `wrangler deploy` — production |
 | `npm run docs:preview:cf` | `wrangler versions upload` — a per-branch preview URL |
 

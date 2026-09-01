@@ -2,7 +2,7 @@
 
 The command reference lives in the public guide, [`docs/guide/building.md`](../../docs/guide/building.md): output formats, every `bundle:*` and `verify:*` script, the test commands, and the linter. Read that first.
 
-This page holds only what the guide does not cover. For installing the workspace, deploying the portal, and cutting a release, see [`dev-docs/BUILD.md`](BUILD.md).
+This page holds only what the guide does not cover. For installing the workspace, deploying the portal, and cutting a release, see [`dev-docs/BUILD.md`](../../dev-docs/BUILD.md).
 
 ## The intermediate build
 
