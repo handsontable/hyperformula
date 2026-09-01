@@ -6,11 +6,11 @@ This repository holds the engine and everything built around it.
 
 | Directory | What it is | Published |
 |---|---|---|
-| [`hyperformula/`](hyperformula/) | The calculation engine. **Start here** — its [README](dev-docs/README.md) is the product documentation. | yes |
+| [`hyperformula/`](hyperformula/) | The calculation engine. **Start here** — its [README](hyperformula/README.md) is the product documentation. | yes |
 | [`hyperformula-ui/`](hyperformula-ui/) | UI components for working with HyperFormula. Not imported yet. | yes |
+| [`docs/`](docs/) | The documentation portal. Installed separately; not a workspace member. | no |
 
 The published packages release together, on one version, and share the single [`CHANGELOG.md`](CHANGELOG.md) at the root.
-| [`docs/`](docs/) | The documentation portal. Installed separately; not a workspace member. | no |
 
 ## Getting started
 
