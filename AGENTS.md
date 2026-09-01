@@ -6,7 +6,7 @@ HyperFormula is a headless spreadsheet calculation engine in TypeScript. No UI, 
 
 ## Start at `dev-docs/`
 
-**[`dev-docs/`](dev-docs/) is the single source of truth for everything internal to this project.** Architecture, conventions, build, testing, standards, and the monorepo plan all live there and nowhere else. This file routes; it does not explain. Neither does any other `AGENTS.md` or `README.md` — if one of them looks like it is explaining something, the explanation belongs in `dev-docs/` and the file should link to it.
+**[`dev-docs/`](dev-docs/) is the single source of truth for everything internal to this project.** Architecture, conventions, build, testing, standards, and the monorepo plan all live there and nowhere else. This file routes; it does not explain. Neither does any other `AGENTS.md` or `README.md`: each carries only what is so specific to its own directory that it would be useless anywhere else, and links for the rest. If one of them looks like it is explaining something general, the explanation belongs in `dev-docs/`.
 
 Read [`dev-docs/README.md`](dev-docs/README.md) first. It says which page covers what, and every directory's own `AGENTS.md` points at the page that covers that directory.
 

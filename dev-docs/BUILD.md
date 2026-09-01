@@ -29,7 +29,7 @@ Both are git-ignored, and both are regenerated as the first step of `docs:dev` a
 
 ## Deploying the portal
 
-The portal is served by a Cloudflare Worker.
+The portal is served by a Cloudflare Worker, and **deployment is driven by Workers Builds on push, not from a developer's machine**: `master` deploys to production, every other branch uploads a preview version. The commands below exist for debugging that pipeline. The triggers, the Worker name, and the dashboard build settings are in [`docs/README.md`](../docs/README.md#deployment).
 
 | Command | Does |
 |---|---|

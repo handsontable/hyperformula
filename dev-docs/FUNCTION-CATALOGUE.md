@@ -4,7 +4,7 @@
 
 It is the single source of truth for two consumers:
 
-- the public [`getAvailableFunctions` / `getFunctionDetails`](../docs/api/classes/hyperformula.md) API;
+- the public `getAvailableFunctions` / `getFunctionDetails` API, documented in the generated API reference (`docs/api/`, built by `npm run typedoc:build-api`);
 - the generated built-in functions guide page (`docs/guide/built-in-functions.md`, produced by `npm run docs:generate-function-docs`).
 
 Every field is required, `documentationUrl` included. Each entry authors its own link rather than inheriting a shared default, so links can diverge per function without touching any code; they all happen to point at the same guide page today.

@@ -17,7 +17,7 @@ To start a local HyperFormula docs server:
 1. Make sure you're running the [Node.js](https://nodejs.org/en/) version pinned in [`.nvmrc`](../.nvmrc) (22).
 2. From the main `hyperformula` directory, install the docs dependencies:
     ```bash
-    npm install
+    npm ci
     ```
 3. From the main `hyperformula` directory, build HyperFormula:
    ```bash

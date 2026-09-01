@@ -37,7 +37,7 @@ Where everything lives today, and where it is going. The repository is becoming 
 ├── worker/                           # Cloudflare Worker that serves the built docs
 ├── examples/                         # Images and CSV fixtures used by the docs
 ├── dev-docs/                         # Developer reference (this directory)
-├── .claude/                          # Claude Code settings, skills, and agents
+├── .claude/                          # Claude Code settings and skills
 ├── .github/                          # CI workflows, issue and PR templates
 ├── AGENTS.md                         # Always-loaded agent rules and routing map
 ├── CLAUDE.md                         # Symlink to AGENTS.md

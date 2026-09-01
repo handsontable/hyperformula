@@ -84,12 +84,14 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 
 ### The five places a function change must touch
 
-All five, or the failure is silent:
+This list is the authority; the skills link here rather than repeating it.
 
-1. the plugin implementation in `src/interpreter/plugin/`;
-2. its `implementedFunctions` metadata;
-3. the catalogue entry in `src/interpreter/functionMetadata/categories/` — see [`FUNCTION-CATALOGUE.md`](FUNCTION-CATALOGUE.md);
-4. **every** language file in `src/i18n/languages/` — see [`I18N.md`](I18N.md);
-5. tests — see [`TESTING.md`](TESTING.md).
+1. the plugin implementation in `src/interpreter/plugin/`, plus its `implementedFunctions` metadata;
+2. the catalogue entry in `src/interpreter/functionMetadata/categories/` — see [`FUNCTION-CATALOGUE.md`](FUNCTION-CATALOGUE.md);
+3. **every** language file in `src/i18n/languages/` — see [`I18N.md`](I18N.md);
+4. tests — see [`TESTING.md`](TESTING.md);
+5. the changelog entry — see [`DEFINITION-OF-DONE.md`](DEFINITION-OF-DONE.md).
+
+They do not fail the same way. A missing catalogue entry **fails the docs build**; a parameter-count mismatch only warns on the console; a missing translation, a missing test, and a missing `optionalArg` fail silently.
 
 Skill: `hyperformula-function-dev`.

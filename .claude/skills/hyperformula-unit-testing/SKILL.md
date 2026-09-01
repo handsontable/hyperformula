@@ -19,7 +19,7 @@ And [`test/README.md`](../../../test/README.md) for how the private suite is fet
 npm run test:setup-private
 ```
 
-Run it after every branch switch. Without `test/hyperformula-tests/` the Jest run covers only the smoke tests and reports a clean pass over almost nothing — the most common false signal in this repository. `test:performance` and `test:compatibility` fail on a missing path rather than an assertion; read the error before concluding the code is broken.
+Run it after every branch switch. Without `test/hyperformula-tests/` the Jest run covers only the smoke tests and reports a clean pass over almost nothing — the most common false signal in this repository. `test:performance`, `test:compatibility` and the benchmarks all resolve into that directory, so without it they fail on a missing path rather than on an assertion; read the error before concluding the code is broken.
 
 ## 3. Write the case from the requirement
 

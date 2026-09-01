@@ -28,9 +28,13 @@ Committed, so every developer gets the same setup.
 
 Relative deny patterns anchor at the session's working directory, and project settings are not inherited from parent directories — these rules apply to sessions started at the repository root.
 
+## Read the repository, not the web
+
+The guides in `docs/guide/` and the generated API reference in `docs/api/` are the same content the documentation portal serves. Read the local files rather than fetching the rendered pages, and read `src/` rather than either when the question is what the code actually does.
+
 ## Skills
 
-All skills live in `.claude/skills/`, at the repository root, and are scoped by the `paths` frontmatter field rather than by placement — one glob, or a comma-separated list. One directory to look in, one directory to keep consistent.
+All skills live in `.claude/skills/`, at the repository root — one directory to look in, one to keep consistent. A skill that belongs to part of the tree is scoped by the `paths` frontmatter field (one glob, or a comma-separated list) rather than by placement. A skill that applies anywhere — writing a changelog entry, opening a pull request, test discipline, reviewing a diff — carries no `paths` and is chosen from its description alone.
 
 A skill holds the **steps**: what to do, in what order, and what to check. It does not restate the rules those steps enforce — it links to the `dev-docs/` page that owns them.
 

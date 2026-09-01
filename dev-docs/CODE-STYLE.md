@@ -1,6 +1,6 @@
 # Code style
 
-ESLint is the source of truth for formatting and code rules. Run `npm run lint` before submitting changes. Everything below is what ESLint cannot check.
+ESLint is the source of truth for formatting and code rules — run `npm run lint` before submitting changes (see [the linter section of the building guide](../docs/guide/building.md#run-the-linter)). Some of what follows it enforces, the `jsdoc` rules among them; the rest is what no linter can check for you.
 
 ## Style
 

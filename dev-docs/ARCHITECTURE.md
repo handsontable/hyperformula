@@ -56,7 +56,7 @@ HyperFormula is a headless spreadsheet calculation engine. No UI, no DOM, no ser
 
 - `LexerConfig.ts` and `ParserConfig.ts` build the token set from the active language and config — the lexer is **language-dependent**, because function names are translated.
 - `ParserWithCaching.ts` is the entry point; identical formula strings resolve from `Cache.ts` rather than being reparsed.
-- `collectDependencies.ts` extracts the relative dependencies of an AST; `absolutizeDependencies.ts` resolves them against a concrete address.
+- `collectDependencies.ts` extracts the relative dependencies of an AST. Resolving them against a concrete address is `src/absolutizeDependencies.ts`, which sits at the source root rather than in `src/parser/`.
 - `Unparser.ts` is the inverse — AST back to text, in the target language. A change to parsing almost always needs a matching change here, or round-tripping breaks.
 
 ## The interpreter
@@ -75,7 +75,7 @@ HyperFormula is a headless spreadsheet calculation engine. No UI, no DOM, no ser
 - `Graph.ts` holds the vertices and edges; `TopSort.ts` produces the evaluation order and detects cycles.
 - Vertex kinds: `ValueCellVertex`, `FormulaVertex`, `EmptyCellVertex`, `RangeVertex`, `ParsingErrorVertex`.
 - `AddressMapping/` maps a `SimpleCellAddress` to its vertex; `RangeMapping.ts` does the same for ranges, so a range is a single vertex rather than one edge per cell.
-- `LazilyTransformingAstService.ts` defers AST rewrites after structural changes until a formula is actually read — a change here affects both correctness and the CRUD hot path.
+- `src/LazilyTransformingAstService.ts` — at the source root, not in this directory — defers AST rewrites after structural changes until a formula is actually read. A change there affects both correctness and the CRUD hot path.
 
 ## Invariants
 

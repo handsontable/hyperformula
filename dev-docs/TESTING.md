@@ -26,10 +26,10 @@ npm run test:setup-private
 | `npm run test:watch` | Jest in watch mode |
 | `npm run test:coverage` | Jest with coverage |
 | `npm run test:browser` | Karma, against the `dist` build |
-| `npm run test:compatibility` | `test/compatibility/test-compatibility.sh` |
+| `npm run test:compatibility` | The compatibility suite, which ships with the private repository |
 | `npm run test:performance` | The basic and CRUD benchmarks |
 
-`test:performance`, `test:compatibility`, and the benchmark scripts all live inside `test/hyperformula-tests/`. Without the private suite they fail with a missing path, not with a test failure — read the error before concluding that something is broken.
+`test:performance`, `test:compatibility`, and the benchmark scripts all resolve into `test/hyperformula-tests/`, so they need the private suite attached. Without it they fail on a missing path rather than on an assertion — read the error before concluding the code is broken.
 
 ## What a change must cover
 
