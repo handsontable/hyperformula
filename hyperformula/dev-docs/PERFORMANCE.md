@@ -2,8 +2,6 @@
 
 HyperFormula is a calculation engine, so the performance of production code is a feature, not an afterthought. The style rules these sit under are repository-wide: [`dev-docs/CODE-STYLE.md`](../../dev-docs/CODE-STYLE.md).
 
-HyperFormula is a calculation engine, so the performance of production code is a feature, not an afterthought.
-
 - Consider the computational complexity of every change, especially in code that runs **per cell, per formula, or per dependency-graph node**. Nested loops over ranges, and repeated work that could be computed once or cached, are the usual suspects.
 - Pick the best complexity that still keeps the code readable. When a faster algorithm is harder to follow, explain the trade-off in a JSDoc comment.
 - Run `npm run test:performance` for changes that may affect the evaluation or CRUD hot paths.
