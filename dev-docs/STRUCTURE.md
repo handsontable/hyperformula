@@ -81,6 +81,8 @@ The repository is becoming a monorepo. The tree above is what a checkout looks l
 
 `docs/` is not a workspace member: the portal drags in a large, old dependency tree (VuePress, `--openssl-legacy-provider`) that must not reach an engine install. It keeps its own `package.json` and is installed separately.
 
+**The packages release together, on one version, from one changelog.** A release cuts every published package at the same version, whether or not each one changed, and `CHANGELOG.md` at the repository root is the single history for all of them. That keeps one number to reason about — the version a user reports a bug against identifies the state of the whole repository — at the cost of publishing a package whose code did not move. Entries name the package they concern where it is not obvious.
+
 ### Target tree
 
 ```
@@ -138,7 +140,7 @@ hyperformula/                              # repository root — private, worksp
 3. **Give `docs/` its own `package.json`** and take it out of the root dependency tree.
 4. **Move `wrangler.jsonc` and `worker/` under `docs/`.** Update `wrangler.jsonc`'s `main`, the `docs:*:cf` scripts, and `script/prepare-cf-assets.js` in the same change. Verify with `npm run docs:preview:cf` — a broken `main` path fails only at deploy time.
 5. **Bring in `hyperformula-ui`**, preserving its history.
-6. **Split `CHANGELOG.md` per package**, each keeping the current Keep a Changelog form.
-7. **Give every package an `.nvmrc` saying `22`.**
+6. **Keep `CHANGELOG.md` at the repository root**, in the current Keep a Changelog form, as the single history for every package. The published package still needs one in its tarball, so the release copies it in at pack time rather than keeping a second file under version control.
+7. **Give every package an `.nvmrc` saying `22`**, and keep their versions in step — a release bumps them together.
 8. **Update the private test suite's checkout path**, from `test/hyperformula-tests/` to `hyperformula/test/hyperformula-tests/`, in `fetch-tests.sh`, `.gitignore`, the three workflows that check it out, and `.worktreeinclude`. It stays branch-matched.
 9. **Path-filter CI.** Each package's jobs run only when its paths change; full runs on `develop`, `master`, and release branches.
