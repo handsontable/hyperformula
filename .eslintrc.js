@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
   root: true,
   ignorePatterns: ['.eslintrc.js'],
@@ -134,7 +136,7 @@ module.exports = {
     {
       files: ['**/src/**/*.ts'],
       rules: {
-        'license-header/header': [ 'error', './hyperformula/.config/source-license-header.js' ],
+        'license-header/header': [ 'error', path.join(__dirname, 'hyperformula/.config/source-license-header.js') ],
       }
     },
     {

@@ -54,7 +54,7 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 
 ## Workspaces
 
-`workspaces` in the root `package.json` lists `hyperformula` and `hyperformula-ui`. `npm ci` at the root installs both into a shared `node_modules`.
+`workspaces` in the root `package.json` lists `hyperformula`. `npm ci` at the root installs it into a shared `node_modules`. `hyperformula-ui/` is a placeholder and is deliberately not listed yet — see [What the move still owes](#what-the-move-still-owes).
 
 **`docs/` is deliberately outside the workspace.** The portal drags in a large, old dependency tree (VuePress 1.x, `--openssl-legacy-provider`) that must not reach an engine install. It has its own `package.json` and installs separately with `npm run docs:install`.
 
@@ -84,7 +84,7 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 
 ## What the move still owes
 
-1. **Import `hyperformula-ui`.** The directory exists and is listed in the root `workspaces` array; the package itself is imported from the formula-builder repository in a separate change, preserving its history. It keeps the scope it publishes under today. When it lands it needs an `.nvmrc` saying `22`, a `CHANGELOG.md`, and an `AGENTS.md` with a `CLAUDE.md` symlink.
+1. **Import `hyperformula-ui`.** The directory is a placeholder; the package is imported from the formula-builder repository in a separate change, preserving its history, and it keeps the scope it publishes under today. Add `hyperformula-ui` to the root `workspaces` array in that same change, not before: npm silently ignores an entry with no `package.json`, so listing it early buys nothing and the lockfile has to be regenerated when the package lands either way. When it arrives it also needs an `.nvmrc` saying `22`, a `CHANGELOG.md`, and an `AGENTS.md` with a `CLAUDE.md` symlink.
 2. **Path-filter CI.** Each package's jobs should run only when its own paths change, with full runs on `develop`, `master`, and release branches. Not done here on purpose: a naive `paths:` filter on a workflow that branch protection lists as a required check leaves the check permanently pending, and pull requests become unmergeable. Doing it safely needs the required-checks list, which lives in repository settings rather than in the tree, and the `dorny/paths-filter`-plus-single-gate shape that the Handsontable monorepo uses.
 
 ## What the move decided

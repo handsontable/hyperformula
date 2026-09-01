@@ -20,8 +20,11 @@
 #                         `wrangler`. They can copy the file themselves.
 #
 #   node_modules          A copy is not an install: `.bin` shims and native
-#                         builds do not survive it. Run `npm ci`, or symlink it
-#                         with `worktree.symlinkDirectories`.
+#                         builds do not survive it. Run `npm ci` in the worktree.
+#                         Do NOT symlink it back to the main checkout: in a
+#                         workspace `npm ci` then installs THROUGH the symlink
+#                         and rewrites the main checkout's dependency tree. See
+#                         dev-docs/WORKTREES.md.
 #
 #   hyperformula/test/hyperformula-tests/
 #                         The private suite is BRANCH-MATCHED to this repository

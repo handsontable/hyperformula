@@ -34,5 +34,5 @@ Hot paths worth knowing about before touching them:
 
 ## TypeScript
 
-- The public API surface is `hyperformula/src/HyperFormula.ts` and the types it exports; `npm run bundle:typings` emits them into `typings/`.
+- The public API surface is `hyperformula/src/HyperFormula.ts` and the types it exports; `npm run bundle:typings --workspace=hyperformula` emits them into `hyperformula/typings/`.
 - `npm run verify:typings` (`tsc --noEmit`) must pass. A change that only compiles because of an `as` cast usually has a modelling problem behind it.

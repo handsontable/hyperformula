@@ -15,15 +15,16 @@ When editing the docs, you can use features described [here](https://vuepress.vu
 To start a local HyperFormula docs server:
 
 1. Make sure you're running the [Node.js](https://nodejs.org/en/) version pinned in [`.nvmrc`](../.nvmrc) (22).
-2. From the main `hyperformula` directory, install the docs dependencies:
+2. From the repository root, install the workspace and then the portal. The portal is **not** a workspace member, so the root install does not bring in VuePress:
     ```bash
-    npm install
+    npm ci
+    npm run docs:install
     ```
-3. From the main `hyperformula` directory, build HyperFormula:
+3. From the repository root, build HyperFormula &mdash; the portal embeds the built engine:
    ```bash
    npm run bundle-all
    ```
-4. From the main `hyperformula` directory, create a dev build of the docs and start your local docs server:
+4. From the repository root, create a dev build of the docs and start your local docs server:
    ```bash
    npm run docs:dev
    ```
@@ -45,10 +46,12 @@ How to write the page — structure, chunking, language, code examples, and the 
 
 ## HyperFormula documentation npm scripts
 
-From the `hyperformula` directory, you can run the following npm scripts:
+From the repository root:
 
+* `npm run docs:install` - Installs the portal's own dependencies (`npm ci` inside `docs/`). Needed once, and again whenever `docs/package.json` changes.
 * `npm run docs:dev` - Starts a local docs server at http://localhost:8080/hyperformula/.
-* `npm run docs:build` - Builds the docs output into `/docs/.vuepress/dist`.
+* `npm run docs:build` - Builds the docs output into `docs/.vuepress/dist/docs`.
+* `npm run docs:build:cf` - The build Cloudflare Workers Builds runs. Installs the portal first, then builds and composes the Worker assets.
 * `npm run docs:generate-function-docs` - Regenerates the built-in functions guide page from the function metadata API. Runs automatically as the first step of `docs:dev` and `docs:build`.
 
 ## Deployment
@@ -57,17 +60,19 @@ The documentation site is deployed to Cloudflare Workers as the `hyperformula-do
 
 | Trigger | Command run by Workers Builds | Result |
 | --- | --- | --- |
-| push to `master` | `npx wrangler deploy` | production deployment |
-| push to any other branch, and every pull request | `npx wrangler versions upload` | preview deployment at `https://<branch>-hyperformula-docs.handsoncode.workers.dev`, posted as a pull request comment |
+| push to `master` | `npx wrangler deploy` (from `docs/`) | production deployment |
+| push to any other branch, and every pull request | `npx wrangler versions upload` (from `docs/`) | preview deployment at `https://<branch>-hyperformula-docs.handsoncode.workers.dev`, posted as a pull request comment |
+
+Both commands must run with `docs/` as the working directory, where `wrangler.jsonc` lives. From the repository root, use `npm run docs:deploy:cf` and `npm run docs:preview:cf`, which do that for you.
 
 Configuration in the repository:
 
-- `wrangler.jsonc` &mdash; Worker name, asset directory, and asset routing.
-- `worker/index.js` &mdash; resolves directory and extensionless URLs and serves the 404 page, so that the URL behaviour matches the previous hosting.
+- `docs/wrangler.jsonc` &mdash; Worker name, asset directory, and asset routing.
+- `docs/worker/index.js` &mdash; resolves directory and extensionless URLs and serves the 404 page, so that the URL behaviour matches the previous hosting.
 - `docs/.vuepress/cf/_headers`, `docs/.vuepress/cf/_redirects` &mdash; asset headers and redirects, copied into the root of the build output by `script/prepare-cf-assets.js`.
-- `.nvmrc` &mdash; Node.js version used by the build.
+- `docs/.nvmrc` &mdash; Node.js version used by the build.
 
-The asset directory is `docs/.vuepress/dist`, while VuePress writes to `docs/.vuepress/dist/docs` (see `docs/.vuepress/build.config.js`). This keeps the `/docs/` prefix that every document is built with, so the site is served under `https://hyperformula.handsontable.com/docs/`.
+The asset directory is `docs/.vuepress/dist` (written as `./.vuepress/dist` in `wrangler.jsonc`, which resolves against `docs/`), while VuePress writes to `docs/.vuepress/dist/docs` (see `docs/.vuepress/build.config.js`). This keeps the `/docs/` prefix that every document is built with, so the site is served under `https://hyperformula.handsontable.com/docs/`.
 
 Production traffic reaches this Worker through the `hyperformula-website` Worker, which proxies `/docs*` to `https://hyperformula-docs.handsoncode.workers.dev` (the `DOCS_ORIGIN` constant in that project).
 

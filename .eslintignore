@@ -9,7 +9,6 @@ hyperformula/src/interpreter/plugin/3rdparty
 
 # Configurations
 *.config.js
-hyperformula/*.config.js
 hyperformula/.config/
 hyperformula/karma.*
 doc
@@ -44,5 +43,3 @@ docs/.vuepress/dist
 doc
 typedoc
 
-# The docs generator, like the rest of script/
-docs/script

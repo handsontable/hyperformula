@@ -20,7 +20,7 @@ Documentation-only, test-only, and CI or tooling changes take none, and neither 
 
 ## 4. Write the bullet
 
-Under `## [Unreleased]` in `CHANGELOG.md`, in the section that matches the change, creating the `### ` heading if it is absent. End it with the link from step 3.
+Under `## [Unreleased]` in the **package's** changelog — `hyperformula/CHANGELOG.md` for the engine. The root `CHANGELOG.md` is an index of the per-package files and has no `[Unreleased]` heading. Put it in the section that matches the change, creating the `### ` heading if it is absent. End it with the link from step 3.
 
 ## 5. Re-read it as a user would
 

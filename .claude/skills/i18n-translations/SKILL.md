@@ -32,4 +32,4 @@ npm run lint
 
 ## Adding a whole language pack
 
-The file, its export in `hyperformula/src/i18n/languages/index.ts`, a key set identical to the other packs, a changelog entry, and `npm run bundle:languages` for the standalone UMD build.
+The file, its export in `hyperformula/src/i18n/languages/index.ts`, a key set identical to the other packs, a changelog entry, and `npm run bundle:languages --workspace=hyperformula` for the standalone UMD build.
