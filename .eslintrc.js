@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
   root: true,
   ignorePatterns: ['.eslintrc.js'],
@@ -15,7 +17,7 @@ module.exports = {
   },
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: './tsconfig.json',
+    project: './hyperformula/tsconfig.json',
     createDefaultProgram: true,
   },
   extends: [
@@ -134,7 +136,7 @@ module.exports = {
     {
       files: ['**/src/**/*.ts'],
       rules: {
-        'license-header/header': [ 'error', './.config/source-license-header.js' ],
+        'license-header/header': [ 'error', path.join(__dirname, 'hyperformula/.config/source-license-header.js') ],
       }
     },
     {

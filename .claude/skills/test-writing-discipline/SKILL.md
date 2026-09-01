@@ -23,7 +23,7 @@ When a test is red the default assumption is that the code is wrong. Changing th
 
 ## 5. Run it again and read the output
 
-Never claim a test passes because the reasoning is sound. And before treating green as coverage, confirm `test/hyperformula-tests/` is present — `npm run test:setup-private`.
+Never claim a test passes because the reasoning is sound. And before treating green as coverage, confirm `hyperformula/test/hyperformula-tests/` is present — `npm run test:setup-private`.
 
 ## If you cannot make it pass honestly
 

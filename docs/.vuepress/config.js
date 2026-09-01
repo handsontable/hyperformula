@@ -1,9 +1,10 @@
+const path = require('path');
 const highlight = require('./highlight');
 const regexPlugin = require('markdown-it-regex').default;
 const footnotePlugin = require('markdown-it-footnote');
 const searchBoxPlugin = require('./plugins/search-box');
 const examples = require('./plugins/examples/examples');
-const HyperFormula = require('../../dist/hyperformula.full');
+const HyperFormula = require('../../hyperformula/dist/hyperformula.full');
 const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet');
 const mdCompanions = require('./plugins/md-companions');
 
@@ -31,14 +32,17 @@ const normalizeBase = (b) => {
 };
 
 const DOCS_BASE = normalizeBase(process.env.DOCS_BASE || buildConfigOverrides.base || '/');
-const DOCS_DEST = process.env.DOCS_DEST || buildConfigOverrides.dest || 'docs/.vuepress/dist';
+const DOCS_DEST = process.env.DOCS_DEST || buildConfigOverrides.dest || '.vuepress/dist';
 const DOCS_HOSTNAME = process.env.DOCS_HOSTNAME || buildConfigOverrides.hostname || 'https://hyperformula.handsontable.com';
 
 module.exports = {
   // Default page globs, minus the built-in-functions template: it is the INPUT of docs:generate-function-docs,
   // not a page, and without this exclusion VuePress would publish it as a duplicate, table-less
   // /guide/built-in-functions.tmpl.html (also polluting the sitemap, search index, and llms.txt corpus).
-  patterns: ['**/*.md', '**/*.vue', '!guide/built-in-functions.tmpl.md'],
+  // AGENTS.md and its CLAUDE.md symlink are internal instructions that happen to
+  // live in this directory. Without these exclusions VuePress publishes them as
+  // /AGENTS.html and an identical /CLAUDE.html, sitemap and search index included.
+  patterns: ['**/*.md', '**/*.vue', '!guide/built-in-functions.tmpl.md', '!AGENTS.md', '!CLAUDE.md'],
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
   head: [
@@ -149,7 +153,11 @@ module.exports = {
         replace: () => `'${HyperFormula.releaseDate}'`
       })
       md.use(footnotePlugin)
-      md.use(includeCodeSnippet)
+      // The snippet paths in the guides are written from the repository root
+      // (`@/docs/examples/...`). Anchor the plugin there explicitly rather than
+      // letting it fall back to `process.cwd()`, which is this directory now that
+      // the portal builds as its own package.
+      md.use(includeCodeSnippet, { root: path.resolve(__dirname, '../..') })
     }
   },
   // TODO: It doesn't work. It's seems that this option is bugged. Documentation says that this option is configurable,

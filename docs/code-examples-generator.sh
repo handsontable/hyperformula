@@ -6,8 +6,11 @@
 #   ./code-examples-generator.sh --generateAll - generates all examples in the content/guides directory
 #   ./code-examples-generator.sh --formatAllTsExamples - runs the autoformatter on all TS and TSX example files in the content/guides directory
 
-ALL_EXAMPLES_DIR="docs/examples"
-ESLINT_CONFIG="docs/examples/eslintrc.examples.js"
+# Anchored at this script rather than the working directory: the script used to
+# be invoked from the repository root and is now invoked from docs/.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ALL_EXAMPLES_DIR="$SCRIPT_DIR/examples"
+ESLINT_CONFIG="$SCRIPT_DIR/examples/eslintrc.examples.js"
 
 format() {
   eslint --fix --no-ignore -c "$ESLINT_CONFIG" "$1" > /dev/null

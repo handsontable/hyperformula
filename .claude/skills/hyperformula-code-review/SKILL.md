@@ -11,9 +11,9 @@ Always:
 |---|---|
 | [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md) | What the change was required to contain |
 | [`CODE-STYLE.md`](../../../dev-docs/CODE-STYLE.md) | Style, and which paths are hot enough that complexity matters |
-| [`TESTING.md`](../../../dev-docs/TESTING.md#a-test-must-prove-behaviour) | Whether the tests prove anything, or only execute code |
+| [`TESTING.md`](../../../hyperformula/dev-docs/TESTING.md#a-test-must-prove-behaviour) | Whether the tests prove anything, or only execute code |
 
-Then the page covering what the diff touches: [`ARCHITECTURE.md`](../../../dev-docs/ARCHITECTURE.md), [`PARSER.md`](../../../dev-docs/PARSER.md), [`INTERPRETER.md`](../../../dev-docs/INTERPRETER.md), [`DEPENDENCY-GRAPH.md`](../../../dev-docs/DEPENDENCY-GRAPH.md), [`FUNCTION-CATALOGUE.md`](../../../dev-docs/FUNCTION-CATALOGUE.md), [`I18N.md`](../../../dev-docs/I18N.md).
+Then the page covering what the diff touches: [`ARCHITECTURE.md`](../../../hyperformula/dev-docs/ARCHITECTURE.md), [`PARSER.md`](../../../hyperformula/dev-docs/PARSER.md), [`INTERPRETER.md`](../../../hyperformula/dev-docs/INTERPRETER.md), [`DEPENDENCY-GRAPH.md`](../../../hyperformula/dev-docs/DEPENDENCY-GRAPH.md), [`FUNCTION-CATALOGUE.md`](../../../hyperformula/dev-docs/FUNCTION-CATALOGUE.md), [`I18N.md`](../../../hyperformula/dev-docs/I18N.md).
 
 Review in the order below, and stop to report the first serious finding rather than burying it under style notes.
 
@@ -29,7 +29,7 @@ Review in the order below, and stop to report the first serious finding rather t
 
 ## 3. Completeness of a function change
 
-Check every one of [the five places a function change must touch](../../../dev-docs/INTERPRETER.md#the-five-places-a-function-change-must-touch); most of them fail silently when missed. Plus `sizeOfResultArrayMethod` for anything array-returning, and an explicit `optionalArg` where arity does not express the valid call. Skill `hyperformula-function-dev`.
+Check every one of [the five places a function change must touch](../../../hyperformula/dev-docs/INTERPRETER.md#the-five-places-a-function-change-must-touch); most of them fail silently when missed. Plus `sizeOfResultArrayMethod` for anything array-returning, and an explicit `optionalArg` where arity does not express the valid call. Skill `hyperformula-function-dev`.
 
 ## 4. Performance
 
@@ -37,7 +37,7 @@ Allocation in a per-cell or per-vertex loop; work that could be hoisted out of t
 
 ## 5. Public API
 
-`src/HyperFormula.ts` and its exported types are the contract. A signature, return-type, or behaviour change is breaking and needs a migration-guide section and an explicit note. JSDoc here is published output — review it as documentation.
+`hyperformula/src/HyperFormula.ts` and its exported types are the contract. A signature, return-type, or behaviour change is breaking and needs a migration-guide section and an explicit note. JSDoc here is published output — review it as documentation.
 
 ## 6. Process
 

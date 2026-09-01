@@ -1,6 +1,6 @@
 ---
 name: hyperformula-function-dev
-paths: src/interpreter/**
+paths: hyperformula/src/interpreter/**
 description: Use when adding a new built-in spreadsheet function to HyperFormula, changing an existing one's signature, arguments, return type, or error behaviour, or when a function returns the wrong value or the wrong error. Covers the FunctionPlugin contract, runFunction and argument metadata, the function metadata catalogue, translations, and the full end-to-end checklist.
 ---
 
@@ -8,9 +8,9 @@ description: Use when adding a new built-in spreadsheet function to HyperFormula
 
 | File | Why |
 |---|---|
-| [`INTERPRETER.md`](../../../dev-docs/INTERPRETER.md#built-in-functions) | The plugin contract, `runFunction`, and every argument and function metadata field. Read this before writing any code. |
-| [`FUNCTION-CATALOGUE.md`](../../../dev-docs/FUNCTION-CATALOGUE.md) | What the catalogue entry must contain, and the two ways to get it wrong |
-| [`I18N.md`](../../../dev-docs/I18N.md) | Where to source a translation, and why an invented one cannot be taken back |
+| [`INTERPRETER.md`](../../../hyperformula/dev-docs/INTERPRETER.md#built-in-functions) | The plugin contract, `runFunction`, and every argument and function metadata field. Read this before writing any code. |
+| [`FUNCTION-CATALOGUE.md`](../../../hyperformula/dev-docs/FUNCTION-CATALOGUE.md) | What the catalogue entry must contain, and the two ways to get it wrong |
+| [`I18N.md`](../../../hyperformula/dev-docs/I18N.md) | Where to source a translation, and why an invented one cannot be taken back |
 | [`TESTING.md`](../../../dev-docs/TESTING.md#what-each-kind-of-change-needs) | The list of cases a function change must cover |
 | [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md) | What the change must contain before review |
 
@@ -18,7 +18,7 @@ description: Use when adding a new built-in spreadsheet function to HyperFormula
 
 A function is not done until all five agree, and they do not fail the same way — a missing catalogue entry fails the docs build, a parameter-count mismatch only warns on the console, and the rest fail silently.
 
-The list is in [`INTERPRETER.md`](../../../dev-docs/INTERPRETER.md#the-five-places-a-function-change-must-touch). Work through it there rather than from a copy; two of the five have their own page, linked from it.
+The list is in [`INTERPRETER.md`](../../../hyperformula/dev-docs/INTERPRETER.md#the-five-places-a-function-change-must-touch). Work through it there rather than from a copy; two of the five have their own page, linked from it.
 
 ## 3. Declare the two things nothing cross-checks
 
