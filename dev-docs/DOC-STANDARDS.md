@@ -63,6 +63,6 @@ A breaking change says what breaks and what to do instead, and still needs a mig
 
 ## The documentation portal
 
-`docs/` is a VuePress site. How to run it, what is generated, and how to add a page are in [`docs/README.md`](README.md).
+`docs/` is a VuePress site. How to run it, what is generated, and how to add a page are in [`docs/README.md`](../docs/README.md).
 
 Two rules from above bear repeating there, because they are the ones most often broken while writing a guide: do not restate the API reference, and describe HyperFormula rather than Excel.
