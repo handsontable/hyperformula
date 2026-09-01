@@ -4,7 +4,8 @@
   "homepage": "https://hyperformula.handsontable.com/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/handsontable/hyperformula.git"
+    "url": "https://github.com/handsontable/hyperformula.git",
+    "directory": "hyperformula"
   },
   "bugs": {
     "url": "https://github.com/handsontable/hyperformula/issues"
@@ -120,7 +121,6 @@
     "@types/webpack-env": "^1.18.5",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "@vuepress/shared-utils": "^1.9.10",
     "as-table": "^1.0.55",
     "babel-loader": "^8.4.1",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",
@@ -135,7 +135,6 @@
     "eslint-plugin-license-header": "^0.6.1",
     "eslint-plugin-prettier": "^5.2.1",
     "exceljs": "^4.4.0",
-    "full-icu": "^1.5.0",
     "jasmine": "^5.4.0",
     "jest": "^26.6.3",
     "jsdom": "^25.0.1",
