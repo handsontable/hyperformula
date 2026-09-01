@@ -21,11 +21,12 @@ Committed, so every developer gets the same setup.
 | Key | Why |
 |---|---|
 | `enabledPlugins` | `typescript-lsp` — language-server go-to-definition and find-references. Use it instead of grepping for a symbol's definition or callers; grep stays right for text searches. |
-| `permissions.deny` | Blocks agent reads of every generated and built path. The build outputs are git-ignored, so content searches already skip them, but nothing otherwise stops an agent opening `dist/hyperformula.js` or answering a behaviour question from `typings/` instead of `hyperformula/src/`. |
-| `worktree.symlinkDirectories` | Symlinks `node_modules` into each worktree rather than duplicating it. See [`WORKTREES.md`](WORKTREES.md). |
+| `permissions.deny` | Blocks agent reads of **build artifacts**. They are git-ignored, so content searches already skip them, but nothing otherwise stops an agent opening `dist/hyperformula.js` or answering a behaviour question from `typings/` instead of `hyperformula/src/`. |
 | `hooks` | The `PostToolUse` lint hook below. |
 
-`node_modules/` and `package-lock.json` are deliberately readable: reading a dependency's source is sometimes the right move when debugging, and a deny rule would also block a targeted grep for a dependency version.
+**Generated documentation is not a build artifact, and is deliberately readable.** `docs/api/` and `docs/guide/built-in-functions.md` are produced by a build step, but they are the API reference and the function reference — reading them to answer a question is the right move, and `FUNCTION-CATALOGUE.md` links straight into them. The rule is about *artifacts*: bundles, declarations, coverage, and the compiled site. Editing either of those files is still always wrong; that is what the build regenerates.
+
+`node_modules/` and `package-lock.json` are deliberately readable too: reading a dependency's source is sometimes the right move when debugging, and a deny rule would also block a targeted grep for a dependency version.
 
 Relative deny patterns anchor at the session's working directory, and project settings are not inherited from parent directories — these rules apply to sessions started at the repository root.
 
