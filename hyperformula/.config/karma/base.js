@@ -6,7 +6,14 @@ module.exports.create = function(config) {
     basePath: '',
 
     client: {
-      clearContext: false,
+      // Karma must be allowed to clear its context iframe when a run finishes.
+      // Left at `false`, Chrome reports "Some of your tests did a full page
+      // reload!" after every spec has already passed, and the run exits
+      // non-zero - intermittently with browsers in parallel, every time when
+      // they run in sequence. The interactive `debug` config sets it back to
+      // `false`, which is what that option is actually for: keeping the
+      // kjhtml results page on screen between runs.
+      clearContext: true,
       spec: config.spec
     },
 

@@ -25,7 +25,7 @@ npm run test:setup-private
 | `npm run test:jest` | Jest only; the fast loop |
 | `npm run test:watch` | Jest in watch mode |
 | `npm run test:coverage` | Jest with coverage |
-| `npm run test:browser` | Karma, against the `dist` build |
+| `npm run test:browser` | Karma, against the `dist` build, in headless Chrome and Firefox |
 | `npm run test:compatibility` | The compatibility suite, which ships with the private repository |
 | `npm run test:performance` | The basic and CRUD benchmarks |
 
@@ -106,3 +106,11 @@ expect(result).toBeTruthy()                                // 1, 'x', and [] all
 ```
 
 Never claim a test passes without having run it, and never claim a fix works because the reasoning is sound.
+
+## The browser run
+
+`npm run test:browser` builds the `dist` bundle and runs the same specs in headless Chrome and Firefox, because the library ships to both.
+
+Karma's `client.clearContext` must stay `true` in `.config/karma/base.js`. With it `false`, Chrome reports `Some of your tests did a full page reload!` *after* every spec has already passed, and the run exits non-zero — intermittently when the browsers run in parallel, and every single time when they run in sequence. The one place it belongs is `.config/karma/debug.js`, which sets it back to `false` so the kjhtml results page stays on screen between watch runs.
+
+`npm run test:browser.debug` is that interactive config: Chrome only, no `singleRun`, watching for changes.
