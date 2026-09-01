@@ -16,11 +16,11 @@ Documentation-only, test-only, and CI or tooling changes take none, and neither 
 
 ## 3. Open the pull request first
 
-The entry carries a link, so it needs the number. Do not guess it — read it from the URL. Skill `pr-creation`.
+**Every entry ends with a GitHub link**: the public issue it fixes when one exists, otherwise the pull request. So the entry needs a number that only exists once the pull request is open. Do not guess it — read it from the URL `gh pr create` prints. Skill `pr-creation`.
 
 ## 4. Write the bullet
 
-Under `## [Unreleased]` in `CHANGELOG.md`, in the section that matches the change, creating the `### ` heading if it is absent. Link the public issue where one exists; otherwise the pull request.
+Under `## [Unreleased]` in `CHANGELOG.md`, in the section that matches the change, creating the `### ` heading if it is absent. End it with the link from step 3.
 
 ## 5. Re-read it as a user would
 

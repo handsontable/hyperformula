@@ -5,7 +5,7 @@ Each package in this repository keeps its own changelog and releases on its own 
 | Package | Changelog |
 |---|---|
 | `hyperformula` | [`hyperformula/CHANGELOG.md`](hyperformula/CHANGELOG.md) |
-| `hyperformula-ui` | not yet imported — see [`dev-docs/MONOREPO.md`](dev-docs/MONOREPO.md) |
+| `hyperformula-ui` | not yet imported — see [`dev-docs/STRUCTURE.md`](dev-docs/STRUCTURE.md#what-the-move-still-owes) |
 
 The documentation portal in `docs/` is not published and keeps no changelog.
 

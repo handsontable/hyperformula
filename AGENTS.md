@@ -8,27 +8,7 @@ HyperFormula is a headless spreadsheet calculation engine in TypeScript. No UI, 
 
 **[`dev-docs/`](dev-docs/) is the single source of truth for everything internal to this project.** Architecture, conventions, build, testing, standards, and the monorepo plan all live there and nowhere else. This file routes; it does not explain. Neither does any other `AGENTS.md` or `README.md` — if one of them looks like it is explaining something, the explanation belongs in `dev-docs/` and the file should link to it.
 
-Read [`dev-docs/README.md`](dev-docs/README.md) first. It indexes the rest.
-
-| You are working on | Read |
-|---|---|
-| Anything in `hyperformula/src/` | [`dev-docs/ARCHITECTURE.md`](dev-docs/ARCHITECTURE.md) |
-| Formula parsing | [`dev-docs/PARSER.md`](dev-docs/PARSER.md) |
-| Formula evaluation, or a built-in function | [`dev-docs/INTERPRETER.md`](dev-docs/INTERPRETER.md) |
-| Function descriptions in the API and the docs | [`dev-docs/FUNCTION-CATALOGUE.md`](dev-docs/FUNCTION-CATALOGUE.md) |
-| Dependency tracking and recalculation order | [`dev-docs/DEPENDENCY-GRAPH.md`](dev-docs/DEPENDENCY-GRAPH.md) |
-| Function-name translations | [`dev-docs/I18N.md`](dev-docs/I18N.md) |
-| Tests | [`dev-docs/TESTING.md`](dev-docs/TESTING.md) |
-| The documentation portal | [`dev-docs/DOC-STANDARDS.md`](dev-docs/DOC-STANDARDS.md) |
-| Building, bundling, releasing | [`dev-docs/BUILD.md`](dev-docs/BUILD.md) |
-| What a change must include before review | [`dev-docs/DEFINITION-OF-DONE.md`](dev-docs/DEFINITION-OF-DONE.md) |
-| Style and performance | [`dev-docs/CODE-STYLE.md`](dev-docs/CODE-STYLE.md) |
-| A linked git worktree | [`dev-docs/WORKTREES.md`](dev-docs/WORKTREES.md) |
-| How this repository is set up for agents | [`dev-docs/AGENT-TOOLING.md`](dev-docs/AGENT-TOOLING.md) |
-| The monorepo migration | [`dev-docs/MONOREPO.md`](dev-docs/MONOREPO.md) |
-| Step-by-step task workflows | [`.claude/skills/`](.claude/skills/) |
-
-Each directory's own `AGENTS.md` points at the page that covers it, and loads automatically when you work there.
+Read [`dev-docs/README.md`](dev-docs/README.md) first. It says which page covers what, and every directory's own `AGENTS.md` points at the page that covers that directory.
 
 ## Never publish sensitive information
 
