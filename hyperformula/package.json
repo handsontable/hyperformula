@@ -55,6 +55,7 @@
   "unpkg": "dist/hyperformula.min.js",
   "typings": "./typings/index.d.ts",
   "scripts": {
+    "copy-changelog": "node -e \"require('fs').copyFileSync('../CHANGELOG.md', 'CHANGELOG.md')\"",
     "bundle-all": "cross-env HF_COMPILE=1 npm-run-all clean compile bundle:** verify-bundles",
     "bundle:es": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=es env-cmd -f ht.config.js babel lib --out-file-extension .mjs --out-dir es",
     "bundle:cjs": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=commonjs env-cmd -f ht.config.js babel lib --out-dir commonjs",
@@ -68,7 +69,7 @@
     "verify:umd:full": "node script/check-file.js dist/hyperformula.full.js",
     "verify:umd:full.min": "node script/check-file.js dist/hyperformula.full.min.js",
     "verify:cjs": "node script/check-file.js commonjs",
-    "verify:publish-package": "npm pack | node script/check-publish-package.js",
+    "verify:publish-package": "npm run copy-changelog && npm pack | node script/check-publish-package.js",
     "verify:typings": "tsc --noEmit",
     "test": "npm-run-all test:jest test:browser",
     "test:setup-private": "bash test/fetch-tests.sh",

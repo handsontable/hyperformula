@@ -25,7 +25,7 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 │   ├── tsconfig.json  jest.config.js  karma.conf.js  webpack.config.js
 │   ├── babel.config.js  ht.config.js  jasmine.json  .npmignore
 │   ├── .typedoc.ts  .typedoc.md.ts   # API reference generation, output into docs/api
-│   ├── package.json  .nvmrc  CHANGELOG.md  README.md  LICENSE.txt
+│   ├── package.json  .nvmrc  README.md  LICENSE.txt
 │   └── AGENTS.md  CLAUDE.md
 │
 ├── hyperformula-ui/                  # ── package: UI components (not imported yet)
@@ -49,7 +49,8 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 ├── .eslintrc.js  .eslintignore       # Linting, run once from the root over everything
 ├── package.json                      # Private workspace root: fan-out scripts only
 ├── package-lock.json  .nvmrc  .worktreeinclude
-├── AGENTS.md  CLAUDE.md  README.md  CONTRIBUTING.md  CHANGELOG.md  LICENSE.txt
+├── AGENTS.md  CLAUDE.md  README.md  CONTRIBUTING.md  LICENSE.txt
+├── CHANGELOG.md                      # one history for every package
 └── CODE_OF_CONDUCT.md
 ```
 
@@ -103,7 +104,7 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 
 ## What the move still owes
 
-1. **Import `hyperformula-ui`.** The directory is a placeholder; the package is imported from the formula-builder repository in a separate change, preserving its history, and it keeps the scope it publishes under today. Add `hyperformula-ui` to the root `workspaces` array in that same change, not before: npm silently ignores an entry with no `package.json`, so listing it early buys nothing and the lockfile has to be regenerated when the package lands either way. When it arrives it also needs an `.nvmrc` saying `22`, a `CHANGELOG.md`, and an `AGENTS.md` with a `CLAUDE.md` symlink.
+1. **Import `hyperformula-ui`.** The directory is a placeholder; the package is imported from the formula-builder repository in a separate change, preserving its history, and it keeps the scope it publishes under today. Add `hyperformula-ui` to the root `workspaces` array in that same change, not before: npm silently ignores an entry with no `package.json`, so listing it early buys nothing and the lockfile has to be regenerated when the package lands either way. When it arrives it also needs an `.nvmrc` saying `22` and an `AGENTS.md` with a `CLAUDE.md` symlink — but no changelog of its own, and its version moves in step with the engine's. The release script bumps one manifest today; give it the second one in the same change.
 2. **Path-filter CI.** Each package's jobs should run only when its own paths change, with full runs on `develop`, `master`, and release branches. Not done here on purpose: a naive `paths:` filter on a workflow that branch protection lists as a required check leaves the check permanently pending, and pull requests become unmergeable. Doing it safely needs the required-checks list, which lives in repository settings rather than in the tree, and the `dorny/paths-filter`-plus-single-gate shape that the Handsontable monorepo uses.
 
 ## What the move decided
@@ -111,7 +112,8 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 - **npm workspaces, not pnpm.** A package-manager migration is a risk the move did not need to carry at the same time.
 - **`docs/` is not a workspace member.** VuePress 1.x and its `--openssl-legacy-provider` dependency tree must never reach an engine install. It installs on its own with `npm run docs:install`, and CI installs it before building the portal.
 - **One `dev-docs/`, at the root.** The original plan put an engine-scope copy inside `hyperformula/`. That was dropped: two directories fragment the single source of truth, and every page would have to know which scope it was written from. The engine's subsystem pages live here alongside the repository-wide ones.
-- **Every package versions and releases on its own cadence**, with its own `CHANGELOG.md` in the existing Keep a Changelog form. No fragment mechanism.
+- **The packages release together, on one version, from one changelog.** A release cuts every published package at the same version, whether or not each one changed, and `CHANGELOG.md` at the repository root is the single history for all of them. That keeps one number to reason about — the version a user reports a bug against identifies the state of the whole repository — at the cost of publishing a package whose code did not move. Entries name the package they concern where it is not obvious.
+- **The published tarball still carries a changelog.** `hyperformula`'s `prepack` copies the root `CHANGELOG.md` into the package and `postpack` removes it again, so there is one file under version control and npm consumers still get one.
 - **Every `.nvmrc` says `22`.**
 - **Linting stays at the root**, run once over the whole repository, so nothing between packages falls through the gap.
 - **The private test suite stays branch-matched.** Only its checkout path moved, to `hyperformula/test/hyperformula-tests/`. Its specs needed no change: they import the engine relatively, and the depth from a spec to the package root is unchanged.

@@ -32,7 +32,7 @@ Describe **HyperFormula's** behaviour, not Excel's. HyperFormula deliberately de
 
 ## The changelog
 
-Each package keeps its own changelog — `hyperformula/CHANGELOG.md` for the engine — following [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The `CHANGELOG.md` at the repository root is an index of those files and takes no entries. Entries go under `## [Unreleased]` in the package's file, in the section matching the change — create the `### ` heading if it is not there yet.
+`CHANGELOG.md` at the repository root is the single history for every package — they release together, on one version. It follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Entries go under `## [Unreleased]`, in the section matching the change — create the `### ` heading if it is not there yet. Name the package an entry concerns when it is not obvious from the text.
 
 | Section | For |
 |---|---|

@@ -50,7 +50,7 @@ manual_checklist() {
 # monorepo. package-lock.json stays at the root, where the workspace resolves it.
 PKG_DIR="hyperformula"
 PKG_JSON="$PKG_DIR/package.json"
-PKG_CHANGELOG="$PKG_DIR/CHANGELOG.md"
+PKG_CHANGELOG="CHANGELOG.md"   # one changelog for every package, at the repository root
 PKG_HT_CONFIG="$PKG_DIR/ht.config.js"
 
 # Prints the body of a CHANGELOG.md section: every line between the given
@@ -1152,7 +1152,11 @@ elif $DRY_RUN; then
   echo "    (would ask for confirmation, then run: npm publish --tag $NPM_TAG)"
 else
   confirm_publish "$VERSION" "$NPM_USER"
-  run npm publish --tag "$NPM_TAG"
+  # The changelog lives at the repository root and npm cannot pack outside the
+  # package, so copy it in first. And publish the workspace, not the root, whose
+  # manifest is private.
+  run npm run copy-changelog --workspace=hyperformula
+  run npm publish --workspace=hyperformula --tag "$NPM_TAG"
   wait_for_npm "$VERSION"
 fi
 

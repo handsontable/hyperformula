@@ -18,6 +18,9 @@
 node_modules/
 /hyperformula/typings/
 /hyperformula/storage/
+# Copied in by the package's prepack so the tarball carries one; the source is the
+# CHANGELOG.md at the repository root.
+/hyperformula/CHANGELOG.md
 
 *.iml
 dev*.html
