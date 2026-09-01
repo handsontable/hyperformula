@@ -20,19 +20,5 @@
       "Read(/docs/.vuepress/api-sidebar.json)",
       "Read(/docs/.vuepress/api-sidebar-relative.json)"
     ]
-  },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/script/claude/post-tool-use.mjs\"",
-            "timeout": 60
-          }
-        ]
-      }
-    ]
   }
 }
