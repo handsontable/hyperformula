@@ -40,6 +40,7 @@
     "docs:dev": "npm run docs:generate-function-docs && npm run typedoc:build-api && npm --prefix docs run dev --",
     "docs:build": "npm run docs:generate-function-docs && npm run bundle-all && npm run typedoc:build-api && npm --prefix docs run build --",
     "docs:build:cf": "npm run docs:install && npm run docs:generate-function-docs && npm run bundle-all && npm run typedoc:build-api && npm --prefix docs run build:cf --",
+    "docs:dev:cf": "npm --prefix docs run dev:cf --",
     "docs:deploy:cf": "npm --prefix docs run deploy:cf --",
     "docs:preview:cf": "npm --prefix docs run preview:cf --",
     "audit": "npm audit --omit=dev",

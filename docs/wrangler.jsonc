@@ -7,9 +7,10 @@
  * extensionless URLs; see the comment there.
  *
  * Deployments are driven by Workers Builds (Git integration configured in the
- * Cloudflare dashboard):
- *   - `master`      -> `npx wrangler deploy`          (production)
- *   - other branches -> `npx wrangler versions upload` (per-branch preview URL)
+ * Cloudflare dashboard). Every command it runs starts at the repository root,
+ * so the deploy commands are the root scripts, which run `wrangler` in `docs/`:
+ *   - `master`       -> `npm run docs:deploy:cf`  (production)
+ *   - other branches -> `npm run docs:preview:cf` (per-branch preview URL)
  */
 {
   "$schema": "./node_modules/wrangler/config-schema.json",

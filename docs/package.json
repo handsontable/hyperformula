@@ -9,6 +9,7 @@
     "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress dev . --silent --no-clear-screen --no-cache",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress build .",
     "build:cf": "rimraf .vuepress/dist && npm run build && node script/prepare-cf-assets.js",
+    "dev:cf": "wrangler dev",
     "deploy:cf": "wrangler deploy",
     "preview:cf": "wrangler versions upload",
     "code-examples:generate-js": "bash code-examples-generator.sh",

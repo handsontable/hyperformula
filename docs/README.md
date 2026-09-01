@@ -60,10 +60,10 @@ The documentation site is deployed to Cloudflare Workers as the `hyperformula-do
 
 | Trigger | Command run by Workers Builds | Result |
 | --- | --- | --- |
-| push to `master` | `npx wrangler deploy` (from `docs/`) | production deployment |
-| push to any other branch, and every pull request | `npx wrangler versions upload` (from `docs/`) | preview deployment at `https://<branch>-hyperformula-docs.handsoncode.workers.dev`, posted as a pull request comment |
+| push to `master` | `npm run docs:deploy:cf` | production deployment |
+| push to any other branch, and every pull request | `npm run docs:preview:cf` | preview deployment at `https://<branch>-hyperformula-docs.handsoncode.workers.dev`, posted as a pull request comment |
 
-Both commands must run with `docs/` as the working directory, where `wrangler.jsonc` lives. From the repository root, use `npm run docs:deploy:cf` and `npm run docs:preview:cf`, which do that for you.
+Every command Workers Builds runs starts at the repository root, because the build command needs the engine bundles and the API reference that only root scripts produce. `wrangler` itself must run in `docs/`, where `wrangler.jsonc` lives — so the deploy commands are the root scripts above, which do the `--prefix docs` for you. A bare `npx wrangler deploy` at the root finds no configuration and no local `wrangler`.
 
 Configuration in the repository:
 
@@ -76,13 +76,13 @@ The asset directory is `docs/.vuepress/dist` (written as `./.vuepress/dist` in `
 
 Production traffic reaches this Worker through the `hyperformula-website` Worker, which proxies `/docs*` to `https://hyperformula-docs.handsoncode.workers.dev` (the `DOCS_ORIGIN` constant in that project).
 
-Build settings in the Cloudflare dashboard, under **Workers & Pages > hyperformula-docs > Settings > Build**: build command `npm run docs:build:cf`, deploy command `npx wrangler deploy`, non-production branch deploy command `npx wrangler versions upload`, production branch `master`, non-production branch builds enabled.
+Build settings in the Cloudflare dashboard, under **Workers & Pages > hyperformula-docs > Settings > Build**: root directory `/`, build command `npm run docs:build:cf`, deploy command `npm run docs:deploy:cf`, non-production branch deploy command `npm run docs:preview:cf`, production branch `master`, non-production branch builds enabled.
 
 Deploying by hand is only needed for debugging; regular deployments go through Workers Builds.
 
 ```bash
 npm run docs:build:cf     # build the documentation and prepare the asset directory
-npx wrangler dev          # serve the built site locally at http://localhost:8787
+npm run docs:dev:cf       # serve the built site locally at http://localhost:8787
 npm run docs:preview:cf   # upload a preview version (does not touch production)
 npm run docs:deploy:cf    # deploy to production
 ```
