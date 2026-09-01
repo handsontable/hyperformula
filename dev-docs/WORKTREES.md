@@ -31,8 +31,8 @@ Claude Code can run a session — or an isolated subagent — in a `git worktree
 }
 ```
 
-This is safe while HyperFormula is a single package: there is exactly one `node_modules/.bin`, and the symlink resolves it. **It stops being safe once the repository becomes a workspace** — package-local `node_modules/.bin` directories are not covered by a root-level symlink, and scripts then die mid-build with a bare `command not found`. Revisit this setting as part of the monorepo migration ([`MONOREPO.md`](MONOREPO.md)).
+This is safe while HyperFormula is a single package: there is exactly one `node_modules/.bin`, and the symlink resolves it. **It stops being safe once the repository becomes a workspace** — package-local `node_modules/.bin` directories are not covered by a root-level symlink, and scripts then die mid-build with a bare `command not found`. Revisit this setting as part of the monorepo migration ([`STRUCTURE.md`](STRUCTURE.md#where-it-is-going)).
 
 ## Sparse checkouts
 
-`worktree.sparsePaths` limits what git writes to disk. It buys little today — this repository is small and `src/` is needed by everything. It becomes worth setting once the packages in [`MONOREPO.md`](MONOREPO.md) exist and a task can be scoped to one of them.
+`worktree.sparsePaths` limits what git writes to disk. It buys little today — this repository is small and `src/` is needed by everything. It becomes worth setting once the packages in [`STRUCTURE.md`](STRUCTURE.md#where-it-is-going) exist and a task can be scoped to one of them.
