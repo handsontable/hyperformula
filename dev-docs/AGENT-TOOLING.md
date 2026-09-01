@@ -23,28 +23,10 @@ Committed, so every developer gets the same setup.
 | `enabledPlugins` | `typescript-lsp` — language-server go-to-definition and find-references. Use it instead of grepping for a symbol's definition or callers; grep stays right for text searches. |
 | `permissions.deny` | Blocks agent reads of every generated and built path. The build outputs are git-ignored, so content searches already skip them, but nothing otherwise stops an agent opening `dist/hyperformula.js` or answering a behaviour question from `typings/` instead of `src/`. |
 | `worktree.symlinkDirectories` | Symlinks `node_modules` into each worktree rather than duplicating it. See [`WORKTREES.md`](WORKTREES.md). |
-| `hooks` | The `PostToolUse` lint hook below. |
 
 `node_modules/` and `package-lock.json` are deliberately readable: reading a dependency's source is sometimes the right move when debugging, and a deny rule would also block a targeted grep for a dependency version.
 
 Relative deny patterns anchor at the session's working directory, and project settings are not inherited from parent directories — these rules apply to sessions started at the repository root.
-
-## The `PostToolUse` lint hook
-
-[`script/claude/post-tool-use.mjs`](../script/claude/post-tool-use.mjs), matched on `Edit|Write`. Claude Code passes the tool payload as JSON on stdin; the hook reads `tool_input.file_path`, lints that one file, and exits 2 with the remaining errors on stderr, which Claude Code shows to the agent. ESLint rules are applied while the change is being written rather than when someone runs `npm run lint` at the end.
-
-Three properties to preserve when changing it:
-
-- **Errors only, never warnings.** `npm run lint` reports tens of thousands of warnings across the repository. Reporting them per edit would bury the agent in noise unrelated to the change it just made.
-- **`--fix-type problem,layout`.** Never plain `--fix`. `jsdoc/require-jsdoc` is a suggestion-type rule whose autofix inserts an **empty** JSDoc block above every undocumented declaration, so an unconstrained `--fix` quietly scatters those stubs through any file the agent edits. The restriction keeps the fixes that are unambiguously right — the licence header, semicolons, quotes, spacing — and drops the ones that need a human.
-- **Fails open.** A missing ESLint binary, a spawn failure, or unparseable output exits 0 silently. A broken hook must never block work.
-
-`script/` is in [`.eslintignore`](../.eslintignore), so the hook is not linted by itself. Verify a change to it by piping a payload in by hand:
-
-```bash
-printf '{"tool_name":"Edit","cwd":"'"$PWD"'","tool_input":{"file_path":"src/interpreter/plugin/AbsPlugin.ts"}}' \
-  | node script/claude/post-tool-use.mjs; echo "exit=$?"
-```
 
 ## Skills
 

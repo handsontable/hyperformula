@@ -28,19 +28,5 @@
     "symlinkDirectories": [
       "node_modules"
     ]
-  },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/script/claude/post-tool-use.mjs\"",
-            "timeout": 60
-          }
-        ]
-      }
-    ]
   }
 }
