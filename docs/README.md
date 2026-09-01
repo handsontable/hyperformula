@@ -69,7 +69,7 @@ Configuration in the repository:
 
 - `docs/wrangler.jsonc` &mdash; Worker name, asset directory, and asset routing.
 - `docs/worker/index.js` &mdash; resolves directory and extensionless URLs and serves the 404 page, so that the URL behaviour matches the previous hosting.
-- `docs/.vuepress/cf/_headers`, `docs/.vuepress/cf/_redirects` &mdash; asset headers and redirects, copied into the root of the build output by `script/prepare-cf-assets.js`.
+- `docs/.vuepress/cf/_headers`, `docs/.vuepress/cf/_redirects` &mdash; asset headers and redirects, copied into the root of the build output by `docs/script/prepare-cf-assets.js`.
 - `docs/.nvmrc` &mdash; Node.js version used by the build.
 
 The asset directory is `docs/.vuepress/dist` (written as `./.vuepress/dist` in `wrangler.jsonc`, which resolves against `docs/`), while VuePress writes to `docs/.vuepress/dist/docs` (see `docs/.vuepress/build.config.js`). This keeps the `/docs/` prefix that every document is built with, so the site is served under `https://hyperformula.handsontable.com/docs/`.

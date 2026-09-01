@@ -97,7 +97,7 @@ Most likely, you will want to document the code. You can use the following comma
 ## Run the tests
 
 ::: tip
-HyperFormula main test suite is maintained outside of this repository. You can find more information [here](https://github.com/handsontable/hyperformula/blob/master/test/README.md).
+HyperFormula main test suite is maintained outside of this repository. You can find more information [here](https://github.com/handsontable/hyperformula/blob/master/hyperformula/test/README.md).
 :::
 
 The tests are done with Jest and Karma. The same test suite should

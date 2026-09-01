@@ -5,7 +5,7 @@
 
 /**
  * The function categories, in the order the built-in functions guide page presents them. This array is the source of
- * truth: `script/renderBuiltinFunctionsTable.ts` emits one `### <Category>` section per entry that has functions, in
+ * truth: `docs/script/renderBuiltinFunctionsTable.ts` emits one `### <Category>` section per entry that has functions, in
  * this order, and the page's table of contents is generated from that same pass &mdash; so reordering, renaming or
  * removing a category here updates the contents list with it, and nothing has to be kept in sync by hand.
  *
@@ -17,7 +17,7 @@
  *
  * This is the *documented* category set &mdash; the categories a catalogue entry may declare and the only ones the
  * generated page renders. [[CUSTOM_FUNCTION_CATEGORY]] is deliberately NOT a member: it names no section of that page,
- * and `script/renderBuiltinFunctionsTable.ts` rejects an entry declaring it rather than dropping the entry silently.
+ * and `docs/script/renderBuiltinFunctionsTable.ts` rejects an entry declaring it rather than dropping the entry silently.
  */
 export const FUNCTION_CATEGORIES = [
   'Array manipulation', 'Database', 'Date and time', 'Engineering',

@@ -31,7 +31,7 @@ Relative deny patterns anchor at the session's working directory, and project se
 
 ## Read the repository, not the web
 
-The guides in `docs/guide/` and the generated API reference in `docs/api/` are the same content the documentation portal serves. Read the local files rather than fetching the rendered pages, and read `src/` rather than either when the question is what the code actually does.
+The guides in `docs/guide/` and the generated API reference in `docs/api/` are the same content the documentation portal serves. Read the local files rather than fetching the rendered pages, and read `hyperformula/src/` rather than either when the question is what the code actually does.
 
 ## Skills
 
