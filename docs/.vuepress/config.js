@@ -39,7 +39,10 @@ module.exports = {
   // Default page globs, minus the built-in-functions template: it is the INPUT of docs:generate-function-docs,
   // not a page, and without this exclusion VuePress would publish it as a duplicate, table-less
   // /guide/built-in-functions.tmpl.html (also polluting the sitemap, search index, and llms.txt corpus).
-  patterns: ['**/*.md', '**/*.vue', '!guide/built-in-functions.tmpl.md'],
+  // AGENTS.md and its CLAUDE.md symlink are internal instructions that happen to
+  // live in this directory. Without these exclusions VuePress publishes them as
+  // /AGENTS.html and an identical /CLAUDE.html, sitemap and search index included.
+  patterns: ['**/*.md', '**/*.vue', '!guide/built-in-functions.tmpl.md', '!AGENTS.md', '!CLAUDE.md'],
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
   head: [

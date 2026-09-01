@@ -33,7 +33,7 @@ Relative deny patterns anchor at the session's working directory, and project se
 
 [`script/claude/post-tool-use.mjs`](../script/claude/post-tool-use.mjs), matched on `Edit|Write`. Claude Code passes the tool payload as JSON on stdin; the hook reads `tool_input.file_path`, lints that one file, and exits 2 with the remaining errors on stderr, which Claude Code shows to the agent. ESLint rules are applied while the change is being written rather than when someone runs `npm run lint` at the end.
 
-Three properties to preserve when changing it:
+Four properties to preserve when changing it:
 
 - **Errors only, never warnings.** `npm run lint` reports tens of thousands of warnings across the repository. Reporting them per edit would bury the agent in noise unrelated to the change it just made.
 - **`--fix-type problem,layout`.** Never plain `--fix`. `jsdoc/require-jsdoc` is a suggestion-type rule whose autofix inserts an **empty** JSDoc block above every undocumented declaration, so an unconstrained `--fix` quietly scatters those stubs through any file the agent edits. The restriction keeps the fixes that are unambiguously right — the licence header, semicolons, quotes, spacing — and drops the ones that need a human.

@@ -7,13 +7,17 @@
 # This covers only the file half of setting up a worktree. It cannot install
 # dependencies and it cannot fetch the private test suite. See dev-docs/WORKTREES.md.
 
-# Cloudflare Worker local secrets, used by the docs deploy/preview scripts.
-# Absent from a fresh worktree, so `wrangler` commands fail there with no
-# explanation that points at the worktree.
-.dev.vars
-.dev.vars.*
+# Nothing is copied into a worktree. The list below records what was considered
+# and rejected, so it does not get added back.
 
 # Deliberately NOT copied — listing these here would cause real bugs:
+#
+#   .dev.vars .dev.vars.*
+#                         Cloudflare Worker deploy credentials. Copying them
+#                         puts a deploy token on disk in every worktree,
+#                         including the isolated ones subagents get, for the
+#                         convenience of the one maintainer who actually runs
+#                         `wrangler`. They can copy the file themselves.
 #
 #   node_modules          A copy is not an install: `.bin` shims and native
 #                         builds do not survive it. Run `npm ci`, or symlink it

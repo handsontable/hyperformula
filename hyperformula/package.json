@@ -77,7 +77,7 @@
     "test:coverage": "npm run test:jest -- --coverage",
     "test:logMemory": "npm run test:jest -- --runInBand --logHeapUsage",
     "test:performance": "npm run benchmark:basic && npm run benchmark:cruds",
-    "test:compatibility": "bash test/compatibility/test-compatibility.sh",
+    "test:compatibility": "bash test/hyperformula-tests/compatibility/test-compatibility.sh",
     "test:ci": "cross-env NODE_ICU_DATA=../node_modules/full-icu node --expose-gc ../node_modules/jest/bin/jest --forceExit",
     "test:browser": "cross-env-shell BABEL_ENV=dist env-cmd -f ht.config.js karma start",
     "test:browser.debug": "cross-env-shell BABEL_ENV=dist NODE_ENV=debug env-cmd -f ht.config.js karma start",

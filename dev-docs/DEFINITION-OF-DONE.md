@@ -10,7 +10,7 @@ Every change to production code — bug fix, feature, or improvement — must in
    See [`TESTING.md`](TESTING.md).
 3. **Documentation updates** matching the change. A breaking change also needs a section in the migration guide. See [`DOC-STANDARDS.md`](DOC-STANDARDS.md).
 4. **JSDoc** on classes and functions, plus a high-level description of the concepts used in any complex fragment.
-5. **A changelog entry**, unless the change is documentation-only (guides, JSDoc, README).
+5. **A changelog entry**. Not needed for documentation-only, test-only, or CI and tooling changes, nor for a bug that was introduced and never released. The full rule, and how to write the entry, is in [`DOC-STANDARDS.md`](DOC-STANDARDS.md#the-changelog).
 6. **A pull request description** — kept current as the branch evolves, not written once and left to rot.
 
 Every element must be not only present but correct: the changelog entry must describe the change accurately, and the documentation must match the new behaviour.

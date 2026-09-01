@@ -35,7 +35,7 @@ HyperFormula is a headless spreadsheet calculation engine. No UI, no DOM, no ser
 |---|---|
 | `hyperformula/src/HyperFormula.ts` | The public API. Every documented method lives here; JSDoc on it is the API reference. |
 | `hyperformula/src/BuildEngineFactory.ts` | Constructs an engine from sheets, data, and config. |
-| `hyperformula/src/Config.ts`, `hyperformula/src/ConfigParams.ts` | Configuration options, defaults, and validation. |
+| `hyperformula/src/Config.ts`, `hyperformula/src/ConfigParams.ts` | Configuration. `ConfigParams.ts` is the interface; `Config.defaultConfig` holds the values. |
 | `hyperformula/src/CrudOperations.ts` | Create/read/update/delete on sheets and cells. Validates before mutating. |
 | `hyperformula/src/Operations.ts` | The mutation primitives `CrudOperations` composes. |
 | `hyperformula/src/UndoRedo.ts` | The undo/redo stack, expressed in terms of those primitives. |
@@ -56,7 +56,7 @@ HyperFormula is a headless spreadsheet calculation engine. No UI, no DOM, no ser
 
 - `LexerConfig.ts` and `ParserConfig.ts` build the token set from the active language and config — the lexer is **language-dependent**, because function names are translated.
 - `ParserWithCaching.ts` is the entry point; identical formula strings resolve from `Cache.ts` rather than being reparsed.
-- `collectDependencies.ts` extracts the relative dependencies of an AST; `absolutizeDependencies.ts` resolves them against a concrete address.
+- `collectDependencies.ts` extracts the relative dependencies of an AST. Resolving them against a concrete address is `src/absolutizeDependencies.ts`, which sits at the source root rather than in `src/parser/`.
 - `Unparser.ts` is the inverse — AST back to text, in the target language. A change to parsing almost always needs a matching change here, or round-tripping breaks.
 
 ## The interpreter
@@ -103,6 +103,6 @@ Everything in `hyperformula/src/` ships, runs in the browser and in Node, and si
 
 - `HyperFormula.ts` — the public API. Every method here is documented output.
 - `CrudOperations.ts` / `Operations.ts` / `UndoRedo.ts` — CRUD validates, `Operations` mutates, `UndoRedo` records. A new mutation needs all three, or undo silently diverges.
-- `Config.ts` / `ConfigParams.ts` — a new option needs a default, validation, and a guide entry.
+- `Config.ts` / `ConfigParams.ts` — `ConfigParams.ts` declares the interface and carries the `@default` JSDoc tags; the values themselves live in `Config.defaultConfig`, which the constructor merges a partial config onto. A new option therefore needs four things: the field, a value in `defaultConfig`, validation, and a guide entry. An option added to `ConfigParams.ts` alone is `undefined` at run time.
 - `dependencyTransformers/` — AST rewrites when rows, columns, or sheets move. Paired with `LazilyTransformingAstService.ts`, which defers them until a formula is read.
 - `format/`, `helpers/`, `Lookup/`, `statistics/` — number and date formats, shared utilities, lookup strategies, instrumentation counters.

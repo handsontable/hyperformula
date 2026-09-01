@@ -11,7 +11,7 @@
 | `LexerConfig.ts`, `ParserConfig.ts` | Build the token set from the active language package and config. |
 | `Ast.ts` | AST node types. |
 | `Unparser.ts` | AST back to formula text, in the target language. |
-| `collectDependencies.ts` | Relative dependencies of an AST. |
+| `collectDependencies.ts` | Relative dependencies of an AST. Resolving them is `src/absolutizeDependencies.ts`, at the source root, not here. |
 | `Address.ts`, `CellAddress.ts`, `ColumnAddress.ts`, `RowAddress.ts` | Address representations and their absolute/relative flags. |
 | `addressRepresentationConverters.ts` | A1 notation to and from the internal representation. |
 
