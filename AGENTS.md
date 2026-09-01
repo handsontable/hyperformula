@@ -1,10 +1,14 @@
 # AGENTS.md
 
-Instructions for AI coding agents (Cursor, Claude Code, Codex, Aider, and any other AI tool) working in this repository.
+Instructions for AI coding agents (Claude Code, Cursor, Codex, Aider, and any other AI tool) working in this repository.
 
-## Start here
+HyperFormula is a headless spreadsheet calculation engine in TypeScript. No UI, no DOM, no server: it parses formulas, tracks cell dependencies, and recalculates incrementally, in the browser and in Node.
 
-Whatever you do, start by reading entire [DEV_DOCS.md](DEV_DOCS.md). Only then proceed to your task.
+## Start at `dev-docs/`
+
+**[`dev-docs/`](dev-docs/) is the single source of truth for everything internal to this project.** Architecture, conventions, build, testing, standards, and the monorepo plan all live there and nowhere else. This file routes; it does not explain. Neither does any other `AGENTS.md` or `README.md`: each carries only what is so specific to its own directory that it would be useless anywhere else, and links for the rest. If one of them looks like it is explaining something general, the explanation belongs in `dev-docs/`.
+
+Read [`dev-docs/README.md`](dev-docs/README.md) first. It says which page covers what, and every directory's own `AGENTS.md` points at the page that covers that directory.
 
 ## Never publish sensitive information
 
@@ -19,13 +23,9 @@ Describe the change on its own technical terms instead: write "fix an off-by-one
 
 If a change cannot be described without such information, stop and ask the user how to proceed.
 
-## Other important resources
+## Keep the documentation single-sourced
 
-- the repository [README.md](README.md) &mdash; high-level project description and quick install/usage
-- the markdown files in [`docs/guide/`](docs/guide/) &mdash; user-facing guides (installation, configuration, built-in functions, custom functions, integrations, etc.)
-- the markdown files in [`docs/api/`](docs/api/) &mdash; API reference (generated from JSDoc; run `npm run docs:build` if the folder is missing)
-
-Prefer reading these local files over fetching the rendered documentation from the web.
+When a change introduces a convention, constraint, file location, or gotcha that future agents should know, record it in `dev-docs/`, on the page that owns the topic — not in an `AGENTS.md`, not in a `README.md`, and not in a skill. Those three link to it.
 
 ## Response style
 
@@ -44,14 +44,5 @@ This section is maintained by the team. Whenever an AI agent makes a mistake wor
 - **Short title** &mdash; What the agent did wrong. What it should have done instead.
 -->
 
-1. Often pull request descriptions becomes obsolete. Remember to update it as you work.
-
-## Skills, MCPs, and other agent tools
-
-This section is maintained by the team. Skills, MCP servers, and other tools vetted as useful for AI agents working on this codebase are listed here.
-
-<!-- Add new items here. Use the format:
-- **Name** &mdash; What it provides and when to use it.
--->
-
-_No items yet._
+1. **Duplicating `dev-docs/`** &mdash; The agent explained a rule inside an `AGENTS.md`, a `README.md`, or a skill instead of linking to the `dev-docs/` page that owns it. Two copies of a rule means one of them is wrong within a release, and the reader cannot tell which.
+2. **Stale pull request descriptions** &mdash; The description was written once and never revisited. Update it as the branch evolves.

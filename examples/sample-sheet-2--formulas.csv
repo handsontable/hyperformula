@@ -1,8 +1,0 @@
-Account,Value,Balance on this account,Total balance
-Checking,5,"=SUMIF(A$2:A2,""=""&A2,B$2:B2)",=SUM(B$2:B2)
-Savings,3,"=SUMIF(A$2:A3,""=""&A3,B$2:B3)",=SUM(B$2:B3)
-Savings,7,"=SUMIF(A$2:A4,""=""&A4,B$2:B4)",=SUM(B$2:B4)
-Checking,-4,"=SUMIF(A$2:A5,""=""&A5,B$2:B5)",=SUM(B$2:B5)
-Checking,10,"=SUMIF(A$2:A6,""=""&A6,B$2:B6)",=SUM(B$2:B6)
-Savings,5,"=SUMIF(A$2:A7,""=""&A7,B$2:B7)",=SUM(B$2:B7)
-Checking,-5,"=SUMIF(A$2:A8,""=""&A8,B$2:B8)",=SUM(B$2:B8)

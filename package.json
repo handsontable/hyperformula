@@ -1,7 +1,8 @@
 {
-  "name": "hyperformula",
-  "description": "HyperFormula is a JavaScript engine for efficient processing of spreadsheet-like data and formulas",
-  "homepage": "https://hyperformula.handsontable.com/",
+  "name": "hyperformula-monorepo",
+  "description": "Monorepo for HyperFormula, its UI components, and its documentation portal.",
+  "private": true,
+  "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "https://github.com/handsontable/hyperformula.git"
@@ -9,136 +10,48 @@
   "bugs": {
     "url": "https://github.com/handsontable/hyperformula/issues"
   },
+  "homepage": "https://hyperformula.handsontable.com/",
   "author": "Handsoncode <hello@handsontable.com>",
-  "version": "3.4.0",
-  "keywords": [
-    "formula",
-    "spreadsheet",
-    "calculation",
-    "data",
-    "compute",
-    "tabular-data",
-    "operation",
-    "conversion",
-    "arithmetic",
-    "concatenation",
-    "comparison",
-    "logical",
-    "formulas",
-    "parser",
-    "excel",
-    "office",
-    "workbook",
-    "worksheet",
-    "sheet",
-    "open formula",
-    "openformula"
+  "workspaces": [
+    "hyperformula"
   ],
-  "browserslist": [
-    "last 2 chrome versions",
-    "last 2 and_chr versions",
-    "last 2 firefox versions",
-    "last 2 and_ff versions",
-    "last 2 safari versions",
-    "last 2 ios_saf versions",
-    "last 2 edge versions",
-    "last 2 and_uc versions",
-    "last 2 and_qq versions",
-    "last 2 op_mob versions"
-  ],
-  "license": "GPL-3.0-only",
-  "type": "commonjs",
-  "module": "es/index.mjs",
-  "main": "commonjs/index.js",
-  "jsnext:main": "es/index.mjs",
-  "jsdelivr": "dist/hyperformula.min.js",
-  "unpkg": "dist/hyperformula.min.js",
-  "typings": "./typings/index.d.ts",
   "scripts": {
-    "docs:dev": "npm run docs:generate-function-docs && npm run typedoc:build-api && cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress dev docs --silent --no-clear-screen --no-cache",
-    "docs:build": "npm run docs:generate-function-docs && npm run bundle-all && npm run typedoc:build-api && cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress build docs",
-    "docs:build:cf": "rimraf docs/.vuepress/dist && npm run docs:build && node script/prepare-cf-assets.js",
-    "docs:deploy:cf": "wrangler deploy",
-    "docs:preview:cf": "wrangler versions upload",
-    "docs:code-examples:generate-js": "bash docs/code-examples-generator.sh",
-    "docs:code-examples:generate-all-js": "bash docs/code-examples-generator.sh --generateAll",
-    "docs:code-examples:format-all-ts": "bash docs/code-examples-generator.sh --formatAllTsExamples",
-    "docs:generate-function-docs": "npm run tsnode script/generate-builtin-functions-doc.ts",
-    "bundle-all": "cross-env HF_COMPILE=1 npm-run-all clean compile bundle:** verify-bundles",
-    "bundle:es": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=es env-cmd -f ht.config.js babel lib --out-file-extension .mjs --out-dir es",
-    "bundle:cjs": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=commonjs env-cmd -f ht.config.js babel lib --out-dir commonjs",
-    "bundle:development": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=dist NODE_ENV=development env-cmd -f ht.config.js webpack ./lib/index.js",
-    "bundle:production": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=dist NODE_ENV=production env-cmd -f ht.config.js webpack ./lib/index.js",
-    "bundle:languages": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=dist NODE_ENV=languages env-cmd -f ht.config.js webpack",
-    "bundle:typings": "tsc --emitDeclarationOnly -d --outDir typings",
-    "verify-bundles": "run-p verify:**",
-    "verify:umd": "node script/check-file.js dist/hyperformula.js",
-    "verify:umd:min": "node script/check-file.js dist/hyperformula.min.js",
-    "verify:umd:full": "node script/check-file.js dist/hyperformula.full.js",
-    "verify:umd:full.min": "node script/check-file.js dist/hyperformula.full.min.js",
-    "verify:cjs": "node script/check-file.js commonjs",
-    "verify:publish-package": "npm pack | node script/check-publish-package.js",
-    "verify:typings": "tsc --noEmit",
+    "build": "npm run bundle-all --workspace=hyperformula --",
+    "bundle-all": "npm run bundle-all --workspace=hyperformula --",
+    "compile": "npm run compile --workspace=hyperformula --",
+    "clean": "npm run clean --workspace=hyperformula --",
     "test": "npm-run-all lint test:jest test:browser",
-    "test:setup-private": "bash test/fetch-tests.sh",
-    "test:jest": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
-    "test:watch": "npm run test:jest -- --watch",
-    "test:tmp": "npm run test:jest -- --watch function-irr",
-    "test:coverage": "npm run test:jest -- --coverage",
-    "test:logMemory": "npm run test:jest -- --runInBand --logHeapUsage",
-    "test:performance": "npm run benchmark:basic && npm run benchmark:cruds",
-    "test:compatibility": "bash test/compatibility/test-compatibility.sh",
-    "test:ci": "cross-env NODE_ICU_DATA=node_modules/full-icu node --expose-gc ./node_modules/jest/bin/jest --forceExit",
-    "test:browser": "cross-env-shell BABEL_ENV=dist env-cmd -f ht.config.js karma start",
-    "test:browser.debug": "cross-env-shell BABEL_ENV=dist NODE_ENV=debug env-cmd -f ht.config.js karma start",
-    "typedoc:build-api": "cross-env NODE_OPTIONS=--openssl-legacy-provider typedoc --options .typedoc.md.ts",
-    "benchmark:basic": "npm run tsnode test/hyperformula-tests/performance/run-basic-benchmark.ts",
-    "benchmark:cruds": "npm run tsnode test/hyperformula-tests/performance/run-cruds-benchmark.ts",
-    "benchmark:write-to-file": "npm run tsnode test/hyperformula-tests/performance/write-to-file.ts",
-    "benchmark:compare-benchmarks": "npm run tsnode test/hyperformula-tests/performance/compare-benchmarks.ts",
+    "test:jest": "npm run test:jest --workspace=hyperformula --",
+    "test:watch": "npm run test:watch --workspace=hyperformula --",
+    "test:coverage": "npm run test:coverage --workspace=hyperformula --",
+    "test:browser": "npm run test:browser --workspace=hyperformula --",
+    "test:ci": "npm run test:ci --workspace=hyperformula --",
+    "test:performance": "npm run test:performance --workspace=hyperformula --",
+    "test:compatibility": "npm run test:compatibility --workspace=hyperformula --",
+    "test:setup-private": "npm run test:setup-private --workspace=hyperformula --",
+    "verify-bundles": "npm run verify-bundles --workspace=hyperformula --",
+    "verify:publish-package": "npm run verify:publish-package --workspace=hyperformula --",
+    "verify:typings": "npm run verify:typings --workspace=hyperformula --",
     "lint": "eslint . --ext .js,.ts",
     "lint:fix": "eslint . --ext .js,.ts --fix",
+    "docs:generate-function-docs": "npm --prefix docs run generate-function-docs --",
+    "typedoc:build-api": "npm run typedoc:build-api --workspace=hyperformula --",
+    "docs:install": "npm --prefix docs ci",
+    "docs:dev": "npm run docs:generate-function-docs && npm run typedoc:build-api && npm --prefix docs run dev --",
+    "docs:build": "npm run docs:generate-function-docs && npm run bundle-all && npm run typedoc:build-api && npm --prefix docs run build --",
+    "docs:build:cf": "npm run docs:install && npm run docs:generate-function-docs && npm run bundle-all && npm run typedoc:build-api && npm --prefix docs run build:cf --",
+    "docs:dev:cf": "npm --prefix docs run dev:cf --",
+    "docs:deploy:cf": "npm --prefix docs run deploy:cf --",
+    "docs:preview:cf": "npm --prefix docs run preview:cf --",
     "audit": "npm audit --omit=dev",
-    "clean": "rimraf coverage/ commonjs/ dist/ es/ languages/ lib/ typings/ test-jasmine/",
-    "compile": "tsc",
-    "check:licenses": "license-checker --production --excludePackages=\"hyperformula@3.1.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\"",
-    "tsnode": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"}",
+    "check:licenses": "node script/check-licenses.mjs",
     "release": "bash script/release/release.sh"
   },
-  "dependencies": {
-    "chevrotain": "^6.5.0",
-    "tiny-emitter": "^2.1.0"
-  },
   "devDependencies": {
-    "@babel/cli": "^7.25.9",
-    "@babel/core": "^7.26.0",
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/plugin-proposal-decorators": "^7.25.9",
-    "@babel/plugin-proposal-private-methods": "^7.18.6",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@babel/plugin-syntax-class-properties": "^7.12.13",
-    "@babel/plugin-transform-modules-commonjs": "^7.25.9",
-    "@babel/plugin-transform-runtime": "^7.25.9",
-    "@babel/preset-env": "^7.26.0",
-    "@babel/preset-react": "^7.25.9",
-    "@babel/preset-typescript": "^7.26.0",
-    "@babel/register": "^7.25.9",
-    "@babel/runtime": "^7.26.0",
-    "@types/exceljs": "^0.5.3",
-    "@types/jasmine": "^5.1.4",
-    "@types/jest": "^26.0.24",
-    "@types/jsdom": "^21.1.7",
     "@types/node": "^17.0.45",
-    "@types/webpack-env": "^1.18.5",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "@vuepress/shared-utils": "^1.9.10",
-    "as-table": "^1.0.55",
-    "babel-loader": "^8.4.1",
-    "babel-plugin-transform-inline-environment-variables": "^0.4.4",
-    "core-js": "^3.39.0",
     "cross-env": "^7.0.3",
-    "env-cmd": "^10.1.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-jasmine": "^4.2.2",
@@ -146,487 +59,8 @@
     "eslint-plugin-jsdoc": "^50.5.0",
     "eslint-plugin-license-header": "^0.6.1",
     "eslint-plugin-prettier": "^5.2.1",
-    "esm": "^3.2.25",
-    "exceljs": "^4.4.0",
-    "full-icu": "^1.5.0",
-    "jasmine": "^5.4.0",
-    "jest": "^26.6.3",
-    "jsdom": "^25.0.1",
-    "karma": "^6.4.4",
-    "karma-chrome-launcher": "^3.2.0",
-    "karma-firefox-launcher": "^2.1.3",
-    "karma-jasmine": "^5.1.0",
-    "karma-jasmine-html-reporter": "^2.1.0",
-    "karma-sourcemap-loader": "^0.4.0",
-    "karma-webpack": "^4.0.2",
-    "license-checker": "^25.0.1",
-    "markdown-it-footnote": "^4.0.0",
-    "markdown-it-regex": "^0.2.0",
-    "moment": "^2.30.1",
     "npm-run-all": "^4.1.5",
-    "on-build-webpack": "^0.1.0",
     "rimraf": "^6.0.1",
-    "string-replace-loader": "^2.3.0",
-    "tar": "^7.4.3",
-    "terser-webpack-plugin": "^4.2.3",
-    "ts-jest": "^26.5.6",
-    "ts-loader": "^8.4.0",
-    "ts-node": "^10.9.2",
-    "typedoc": "^0.19.2",
-    "typedoc-plugin-markdown": "^2.4.2",
-    "typescript": "^4.0.8",
-    "vuepress": "^1.9.10",
-    "vuepress-plugin-sitemap": "^2.3.1",
-    "webpack": "^4.47.0",
-    "webpack-cli": "^4.10.0",
-    "webpackbar": "^6.0.1",
-    "wrangler": "^4.118.0"
-  },
-  "exports": {
-    ".": {
-      "types": "./typings/index.d.ts",
-      "import": "./es/index.mjs",
-      "require": "./commonjs/index.js"
-    },
-    "./i18n/languages": {
-      "types": "./typings/i18n/languages/index.d.ts",
-      "import": "./es/i18n/languages/index.mjs",
-      "require": "./commonjs/i18n/languages/index.js"
-    },
-    "./es/i18n/languages": {
-      "types": "./typings/i18n/languages/index.d.ts",
-      "import": "./es/i18n/languages/index.mjs",
-      "require": "./commonjs/i18n/languages/index.js"
-    },
-    "./commonjs/i18n/languages": {
-      "types": "./typings/i18n/languages/index.d.ts",
-      "import": "./es/i18n/languages/index.mjs",
-      "require": "./commonjs/i18n/languages/index.js"
-    },
-    "./i18n/languages/csCZ": {
-      "types": "./typings/i18n/languages/csCZ.d.ts",
-      "import": "./es/i18n/languages/csCZ.mjs",
-      "require": "./commonjs/i18n/languages/csCZ.js"
-    },
-    "./es/i18n/languages/csCZ": {
-      "types": "./typings/i18n/languages/csCZ.d.ts",
-      "import": "./es/i18n/languages/csCZ.mjs",
-      "require": "./commonjs/i18n/languages/csCZ.js"
-    },
-    "./es/i18n/languages/csCZ.js": {
-      "types": "./typings/i18n/languages/csCZ.d.ts",
-      "import": "./es/i18n/languages/csCZ.mjs",
-      "require": "./commonjs/i18n/languages/csCZ.js"
-    },
-    "./commonjs/i18n/languages/csCZ": {
-      "types": "./typings/i18n/languages/csCZ.d.ts",
-      "import": "./es/i18n/languages/csCZ.mjs",
-      "require": "./commonjs/i18n/languages/csCZ.js"
-    },
-    "./commonjs/i18n/languages/csCZ.js": {
-      "types": "./typings/i18n/languages/csCZ.d.ts",
-      "import": "./es/i18n/languages/csCZ.mjs",
-      "require": "./commonjs/i18n/languages/csCZ.js"
-    },
-    "./i18n/languages/daDK": {
-      "types": "./typings/i18n/languages/daDK.d.ts",
-      "import": "./es/i18n/languages/daDK.mjs",
-      "require": "./commonjs/i18n/languages/daDK.js"
-    },
-    "./es/i18n/languages/daDK": {
-      "types": "./typings/i18n/languages/daDK.d.ts",
-      "import": "./es/i18n/languages/daDK.mjs",
-      "require": "./commonjs/i18n/languages/daDK.js"
-    },
-    "./es/i18n/languages/daDK.js": {
-      "types": "./typings/i18n/languages/daDK.d.ts",
-      "import": "./es/i18n/languages/daDK.mjs",
-      "require": "./commonjs/i18n/languages/daDK.js"
-    },
-    "./commonjs/i18n/languages/daDK": {
-      "types": "./typings/i18n/languages/daDK.d.ts",
-      "import": "./es/i18n/languages/daDK.mjs",
-      "require": "./commonjs/i18n/languages/daDK.js"
-    },
-    "./commonjs/i18n/languages/daDK.js": {
-      "types": "./typings/i18n/languages/daDK.d.ts",
-      "import": "./es/i18n/languages/daDK.mjs",
-      "require": "./commonjs/i18n/languages/daDK.js"
-    },
-    "./i18n/languages/deDE": {
-      "types": "./typings/i18n/languages/deDE.d.ts",
-      "import": "./es/i18n/languages/deDE.mjs",
-      "require": "./commonjs/i18n/languages/deDE.js"
-    },
-    "./es/i18n/languages/deDE": {
-      "types": "./typings/i18n/languages/deDE.d.ts",
-      "import": "./es/i18n/languages/deDE.mjs",
-      "require": "./commonjs/i18n/languages/deDE.js"
-    },
-    "./es/i18n/languages/deDE.js": {
-      "types": "./typings/i18n/languages/deDE.d.ts",
-      "import": "./es/i18n/languages/deDE.mjs",
-      "require": "./commonjs/i18n/languages/deDE.js"
-    },
-    "./commonjs/i18n/languages/deDE": {
-      "types": "./typings/i18n/languages/deDE.d.ts",
-      "import": "./es/i18n/languages/deDE.mjs",
-      "require": "./commonjs/i18n/languages/deDE.js"
-    },
-    "./commonjs/i18n/languages/deDE.js": {
-      "types": "./typings/i18n/languages/deDE.d.ts",
-      "import": "./es/i18n/languages/deDE.mjs",
-      "require": "./commonjs/i18n/languages/deDE.js"
-    },
-    "./i18n/languages/enGB": {
-      "types": "./typings/i18n/languages/enGB.d.ts",
-      "import": "./es/i18n/languages/enGB.mjs",
-      "require": "./commonjs/i18n/languages/enGB.js"
-    },
-    "./es/i18n/languages/enGB": {
-      "types": "./typings/i18n/languages/enGB.d.ts",
-      "import": "./es/i18n/languages/enGB.mjs",
-      "require": "./commonjs/i18n/languages/enGB.js"
-    },
-    "./es/i18n/languages/enGB.js": {
-      "types": "./typings/i18n/languages/enGB.d.ts",
-      "import": "./es/i18n/languages/enGB.mjs",
-      "require": "./commonjs/i18n/languages/enGB.js"
-    },
-    "./commonjs/i18n/languages/enGB": {
-      "types": "./typings/i18n/languages/enGB.d.ts",
-      "import": "./es/i18n/languages/enGB.mjs",
-      "require": "./commonjs/i18n/languages/enGB.js"
-    },
-    "./commonjs/i18n/languages/enGB.js": {
-      "types": "./typings/i18n/languages/enGB.d.ts",
-      "import": "./es/i18n/languages/enGB.mjs",
-      "require": "./commonjs/i18n/languages/enGB.js"
-    },
-    "./i18n/languages/enUS": {
-      "types": "./typings/i18n/languages/enUS.d.ts",
-      "import": "./es/i18n/languages/enUS.mjs",
-      "require": "./commonjs/i18n/languages/enUS.js"
-    },
-    "./es/i18n/languages/enUS": {
-      "types": "./typings/i18n/languages/enUS.d.ts",
-      "import": "./es/i18n/languages/enUS.mjs",
-      "require": "./commonjs/i18n/languages/enUS.js"
-    },
-    "./es/i18n/languages/enUS.js": {
-      "types": "./typings/i18n/languages/enUS.d.ts",
-      "import": "./es/i18n/languages/enUS.mjs",
-      "require": "./commonjs/i18n/languages/enUS.js"
-    },
-    "./commonjs/i18n/languages/enUS": {
-      "types": "./typings/i18n/languages/enUS.d.ts",
-      "import": "./es/i18n/languages/enUS.mjs",
-      "require": "./commonjs/i18n/languages/enUS.js"
-    },
-    "./commonjs/i18n/languages/enUS.js": {
-      "types": "./typings/i18n/languages/enUS.d.ts",
-      "import": "./es/i18n/languages/enUS.mjs",
-      "require": "./commonjs/i18n/languages/enUS.js"
-    },
-    "./i18n/languages/esES": {
-      "types": "./typings/i18n/languages/esES.d.ts",
-      "import": "./es/i18n/languages/esES.mjs",
-      "require": "./commonjs/i18n/languages/esES.js"
-    },
-    "./es/i18n/languages/esES": {
-      "types": "./typings/i18n/languages/esES.d.ts",
-      "import": "./es/i18n/languages/esES.mjs",
-      "require": "./commonjs/i18n/languages/esES.js"
-    },
-    "./es/i18n/languages/esES.js": {
-      "types": "./typings/i18n/languages/esES.d.ts",
-      "import": "./es/i18n/languages/esES.mjs",
-      "require": "./commonjs/i18n/languages/esES.js"
-    },
-    "./commonjs/i18n/languages/esES": {
-      "types": "./typings/i18n/languages/esES.d.ts",
-      "import": "./es/i18n/languages/esES.mjs",
-      "require": "./commonjs/i18n/languages/esES.js"
-    },
-    "./commonjs/i18n/languages/esES.js": {
-      "types": "./typings/i18n/languages/esES.d.ts",
-      "import": "./es/i18n/languages/esES.mjs",
-      "require": "./commonjs/i18n/languages/esES.js"
-    },
-    "./i18n/languages/fiFI": {
-      "types": "./typings/i18n/languages/fiFI.d.ts",
-      "import": "./es/i18n/languages/fiFI.mjs",
-      "require": "./commonjs/i18n/languages/fiFI.js"
-    },
-    "./es/i18n/languages/fiFI": {
-      "types": "./typings/i18n/languages/fiFI.d.ts",
-      "import": "./es/i18n/languages/fiFI.mjs",
-      "require": "./commonjs/i18n/languages/fiFI.js"
-    },
-    "./es/i18n/languages/fiFI.js": {
-      "types": "./typings/i18n/languages/fiFI.d.ts",
-      "import": "./es/i18n/languages/fiFI.mjs",
-      "require": "./commonjs/i18n/languages/fiFI.js"
-    },
-    "./commonjs/i18n/languages/fiFI": {
-      "types": "./typings/i18n/languages/fiFI.d.ts",
-      "import": "./es/i18n/languages/fiFI.mjs",
-      "require": "./commonjs/i18n/languages/fiFI.js"
-    },
-    "./commonjs/i18n/languages/fiFI.js": {
-      "types": "./typings/i18n/languages/fiFI.d.ts",
-      "import": "./es/i18n/languages/fiFI.mjs",
-      "require": "./commonjs/i18n/languages/fiFI.js"
-    },
-    "./i18n/languages/frFR": {
-      "types": "./typings/i18n/languages/frFR.d.ts",
-      "import": "./es/i18n/languages/frFR.mjs",
-      "require": "./commonjs/i18n/languages/frFR.js"
-    },
-    "./es/i18n/languages/frFR": {
-      "types": "./typings/i18n/languages/frFR.d.ts",
-      "import": "./es/i18n/languages/frFR.mjs",
-      "require": "./commonjs/i18n/languages/frFR.js"
-    },
-    "./es/i18n/languages/frFR.js": {
-      "types": "./typings/i18n/languages/frFR.d.ts",
-      "import": "./es/i18n/languages/frFR.mjs",
-      "require": "./commonjs/i18n/languages/frFR.js"
-    },
-    "./commonjs/i18n/languages/frFR": {
-      "types": "./typings/i18n/languages/frFR.d.ts",
-      "import": "./es/i18n/languages/frFR.mjs",
-      "require": "./commonjs/i18n/languages/frFR.js"
-    },
-    "./commonjs/i18n/languages/frFR.js": {
-      "types": "./typings/i18n/languages/frFR.d.ts",
-      "import": "./es/i18n/languages/frFR.mjs",
-      "require": "./commonjs/i18n/languages/frFR.js"
-    },
-    "./i18n/languages/huHU": {
-      "types": "./typings/i18n/languages/huHU.d.ts",
-      "import": "./es/i18n/languages/huHU.mjs",
-      "require": "./commonjs/i18n/languages/huHU.js"
-    },
-    "./es/i18n/languages/huHU": {
-      "types": "./typings/i18n/languages/huHU.d.ts",
-      "import": "./es/i18n/languages/huHU.mjs",
-      "require": "./commonjs/i18n/languages/huHU.js"
-    },
-    "./es/i18n/languages/huHU.js": {
-      "types": "./typings/i18n/languages/huHU.d.ts",
-      "import": "./es/i18n/languages/huHU.mjs",
-      "require": "./commonjs/i18n/languages/huHU.js"
-    },
-    "./commonjs/i18n/languages/huHU": {
-      "types": "./typings/i18n/languages/huHU.d.ts",
-      "import": "./es/i18n/languages/huHU.mjs",
-      "require": "./commonjs/i18n/languages/huHU.js"
-    },
-    "./commonjs/i18n/languages/huHU.js": {
-      "types": "./typings/i18n/languages/huHU.d.ts",
-      "import": "./es/i18n/languages/huHU.mjs",
-      "require": "./commonjs/i18n/languages/huHU.js"
-    },
-    "./i18n/languages/itIT": {
-      "types": "./typings/i18n/languages/itIT.d.ts",
-      "import": "./es/i18n/languages/itIT.mjs",
-      "require": "./commonjs/i18n/languages/itIT.js"
-    },
-    "./es/i18n/languages/itIT": {
-      "types": "./typings/i18n/languages/itIT.d.ts",
-      "import": "./es/i18n/languages/itIT.mjs",
-      "require": "./commonjs/i18n/languages/itIT.js"
-    },
-    "./es/i18n/languages/itIT.js": {
-      "types": "./typings/i18n/languages/itIT.d.ts",
-      "import": "./es/i18n/languages/itIT.mjs",
-      "require": "./commonjs/i18n/languages/itIT.js"
-    },
-    "./commonjs/i18n/languages/itIT": {
-      "types": "./typings/i18n/languages/itIT.d.ts",
-      "import": "./es/i18n/languages/itIT.mjs",
-      "require": "./commonjs/i18n/languages/itIT.js"
-    },
-    "./commonjs/i18n/languages/itIT.js": {
-      "types": "./typings/i18n/languages/itIT.d.ts",
-      "import": "./es/i18n/languages/itIT.mjs",
-      "require": "./commonjs/i18n/languages/itIT.js"
-    },
-    "./i18n/languages/nbNO": {
-      "types": "./typings/i18n/languages/nbNO.d.ts",
-      "import": "./es/i18n/languages/nbNO.mjs",
-      "require": "./commonjs/i18n/languages/nbNO.js"
-    },
-    "./es/i18n/languages/nbNO": {
-      "types": "./typings/i18n/languages/nbNO.d.ts",
-      "import": "./es/i18n/languages/nbNO.mjs",
-      "require": "./commonjs/i18n/languages/nbNO.js"
-    },
-    "./es/i18n/languages/nbNO.js": {
-      "types": "./typings/i18n/languages/nbNO.d.ts",
-      "import": "./es/i18n/languages/nbNO.mjs",
-      "require": "./commonjs/i18n/languages/nbNO.js"
-    },
-    "./commonjs/i18n/languages/nbNO": {
-      "types": "./typings/i18n/languages/nbNO.d.ts",
-      "import": "./es/i18n/languages/nbNO.mjs",
-      "require": "./commonjs/i18n/languages/nbNO.js"
-    },
-    "./commonjs/i18n/languages/nbNO.js": {
-      "types": "./typings/i18n/languages/nbNO.d.ts",
-      "import": "./es/i18n/languages/nbNO.mjs",
-      "require": "./commonjs/i18n/languages/nbNO.js"
-    },
-    "./i18n/languages/nlNL": {
-      "types": "./typings/i18n/languages/nlNL.d.ts",
-      "import": "./es/i18n/languages/nlNL.mjs",
-      "require": "./commonjs/i18n/languages/nlNL.js"
-    },
-    "./es/i18n/languages/nlNL": {
-      "types": "./typings/i18n/languages/nlNL.d.ts",
-      "import": "./es/i18n/languages/nlNL.mjs",
-      "require": "./commonjs/i18n/languages/nlNL.js"
-    },
-    "./es/i18n/languages/nlNL.js": {
-      "types": "./typings/i18n/languages/nlNL.d.ts",
-      "import": "./es/i18n/languages/nlNL.mjs",
-      "require": "./commonjs/i18n/languages/nlNL.js"
-    },
-    "./commonjs/i18n/languages/nlNL": {
-      "types": "./typings/i18n/languages/nlNL.d.ts",
-      "import": "./es/i18n/languages/nlNL.mjs",
-      "require": "./commonjs/i18n/languages/nlNL.js"
-    },
-    "./commonjs/i18n/languages/nlNL.js": {
-      "types": "./typings/i18n/languages/nlNL.d.ts",
-      "import": "./es/i18n/languages/nlNL.mjs",
-      "require": "./commonjs/i18n/languages/nlNL.js"
-    },
-    "./i18n/languages/plPL": {
-      "types": "./typings/i18n/languages/plPL.d.ts",
-      "import": "./es/i18n/languages/plPL.mjs",
-      "require": "./commonjs/i18n/languages/plPL.js"
-    },
-    "./es/i18n/languages/plPL": {
-      "types": "./typings/i18n/languages/plPL.d.ts",
-      "import": "./es/i18n/languages/plPL.mjs",
-      "require": "./commonjs/i18n/languages/plPL.js"
-    },
-    "./es/i18n/languages/plPL.js": {
-      "types": "./typings/i18n/languages/plPL.d.ts",
-      "import": "./es/i18n/languages/plPL.mjs",
-      "require": "./commonjs/i18n/languages/plPL.js"
-    },
-    "./commonjs/i18n/languages/plPL": {
-      "types": "./typings/i18n/languages/plPL.d.ts",
-      "import": "./es/i18n/languages/plPL.mjs",
-      "require": "./commonjs/i18n/languages/plPL.js"
-    },
-    "./commonjs/i18n/languages/plPL.js": {
-      "types": "./typings/i18n/languages/plPL.d.ts",
-      "import": "./es/i18n/languages/plPL.mjs",
-      "require": "./commonjs/i18n/languages/plPL.js"
-    },
-    "./i18n/languages/ptPT": {
-      "types": "./typings/i18n/languages/ptPT.d.ts",
-      "import": "./es/i18n/languages/ptPT.mjs",
-      "require": "./commonjs/i18n/languages/ptPT.js"
-    },
-    "./es/i18n/languages/ptPT": {
-      "types": "./typings/i18n/languages/ptPT.d.ts",
-      "import": "./es/i18n/languages/ptPT.mjs",
-      "require": "./commonjs/i18n/languages/ptPT.js"
-    },
-    "./es/i18n/languages/ptPT.js": {
-      "types": "./typings/i18n/languages/ptPT.d.ts",
-      "import": "./es/i18n/languages/ptPT.mjs",
-      "require": "./commonjs/i18n/languages/ptPT.js"
-    },
-    "./commonjs/i18n/languages/ptPT": {
-      "types": "./typings/i18n/languages/ptPT.d.ts",
-      "import": "./es/i18n/languages/ptPT.mjs",
-      "require": "./commonjs/i18n/languages/ptPT.js"
-    },
-    "./commonjs/i18n/languages/ptPT.js": {
-      "types": "./typings/i18n/languages/ptPT.d.ts",
-      "import": "./es/i18n/languages/ptPT.mjs",
-      "require": "./commonjs/i18n/languages/ptPT.js"
-    },
-    "./i18n/languages/ruRU": {
-      "types": "./typings/i18n/languages/ruRU.d.ts",
-      "import": "./es/i18n/languages/ruRU.mjs",
-      "require": "./commonjs/i18n/languages/ruRU.js"
-    },
-    "./es/i18n/languages/ruRU": {
-      "types": "./typings/i18n/languages/ruRU.d.ts",
-      "import": "./es/i18n/languages/ruRU.mjs",
-      "require": "./commonjs/i18n/languages/ruRU.js"
-    },
-    "./es/i18n/languages/ruRU.js": {
-      "types": "./typings/i18n/languages/ruRU.d.ts",
-      "import": "./es/i18n/languages/ruRU.mjs",
-      "require": "./commonjs/i18n/languages/ruRU.js"
-    },
-    "./commonjs/i18n/languages/ruRU": {
-      "types": "./typings/i18n/languages/ruRU.d.ts",
-      "import": "./es/i18n/languages/ruRU.mjs",
-      "require": "./commonjs/i18n/languages/ruRU.js"
-    },
-    "./commonjs/i18n/languages/ruRU.js": {
-      "types": "./typings/i18n/languages/ruRU.d.ts",
-      "import": "./es/i18n/languages/ruRU.mjs",
-      "require": "./commonjs/i18n/languages/ruRU.js"
-    },
-    "./i18n/languages/svSE": {
-      "types": "./typings/i18n/languages/svSE.d.ts",
-      "import": "./es/i18n/languages/svSE.mjs",
-      "require": "./commonjs/i18n/languages/svSE.js"
-    },
-    "./es/i18n/languages/svSE": {
-      "types": "./typings/i18n/languages/svSE.d.ts",
-      "import": "./es/i18n/languages/svSE.mjs",
-      "require": "./commonjs/i18n/languages/svSE.js"
-    },
-    "./es/i18n/languages/svSE.js": {
-      "types": "./typings/i18n/languages/svSE.d.ts",
-      "import": "./es/i18n/languages/svSE.mjs",
-      "require": "./commonjs/i18n/languages/svSE.js"
-    },
-    "./commonjs/i18n/languages/svSE": {
-      "types": "./typings/i18n/languages/svSE.d.ts",
-      "import": "./es/i18n/languages/svSE.mjs",
-      "require": "./commonjs/i18n/languages/svSE.js"
-    },
-    "./commonjs/i18n/languages/svSE.js": {
-      "types": "./typings/i18n/languages/svSE.d.ts",
-      "import": "./es/i18n/languages/svSE.mjs",
-      "require": "./commonjs/i18n/languages/svSE.js"
-    },
-    "./i18n/languages/trTR": {
-      "types": "./typings/i18n/languages/trTR.d.ts",
-      "import": "./es/i18n/languages/trTR.mjs",
-      "require": "./commonjs/i18n/languages/trTR.js"
-    },
-    "./es/i18n/languages/trTR": {
-      "types": "./typings/i18n/languages/trTR.d.ts",
-      "import": "./es/i18n/languages/trTR.mjs",
-      "require": "./commonjs/i18n/languages/trTR.js"
-    },
-    "./es/i18n/languages/trTR.js": {
-      "types": "./typings/i18n/languages/trTR.d.ts",
-      "import": "./es/i18n/languages/trTR.mjs",
-      "require": "./commonjs/i18n/languages/trTR.js"
-    },
-    "./commonjs/i18n/languages/trTR": {
-      "types": "./typings/i18n/languages/trTR.d.ts",
-      "import": "./es/i18n/languages/trTR.mjs",
-      "require": "./commonjs/i18n/languages/trTR.js"
-    },
-    "./commonjs/i18n/languages/trTR.js": {
-      "types": "./typings/i18n/languages/trTR.d.ts",
-      "import": "./es/i18n/languages/trTR.mjs",
-      "require": "./commonjs/i18n/languages/trTR.js"
-    }
+    "typescript": "^4.0.8"
   }
 }

@@ -1,0 +1,54 @@
+# Gitignored files copied into each worktree Claude Code creates.
+#
+# Uses .gitignore syntax. Only files that match a pattern AND are gitignored are
+# copied, so nothing tracked is ever duplicated. Applies to worktrees created by
+# `--worktree`, by subagent isolation, and by the desktop app.
+#
+# This covers only the file half of setting up a worktree. It cannot install
+# dependencies and it cannot fetch the private test suite. See dev-docs/WORKTREES.md.
+
+# Nothing is copied into a worktree. The list below records what was considered
+# and rejected, so it does not get added back.
+
+# Deliberately NOT copied — listing these here would cause real bugs:
+#
+#   .dev.vars .dev.vars.*
+#                         Cloudflare Worker deploy credentials. Copying them
+#                         puts a deploy token on disk in every worktree,
+#                         including the isolated ones subagents get, for the
+#                         convenience of the one maintainer who actually runs
+#                         `wrangler`. They can copy the file themselves.
+#
+#   node_modules          A copy is not an install: `.bin` shims and native
+#                         builds do not survive it. Run `npm ci` in the worktree.
+#                         Do NOT symlink it back to the main checkout: in a
+#                         workspace `npm ci` then installs THROUGH the symlink
+#                         and rewrites the main checkout's dependency tree. See
+#                         dev-docs/WORKTREES.md.
+#
+#   hyperformula/test/hyperformula-tests/
+#                         The private suite is BRANCH-MATCHED to this repository
+#                         (test/fetch-tests.sh checks out the branch of the same
+#                         name). A copy carries the source branch's tests and
+#                         silently tests the wrong thing — worse than having no
+#                         suite at all. Run `npm run test:setup-private` in the
+#                         worktree instead.
+#
+#   hyperformula/{lib,dist,es,commonjs,typings,languages}/
+#                         Build outputs. A stale copy makes `npm run test:browser`
+#                         and the bundle checks pass or fail against the other
+#                         branch's build. Run `npm run bundle-all`.
+#
+#   docs/api/  docs/guide/built-in-functions.md  docs/.vuepress/dist/
+#                         Generated from source. A copy goes stale the moment the
+#                         JSDoc or the metadata catalogue changes.
+#
+#   coverage/ test-jasmine/ test-jest/ .wrangler/
+#                         Run artifacts and local tool state. Nothing reads them
+#                         across branches.
+#
+#   .claude/settings.local.json
+#                         Not needed. Since Claude Code v2.1.211 a permission
+#                         approval made in a worktree is saved to the MAIN
+#                         checkout's file and applies in every worktree of the
+#                         repository, so a copy here would only go stale.

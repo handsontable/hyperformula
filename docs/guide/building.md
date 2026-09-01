@@ -15,10 +15,22 @@ The build process uses Webpack and Babel, as well as npm tasks
 listed in package.json. During this process, the source located in
 the `src/*` directory is transformed into the output files.
 
-The library is developed in TypeScript and the exact configuration
-options can be found in `tsconfig.json`. To run the commands you need
-to set up your environment to have `npm` or `yarn` properly installed.
-After that, navigate to the project and run `npm install`.
+The library is developed in TypeScript and the exact configuration options can
+be found in `hyperformula/tsconfig.json`.
+
+This repository is an npm workspace: the engine is the `hyperformula` package, and
+the documentation portal in `docs/` installs separately. From the repository root:
+
+```bash
+npm ci               # the engine and its toolchain
+npm run docs:install # the documentation portal, only if you are building the docs
+```
+
+The commands below are the engine's own scripts. Run them from the repository
+root, where each is forwarded to the package, or from `hyperformula/` directly.
+Only `bundle-all` and the `test:*`, `verify:*` and `docs:*` entry points are
+forwarded from the root; for anything else, add `--workspace=hyperformula` or
+work inside `hyperformula/`.
 
 ## Output formats
 
@@ -45,7 +57,11 @@ dependencies
 To build the project you can use the following commands:
 
 * `npm run bundle-all`  - generates development and production
-builds, verifies the version
+builds, verifies the version. Forwarded from the repository root.
+
+The individual steps are scripts of the `hyperformula` package, so run them with
+`--workspace=hyperformula` from the root, or from inside `hyperformula/`:
+
 * `npm run bundle:es` - transpiles files into the `import/export`
 format , builds ES6 version
 * `npm run bundle:cjs` - builds CommonJS version
@@ -58,7 +74,9 @@ We use the Node 22 LTS in the build-chain and recommend this version for buildin
 
 ## Verify the build
 
-By using the following commands you can verify the build:
+`npm run verify-bundles` is forwarded from the repository root; the individual
+checks are package scripts, so run them with `--workspace=hyperformula` or from
+inside `hyperformula/`:
 
 * `verify-bundles` - runs all verify commands
 * `verify:umd` - verifies UMD version
@@ -79,7 +97,7 @@ Most likely, you will want to document the code. You can use the following comma
 ## Run the tests
 
 ::: tip
-HyperFormula main test suite is maintained outside of this repository. You can find more information [here](https://github.com/handsontable/hyperformula/blob/master/test/README.md).
+HyperFormula main test suite is maintained outside of this repository. You can find more information [here](https://github.com/handsontable/hyperformula/blob/master/hyperformula/test/README.md).
 :::
 
 The tests are done with Jest and Karma. The same test suite should
@@ -92,8 +110,8 @@ to be sure that both environments are fine.
   * To run a test suite that matches a word, add a Jest `-t` flag. For example: `npm run test:jest -- -t 'SUMIF'` runs only the tests that match the word `SUMIF` within `describe()` or `it()`.
   * To run a specific test suite, pass the file name. For example: `npm run test:jest 'function-sumif.spec.ts'` runs only the unit tests from the file `function-sumif.spec.ts`.
 * `npm run test:browser` - runs tests in **karma** once and closes all open browsers
-  * To run a specific `spec` file or a test suite you can add a Karma `--spec` flag. For example: `npm run test:browser.debug -- --spec=matrix.spec.ts` runs `matrix.spec.ts` browser tests only
-* `npm run test:browser.debug` - runs test in **karma** only in Chrome until you exit the process. It watches changes in `src` and `test` directories and rebuilds them automatically.
+  * To run a specific `spec` file or a test suite you can add a Karma `--spec` flag. For example: `npm run test:browser.debug --workspace=hyperformula -- --spec=matrix.spec.ts` runs `matrix.spec.ts` browser tests only
+* `npm run test:browser.debug --workspace=hyperformula` - runs test in **karma** only in Chrome until you exit the process. It watches changes in `src` and `test` directories and rebuilds them automatically. This one is not forwarded from the root.
 
 ## Run the linter
 

@@ -34,4 +34,4 @@ jobs:
         run: npm ci
 
       - name: Build docs
-        run: npm run docs:build
+        run: npm run docs:install && npm run docs:build
