@@ -2,7 +2,7 @@
 
 What a change must prove, and how a test case is written. These apply to every package in the repository.
 
-Each package documents its own suites and commands: the engine's are in [`hyperformula/dev-docs/TESTING.md`](TESTING.md).
+Each package documents its own suites and commands: the engine's are in [`hyperformula/dev-docs/TESTING.md`](../hyperformula/dev-docs/TESTING.md).
 
 ## What a change must cover
 

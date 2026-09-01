@@ -44,7 +44,8 @@ Outside both: [`docs/README.md`](../docs/README.md) for running the documentatio
 
 ## Conventions
 
-- Cross-references use repository-root-relative paths (for example `dev-docs/TESTING.md`), not filesystem-relative `../` paths.
+- Markdown **link targets** are filesystem-relative — `../test/README.md` from here, `../../../dev-docs/TESTING.md` from a nested `AGENTS.md` — so they resolve on GitHub and in an editor.
+- A path **named in prose** rather than linked is spelled from the repository root: `dev-docs/TESTING.md`, `src/interpreter/plugin/`.
 - Diagrams live only in `dev-docs/`, never in the always-loaded `AGENTS.md` files.
 - Public, user-facing documentation belongs in [`docs/`](../docs/), not here. `dev-docs/` never ships.
 - **Nothing outside this directory restates what is in it.** `AGENTS.md`, `README.md`, and `SKILL.md` files carry only what is so specific to their own context that it would be useless anywhere else; everything else is a link. Two copies of a rule means one of them is wrong within a release, and the reader cannot tell which.

@@ -9,20 +9,16 @@ description: Use when adding a new built-in spreadsheet function to HyperFormula
 | File | Why |
 |---|---|
 | [`INTERPRETER.md`](../../../hyperformula/dev-docs/INTERPRETER.md#built-in-functions) | The plugin contract, `runFunction`, and every argument and function metadata field. Read this before writing any code. |
-| [`FUNCTION-CATALOGUE.md`](../../../hyperformula/dev-docs/FUNCTION-CATALOGUE.md) | What the catalogue entry must contain, and the two failure modes that are silent |
+| [`FUNCTION-CATALOGUE.md`](../../../hyperformula/dev-docs/FUNCTION-CATALOGUE.md) | What the catalogue entry must contain, and the two ways to get it wrong |
 | [`I18N.md`](../../../hyperformula/dev-docs/I18N.md) | Where to source a translation, and why an invented one cannot be taken back |
-| [`TESTING.md`](../../../hyperformula/dev-docs/TESTING.md#what-each-kind-of-change-needs) | The list of cases a function change must cover |
+| [`TESTING.md`](../../../dev-docs/TESTING.md#what-each-kind-of-change-needs) | The list of cases a function change must cover |
 | [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md) | What the change must contain before review |
 
 ## 2. Touch all five places
 
-A function is not done until all five agree. Each omission fails differently, and three of them fail silently.
+A function is not done until all five agree, and they do not fail the same way — a missing catalogue entry fails the docs build, a parameter-count mismatch only warns on the console, and the rest fail silently.
 
-1. **Implementation** — the plugin class in `hyperformula/src/interpreter/plugin/`, plus its `implementedFunctions` entry keyed by the canonical English id.
-2. **Catalogue entry** — `hyperformula/src/interpreter/functionMetadata/categories/<category>.ts`. Parameter **count** must match `implementedFunctions`, or the authored names and descriptions are discarded at run time with only a console warning. A missing entry fails the docs build.
-3. **Translations** — every file in `hyperformula/src/i18n/languages/`.
-4. **Tests** — in `hyperformula/test/`.
-5. **Changelog** — skill `changelog-creation`.
+The list is in [`INTERPRETER.md`](../../../hyperformula/dev-docs/INTERPRETER.md#the-five-places-a-function-change-must-touch). Work through it there rather than from a copy; two of the five have their own page, linked from it.
 
 ## 3. Declare the two things nothing cross-checks
 

@@ -9,7 +9,7 @@ These apply across the whole repository: guides, the API reference, JSDoc inside
 - Any public-API change updates the JSDoc **and** the affected guides.
 - Any user-facing behaviour change is documented in the same pull request as the change.
 - Any breaking change adds a migration-guide section.
-- Documentation-only changes (guides, JSDoc, README) need no changelog entry.
+- Documentation-only changes need no changelog entry. The full exemption is under [The changelog](#the-changelog).
 
 ## The API reference is the source of truth
 

@@ -29,7 +29,7 @@ Review in the order below, and stop to report the first serious finding rather t
 
 ## 3. Completeness of a function change
 
-All five places, three of which fail silently: implementation, catalogue entry with a matching parameter count, every language file, tests, changelog. Plus `sizeOfResultArrayMethod` for anything array-returning, and an explicit `optionalArg` where arity does not express the valid call. Skill `hyperformula-function-dev`.
+Check every one of [the five places a function change must touch](../../../hyperformula/dev-docs/INTERPRETER.md#the-five-places-a-function-change-must-touch); most of them fail silently when missed. Plus `sizeOfResultArrayMethod` for anything array-returning, and an explicit `optionalArg` where arity does not express the valid call. Skill `hyperformula-function-dev`.
 
 ## 4. Performance
 

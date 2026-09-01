@@ -75,7 +75,7 @@ HyperFormula is a headless spreadsheet calculation engine. No UI, no DOM, no ser
 - `Graph.ts` holds the vertices and edges; `TopSort.ts` produces the evaluation order and detects cycles.
 - Vertex kinds: `ValueCellVertex`, `FormulaVertex`, `EmptyCellVertex`, `RangeVertex`, `ParsingErrorVertex`.
 - `AddressMapping/` maps a `SimpleCellAddress` to its vertex; `RangeMapping.ts` does the same for ranges, so a range is a single vertex rather than one edge per cell.
-- `LazilyTransformingAstService.ts` defers AST rewrites after structural changes until a formula is actually read — a change here affects both correctness and the CRUD hot path.
+- `src/LazilyTransformingAstService.ts` — at the source root, not in this directory — defers AST rewrites after structural changes until a formula is actually read. A change there affects both correctness and the CRUD hot path.
 
 ## Invariants
 
