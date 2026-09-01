@@ -11,7 +11,7 @@ description: Use when adding a new built-in spreadsheet function to HyperFormula
 | [`INTERPRETER.md`](../../../hyperformula/dev-docs/INTERPRETER.md#built-in-functions) | The plugin contract, `runFunction`, and every argument and function metadata field. Read this before writing any code. |
 | [`FUNCTION-CATALOGUE.md`](../../../hyperformula/dev-docs/FUNCTION-CATALOGUE.md) | What the catalogue entry must contain, and the two ways to get it wrong |
 | [`I18N.md`](../../../hyperformula/dev-docs/I18N.md) | Where to source a translation, and why an invented one cannot be taken back |
-| [`TESTING.md`](../../../dev-docs/TESTING.md#what-each-kind-of-change-needs) | The list of cases a function change must cover |
+| [`TESTING.md`](../../../hyperformula/dev-docs/TESTING.md#what-each-kind-of-change-needs) | The list of cases a function change must cover |
 | [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md) | What the change must contain before review |
 
 ## 2. Touch all five places

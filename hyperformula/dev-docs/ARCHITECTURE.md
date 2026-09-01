@@ -86,7 +86,7 @@ Everything in `hyperformula/src/` ships, runs in the browser and in Node, and si
 - **Language-dependent parsing.** Function names, argument separators, and error literals all vary by language. Never hard-code an English function name in the parser or the interpreter.
 - **Errors are values.** Return a `CellError` with a message from `hyperformula/src/error-message.ts`. A throw reachable from evaluation escapes one cell and takes the whole recalculation with it.
 - **Coercion goes through `ArithmeticHelper`.** Spreadsheet coercion is not JavaScript coercion, and it is already implemented once.
-- **Public API stability.** `hyperformula/src/HyperFormula.ts` and the types it exports are the contract. The JSDoc on it **is** the published API reference — write it for the reader of the docs portal. See [`DEFINITION-OF-DONE.md`](../../dev-docs/DEFINITION-OF-DONE.md) for what a breaking change requires.
+- **Public API stability.** `hyperformula/src/HyperFormula.ts` and the types re-exported from `hyperformula/src/index.ts` are the contract. The JSDoc on it **is** the published API reference — write it for the reader of the docs portal. See [`DEFINITION-OF-DONE.md`](../../dev-docs/DEFINITION-OF-DONE.md) for what a breaking change requires.
 - **Tests, always.** Every change here ships a test in `hyperformula/test/`; a bug fix ships one that fails against the unfixed code. See [`TESTING.md`](TESTING.md).
 
 ## Subsystem references

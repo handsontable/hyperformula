@@ -59,6 +59,7 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 | `argumentType` | `NUMBER`, `STRING`, `BOOLEAN`, `SCALAR`, `NOERROR`, `RANGE`, `ANY`, `INTEGER`, `COMPLEX` |
 | `optionalArg` | The argument may be omitted |
 | `defaultValue` | Value used when omitted |
+| `emptyAsDefault` | An empty argument falls back to `defaultValue` instead of the zero-value for its type; requires `defaultValue` |
 | `minValue`, `maxValue`, `lessThan`, `greaterThan` | Range constraints, enforced during coercion |
 | `passSubtype` | Keep the extended number subtype instead of unwrapping to a raw number |
 
@@ -72,8 +73,11 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 | `isDependentOnSheetStructureChange` | It must recalculate when rows or columns are added or removed |
 | `doesNotNeedArgumentsToBeComputed` | Reference and range arguments create no dependency |
 | `vectorizationForbidden` | It returns an array, or is otherwise special |
+| `enableArrayArithmeticForArguments` | Array arithmetic mode should apply to its arguments and nested expressions |
 | `sizeOfResultArrayMethod` | **Required** for any function that can return an array |
 | `returnNumberType` | The result is a percent, currency, date, or time |
+
+`arrayFunction` and `arraySizeMethod` are still declared on the interface but are **deprecated since 3.1.0**, superseded by `enableArrayArithmeticForArguments` and `sizeOfResultArrayMethod`. Do not carry them forward from an older plugin.
 
 ### Never
 

@@ -27,7 +27,7 @@ Every change in the pull request must be relevant to the issue it solves. Unrela
 
 ## Breaking changes
 
-The public API is `hyperformula/src/HyperFormula.ts` and the types it exports. Avoid breaking it. When a change genuinely requires a break:
+The public API is `hyperformula/src/HyperFormula.ts` and the types re-exported from `hyperformula/src/index.ts`. Avoid breaking it. When a change genuinely requires a break:
 
 - state it explicitly in the pull request description and the changelog entry;
 - add a migration-guide section describing what breaks and what to do instead;

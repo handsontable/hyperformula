@@ -16,7 +16,7 @@ ESLint is the source of truth for formatting and code rules — run `npm run lin
 
 ## TypeScript
 
-- The public API surface is `hyperformula/src/HyperFormula.ts` and the types it exports; `npm run bundle:typings --workspace=hyperformula` emits them into `hyperformula/typings/`.
+- The public API surface is `hyperformula/src/HyperFormula.ts` and the types re-exported from `hyperformula/src/index.ts`; `npm run bundle:typings --workspace=hyperformula` emits them into `hyperformula/typings/`.
 - `npm run verify:typings` (`tsc --noEmit`) must pass. A change that only compiles because of an `as` cast usually has a modelling problem behind it.
 
 ## Performance
