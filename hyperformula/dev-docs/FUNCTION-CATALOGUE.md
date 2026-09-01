@@ -4,7 +4,7 @@
 
 It is the single source of truth for two consumers:
 
-- the public [`getAvailableFunctions` / `getFunctionDetails`](../docs/api/classes/hyperformula.md) API;
+- the public [`getAvailableFunctions` / `getFunctionDetails`](../../docs/api/classes/hyperformula.md) API;
 - the generated built-in functions guide page (`docs/guide/built-in-functions.md`, produced by `npm run docs:generate-function-docs`).
 
 Every field is required, `documentationUrl` included. Each entry authors its own link rather than inheriting a shared default, so links can diverge per function without touching any code; they all happen to point at the same guide page today.
@@ -47,7 +47,7 @@ It does **not** turn ordinary English into identifiers. A parameter's own descri
 
 ## Behaviour, not Excel
 
-Descriptions must describe **HyperFormula's** behaviour, not Excel's. Much of the catalogue was seeded from a hand-written page that documented Excel, and HyperFormula deliberately deviates in places (`INT` truncates toward zero, `ISEVEN`/`ISODD` do not truncate, `CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1). Verify a claim against the implementation before authoring it, and record any deviation in [the list of differences](../docs/guide/list-of-differences.md).
+Descriptions must describe **HyperFormula's** behaviour, not Excel's. Much of the catalogue was seeded from a hand-written page that documented Excel, and HyperFormula deliberately deviates in places (`INT` truncates toward zero, `ISEVEN`/`ISODD` do not truncate, `CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1). Verify a claim against the implementation before authoring it, and record any deviation in [the list of differences](../../docs/guide/list-of-differences.md).
 
 ## The rules, in short
 

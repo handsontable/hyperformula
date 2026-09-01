@@ -19,6 +19,8 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 │   │   ├── smoke.spec.ts             # Public smoke tests
 │   │   ├── fetch-tests.sh            # Clones/updates the private test repository
 │   │   └── hyperformula-tests/       # Private suite (git-ignored, branch-matched)
+│   ├── dev-docs/                     # the engine's own internals reference
+│   ├── script/                       # its build checks: check-file, check-publish-package, if-ne-env
 │   ├── .config/                      # webpack, karma, and babel config factories
 │   ├── tsconfig.json  jest.config.js  karma.conf.js  webpack.config.js
 │   ├── babel.config.js  ht.config.js  jasmine.json  .npmignore
@@ -33,15 +35,14 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 │   ├── api/                          # API reference (generated; git-ignored)
 │   ├── examples/                     # Code examples embedded in guides
 │   ├── .vuepress/                    # VuePress configuration, theme, components, plugins
-│   ├── script/                       # Generates guide/built-in-functions.md
+│   ├── script/                       # Generates guide/built-in-functions.md; composes the Worker assets
 │   ├── worker/index.js               # Cloudflare Worker serving the built portal
 │   ├── wrangler.jsonc                # Its deploy configuration
 │   ├── package.json  .nvmrc
 │   └── AGENTS.md  CLAUDE.md  README.md
 │
-├── script/                           # Repository-wide scripts: build checks, release, agent hooks
-├── examples/                         # Images and CSV fixtures used by the docs
-├── dev-docs/                         # Developer reference (this directory; start at README.md)
+├── script/                           # Repository-wide only: the release procedure and the licence gate
+├── dev-docs/                         # Repository-wide reference (this directory; start at README.md)
 ├── .ai/                              # One sentence pointing at dev-docs/, for agents that look here
 ├── .claude/                          # Claude Code settings, skills, and hooks
 ├── .github/                          # CI workflows, issue and PR templates
@@ -75,6 +76,24 @@ All git-ignored, all under `hyperformula/`: `lib/` (`tsc` output, the input to e
 Never edit any of them. Never read the **build artifacts** — `lib/`, `es/`, `commonjs/`, `dist/`, `languages/`, `typings/`, `docs/.vuepress/dist/` — to answer a question about behaviour; read `hyperformula/src/` instead, and the agent deny list in `.claude/settings.json` enforces that.
 
 `docs/api/` and `docs/guide/built-in-functions.md` are the exception. They are generated, so editing them is pointless, but they *are* the API reference and the function reference and reading them is often exactly right.
+
+## `dev-docs/` at two levels
+
+This directory holds what applies to the whole repository: the definition of done, code style, testing standards, documentation rules, the build and release process, pull requests, worktrees, and the agent setup.
+
+[`hyperformula/dev-docs/`](../hyperformula/dev-docs/README.md) holds the engine's internals: architecture, the parser, the interpreter, the dependency graph, the function catalogue, translations, performance, its test suites, and its own build steps.
+
+The split is by ownership. A fact lives in exactly one of them, and `hyperformula-ui` gets its own when it lands.
+
+## Scripts at three levels
+
+Each script lives with whatever invokes it, and every one has exactly one caller:
+
+| Directory | Holds |
+|---|---|
+| `script/` | `release/` and `check-licenses.mjs` — both span the whole repository |
+| `hyperformula/script/` | `check-file.js`, `check-publish-package.js`, `if-ne-env.js` — called by the engine's build |
+| `docs/script/` | the built-in-functions generator and `prepare-cf-assets.js` — called by the portal |
 
 ## Directories with their own `AGENTS.md`
 

@@ -17,7 +17,7 @@ Always:
 
 | File | Why |
 |---|---|
-| [`ARCHITECTURE.md`](../../../dev-docs/ARCHITECTURE.md) | The pipeline, the core modules, and the invariants that hold everywhere in `hyperformula/src/` |
+| [`ARCHITECTURE.md`](../../../hyperformula/dev-docs/ARCHITECTURE.md) | The pipeline, the core modules, and the invariants that hold everywhere in `hyperformula/src/` |
 | [`CODE-STYLE.md`](../../../dev-docs/CODE-STYLE.md) | Style, and which paths are hot enough that complexity matters |
 | [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md) | What the change must contain before review |
 
@@ -25,12 +25,12 @@ Then the page for the stage you are changing:
 
 | File | For |
 |---|---|
-| [`PARSER.md`](../../../dev-docs/PARSER.md) | `hyperformula/src/parser/` — formula text to AST, and back |
-| [`INTERPRETER.md`](../../../dev-docs/INTERPRETER.md) | `hyperformula/src/interpreter/` — AST to value, and built-in functions |
-| [`DEPENDENCY-GRAPH.md`](../../../dev-docs/DEPENDENCY-GRAPH.md) | `hyperformula/src/DependencyGraph/` — dependency tracking and recalculation order |
-| [`FUNCTION-CATALOGUE.md`](../../../dev-docs/FUNCTION-CATALOGUE.md) | `hyperformula/src/interpreter/functionMetadata/` — function descriptions |
-| [`I18N.md`](../../../dev-docs/I18N.md) | `hyperformula/src/i18n/` — function-name translations |
-| [`TESTING.md`](../../../dev-docs/TESTING.md) | Writing the test the change needs |
+| [`PARSER.md`](../../../hyperformula/dev-docs/PARSER.md) | `hyperformula/src/parser/` — formula text to AST, and back |
+| [`INTERPRETER.md`](../../../hyperformula/dev-docs/INTERPRETER.md) | `hyperformula/src/interpreter/` — AST to value, and built-in functions |
+| [`DEPENDENCY-GRAPH.md`](../../../hyperformula/dev-docs/DEPENDENCY-GRAPH.md) | `hyperformula/src/DependencyGraph/` — dependency tracking and recalculation order |
+| [`FUNCTION-CATALOGUE.md`](../../../hyperformula/dev-docs/FUNCTION-CATALOGUE.md) | `hyperformula/src/interpreter/functionMetadata/` — function descriptions |
+| [`I18N.md`](../../../hyperformula/dev-docs/I18N.md) | `hyperformula/src/i18n/` — function-name translations |
+| [`TESTING.md`](../../../hyperformula/dev-docs/TESTING.md) | Writing the test the change needs |
 
 ## 2. Locate the stage before changing anything
 

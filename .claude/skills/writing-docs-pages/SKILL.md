@@ -10,10 +10,10 @@ description: Use when creating or editing a page in the HyperFormula documentati
 |---|---|
 | [`DOCS-CONTENT-GUIDE.md`](../../../dev-docs/DOCS-CONTENT-GUIDE.md) | How to write the page: structure, chunking, language, code examples, VuePress conventions, and the self-review checklist to run before finishing |
 | [`DOC-STANDARDS.md`](../../../dev-docs/DOC-STANDARDS.md) | When documentation is required, and describing HyperFormula rather than Excel |
-| [`FUNCTION-CATALOGUE.md`](../../../dev-docs/FUNCTION-CATALOGUE.md) | Only when the change concerns the built-in functions page, which is generated from the catalogue |
+| [`FUNCTION-CATALOGUE.md`](../../../hyperformula/dev-docs/FUNCTION-CATALOGUE.md) | Only when the change concerns the built-in functions page, which is generated from the catalogue |
 | [`BUILD.md`](../../../dev-docs/BUILD.md) | Which documentation files are generated, by which command |
 
-And [`docs/README.md`](../../../docs/README.md), for what the portal contains and how to run it.
+And [`docs/README.md`](../../../dev-docs/README.md), for what the portal contains and how to run it.
 
 ## 2. Change the source, not the output
 

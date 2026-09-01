@@ -79,7 +79,7 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 
 - **Never throw.** Return a `CellError` with a message from `hyperformula/src/error-message.ts`.
 - **Never hand-roll coercion.** Declare the `argumentType` and let `runFunction` coerce, or use `ArithmeticHelper`.
-- **Never describe Excel's behaviour when HyperFormula deviates.** Implement what is specified, then record the deviation in [`docs/guide/list-of-differences.md`](../docs/guide/list-of-differences.md).
+- **Never describe Excel's behaviour when HyperFormula deviates.** Implement what is specified, then record the deviation in [`docs/guide/list-of-differences.md`](../../docs/guide/list-of-differences.md).
 - **Never allocate inside a per-cell loop** when the value can be hoisted.
 
 ### The five places a function change must touch

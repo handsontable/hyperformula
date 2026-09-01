@@ -8,12 +8,12 @@ description: Use when adding a built-in function that needs translated names, ad
 
 | File | Why |
 |---|---|
-| [`I18N.md`](../../../dev-docs/I18N.md) | Why translations are engine input rather than decoration, the rules, and the table of sources to translate from |
-| [`PARSER.md`](../../../dev-docs/PARSER.md) | Only when changing separators or error literals — the lexer builds its token set from the language package |
+| [`I18N.md`](../../../hyperformula/dev-docs/I18N.md) | Why translations are engine input rather than decoration, the rules, and the table of sources to translate from |
+| [`PARSER.md`](../../../hyperformula/dev-docs/PARSER.md) | Only when changing separators or error literals — the lexer builds its token set from the language package |
 
 ## 2. Look the name up in a real source
 
-Use the sources in [`I18N.md`](../../../dev-docs/I18N.md#where-to-find-a-translation), in the order listed. **Never invent or machine-translate a function name.** A wrong one ships to every user of that language pack and cannot be changed without breaking their formulas.
+Use the sources in [`I18N.md`](../../../hyperformula/dev-docs/I18N.md#where-to-find-a-translation), in the order listed. **Never invent or machine-translate a function name.** A wrong one ships to every user of that language pack and cannot be changed without breaking their formulas.
 
 ## 3. Add the key to every language file
 

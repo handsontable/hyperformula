@@ -14,30 +14,33 @@ Everything a developer needs to know lives here or is linked from here. External
 
 In every directory, `CLAUDE.md` is a symlink to its sibling `AGENTS.md`. Edit `AGENTS.md` — the symlink keeps Claude Code and Cursor reading the same single source.
 
+`dev-docs/` exists at two levels. This one holds what applies to the whole repository; each package holds its own internals. A fact has exactly one home in exactly one of them — the split is by ownership, never a copy.
+
 ## Where to look
+
+Repository-wide standards and process live here. Each package documents its own internals: the engine's are in [`hyperformula/dev-docs/`](../hyperformula/dev-docs/README.md).
 
 | You are working on | Read |
 |---|---|
-| Anything in `hyperformula/src/` | [`ARCHITECTURE.md`](ARCHITECTURE.md) — the pipeline, the core modules, and the invariants that hold everywhere in `src/` |
-| Formula parsing | [`PARSER.md`](PARSER.md) |
-| Formula evaluation, or a built-in function | [`INTERPRETER.md`](INTERPRETER.md) |
-| Function descriptions in the API and the docs | [`FUNCTION-CATALOGUE.md`](FUNCTION-CATALOGUE.md) |
-| Dependency tracking and recalculation order | [`DEPENDENCY-GRAPH.md`](DEPENDENCY-GRAPH.md) |
-| Function-name translations | [`I18N.md`](I18N.md) |
-| Tests | [`TESTING.md`](TESTING.md) |
 | What a change must include before review | [`DEFINITION-OF-DONE.md`](DEFINITION-OF-DONE.md) |
-| Style and performance | [`CODE-STYLE.md`](CODE-STYLE.md) |
+| Code style | [`CODE-STYLE.md`](CODE-STYLE.md) |
+| What a test must prove, and how a case is written | [`TESTING.md`](TESTING.md) |
 | Documentation rules, and the changelog | [`DOC-STANDARDS.md`](DOC-STANDARDS.md) |
 | Writing a documentation page | [`DOCS-CONTENT-GUIDE.md`](DOCS-CONTENT-GUIDE.md) |
-| Building, bundling, releasing | [`BUILD.md`](BUILD.md) |
+| Installing the workspace, deploying the portal, cutting a release | [`BUILD.md`](BUILD.md) |
 | Opening a pull request | [`PULL-REQUESTS.md`](PULL-REQUESTS.md) |
 | Which package holds what, and what the monorepo move still owes | [`STRUCTURE.md`](STRUCTURE.md) |
 | A linked git worktree | [`WORKTREES.md`](WORKTREES.md) |
 | How this repository is set up for agents | [`AGENT-TOOLING.md`](AGENT-TOOLING.md) |
 | Step-by-step task workflows | [`.claude/skills/`](../.claude/skills/) |
 
-Outside this directory: [`docs/README.md`](../docs/README.md) for running the documentation portal, [`hyperformula/test/README.md`](../hyperformula/test/README.md) for attaching the private test suite, [`script/README.md`](../script/README.md) for what each build and release script does, and [`CONTRIBUTING.md`](../CONTRIBUTING.md) for external contributors.
+Inside the engine — architecture, the parser, the interpreter, the dependency graph, the function catalogue, translations, performance, its test suites and its build:
 
+| You are working on | Read |
+|---|---|
+| Anything in `hyperformula/src/` | [`hyperformula/dev-docs/README.md`](../hyperformula/dev-docs/README.md) |
+
+Outside both: [`docs/README.md`](../docs/README.md) for running the documentation portal, [`hyperformula/test/README.md`](../hyperformula/test/README.md) for attaching the private test suite, and [`CONTRIBUTING.md`](../CONTRIBUTING.md) for external contributors.
 
 ## Conventions
 

@@ -8,7 +8,7 @@
     "generate-function-docs": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"} script/generate-builtin-functions-doc.ts",
     "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress dev . --silent --no-clear-screen --no-cache",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress build .",
-    "build:cf": "rimraf .vuepress/dist && npm run build && node ../script/prepare-cf-assets.js",
+    "build:cf": "rimraf .vuepress/dist && npm run build && node script/prepare-cf-assets.js",
     "deploy:cf": "wrangler deploy",
     "preview:cf": "wrangler versions upload",
     "code-examples:generate-js": "bash code-examples-generator.sh",

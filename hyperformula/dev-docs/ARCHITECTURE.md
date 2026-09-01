@@ -64,7 +64,7 @@ HyperFormula is a headless spreadsheet calculation engine. No UI, no DOM, no ser
 `hyperformula/src/interpreter/Interpreter.ts` evaluates an AST node against an `InterpreterState`.
 
 - `FunctionRegistry.ts` maps a function id to the plugin that implements it. Custom functions register through the same registry, and may override a built-in id.
-- Every built-in function lives in a plugin under `hyperformula/src/interpreter/plugin/` extending `FunctionPlugin`. See [`hyperformula/src/interpreter/plugin/AGENTS.md`](../hyperformula/src/interpreter/plugin/AGENTS.md).
+- Every built-in function lives in a plugin under `hyperformula/src/interpreter/plugin/` extending `FunctionPlugin`. See [`hyperformula/src/interpreter/plugin/AGENTS.md`](../src/interpreter/plugin/AGENTS.md).
 - `hyperformula/src/interpreter/functionMetadata/` holds the human-readable description of each function — a separate, id-keyed source from the implementation. See [`FUNCTION-CATALOGUE.md`](FUNCTION-CATALOGUE.md).
 - `ArithmeticHelper.ts` centralises coercion and comparison. Reach for it rather than writing coercion inside a function.
 
@@ -86,7 +86,7 @@ Everything in `hyperformula/src/` ships, runs in the browser and in Node, and si
 - **Language-dependent parsing.** Function names, argument separators, and error literals all vary by language. Never hard-code an English function name in the parser or the interpreter.
 - **Errors are values.** Return a `CellError` with a message from `hyperformula/src/error-message.ts`. A throw reachable from evaluation escapes one cell and takes the whole recalculation with it.
 - **Coercion goes through `ArithmeticHelper`.** Spreadsheet coercion is not JavaScript coercion, and it is already implemented once.
-- **Public API stability.** `hyperformula/src/HyperFormula.ts` and the types it exports are the contract. The JSDoc on it **is** the published API reference — write it for the reader of the docs portal. See [`DEFINITION-OF-DONE.md`](DEFINITION-OF-DONE.md) for what a breaking change requires.
+- **Public API stability.** `hyperformula/src/HyperFormula.ts` and the types it exports are the contract. The JSDoc on it **is** the published API reference — write it for the reader of the docs portal. See [`DEFINITION-OF-DONE.md`](../../dev-docs/DEFINITION-OF-DONE.md) for what a breaking change requires.
 - **Tests, always.** Every change here ships a test in `hyperformula/test/`; a bug fix ships one that fails against the unfixed code. See [`TESTING.md`](TESTING.md).
 
 ## Subsystem references

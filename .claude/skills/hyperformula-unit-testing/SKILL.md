@@ -8,10 +8,10 @@ description: Use when writing or modifying tests for HyperFormula, or when a cha
 
 | File | Why |
 |---|---|
-| [`TESTING.md`](../../../dev-docs/TESTING.md) | The two suites, how to write a case, and what each kind of change must cover |
+| [`TESTING.md`](../../../hyperformula/dev-docs/TESTING.md) | The two suites, how to write a case, and what each kind of change must cover |
 | [`WORKTREES.md`](../../../dev-docs/WORKTREES.md) | Only when working in a linked worktree, where the private suite is absent entirely |
 
-And [`hyperformula/test/README.md`](../../../hyperformula/test/README.md) for how the private suite is fetched and the environment variables it honours.
+And [`hyperformula/test/README.md`](../../../dev-docs/README.md) for how the private suite is fetched and the environment variables it honours.
 
 ## 2. Attach the private suite before trusting anything
 
