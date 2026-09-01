@@ -44,7 +44,7 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 ├── script/                           # Repository-wide only: the release procedure and the licence gate
 ├── dev-docs/                         # Repository-wide reference (this directory; start at README.md)
 ├── .ai/                              # One sentence pointing at dev-docs/, for agents that look here
-├── .claude/                          # Claude Code settings, skills, and hooks
+├── .claude/                          # Claude Code settings and skills
 ├── .github/                          # CI workflows, issue and PR templates
 ├── .eslintrc.js  .eslintignore       # Linting, run once from the root over everything
 ├── package.json                      # Private workspace root: fan-out scripts only
@@ -111,7 +111,7 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 
 - **npm workspaces, not pnpm.** A package-manager migration is a risk the move did not need to carry at the same time.
 - **`docs/` is not a workspace member.** VuePress 1.x and its `--openssl-legacy-provider` dependency tree must never reach an engine install. It installs on its own with `npm run docs:install`, and CI installs it before building the portal.
-- **One `dev-docs/`, at the root.** The original plan put an engine-scope copy inside `hyperformula/`. That was dropped: two directories fragment the single source of truth, and every page would have to know which scope it was written from. The engine's subsystem pages live here alongside the repository-wide ones.
+- **`dev-docs/` at two levels, not one at the root.** One directory at the root was the original plan; it was dropped in favour of splitting by ownership, so that each package's internals travel with the package and `hyperformula-ui` gets its own when it lands. Repository-wide standards stay here, and a fact lives in exactly one level — see [`dev-docs/` at two levels](#dev-docs-at-two-levels).
 - **The packages release together, on one version, from one changelog.** A release cuts every published package at the same version, whether or not each one changed, and `CHANGELOG.md` at the repository root is the single history for all of them. That keeps one number to reason about — the version a user reports a bug against identifies the state of the whole repository — at the cost of publishing a package whose code did not move. Entries name the package they concern where it is not obvious.
 - **The published tarball still carries a changelog.** `hyperformula`'s `prepack` copies the root `CHANGELOG.md` into the package and `postpack` removes it again, so there is one file under version control and npm consumers still get one.
 - **Every `.nvmrc` says `22`.**

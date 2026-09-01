@@ -24,7 +24,7 @@ This is not a licence to make a guide unreadable on its own. A guide page repeat
 | `docs/api/` | `npm run typedoc:build-api` | Never edit. Change the JSDoc in `hyperformula/src/`. |
 | `docs/guide/built-in-functions.md` | `npm run docs:generate-function-docs` | Never edit, never commit. Change the metadata catalogue — see [`FUNCTION-CATALOGUE.md`](../hyperformula/dev-docs/FUNCTION-CATALOGUE.md). |
 
-Both are git-ignored. A missing `docs/api/` folder means it has not been built yet; run `npm run docs:build`.
+Both are git-ignored. A missing `docs/api/` folder means it has not been built yet; run `npm run typedoc:build-api`.
 
 ## Describing behaviour
 
