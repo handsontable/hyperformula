@@ -2,7 +2,7 @@
 
 The suites, how to attach the private one, and what each kind of engine change must cover.
 
-The standards these run against — what a change must prove, how a case is written, and the ways a run must never be made green — are repository-wide: [`dev-docs/TESTING.md`](TESTING.md).
+The standards these run against — what a change must prove, how a case is written, and the ways a run must never be made green — are repository-wide: [`dev-docs/TESTING.md`](../../dev-docs/TESTING.md).
 
 ## The two suites
 

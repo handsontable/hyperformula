@@ -16,4 +16,4 @@ This page holds only what the guide does not cover. For installing the workspace
 
 ## Packaging
 
-`npm run verify:publish-package` runs `npm pack` through `script/check-publish-package.js` and checks what would actually ship. Run it whenever a change touches `package.json`, `.npmignore`, or the `exports`/`typings` surface.
+`npm run verify:publish-package` runs `npm pack` through `script/check-publish-package.js` and checks what would actually ship. `verify-bundles` is `run-p verify:**`, so it is part of every `bundle-all`; run it on its own whenever a change touches `package.json`, `.npmignore`, or the `exports`/`typings` surface without rebuilding everything.
