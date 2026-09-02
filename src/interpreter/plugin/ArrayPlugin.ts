@@ -354,15 +354,6 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         const sourceRange = range.range
 
         if (sourceRange !== undefined) {
-          const leavesHeightUnbounded = !Number.isFinite(sourceRange.height()) && !Number.isFinite(requestedRows)
-          const leavesWidthUnbounded = !Number.isFinite(sourceRange.width()) && !Number.isFinite(requestedColumns)
-          const startsBelowFirstRow = leavesHeightUnbounded && state.formulaAddress.row !== 0
-          const startsRightOfFirstColumn = leavesWidthUnbounded && state.formulaAddress.col !== 0
-
-          if (startsBelowFirstRow || startsRightOfFirstColumn) {
-            return new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult)
-          }
-
           // Keep address-backed ranges lazy to avoid materializing cells outside the TAKE result.
           const resultRange = AbsoluteCellRange.spanFrom(
             sourceRange.getAddress(startColumn, startRow),
@@ -387,6 +378,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * the upper bound. Unbounded dimensions are valid only at the corresponding
    * output-sheet edge, then direct references use their effective dimensions
    * to register the materialized spill footprint.
+   *
+   * An unbounded result anchored away from the required sheet edge retains its
+   * unbounded predicted dimension so array-space validation returns a spill
+   * error without evaluating TAKE as a scalar formula.
    *
    * @param {ProcedureAst} ast - The parsed TAKE call.
    * @param {InterpreterState} state - The formula state whose address anchors the spill.
@@ -422,7 +417,11 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       ? sourceRange.effectiveWidth(this.dependencyGraph)
       : width
 
-    if (startsBelowFirstRow || startsRightOfFirstColumn || effectiveHeight < 1 || effectiveWidth < 1) {
+    if (startsBelowFirstRow || startsRightOfFirstColumn) {
+      return new ArraySize(width, height)
+    }
+
+    if (effectiveHeight < 1 || effectiveWidth < 1) {
       return ArraySize.error()
     }
 
