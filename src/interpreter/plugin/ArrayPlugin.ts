@@ -375,9 +375,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
   /**
    * Calculates the spilled array size of TAKE using the source dimensions as
-   * the upper bound. Unbounded dimensions are valid only at the corresponding
-   * output-sheet edge, then direct references use their effective dimensions
-   * to register the materialized spill footprint.
+   * the upper bound. Direct unbounded references use their effective dimensions
+   * to cap finite counts and register the materialized spill footprint.
+   * Dimensions that remain unbounded are valid only at the corresponding
+   * output-sheet edge.
    *
    * An unbounded result anchored away from the required sheet edge retains its
    * unbounded predicted dimension so array-space validation returns a spill
@@ -410,14 +411,19 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const startsBelowFirstRow = !Number.isFinite(height) && state.formulaAddress.row !== 0
     const startsRightOfFirstColumn = !Number.isFinite(width) && state.formulaAddress.col !== 0
     const sourceRange = this.takeSourceRange(ast.args[0], state)
-    const effectiveHeight = !Number.isFinite(height) && sourceRange !== undefined
-      ? sourceRange.effectiveHeight(this.dependencyGraph)
+    const effectiveHeight = !Number.isFinite(sourceSize.height) && sourceRange !== undefined
+      ? Math.min(height, sourceRange.effectiveHeight(this.dependencyGraph))
       : height
-    const effectiveWidth = !Number.isFinite(width) && sourceRange !== undefined
-      ? sourceRange.effectiveWidth(this.dependencyGraph)
+    const effectiveWidth = !Number.isFinite(sourceSize.width) && sourceRange !== undefined
+      ? Math.min(width, sourceRange.effectiveWidth(this.dependencyGraph))
       : width
 
-    if (effectiveHeight < 1 || effectiveWidth < 1) {
+    if (
+      effectiveHeight < 1
+      || effectiveWidth < 1
+      || effectiveHeight > this.config.maxRows
+      || effectiveWidth > this.config.maxColumns
+    ) {
       return ArraySize.error()
     }
 
