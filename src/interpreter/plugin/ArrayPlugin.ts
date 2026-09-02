@@ -417,12 +417,12 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       ? sourceRange.effectiveWidth(this.dependencyGraph)
       : width
 
-    if (startsBelowFirstRow || startsRightOfFirstColumn) {
-      return new ArraySize(width, height)
-    }
-
     if (effectiveHeight < 1 || effectiveWidth < 1) {
       return ArraySize.error()
+    }
+
+    if (startsBelowFirstRow || startsRightOfFirstColumn) {
+      return new ArraySize(width, height)
     }
 
     return new ArraySize(effectiveWidth, effectiveHeight)
