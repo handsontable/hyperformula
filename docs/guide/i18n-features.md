@@ -1,3 +1,13 @@
+---
+tags:
+  - i18n
+  - localization
+  - localeLang
+  - decimalSeparator
+  - thousandSeparator
+  - Intl.Collator
+---
+
 # Internationalization features
 
 Configure HyperFormula to match the languages and regions of your users.

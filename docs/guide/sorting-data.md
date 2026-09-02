@@ -1,3 +1,14 @@
+---
+tags:
+  - setRowOrder
+  - setColumnOrder
+  - ascending
+  - descending
+  - reordering
+  - permutation
+  - sort by column
+---
+
 # Sorting data
 
 In HyperFormula, you can sort data by reordering rows and columns.

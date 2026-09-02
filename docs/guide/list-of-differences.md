@@ -1,3 +1,13 @@
+---
+tags:
+  - Microsoft Excel
+  - Google Sheets
+  - compatibility
+  - OpenDocument
+  - negative numbers
+  - rounding
+---
+
 # List of differences with other spreadsheets
 
 <!--
@@ -109,7 +119,6 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | TAKE          | =TAKE(A1:A3, 0)                                                |          N/A | No such function. |           CALC  |
 | TAKE          | =TAKE(Data!A:A, , 1)                                           | Spills the whole column from row 1; returns SPILL below row 1. | No such function. | Spills the whole column from row 1; returns SPILL below row 1. |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
-| MOD           | =MOD(-10, 3)                                                   |           -1 |             2 |               2 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
 | CEILING.MATH  | =CEILING.MATH(-4.3, 2, 2)                                      |           -4 |            -6 |              -6 |
@@ -118,6 +127,5 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 A few of the rows above share a root cause worth stating once:
 
 - **Rounding toward zero, not down.** `INT` discards the fractional part rather than rounding toward negative infinity, so it differs from Excel and Google Sheets for negative input only. `ROUNDDOWN`/`ROUNDUP` are unaffected — they are defined in terms of zero in all three.
-- **`MOD` takes the sign of the dividend.** Excel and Google Sheets return a result with the sign of the *divisor*.
 - **`ISEVEN`/`ISODD` do not truncate.** They test the remainder of the value as given, so a value with a fractional part returns `FALSE` from *both*. Excel and Google Sheets truncate to an integer first, so exactly one of the two is always `TRUE`.
 - **`CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1.** Excel and Google Sheets switch the negative-number rounding direction for any non-zero `mode`.

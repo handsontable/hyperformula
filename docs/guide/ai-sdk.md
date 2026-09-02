@@ -1,3 +1,14 @@
+---
+tags:
+  - AI agents
+  - LLM
+  - tool calling
+  - deterministic
+  - createSpreadsheetTools
+  - OpenAI
+  - what-if analysis
+---
+
 # HyperFormula AI SDK for Vercel
 
 A [Vercel AI SDK](https://sdk.vercel.ai/docs) tool that gives your agents deterministic spreadsheet and formula computation — backed by HyperFormula's Excel-compatible engine.
