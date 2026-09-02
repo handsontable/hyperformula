@@ -83,7 +83,7 @@ function escapeCell(text: string): string {
  * Only the documented categories get a section, so every entry passed in must declare one: the page is generated from
  * the built-in catalogue, where `category` is a [[DocumentedFunctionCategory]] by type. A `'Custom'` entry is rejected
  * rather than skipped — silently dropping it would leave the page short of a row while the printed function total,
- * which is computed independently in `docs/.vuepress/config.js`, still claimed it.
+ * which `docs/.vuepress/config.js` computes from its own engine, still claimed it.
  *
  * @param {FunctionListEntry[]} entries - the function set to document (e.g. an engine's `getAvailableFunctions`)
  * @param {(canonicalName: string) => FunctionDetails | undefined} detailsFor - resolves a function's details
