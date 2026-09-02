@@ -1,3 +1,16 @@
+---
+tags:
+  - CRUD
+  - insert rows
+  - delete rows
+  - setCellContents
+  - SimpleCellAddress
+  - A1 notation
+  - workbook
+  - sheet tabs
+  - NoSheetWithIdError
+---
+
 # Basic operations
 
 HyperFormula can perform efficient **CRUD** operations on the workbook.

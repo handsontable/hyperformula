@@ -1,3 +1,15 @@
+---
+tags:
+  - Vue 3
+  - Vue.js
+  - markRaw
+  - shallowRef
+  - Pinia
+  - ClientOnly
+  - SSR
+  - licenseKeyValidityState
+---
+
 # Integration with Vue
 
 The HyperFormula API is identical in a Vue 3 app and in plain JavaScript. This guide demonstrates how HyperFormula integrates with the Vue reactivity system and how to surface its values in the template.

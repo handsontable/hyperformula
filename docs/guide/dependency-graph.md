@@ -1,3 +1,14 @@
+---
+tags:
+  - getCellPrecedents
+  - getCellDependents
+  - DAG
+  - trace precedents
+  - evaluation order
+  - dependency tree
+  - BFS
+---
+
 # Dependency graph
 
 For accuracy and performance, HyperFormula needs to process cells in a correct and optimal order. For example: in formula `C1=A1+B1`, cells `A1` and `B1` need to be evaluated before `C1`.
