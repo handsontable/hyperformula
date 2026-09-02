@@ -406,6 +406,13 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       return ArraySize.error()
     }
 
+    const hasZeroDimension = (rowDimension.kind === 'value' && rowDimension.value === 0)
+      || (columnDimension.kind === 'value' && columnDimension.value === 0)
+
+    if (hasZeroDimension) {
+      return ArraySize.error()
+    }
+
     const height = rowDimension.kind === 'value'
       ? Math.min(sourceSize.height, rowDimension.value, this.config.maxRows)
       : sourceSize.height
@@ -421,12 +428,6 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const effectiveWidth = !Number.isFinite(width)
       ? sourceRange?.effectiveWidth(this.dependencyGraph) ?? this.config.maxColumns
       : width
-    const hasZeroDimension = (rowDimension.kind === 'value' && rowDimension.value === 0)
-      || (columnDimension.kind === 'value' && columnDimension.value === 0)
-
-    if (hasZeroDimension) {
-      return ArraySize.error()
-    }
 
     if (startsBelowFirstRow || startsRightOfFirstColumn) {
       return new ArraySize(width, height)
