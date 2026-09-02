@@ -1,3 +1,11 @@
+---
+tags:
+  - translations
+  - translate
+  - locales
+  - registerLanguage
+---
+
 # Localizing functions
 
 You can localize a function's ID and error

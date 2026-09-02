@@ -22,7 +22,6 @@
 
 ---
 
-
 HyperFormula is a headless spreadsheet built in TypeScript, serving as both a parser and evaluator of spreadsheet formulas. It can be integrated into your browser or utilized as a service with Node.js as your back-end technology.
 
 ## What HyperFormula can be used for?
@@ -39,36 +38,36 @@ HyperFormula doesn't assume any existing user interface, making it a general-pur
 
 ## Features
 
-- [Function syntax compatible with Microsoft Excel](https://hyperformula.handsontable.com/guide/compatibility-with-microsoft-excel.html) and [Google Sheets](https://hyperformula.handsontable.com/guide/compatibility-with-google-sheets.html)
+- [Function syntax compatible with Microsoft Excel](https://hyperformula.handsontable.com/docs/guide/compatibility-with-microsoft-excel.html) and [Google Sheets](https://hyperformula.handsontable.com/docs/guide/compatibility-with-google-sheets.html)
 - High-speed parsing and evaluation of spreadsheet formulas
-- [A library of over 400 built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html)
-- [Support for custom functions](https://hyperformula.handsontable.com/guide/custom-functions.html)
-- [Support for Node.js](https://hyperformula.handsontable.com/guide/server-side-installation.html#install-with-npm-or-yarn)
-- [Support for undo/redo](https://hyperformula.handsontable.com/guide/undo-redo.html)
-- [Support for CRUD operations](https://hyperformula.handsontable.com/guide/basic-operations.html)
-- [Support for clipboard](https://hyperformula.handsontable.com/guide/clipboard-operations.html)
-- [Support for named expressions](https://hyperformula.handsontable.com/guide/named-expressions.html)
-- [Support for data sorting](https://hyperformula.handsontable.com/guide/sorting-data.html)
-- [Support for formula localization with 18 built-in languages](https://hyperformula.handsontable.com/guide/i18n-features.html)
+- [A library of over 400 built-in functions](https://hyperformula.handsontable.com/docs/guide/built-in-functions.html)
+- [Support for custom functions](https://hyperformula.handsontable.com/docs/guide/custom-functions.html)
+- [Support for Node.js](https://hyperformula.handsontable.com/docs/guide/server-side-installation.html#install-with-npm-or-yarn)
+- [Support for undo/redo](https://hyperformula.handsontable.com/docs/guide/undo-redo.html)
+- [Support for CRUD operations](https://hyperformula.handsontable.com/docs/guide/basic-operations.html)
+- [Support for clipboard](https://hyperformula.handsontable.com/docs/guide/clipboard-operations.html)
+- [Support for named expressions](https://hyperformula.handsontable.com/docs/guide/named-expressions.html)
+- [Support for data sorting](https://hyperformula.handsontable.com/docs/guide/sorting-data.html)
+- [Support for formula localization with 18 built-in languages](https://hyperformula.handsontable.com/docs/guide/i18n-features.html)
 - Easy integration with any front-end or back-end application
 - GPLv3 or a [commercial license](https://handsontable.com/get-a-quote)
 - Maintained by the team that stands behind the [Handsontable](https://handsontable.com/) data grid
 
 ## Documentation
 
-- [Client-side installation](https://hyperformula.handsontable.com/guide/client-side-installation.html)
-- [Server-side installation](https://hyperformula.handsontable.com/guide/server-side-installation.html)
-- [Basic usage](https://hyperformula.handsontable.com/guide/basic-usage.html)
-- [Configuration options](https://hyperformula.handsontable.com/guide/configuration-options.html)
-- [List of built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html)
-- [API Reference](https://hyperformula.handsontable.com/api/)
+- [Client-side installation](https://hyperformula.handsontable.com/docs/guide/client-side-installation.html)
+- [Server-side installation](https://hyperformula.handsontable.com/docs/guide/server-side-installation.html)
+- [Basic usage](https://hyperformula.handsontable.com/docs/guide/basic-usage.html)
+- [Configuration options](https://hyperformula.handsontable.com/docs/guide/configuration-options.html)
+- [List of built-in functions](https://hyperformula.handsontable.com/docs/guide/built-in-functions.html)
+- [API Reference](https://hyperformula.handsontable.com/docs/api/)
 
 ## Integrations
 
-- [Integration with React](https://hyperformula.handsontable.com/guide/integration-with-react.html#demo)
-- [Integration with Angular](https://hyperformula.handsontable.com/guide/integration-with-angular.html#demo)
-- [Integration with Vue](https://hyperformula.handsontable.com/guide/integration-with-vue.html#demo)
-- [Integration with Svelte](https://hyperformula.handsontable.com/guide/integration-with-svelte.html#demo)
+- [Integration with React](https://hyperformula.handsontable.com/docs/guide/integration-with-react.html#demo)
+- [Integration with Angular](https://hyperformula.handsontable.com/docs/guide/integration-with-angular.html#demo)
+- [Integration with Vue](https://hyperformula.handsontable.com/docs/guide/integration-with-vue.html#demo)
+- [Integration with Svelte](https://hyperformula.handsontable.com/docs/guide/integration-with-svelte.html#demo)
 
 ## Installation and usage
 
@@ -104,9 +103,11 @@ console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCel
 
 [Run this code in StackBlitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.4.x/mortgage-calculator)
 
+HyperFormula ships an official Claude skill and machine-readable docs, so your AI coding agent can scaffold, configure, and debug HyperFormula correctly. To install the skill in Claude Code, or to point Cursor, GitHub Copilot, or another agent at the docs, see [Set up your coding agent](https://hyperformula.handsontable.com/docs/guide/setup-coding-agent.html).
+
 ## Contributing
 
-Contributions are welcome, but before you make them, please read the [Contributing Guide](https://hyperformula.handsontable.com/guide/contributing.html) and accept the [Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2).
+Contributions are welcome, but before you make them, please read the [Contributing Guide](https://hyperformula.handsontable.com/docs/guide/contributing.html) and accept the [Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2).
 
 ## License
 

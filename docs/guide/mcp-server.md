@@ -1,3 +1,13 @@
+---
+tags:
+  - Model Context Protocol
+  - Claude Desktop
+  - AI agents
+  - LLM
+  - tool calling
+  - deterministic
+---
+
 # HyperFormula MCP Server
 
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server that exposes HyperFormula as a tool for any MCP-compatible AI client (Claude Desktop, Cursor, VS Code, and others) — giving LLMs deterministic spreadsheet and formula computation.

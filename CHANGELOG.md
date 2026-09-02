@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
+- Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
+- Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
@@ -242,7 +248,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Removed
 
 - Removed all polyfills from the CommonJS build and the ES modules build. In the UMD build, kept only the polyfills
-  required by the [supported browsers](https://hyperformula.handsontable.com/guide/supported-browsers.html).
+  required by the [supported browsers](https://hyperformula.handsontable.com/docs/guide/supported-browsers.html).
   [#1011](https://github.com/handsontable/hyperformula/issues/1011)
 
 ## [2.0.1] - 2022-06-14
@@ -261,9 +267,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 For more information on this release, see:
 
-- [Release notes](https://hyperformula.handsontable.com/guide/release-notes.html)
+- [Release notes](https://hyperformula.handsontable.com/docs/guide/release-notes.html)
 - [Blog post](https://handsontable.com/blog/articles/2022/04/whats-new-in-hyperformula-2.0.0)
-- [Migration guide](https://hyperformula.handsontable.com/guide/migration-from-1.0-to-2.0.html)
+- [Migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-1.x-to-2.0.html)
 
 ### Added
 

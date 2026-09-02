@@ -1,3 +1,12 @@
+---
+tags:
+  - undoLimit
+  - undo history
+  - undo stack
+  - revert changes
+  - Ctrl+Z
+---
+
 # Undo-redo
 
 HyperFormula supports undo-redo for CRUD and move operations.

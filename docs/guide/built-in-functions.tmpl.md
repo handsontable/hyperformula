@@ -1,3 +1,11 @@
+---
+tags:
+  - supported functions
+  - function syntax
+  - function categories
+  - statistics
+---
+
 # Built-in functions
 
 <!--
