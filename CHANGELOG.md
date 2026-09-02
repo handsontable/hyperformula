@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
-- Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. HyperFormula 3.4.0 incorrectly shipped English placeholder names in locales where Excel uses localized names. Formulas created with 3.4.0 using the incorrect English names must switch to the correct localized names. English, Indonesian, and Swedish correctly use `VSTACK` and `HSTACK`.
+- Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
 
 ## [3.4.0] - 2026-08-10
 
