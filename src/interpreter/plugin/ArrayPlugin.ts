@@ -375,10 +375,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
   /**
    * Calculates the spilled array size of TAKE using the source dimensions as
-   * the upper bound. Direct unbounded references use their effective dimensions
-   * to cap finite counts and register the materialized spill footprint.
-   * Dimensions that remain unbounded are valid only at the corresponding
-   * output-sheet edge.
+   * the upper bound. Finite counts are capped at the configured sheet limits.
+   * Direct references that remain unbounded use their effective dimensions,
+   * while computed sources use the configured limit. Unbounded dimensions are
+   * valid only at the corresponding output-sheet edge.
    *
    * An unbounded result anchored away from the required sheet edge retains its
    * unbounded predicted dimension so array-space validation returns a spill
@@ -406,29 +406,34 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       return ArraySize.error()
     }
 
-    const height = rowDimension.kind === 'value' ? Math.min(sourceSize.height, rowDimension.value) : sourceSize.height
-    const width = columnDimension.kind === 'value' ? Math.min(sourceSize.width, columnDimension.value) : sourceSize.width
+    const height = rowDimension.kind === 'value'
+      ? Math.min(sourceSize.height, rowDimension.value, this.config.maxRows)
+      : sourceSize.height
+    const width = columnDimension.kind === 'value'
+      ? Math.min(sourceSize.width, columnDimension.value, this.config.maxColumns)
+      : sourceSize.width
     const startsBelowFirstRow = !Number.isFinite(height) && state.formulaAddress.row !== 0
     const startsRightOfFirstColumn = !Number.isFinite(width) && state.formulaAddress.col !== 0
     const sourceRange = this.takeSourceRange(ast.args[0], state)
-    const effectiveHeight = !Number.isFinite(sourceSize.height) && sourceRange !== undefined
-      ? Math.min(height, sourceRange.effectiveHeight(this.dependencyGraph))
+    const effectiveHeight = !Number.isFinite(height)
+      ? sourceRange?.effectiveHeight(this.dependencyGraph) ?? this.config.maxRows
       : height
-    const effectiveWidth = !Number.isFinite(sourceSize.width) && sourceRange !== undefined
-      ? Math.min(width, sourceRange.effectiveWidth(this.dependencyGraph))
+    const effectiveWidth = !Number.isFinite(width)
+      ? sourceRange?.effectiveWidth(this.dependencyGraph) ?? this.config.maxColumns
       : width
+    const hasZeroDimension = (rowDimension.kind === 'value' && rowDimension.value === 0)
+      || (columnDimension.kind === 'value' && columnDimension.value === 0)
 
-    if (
-      effectiveHeight < 1
-      || effectiveWidth < 1
-      || effectiveHeight > this.config.maxRows
-      || effectiveWidth > this.config.maxColumns
-    ) {
+    if (hasZeroDimension) {
       return ArraySize.error()
     }
 
     if (startsBelowFirstRow || startsRightOfFirstColumn) {
       return new ArraySize(width, height)
+    }
+
+    if (effectiveHeight < 1 || effectiveWidth < 1) {
+      return ArraySize.error()
     }
 
     return new ArraySize(effectiveWidth, effectiveHeight)
