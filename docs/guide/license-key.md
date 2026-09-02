@@ -1,3 +1,14 @@
+---
+tags:
+  - licenseKey
+  - gpl-v3
+  - licence key
+  - invalid license key
+  - expired license key
+  - console warning
+  - offline validation
+---
+
 # License key
 
 To use HyperFormula, you need to specify which [license type](licensing.md#available-licenses) you use, by entering a license key in your [configuration options](configuration-options.md).

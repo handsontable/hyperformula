@@ -1,3 +1,15 @@
+---
+tags:
+  - SSR
+  - React hooks
+  - useEffect
+  - useRef
+  - useState
+  - dynamic import
+  - use client
+  - lifecycle
+---
+
 # Integration with React
 
 The HyperFormula API is identical in a React app and in plain JavaScript. This guide demonstrates how HyperFormula is integrated with the React component tree and how its lifecycle maps to React hooks.
