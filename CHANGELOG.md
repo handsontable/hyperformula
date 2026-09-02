@@ -7,9 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-### Changed
+### Fixed
 
-- **Breaking change**: Updated the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. Formulas created with HyperFormula 3.4.0 that use the English names in those locales must switch to the localized names. The English names remain unchanged in English, Indonesian, and Swedish.
+- Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. HyperFormula 3.4.0 incorrectly shipped English placeholder names in locales where Excel uses localized names. Formulas created with 3.4.0 using the incorrect English names must switch to the correct localized names. English, Indonesian, and Swedish correctly use `VSTACK` and `HSTACK`.
 
 ## [3.4.0] - 2026-08-10
 
