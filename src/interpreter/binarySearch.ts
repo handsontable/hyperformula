@@ -6,17 +6,13 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
+import {ApproximateMatchPolicy} from '../Lookup/SearchStrategy'
 import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue} from './InterpreterValue'
 
 const NOT_FOUND = -1
 
-/*
+/**
  * Searches for the searchKey in a sorted 1-D range.
- *
- * Options:
- * - searchCoordinate - must be set to either 'row' or 'col' to indicate the dimension of the search,
- * - orderingDirection - must be set to either 'asc' or 'desc' to indicate the ordering direction for the search range,
- * - ifNoMatch - must be set to 'returnLowerBound', 'returnUpperBound' or 'returnNotFound'
  *
  * If the search range contains duplicates, returns the last matching value, with one caveat: in the
  * 'returnNotFound' mode, when the range contains both duplicates of the searchKey and interspersed
@@ -38,11 +34,29 @@ const NOT_FOUND = -1
  * back to an O(n) scan that compacts the non-empty indices and re-runs the binary search over them.
  *
  * Note: this function does not normalize input strings.
+ *
+ * @param {RawNoErrorScalarValue} searchKey - Lookup value.
+ * @param {AbsoluteCellRange} range - Sorted one-dimensional cell range.
+ * @param {object} options - Search direction, requested miss result, and approximate-match policy.
+ * @param {('row'|'col')} options.searchCoordinate - Dimension containing the one-dimensional lookup values.
+ * @param {('asc'|'desc')} options.orderingDirection - Ascending or descending ordering assumed by the binary search.
+ * @param {('returnLowerBound'|'returnUpperBound'|'returnNotFound')} options.ifNoMatch - Whether an absent exact value requests a lower bound, upper bound, or no result.
+ * @param {ApproximateMatchPolicy} options.approximateMatchPolicy - Cross-type candidate policy for approximate bounds.
+ * @param {DependencyGraph} dependencyGraph - Source of current cell values for the range.
+ * @returns {number} The range-relative index of the match, or `NOT_FOUND` when no valid result exists.
+ *
+ * Approximate result invariant:
+ *
+ * Exact equality is resolved before approximate policy validation. Every approximate exit path,
+ * including candidates reached by stepping over empty cells, is finalized through the same policy
+ * check so linear and binary lookup routes cannot assign different cross-type semantics.
+ *
+ * @internal
  */
 export function findLastOccurrenceInOrderedRange(
   searchKey: RawNoErrorScalarValue,
   range: AbsoluteCellRange,
-  { searchCoordinate, orderingDirection, ifNoMatch }: { searchCoordinate: 'row' | 'col', orderingDirection: 'asc' | 'desc', ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound' },
+  { searchCoordinate, orderingDirection, ifNoMatch, approximateMatchPolicy }: { searchCoordinate: 'row' | 'col', orderingDirection: 'asc' | 'desc', ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound', approximateMatchPolicy: ApproximateMatchPolicy },
   dependencyGraph: DependencyGraph,
 ): number {
   const start = range.start[searchCoordinate]
@@ -117,6 +131,26 @@ export function findLastOccurrenceInOrderedRange(
 
   const foundValue = foundIndex === NOT_FOUND ? EmptyValue : getValueFromIndexFn(foundIndex)
 
+  /**
+   * Validates and converts an absolute approximate candidate index into a range-relative result.
+   *
+   * @param {(number|undefined)} index - Absolute candidate index, or `undefined` when no non-empty candidate exists.
+   * @returns {number} The range-relative index, or `NOT_FOUND` when the candidate is absent or disallowed.
+   *
+   * @internal
+   */
+  const returnApproximateResult = (index: number | undefined): number => {
+    if (index === undefined || index === NOT_FOUND) {
+      return NOT_FOUND
+    }
+
+    if (approximateMatchPolicy === 'sameType' && typeof getValueFromIndexFn(index) !== typeof searchKey) {
+      return NOT_FOUND
+    }
+
+    return index - start
+  }
+
   if (foundValue === searchKey) {
     return foundIndex - start
   }
@@ -131,22 +165,18 @@ export function findLastOccurrenceInOrderedRange(
       // is the first (largest) non-empty value — never an empty leading cell, and NOT_FOUND on an
       // all-empty range.
       const firstNonEmptyIndex = findNextNonEmptyIndex(start)
-      return firstNonEmptyIndex !== undefined ? firstNonEmptyIndex - start : NOT_FOUND
-    }
-
-    if (typeof foundValue !== typeof searchKey) {
-      return NOT_FOUND
+      return returnApproximateResult(firstNonEmptyIndex)
     }
 
     // here: foundValue !== searchKey
     if (orderingDirection === 'asc') {
-      return foundIndex - start
+      return returnApproximateResult(foundIndex)
     }
 
     // orderingDirection === 'desc': step to the next non-empty cell, so skipped empty slots never
     // shift the reported position.
     const nextIndex = findNextNonEmptyIndex(foundIndex + 1)
-    return nextIndex !== undefined ? nextIndex - start : NOT_FOUND
+    return returnApproximateResult(nextIndex)
   }
 
   if (ifNoMatch === 'returnUpperBound') {
@@ -159,22 +189,18 @@ export function findLastOccurrenceInOrderedRange(
       // is the first (smallest) non-empty value — never an empty leading cell, and NOT_FOUND on an
       // all-empty range.
       const firstNonEmptyIndex = findNextNonEmptyIndex(start)
-      return firstNonEmptyIndex !== undefined ? firstNonEmptyIndex - start : NOT_FOUND
-    }
-
-    if (typeof foundValue !== typeof searchKey) {
-      return NOT_FOUND
+      return returnApproximateResult(firstNonEmptyIndex)
     }
 
     // here: foundValue !== searchKey
     if (orderingDirection === 'desc') {
-      return foundIndex - start
+      return returnApproximateResult(foundIndex)
     }
 
     // orderingDirection === 'asc': step to the next non-empty cell, so skipped empty slots never
     // shift the reported position.
     const nextIndex = findNextNonEmptyIndex(foundIndex + 1)
-    return nextIndex !== undefined ? nextIndex - start : NOT_FOUND
+    return returnApproximateResult(nextIndex)
   }
 
   // ifNoMatch === 'returnNotFound'
