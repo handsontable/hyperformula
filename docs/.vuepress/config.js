@@ -141,11 +141,11 @@ module.exports = {
         // inject current HF releaseDate as {{ $page.releaseDate }} variable
         $page.releaseDate = HyperFormula.releaseDate
         // inject current HF function count as {{ $page.functionsCount }} variable
-        // This total and the rows of the built-in functions page come from two different sources: the count below,
-        // and getAvailableFunctions via script/renderBuiltinFunctionsTable.ts. They agree today (423 each) and must
-        // be kept in step by hand, or the page prints a total that contradicts the number of rows under it. The
-        // renderer throws on the one divergence it can see from its side; this side cannot detect any.
-        $page.functionsCount = HyperFormula.getRegisteredFunctionNames('enGB').length
+        // Both the count here and the built-in functions page table rows derive from getAvailableFunctions, so they
+        // stay in sync automatically. A default-config engine is required, as functionPlugins restrictions would
+        // give a narrower count than the generated table.
+        const engine = HyperFormula.buildEmpty({language: 'enGB', licenseKey: 'gpl-v3'})
+        $page.functionsCount = engine.getAvailableFunctions().length
         // inject current HF built-in language count as {{ $page.languagesCount }} variable
         $page.languagesCount = languagesCount
 
