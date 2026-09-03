@@ -12,6 +12,7 @@ import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {BooleanPlugin} from './BooleanPlugin'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 type TakeLiteralDimension =
@@ -65,13 +66,13 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       return {kind: 'value', value: getRawValue(this.arithmeticHelper.unaryPercent(dimension.value))}
     }
 
-    if (argument?.type === AstNodeType.FUNCTION_CALL && argument.args.length === 0) {
-      if (argument.procedureName === 'TRUE') {
-        return {kind: 'value', value: 1}
-      }
-      if (argument.procedureName === 'FALSE') {
-        return {kind: 'value', value: 0}
-      }
+    if (
+      argument?.type === AstNodeType.FUNCTION_CALL
+      && argument.args.length === 0
+      && (argument.procedureName === 'TRUE' || argument.procedureName === 'FALSE')
+      && this.interpreter.isFunctionImplementedBy(argument.procedureName, BooleanPlugin)
+    ) {
+      return {kind: 'value', value: argument.procedureName === 'TRUE' ? 1 : 0}
     }
 
     if (
@@ -402,14 +403,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const rowDimension = this.parseTakeLiteralDimension(ast.args[1])
     const columnDimension = this.parseTakeLiteralDimension(ast.args[2])
 
-    if (rowDimension.kind === 'invalid' || columnDimension.kind === 'invalid') {
-      return ArraySize.error()
-    }
-
     const hasZeroDimension = (rowDimension.kind === 'value' && rowDimension.value === 0)
       || (columnDimension.kind === 'value' && columnDimension.value === 0)
 
-    if (hasZeroDimension) {
+    if (rowDimension.kind === 'invalid' || columnDimension.kind === 'invalid' || hasZeroDimension) {
       return ArraySize.error()
     }
 
