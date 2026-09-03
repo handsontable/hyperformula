@@ -1,3 +1,12 @@
+---
+tags:
+  - batching
+  - isEvaluationSuspended
+  - EvaluationSuspendedError
+  - bulk updates
+  - recalculation
+---
+
 # Batch operations
 
 HyperFormula offers a built-in feature for doing batch operations.

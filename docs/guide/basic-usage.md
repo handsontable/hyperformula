@@ -1,3 +1,12 @@
+---
+tags:
+  - getting started
+  - quickstart
+  - tutorial
+  - buildFromArray
+  - buildFromSheets
+---
+
 # Basic usage
 
 ::: tip

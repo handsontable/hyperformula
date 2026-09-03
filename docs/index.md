@@ -45,7 +45,7 @@ HyperFormula doesn't assume any existing user interface, making it a general-pur
 
 - [Function syntax compatible with Microsoft Excel](guide/compatibility-with-microsoft-excel.md) and [Google Sheets](guide/compatibility-with-google-sheets.md)
 - High-speed parsing and evaluation of spreadsheet formulas
-- [A library of ~400 built-in functions](guide/built-in-functions.md)
+- [A library of {{ $page.functionsCount }} built-in functions](guide/built-in-functions.md)
 - [Support for custom functions](guide/custom-functions.md)
 - [Support for Node.js](guide/server-side-installation.md#install-with-npm-or-yarn)
 - [Support for undo/redo](guide/undo-redo.md)
@@ -53,7 +53,7 @@ HyperFormula doesn't assume any existing user interface, making it a general-pur
 - [Support for clipboard](guide/clipboard-operations.md)
 - [Support for named expressions](guide/named-expressions.md)
 - [Support for data sorting](guide/sorting-data.md)
-- [Support for formula localization with 17 built-in languages](guide/i18n-features.md)
+- [Support for formula localization with {{ $page.languagesCount }} built-in languages](guide/i18n-features.md)
 - Easy integration with any front-end or back-end application
 - GPLv3 or a [commercial license](https://handsontable.com/get-a-quote)
 - Maintained by the team that stands behind the [Handsontable](https://handsontable.com/) data grid
@@ -107,6 +107,8 @@ console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCel
 ```
 
 [Run this code in StackBlitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.4.x/mortgage-calculator)
+
+HyperFormula ships an official Claude skill and machine-readable docs, so your AI coding agent can scaffold, configure, and debug HyperFormula correctly. To install the skill in Claude Code, or to point Cursor, GitHub Copilot, or another agent at the docs, see [Set up your coding agent](guide/setup-coding-agent.md).
 
 ## Contributing
 

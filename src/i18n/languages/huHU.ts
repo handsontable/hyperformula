@@ -20,8 +20,8 @@ const dictionary: RawTranslationPackage = {
   functions: {
     CHOOSECOLS: 'OSZLOPVÁLASZTÁS',
     FILTER: 'FILTER',
-    VSTACK: 'VSTACK',
-    HSTACK: 'HSTACK',
+    VSTACK: 'FÜGG.HALMOZÁS',
+    HSTACK: 'VÍZSZ.HALMOZÁS',
     ADDRESS: 'CÍM',
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',

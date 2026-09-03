@@ -20,8 +20,8 @@ export const dictionary: RawTranslationPackage = {
   functions: {
     CHOOSECOLS: 'ELEGIRCOLS',
     FILTER: 'FILTER',
-    VSTACK: 'VSTACK',
-    HSTACK: 'HSTACK',
+    VSTACK: 'APILARV',
+    HSTACK: 'APILARH',
     ADDRESS: 'DIRECCION',
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
