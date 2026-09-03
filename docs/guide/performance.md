@@ -87,10 +87,11 @@ puts you on the slow path again with nothing to signal it.
 ### Passing the engine to other libraries
 
 A library you hand HyperFormula to may accept either the
-`HyperFormula` class or a ready instance. Given the class, it has to
-call [`buildEmpty`](../api/classes/hyperformula.md#buildempty) and add
-your sheets one at a time, which is the slow path above. Build the
-instance yourself with `buildFromSheets` and pass that instead.
+`HyperFormula` class or a ready instance. Given the class, it builds
+the engine on its own terms, and an integration that receives your
+sheets one at a time will add them the same way – the slow path
+above. Building the instance yourself with `buildFromSheets` and
+passing that instead takes the decision out of its hands.
 
 ## VLOOKUP/MATCH
 
