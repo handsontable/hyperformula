@@ -18,6 +18,7 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#HODNOTA!',
   },
   functions: {
+    CHOOSECOLS: 'ZVOLITSLOUPCE',
     FILTER: 'FILTER',
     VSTACK: 'SROVNAT.SVISLE',
     HSTACK: 'SROVNAT.VODOROVNĚ',
