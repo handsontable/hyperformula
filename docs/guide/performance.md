@@ -5,6 +5,9 @@ tags:
   - memory
   - optimize
   - recalculate
+  - loading
+  - buildFromSheets
+  - addSheet
   - useColumnIndex
   - chooseAddressMappingPolicy
   - maxPendingLazyTransformations
@@ -16,6 +19,45 @@ We implemented various techniques to boost the performance of
 HyperFormula. In some cases, turning them on or off might increase
 the performance of your app. Below we provide a number of tips on
 how to speed it up.
+
+## Loading multiple sheets
+
+Build the engine once with all the data instead of adding sheets one
+by one. HyperFormula's
+[`buildFromSheets`](../api/classes/hyperformula.md#buildfromsheets)
+method takes every sheet in a single call and resolves the whole
+dependency graph once:
+
+```javascript
+const hf = HyperFormula.buildFromSheets({
+  Sheet1: [ ['1', '=Sheet2!A1'] ],
+  Sheet2: [ ['10'] ],
+}, { licenseKey: 'gpl-v3' })
+```
+
+Loading the same data incrementally, with an
+[`addSheet`](../api/classes/hyperformula.md#addsheet) and a
+[`setSheetContent`](../api/classes/hyperformula.md#setsheetcontent)
+call per sheet, is much slower, and the gap widens with every sheet
+added. Each [`setSheetContent`](../api/classes/hyperformula.md#setsheetcontent)
+call recalculates every loaded cell that depends on the sheet it just
+filled, so when the sheets already loaded reference the one being
+added, the work grows with each step. In a test with 500
+cross-referencing sheets, the per-sheet loop was more than a hundred
+times slower than a single `buildFromSheets` call.
+
+[`addSheet`](../api/classes/hyperformula.md#addsheet) adds to this
+whenever the formulas already loaded point at the sheet being added:
+it marks all the cells and ranges of that sheet as dirty and
+recalculates on its own, which roughly doubles the cost of each step.
+Registering all the sheet names upfront removes that half, because
+there is nothing to recalculate yet when the names are registered, but
+it does not remove the growth.
+
+When the data is not known upfront and sheets have to be added at
+runtime, group the operations into a
+[batch](batch-operations.md), so that the recalculation runs once for
+the whole group instead of once per operation.
 
 ## VLOOKUP/MATCH
 
