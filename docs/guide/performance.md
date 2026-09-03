@@ -57,7 +57,44 @@ it does not remove the growth.
 When the data is not known upfront and sheets have to be added at
 runtime, group the operations into a
 [batch](batch-operations.md), so that the recalculation runs once for
-the whole group instead of once per operation.
+the whole group instead of once per operation. Note that during a
+batch, and between
+[`suspendEvaluation`](../api/classes/hyperformula.md#suspendevaluation)
+and [`resumeEvaluation`](../api/classes/hyperformula.md#resumeevaluation),
+the methods that read cell values throw an error instead of returning
+a value (see [batch operations](batch-operations.md)). Keep whatever
+renders your data from reading the engine until the evaluation is
+resumed.
+
+### The order of loading does not matter
+
+A formula that references a sheet which has not been added yet
+evaluates to `#REF!`, but the reference stays live: adding that sheet
+later repairs the formula, with no re-parsing and no rebuild on your
+side. Load the sheets in whatever order is convenient.
+
+```javascript
+const hf = HyperFormula.buildFromSheets({
+  Hub: [ ['=Later!A1+1'] ],  // #REF! for now
+}, { licenseKey: 'gpl-v3' })
+
+hf.addSheet('Later')                                  // Hub!A1 is 1
+hf.setSheetContent(hf.getSheetId('Later'), [ [41] ])  // Hub!A1 is 42
+```
+
+This also means that ordering the inserts by dependency is not a fix
+for the cost described above. It helps only as long as every reference
+happens to point the same way, and a single reference pointing back
+puts you on the slow path again with nothing to signal it.
+
+### Passing the engine to other libraries
+
+Data grids and other integrations built on HyperFormula usually accept
+either the `HyperFormula` class or a ready instance. Given the class,
+they call [`buildEmpty`](../api/classes/hyperformula.md#buildempty) and
+then add your sheets one at a time, which is the slow path above.
+Build the instance yourself with `buildFromSheets` and hand that over
+instead.
 
 ## VLOOKUP/MATCH
 
