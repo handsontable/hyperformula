@@ -5,6 +5,8 @@ tags:
   - memory
   - optimize
   - recalculate
+  - buildFromSheets
+  - addSheet
   - useColumnIndex
   - chooseAddressMappingPolicy
   - maxPendingLazyTransformations
@@ -16,6 +18,80 @@ We implemented various techniques to boost the performance of
 HyperFormula. In some cases, turning them on or off might increase
 the performance of your app. Below we provide a number of tips on
 how to speed it up.
+
+## Loading multiple sheets
+
+Build the engine once with all the data instead of adding sheets one
+by one. HyperFormula's
+[`buildFromSheets`](../api/classes/hyperformula.md#buildfromsheets)
+method takes every sheet in a single call and resolves the whole
+dependency graph once:
+
+```javascript
+const hf = HyperFormula.buildFromSheets({
+  Sheet1: [ ['1', '=Sheet2!A1'] ],
+  Sheet2: [ ['10'] ],
+}, { licenseKey: 'gpl-v3' })
+```
+
+Loading the same data incrementally, with an
+[`addSheet`](../api/classes/hyperformula.md#addsheet) and a
+[`setSheetContent`](../api/classes/hyperformula.md#setsheetcontent)
+call per sheet, is much slower, and the gap widens with every sheet
+added. Each [`setSheetContent`](../api/classes/hyperformula.md#setsheetcontent)
+call recalculates every loaded cell that depends on the sheet it just
+filled, so when the sheets already loaded reference the one being
+added, the work grows with each step. In a test with 500
+cross-referencing sheets, the per-sheet loop was more than a hundred
+times slower than a single `buildFromSheets` call.
+
+[`addSheet`](../api/classes/hyperformula.md#addsheet) adds to this
+whenever the formulas already loaded point at the sheet being added:
+it marks all the cells and ranges of that sheet as dirty and
+recalculates on its own; in the test above that roughly doubled the
+cost of each step. Registering all the sheet names upfront removes
+that share, because there is nothing to recalculate yet when the names
+are registered, but it does not remove the growth.
+
+When the data is not known upfront and sheets have to be added at
+runtime, group the operations into a [batch](batch-operations.md) so
+that the recalculation runs once for the whole group instead of once
+per operation, and keep whatever renders your data from reading the
+engine until the batch ends: the methods that read cell values throw
+while the evaluation is suspended. See
+[suspending automatic recalculations](#suspending-automatic-recalculations)
+below.
+
+### Order of loading
+
+Since version 3.1.1, a formula that references a sheet which has not
+been added yet evaluates to `#REF!` but keeps a live reference: adding
+that sheet later repairs the formula, with no re-parsing and no
+rebuild on your side. Load the sheets in whatever order is
+convenient.
+
+```javascript
+const hf = HyperFormula.buildFromSheets({
+  Hub: [ ['=Later!A1+1'] ],  // #REF! for now
+}, { licenseKey: 'gpl-v3' })
+
+hf.addSheet('Later')                                  // Hub!A1 is 1
+hf.setSheetContent(hf.getSheetId('Later'), [ ['41'] ])  // Hub!A1 is 42
+```
+
+This also means that ordering the inserts by dependency is not a fix
+for the cost described above. It helps only as long as every reference
+happens to point the same way, and a single reference pointing back
+puts you on the slow path again with nothing to signal it.
+
+### Passing the engine to other libraries
+
+A library you hand HyperFormula to may accept either the
+`HyperFormula` class or a ready instance. Given the class, it builds
+the engine on its own terms, and an integration that receives your
+sheets one at a time will add them the same way – the slow path
+above. Building the instance yourself with `buildFromSheets` and
+passing that instead takes the decision out of its hands.
 
 ## VLOOKUP/MATCH
 
