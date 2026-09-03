@@ -3,17 +3,172 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {BooleanPlugin} from './BooleanPlugin'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ * Classifies a TAKE count expression whose value may be known before evaluation.
+ *
+ * @internal
+ */
+type TakeLiteralNumber =
+  | {kind: 'value', value: number}
+  | {kind: 'invalid'}
+  | {kind: 'unresolved'}
+
+/**
+ * Distinguishes an omitted or empty TAKE count from an expression whose value
+ * cannot be resolved during static result-size prediction.
+ *
+ * @internal
+ */
+type TakeLiteralDimension = TakeLiteralNumber | {kind: 'unbounded'}
+
 export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ArrayPlugin> {
+  /**
+   * Evaluates the dependency-free subset of TAKE count expressions used for
+   * static result-size prediction.
+   *
+   * @param {Ast | undefined} argument - The count expression to inspect before evaluation.
+   * @returns {TakeLiteralDimension} The constant value, an invalid-literal marker, or an unresolved marker.
+   * @internal
+   */
+  private parseTakeLiteralNumber(argument: Ast | undefined): TakeLiteralNumber {
+    if (argument?.type === AstNodeType.NUMBER) {
+      return {kind: 'value', value: argument.value}
+    }
+
+    if (argument?.type === AstNodeType.STRING) {
+      const coercedValue = this.arithmeticHelper.coerceToMaybeNumber(argument.value)
+      if (coercedValue === undefined) {
+        return {kind: 'invalid'}
+      }
+      return {kind: 'value', value: getRawValue(coercedValue)}
+    }
+
+    if (argument?.type === AstNodeType.ERROR || argument?.type === AstNodeType.ERROR_WITH_RAW_INPUT) {
+      return {kind: 'invalid'}
+    }
+
+    if (argument?.type === AstNodeType.PLUS_UNARY_OP || argument?.type === AstNodeType.MINUS_UNARY_OP) {
+      const dimension = this.parseTakeLiteralNumber(argument.value)
+      if (dimension.kind !== 'value') {
+        return dimension
+      }
+      return {kind: 'value', value: argument.type === AstNodeType.MINUS_UNARY_OP ? -dimension.value : dimension.value}
+    }
+
+    if (argument?.type === AstNodeType.PARENTHESIS) {
+      return this.parseTakeLiteralNumber(argument.expression)
+    }
+
+    if (argument?.type === AstNodeType.PERCENT_OP) {
+      const dimension = this.parseTakeLiteralNumber(argument.value)
+      if (dimension.kind !== 'value') {
+        return dimension
+      }
+      return {kind: 'value', value: getRawValue(this.arithmeticHelper.unaryPercent(dimension.value))}
+    }
+
+    if (
+      argument?.type === AstNodeType.FUNCTION_CALL
+      && argument.args.length === 0
+      && (argument.procedureName === 'TRUE' || argument.procedureName === 'FALSE')
+      && this.interpreter.isFunctionImplementedBy(argument.procedureName, BooleanPlugin)
+    ) {
+      return {kind: 'value', value: argument.procedureName === 'TRUE' ? 1 : 0}
+    }
+
+    if (
+      argument?.type === AstNodeType.PLUS_OP
+      || argument?.type === AstNodeType.MINUS_OP
+      || argument?.type === AstNodeType.TIMES_OP
+      || argument?.type === AstNodeType.DIV_OP
+      || argument?.type === AstNodeType.POWER_OP
+    ) {
+      const left = this.parseTakeLiteralNumber(argument.left)
+      const right = this.parseTakeLiteralNumber(argument.right)
+      if (left.kind === 'invalid' || right.kind === 'invalid') {
+        return {kind: 'invalid'}
+      }
+      if (left.kind === 'value' && right.kind === 'value') {
+        let value: number
+        switch (argument.type) {
+          case AstNodeType.PLUS_OP:
+            value = this.arithmeticHelper.addWithEpsilonRaw(left.value, right.value)
+            break
+          case AstNodeType.MINUS_OP:
+            value = getRawValue(this.arithmeticHelper.subtract(left.value, right.value))
+            break
+          case AstNodeType.TIMES_OP:
+            value = getRawValue(this.arithmeticHelper.multiply(left.value, right.value))
+            break
+          case AstNodeType.DIV_OP: {
+            const quotient = this.arithmeticHelper.divide(left.value, right.value)
+            if (quotient instanceof CellError) {
+              return {kind: 'invalid'}
+            }
+            value = getRawValue(quotient)
+            break
+          }
+          case AstNodeType.POWER_OP:
+            value = this.arithmeticHelper.pow(left.value, right.value)
+            break
+        }
+        return Number.isFinite(value) ? {kind: 'value', value} : {kind: 'invalid'}
+      }
+    }
+
+    return {kind: 'unresolved'}
+  }
+
+  /**
+   * Converts a statically resolved TAKE count into its output dimension.
+   *
+   * @param {Ast | undefined} argument - The count expression to classify.
+   * @returns {TakeLiteralDimension} The non-negative truncated dimension or its invalid, unresolved, or unbounded classification.
+   * @internal
+   */
+  private parseTakeLiteralDimension(argument: Ast | undefined): TakeLiteralDimension {
+    if (argument === undefined || argument.type === AstNodeType.EMPTY) {
+      return {kind: 'unbounded'}
+    }
+
+    const dimension = this.parseTakeLiteralNumber(argument)
+    return dimension.kind === 'value'
+      ? {kind: 'value', value: Math.abs(Math.trunc(dimension.value))}
+      : dimension
+  }
+
+  /**
+   * Resolves a direct TAKE source reference without evaluating its values.
+   * The range supplies materialized dimensions only; spill placement never
+   * depends on its sheet.
+   *
+   * @param {Ast} argument - The source expression to inspect.
+   * @param {InterpreterState} state - The formula state used to resolve relative addresses.
+   * @returns {AbsoluteCellRange | undefined} The source range, or `undefined` for a computed array.
+   * @internal
+   */
+  private takeSourceRange(argument: Ast, state: InterpreterState): AbsoluteCellRange | undefined {
+    if (argument.type === AstNodeType.PARENTHESIS) {
+      return this.takeSourceRange(argument.expression, state)
+    }
+    if (argument.type === AstNodeType.CELL_RANGE || argument.type === AstNodeType.COLUMN_RANGE || argument.type === AstNodeType.ROW_RANGE) {
+      return AbsoluteCellRange.fromAstOrUndef(argument, state.formulaAddress)
+    }
+    return undefined
+  }
+
   public static implementedFunctions: ImplementedFunctions = {
     'ARRAYFORMULA': {
       method: 'arrayformula',
@@ -42,6 +197,17 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: FunctionArgumentType.RANGE},
       ],
       repeatLastArgs: 1,
+    },
+    'TAKE': {
+      method: 'take',
+      sizeOfResultArrayMethod: 'takeArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
+      ],
+      vectorizationForbidden: true,
     },
     'VSTACK': {
       method: 'vstack',
@@ -164,6 +330,128 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const width = Math.max(...(subChecks).map(val => val.width))
     const height = Math.max(...(subChecks).map(val => val.height))
     return new ArraySize(width, height)
+  }
+
+  /**
+   * Corresponds to TAKE(array, rows, [columns]).
+   *
+   * Returns rows and columns from the beginning or end of the source array.
+   * Syntactically empty dimensions keep all rows or columns. Counts that
+   * evaluate to zero return a #N/A error.
+   *
+   * @param {ProcedureAst} ast - The parsed TAKE call.
+   * @param {InterpreterState} state - The current formula evaluation state.
+   * @returns {InterpreterValue} The selected source values or a spreadsheet error.
+   */
+  public take(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    // The default supports TAKE(array, , columns), but the rows argument
+    // position must still be present.
+    if (ast.args.length < 2) {
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+    }
+
+    return this.runFunction(ast.args, state, this.metadata('TAKE'),
+      (range: SimpleRangeValue, rows: number, columns: number) => {
+        const sourceHeight = range.height()
+        const sourceWidth = range.width()
+        const requestedRows = Math.trunc(rows)
+        const requestedColumns = Math.trunc(columns)
+
+        if (requestedRows === 0 || requestedColumns === 0) {
+          return new CellError(ErrorType.NA, ErrorMessage.ZeroRowOrColumnCount)
+        }
+
+        if (sourceHeight === 0 || sourceWidth === 0) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+        }
+
+        const rowsToTake = Math.min(Math.abs(requestedRows), sourceHeight)
+        const columnsToTake = Math.min(Math.abs(requestedColumns), sourceWidth)
+        const startRow = requestedRows > 0 ? 0 : sourceHeight - rowsToTake
+        const startColumn = requestedColumns > 0 ? 0 : sourceWidth - columnsToTake
+        const sourceRange = range.range
+
+        if (sourceRange !== undefined) {
+          // Keep address-backed ranges lazy to avoid materializing cells outside the TAKE result.
+          const resultRange = AbsoluteCellRange.spanFrom(
+            sourceRange.getAddress(startColumn, startRow),
+            columnsToTake,
+            rowsToTake,
+          )
+          const result = SimpleRangeValue.onlyRange(resultRange, this.dependencyGraph).data
+          return SimpleRangeValue.onlyValues(result)
+        }
+
+        const result = range.data
+          .slice(startRow, startRow + rowsToTake)
+          .map(row => row.slice(startColumn, startColumn + columnsToTake))
+
+        return SimpleRangeValue.onlyValues(result)
+      }
+    )
+  }
+
+  /**
+   * Calculates the spilled array size of TAKE using the source dimensions as
+   * the upper bound. Finite counts are capped at the configured sheet limits.
+   * Direct references that remain unbounded use their effective dimensions,
+   * while computed sources use the configured limit. Unbounded dimensions are
+   * valid only at the corresponding output-sheet edge.
+   *
+   * An unbounded result anchored away from the required sheet edge retains its
+   * unbounded predicted dimension so array-space validation returns a spill
+   * error without evaluating TAKE as a scalar formula.
+   *
+   * @param {ProcedureAst} ast - The parsed TAKE call.
+   * @param {InterpreterState} state - The formula state whose address anchors the spill.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  public takeArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 2 || ast.args.length > 3) {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata('TAKE')
+    const sourceSize = this.arraySizeForAst(
+      ast.args[0],
+      new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
+    )
+
+    const rowDimension = this.parseTakeLiteralDimension(ast.args[1])
+    const columnDimension = this.parseTakeLiteralDimension(ast.args[2])
+
+    const hasZeroDimension = (rowDimension.kind === 'value' && rowDimension.value === 0)
+      || (columnDimension.kind === 'value' && columnDimension.value === 0)
+
+    if (rowDimension.kind === 'invalid' || columnDimension.kind === 'invalid' || hasZeroDimension) {
+      return ArraySize.error()
+    }
+
+    const height = rowDimension.kind === 'value'
+      ? Math.min(sourceSize.height, rowDimension.value, this.config.maxRows)
+      : sourceSize.height
+    const width = columnDimension.kind === 'value'
+      ? Math.min(sourceSize.width, columnDimension.value, this.config.maxColumns)
+      : sourceSize.width
+    const startsBelowFirstRow = rowDimension.kind === 'unbounded' && !Number.isFinite(height) && state.formulaAddress.row !== 0
+    const startsRightOfFirstColumn = columnDimension.kind === 'unbounded' && !Number.isFinite(width) && state.formulaAddress.col !== 0
+    const sourceRange = this.takeSourceRange(ast.args[0], state)
+    const effectiveHeight = !Number.isFinite(height)
+      ? sourceRange?.effectiveHeight(this.dependencyGraph) ?? this.config.maxRows
+      : height
+    const effectiveWidth = !Number.isFinite(width)
+      ? sourceRange?.effectiveWidth(this.dependencyGraph) ?? this.config.maxColumns
+      : width
+
+    if (startsBelowFirstRow || startsRightOfFirstColumn) {
+      return new ArraySize(width, height)
+    }
+
+    if (effectiveHeight < 1 || effectiveWidth < 1) {
+      return ArraySize.error()
+    }
+
+    return new ArraySize(effectiveWidth, effectiveHeight)
   }
 
   /**
