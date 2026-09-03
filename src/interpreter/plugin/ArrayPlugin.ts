@@ -15,10 +15,23 @@ import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {BooleanPlugin} from './BooleanPlugin'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
-type TakeLiteralDimension =
+/**
+ * Classifies a TAKE count expression whose value may be known before evaluation.
+ *
+ * @internal
+ */
+type TakeLiteralNumber =
   | {kind: 'value', value: number}
   | {kind: 'invalid'}
   | {kind: 'unresolved'}
+
+/**
+ * Distinguishes an omitted or empty TAKE count from an expression whose value
+ * cannot be resolved during static result-size prediction.
+ *
+ * @internal
+ */
+type TakeLiteralDimension = TakeLiteralNumber | {kind: 'unbounded'}
 
 export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ArrayPlugin> {
   /**
@@ -29,7 +42,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * @returns {TakeLiteralDimension} The constant value, an invalid-literal marker, or an unresolved marker.
    * @internal
    */
-  private parseTakeLiteralNumber(argument: Ast | undefined): TakeLiteralDimension {
+  private parseTakeLiteralNumber(argument: Ast | undefined): TakeLiteralNumber {
     if (argument?.type === AstNodeType.NUMBER) {
       return {kind: 'value', value: argument.value}
     }
@@ -122,10 +135,14 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * Converts a statically resolved TAKE count into its output dimension.
    *
    * @param {Ast | undefined} argument - The count expression to classify.
-   * @returns {TakeLiteralDimension} The non-negative truncated dimension or its unresolved classification.
+   * @returns {TakeLiteralDimension} The non-negative truncated dimension or its invalid, unresolved, or unbounded classification.
    * @internal
    */
   private parseTakeLiteralDimension(argument: Ast | undefined): TakeLiteralDimension {
+    if (argument === undefined || argument.type === AstNodeType.EMPTY) {
+      return {kind: 'unbounded'}
+    }
+
     const dimension = this.parseTakeLiteralNumber(argument)
     return dimension.kind === 'value'
       ? {kind: 'value', value: Math.abs(Math.trunc(dimension.value))}
@@ -416,8 +433,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const width = columnDimension.kind === 'value'
       ? Math.min(sourceSize.width, columnDimension.value, this.config.maxColumns)
       : sourceSize.width
-    const startsBelowFirstRow = !Number.isFinite(height) && state.formulaAddress.row !== 0
-    const startsRightOfFirstColumn = !Number.isFinite(width) && state.formulaAddress.col !== 0
+    const startsBelowFirstRow = rowDimension.kind === 'unbounded' && !Number.isFinite(height) && state.formulaAddress.row !== 0
+    const startsRightOfFirstColumn = columnDimension.kind === 'unbounded' && !Number.isFinite(width) && state.formulaAddress.col !== 0
     const sourceRange = this.takeSourceRange(ast.args[0], state)
     const effectiveHeight = !Number.isFinite(height)
       ? sourceRange?.effectiveHeight(this.dependencyGraph) ?? this.config.maxRows
