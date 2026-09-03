@@ -117,7 +117,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
 | TAKE          | =TAKE(A1:A3, 0)                                                |          N/A | No such function. |           CALC  |
-| TAKE          | =TAKE(Data!A:A, , 1)                                           | Spills the whole column from row 1; returns SPILL below row 1. | No such function. | Spills the whole column from row 1; returns SPILL below row 1. |
+| TAKE          | =TAKE(Data!A:A, , 1)                                           | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | No such function. | Spills all 1,048,576 rows from row 1, with blank source cells as 0; returns SPILL below row 1. |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
