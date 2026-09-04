@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     AVERAGE: 'RATA-RATA',
     AVERAGEA: 'RATA-RATAA',
     AVERAGEIF: 'RATA-RATA.JIKA',
+    AVERAGEIFS: 'AVERAGEIFS',
     BASE: 'BASIS',
     BIN2DEC: 'BIN.DEC',
     BIN2HEX: 'BIN.HEX',

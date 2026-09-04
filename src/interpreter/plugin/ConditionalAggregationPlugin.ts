@@ -74,6 +74,38 @@ function mapToRawScalarValue(arg: InternalScalarValue): Maybe<CellError | RawSca
   return undefined
 }
 
+/** Combines average accumulators while preserving the first encountered error. */
+function composeAverageResults(left: AverageResult | CellError, right: AverageResult | CellError): AverageResult | CellError {
+  if (left instanceof CellError) {
+    return left
+  } else if (right instanceof CellError) {
+    return right
+  } else {
+    return left.compose(right)
+  }
+}
+
+/** Maps a scalar value to an average accumulator or preserves its error. */
+function mapToAverageResult(arg: InternalScalarValue): AverageResult | CellError {
+  const rawValue = mapToRawScalarValue(arg)
+  if (rawValue instanceof CellError) {
+    return rawValue
+  } else if (typeof rawValue === 'number') {
+    return AverageResult.single(rawValue)
+  } else {
+    return AverageResult.empty
+  }
+}
+
+/** Converts a completed average accumulator to its spreadsheet result. */
+function finalizeAverageResult(averageResult: AverageResult | CellError): number | CellError {
+  if (averageResult instanceof CellError) {
+    return averageResult
+  } else {
+    return averageResult.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+  }
+}
+
 export class ConditionalAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ConditionalAggregationPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     SUMIF: {
@@ -98,6 +130,15 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
         {argumentType: FunctionArgumentType.NOERROR},
         {argumentType: FunctionArgumentType.RANGE, optionalArg: true},
       ],
+    },
+    AVERAGEIFS: {
+      method: 'averageifs',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NOERROR},
+      ],
+      repeatLastArgs: 2,
     },
     SUMIFS: {
       method: 'sumifs',
@@ -197,11 +238,35 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
         (arg) => isExtendedNumber(arg) ? AverageResult.single(getRawValue(arg)) : AverageResult.empty,
         )
 
-      if (averageResult instanceof CellError) {
-        return averageResult
-      } else {
-        return averageResult.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
-      }
+      return finalizeAverageResult(averageResult)
+    }
+
+    return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
+  }
+
+  /**
+   * Corresponds to AVERAGEIFS(average_range, criteria_range1, criteria1, ...)
+   *
+   * `average_range` is the range whose matching numeric values are averaged.
+   * `criteria_range1` and `criteria1`, and every additional numbered pair, add conditions that must all be satisfied.
+   *
+   * @param ast
+   * @param state
+   */
+  public averageifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const functionName = 'AVERAGEIFS'
+
+    const computeFn = (values: SimpleRangeValue, ...args: unknown[]) => {
+      const averageResult = this.computeConditionalAggregationFunction<AverageResult | CellError>(
+        values,
+        args as RawInterpreterValue[],
+        functionName,
+        AverageResult.empty,
+        composeAverageResults,
+        mapToAverageResult,
+      )
+
+      return finalizeAverageResult(averageResult)
     }
 
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
