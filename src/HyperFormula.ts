@@ -4364,7 +4364,7 @@ export class HyperFormula implements TypedEmitter {
     if (ast === undefined) {
       throw new NotAFormulaError()
     }
-    const internalCellValue = this.evaluator.runAndForget(ast, address, dependencies)
+    const internalCellValue = this.evaluator.evaluateSingleFormula(ast, address, dependencies)
     return this._exporter.exportScalarOrRange(internalCellValue)
   }
 
@@ -4847,7 +4847,7 @@ export class HyperFormula implements TypedEmitter {
       this.compactLazyTransformationsIfNeeded()
 
       if (verticesToRecomputeFrom.length > 0) {
-        changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
+        changes.addAll(this.evaluator.recomputeSubgraph(verticesToRecomputeFrom))
       }
 
       const exportedChanges = changes.exportChanges(this._exporter)
