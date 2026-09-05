@@ -3,14 +3,106 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../../error-message'
+import {Maybe} from '../../Maybe'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+
+/**
+ * The value of an INDEX index argument that selects every row or every column of the range instead
+ * of a single one.
+ */
+const WHOLE_DIMENSION_INDEX = 0
+
+/** Position of the `row_num` argument in the argument list of INDEX. */
+const INDEX_ROW_ARGUMENT = 1
+
+/** Position of the `column_num` argument in the argument list of INDEX. */
+const INDEX_COLUMN_ARGUMENT = 2
+
+/**
+ * Reads the two index arguments the way Excel does, truncating both toward zero.
+ *
+ * When `column_num` is left out of the formula entirely, Excel requires the range to be a single row
+ * or a single column, and reads the only index provided as the position along it: `=INDEX(A1:C1, 3)`
+ * is `C1` and `=INDEX(A1:A3, 2)` is `A2`. Given a range with several rows and several columns there
+ * is nothing for that index to mean, and Excel answers `#REF!` — which is what `undefined` requests
+ * from the caller here.
+ *
+ * An argument left empty rather than left out, as in `=INDEX(A1:C1, 3, )`, is not the same thing: it
+ * is a `column_num` of zero, so the result is the whole third row, and a single-row range has none.
+ *
+ * Either of the returned indices can be {@link WHOLE_DIMENSION_INDEX}, meaning that the result spans
+ * the whole dimension.
+ */
+function resolveIndexArguments(rowArgument: number, columnArgument: number, columnArgumentIsOmitted: boolean, rangeHeight: number, rangeWidth: number): Maybe<{row: number, column: number}> {
+  const row = Math.trunc(rowArgument)
+
+  if (!columnArgumentIsOmitted) {
+    return {row, column: Math.trunc(columnArgument)}
+  }
+  if (rangeHeight === 1) {
+    return {row: 1, column: row}
+  }
+  if (rangeWidth === 1) {
+    return {row, column: 1}
+  }
+
+  return undefined
+}
+
+/**
+ * Returns the height a range is declared with, rather than the height the sheet currently uses.
+ *
+ * The two differ for an unbounded range, whose declared height is infinite while its used height
+ * follows the data. Only the declared height may decide how an omitted `column_num` is read: keying
+ * that on the used height would let `=INDEX(A:C, 2)` mean "cell B1" on a sheet holding one row of
+ * data and something else entirely once a second row is filled in, and would also disagree with
+ * {@link InformationPlugin#indexArraySize}, which has nothing but the declared size to work from.
+ */
+function declaredHeightOf(rangeValue: SimpleRangeValue): number {
+  return rangeValue.range?.height() ?? rangeValue.height()
+}
+
+/**
+ * Returns the width a range is declared with, rather than the width the sheet currently uses. See
+ * {@link declaredHeightOf} for why the declared size is the one that may decide how an argument is
+ * read.
+ */
+function declaredWidthOf(rangeValue: SimpleRangeValue): number {
+  return rangeValue.range?.width() ?? rangeValue.width()
+}
+
+/**
+ * Returns the value of an INDEX index argument that can be derived from the formula alone, or
+ * `undefined` when it is known only once the argument is evaluated. An absent argument counts as
+ * {@link WHOLE_DIMENSION_INDEX}, matching how such an argument is coerced at runtime. Truncation is
+ * left to {@link resolveIndexArguments}, the single place that applies it.
+ */
+function staticIndexArgument(ast: ProcedureAst, argumentIndex: number): Maybe<number> {
+  const argument = ast.args[argumentIndex]
+
+  if (argument === undefined || argument.type === AstNodeType.EMPTY) {
+    return WHOLE_DIMENSION_INDEX
+  }
+
+  return argument.type === AstNodeType.NUMBER ? argument.value : undefined
+}
+
+/**
+ * Returns `true` if and only if the `column_num` argument is missing from the formula, as in
+ * `=INDEX(A1:C3, 2)`. An argument that is present but empty, as in `=INDEX(A1:C3, 2, )`, is not
+ * missing: it is a zero. See {@link resolveIndexArguments}.
+ */
+function columnArgumentIsOmitted(ast: ProcedureAst): boolean {
+  return ast.args.length <= INDEX_COLUMN_ARGUMENT
+}
 
 /**
  * Interpreter plugin containing information functions
@@ -106,11 +198,15 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     },
     'INDEX': {
       method: 'index',
+      sizeOfResultArrayMethod: 'indexArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
-      ]
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: WHOLE_DIMENSION_INDEX},
+      ],
+      // A vectorized call evaluates the function once per element and rejects an array result, which
+      // an index of WHOLE_DIMENSION_INDEX produces. Array-output functions are never vectorized.
+      vectorizationForbidden: true,
     },
     'NA': {
       method: 'na',
@@ -413,23 +509,116 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
   }
 
   /**
-   * Corresponds to INDEX
+   * Corresponds to INDEX(range, row_num, column_num)
    *
-   * Returns specific position in 2d array.
+   * Returns the value of a single cell of the range, or a whole row, a whole column or the whole
+   * range when the corresponding index is {@link WHOLE_DIMENSION_INDEX}.
+   *
+   * A `column_num` left *empty* is read as {@link WHOLE_DIMENSION_INDEX}. A `column_num` left *out*
+   * is a different thing: see {@link resolveIndexArguments}. Both conventions come from Excel, where
+   * `=INDEX(A1:C3, 2, )` returns the whole second row while `=INDEX(A1:C3, 2)` is `#REF!`.
+   *
+   * A result spanning more than one cell is an array, so the sheet has to reserve space for it
+   * before the formula is evaluated. That space is reserved based on
+   * {@link InformationPlugin#indexArraySize}, which can only tell the shape of the result for
+   * indices written as literal numbers. When an index is computed by a subexpression, the result is
+   * predicted to be a single cell: such a formula still passes whole rows and columns to an
+   * enclosing function (for example `=SUM(INDEX(A1:C3, B1, 0))`), but it cannot spill into the
+   * sheet on its own.
    *
    * @param ast
    * @param state
    */
   public index(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('INDEX'), (rangeValue: SimpleRangeValue, row: number, col: number) => {
-      if (col < 1 || row < 1) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+    const columnIsOmitted = columnArgumentIsOmitted(ast)
+
+    return this.runFunction(ast.args, state, this.metadata('INDEX'), (rangeValue: SimpleRangeValue, rowArg: number, columnArg: number): InterpreterValue => {
+      if (rowArg < WHOLE_DIMENSION_INDEX || columnArg < WHOLE_DIMENSION_INDEX) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.Negative)
       }
-      if (col > rangeValue.width() || row > rangeValue.height()) {
-        return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+
+      if (rangeValue.height() === 0 || rangeValue.width() === 0) {
+        return new CellError(ErrorType.REF, ErrorMessage.EmptyRange)
       }
-      return rangeValue?.data?.[row - 1]?.[col - 1] ?? rangeValue?.data?.[0]?.[0] ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+
+      const resolved = resolveIndexArguments(rowArg, columnArg, columnIsOmitted, declaredHeightOf(rangeValue), declaredWidthOf(rangeValue))
+
+      if (resolved === undefined) {
+        return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
+      }
+
+      const {row, column} = resolved
+
+      if (row > rangeValue.height() || column > rangeValue.width()) {
+        return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
+      }
+      if (row !== WHOLE_DIMENSION_INDEX && column !== WHOLE_DIMENSION_INDEX) {
+        return rangeValue.data[row - 1][column - 1]
+      }
+
+      const selectedRows = row === WHOLE_DIMENSION_INDEX ? rangeValue.data : [rangeValue.data[row - 1]]
+      const selectedData: InternalScalarValue[][] = column === WHOLE_DIMENSION_INDEX
+        ? selectedRows.map(rowData => rowData.slice())
+        : selectedRows.map(rowData => [rowData[column - 1]])
+
+      return selectedData.length === 1 && selectedData[0].length === 1
+        ? selectedData[0][0]
+        : SimpleRangeValue.onlyValues(selectedData)
     })
+  }
+
+  /**
+   * Returns the size of the array returned by INDEX, or a scalar size when the shape of the result
+   * cannot be derived from the formula alone. See {@link InformationPlugin#index}.
+   *
+   * The indices are resolved with the same {@link resolveIndexArguments} the evaluation uses, so
+   * that the predicted shape cannot disagree with the shape of the value returned later.
+   *
+   * An index past the end of the range makes the formula fail, and a single cell is predicted for it
+   * so that the error is reported once instead of filling the area an array result would have
+   * occupied. A negative index needs no such case: it is always written as a negated literal, which
+   * is not a literal number and so is not known here in the first place.
+   *
+   * An unbounded range (`A:C`, `1:2`) has an infinite dimension, and no area of that size can be
+   * reserved in a sheet. A single cell is predicted for it too, which makes the formula report that
+   * its result does not fit rather than silently spill only the part that does.
+   *
+   * @param ast
+   * @param state
+   */
+  public indexArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 2 || ast.args.length > 3) {
+      return ArraySize.error()
+    }
+
+    const rowArgument = staticIndexArgument(ast, INDEX_ROW_ARGUMENT)
+    const columnArgument = staticIndexArgument(ast, INDEX_COLUMN_ARGUMENT)
+
+    if (rowArgument === undefined || columnArgument === undefined) {
+      return ArraySize.scalar()
+    }
+
+    const rangeSize = this.arraySizeForAst(ast.args[0], state)
+    const resolved = resolveIndexArguments(rowArgument, columnArgument, columnArgumentIsOmitted(ast), rangeSize.height, rangeSize.width)
+
+    if (resolved === undefined) {
+      return ArraySize.scalar()
+    }
+
+    const {row, column} = resolved
+
+    if (row > rangeSize.height || column > rangeSize.width) {
+      return ArraySize.scalar()
+    }
+
+    const width = column === WHOLE_DIMENSION_INDEX ? rangeSize.width : 1
+    const height = row === WHOLE_DIMENSION_INDEX ? rangeSize.height : 1
+
+    if (!Number.isFinite(width) || !Number.isFinite(height)) {
+      return ArraySize.scalar()
+    }
+
+    return new ArraySize(width, height)
   }
 
   /**
