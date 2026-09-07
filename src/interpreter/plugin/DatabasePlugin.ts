@@ -216,7 +216,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       }
 
       if (count === 0) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
       }
 
       return sum / count
@@ -338,7 +338,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       }
 
       if (values.length <= 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
       }
 
       const mean = values.reduce((a, b) => a + b, 0) / values.length
@@ -363,7 +363,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       }
 
       if (values.length === 0) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
       }
 
       const mean = values.reduce((a, b) => a + b, 0) / values.length
@@ -387,7 +387,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       }
 
       if (values.length <= 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
       }
 
       const mean = values.reduce((a, b) => a + b, 0) / values.length
@@ -411,7 +411,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       }
 
       if (values.length === 0) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
       }
 
       const mean = values.reduce((a, b) => a + b, 0) / values.length

@@ -4,6 +4,7 @@
  */
 
 import {CellError, ErrorType} from '../../Cell'
+import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
@@ -23,7 +24,7 @@ export class ModuloPlugin extends FunctionPlugin implements FunctionPluginTypech
   public mod(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MOD'), (dividend: number, divisor: number) => {
       if (divisor === 0) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
       } else {
         return dividend % divisor
       }
