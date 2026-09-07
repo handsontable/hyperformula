@@ -150,8 +150,73 @@ export class CellError {
   constructor(
     public readonly type: ErrorType,
     public readonly message?: string,
-    public readonly root?: FormulaVertex
+    public readonly root?: FormulaVertex,
+    public readonly originFunction?: string,
+    public readonly argumentIndex?: number,
+    public readonly propagated: boolean = false,
+    public readonly originAddress?: SimpleCellAddress,
   ) {
+  }
+
+  /**
+   * Names the function or operator that produced this error.
+   *
+   * First occurrence wins, so an outer function that merely received the error back does not
+   * claim it: `=SUM(SQRT(-1))` keeps `SQRT`. A propagated error — one read out of another cell
+   * rather than produced here — can never acquire an origin it did not already have.
+   *
+   * @param {string} functionName - the function or operator helper that produced the error
+   */
+  public withOrigin(functionName: string): CellError {
+    if (this.propagated || this.originFunction !== undefined) {
+      return this
+    }
+    return new CellError(this.type, this.message, this.root, functionName, this.argumentIndex, this.propagated, this.originAddress)
+  }
+
+  /**
+   * Records which argument of the origin function was rejected. First occurrence wins, and a
+   * propagated error never acquires one: the reading function's own argument slot is not the
+   * offending argument.
+   *
+   * @param {number} index - zero-based index of the offending argument
+   */
+  public withArgumentIndex(index: number): CellError {
+    if (this.propagated || this.argumentIndex !== undefined) {
+      return this
+    }
+    return new CellError(this.type, this.message, this.root, this.originFunction, index, this.propagated, this.originAddress)
+  }
+
+  /**
+   * Marks this error as read from another cell rather than produced by the current evaluation.
+   *
+   * This is what stops a cell from adopting an error it only read: {@link attachRootVertex} skips
+   * a propagated error, so the reported address stays the one where the error actually appeared.
+   */
+  public asPropagated(): CellError {
+    if (this.propagated) {
+      return this
+    }
+    return new CellError(this.type, this.message, this.root, this.originFunction, this.argumentIndex, true, this.originAddress)
+  }
+
+  /**
+   * Records the address an otherwise rootless error appeared at.
+   *
+   * For vertices that hold a static error rather than computing one (a parse error, or an error
+   * value the user typed), there is no `FormulaVertex` to serve as a lazily-resolved `root`. This
+   * cannot go stale: `CellError` is immutable, so the stored value is never stamped — every read
+   * stamps a fresh copy with the address current at that moment, which is what keeps it correct
+   * across row and column changes.
+   *
+   * @param {SimpleCellAddress} address - the address the error was read from
+   */
+  public withOriginAddress(address: SimpleCellAddress): CellError {
+    if (this.originAddress !== undefined) {
+      return this
+    }
+    return new CellError(this.type, this.message, this.root, this.originFunction, this.argumentIndex, this.propagated, address)
   }
 
   /**
@@ -164,7 +229,7 @@ export class CellError {
 
   public attachRootVertex(vertex: FormulaVertex): CellError {
     if (this.root === undefined) {
-      return new CellError(this.type, this.message, vertex)
+      return new CellError(this.type, this.message, vertex, this.originFunction, this.argumentIndex, this.propagated, this.originAddress)
     } else {
       return this
     }

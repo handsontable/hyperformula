@@ -115,7 +115,7 @@ export class Exporter implements ChangeExporter<ExportedChange> {
 
   private detailedError(error: CellError): DetailedCellError {
     let address = undefined
-    const originAddress = error.root?.getAddress(this.lazilyTransformingService)
+    const originAddress = error.root?.getAddress(this.lazilyTransformingService) ?? error.originAddress
     if (originAddress !== undefined) {
       if (originAddress.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
         address = this.namedExpressions.namedExpressionInAddress(originAddress.row)?.displayName

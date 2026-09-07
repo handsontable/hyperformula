@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Changed the cell errors thrown by the formula engine to always carry a message describing their cause. [#131](https://github.com/handsontable/hyperformula/issues/131)
 
+### Fixed
+
+- A cell error read from another cell no longer reports the reading cell as its origin. Errors that come from a cell holding a static error value — a formula with a syntax error, or an error value entered directly — now report that cell's address instead of the address of whichever cell happened to read them first. [#131](https://github.com/handsontable/hyperformula/issues/131)
+
 ## [3.4.0] - 2026-08-10
 
 ### Added

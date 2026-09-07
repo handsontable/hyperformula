@@ -1,3 +1,5 @@
+import { cellErrorMismatchMessage, cellErrorsMatch } from '../matchers/cellErrorComparison'
+
 type CustomMatcherResult = jest.CustomMatcherResult
 type ExpectExtendMap = jest.ExpectExtendMap
 
@@ -11,19 +13,10 @@ declare global {
 
 export const toEqualError: ExpectExtendMap = {
   toEqualError(received: any, expected: any): CustomMatcherResult {
-    let result = false
-
-    if (typeof received === 'object' && typeof expected === 'object' && received.message != null && expected.message != null && received.message.includes(expected.message)) {
-      result = this.equals(
-        {...received, message: undefined, root: undefined, address: undefined},
-        {...expected, message: undefined, root: undefined, address: undefined}
-      )
-    } else {
-      result = this.equals(received, expected)
-    }
+    const result = cellErrorsMatch(received, expected, (a, b) => this.equals(a, b))
     return {
       pass: result,
-      message: () => (result ? '' : `Expected ${JSON.stringify(received, null, 2)} to match ${JSON.stringify(expected, null, 2)}.`)
+      message: () => (result ? '' : cellErrorMismatchMessage(received, expected))
     }
   }
 }
