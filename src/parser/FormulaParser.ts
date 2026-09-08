@@ -552,7 +552,7 @@ export class FormulaParser extends EmbeddedActionsParser {
           const errString = token.image.toUpperCase()
           const errorType = this.lexerConfig.errorMapping[errString]
           if (errorType) {
-            return buildCellErrorAst(new CellError(errorType, ErrorMessage.ErrorLiteral), token.leadingWhitespace)
+            return buildCellErrorAst(new CellError(errorType, ErrorMessage.ErrorLiteral).withOrigin('literal'), token.leadingWhitespace)
           } else {
             return this.parsingError(ParsingErrorType.ParserError, 'Unknown error literal')
           }

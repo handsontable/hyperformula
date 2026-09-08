@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - A cell error read from another cell no longer reports the reading cell as its origin. Errors that come from a cell holding a static error value — a formula with a syntax error, or an error value entered directly — now report that cell's address instead of the address of whichever cell happened to read them first. [#131](https://github.com/handsontable/hyperformula/issues/131)
+- A parsing error, an error value typed directly into a cell, and an error literal written into a formula are now attributed to `parser`, `user input`, or `literal` respectively, instead of being silently unattributed or (for a parsing error) reporting no address at all. `#SPILL!` errors now report the cell that failed to spill instead of no address. [#131](https://github.com/handsontable/hyperformula/issues/131)
 
 ## [3.4.0] - 2026-08-10
 
