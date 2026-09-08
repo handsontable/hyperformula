@@ -9,6 +9,7 @@ tags:
   - "#CYCLE!"
   - "#ERROR!"
   - "#LIC!"
+  - "#SPILL!"
   - division by zero
 ---
 
@@ -38,3 +39,15 @@ according to the language settings.
 | #CYCLE! | Circular reference | It occurs when a formula refers to its own cell, both directly and indirectly. |
 | #ERROR! | An error occurred | It indicates that there is an unknown error in a formula. |
 | #LIC! | Invalid license key | It occurs when the license key is invalid, expired, or missing. |
+| #SPILL! | No space for array result | It occurs when an array formula's result would overwrite one or more non-empty cells, so it has nowhere to spill into. |
+
+## Error messages and explanations
+
+An error's `message` property states the specific cause within its type — for
+example, distinguishing *why* a formula returned `#NUM!` rather than only that it
+did. HyperFormula does not turn that message into a longer, plain-language
+explanation, and does not call out to a language model to generate one. An
+application built on top of HyperFormula that wants to rephrase an error for its
+end users — in natural language, or translated beyond the languages HyperFormula
+ships with — should do so at the application layer, using the `type` and
+`message` HyperFormula already provides as its input.
