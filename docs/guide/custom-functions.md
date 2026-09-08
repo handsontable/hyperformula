@@ -326,6 +326,12 @@ custom error messages. Put them to good use: let your users know what caused the
 error and how to avoid it in the future.
 :::
 
+Every error the engine itself produces always carries a message. A custom function's
+`message` argument stays optional — if you omit it, a consumer reading the resulting
+`DetailedCellError` sees `message` as an empty string, the same value HyperFormula uses
+for "no message". To tell the two cases apart, check `hasMessage`: `true` means a
+message was set (even if it's a deliberately empty string), `false` means none was.
+
 ### Test your function
 
 To make sure your function works correctly, add unit tests. Use a JavaScript
