@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Changed the cell errors thrown by the formula engine to always carry a message describing their cause. [#131](https://github.com/handsontable/hyperformula/issues/131)
+- Changed the cell errors thrown outside the formula interpreter — invalidated references, references the parser cannot resolve, references exceeding the sheet size, circular references, cleaned-up array results, and error values typed directly into a formula — to also carry a message describing their cause. [#131](https://github.com/handsontable/hyperformula/issues/131)
 
 ### Fixed
 

@@ -981,7 +981,7 @@ export class DependencyGraph {
       const oldValue = vertex.getArrayCellValue(address)
       if (this.getCell(address) === vertex) {
         if (vertex.isLeftCorner(address)) {
-          this.changes.addChange(new CellError(ErrorType.REF), address, oldValue)
+          this.changes.addChange(new CellError(ErrorType.REF, ErrorMessage.ArraySourceRemoved), address, oldValue)
         } else {
           this.addressMapping.removeCell(address)
           this.changes.addChange(EmptyValue, address, oldValue)
