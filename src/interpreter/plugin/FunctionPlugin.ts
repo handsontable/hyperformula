@@ -485,11 +485,11 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       const coercedValue = this.coerceToType(argumentValue, argumentMetadata, state)
 
       if (coercedValue === undefined && !argumentIgnorableFlags[i]) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType).withArgumentIndex(i)
       }
 
       if (coercedValue instanceof CellError && argumentMetadata.argumentType !== FunctionArgumentType.SCALAR) {
-        return coercedValue
+        return coercedValue.withArgumentIndex(i)
       }
 
       coercedArguments.push(coercedValue)
