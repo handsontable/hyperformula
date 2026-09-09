@@ -16,4 +16,5 @@ export interface ParserConfig {
   errorMapping: Record<string, TranslatableErrorType>,
   maxColumns: number,
   maxRows: number,
+  maxParserCacheSize: number,
 }

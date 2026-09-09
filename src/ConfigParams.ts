@@ -434,6 +434,18 @@ export interface ConfigParams {
    */
   maxPendingLazyTransformations: number,
   /**
+   * Maximum number of parsed formula entries retained in the parser cache.
+   * Must be a non-negative safe integer. Set to `0` to disable parser caching.
+   *
+   * Least recently used entries are discarded when the limit is reached.
+   * Smaller limits reduce cache memory but may increase parsing work. This does
+   * not limit formulas retained by cells, named expressions, undo/redo or the clipboard.
+   *
+   * @default 10000
+   * @category Engine
+   */
+  maxParserCacheSize: number,
+  /**
    * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) are allowed to use regular expressions.
    * @default false
    * @category String
