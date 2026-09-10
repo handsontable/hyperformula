@@ -165,8 +165,8 @@ export class RegressionPlugin extends FunctionPlugin implements FunctionPluginTy
         if (!yValues.every(isExtendedNumber) || !xValues.every(isExtendedNumber)) {
           return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
         }
-        const observations = yValues.map(getRawValue) as number[]
-        const numericX = xValues.map(getRawValue) as number[]
+        const observations = yValues.map(getRawValue)
+        const numericX = xValues.map(getRawValue)
         const predictors = observations.map((_, i) => {
           if (shape.orientation === 'paired') {
             return [numericX[i]]
