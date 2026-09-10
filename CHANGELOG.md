@@ -7,9 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- A **breaking change**: an empty string (`""`) is no longer coerced to `0` in numeric contexts. As in Excel, `""` is text and is never a number, so `=""+0` now returns the `#VALUE!` error instead of `0`, and `=COUNT("")` returns `0` instead of `1`. This applies wherever a value reaches a number: the arithmetic operators, numeric aggregation (`SUM`, `AVERAGE`, `MIN`, `MAX`, `PRODUCT`, `COUNT`), and any function argument declared as a number. Blank cells are a different value and are unaffected — they still coerce to `0`, and the `evaluateNullToZero` option behaves exactly as before. See the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html#changes-to-empty-string-coercion). [#1768](https://github.com/handsontable/hyperformula/pull/1768)
+
 ### Fixed
 
-- **Breaking change**: Fixed an empty string (`''`) being silently coerced to `0` in arithmetic operations and in any function argument that expects a number, which made results differ from Excel (e.g. `=""+0` returned `0` instead of the `#VALUE!` error, and `COUNT("")` returned `1` instead of `0`). This does not affect blank cells, which keep coercing to `0` as before. (HF-361)
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
 - Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
