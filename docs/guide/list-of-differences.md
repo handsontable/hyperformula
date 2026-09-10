@@ -34,6 +34,12 @@ See a full list of differences between HyperFormula, Microsoft Excel, and Google
 **Contents:**
 [[toc]]
 
+## LINEST
+
+Unlike Excel, HyperFormula requires a constant `stats` argument because the output dimensions are determined before evaluation. For example, `=LINEST(A1:A10,B1:B10,TRUE(),D1)` returns `#VALUE!`; use `TRUE()` or `FALSE()` directly for `stats`. See [LINEST limitations](known-limitations.md#linest-function) for supported constants and input-sizing requirements.
+
+Numerical results can differ for nearly dependent predictors and nearly perfect fits. Coefficient standard errors are sensitive to conditioning, and the F statistic is sensitive to residuals close to machine precision. For an effectively perfect multiple regression, Excel and HyperFormula can return different large finite F values even when the coefficients agree.
+
 ## General functionalities
 
 | Functionality                                      | Examples                                                                  | HyperFormula                                                                                                                                                                                                                                                                                                                                                 | Google Sheets                                                                                                                  | Microsoft Excel                                                                                                                |

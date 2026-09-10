@@ -61,6 +61,14 @@ a circular reference.
 
 * Ordering (including mixed types, empty cells, and text collation) follows HyperFormula's own comparison rules, which honor the `caseSensitive` and `accentSensitive` configuration options. Numbers sort before text, and text before logical values.
 
+### LINEST function
+
+* The `stats` argument controls whether the result has one or five rows. It must be omitted or supplied as a constant: `TRUE()`, `FALSE()`, a number, or the text `"TRUE"` or `"FALSE"`. Parentheses and numeric unary signs are supported. Cell references, named expressions, and calculated expressions such as `1=1` return `#VALUE!`, including when `LINEST` is nested inside another function.
+
+* Result width is determined from the predictor dimensions before evaluation. Changes to values within fixed input ranges and to a referenced `const` argument recalculate normally. Changes to dependency values do not resize the result automatically; this is the existing array-sizing limitation.
+
+* If an input expression returns a different predictor count than predicted, `LINEST` returns `#VALUE!`. For example, filtering predictor columns can change the required result width.
+
 ### OFFSET function
 
 HyperFormula resolves the OFFSET function at parse time rather than during evaluation. The parser inspects the arguments and rewrites the expression into a plain cell reference or range. This keeps the dependency graph accurate but imposes several restrictions.
