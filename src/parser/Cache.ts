@@ -22,33 +22,94 @@ const buildCacheEntry = (ast: Ast, relativeDependencies: RelativeDependency[], h
   hasStructuralChangeFunction
 })
 
+/** Links cached results in access order so eviction does not scan the cache. */
+interface CacheNode {
+  hash: string,
+  entry: CacheEntry,
+  previous?: CacheNode,
+  next?: CacheNode,
+}
+
+/**
+ * A bounded LRU cache; callers must retain ASTs they need independently of it.
+ * A doubly linked list adds two references per entry so promotion and eviction
+ * update a fixed number of links without scanning the cache.
+ */
 export class Cache {
-  private cache: Map<string, CacheEntry> = new Map()
+  private cache: Map<string, CacheNode> = new Map()
+  private oldest?: CacheNode
+  private newest?: CacheNode
 
   constructor(
     private readonly functionRegistry: FunctionRegistry,
+    private readonly maxSize: number,
   ) {
   }
 
+  /** Builds parsing metadata and caches it, evicting the least recently used entry. */
   public set(hash: string, ast: Ast): CacheEntry {
     const astRelativeDependencies = collectDependencies(ast, this.functionRegistry)
     const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.functionRegistry.isFunctionVolatile), doesContainFunctions(ast, this.functionRegistry.isFunctionDependentOnSheetStructureChange))
-    this.cache.set(hash, cacheEntry)
+    if (this.maxSize === 0) {
+      return cacheEntry
+    }
+
+    if (this.cache.size === this.maxSize && this.oldest !== undefined) {
+      this.cache.delete(this.oldest.hash)
+      this.detach(this.oldest)
+    }
+    const node: CacheNode = {hash, entry: cacheEntry}
+    this.cache.set(hash, node)
+    this.markRecentlyUsed(node)
     return cacheEntry
   }
 
+  /** Returns an entry and marks it as recently used. */
   public get(hash: string): Maybe<CacheEntry> {
-    return this.cache.get(hash)
+    const node = this.cache.get(hash)
+    if (node !== undefined) {
+      this.markRecentlyUsed(node)
+    }
+    return node?.entry
   }
 
+  /** Reuses a cached AST when available, otherwise retains the supplied AST. */
   public maybeSetAndThenGet(hash: string, ast: Ast): Ast {
-    const entryFromCache = this.cache.get(hash)
-    if (entryFromCache !== undefined) {
-      return entryFromCache.ast
-    } else {
-      this.set(hash, ast)
-      return ast
+    return this.get(hash)?.ast ?? this.set(hash, ast).ast
+  }
+
+  /** Moves a node to the most recently used end in constant time. */
+  private markRecentlyUsed(node: CacheNode): void {
+    if (node === this.newest) {
+      return
     }
+    // A new node is not linked yet; existing nodes must first leave their old position.
+    if (node === this.oldest || node.previous !== undefined || node.next !== undefined) {
+      this.detach(node)
+    }
+    node.previous = this.newest
+    if (this.newest !== undefined) {
+      this.newest.next = node
+    } else {
+      this.oldest = node
+    }
+    this.newest = node
+  }
+
+  /** Removes a linked node, updating both ends when the cache has only one entry. */
+  private detach(node: CacheNode): void {
+    if (node.previous !== undefined) {
+      node.previous.next = node.next
+    } else {
+      this.oldest = node.next
+    }
+    if (node.next !== undefined) {
+      node.next.previous = node.previous
+    } else {
+      this.newest = node.previous
+    }
+    node.previous = undefined
+    node.next = undefined
   }
 }
 

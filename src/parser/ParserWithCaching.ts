@@ -57,7 +57,7 @@ export class ParserWithCaching {
     this.lexerConfig = buildLexerConfig(config)
     this.lexer = new FormulaLexer(this.lexerConfig)
     this.formulaParser = new FormulaParser(this.lexerConfig, this.resolveSheetReference)
-    this.cache = new Cache(this.functionRegistry)
+    this.cache = new Cache(this.functionRegistry, config.maxParserCacheSize)
   }
 
   /**
@@ -211,19 +211,12 @@ export class ParserWithCaching {
     return sheetA - sheetB
   }
 
+  /** Retrieves parsing metadata, rebuilding it from the retained AST after eviction. */
   public fetchCachedResultForAst(ast: Ast): ParsingResult {
     const hash = this.computeHashFromAst(ast)
-    return this.fetchCachedResult(hash)
-  }
-
-  public fetchCachedResult(hash: string): ParsingResult {
-    const cacheResult = this.cache.get(hash)
-    if (cacheResult === undefined) {
-      throw new Error('There is no AST with such key in the cache')
-    } else {
-      const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
-      return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
-    }
+    const cacheResult = this.cache.get(hash) ?? this.cache.set(hash, ast)
+    const {ast: cachedAst, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
+    return {ast: cachedAst, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
   }
 
   public computeHashFromTokens(tokens: IToken[], baseAddress: SimpleCellAddress): string {
