@@ -54,13 +54,6 @@ export class Cache {
       return cacheEntry
     }
 
-    const existing = this.cache.get(hash)
-    if (existing !== undefined) {
-      existing.entry = cacheEntry
-      this.markRecentlyUsed(existing)
-      return cacheEntry
-    }
-
     if (this.cache.size === this.maxSize && this.oldest !== undefined) {
       this.cache.delete(this.oldest.hash)
       this.detach(this.oldest)
