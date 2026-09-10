@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added `LINEST` for simple and multiple linear regression, with optional intercept and regression statistics. The `stats` argument must be constant because result dimensions are determined before evaluation.
+- Added `LINEST` for simple and multiple linear regression, with optional intercept and regression statistics. The `stats` argument must be constant because result dimensions are determined before evaluation. [#1769](https://github.com/handsontable/hyperformula/pull/1769)
 
 ### Fixed
 
