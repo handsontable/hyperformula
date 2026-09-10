@@ -144,12 +144,14 @@ module.exports = {
       }
     },
     {
-      files: ['**/src/interpreter/**/*.ts'],
+      files: ['**/src/**/*.ts'],
       rules: {
         // HF-131: an engine-thrown cell error must always state its cause.
         // The public `CellError` constructor keeps `message` optional for custom
         // functions (docs/guide/custom-functions.md); this rule enforces the
-        // stricter contract on our own code only.
+        // stricter contract on our own code only. It is a syntactic floor, not a
+        // proof of completeness — see the comment at CellContentParser.ts's
+        // `CellContent.Error` constructor for a call site it cannot catch.
         'no-restricted-syntax': ['error',
           {
             selector: "NewExpression[callee.name='CellError'][arguments.length<2]",
