@@ -4,6 +4,77 @@ const footnotePlugin = require('markdown-it-footnote');
 const searchBoxPlugin = require('./plugins/search-box');
 const examples = require('./plugins/examples/examples');
 const HyperFormula = require('../../dist/hyperformula.full');
+const fs = require('fs');
+const path = require('path');
+
+// HF-282: count HF built-in languages from `src/i18n/languages` (source of truth): one module
+// per shipped language, next to the `index.ts` export barrel. Counted by listing the directory
+// rather than by matching `export {default as xxYY}` lines in the barrel, so the total cannot
+// depend on how those lines are punctuated: `export { default as ukUA }` is the same export to
+// TypeScript, but a regex anchored on the brace spacing misses it and then quietly publishes a
+// stale total with every check below still green. Read once at config load — no dist/
+// dependency, so it resolves identically in `docs:dev` and `docs:build`.
+const languagesDir = path.resolve(__dirname, '../../src/i18n/languages');
+const languageCodes = fs.readdirSync(languagesDir)
+  .filter((file) => file.endsWith('.ts') && !file.endsWith('.d.ts') && file !== 'index.ts')
+  .map((file) => path.basename(file, '.ts'));
+const languagesCount = languageCodes.length;
+if (!languagesCount) {
+  throw new Error(`HF-282: derived languagesCount is 0 — no language modules found in ${languagesDir}; check the path in docs/.vuepress/config.js.`);
+}
+// Listing the directory counts what is *present*, and only the barrel decides what actually
+// ships, so a module nobody re-exported would overstate the total. Cross-check by language code
+// (no brace matching, so barrel formatting stays irrelevant) and fail loudly on the mismatch.
+const languagesBarrel = fs.readFileSync(path.join(languagesDir, 'index.ts'), 'utf8');
+const unexportedLanguages = languageCodes.filter((code) => !new RegExp(`\\bdefault as ${code}\\b`).test(languagesBarrel));
+if (unexportedLanguages.length) {
+  throw new Error(`HF-282: language modules present in src/i18n/languages/ but not re-exported from index.ts, so they do not ship and must not be counted: ${unexportedLanguages.join(', ')} — add them to the barrel, or remove the files.`);
+}
+
+// HF-282: the root README.md is rendered by GitHub and npm, not VuePress, so it cannot
+// use the `{{ $page.languagesCount }}` interpolation and states the count literally.
+// Assert it against the count derived above so it cannot rot unnoticed — it already did once, when
+// the Indonesian pack (#1674) left the README saying 17. The function count needs no
+// such check: "over 400" stays true as functions are added.
+//
+// The claim under test is one specific line: the features bullet linking to the i18n guide. Matched
+// there rather than loose against the whole file, because `String.match` without /g returns the
+// first hit anywhere — inside a fenced example, or in a sentence about an older release — and would
+// then report a number from a line that was never the claim, sending the reader to correct text
+// that is already right. Fenced blocks are skipped for the same reason.
+const readmeLanguagesClaims = [];
+let inReadmeFence = false;
+for (const line of fs.readFileSync(path.resolve(__dirname, '../../README.md'), 'utf8').split('\n')) {
+  if (/^\s*(```|~~~)/.test(line)) {
+    inReadmeFence = !inReadmeFence;
+    continue;
+  }
+  if (inReadmeFence || !line.startsWith('- ') || !line.includes('guide/i18n-features')) {
+    continue;
+  }
+  const match = line.match(/(\d+) built-in languages/);
+  if (match) {
+    readmeLanguagesClaims.push(match[1]);
+  }
+}
+if (readmeLanguagesClaims.length !== 1) {
+  throw new Error(`HF-282: expected exactly one README.md features bullet linking to the i18n guide and stating "<n> built-in languages", found ${readmeLanguagesClaims.length} — if the wording changed on purpose, update this check in docs/.vuepress/config.js.`);
+}
+if (Number(readmeLanguagesClaims[0]) !== languagesCount) {
+  throw new Error(`HF-282: README.md says ${readmeLanguagesClaims[0]} built-in languages but src/i18n/languages/ ships ${languagesCount} — update README.md.`);
+}
+
+// HF-282: the function total. Derived from `getAvailableFunctions` on a default-config engine —
+// the same API, and the same engine options, as `script/generate-builtin-functions-doc.ts`, so the
+// total and the rows of the page it heads cannot describe different function sets. Default-config
+// is the point: `functionPlugins` restrictions would give a narrower count than the generated
+// table. The GPLv3 key only keeps the build quiet — a keyless engine logs a missing-key warning —
+// but see the LICENSE_KEY note in that script for why it has to stay the fully-entitled one.
+// Built once here, not per page: `extendPageData` runs for every page and the count is invariant.
+const functionsCount = HyperFormula
+  .buildEmpty({language: 'enGB', licenseKey: 'gpl-v3'})
+  .getAvailableFunctions().length;
+
 const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet');
 const mdCompanions = require('./plugins/md-companions');
 
@@ -112,11 +183,9 @@ module.exports = {
         // inject current HF releaseDate as {{ $page.releaseDate }} variable
         $page.releaseDate = HyperFormula.releaseDate
         // inject current HF function count as {{ $page.functionsCount }} variable
-        // This total and the rows of the built-in functions page come from two different sources: the count below,
-        // and getAvailableFunctions via script/renderBuiltinFunctionsTable.ts. They agree today (423 each) and must
-        // be kept in step by hand, or the page prints a total that contradicts the number of rows under it. The
-        // renderer throws on the one divergence it can see from its side; this side cannot detect any.
-        $page.functionsCount = HyperFormula.getRegisteredFunctionNames('enGB').length
+        $page.functionsCount = functionsCount
+        // inject current HF built-in language count as {{ $page.languagesCount }} variable
+        $page.languagesCount = languagesCount
 
         if (searchPattern.test($page.path) || generatedPagePattern.test($page.path)) {
           $page.frontmatter.editLink = false

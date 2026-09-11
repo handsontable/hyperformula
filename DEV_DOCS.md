@@ -153,16 +153,26 @@ It does **not** turn ordinary English into identifiers. A parameter's own descri
 
 Note what the drift warning does **not** cover: **optionality is not cross-checked.** The catalogue authors no optionality of its own &mdash; a parameter's `optional` flag is derived entirely from `optionalArg`/`defaultValue` in `implementedFunctions` &mdash; so a description that calls an argument optional can sit next to `optional: false` with nothing failing. When a function accepts a call that arity alone does not express (`SHEET()`, `ROW()`, and anything else served by `runFunctionWithReferenceArgument`'s zero-argument path), the plugin must declare `optionalArg: true` explicitly, or the public API will advertise the argument as required. `ROW`, `COLUMN`, `SHEET` and `SHEETS` all declare it; `ISFORMULA` takes the same path and correctly does not, because its zero-argument call is an error rather than a shorthand.
 
-Descriptions must describe **HyperFormula's** behaviour, not Excel's. Much of the catalogue was seeded from a hand-written page that documented Excel, and HyperFormula deliberately deviates in places (`INT` truncates toward zero, `MOD` takes the sign of the dividend, `ISEVEN`/`ISODD` do not truncate, `CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1). Verify a claim against the implementation before authoring it, and record any deviation in [the list of differences](docs/guide/list-of-differences.md).
+Descriptions must describe **HyperFormula's** behaviour, not Excel's. Much of the catalogue was seeded from a hand-written page that documented Excel, and HyperFormula deliberately deviates in places (`INT` truncates toward zero, `ISEVEN`/`ISODD` do not truncate, `CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1). Verify a claim against the implementation before authoring it, and record any deviation in [the list of differences](docs/guide/list-of-differences.md).
 
 ## Internationalization and function translations
 
 HyperFormula supports internationalization and provides localized function names for all built-in languages. Translation files live in `src/i18n/languages/`. New functions must include translations for all built-in languages.
 
+Only add a localized function name after confirming that Microsoft Excel ships that exact name. If an authoritative source does not provide a localized name, keep the English name instead of translating or inferring one.
+
 When looking for the valid translations for new functions, try these sources:
 
 - https://support.microsoft.com/en-us/office/excel-functions-translator-f262d0c0-991c-485b-89b6-32cc8d326889
 - http://dolf.trieschnigg.nl/excel/index.php
+
+For recent Excel functions that are absent from those sources, use Microsoft's localized alphabetical function list:
+
+```text
+https://support.microsoft.com/<locale>/office/excel-functions-alphabetical-b3944572-255d-4efb-bb96-c6d90033e188
+```
+
+Find the link whose URL contains `functions/<english-name>-function`, then follow it and confirm that the individual function page uses the same localized name in its title and formula syntax. Check each locale independently because Excel keeps some function names in English. If the alphabetical list and the individual page disagree, do not copy the list entry without additional product verification.
 
 For languages not officially supported by Microsoft Excel, the two sources above do not apply. For these languages, use Google Sheets as the reference. Switch the `hl` query parameter to the target locale, for example:
 
