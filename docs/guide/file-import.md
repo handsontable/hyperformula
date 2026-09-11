@@ -23,6 +23,27 @@ To import CSV files, use a third-party [CSV parser](https://www.npmjs.com/search
 
 To import XLSX files, use a third-party [XLSX parser](https://www.npmjs.com/search?q=xlsx) (e.g., [ExcelJS](https://www.npmjs.com/package/exceljs) or [xlsx](https://www.npmjs.com/package/xlsx)). Then pass the result to HyperFormula as a JavaScript array.
 
+### Excel's internal function prefixes
+
+Excel stores some function names with an internal prefix. It marks every function added after Excel 2007 this way, so a file can contain `_xlfn.IFS(...)` where the user typed `IFS(...)`. The prefixes are an artifact of how Excel saves the file, not part of the function name.
+
+Which prefixes reach your code depends on the parser you use. ExcelJS passes them through. SheetJS removes `_xlfn.` but keeps `_xlws.`.
+
+HyperFormula ignores these prefixes, so you can pass the formula straight to the engine:
+
+| Prefix | Example |
+| --- | --- |
+| `_xlfn.` | `=_xlfn.IFS(A1>B1,"Pass","Fail")` |
+| `_xlfn._xlws.` | `=_xlfn._xlws.FILTER(A1:A9,B1:B9>1)` |
+| `_xlws.` | `=_xlws.SORT(A1:A9)` |
+| `_xludf.` | `=_xludf.MY_FUNCTION()` |
+
+HyperFormula also ignores the `_xlpm.` prefix, which Excel writes on `LAMBDA` and `LET` parameter names. HyperFormula does not support `LAMBDA` or `LET`, so a formula that uses one still returns an error.
+
+[`getCellFormula()`](../api/classes/hyperformula.md#getcellformula) returns the formula without the prefix, so `=_xlfn.IFS(A1>B1,"Pass","Fail")` reads back as `=IFS(A1>B1,"Pass","Fail")`.
+
+A prefix does not add a function. If HyperFormula does not support the function itself, the cell holds a `#NAME?` error. See the [list of supported functions](built-in-functions.md).
+
 ### Example: Import XLSX files in Node
 
 This example uses [ExcelJS](https://www.npmjs.com/package/exceljs) to import XLSX files into HyperFormula.

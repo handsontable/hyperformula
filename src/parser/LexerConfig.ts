@@ -9,6 +9,7 @@ import {ParserConfig} from './ParserConfig'
 import {
   ALL_WHITESPACE_PATTERN,
   COLUMN_REFERENCE_PATTERN,
+  EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN,
   NON_RESERVED_CHARACTER_PATTERN,
   ODFF_WHITESPACE_PATTERN,
   RANGE_OPERATOR,
@@ -47,7 +48,28 @@ export const RangeSeparator = createToken({ name: 'RangeSeparator', pattern: new
 export const ColumnRange = createToken({ name: 'ColumnRange', pattern: new RegExp(`${COLUMN_REFERENCE_PATTERN}${RANGE_OPERATOR}${COLUMN_REFERENCE_PATTERN}`) })
 export const RowRange = createToken({ name: 'RowRange', pattern: new RegExp(`${ROW_REFERENCE_PATTERN}${RANGE_OPERATOR}${ROW_REFERENCE_PATTERN}`) })
 
-export const ProcedureName = createToken({ name: 'ProcedureName', pattern: new RegExp(`([${UNICODE_LETTER_PATTERN}][${NON_RESERVED_CHARACTER_PATTERN}]*)\\(`) })
+export const ProcedureName = createToken({ name: 'ProcedureName', pattern: new RegExp(`(?:${EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN})?([${UNICODE_LETTER_PATTERN}][${NON_RESERVED_CHARACTER_PATTERN}]*)\\(`) })
+
+const excelInternalFunctionPrefixRegexp = new RegExp(`^(?:${EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN})`)
+
+/**
+ * Reads the canonical function name out of a ProcedureName token.
+ *
+ * The token image spans the whole match, so it carries the trailing opening parenthesis and, for a
+ * formula imported from an .xlsx file, one of the prefixes Excel prepends when it serializes a
+ * workbook (see EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN). Dropping both here is what lets
+ * `_xlfn.IFS(A1)` resolve to the same function as `IFS(A1)`.
+ *
+ * The prefix is removed before the name is upper-cased, because the prefixes are matched in lower
+ * case only.
+ *
+ * @param image - image of the ProcedureName token, for example `_xlfn.IFS(`
+ * @param functionMapping - maps a translated function name to its canonical English name
+ */
+export function canonicalProcedureNameFromToken(image: string, functionMapping: Record<string, string>): string {
+  const procedureName = image.slice(0, -1).replace(excelInternalFunctionPrefixRegexp, '').toUpperCase()
+  return functionMapping[procedureName] ?? procedureName
+}
 
 const cellReferenceMatcher = new CellReferenceMatcher()
 export const CellReference = createToken({
@@ -93,7 +115,10 @@ export const buildLexerConfig = (config: ParserConfig): LexerConfig => {
   const ArrayRowSeparator = createToken({name: 'ArrayRowSep', pattern: config.arrayRowSeparator})
   const ArrayColSeparator = createToken({name: 'ArrayColSep', pattern: config.arrayColumnSeparator})
   const NumberLiteral = createToken({ name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`) })
-  const OffsetProcedureName = createToken({ name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i') })
+  // OFFSET has its own token because it has its own grammar rule, so it needs the prefix handling of
+  // ProcedureName repeated here. The 'i' flag is for the translated OFFSET name and incidentally makes
+  // the prefix case-insensitive too, which is harmless: Excel only ever writes it in lower case.
+  const OffsetProcedureName = createToken({ name: 'OffsetProcedureName', pattern: new RegExp(`(?:${EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN})?${offsetProcedureNameLiteral}`, 'i') })
 
   let ArgSeparator: TokenType
   let inject: TokenType[]
