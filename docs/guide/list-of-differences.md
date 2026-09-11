@@ -40,6 +40,8 @@ Unlike Excel, HyperFormula requires a constant `stats` argument because the outp
 
 Numerical results can differ for nearly dependent predictors and nearly perfect fits. Coefficient standard errors are sensitive to conditioning, and the F statistic is sensitive to residuals close to machine precision. For an effectively perfect multiple regression, Excel and HyperFormula can return different large finite F values even when the coefficients agree.
 
+Very large or very small input scales can also cause substantial differences in coefficients and statistics, including for a single predictor with a non-perfect fit. HyperFormula does not reproduce Excel's loss of predictors or zero standard errors observed at extreme scales. Rescaling inputs to more moderate units can reduce numerical errors in both engines.
+
 ## General functionalities
 
 | Functionality                                      | Examples                                                                  | HyperFormula                                                                                                                                                                                                                                                                                                                                                 | Google Sheets                                                                                                                  | Microsoft Excel                                                                                                                |

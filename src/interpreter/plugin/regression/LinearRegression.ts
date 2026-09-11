@@ -172,10 +172,12 @@ export function fitLinearRegression(predictors: number[][], observations: number
   const degreesOfFreedom = n - count
   const variance = degreesOfFreedom === 0 ? 0 : residualSumSquares / degreesOfFreedom
   const standardErrors = Array<number>(k).fill(0)
-  let interceptVariance = 0
+  let interceptError = 0
   if (statistics && variance !== 0) {
-    // Each solve produces one column of R^-1. Accumulate only covariance diagonals
-    // and the intercept's quadratic form, avoiding a full covariance matrix.
+    const residualStandardError = Math.sqrt(variance)
+    // Each solve produces one column of R^-1 without a full covariance matrix.
+    // Accumulate scaled uncertainty magnitudes with hypot: squaring first can
+    // overflow or underflow even when the final standard error is representable.
     for (let j = 0; j < count; j++) {
       const right = Array<number>(count).fill(0)
       right[j] = 1
@@ -183,17 +185,17 @@ export function fitLinearRegression(predictors: number[][], observations: number
       let interceptWeight = fitIntercept ? inverseColumn[0] : 0
       for (let i = offset; i < count; i++) {
         const original = columns[i].index
-        standardErrors[original] += variance * inverseColumn[i] ** 2
+        standardErrors[original] = Math.hypot(standardErrors[original], residualStandardError * inverseColumn[i])
         interceptWeight -= means[original] * inverseColumn[i]
       }
-      interceptVariance += variance * interceptWeight ** 2
+      interceptError = Math.hypot(interceptError, residualStandardError * interceptWeight)
     }
   }
   return {
     coefficients,
     intercept,
-    standardErrors: standardErrors.map(Math.sqrt),
-    interceptError: Math.sqrt(interceptVariance),
+    standardErrors,
+    interceptError,
     residualSumSquares,
     totalSumSquares,
     degreesOfFreedom,

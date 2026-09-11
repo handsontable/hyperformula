@@ -69,6 +69,8 @@ a circular reference.
 
 * If an input expression returns a different predictor count than predicted, `LINEST` returns `#VALUE!`. For example, filtering predictor columns can change the required result width.
 
+* Very large or very small input magnitudes can reduce numerical accuracy. Intermediate calculations, such as residual sums of squares, can still overflow or underflow, producing `#NUM!` or inaccurate statistics. Rescale inputs to more moderate units where possible. See [LINEST numerical differences](list-of-differences.md#linest) for compatibility considerations.
+
 ### OFFSET function
 
 HyperFormula resolves the OFFSET function at parse time rather than during evaluation. The parser inspects the arguments and rewrites the expression into a plain cell reference or range. This keeps the dependency graph accurate but imposes several restrictions.
