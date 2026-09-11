@@ -200,7 +200,7 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
       if (averageResult instanceof CellError) {
         return averageResult
       } else {
-        return averageResult.averageValue() || new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
+        return averageResult.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
       }
     }
 

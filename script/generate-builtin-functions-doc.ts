@@ -38,9 +38,10 @@ const LICENSE_KEY = 'gpl-v3'
 
 /** Reads the committed template and returns the page with both generated regions spliced in. */
 function buildUpdatedFile(): string {
-  // Deliberately a default-config engine: its registry must stay the global one, because the function total printed
-  // on the page is computed separately, from the global registry, in docs/.vuepress/config.js. Restricting this
-  // engine with `functionPlugins` would give the table a different function set from the total above it.
+  // Deliberately a default-config engine, matching the one `docs/.vuepress/config.js` builds for the function total
+  // printed above the table: same `getAvailableFunctions` call, same language, same license key. Restricting this
+  // engine with `functionPlugins` would give the table a different function set from that total. The two engines are
+  // still separate call sites — keep the options here and there in step.
   const engine = HyperFormula.buildEmpty({language: LANGUAGE, licenseKey: LICENSE_KEY})
   const entries = engine.getAvailableFunctions()
   const detailsFor = (canonicalName: string) => engine.getFunctionDetails(canonicalName)
