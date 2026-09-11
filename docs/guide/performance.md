@@ -84,6 +84,16 @@ for the cost described above. It helps only as long as every reference
 happens to point the same way, and a single reference pointing back
 puts you on the slow path again with nothing to signal it.
 
+### One engine, not one per sheet
+
+Splitting the sheets across several engine instances is not a way out
+of the cost above. A formula can only reference a sheet that lives in
+the same instance: pointing at a sheet held by another one evaluates
+to `#REF!`, the same as pointing at a sheet that does not exist. So
+sharding by instance does not divide the work, it removes the
+cross-sheet references that made the work necessary – which is
+usually the feature the sheets were loaded for.
+
 ### Passing the engine to other libraries
 
 A library you hand HyperFormula to may accept either the
