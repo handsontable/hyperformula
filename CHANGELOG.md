@@ -21,6 +21,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - A cell error read from another cell no longer reports the reading cell as its origin. Errors that come from a cell holding a static error value — a formula with a syntax error, or an error value entered directly — now report that cell's address instead of the address of whichever cell happened to read them first. [#131](https://github.com/handsontable/hyperformula/issues/131)
 
+### Fixed
+
+- Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
+- Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
+- Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
+- Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
