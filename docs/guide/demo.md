@@ -1,3 +1,10 @@
+---
+tags:
+  - live demo
+  - playground
+  - calculateFormula
+---
+
 # Demo
 
 ::: example #example1 --html 1 --css 2 --js 3 --ts 4

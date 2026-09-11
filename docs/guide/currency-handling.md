@@ -1,3 +1,14 @@
+---
+tags:
+  - stringifyCurrency
+  - currencySymbol
+  - money
+  - accounting format
+  - Intl.NumberFormat
+  - LCID
+  - NUMBER_CURRENCY
+---
+
 # Currency handling
 
 HyperFormula treats currency through **two independent mechanisms**:

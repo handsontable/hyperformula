@@ -1,3 +1,12 @@
+---
+tags:
+  - ExcelJS
+  - SheetJS
+  - PapaParse
+  - CSV parser
+  - read Excel file
+---
+
 # File import and export
 
 Import and export XLSX files, and import CSV files, with HyperFormula.
