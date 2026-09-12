@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- Fixed a named range evaluating to the `#VALUE!` error instead of spilling when passed to an array-returning function, and, with `useArrayArithmetic` enabled, when used as an operand. A named expression now predicts the same array size as the expression it stands for, so `=TRANSPOSE(myRange)` and `=myRange + 1` behave as `=TRANSPOSE(A1:A5)` and `=A1:A5 + 1` do. [#1772](https://github.com/handsontable/hyperformula/pull/1772)
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
 - Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
