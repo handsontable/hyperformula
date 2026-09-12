@@ -38,7 +38,7 @@ HyperFormula ignores these prefixes, so you can pass the formula straight to the
 | `_xlws.` | `=_xlws.SORT(A1:A9)` |
 | `_xludf.` | `=_xludf.MY_FUNCTION()` |
 
-HyperFormula also ignores the `_xlpm.` prefix, which Excel writes on `LAMBDA` and `LET` parameter names. HyperFormula does not support `LAMBDA` or `LET`, so a formula that uses one still returns an error.
+The `_xlpm.` prefix marks a `LAMBDA`/`LET` parameter name. HyperFormula does not support `LAMBDA` or `LET`, so a formula containing one returns `#NAME?` whether or not the prefix is present.
 
 [`getCellFormula()`](../api/classes/hyperformula.md#getcellformula) returns the formula without the prefix, so `=_xlfn.IFS(A1>B1,"Pass","Fail")` reads back as `=IFS(A1>B1,"Pass","Fail")`.
 

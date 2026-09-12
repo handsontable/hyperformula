@@ -61,7 +61,7 @@ const UNDERSCORE_CHAR_CODE = '_'.charCodeAt(0)
  * OffsetProcedureName token in every parse, so the common case — a name with no prefix at all — takes
  * a plain character check instead of always paying for the regex match-and-fail.
  *
- * @param nameWithoutTrailingParen - a token image with any trailing `(` already removed
+ * @param {string} nameWithoutTrailingParen - a token image with any trailing `(` already removed
  */
 function stripExcelInternalFunctionPrefix(nameWithoutTrailingParen: string): string {
   if (nameWithoutTrailingParen.charCodeAt(0) !== UNDERSCORE_CHAR_CODE) {
@@ -80,8 +80,8 @@ function stripExcelInternalFunctionPrefix(nameWithoutTrailingParen: string): str
  * The prefix is removed before the name is upper-cased, because the prefixes are matched in lower
  * case only.
  *
- * @param image - image of the ProcedureName token, for example `_xlfn.IFS(`
- * @param functionMapping - maps a translated function name to its canonical English name
+ * @param {string} image - image of the ProcedureName token, for example `_xlfn.IFS(`
+ * @param {Record<string, string>} functionMapping - maps a translated function name to its canonical English name
  */
 export function canonicalProcedureNameFromToken(image: string, functionMapping: Record<string, string>): string {
   const procedureName = stripExcelInternalFunctionPrefix(image.slice(0, -1)).toUpperCase()
@@ -95,7 +95,7 @@ export function canonicalProcedureNameFromToken(image: string, functionMapping: 
  * rule consumes `(` separately) and no translation lookup (the token pattern already embeds the
  * localized OFFSET name), so it needs only the prefix stripped, not the full canonicalization above.
  *
- * @param image - image of the OffsetProcedureName token, for example `_xlfn.OFFSET`
+ * @param {string} image - image of the OffsetProcedureName token, for example `_xlfn.OFFSET`
  */
 export function canonicalOffsetProcedureNameFromToken(image: string): string {
   return stripExcelInternalFunctionPrefix(image)
@@ -146,8 +146,13 @@ export const buildLexerConfig = (config: ParserConfig): LexerConfig => {
   const ArrayColSeparator = createToken({name: 'ArrayColSep', pattern: config.arrayColumnSeparator})
   const NumberLiteral = createToken({ name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`) })
   // OFFSET has its own token because it has its own grammar rule, so it needs the prefix handling of
-  // ProcedureName repeated here. The 'i' flag is for the translated OFFSET name and incidentally makes
-  // the prefix case-insensitive too, which is harmless: Excel only ever writes it in lower case.
+  // ProcedureName repeated here. The 'i' flag exists for the translated OFFSET name (pre-dates this
+  // prefix support) and applies to the whole pattern, so unlike ProcedureName it also makes the prefix
+  // case-insensitive: `_XLFN.OFFSET(...)` is accepted here where `_XLFN.SUM(...)` is a parsing error.
+  // Left as-is rather than given a dedicated case-sensitive-prefix matcher: OFFSET predates the OOXML
+  // cutoff this whole prefix scheme exists for, so Excel can never actually emit a prefixed OFFSET call
+  // in any case — the asymmetry has no reachable real input, only hand-typed formulas (see the
+  // "an upper-cased prefix is accepted on OFFSET, unlike everywhere else" test).
   const OffsetProcedureName = createToken({ name: 'OffsetProcedureName', pattern: new RegExp(`(?:${EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN})?${offsetProcedureNameLiteral}`, 'i') })
 
   let ArgSeparator: TokenType

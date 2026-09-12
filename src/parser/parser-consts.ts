@@ -39,8 +39,11 @@ export const CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN = `(${CELL_REFERENCE_PAT
  * | `_xludf.`      | user-defined function (a `LAMBDA` stored in Name Manager) |
  *
  * The alternatives are ordered longest-first so that `_xlfn._xlws.` is consumed whole instead of
- * leaving `_xlws.` behind. Excel always writes them in lower case, so they are matched in lower
- * case only: an upper-cased spelling is not something Excel can produce.
+ * leaving `_xlws.` behind. Excel always writes them in lower case, so wherever this pattern is used
+ * to recognize a *function call* (the `ProcedureName` token in LexerConfig.ts) it is matched in lower
+ * case only: an upper-cased spelling there is not something Excel can produce. The one exception is
+ * the `OffsetProcedureName` token, which reuses this pattern inside an already case-insensitive regex
+ * (for the translated OFFSET name) and so matches an upper-cased prefix too — see its comment.
  */
 export const EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN = '_xlfn\\._xlws\\.|_xlfn\\.|_xlws\\.|_xlpm\\.|_xludf\\.'
 
