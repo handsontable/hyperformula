@@ -69,6 +69,7 @@ import {
   ArrayLParen,
   ArrayRParen,
   BooleanOp,
+  canonicalProcedureNameFromToken,
   CellReference,
   ColumnRange,
   ConcatenateOp,
@@ -157,8 +158,7 @@ export class FormulaParser extends EmbeddedActionsParser {
    */
   private procedureExpression: AstRule = this.RULE('procedureExpression', () => {
     const procedureNameToken = this.CONSUME(ProcedureName) as ExtendedToken
-    const procedureName = procedureNameToken.image.toUpperCase().slice(0, -1)
-    const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] ?? procedureName
+    const canonicalProcedureName = canonicalProcedureNameFromToken(procedureNameToken.image, this.lexerConfig.functionMapping)
     const args: Ast[] = []
 
     let argument = this.SUBRULE(this.booleanExpressionOrEmpty)

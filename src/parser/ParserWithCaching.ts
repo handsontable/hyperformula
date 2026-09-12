@@ -19,6 +19,8 @@ import {Cache} from './Cache'
 import {FormulaLexer, FormulaParser, ExtendedToken} from './FormulaParser'
 import {
   buildLexerConfig,
+  canonicalOffsetProcedureNameFromToken,
+  canonicalProcedureNameFromToken,
   CellReference,
   ColumnRange,
   LexerConfig,
@@ -239,9 +241,10 @@ export class ParserWithCaching {
           hash = hash.concat(cellAddress.hash(true))
         }
       } else if (tokenMatcher(token, ProcedureName)) {
-        const procedureName = token.image.toUpperCase().slice(0, -1)
-        const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] ?? procedureName
+        const canonicalProcedureName = canonicalProcedureNameFromToken(token.image, this.lexerConfig.functionMapping)
         hash = hash.concat(canonicalProcedureName, '(')
+      } else if (tokenMatcher(token, this.lexerConfig.OffsetProcedureName)) {
+        hash = hash.concat(canonicalOffsetProcedureNameFromToken(token.image))
       } else if (tokenMatcher(token, ColumnRange)) {
         const [start, end] = token.image.split(':')
         const startAddress = columnAddressFromString(start, baseAddress, this.resolveSheetReference)
