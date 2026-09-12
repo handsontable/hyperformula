@@ -607,6 +607,17 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address, { throwIfSheetNotExists: true })
   }
 
+  /**
+   * Gets the formula stored at the specified address.
+   *
+   * Returns `undefined` when the address holds anything other than a formula: a static value,
+   * an empty cell, a formula that failed to parse, or a cell of a sheet that does not exist.
+   */
+  public getFormulaAst(address: SimpleCellAddress): Maybe<Ast> {
+    const vertex = this.addressMapping.getCell(address)
+    return vertex instanceof FormulaVertex ? vertex.getFormula(this.lazilyTransformingAstService) : undefined
+  }
+
   public getCellValue(address: SimpleCellAddress): InterpreterValue {
     if (this.isPlaceholder(address.sheet)) {
       return new CellError(ErrorType.REF, ErrorMessage.SheetRef)

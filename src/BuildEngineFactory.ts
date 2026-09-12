@@ -103,7 +103,7 @@ export class BuildEngineFactory {
     const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralHelper)
     const cellContentParser = new CellContentParser(config, dateTimeHelper, numberLiteralHelper)
 
-    const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
+    const arraySizePredictor = new ArraySizePredictor(config, functionRegistry, dependencyGraph)
     const operations = new Operations(config, dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
     const undoRedo = new UndoRedo(config, operations)
     lazilyTransformingAstService.undoRedo = undoRedo
