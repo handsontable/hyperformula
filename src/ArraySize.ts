@@ -6,10 +6,12 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
 import {Config} from './Config'
+import {DependencyGraph} from './DependencyGraph'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {InterpreterState} from './interpreter/InterpreterState'
 import {FunctionArgumentType} from './interpreter'
-import {Ast, AstNodeType, ProcedureAst} from './parser'
+import {InternalNamedExpression} from './NamedExpressions'
+import {Ast, AstNodeType, NamedExpressionAst, ProcedureAst} from './parser'
 
 export class ArraySize {
   constructor(
@@ -40,9 +42,19 @@ function arraySizeForUnaryOp(arraySize: ArraySize): ArraySize {
 }
 
 export class ArraySizePredictor {
+  /**
+   * Named expressions whose size is currently being predicted.
+   *
+   * Names may refer to one another, and a cycle of such references would make the prediction
+   * recurse until the stack overflows. A name already on this set is treated as unpredictable,
+   * which leaves the referring cell a scalar formula and lets the evaluator report the cycle.
+   */
+  private readonly namedExpressionsBeingPredicted = new Set<InternalNamedExpression>()
+
   constructor(
     private config: Config,
     private functionRegistry: FunctionRegistry,
+    private dependencyGraph: DependencyGraph,
   ) {
   }
 
@@ -84,6 +96,8 @@ export class ArraySizePredictor {
         return ArraySize.scalar()
       case AstNodeType.CELL_REFERENCE:
         return new ArraySize(1, 1, true)
+      case AstNodeType.NAMED_EXPRESSION:
+        return this.checkArraySizeForNamedExpression(ast, state)
       case AstNodeType.DIV_OP:
       case AstNodeType.CONCATENATE_OP:
       case AstNodeType.EQUALS_OP:
@@ -119,6 +133,46 @@ export class ArraySizePredictor {
         return ArraySize.error()
       default:
         return ArraySize.error()
+    }
+  }
+
+  /**
+   * Predicts the size of a named expression referred to by a formula.
+   *
+   * A name stands for an expression, so its size is the size of that expression, the `isRef`
+   * flag included: a name bound to a range predicts like the range literal it stands for, and a
+   * name bound to an array-returning formula predicts like that formula. Without this, every
+   * named expression was predicted as a scalar, the referring cell was never turned into an
+   * array vertex, and an array-shaped result reached the exporter, which rejects it as a
+   * `#VALUE!` error.
+   *
+   * The prediction deliberately uses the engine's own array-arithmetic setting instead of the
+   * calling state's: the named expression has a cell of its own, and the evaluator always
+   * computes that cell with `Config.useArrayArithmetic`, no matter where the name is used.
+   * Inheriting the caller's flag would predict a shape the named expression never produces -
+   * for example a range-arithmetic name is a scalar error under the default configuration even
+   * when the name appears inside an array function.
+   */
+  private checkArraySizeForNamedExpression(ast: NamedExpressionAst, state: InterpreterState): ArraySize {
+    const namedExpression = this.dependencyGraph.namedExpressions.nearestNamedExpression(ast.expressionName, state.formulaAddress.sheet)
+
+    if (namedExpression === undefined || this.namedExpressionsBeingPredicted.has(namedExpression)) {
+      return ArraySize.error()
+    }
+
+    const expression = this.dependencyGraph.getFormulaAst(namedExpression.address)
+
+    if (expression === undefined) {
+      return ArraySize.scalar()
+    }
+
+    this.namedExpressionsBeingPredicted.add(namedExpression)
+
+    try {
+      const size = this.checkArraySize(expression, namedExpression.address)
+      return new ArraySize(size.width, size.height, size.isRef)
+    } finally {
+      this.namedExpressionsBeingPredicted.delete(namedExpression)
     }
   }
 
