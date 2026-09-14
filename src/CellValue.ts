@@ -17,8 +17,10 @@ export class DetailedCellError {
    *
    * `message` collapses "no message" and "an empty message" into `''`; this flag
    * keeps them apart for consumers that need to know whether a cause was stated.
-   * Errors produced by HyperFormula itself always carry one — a `false` here
-   * means the error came from a custom function that did not supply a message.
+   * Errors the engine raises while evaluating a formula always carry a message. A
+   * `false` here means nobody stated a cause: a custom function that did not supply
+   * one, or an error value a user typed straight into a cell, where the cause is the
+   * typing itself and `originFunction` says so.
    */
   public readonly hasMessage: boolean
 
