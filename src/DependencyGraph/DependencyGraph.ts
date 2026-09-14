@@ -623,12 +623,14 @@ export class DependencyGraph {
     // being reported as the origin.
     //
     // A vertex holding a STATIC error (a parse error, or an error value the user typed) has no
-    // FormulaVertex to act as a root, so the address is stamped here instead. The stamp cannot
-    // go stale: CellError is immutable, so this copies rather than mutating what is stored.
+    // FormulaVertex to act as a root, so the address is stamped here instead, together with the
+    // transformation version it is true at. The reading cell caches the stamped copy and is not
+    // recomputed by a row or column change that merely shifts it, so the address alone would go
+    // stale; the version lets Exporter replay the intervening transformations over it.
     const vertex = this.addressMapping.getCell(address)
     const holdsAStaticError = vertex instanceof ParsingErrorVertex || vertex instanceof ValueCellVertex
     return holdsAStaticError
-      ? value.withOriginAddress(address).asPropagated()
+      ? value.withOriginAddress(address, this.lazilyTransformingAstService.version()).asPropagated()
       : value.asPropagated()
   }
 
