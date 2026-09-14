@@ -155,6 +155,7 @@ export class CellError {
     public readonly argumentIndex?: number,
     public readonly propagated: boolean = false,
     public readonly originAddress?: SimpleCellAddress,
+    public readonly originAddressVersion?: number,
   ) {
   }
 
@@ -171,7 +172,7 @@ export class CellError {
     if (this.propagated || this.originFunction !== undefined) {
       return this
     }
-    return new CellError(this.type, this.message, this.root, functionName, this.argumentIndex, this.propagated, this.originAddress)
+    return new CellError(this.type, this.message, this.root, functionName, this.argumentIndex, this.propagated, this.originAddress, this.originAddressVersion)
   }
 
   /**
@@ -185,7 +186,7 @@ export class CellError {
     if (this.propagated || this.argumentIndex !== undefined) {
       return this
     }
-    return new CellError(this.type, this.message, this.root, this.originFunction, index, this.propagated, this.originAddress)
+    return new CellError(this.type, this.message, this.root, this.originFunction, index, this.propagated, this.originAddress, this.originAddressVersion)
   }
 
   /**
@@ -198,25 +199,29 @@ export class CellError {
     if (this.propagated) {
       return this
     }
-    return new CellError(this.type, this.message, this.root, this.originFunction, this.argumentIndex, true, this.originAddress)
+    return new CellError(this.type, this.message, this.root, this.originFunction, this.argumentIndex, true, this.originAddress, this.originAddressVersion)
   }
 
   /**
-   * Records the address an otherwise rootless error appeared at.
+   * Records the address an otherwise rootless error appeared at, and the moment it was recorded.
    *
    * For vertices that hold a static error rather than computing one (a parse error, or an error
-   * value the user typed), there is no `FormulaVertex` to serve as a lazily-resolved `root`. This
-   * cannot go stale: `CellError` is immutable, so the stored value is never stamped — every read
-   * stamps a fresh copy with the address current at that moment, which is what keeps it correct
-   * across row and column changes.
+   * value the user typed), there is no `FormulaVertex` to serve as a lazily-resolved `root`, so
+   * the address has to be recorded on the value itself. A recorded address is a snapshot and does
+   * go stale: the cell that read it caches this instance, and a later row or column change that
+   * merely shifts that cell does not recompute it. The `version` is what makes the snapshot
+   * repairable — it names the point in `LazilyTransformingAstService`'s history the address was
+   * true at, so `Exporter` can replay the intervening transformations over it and report where the
+   * origin sits now. See {@link LazilyTransformingAstService.applyTransformationsToAddress}.
    *
    * @param {SimpleCellAddress} address - the address the error was read from
+   * @param {number} version - the transformation version that address was current at
    */
-  public withOriginAddress(address: SimpleCellAddress): CellError {
+  public withOriginAddress(address: SimpleCellAddress, version: number): CellError {
     if (this.originAddress !== undefined) {
       return this
     }
-    return new CellError(this.type, this.message, this.root, this.originFunction, this.argumentIndex, this.propagated, address)
+    return new CellError(this.type, this.message, this.root, this.originFunction, this.argumentIndex, this.propagated, address, version)
   }
 
   /**
@@ -229,7 +234,7 @@ export class CellError {
 
   public attachRootVertex(vertex: FormulaVertex): CellError {
     if (this.root === undefined) {
-      return new CellError(this.type, this.message, vertex, this.originFunction, this.argumentIndex, this.propagated, this.originAddress)
+      return new CellError(this.type, this.message, vertex, this.originFunction, this.argumentIndex, this.propagated, this.originAddress, this.originAddressVersion)
     } else {
       return this
     }
