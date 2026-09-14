@@ -143,6 +143,7 @@ const dictionary: RawTranslationPackage = {
     ISTEXT: 'EMETİNSE',
     LEFT: 'SOL',
     LEN: 'UZUNLUK',
+    LINEST: 'DOT',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
