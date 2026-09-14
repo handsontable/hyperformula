@@ -144,6 +144,25 @@ module.exports = {
       }
     },
     {
+      files: ['**/src/interpreter/**/*.ts'],
+      rules: {
+        // HF-131: an engine-thrown cell error must always state its cause.
+        // The public `CellError` constructor keeps `message` optional for custom
+        // functions (docs/guide/custom-functions.md); this rule enforces the
+        // stricter contract on our own code only.
+        'no-restricted-syntax': ['error',
+          {
+            selector: "NewExpression[callee.name='CellError'][arguments.length<2]",
+            message: 'HF-131: pass an ErrorMessage constant as the second argument — no cell error may be thrown without a cause.',
+          },
+          {
+            selector: "NewExpression[callee.name='CellError'] > Identifier.arguments:nth-child(2)[name='undefined']",
+            message: 'HF-131: an explicit undefined message is not allowed — pass an ErrorMessage constant.',
+          },
+        ],
+      },
+    },
+    {
       files: ['**/*.spec.ts'],
       rules: {
         '@typescript-eslint/no-non-null-assertion': 'off',

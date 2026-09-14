@@ -307,7 +307,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -325,7 +325,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -335,7 +335,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -354,7 +354,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       return result
     } else {
       const val = result.varSValue()
-      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero) : Math.sqrt(val)
     }
   }
 
@@ -365,7 +365,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       return result
     } else {
       const val = result.varPValue()
-      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero) : Math.sqrt(val)
     }
   }
 
@@ -444,7 +444,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -454,7 +454,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -464,7 +464,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -475,7 +475,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       return result
     } else {
       const val = result.varSValue()
-      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero) : Math.sqrt(val)
     }
   }
 
@@ -486,7 +486,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       return result
     } else {
       const val = result.varPValue()
-      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero) : Math.sqrt(val)
     }
   }
 
