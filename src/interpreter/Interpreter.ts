@@ -65,13 +65,18 @@ export class Interpreter {
     let val = this.evaluateAstWithoutPostprocessing(ast, state)
     if (isExtendedNumber(val)) {
       if (isNumberOverflow(getRawValue(val))) {
-        return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+        // Assigned rather than returned, so an overflow error reaches the same postprocessing
+        // as every other result below and gets an origin and a root like anything else.
+        val = new CellError(ErrorType.NUM, ErrorMessage.NaN)
       } else {
         val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
       }
     }
     if (val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
       [[val]] = val.data
+    }
+    if (val instanceof CellError) {
+      val = stampOriginForAstNode(val, ast)
     }
     return wrapperForRootVertex(val, state.formulaVertex)
   }
@@ -493,7 +498,73 @@ function binaryErrorWrapper<T extends InterpreterValue>(op: (arg1: T, arg2: T) =
 
 function wrapperForRootVertex(val: InterpreterValue, vertex?: FormulaVertex): InterpreterValue {
   if (val instanceof CellError && vertex !== undefined) {
-    return val.attachRootVertex(vertex)
+    // A propagated error was read from another cell, so this cell is not its origin.
+    return val.propagated ? val : val.attachRootVertex(vertex)
   }
   return val
+}
+
+/**
+ * The name recorded as an error's `originFunction` when evaluating this AST node is what produced
+ * it: the function name for a call, or the `ArithmeticHelper` method the operator dispatches to.
+ *
+ * Every name below was read off this file's own operator definitions rather than guessed, which is
+ * why `PLUS_OP` maps to `addWithEpsilon` and `PERCENT_OP` to `unaryPercent`. Any other node type
+ * returns undefined and leaves whatever origin the value already carries untouched.
+ *
+ * @param {Ast} ast - the node being evaluated
+ */
+function originNameForAstNode(ast: Ast): Maybe<string> {
+  switch (ast.type) {
+    case AstNodeType.FUNCTION_CALL:
+      return ast.procedureName
+    case AstNodeType.CONCATENATE_OP:
+      return 'concat'
+    case AstNodeType.EQUALS_OP:
+      return 'eq'
+    case AstNodeType.NOT_EQUAL_OP:
+      return 'neq'
+    case AstNodeType.GREATER_THAN_OP:
+      return 'gt'
+    case AstNodeType.LESS_THAN_OP:
+      return 'lt'
+    case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
+      return 'geq'
+    case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+      return 'leq'
+    case AstNodeType.PLUS_OP:
+      return 'addWithEpsilon'
+    case AstNodeType.MINUS_OP:
+      return 'subtract'
+    case AstNodeType.TIMES_OP:
+      return 'multiply'
+    case AstNodeType.POWER_OP:
+      return 'pow'
+    case AstNodeType.DIV_OP:
+      return 'divide'
+    case AstNodeType.PLUS_UNARY_OP:
+      return 'unaryPlus'
+    case AstNodeType.MINUS_UNARY_OP:
+      return 'unaryMinus'
+    case AstNodeType.PERCENT_OP:
+      return 'unaryPercent'
+    default:
+      return undefined
+  }
+}
+
+/**
+ * Stamps the origin function on an error, once per evaluation.
+ *
+ * Placed in `evaluateAst`'s single postprocessing tail rather than in each `switch` case, so it
+ * also catches the overflow guard's freshly-minted error, and so no case can be forgotten. Every
+ * nested sub-expression runs its own `evaluateAst` first, so an inner error is always stamped
+ * before an outer function could overwrite it — and `withOrigin` is a no-op once set anyway.
+ *
+ * @param {CellError} val - the error produced by this evaluation
+ * @param {Ast} ast - the node being evaluated
+ */
+function stampOriginForAstNode(val: CellError, ast: Ast): CellError {
+  const originName = originNameForAstNode(ast)
+  return originName === undefined ? val : val.withOrigin(originName)
 }

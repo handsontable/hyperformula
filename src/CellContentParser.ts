@@ -61,6 +61,15 @@ export namespace CellContent {
   export class Error {
     public readonly value: CellError
 
+    // HF-131: `message` stays optional here on purpose. This constructor's only
+    // no-message caller is the `errorMapping` lookup below (a user typing e.g.
+    // `#REF!` literally into a cell) — the engine has no cause to state beyond
+    // "the user wrote this", so leaving it unset is honest, not an oversight.
+    // This is also the concrete case the HF-131 ESLint rule (.eslintrc.js) cannot
+    // catch: the call `new CellError(errorType, message)` is syntactically a
+    // two-argument construction and passes the rule cleanly even when the
+    // caller passes no message, because the rule only inspects this call site,
+    // not who calls it.
     constructor(errorType: ErrorType, message?: string) {
       this.value = new CellError(errorType, message)
     }

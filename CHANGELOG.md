@@ -10,9 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Changed the cell errors thrown by the formula engine to always carry a message describing their cause. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Changed the cell errors thrown outside the formula interpreter — invalidated references, references the parser cannot resolve, references exceeding the sheet size, circular references, cleaned-up array results, and error values typed directly into a formula — to also carry a message describing their cause. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ### Fixed
 
+- Fixed a cell holding a static error value — a formula the parser rejected, or an error value entered directly — being reported under the address of whichever cell read it first. Such a cell now reports its own address, and keeps reporting it as rows and columns move around it. After a very long run of structural changes the original position can no longer be reconstructed, and the address is omitted rather than guessed. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
 - Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
