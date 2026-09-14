@@ -106,6 +106,17 @@ const DOCS_DEST = process.env.DOCS_DEST || buildConfigOverrides.dest || 'docs/.v
 const DOCS_HOSTNAME = process.env.DOCS_HOSTNAME || buildConfigOverrides.hostname || 'https://hyperformula.handsontable.com';
 
 module.exports = {
+  // The docs bundle HyperFormula's 'full' build, which keeps exceljs external and therefore
+  // emits a bare require('exceljs'). In the server-side render that resolves to ExcelJS's Node
+  // entry, whose stream reader reaches unzipper -> fstream -> rimraf; rimraf ships ESM using
+  // optional chaining, which this webpack cannot parse, so the server bundle failed to compile.
+  // Nothing in the documentation calls buildFromFile or toFile, so exceljs is left external here
+  // too: Node would resolve it at call time, and there is no call.
+  configureWebpack: (config, isServer) => {
+    if (isServer) {
+      config.externals = [].concat(config.externals || [], 'exceljs');
+    }
+  },
   // Default page globs, minus the built-in-functions template: it is the INPUT of docs:generate-function-docs,
   // not a page, and without this exclusion VuePress would publish it as a duplicate, table-less
   // /guide/built-in-functions.tmpl.html (also polluting the sitemap, search index, and llms.txt corpus).

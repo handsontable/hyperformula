@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added built-in `.xlsx` import/export: the `HyperFormula.buildFromFile()` static factory and the `toFile()` instance method, backed by ExcelJS. [#1702](https://github.com/handsontable/hyperformula/pull/1702)
+- ExcelJS is declared as an **optional peer dependency**: it is required only by `buildFromFile()` and `toFile()`, is loaded on demand, and is not installed with HyperFormula. Add it with `npm install exceljs` if you use either method. [#1702](https://github.com/handsontable/hyperformula/pull/1702)
+
 ### Fixed
 
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)

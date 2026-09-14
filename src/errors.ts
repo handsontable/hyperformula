@@ -392,3 +392,15 @@ export class AliasAlreadyExisting extends Error {
     super(`Alias id ${name} in plugin ${pluginName} already defined as a function or alias.`)
   }
 }
+
+/**
+ * Error thrown when a file cannot be read as a supported spreadsheet format,
+ * e.g. when its byte buffer is empty or cannot be parsed as an .xlsx workbook.
+ */
+export class UnsupportedFileError extends Error {
+  constructor(public readonly reason: 'empty' | 'unparseable', detail?: string) {
+    super(detail === undefined
+      ? `Unsupported or unreadable file (${reason})`
+      : `Unsupported or unreadable file (${reason}): ${detail}`)
+  }
+}
