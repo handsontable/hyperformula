@@ -23,8 +23,9 @@ export type EqualsFn = (actual: unknown, expected: unknown) => boolean
  *
  * These are asserted explicitly by the specs that care about them, rather than implicitly by
  * every error assertion in the suite. `message` is excluded because it is matched by substring
- * above; `root` and `address` because an expectation built by the `detailedError` test helper
- * cannot know the vertex or address the engine resolved.
+ * above; `root`, `address`, `propagated`, `originAddress` and `originAddressVersion` because an
+ * expectation built by the `detailedError` test helper cannot know the vertex, the address, or how
+ * far the engine had travelled when it recorded them.
  *
  * ADDING A FIELD TO `CellError` OR `DetailedCellError`? Add it here, once. Do not add it to a
  * runner wrapper.
@@ -35,6 +36,9 @@ const IGNORED_IN_STRUCTURAL_COMPARE = {
   address: undefined,
   originFunction: undefined,
   argumentIndex: undefined,
+  propagated: undefined,
+  originAddress: undefined,
+  originAddressVersion: undefined,
 }
 
 /**
