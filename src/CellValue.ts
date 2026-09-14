@@ -23,12 +23,22 @@ export class DetailedCellError {
   public readonly hasMessage: boolean
 
   /**
-   * The function or operator that produced this error, e.g. `'SUM'` or `'divide'`.
+   * What produced this error.
    *
-   * `undefined` when no function or operator produced it — a value typed directly into a
-   * cell, a parsing error, or an error read from another cell without originating here.
-   * First occurrence wins: a function that only reads or propagates an error never claims
-   * to have produced it.
+   * Usually the function or operator that rejected a value, e.g. `'SUM'` or `'divide'`.
+   * Errors that exist before any function reads them name what built them instead:
+   * `'reference'` for a reference that cannot be resolved, `'removed reference'` for one
+   * destroyed by removing rows or columns, `'parser'` for a formula that could not be
+   * parsed, `'user input'` for an error value typed into a cell, and `'literal'` for one
+   * written into a formula.
+   *
+   * First occurrence wins, so a function that only read the error never replaces that:
+   * `=SUM(SQRT(-1))` reports `'SQRT'`, and `=SUM(A2:A99999999999)` reports `'reference'`.
+   *
+   * `undefined` when nothing produced the error in this sense — `#SPILL!` and `#CYCLE!`
+   * arise from the layout of a sheet rather than from evaluating a value. It is also
+   * `undefined`, and the reading function's name may appear instead, for an error that
+   * arises inside an array result; see the known limitations.
    */
   public readonly originFunction?: string
 
@@ -38,7 +48,11 @@ export class DetailedCellError {
    *
    * `undefined` whenever the error was not a coercion failure on one of the origin
    * function's own arguments — including when it came from a nested call (its own
-   * `originFunction` already claimed it) or was propagated from elsewhere.
+   * `originFunction` already claimed it), when it was propagated from elsewhere, or when
+   * the argument was a reference that could not be resolved, which the reference itself
+   * reports. An error raised per element while a function is applied across an array is
+   * the one case where an index can appear without an `originFunction`; see the known
+   * limitations.
    */
   public readonly argumentIndex?: number
 
