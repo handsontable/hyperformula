@@ -96,11 +96,11 @@ export class Interpreter {
         const address = ast.reference.toSimpleCellAddress(state.formulaAddress)
 
         if (isColOrRowInvalid(address)) {
-          return new CellError(ErrorType.REF, ErrorMessage.BadRef)
+          return new CellError(ErrorType.REF, ErrorMessage.BadRef).withOrigin('reference')
         }
 
         if (!this.isSheetValid(ast.reference)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
         }
 
         return this.dependencyGraph.getCellValue(address)
@@ -197,16 +197,16 @@ export class Interpreter {
         if (namedExpression) {
           return this.dependencyGraph.getCellValue(namedExpression.address)
         } else {
-          return new CellError(ErrorType.NAME, ErrorMessage.NamedExpressionName(ast.expressionName))
+          return new CellError(ErrorType.NAME, ErrorMessage.NamedExpressionName(ast.expressionName)).withOrigin('reference')
         }
       }
       case AstNodeType.CELL_RANGE: {
         if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
         }
 
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin('reference')
         }
 
         const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
@@ -229,22 +229,22 @@ export class Interpreter {
       }
       case AstNodeType.COLUMN_RANGE: {
         if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
         }
 
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin('reference')
         }
         const range = AbsoluteColumnRange.fromColumnRange(ast, state.formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.ROW_RANGE: {
         if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
         }
 
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin('reference')
         }
         const range = AbsoluteRowRange.fromRowRangeAst(ast, state.formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
