@@ -16,22 +16,44 @@ import {fitLinearRegression, LinearRegressionResult} from './regression/LinearRe
 
 /** The orientation and predictor count shared by size prediction and runtime validation. */
 interface RegressionShape {
-  predictors: number,
+  predictorCount: number,
   orientation: 'paired' | 'columns' | 'rows',
 }
 
 /** Classifies the original dimensions before any values are flattened. */
 function regressionShape(y: ArraySize, x?: ArraySize): RegressionShape | undefined {
   if (x === undefined || (y.width === x.width && y.height === x.height)) {
-    return {predictors: 1, orientation: 'paired'}
+    return {predictorCount: 1, orientation: 'paired'}
   }
   if (y.width === 1 && y.height === x.height) {
-    return {predictors: x.width, orientation: 'columns'}
+    return {predictorCount: x.width, orientation: 'columns'}
   }
   if (y.height === 1 && y.width === x.width) {
-    return {predictors: x.height, orientation: 'rows'}
+    return {predictorCount: x.height, orientation: 'rows'}
   }
   return undefined
+}
+
+/**
+ * Converts validated, flattened predictor values into one row per observation.
+ * In columns orientation, each source row is an observation; in rows orientation,
+ * each source row is a predictor. Paired ranges supply one predictor per observation.
+ */
+function buildPredictorRows(predictorValues: number[], observationCount: number, shape: RegressionShape): number[][] {
+  return Array.from({length: observationCount}, (_, observationIndex) => {
+    if (shape.orientation === 'paired') {
+      return [predictorValues[observationIndex]]
+    }
+    return Array.from({length: shape.predictorCount}, (_, predictorIndex) => {
+      let flatIndex: number
+      if (shape.orientation === 'columns') {
+        flatIndex = observationIndex * shape.predictorCount + predictorIndex
+      } else {
+        flatIndex = predictorIndex * observationCount + observationIndex
+      }
+      return predictorValues[flatIndex]
+    })
+  })
 }
 
 /** LINEST rejects empty strings as Boolean options, including formula-generated strings. */
@@ -154,10 +176,10 @@ export class RegressionPlugin extends FunctionPlugin implements FunctionPluginTy
         if (shape === undefined) {
           return new CellError(ErrorType.REF, ErrorMessage.ArrayDimensions)
         }
-        if (shape.predictors + 1 > this.config.maxColumns) {
+        if (shape.predictorCount + 1 > this.config.maxColumns) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
         }
-        if (this.linestArraySize(ast, state).width !== shape.predictors + 1) {
+        if (this.linestArraySize(ast, state).width !== shape.predictorCount + 1) {
           return new CellError(ErrorType.VALUE, ErrorMessage.LinestStaticSize)
         }
         const yValues = Array.from(knownY.valuesFromTopLeftCorner())
@@ -167,12 +189,7 @@ export class RegressionPlugin extends FunctionPlugin implements FunctionPluginTy
         }
         const observations = yValues.map(getRawValue)
         const numericX = xValues.map(getRawValue)
-        const predictors = observations.map((_, i) => {
-          if (shape.orientation === 'paired') {
-            return [numericX[i]]
-          }
-          return Array.from({length: shape.predictors}, (_, j) => numericX[shape.orientation === 'columns' ? i * shape.predictors + j : j * observations.length + i])
-        })
+        const predictors = buildPredictorRows(numericX, observations.length, shape)
         const fit = fitLinearRegression(predictors, observations, fitIntercept, statistics)
         return regressionOutput(fit, statistics, fitIntercept)
       })
@@ -191,9 +208,9 @@ export class RegressionPlugin extends FunctionPlugin implements FunctionPluginTy
     const y = this.arraySizeForAst(ast.args[0], arrayState)
     const x = ast.args.length < 2 || ast.args[1].type === AstNodeType.EMPTY ? undefined : this.arraySizeForAst(ast.args[1], arrayState)
     const shape = regressionShape(y, x)
-    if (shape === undefined || shape.predictors + 1 > this.config.maxColumns) {
+    if (shape === undefined || shape.predictorCount + 1 > this.config.maxColumns) {
       return ArraySize.error()
     }
-    return new ArraySize(shape.predictors + 1, statistics ? 5 : 1)
+    return new ArraySize(shape.predictorCount + 1, statistics ? 5 : 1)
   }
 }
