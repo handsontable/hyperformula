@@ -66,6 +66,14 @@ module.exports.create = function(config) {
       // Take the second config from an array - full HF build.
       const config = webpackConfigFactory('development')[1];
 
+      // That build keeps exceljs external so consumers can supply the global themselves. A test
+      // bundle has no consumer to supply it, so the reference resolved to nothing in the browser
+      // and every spec touching xlsx import/export failed. Bundle it in instead: the size and
+      // license reasons for externalising it apply to what is published, not to what Karma runs.
+      if (config.externals && config.externals.exceljs) {
+        delete config.externals.exceljs;
+      }
+
       // Loaders are executed from bottom to top. Push ts-loader as a first loader.
       config.module.rules[0].use.push({
         loader: 'ts-loader',
