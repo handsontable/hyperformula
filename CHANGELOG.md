@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added `DetailedCellError.hasMessage`, so a consumer can tell a cell error that never carried a message (e.g. a custom function that omitted one) apart from one with a deliberately empty message — both previously surfaced identically as `message: ''`. [#131](https://github.com/handsontable/hyperformula/issues/131)
+- Added `DetailedCellError.hasMessage`, so a consumer can tell a cell error that never carried a message (e.g. a custom function that omitted one) apart from one with a deliberately empty message — both previously surfaced identically as `message: ''`. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ### Changed
 
