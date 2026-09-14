@@ -11,6 +11,7 @@ import {ErrorMessage} from './error-message'
 import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {Maybe} from './Maybe'
 import {NamedExpressions} from './NamedExpressions'
 import {simpleCellAddressToString} from './parser/addressRepresentationConverters'
 import { SheetMapping } from './DependencyGraph/SheetMapping'
@@ -115,7 +116,7 @@ export class Exporter implements ChangeExporter<ExportedChange> {
 
   private detailedError(error: CellError): DetailedCellError {
     let address = undefined
-    const originAddress = error.root?.getAddress(this.lazilyTransformingService) ?? error.originAddress
+    const originAddress = error.root?.getAddress(this.lazilyTransformingService) ?? this.currentOriginAddress(error)
     if (originAddress !== undefined) {
       if (originAddress.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
         address = this.namedExpressions.namedExpressionInAddress(originAddress.row)?.displayName
@@ -124,6 +125,28 @@ export class Exporter implements ChangeExporter<ExportedChange> {
       }
     }
     return new DetailedCellError(error, this.config.translationPackage.getErrorTranslation(error.type), address)
+  }
+
+  /**
+   * Where a rootless error's origin sits now.
+   *
+   * An error produced by a formula resolves its address through its root vertex, which keeps
+   * itself current. An error read out of a cell that merely holds it — a parse error, or a value
+   * the user typed — has no such vertex, so it carries a snapshot address plus the transformation
+   * version that snapshot was true at, and the intervening transformations are replayed here.
+   * A named expression is exempt: its rows are handed out monotonically and never shifted.
+   *
+   * @param {CellError} error - the error being exported
+   */
+  private currentOriginAddress(error: CellError): Maybe<SimpleCellAddress> {
+    const {originAddress, originAddressVersion} = error
+    if (originAddress === undefined || originAddressVersion === undefined) {
+      return originAddress
+    }
+    if (originAddress.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
+      return originAddress
+    }
+    return this.lazilyTransformingService.applyTransformationsToAddress(originAddress, originAddressVersion)
   }
 
   private cellValueRounding(value: number): number {
