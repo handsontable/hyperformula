@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- Changed the cell errors thrown by the formula engine to always carry a message describing their cause. [#131](https://github.com/handsontable/hyperformula/issues/131)
+- Changed the cell errors thrown by the formula engine to always carry a message describing their cause. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ### Fixed
 
