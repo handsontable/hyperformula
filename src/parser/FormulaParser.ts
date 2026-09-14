@@ -213,11 +213,11 @@ export class FormulaParser extends EmbeddedActionsParser {
     const secondAddress = this.ACTION(() => columnAddressFromString(endImage, this.formulaAddress, this.resolveSheetReference))
 
     if (firstAddress === undefined || secondAddress === undefined) {
-      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference))
+      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference).withOrigin('reference'))
     }
 
     if (firstAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns) || secondAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns)) {
-      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME, ErrorMessage.ReferenceExceedsSheetSize), range.leadingWhitespace)
+      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME, ErrorMessage.ReferenceExceedsSheetSize).withOrigin('reference'), range.leadingWhitespace)
     }
 
     if (firstAddress.sheet === undefined && secondAddress.sheet !== undefined) {
@@ -239,11 +239,11 @@ export class FormulaParser extends EmbeddedActionsParser {
     const secondAddress = this.ACTION(() => rowAddressFromString(endImage, this.formulaAddress, this.resolveSheetReference))
 
     if (firstAddress === undefined || secondAddress === undefined) {
-      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference))
+      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference).withOrigin('reference'))
     }
 
     if (firstAddress.exceedsSheetSizeLimits(this.lexerConfig.maxRows) || secondAddress.exceedsSheetSizeLimits(this.lexerConfig.maxRows)) {
-      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME, ErrorMessage.ReferenceExceedsSheetSize), range.leadingWhitespace)
+      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME, ErrorMessage.ReferenceExceedsSheetSize).withOrigin('reference'), range.leadingWhitespace)
     }
 
     if (firstAddress.sheet === undefined && secondAddress.sheet !== undefined) {
@@ -265,9 +265,9 @@ export class FormulaParser extends EmbeddedActionsParser {
     })
 
     if (address === undefined) {
-      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference), cell.leadingWhitespace)
+      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference).withOrigin('reference'), cell.leadingWhitespace)
     } else if (address.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
-      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.NAME, ErrorMessage.ReferenceExceedsSheetSize), cell.leadingWhitespace)
+      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.NAME, ErrorMessage.ReferenceExceedsSheetSize).withOrigin('reference'), cell.leadingWhitespace)
     } else {
       return buildCellReferenceAst(address, cell.leadingWhitespace)
     }
@@ -288,12 +288,12 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     if (startAddress === undefined || endAddress === undefined) {
       return this.ACTION(() => {
-        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference), start.leadingWhitespace)
+        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference).withOrigin('reference'), start.leadingWhitespace)
       })
     } else if (startAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)
       || endAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
       return this.ACTION(() => {
-        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.NAME, ErrorMessage.ReferenceExceedsSheetSize), start.leadingWhitespace)
+        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.NAME, ErrorMessage.ReferenceExceedsSheetSize).withOrigin('reference'), start.leadingWhitespace)
       })
     }
 
@@ -319,7 +319,7 @@ export class FormulaParser extends EmbeddedActionsParser {
             return cellAddressFromString(start.image, this.formulaAddress, this.resolveSheetReference)
           })
           if (startAddress === undefined) {
-            return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference))
+            return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference).withOrigin('reference'))
           }
           if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
             return this.buildCellRange(startAddress, offsetProcedure.reference, start.leadingWhitespace?.image)
@@ -352,7 +352,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     if (endAddress === undefined) {
       return this.ACTION(() => {
-        return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference))
+        return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference).withOrigin('reference'))
       })
     }
 
@@ -835,7 +835,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     if (absoluteCol < 0 || absoluteRow < 0) {
-      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.OutOfSheet))
+      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.OutOfSheet).withOrigin('OFFSET'))
     }
     if (width === 1 && height === 1) {
       return buildCellReferenceAst(topLeftCorner)
