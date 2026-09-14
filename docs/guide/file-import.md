@@ -13,11 +13,23 @@ Import and export XLSX files, and import CSV files, with HyperFormula.
 
 ## Overview
 
-HyperFormula can import and export `.xlsx` files out of the box, using the
-[ExcelJS](https://www.npmjs.com/package/exceljs) library under the hood. Import
-with the [`buildFromFile`](../api/classes/hyperformula.md#buildfromfile) factory
-method and export with the [`toFile`](../api/classes/hyperformula.md#tofile)
-method.
+HyperFormula imports and exports `.xlsx` files through the
+[ExcelJS](https://www.npmjs.com/package/exceljs) library. Import with the
+[`buildFromFile`](../api/classes/hyperformula.md#buildfromfile) factory method
+and export with the [`toFile`](../api/classes/hyperformula.md#tofile) method.
+
+ExcelJS is an **optional peer dependency**, so it is not installed with
+HyperFormula. Add it only if you use these two methods:
+
+```bash
+npm install exceljs
+```
+
+Everything else in HyperFormula works without it. Calling `buildFromFile` or
+`toFile` without ExcelJS installed fails at the point of the call rather than at
+import time, because the library is loaded on demand. In the UMD `full` build the
+same applies: ExcelJS is kept out of the bundle and has to be provided as the
+global `ExcelJS`.
 
 For any other format (for example CSV), HyperFormula's
 [factory methods](../api/classes/hyperformula.md#factories) accept standard
