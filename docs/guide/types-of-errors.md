@@ -9,7 +9,7 @@ tags:
   - "#CYCLE!"
   - "#ERROR!"
   - "#LIC!"
-  - division by zero
+  - "#SPILL!"
 ---
 
 # Types of errors
@@ -38,3 +38,38 @@ according to the language settings.
 | #CYCLE! | Circular reference | It occurs when a formula refers to its own cell, both directly and indirectly. |
 | #ERROR! | An error occurred | It indicates that there is an unknown error in a formula. |
 | #LIC! | Invalid license key | It occurs when the license key is invalid, expired, or missing. |
+| #SPILL! | No space for array result | It occurs when an array formula's result would overwrite one or more non-empty cells, so it has nowhere to spill into. |
+
+## Error messages and explanations
+
+An error's `message` property states the specific cause within its type — for
+example, distinguishing *why* a formula returned `#NUM!` rather than only that it
+did. HyperFormula does not turn that message into a longer, plain-language
+explanation, and does not call out to a language model to generate one. An
+application built on top of HyperFormula that wants to rephrase an error for its
+end users — in natural language, or translated beyond the languages HyperFormula
+ships with — should do so at the application layer, using the `type` and
+`message` HyperFormula already provides as its input.
+
+## Finding out where an error came from
+
+Besides `type` and `message`, a `DetailedCellError` tells you what produced the
+error and, when it was a function rejecting one of its own arguments, which
+argument. `originFunction` names a function or an operator helper when one of them
+rejected a value, and otherwise names what built the error: `reference` for a
+reference that cannot be resolved, `removed reference` for one destroyed by
+removing rows or columns, `parser` for a formula that could not be parsed, `user
+input` for an error value typed into a cell, or `literal` for one written into a
+formula. `argumentIndex` is zero-based.
+
+```javascript
+const hf = HyperFormula.buildFromArray([['=SUM(SQRT(-1))'], ['=DATE(2000, "x", 1)'], ['=SUM(A99999999999:A99999999999)']]);
+
+hf.getCellValue({ sheet: 0, col: 0, row: 0 }).originFunction; // 'SQRT', not 'SUM'
+hf.getCellValue({ sheet: 0, col: 0, row: 1 }).argumentIndex;  // 1, the second argument
+hf.getCellValue({ sheet: 0, col: 0, row: 2 }).originFunction; // 'reference'
+```
+
+The first occurrence wins, so a function that only read an error never replaces
+the identity already on it. `address` points at the cell where the error arose,
+which is not always the cell you read it from.
