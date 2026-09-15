@@ -78,6 +78,9 @@ export class Interpreter {
     if (val instanceof CellError) {
       val = stampOriginForAstNode(val, ast)
     }
+    if (val instanceof SimpleRangeValue) {
+      val = stampOriginForArrayElements(val, ast)
+    }
     return wrapperForRootVertex(val, state.formulaVertex)
   }
 
@@ -564,6 +567,43 @@ function originNameForAstNode(ast: Ast): Maybe<string> {
  * @param {CellError} val - the error produced by this evaluation
  * @param {Ast} ast - the node being evaluated
  */
+/**
+ * Stamps the origin function on errors sitting inside an array this node produced.
+ *
+ * An error that is one element of a returned array never reaches the scalar branch above, so
+ * without this it would arrive at the enclosing call unclaimed and that call would take it: an
+ * `#N/A` left by a broadcast, or a per-element coercion failure, would be reported as produced by
+ * whichever function happened to read the array. The operation that built the array is the one
+ * that produced them, so it is the one that signs.
+ *
+ * `withOrigin` is first-wins, so an element that already carries an origin keeps it, and the array
+ * is rebuilt only if at least one element actually changed.
+ *
+ * @param {SimpleRangeValue} val - the array this node produced
+ * @param {Ast} ast - the node being evaluated
+ */
+function stampOriginForArrayElements(val: SimpleRangeValue, ast: Ast): SimpleRangeValue {
+  const originName = originNameForAstNode(ast)
+  if (originName === undefined || val.range !== undefined) {
+    // A range-backed value is a view over cells, and an error read out of a cell was already
+    // marked as propagated when it was read, so there is nothing here to claim. Skipping it also
+    // keeps this off the hot path: reading `data` on such a value materialises the whole range.
+    return val
+  }
+
+  let changed = false
+  const stamped = val.data.map(row => row.map(cell => {
+    if (!(cell instanceof CellError)) {
+      return cell
+    }
+    const withOrigin = cell.withOrigin(originName)
+    changed = changed || withOrigin !== cell
+    return withOrigin
+  }))
+
+  return changed ? SimpleRangeValue.onlyValues(stamped) : val
+}
+
 function stampOriginForAstNode(val: CellError, ast: Ast): CellError {
   const originName = originNameForAstNode(ast)
   return originName === undefined ? val : val.withOrigin(originName)
