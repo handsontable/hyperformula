@@ -29,6 +29,14 @@ export class ArraySize {
   isScalar(): boolean {
     return (this.width === 1 && this.height === 1) || this.isRef
   }
+
+  /**
+   * Checks result dimensions against the configured sheet limits, independently
+   * of the formula's position. Call before allocating a result array.
+   */
+  exceedsSheetSizeLimits(maxColumns: number, maxRows: number): boolean {
+    return this.width > maxColumns || this.height > maxRows
+  }
 }
 
 function arraySizeForBinaryOp(leftArraySize: ArraySize, rightArraySize: ArraySize): ArraySize {
@@ -46,8 +54,18 @@ export class ArraySizePredictor {
   ) {
   }
 
+  /**
+   * Limits the predicted spill area before the dependency graph maps its cells.
+   * A scalar fallback still evaluates the formula, so runtime allocation guards
+   * determine the error and also protect intermediate arrays.
+   * Infinite dimensions represent whole-row or whole-column references, whose
+   * effective size is resolved by the dependency graph.
+   */
   public checkArraySize(ast: Ast, formulaAddress: SimpleCellAddress): ArraySize {
-    return this.checkArraySizeForAst(ast, {formulaAddress, arraysFlag: this.config.useArrayArithmetic})
+    const size = this.checkArraySizeForAst(ast, {formulaAddress, arraysFlag: this.config.useArrayArithmetic})
+    const maxColumns = size.width === Infinity ? Infinity : this.config.maxColumns
+    const maxRows = size.height === Infinity ? Infinity : this.config.maxRows
+    return size.exceedsSheetSizeLimits(maxColumns, maxRows) ? ArraySize.error() : size
   }
 
   public checkArraySizeForAst(ast: Ast, state: InterpreterState): ArraySize {
