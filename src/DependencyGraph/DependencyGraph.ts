@@ -609,7 +609,7 @@ export class DependencyGraph {
 
   public getCellValue(address: SimpleCellAddress): InterpreterValue {
     if (this.isPlaceholder(address.sheet)) {
-      return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+      return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
     }
 
     const value = this.addressMapping.getCellValue(address)

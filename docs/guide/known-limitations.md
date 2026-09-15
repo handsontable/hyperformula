@@ -47,6 +47,7 @@ a circular reference.
 * The FILTER function accepts either single rows of equal width or single columns of equal height. In other words, all arrays passed to the FILTER function must have equal dimensions, and at least one of those dimensions must be 1.
 * Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
 * The TEXT function does not accept embedded double-quote literals in the format string. In Excel, `""` inside a format string is an escape sequence for a literal `"` character — e.g. `=TEXT(1234.5, "#,##0.00 ""zł""")` returns `"1,234.50 zł"`. If your application requires this escape sequence, supply a custom [`stringifyCurrency`](currency-handling.md) callback.
+* `#SPILL!` and `#CYCLE!` errors report the cell they affect but name no `originFunction`, because no function produced them — they follow from the layout of the sheet rather than from evaluating a value. Every other cell error names what produced it: the function or operator that rejected a value, `reference` for a reference that cannot be resolved, `removed reference` for one destroyed by removing rows or columns, `parser`, `user input`, or `literal`.
 
 ### UNIQUE function
 
