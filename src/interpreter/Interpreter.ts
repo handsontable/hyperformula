@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
-import {ArraySizePredictor} from '../ArraySize'
+import {ArraySize, ArraySizePredictor} from '../ArraySize'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
 import {CellError, ErrorType, isColOrRowInvalid} from '../Cell'
 import {Config} from '../Config'
@@ -256,15 +256,20 @@ export class Interpreter {
           for (const astIt of astRow) {
             const arr = coerceToRange(this.evaluateAst(astIt, state))
             const height = arr.height()
+            if (rowHeight !== undefined && rowHeight !== height) {
+              return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
+            }
+            const size = new ArraySize((rowRet[0]?.length ?? 0) + arr.width(), ret.length + height)
+            if (size.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+              return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
+            }
             if (rowHeight === undefined) {
               rowHeight = height
               rowRet.push(...arr.data)
-            } else if (rowHeight === height) {
+            } else {
               for (let i = 0; i < height; i++) {
                 rowRet[i].push(...arr.data[i])
               }
-            } else {
-              return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
             }
           }
           const width = rowRet[0].length

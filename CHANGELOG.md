@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- Fixed array results exceeding the configured row or column limits, including intermediate arrays created by `VSTACK`, `HSTACK`, `TRANSPOSE`, and array literals. Arrays with valid dimensions now return `#SPILL!` when their spill area extends beyond the sheet edge. [#1646](https://github.com/handsontable/hyperformula/issues/1646) [#1774](https://github.com/handsontable/hyperformula/pull/1774)
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
 - Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
