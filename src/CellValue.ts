@@ -38,9 +38,7 @@ export class DetailedCellError {
    * `=SUM(SQRT(-1))` reports `'SQRT'`, and `=SUM(A2:A99999999999)` reports `'reference'`.
    *
    * `undefined` when nothing produced the error in this sense — `#SPILL!` and `#CYCLE!`
-   * arise from the layout of a sheet rather than from evaluating a value. It is also
-   * `undefined`, and the reading function's name may appear instead, for an error that
-   * arises inside an array result; see the known limitations.
+   * arise from the layout of a sheet rather than from evaluating a value.
    */
   public readonly originFunction?: string
 
@@ -52,9 +50,8 @@ export class DetailedCellError {
    * function's own arguments — including when it came from a nested call (its own
    * `originFunction` already claimed it), when it was propagated from elsewhere, or when
    * the argument was a reference that could not be resolved, which the reference itself
-   * reports. An error raised per element while a function is applied across an array is
-   * the one case where an index can appear without an `originFunction`; see the known
-   * limitations.
+   * reports. When a function is applied across an array, an element that fails coercion
+   * carries the index alongside the function's own name, like any other coercion failure.
    */
   public readonly argumentIndex?: number
 
