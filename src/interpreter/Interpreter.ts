@@ -521,6 +521,9 @@ function originNameForAstNode(ast: Ast): Maybe<string> {
   switch (ast.type) {
     case AstNodeType.FUNCTION_CALL:
       return ast.procedureName
+    case AstNodeType.ARRAY:
+      // An array literal with mismatched rows builds its own error before any call sees it.
+      return 'array literal'
     case AstNodeType.CONCATENATE_OP:
       return 'concat'
     case AstNodeType.EQUALS_OP:
