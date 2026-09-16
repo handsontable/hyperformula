@@ -27,6 +27,21 @@ interface RegressionColumn {
   originalNorm: number,
 }
 
+/** Working arrays owned by one fit, with centering offsets kept in the original predictor order. */
+interface PreparedRegression {
+  columns: RegressionColumn[],
+  predictorMeans: number[],
+  transformedResponse: number[],
+}
+
+/** Residual statistics shared by coefficient uncertainty calculation and spreadsheet output. */
+interface ResidualStatistics {
+  totalSumSquares: number,
+  residualSumSquares: number,
+  degreesOfFreedom: number,
+  residualVariance: number,
+}
+
 /** A reflection and the leading value it produces in the selected column tail. */
 interface HouseholderReflection {
   vector: number[],
@@ -42,7 +57,7 @@ interface CoefficientStandardErrors {
 
 /**
  * Rank threshold relative to a predictor's original centered norm.
- * Excel Online retains a 1e-5 perturbation of a duplicated predictor and removes 1e-6.
+ * Sampled Excel Online cases with proportional predictors retain a 1e-5 perturbation and remove 1e-6.
  * Keep the threshold separate from roundoff handling for the fitted statistics.
  */
 const RANK_TOLERANCE = 1e-6
@@ -195,24 +210,20 @@ function computeCoefficientStandardErrors(
 }
 
 /**
- * Fits observations using pivoted Householder QR, with a fixed leading intercept column.
- * Prepares columns, factorizes them, restores coefficients, then computes fit statistics.
- * Predictor centering preserves accuracy for large offsets. For n observations and k predictors,
- * the factorization uses O(n*k + k*k) storage and costs O(n*k*k) for n >= k; Q is never materialized.
+ * Copies observations and predictors into working arrays without modifying the inputs.
+ * With an intercept, uses centeredX = x - mean(x) and shiftedY = y - y[0] to preserve
+ * small variations on large offsets. Without an intercept, leaves both coordinates unchanged.
+ * Predictor means retain their input order for recovering b = mean(y) - sum(m * mean(x)).
+ * When no intercept is fitted, predictorMeans contains zero offsets instead.
  *
- * Exactly zero predictors intentionally consume an available QR slot. Excel Online returns a
- * zero coefficient but still excludes that transformed response entry from residual statistics.
- * A dependent nonzero predictor is instead removed using its relative norm, increasing degrees of freedom.
- *
- * @param predictors - observation rows, with predictor columns in their original order
+ * @param predictors - observation rows with predictor columns in their original order
  * @param observations - numeric response for each observation
- * @param fitIntercept - whether to include a constant term
- * @param statistics - whether to compute coefficient uncertainties
+ * @param fitIntercept - whether to add a column of ones and shift the coordinates
+ * @returns Working columns in Excel tie order, predictor centering offsets, and the shifted response.
  */
-export function fitLinearRegression(predictors: number[][], observations: number[], fitIntercept: boolean, statistics: boolean): LinearRegressionResult {
+function prepareRegression(predictors: number[][], observations: number[], fitIntercept: boolean): PreparedRegression {
   const observationCount = observations.length
   const predictorCount = predictors[0].length
-  const interceptColumnCount = fitIntercept ? 1 : 0
   const predictorMeans = Array<number>(predictorCount).fill(0)
   const columns: RegressionColumn[] = []
   if (fitIntercept) {
@@ -234,7 +245,26 @@ export function fitLinearRegression(predictors: number[][], observations: number
   // Remove a common response offset before reflection to preserve small variations.
   const responseOrigin = fitIntercept ? observations[0] : 0
   const transformedResponse = observations.map(value => value - responseOrigin)
+  return {columns, predictorMeans, transformedResponse}
+}
 
+/**
+ * Overwrites working columns with a pivoted triangular system and applies the same
+ * Householder reflections to the response. Retained columns store R; the transformed
+ * response supplies the right-hand side of R * solution = response and its residual tail.
+ * Original predictor positions remain available through each column's predictorIndex.
+ *
+ * Exactly zero predictors intentionally consume an available slot. Excel Online returns
+ * a zero coefficient but still excludes that response entry from residual statistics.
+ * A dependent nonzero predictor is removed without consuming a slot.
+ *
+ * @param columns - mutable working columns, including a fixed leading intercept when present
+ * @param transformedResponse - mutable shifted response, transformed in place alongside the columns
+ * @param interceptColumnCount - one when fitting an intercept, otherwise zero
+ * @returns Number of processed columns, including zero columns; this is not mathematical rank.
+ */
+function factorizeRegressionInPlace(columns: RegressionColumn[], transformedResponse: number[], interceptColumnCount: number): number {
+  const observationCount = transformedResponse.length
   // Columns are partitioned as [processed | candidates | rejected]:
   // [0, processedColumnCount), [processedColumnCount, activeColumnCount), and the rest.
   // processedColumnCount is also the current diagonal index, not the mathematical rank:
@@ -269,18 +299,30 @@ export function fitLinearRegression(predictors: number[][], observations: number
     }
     processedColumnCount++
   }
+  return processedColumnCount
+}
 
-  // Solve in pivot order, then restore the caller's predictor order. Rejected slots stay zero.
-  const solution = backSubstitute(columns, processedColumnCount, transformedResponse)
-  const coefficients = Array<number>(predictorCount).fill(0)
-  for (let columnIndex = interceptColumnCount; columnIndex < processedColumnCount; columnIndex++) {
-    coefficients[columns[columnIndex].predictorIndex] = solution[columnIndex]
-  }
-  // Recover the intercept in original coordinates: b = mean(y) - sum(coefficient * mean(x)).
-  const intercept = fitIntercept
-    ? mean(observations) - coefficients.reduce((sum, coefficient, predictorIndex) => sum + coefficient * predictorMeans[predictorIndex], 0)
-    : 0
-
+/**
+ * Computes response variation and residual error without modifying either response array.
+ * Total variation is sum((y - mean(y))^2) with an intercept, otherwise sum(y^2).
+ * Residual error is the squared norm below the processed rows of the transformed response.
+ * Uses the factorization's Excel-compatible row boundary, including consumed zero columns.
+ *
+ * @param observations - response values in their original coordinates
+ * @param transformedResponse - shifted response after the factorization's reflections
+ * @param processedColumnCount - number of response entries assigned to the triangular solve
+ * @param predictorCount - original predictor count, used for the simple-fit roundoff rule
+ * @param fitIntercept - whether total variation is measured around the response mean
+ * @returns Sums of squares, remaining degrees of freedom, and residual variance (zero when no degrees remain).
+ */
+function computeResidualStatistics(
+  observations: number[],
+  transformedResponse: number[],
+  processedColumnCount: number,
+  predictorCount: number,
+  fitIntercept: boolean,
+): ResidualStatistics {
+  const observationCount = observations.length
   const responseMean = fitIntercept ? mean(observations) : 0
   const centeredResponse = observations.map(value => value - responseMean)
   const totalSumSquares = norm(centeredResponse) ** 2
@@ -294,6 +336,40 @@ export function fitLinearRegression(predictors: number[][], observations: number
   }
   const degreesOfFreedom = observationCount - processedColumnCount
   const residualVariance = degreesOfFreedom === 0 ? 0 : residualSumSquares / degreesOfFreedom
+  return {totalSumSquares, residualSumSquares, degreesOfFreedom, residualVariance}
+}
+
+/**
+ * Fits observations using pivoted Householder QR, with a fixed leading intercept column.
+ * Prepares columns, factorizes them, restores coefficients, then computes fit statistics.
+ * Predictor centering preserves accuracy for large offsets. For n observations and k predictors,
+ * the factorization uses O(n*k + k*k) storage and costs O(n*k*k) for n >= k; Q is never materialized.
+ *
+ * @param predictors - observation rows, with predictor columns in their original order
+ * @param observations - numeric response for each observation
+ * @param fitIntercept - whether to include a constant term
+ * @param statistics - whether to compute coefficient uncertainties
+ */
+export function fitLinearRegression(predictors: number[][], observations: number[], fitIntercept: boolean, statistics: boolean): LinearRegressionResult {
+  const predictorCount = predictors[0].length
+  const interceptColumnCount = fitIntercept ? 1 : 0
+  const {columns, predictorMeans, transformedResponse} = prepareRegression(predictors, observations, fitIntercept)
+  const processedColumnCount = factorizeRegressionInPlace(columns, transformedResponse, interceptColumnCount)
+
+  // Solve in pivot order, then restore the caller's predictor order. Rejected slots stay zero.
+  const solution = backSubstitute(columns, processedColumnCount, transformedResponse)
+  const coefficients = Array<number>(predictorCount).fill(0)
+  for (let columnIndex = interceptColumnCount; columnIndex < processedColumnCount; columnIndex++) {
+    coefficients[columns[columnIndex].predictorIndex] = solution[columnIndex]
+  }
+  // Recover the intercept in original coordinates: b = mean(y) - sum(coefficient * mean(x)).
+  const intercept = fitIntercept
+    ? mean(observations) - coefficients.reduce((sum, coefficient, predictorIndex) => sum + coefficient * predictorMeans[predictorIndex], 0)
+    : 0
+
+  const {totalSumSquares, residualSumSquares, degreesOfFreedom, residualVariance} = computeResidualStatistics(
+    observations, transformedResponse, processedColumnCount, predictorCount, fitIntercept,
+  )
   const {standardErrors, interceptError} = statistics
     ? computeCoefficientStandardErrors(columns, processedColumnCount, predictorMeans, fitIntercept, residualVariance)
     : {standardErrors: Array<number>(predictorCount).fill(0), interceptError: 0}
