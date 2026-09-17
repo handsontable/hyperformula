@@ -6,6 +6,7 @@ tags:
   - AI agents
   - Codex
   - Windsurf
+  - MCP
   - GitMCP
   - Context7
   - llms.txt
@@ -41,8 +42,9 @@ For agents that read a rules file (e.g. Cursor's `AGENTS.md`), add a line pointi
 
 ## Live docs via MCP (any agent)
 
-Two zero-setup ways to let an agent pull authoritative HyperFormula docs on demand:
+Zero-setup ways to let an agent pull authoritative HyperFormula docs on demand:
 
+- **Docs MCP server** (first-party, recommended) — add `https://docs-assistant.handsontable.com/mcp` to your agent (e.g. `claude mcp add --transport http handsontable-docs https://docs-assistant.handsontable.com/mcp`). Semantic search over the full HyperFormula and Handsontable knowledge base: docs guides, API reference, code recipes, release notes, blog posts, and GitHub issues — always current with the latest release. No install, no auth.
 - **GitMCP** — add the MCP server `https://gitmcp.io/handsontable/hyperformula` to your agent (e.g. `claude mcp add --transport http hyperformula https://gitmcp.io/handsontable/hyperformula`). It serves this GitHub repository's docs. No install, no auth.
 - **Context7** — run `npx -y @upstash/context7-mcp` (or use the Context7 skill / `ctx7` CLI) and ask for the `hyperformula` library. Context7 indexes the repository's `docs` folder (see `context7.json` in the repo root).
 
@@ -56,5 +58,6 @@ cp -r handsontable-skills/skills/hyperformula ~/.claude/skills/
 ## Resources
 
 - [Official skill repository](https://github.com/handsontable/handsontable-skills)
+- [Docs MCP server](https://docs-assistant.handsontable.com/mcp)
 - [`llms-full.txt`](../llms-full.txt)
 - [API reference](/api/)
