@@ -6,7 +6,6 @@ tags:
   - AI agents
   - Codex
   - Windsurf
-  - MCP
   - GitMCP
   - Context7
   - llms.txt
