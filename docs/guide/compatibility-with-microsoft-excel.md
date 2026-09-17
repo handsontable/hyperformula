@@ -170,6 +170,8 @@ Options related to date and time formats:
 
 ### `TEXT` function formats
 
+HyperFormula's built-in number formatter supports percentage formats such as `0%` and `0.00%`. Each unquoted, unescaped `%` multiplies the value by 100 before rounding. For example, `=TEXT(0.0123,"0.00%")` returns `1.23%`. A quoted or backslash-escaped percent sign in a numeric format is displayed literally without scaling the value.
+
 Excel's `TEXT` function supports a wide range of date, time, and currency formats. To cover the full range in HyperFormula, supply both [`stringifyDateTime()`](../api/interfaces/configparams.md#stringifydatetime) (for dates and durations) and [`stringifyCurrency()`](../api/interfaces/configparams.md#stringifycurrency) (for currency formats — locale-aware grouping, non-`$` symbols, accounting two-section patterns). See [Currency handling](currency-handling.md) for an `Intl.NumberFormat`-based example.
 
 ## Full configuration
