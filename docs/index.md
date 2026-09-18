@@ -108,7 +108,7 @@ console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCel
 
 [Run this code in StackBlitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.4.x/mortgage-calculator)
 
-HyperFormula ships an official Claude skill and machine-readable docs, so your AI coding agent can scaffold, configure, and debug HyperFormula correctly. To install the skill in Claude Code, or to point Cursor, GitHub Copilot, or another agent at the docs, see [Set up your coding agent](guide/setup-coding-agent.md). You can also connect any MCP-capable agent to the first-party [docs MCP server](https://docs-assistant.handsontable.com/mcp) — semantic search over the full HyperFormula and Handsontable knowledge base: docs guides, API reference, code recipes, release notes, blog posts, and GitHub issues, always current with the latest release.
+HyperFormula ships an official Claude skill and machine-readable docs, so your AI coding agent can scaffold, configure, and debug HyperFormula correctly. To install the skill in Claude Code, or to point Cursor, GitHub Copilot, or another agent at the docs, see [Set up your coding agent](guide/setup-coding-agent.md). You can also connect any MCP-capable agent to the first-party [docs MCP server](https://handsontable.com/docs/javascript-data-grid/docs-mcp-server/) — semantic search over the full HyperFormula and Handsontable knowledge base: docs guides, API reference, code recipes, release notes, blog posts, and GitHub issues, always current with the latest release.
 
 ## Contributing
 
