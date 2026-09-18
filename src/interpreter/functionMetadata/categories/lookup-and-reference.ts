@@ -121,6 +121,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=SORT(A1:A10)', '=SORT(A1:B10, 2, -1)'],
   },
+  TAKE: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns specified rows or columns from the beginning or end of an array.',
+    parameters: [{name: 'array', description: 'The array or range from which to take rows or columns.'}, {name: 'rows', description: 'The number of rows to take; a negative value takes rows from the end. An empty argument keeps all rows.'}, {name: 'columns', description: 'The number of columns to take; a negative value takes columns from the end. When omitted or empty, all columns are kept.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TAKE(A1:C5, 2)', '=TAKE(A1:C5, -2, -1)', '=TAKE(A1:C5, , 2)'],
+  },
   TRANSPOSE: {
     category: 'Lookup and reference',
     shortDescription: 'Transposes the rows and columns of an array.',
