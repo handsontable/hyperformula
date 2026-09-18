@@ -10,7 +10,7 @@ import {Config} from './Config'
 import {CrudOperations} from './CrudOperations'
 import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph} from './DependencyGraph'
-import {SheetSizeLimitExceededError} from './errors'
+import {LicenseCapabilityMissingError, SheetSizeLimitExceededError} from './errors'
 import {Evaluator} from './Evaluator'
 import {Exporter} from './Exporter'
 import {GraphBuilder} from './GraphBuilder'
@@ -19,6 +19,8 @@ import {ArithmeticHelper} from './interpreter/ArithmeticHelper'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {allowsFeature} from './license/CapabilityRegistry'
+import {FeatureId} from './license/LicenseEntitlement'
 import {buildColumnSearchStrategy, ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
@@ -50,21 +52,42 @@ export type EngineState = {
 export class BuildEngineFactory {
   public static buildFromSheets(sheets: Sheets, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): EngineState {
     const config = new Config(configInput)
+    this.ensureNamedExpressionsCapability(config, namedExpressions)
     return this.buildEngine(config, sheets, namedExpressions)
   }
 
   public static buildFromSheet(sheet: Sheet, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): EngineState {
     const config = new Config(configInput)
+    this.ensureNamedExpressionsCapability(config, namedExpressions)
     const newsheetprefix = config.translationPackage.getUITranslation(UIElement.NEW_SHEET_PREFIX) + '1'
     return this.buildEngine(config, {[newsheetprefix]: sheet}, namedExpressions)
   }
 
   public static buildEmpty(configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): EngineState {
-    return this.buildEngine(new Config(configInput), {}, namedExpressions)
+    const config = new Config(configInput)
+    this.ensureNamedExpressionsCapability(config, namedExpressions)
+    return this.buildEngine(config, {}, namedExpressions)
   }
 
   public static rebuildWithConfig(config: Config, sheets: Sheets, namedExpressions: SerializedNamedExpression[], stats: Statistics): EngineState {
     return this.buildEngine(config, sheets, namedExpressions, stats)
+  }
+
+  /**
+   * Throws if `namedExpressions` is non-empty and `config`'s entitlement does not grant
+   * {@link FeatureId.NamedExpressions} (HF-307 PR 2, task 2.3 - the build-time counterpart of
+   * {@link HyperFormula.ensureCapability}). An empty list is never checked: building an engine
+   * with no named expressions never touches the feature. Deliberately not called from
+   * {@link rebuildWithConfig}, which re-serializes named expressions an already-built instance
+   * created (and was allowed to create) rather than accepting them fresh from a caller.
+   */
+  private static ensureNamedExpressionsCapability(config: Config, namedExpressions: SerializedNamedExpression[]): void {
+    if (namedExpressions.length === 0) {
+      return
+    }
+    if (config.isLicenseGateActive && !allowsFeature(config.licenseCapabilities, FeatureId.NamedExpressions)) {
+      throw new LicenseCapabilityMissingError(FeatureId.NamedExpressions)
+    }
   }
 
   private static buildEngine(config: Config, sheets: Sheets = {}, inputNamedExpressions: SerializedNamedExpression[] = [], stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {

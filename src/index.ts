@@ -26,6 +26,7 @@ import {
   InvalidArgumentsError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
+  LicenseCapabilityMissingError,
   MissingTranslationError,
   NamedExpressionDoesNotExistError,
   NamedExpressionNameIsAlreadyTakenError,
@@ -86,6 +87,7 @@ class HyperFormulaNS extends HyperFormula {
   public static InvalidArgumentsError = InvalidArgumentsError
   public static LanguageNotRegisteredError = LanguageNotRegisteredError
   public static LanguageAlreadyRegisteredError = LanguageAlreadyRegisteredError
+  public static LicenseCapabilityMissingError = LicenseCapabilityMissingError
   public static MissingTranslationError = MissingTranslationError
   public static NamedExpressionDoesNotExistError = NamedExpressionDoesNotExistError
   public static NamedExpressionNameIsAlreadyTakenError = NamedExpressionNameIsAlreadyTakenError
@@ -169,6 +171,7 @@ export {
   InvalidArgumentsError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
+  LicenseCapabilityMissingError,
   MissingTranslationError,
   NamedExpressionDoesNotExistError,
   NamedExpressionNameIsAlreadyTakenError,

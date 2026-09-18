@@ -197,6 +197,17 @@ export class CrudOperations {
     return this.clipboardOperations.clipboard === undefined
   }
 
+  /**
+   * Returns whether the clipboard currently holds a cut (as opposed to a copy, or nothing) -
+   * i.e. whether the next {@link paste} call will move cells rather than only copy their content.
+   * Exposed so the public API layer can gate a cut-then-paste as the cell-relocating mutation it
+   * actually is (HF-307 PR 2: {@link paste} must require the Crud feature in this case, not just
+   * Clipboard, since it performs the same move {@link HyperFormula.moveCells} requires Crud for).
+   */
+  public isCutClipboard(): boolean {
+    return this.clipboardOperations.isCutClipboard()
+  }
+
   public clearClipboard(): void {
     this.clipboardOperations.clear()
   }
