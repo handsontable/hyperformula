@@ -3,9 +3,11 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {CellError, ErrorType} from '../Cell'
 import {Config} from '../Config'
 import {TIME_FORMAT_SECONDS_ITEM_REGEXP} from '../DateTimeDefault'
 import {DateTimeHelper, numberToSimpleTime, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
+import {ErrorMessage} from '../error-message'
 import {RawScalarValue} from '../interpreter/InterpreterValue'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
@@ -75,12 +77,24 @@ function countChars(text: string, char: string) {
   return text.split(char).length - 1
 }
 
+/**
+ * Renders a numeric mask after scaling once for each active percent operator.
+ * Scaling precedes rounding and leaves custom formatter callbacks unaffected.
+ */
 function numberFormat(tokens: FormatToken[], value: number): RawScalarValue {
+  for (const token of tokens) {
+    if (token.type === TokenType.PERCENT) {
+      value *= 100
+      if (!Number.isFinite(value)) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
+      }
+    }
+  }
   let result = ''
 
   for (let i = 0; i < tokens.length; ++i) {
     const token = tokens[i]
-    if (token.type === TokenType.FREE_TEXT) {
+    if (token.type === TokenType.FREE_TEXT || token.type === TokenType.PERCENT) {
       result += token.value
       continue
     }
