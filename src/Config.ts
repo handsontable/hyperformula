@@ -20,11 +20,24 @@ import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licens
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
+import {CapabilityRegistry, ResolvedCapabilities} from './license/CapabilityRegistry'
+import {unrestrictedEntitlement} from './license/LicenseEntitlement'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 import {ConfigParams, ConfigParamsList} from './ConfigParams'
 
-const privatePool: WeakMap<Config, { licenseKeyValidityState: LicenseKeyValidityState }> = new WeakMap()
+/**
+ * The license-derived state kept off the public `ConfigParams` surface — see
+ * {@link Config.licenseCapabilities}.
+ */
+interface LicensePrivateState {
+  licenseKeyValidityState: LicenseKeyValidityState,
+  licenseCapabilities: ResolvedCapabilities,
+  isLicenseGateActive: boolean,
+  capabilityRegistry: CapabilityRegistry,
+}
+
+const privatePool: WeakMap<Config, LicensePrivateState> = new WeakMap()
 
 export class Config implements ConfigParams, ParserConfig {
 
@@ -266,8 +279,19 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
     this.context = context
 
+    const licenseKeyValidityState = checkLicenseKeyValidity(this.licenseKey)
+    const capabilityRegistry = new CapabilityRegistry()
+    // PR 1 (HF-307) ships the gate infrastructure without a real license-key payload adapter —
+    // that lands in PR 3 as src/license/payloadAdapter.ts. Until then every entitlement resolves
+    // as unrestricted, so isLicenseGateActive below reduces to today's licenseKeyValidityState
+    // check and gate B in the interpreter never actually restricts a function.
+    const licenseCapabilities = capabilityRegistry.resolve(unrestrictedEntitlement())
+
     privatePool.set(this, {
-      licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
+      licenseKeyValidityState,
+      licenseCapabilities,
+      isLicenseGateActive: licenseKeyValidityState !== LicenseKeyValidityState.VALID || !licenseCapabilities.unrestricted,
+      capabilityRegistry,
     })
 
     configCheckIfParametersNotInConflict(
@@ -305,7 +329,40 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public get licenseKeyValidityState(): LicenseKeyValidityState {
-    return (privatePool.get(this) as Config).licenseKeyValidityState
+    return (privatePool.get(this) as LicensePrivateState).licenseKeyValidityState
+  }
+
+  /**
+   * The functions and features this config's license entitles it to, already resolved from
+   * whatever tokens the license key carries. Proxied to its private counterpart for the same
+   * reason as {@link licenseKeyValidityState}: it must never become part of {@link getConfig}.
+   *
+   * @internal
+   */
+  public get licenseCapabilities(): ResolvedCapabilities {
+    return (privatePool.get(this) as LicensePrivateState).licenseCapabilities
+  }
+
+  /**
+   * Whether gate B (the entitlement check in the interpreter) needs to run at all for this
+   * config. `false` — the common case, for `gpl-v3`, legacy keys, and an unrestricted typed
+   * key — is a single boolean read, cheaper than the string-enum comparison it replaces.
+   *
+   * @internal
+   */
+  public get isLicenseGateActive(): boolean {
+    return (privatePool.get(this) as LicensePrivateState).isLicenseGateActive
+  }
+
+  /**
+   * The registry used to resolve this config's entitlement into {@link licenseCapabilities}.
+   * Exposed so the interpreter can tell a custom, instance-registered function apart from a
+   * built-in outside the capability table without constructing a second registry.
+   *
+   * @internal
+   */
+  public get capabilityRegistry(): CapabilityRegistry {
+    return (privatePool.get(this) as LicensePrivateState).capabilityRegistry
   }
 
   public getConfig(): ConfigParams {
