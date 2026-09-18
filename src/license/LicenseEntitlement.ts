@@ -6,10 +6,13 @@
 /**
  * Identifies a feature area of the public API that a license entitlement can gate.
  *
- * `CustomFunctions` and `ImportExport` are reserved vocabulary: they exist so a license payload
- * is free to carry them, but no capability grant in this release maps to either of them yet.
- * HF-307 decision D1 drops function-registration gating (and the `CustomFunctions` grant) from
- * this release; `ImportExport` has no gated methods until HF-107 lands.
+ * `CustomFunctions` is reserved vocabulary: it exists so a license payload is free to carry it,
+ * but HF-307 decision D1 drops function-registration gating (and the `CustomFunctions` grant)
+ * from this release, so no capability grant maps to it.
+ *
+ * `ImportExport` IS granted, by the `import_export` add-on token (2026-08-12 packages meeting) —
+ * but it gates no public method yet, because HF-107 hasn't shipped the import/export feature it
+ * would gate. The grant exists; the gate does not, yet.
  */
 export const enum FeatureId {
   NamedExpressions = 'named_expressions',
@@ -24,12 +27,15 @@ export const enum FeatureId {
 /**
  * Describes when a license entitlement stops being valid.
  *
- * Per key-spec rev 3 §1.3, `date` is kept as a calendar string rather than an epoch, and is
- * INCLUSIVE of its last valid day:
- * - `kind === 'usage'`: `date` is compared against the client's LOCAL calendar date — deliberately
- *   not UTC, the date means the date, wherever the customer is.
- * - `kind === 'release'`: `date` is compared LEXICOGRAPHICALLY, as text, against the library's
- *   build date; no clock is involved.
+ * `date` is kept as a calendar string rather than an epoch, and is INCLUSIVE of its last valid
+ * day:
+ * - `kind === 'usage'`: compared against the current instant in **UTC**. An earlier revision of
+ *   the key spec called for the client's LOCAL calendar date; that was reversed, because the
+ *   offline check and a future online check have to return the same verdict for the same key at
+ *   the same instant, and any rule that reads a local clock breaks that parity. The practical
+ *   cost is that a customer far west of UTC loses the tail of their last local day.
+ * - `kind === 'release'`: compared against the library's build date; no clock is involved, which
+ *   is what keeps an air-gapped install with a wrong system clock working.
  * - `kind === 'none'`: the entitlement does not expire.
  */
 export interface LicenseExpiry {
@@ -63,9 +69,13 @@ export interface LicenseEntitlement {
   expiry: LicenseExpiry,
   /**
    * When `true`, resolving this entitlement must not print a console message of any kind.
-   * HF-307 decision D3 (fail-closed, silent): a typed key with no recognized token resolves
-   * like an explicit `capabilities: []` — core and protected functions only, without a message,
-   * a warning, or a diagnostics getter.
+   *
+   * Set from the key's own flags ONLY — the key spec spells that flag three different ways across
+   * revisions and even within one revision, and all are honoured. An unrecognized token does NOT
+   * set it: HF-307 decision D3 makes the *grant* silent (an unknown token grants nothing, with no
+   * message and no diagnostics getter), which is a different thing from muting the key's console
+   * output. Coupling them suppressed expiry notices as a side effect of a vocabulary mismatch, and
+   * was confirmed an implementation error.
    */
   silent: boolean,
   isTrial: boolean,
@@ -74,7 +84,7 @@ export interface LicenseEntitlement {
 /**
  * The unrestricted entitlement: legacy keys and `gpl-v3` resolve to this today.
  *
- * HF-307 decision D3 (fail-closed, silent) means a typed key whose tokens this library version
+ * HF-307 decision D3 (fail-closed, silent) means an entitlement key whose tokens this library version
  * does not recognize at all no longer maps here — it resolves to an entitlement with an empty,
  * silent capability set instead of falling back to unrestricted access. Do not reuse this
  * function for that case.
