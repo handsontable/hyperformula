@@ -1,3 +1,13 @@
+---
+tags:
+  - i18n
+  - localization
+  - localeLang
+  - decimalSeparator
+  - thousandSeparator
+  - Intl.Collator
+---
+
 # Internationalization features
 
 Configure HyperFormula to match the languages and regions of your users.
@@ -7,7 +17,7 @@ Configure HyperFormula to match the languages and regions of your users.
 
 ## Function names and errors
 
-Each of HyperFormula's [built-in functions](built-in-functions.md) and [errors](types-of-errors.md) is available in [18 languages](localizing-functions.md#list-of-supported-languages).
+Each of HyperFormula's [built-in functions](built-in-functions.md) and [errors](types-of-errors.md) is available in [{{ $page.languagesCount }} languages](localizing-functions.md#list-of-supported-languages).
 
 You can easily [switch between languages](localizing-functions.md) ([`language`](../api/interfaces/configparams.md#language)).
 

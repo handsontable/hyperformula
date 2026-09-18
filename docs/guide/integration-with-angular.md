@@ -1,3 +1,16 @@
+---
+tags:
+  - SSR
+  - signals
+  - zoneless
+  - OnPush change detection
+  - Injectable service
+  - standalone components
+  - RxJS
+  - BehaviorSubject
+  - ngOnDestroy
+---
+
 # Integration with Angular
 
 The HyperFormula API is identical in an Angular app and in plain JavaScript. This guide demonstrates how HyperFormula is integrated with an Angular app (typically as an injectable service), how it is cleaned up, and how you bridge its values into the change-detection cycle.

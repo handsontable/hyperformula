@@ -1,3 +1,14 @@
+---
+tags:
+  - bessel
+  - Chevrotain
+  - core-js
+  - jStat
+  - tiny-emitter
+  - third-party libraries
+  - dependency licenses
+---
+
 # Dependencies
 
 HyperFormula depends on a few external libraries, as listed below.

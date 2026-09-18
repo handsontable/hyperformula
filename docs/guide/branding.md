@@ -1,3 +1,11 @@
+---
+tags:
+  - brand book
+  - brand guidelines
+  - brand assets
+  - press kit
+---
+
 # Branding
 
 ## Our logo
