@@ -1,3 +1,12 @@
+---
+tags:
+  - SSR
+  - onMount
+  - onDestroy
+  - reactivity
+  - lifecycle
+---
+
 # Integration with Svelte
 
 The HyperFormula API is identical in a Svelte app and in plain JavaScript. This guide demonstrates how HyperFormula integrates with the Svelte component's lifecycle and how you bridge its values into Svelte's reactivity.

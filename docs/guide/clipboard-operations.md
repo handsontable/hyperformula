@@ -1,3 +1,10 @@
+---
+tags:
+  - clearClipboard
+  - isClipboardEmpty
+  - system clipboard
+---
+
 # Clipboard operations
 
 Through a set of dedicated methods, HyperFormula supports clipboard operations, such as copying, cutting,

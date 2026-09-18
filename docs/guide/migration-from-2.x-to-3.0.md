@@ -1,3 +1,17 @@
+---
+tags:
+  - migration
+  - migrate
+  - upgrade
+  - breaking changes
+  - v3.0
+  - ESM
+  - mjs
+  - tsconfig
+  - moduleResolution
+  - bundlers
+---
+
 # Migrating from 2.x to 3.0
 
 To upgrade your HyperFormula version from 2.x.x to 3.0.0, follow this guide.

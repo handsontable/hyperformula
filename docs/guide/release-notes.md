@@ -1,3 +1,12 @@
+---
+tags:
+  - changelog
+  - version history
+  - breaking changes
+  - bug fixes
+  - new features
+---
+
 # Release notes
 
 This page lists HyperFormula release notes. The format is based on
@@ -282,7 +291,7 @@ HyperFormula adheres to
 ### Removed
 
 - Removed all polyfills from the CommonJS build and the ES modules build. In the UMD build, kept only the polyfills
-  required by the [supported browsers](https://hyperformula.handsontable.com/guide/supported-browsers.html).
+  required by the [supported browsers](https://hyperformula.handsontable.com/docs/guide/supported-browsers.html).
   [#1011](https://github.com/handsontable/hyperformula/issues/1011)
 
 ## 2.0.1
