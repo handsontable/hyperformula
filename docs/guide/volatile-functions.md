@@ -1,3 +1,14 @@
+---
+tags:
+  - recalculation triggers
+  - recalculate
+  - isVolatile
+  - RANDBETWEEN
+  - NOW
+  - TODAY
+  - dirty
+---
+
 # Volatile functions
 
 If you work with spreadsheet software regularly, then you've probably

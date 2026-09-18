@@ -7,6 +7,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added support for proprietary license keys that grant a subset of the library ("feature packages and add-ons"). A function your key does not include evaluates to a `#LIC!` error, and the corresponding parts of the API throw a `LicenseCapabilityMissingError`. Keys that grant everything, including `gpl-v3`, are unaffected. [#1728](https://github.com/handsontable/hyperformula/pull/1728) [#1729](https://github.com/handsontable/hyperformula/pull/1729) [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+- Added a one-time console notice when a license key's usage-based expiry date falls within its configured notice period, naming the key's last covered day ("valid until … (UTC)"). The notice is silenced by the key's own silent flag, and never fires for a key expiring on the perpetual (`release_until`) axis. Blocking behavior at and after expiry is unchanged. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+- Added grants to the two commercial add-on tokens: `spreadsheet` (the Spreadsheet Bundle) now grants the CRUD, undo/redo, clipboard, and batching feature areas, and `import_export` grants the reserved import/export feature that nothing gates on until the feature ships. A key naming neither add-on keeps every feature area it has today. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+
+### Changed
+
+- Changed `getAvailableFunctions()` and `getFunctionDetails()` to describe only the functions the instance's license key includes, so they no longer advertise a function that would evaluate to a `#LIC!` error. A missing, invalid, or expired key does not shorten the list. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+- Changed the parser for the new proprietary license keys to the entitlement key format (a human-readable text ending with a machine-readable block in square brackets), following its upstream specification. This replaces the tagged key format, which was never issued to anyone. Classic 25-character license keys and `gpl-v3` are unaffected. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+- Changed the license capability tokens to be matched case-insensitively, and added support for the packaging group-token vocabulary (`fun:all`, `fun:<family>.<A|B|C>`, and per-function `fun:<FUNCTION_NAME>` tokens) alongside the existing package tokens (`functions_1`–`functions_4` and the add-ons). A key worded in either vocabulary grants the same functions. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+
+### Fixed
+
+- Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
+- Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
+- Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
+- Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
@@ -242,7 +261,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Removed
 
 - Removed all polyfills from the CommonJS build and the ES modules build. In the UMD build, kept only the polyfills
-  required by the [supported browsers](https://hyperformula.handsontable.com/guide/supported-browsers.html).
+  required by the [supported browsers](https://hyperformula.handsontable.com/docs/guide/supported-browsers.html).
   [#1011](https://github.com/handsontable/hyperformula/issues/1011)
 
 ## [2.0.1] - 2022-06-14
@@ -261,9 +280,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 For more information on this release, see:
 
-- [Release notes](https://hyperformula.handsontable.com/guide/release-notes.html)
+- [Release notes](https://hyperformula.handsontable.com/docs/guide/release-notes.html)
 - [Blog post](https://handsontable.com/blog/articles/2022/04/whats-new-in-hyperformula-2.0.0)
-- [Migration guide](https://hyperformula.handsontable.com/guide/migration-from-1.0-to-2.0.html)
+- [Migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-1.x-to-2.0.html)
 
 ### Added
 

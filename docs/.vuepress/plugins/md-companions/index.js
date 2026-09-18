@@ -13,7 +13,7 @@ const { stripVuePressSyntax } = require('./strip');
  */
 function resolvePageVars(md, page) {
   return md.replace(
-    /\{\{\s*\$page\.(version|buildDate|buildDateURIEncoded|releaseDate|functionsCount)\s*\}\}/g,
+    /\{\{\s*\$page\.(version|buildDate|buildDateURIEncoded|releaseDate|functionsCount|languagesCount)\s*\}\}/g,
     (m, key) => (page && page[key] != null ? String(page[key]) : m)
   );
 }
