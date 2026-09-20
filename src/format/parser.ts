@@ -6,7 +6,27 @@
 import {Maybe} from '../Maybe'
 
 const dateFormatRegex = /(\\.|dd|DD|d|D|mm|MM|m|M|YYYY|YY|yyyy|yy|HH|hh|H|h|ss(\.(0+|s+))?|s|AM\/PM|am\/pm|A\/P|a\/p|\[mm]|\[MM]|\[hh]|\[HH])/g
-const numberFormatRegex = /(\\.|[#0]+(\.[#0]*)?)/g
+
+/**
+ * Number-format tokenizer regex.
+ *
+ * The class is intentionally FLAT — `[#0,]+(\.[#0]*)?` — admitting the grouping
+ * comma alongside the `#`/`0` placeholders. Whether a comma means "group
+ * thousands", a "trailing scaler", or neither is decided later by string
+ * inspection in `format.ts`, never by regex structure.
+ *
+ * Synchronous catastrophic backtracking is not catchable by jest/jasmine
+ * wall-clock timeouts (see DEV-2120), so this pattern MUST NOT be rewritten
+ * into a nested-quantifier form such as `([#0]+,)*[#0]+`. Its shape is pinned
+ * by a white-box test via {@link NUMBER_FORMAT_REGEX_SOURCE}.
+ */
+const numberFormatRegex = /(\\.|[#0,]+(\.[#0]*)?)/g
+
+/**
+ * The `source` of {@link numberFormatRegex}, exported for the white-box ReDoS
+ * shape assertion. Not re-exported from `src/index.ts` — test-only internal.
+ */
+export const NUMBER_FORMAT_REGEX_SOURCE = numberFormatRegex.source
 
 export enum TokenType {
   FORMAT = 'FORMAT',
@@ -54,13 +74,22 @@ function matchDateFormat(str: string): RegExpExecArray[] {
 
 function matchNumberFormat(str: string): RegExpExecArray[] {
   numberFormatRegex.lastIndex = 0
-  const numberFormatToken = numberFormatRegex.exec(str)
 
-  if (numberFormatToken !== null) {
-    return [numberFormatToken]
-  } else {
-    return []
+  // A run admitted by the flat class is only a genuine number token if it
+  // contains at least one `#`/`0` placeholder. A run that is punctuation-only
+  // (e.g. a lone grouping `,`, now inside the class) or an escape token is NOT
+  // a number token — Excel treats a placeholder-less segment as a literal — so
+  // skip it and keep scanning for the first placeholder-bearing run. Without
+  // this guard a mask such as `,` or `a,b` would splice the value into free
+  // text (`,` → `5,`); with it, `matchNumberFormat` still returns a single
+  // token (the first real placeholder run), preserving the tokenizer contract.
+  let match
+  while ((match = numberFormatRegex.exec(str)) !== null) {
+    if (!isEscapeToken(match) && /[#0]/.test(match[0])) {
+      return [match]
+    }
   }
+  return []
 }
 
 function createTokens(regexTokens: RegExpExecArray[], str: string) {
