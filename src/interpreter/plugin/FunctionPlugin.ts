@@ -247,6 +247,26 @@ export interface FunctionArgument {
    * Requires `defaultValue` to be set.
    */
   emptyAsDefault?: boolean,
+
+  /**
+   * If set to `true`, a syntactically empty argument is treated as if the argument had
+   * not been provided at all: the function implementation receives `undefined`.
+   *
+   * This differs from {@link emptyAsDefault}, which substitutes `defaultValue`. It is the
+   * only way to tell "no argument was given" apart from "an argument was given and its
+   * value is empty" — a distinction Microsoft Excel makes for `ADDRESS`, where an absent
+   * sheet name omits the `!` separator while an explicitly empty one keeps it.
+   *
+   * | Formula                      | `emptyAsAbsent: false` (default) | `emptyAsAbsent: true`   |
+   * |------------------------------|----------------------------------|-------------------------|
+   * | `ADDRESS(2,3,1,FALSE())`     | `undefined` for 5th arg          | `undefined` for 5th arg |
+   * | `ADDRESS(2,3,1,FALSE(),)`     | `""` for 5th arg                 | `undefined` for 5th arg |
+   * | `ADDRESS(2,3,1,FALSE(),"")`   | `""` for 5th arg                 | `""` for 5th arg        |
+   *
+   * Does not require `defaultValue`; it applies only when `defaultValue` is unset, so it
+   * never competes with {@link emptyAsDefault}.
+   */
+  emptyAsAbsent?: boolean,
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
@@ -471,7 +491,10 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     for (let i = 0; i < argumentsMetadata.length; i++) {
       const argumentMetadata = argumentsMetadata[i]
       const rawArg = vectorizedArguments[i]
-      const argumentValue = rawArg === undefined
+      const emptySlotIsAbsent = syntacticallyEmptyFlags[i]
+        && argumentMetadata?.emptyAsAbsent === true
+        && argumentMetadata?.defaultValue === undefined
+      const argumentValue = rawArg === undefined || emptySlotIsAbsent
         ? argumentMetadata?.defaultValue
         : (syntacticallyEmptyFlags[i] && argumentMetadata?.emptyAsDefault && argumentMetadata?.defaultValue !== undefined)
           ? argumentMetadata.defaultValue
