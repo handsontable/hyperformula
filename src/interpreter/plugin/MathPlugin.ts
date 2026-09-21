@@ -251,7 +251,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     return this.runFunction(ast.args, state, this.metadata('QUOTIENT'),
       (nom: number, denom: number) => {
         if (denom === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         return Math.trunc(nom / denom)
       }

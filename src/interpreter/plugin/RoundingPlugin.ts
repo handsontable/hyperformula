@@ -198,7 +198,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
           return 0
         }
         if (significance === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
 
         if ((value > 0) && (significance < 0)) {
@@ -243,7 +243,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
           return 0
         }
         if (significance === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
 
         if ((value > 0) && (significance < 0)) {

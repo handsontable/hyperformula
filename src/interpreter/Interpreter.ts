@@ -462,7 +462,7 @@ export class Interpreter {
           if (i1 < arg1.height() && i2 < arg2.height() && j1 < arg1.width() && j2 < arg2.width()) {
             ret[i][j] = op(arg1.data[i1][j1], arg2.data[i2][j2])
           } else {
-            ret[i][j] = new CellError(ErrorType.NA)
+            ret[i][j] = new CellError(ErrorType.NA, ErrorMessage.NoBroadcastValue)
           }
         }
       }

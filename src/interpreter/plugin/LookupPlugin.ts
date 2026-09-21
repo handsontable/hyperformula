@@ -305,7 +305,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
 
     if (rangeValue.width() > 1 && rangeValue.height() > 1) {
-      return new CellError(ErrorType.NA)
+      return new CellError(ErrorType.NA, ErrorMessage.SearchRangeDimension)
     }
 
     const searchStrategy = rangeValue.width() === 1 ? this.columnSearch : this.rowSearch
