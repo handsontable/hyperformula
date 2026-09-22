@@ -2496,7 +2496,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NothingToPasteError]] when clipboard is empty
    * @throws [[TargetLocationHasArrayError]] when the selected target area has array inside
    * @throws [[ExpectedValueOfTypeError]] if targetLeftCorner is of wrong type
-   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Clipboard feature, or the Crud feature when pasting a cut
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Clipboard feature
    *
    * @example
    * ```js
