@@ -296,19 +296,27 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     return this.arraySizePredictor.checkArraySizeForAst(ast, state)
   }
 
-  protected listOfScalarValues(asts: Ast[], state: InterpreterState): [InternalScalarValue, boolean, boolean][] {
-    const ret: [InternalScalarValue, boolean, boolean][] = []
-    for (const argAst of asts) {
+  /**
+   * Flattens the arguments into scalars, expanding any range into its values.
+   *
+   * The fourth element of each tuple is the index of the ARGUMENT THE USER WROTE that the
+   * scalar came from. Every value expanded out of one range keeps that range's own index,
+   * so a later error can name the argument rather than its position in this flattened
+   * list — `=AND(A1:A3,"x")` must blame argument 1, not entry 3.
+   */
+  protected listOfScalarValues(asts: Ast[], state: InterpreterState): [InternalScalarValue, boolean, boolean, number][] {
+    const ret: [InternalScalarValue, boolean, boolean, number][] = []
+    asts.forEach((argAst, argumentIndex) => {
       const isSyntacticallyEmpty = argAst.type === AstNodeType.EMPTY
       const value = this.evaluateAst(argAst, state)
       if (value instanceof SimpleRangeValue) {
         for (const scalarValue of value.valuesFromTopLeftCorner()) {
-          ret.push([scalarValue, true, isSyntacticallyEmpty])
+          ret.push([scalarValue, true, isSyntacticallyEmpty, argumentIndex])
         }
       } else {
-        ret.push([value, false, isSyntacticallyEmpty])
+        ret.push([value, false, isSyntacticallyEmpty, argumentIndex])
       }
-    }
+    })
     return ret
   }
 
@@ -410,6 +418,10 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     const argumentValues: InterpreterValue[] = evaluatedArguments.map(([value]) => value)
     const argumentIgnorableFlags = evaluatedArguments.map(([, ignorable]) => ignorable)
     const syntacticallyEmptyFlags = evaluatedArguments.map(([, , empty]) => empty)
+    // Which argument each value came from. Identical to the position in this list unless a
+    // range was expanded above; a custom plugin overriding `listOfScalarValues` with the
+    // old three-element tuple yields undefined here and falls back to the position.
+    const sourceArgumentIndexes = evaluatedArguments.map(([, , , index]) => index)
     const argumentMetadata = this.buildMetadataForEachArgumentValue(argumentValues.length, metadata)
     const isVectorizationOn = state.arraysFlag && !metadata.vectorizationForbidden
 
@@ -421,13 +433,13 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
     if (resultArrayHeight === 1 && resultArrayWidth === 1) {
       const vectorizedArguments = this.vectorizeAndBroadcastArgumentsIfNecessary(isVectorizationOn, argumentValues, argumentMetadata, 0, 0)
-      return this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, syntacticallyEmptyFlags, functionImplementation, metadata.returnNumberType)
+      return this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, syntacticallyEmptyFlags, functionImplementation, metadata.returnNumberType, sourceArgumentIndexes)
     }
 
     const resultArray: InternalScalarValue[][] = [ ...Array(resultArrayHeight).keys() ].map(row =>
       [ ...Array(resultArrayWidth).keys() ].map(col => {
         const vectorizedArguments = this.vectorizeAndBroadcastArgumentsIfNecessary(isVectorizationOn, argumentValues, argumentMetadata, row, col)
-        const result = this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, syntacticallyEmptyFlags, functionImplementation, metadata.returnNumberType)
+        const result = this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, syntacticallyEmptyFlags, functionImplementation, metadata.returnNumberType, sourceArgumentIndexes)
 
         if (result instanceof SimpleRangeValue) {
           throw new Error('Function returning array cannot be vectorized.')
@@ -448,8 +460,9 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     syntacticallyEmptyFlags: boolean[],
     functionImplementation: (...arg: any) => InterpreterValue,
     returnNumberType: NumberType | undefined,
+    sourceArgumentIndexes: number[] = [],
   ): RawInterpreterValue {
-    const coercedArguments = this.coerceArgumentsToRequiredTypes(state, vectorizedArguments, argumentsMetadata, argumentIgnorableFlags, syntacticallyEmptyFlags)
+    const coercedArguments = this.coerceArgumentsToRequiredTypes(state, vectorizedArguments, argumentsMetadata, argumentIgnorableFlags, syntacticallyEmptyFlags, sourceArgumentIndexes)
 
     if (coercedArguments instanceof CellError) {
       return coercedArguments
@@ -465,8 +478,13 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     argumentsMetadata: FunctionArgument[],
     argumentIgnorableFlags: boolean[],
     syntacticallyEmptyFlags: boolean[],
+    sourceArgumentIndexes: number[] = [],
   ):  CellError | Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] {
     const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
+    // The argument the user wrote, which is the position in this loop only when no range
+    // was expanded. Reporting the loop index made the reported argument depend on how many
+    // cells a preceding range happened to cover.
+    const writtenArgumentIndex = (i: number): number => sourceArgumentIndexes[i] ?? i
 
     for (let i = 0; i < argumentsMetadata.length; i++) {
       const argumentMetadata = argumentsMetadata[i]
@@ -485,11 +503,11 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       const coercedValue = this.coerceToType(argumentValue, argumentMetadata, state)
 
       if (coercedValue === undefined && !argumentIgnorableFlags[i]) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType).withArgumentIndex(writtenArgumentIndex(i))
       }
 
       if (coercedValue instanceof CellError && argumentMetadata.argumentType !== FunctionArgumentType.SCALAR) {
-        return coercedValue
+        return coercedValue.withArgumentIndex(writtenArgumentIndex(i))
       }
 
       coercedArguments.push(coercedValue)
@@ -513,10 +531,10 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     return argumentValue.data[targetRowNum]?.[targetColNum]
   }
 
-  protected evaluateArguments(args: Ast[], state: InterpreterState, metadata: FunctionMetadata): [InterpreterValue, boolean, boolean][] {
+  protected evaluateArguments(args: Ast[], state: InterpreterState, metadata: FunctionMetadata): [InterpreterValue, boolean, boolean, number][] {
     return metadata.expandRanges
       ? this.listOfScalarValues(args, state)
-      : args.map((ast) => [this.evaluateAst(ast, state), false, ast.type === AstNodeType.EMPTY])
+      : args.map((ast, argumentIndex) => [this.evaluateAst(ast, state), false, ast.type === AstNodeType.EMPTY, argumentIndex])
   }
 
   protected buildMetadataForEachArgumentValue(numberOfArgumentValuesPassed: number, metadata: FunctionMetadata): FunctionArgument[] {
