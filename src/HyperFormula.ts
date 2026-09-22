@@ -729,7 +729,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * Gate B only, deliberately — never the license key's validity state. A missing, invalid or expired
    * key resolves to an unrestricted entitlement (the invariant `resolveLicense` documents), so it
-   * reaches this method with `licenseCapabilities.unrestricted` set and every function stays listed.
+   * reaches this method with both `licenseCapabilities` axes set to `'all'` and every function
+   * stays listed.
    * That is the intended answer: a key problem is reported on the console and by `#LIC!` in cells,
    * and narrowing the catalogue to the two protected built-ins would leave an integrator who has not
    * wired up their key yet with an empty function picker and no clue why. The list narrows only for
