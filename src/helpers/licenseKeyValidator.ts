@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {ENTITLEMENT_KEY_CHECKSUM_LENGTH} from '../license/vendor/constants'
+import {ENTITLEMENT_KEY_CHECKSUM_LENGTH} from '../license/handsontable-license-key-parser/constants'
 import {checkKeySchema, extractTime} from './licenseKeyHelper'
 
 /**

@@ -11,9 +11,9 @@ import {
 } from '../helpers/licenseKeyValidator'
 import {ALL_FEATURE_TOKENS, CAPABILITY_TABLE, CORE_TOKEN, normalizeCapabilityToken} from './capabilities'
 import {LicenseEntitlement, LicenseExpiry, unrestrictedEntitlement} from './LicenseEntitlement'
-import {detectLicenseKeyFormat} from './vendor/detectFormat'
-import {EntitlementKeyData, EntitlementProductGrant, extractEntitlementKeyData} from './vendor/extractKeyData'
-import {parseIsoDate} from './vendor/utils'
+import {detectLicenseKeyFormat} from './handsontable-license-key-parser/detectFormat'
+import {EntitlementKeyData, EntitlementProductGrant, extractEntitlementKeyData} from './handsontable-license-key-parser/extractKeyData'
+import {parseIsoDate} from './handsontable-license-key-parser/utils'
 
 /** Milliseconds in a day, used to turn a grace period in days into a deadline. */
 const MILLISECONDS_PER_DAY = 86400000
