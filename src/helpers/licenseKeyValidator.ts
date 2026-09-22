@@ -18,6 +18,12 @@ export const enum LicenseKeyValidityState {
 
 type LicenseKeyInvalidState = Exclude<LicenseKeyValidityState, LicenseKeyValidityState.VALID>
 
+/**
+ * Which deadline a key ran out against: the date of the build in use (`release`) or the wall
+ * clock (`usage`).
+ */
+export type LicenseExpiryAxis = 'release' | 'usage'
+
 interface TemplateVars {
   [key: string]: string,
 }
@@ -36,8 +42,14 @@ type MessageDescriptor = {
  */
 const consoleMessages: ConsoleMessages = {
   invalid: () => 'The license key for HyperFormula is invalid.',
-  expired: ({keyValidityDate}) => 'The license key for HyperFormula expired' +
-    ` on ${keyValidityDate}, and is not valid for the installed version.`,
+  // Two wordings, because a key can run out along either of two axes and only one of them is
+  // about the build you installed. A maintenance key stops covering RELEASES after its date, so
+  // an older version keeps working and the fix is to install one; a usage-based key stops being
+  // valid at all, and telling its holder the key "is not valid for the installed version" sends
+  // them to downgrade, which changes nothing.
+  expired: ({keyValidityDate, axis}) => axis === 'usage'
+    ? `The license key for HyperFormula expired on ${keyValidityDate}.`
+    : `The license key for HyperFormula expired on ${keyValidityDate}, and is not valid for the installed version.`,
   missing: () => 'The license key for HyperFormula is missing.',
 }
 
@@ -84,13 +96,22 @@ export function resetLicenseKeyNotificationForTests(): void {
  * @param {LicenseKeyValidityState} state - the state to report; `VALID` prints nothing
  * @param {Date} [keyValidityDate] - the day the key stopped being valid, used by the `expired`
  * message
+ * @param {LicenseExpiryAxis} [expiryAxis] - which axis the key ran out along. Defaults to
+ * `release`, which is the only axis the classic 25-character format has, so its message is
+ * unchanged.
  */
-export function notifyLicenseKeyState(state: LicenseKeyValidityState, keyValidityDate?: Date): void {
+export function notifyLicenseKeyState(
+  state: LicenseKeyValidityState,
+  keyValidityDate?: Date,
+  expiryAxis: LicenseExpiryAxis = 'release',
+): void {
   if (_notified || state === LicenseKeyValidityState.VALID) {
     return
   }
 
-  const vars: TemplateVars = keyValidityDate === undefined ? {} : {keyValidityDate: formatDate(keyValidityDate)}
+  const vars: TemplateVars = keyValidityDate === undefined
+    ? {}
+    : {keyValidityDate: formatDate(keyValidityDate), axis: expiryAxis}
 
   console.warn(consoleMessages[state](vars))
   _notified = true
