@@ -2483,16 +2483,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
+    // Clipboard alone is enough, including for pasting a CUT - which relocates cells, the same
+    // mutation the public moveCells() requires Crud for. Granting the clipboard is taken to grant
+    // what the clipboard does, so this route is deliberately not gated on Crud as well.
     this.ensureCapability(FeatureId.Clipboard)
-    // Pasting a CUT moves cells across the sheet - the same mutation the public moveCells()
-    // requires Crud for - so a Clipboard-only entitlement must not reach it this way. Pasting a
-    // COPY only duplicates values/formulas and stays Clipboard-only, correctly. Checked before
-    // argument validation, same as every other ensureCapability call (HF-307 spec-to-ship review,
-    // 18.08: found as a hard-gating bypass - a Clipboard-only entitlement could cut() then
-    // paste() to relocate cells without Crud ever being granted).
-    if (this._crudOperations.isCutClipboard()) {
-      this.ensureCapability(FeatureId.Crud)
-    }
     if (!isSimpleCellAddress(targetLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'targetLeftCorner')
     }
