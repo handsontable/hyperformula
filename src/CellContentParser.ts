@@ -71,7 +71,7 @@ export namespace CellContent {
     // caller passes no message, because the rule only inspects this call site,
     // not who calls it.
     constructor(errorType: ErrorType, message?: string) {
-      this.value = new CellError(errorType, message)
+      this.value = new CellError(errorType, message).withOrigin('user input')
     }
   }
 
