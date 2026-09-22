@@ -15,11 +15,6 @@ parser rejects genuine customer keys.
 | Ported on | 2026-08-20 |
 | Reference docs | the format and design notes kept alongside the upstream sources; the byte-level rules are also specified in the key spec's "Technical implementation" addendum (T1–T14) |
 
-This replaces the earlier port of `src/typed-key/` at `7553d0d1` (2026-08-11). Upstream 4.0.0
-(DEV-2512) **deleted** that directory and replaced the tagged key format with the entitlement key
-format; the tagged format never reached customers, so the old reader was removed here rather than
-kept alongside.
-
 ## Files
 
 Hashes are of the **upstream** `.js` sources at the tag above, so drift is detectable without
@@ -32,10 +27,6 @@ storing a copy of them here.
 | `extractKeyData.ts` | `extract-key-data.js` | `afd0858768879764ea016d2bc4fca692a0cd12214c1dfda6932d7ed9e4f32e45` |
 | `utils.ts` | `utils.js` | `135a8396bb22f424160fc651e899931d4be807df9b94c6dd24bb1cf6526e0541` |
 | `sha512.ts` | `sha512.js` | `668dd1109160b92965a1f9a9c5fb78dfdc1e5b7e93f635a147ae8a6bb2a5d837` |
-
-`utils.js` and `sha512.js` are byte-identical between `src/typed-key/` at the old pin and
-`src/entitlement-key/` at `4.0.0` (same hashes as the previous revision of this table), so their
-ports carried over unchanged apart from this file's path references.
 
 ### Checking for drift
 
@@ -80,13 +71,19 @@ following, which a drift review should expect to see:
    TypeScript.
 3. **The normalized product entry is typed** (`EntitlementProductGrant`), which upstream's plain
    JavaScript does not do. The types state what the reader CHECKS, and the checks are upstream's:
-   `capabilities` and `flags` are verified element by element, `notice` and `grace` are verified as
-   non-negative integers, and the date field is verified only by matching `String(value)` against
-   `YYYY-MM-DD` — so a payload whose `usage_until` is a single-element array of the right string
-   passes, and the declared `string` type is then wider than the value. Faithful to upstream, which
-   stringifies the same way; noted here because the declaration alone reads stronger than the check.
-   Everything the reader does not verify — unknown fields are preserved on purpose — sits behind an
-   `unknown`-valued index signature, so consumers must narrow before use.
+   `capabilities` and `flags` are verified element by element, and `notice` and `grace` are verified
+   as non-negative integers. Everything the reader does not verify — unknown fields are preserved on
+   purpose — sits behind an `unknown`-valued index signature, so consumers must narrow before use.
+4. **The date field is checked for type, not only for shape** (`isIsoDate` in `extractKeyData.ts`).
+   Upstream matches `String(value)` against `YYYY-MM-DD`, so a `usage_until` that is a single-element
+   array of the right string passes its shape check and the declared `string` type ends up wider than
+   the value. Here a non-string is rejected outright. This is the one divergence that CHANGES which
+   keys are accepted, so it is called out separately: a malformed key that upstream would carry into
+   a RESTRICTED entitlement takes the invalid-key path instead. The key spec's addendum (T7) makes
+   the field a real calendar date, so the stricter reading is the specified one and it is upstream
+   that deviates — but upstream has not adopted it (checked at `c50ef40a`, `develop` and `master`;
+   no pull request or issue proposes it), so this is a live fork of behaviour, not a re-port waiting
+   to happen. Re-check it at every drift review.
 
 Upstream's `/* eslint-disable */` pragmas were dropped where HyperFormula's own ESLint config
 does not need them.

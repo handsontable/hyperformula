@@ -83,14 +83,13 @@ export function normalizeCapabilityToken(token: string): string {
 }
 
 /**
- * Describes what a capability token grants: a set of function ids, a set of {@link FeatureId}
- * values, and optionally other tokens it implies. `implies` is expanded recursively by
- * `CapabilityRegistry.resolve`, not by anything in this file.
+ * Describes what a capability token grants: a set of function ids and a set of {@link FeatureId}
+ * values. A grant never refers to another token — every one stands alone, so
+ * `CapabilityRegistry.resolve` reads the table in a single flat pass.
  */
 export interface CapabilityGrant {
   functions: string[],
   features: FeatureId[],
-  implies?: string[],
 }
 
 /**
@@ -319,8 +318,8 @@ const singleFunctionEntries: [string, CapabilityGrant][] = functions4Grant.funct
  * to the still-open business decision about which dialect keys will finally be worded in
  * (owner's call, 20.08). A key's function set is the UNION of everything recognized.
  *
- * The grants are stored FULLY EXPANDED rather than chained through `implies`: the packaging
- * design states the enforcement layer must not assume a hierarchy between tokens, and that the
+ * Every grant is stored FULLY EXPANDED, and no grant refers to another: the packaging design
+ * states the enforcement layer must not assume a hierarchy between tokens, and that the
  * commercial nesting is expressed by a bigger licence simply listing more functions. The
  * cumulative spreads above keep the source DRY without putting that hierarchy into the runtime.
  *

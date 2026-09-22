@@ -5,7 +5,7 @@
 
 /**
  * Vendored from `handsontable/license-key`, `src/entitlement-key/extract-key-data.js`.
- * See `src/license/vendor/PROVENANCE.md` before editing — this file is a port, not original code.
+ * See `src/license/handsontable-license-key-parser/PROVENANCE.md` before editing — this file is a port, not original code.
  *
  * Unlike the typed-key reader this file replaces, the entitlement reader is deliberately
  * SCHEMA-FREE upstream: unknown products, capabilities and flags are all tolerated, so nothing

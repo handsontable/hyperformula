@@ -40,33 +40,15 @@ const options = {
 }
 ```
 
-### Proprietary license key formats
-
-Your proprietary license key is in one of two formats, and both work the same way:
-
-* A classic key: 25 characters in five dash-separated groups, for example
-  `1a2b3-4c5d6-7e8f9-0a1b2-3c4d5`.
-* An entitlement key: a short, human-readable license text that ends with a machine-readable
-  block in square brackets. Assign the whole text to the `licenseKey` option, or just the
-  bracketed block — the block is the only part HyperFormula reads, so both work. The text around
-  the block may be re-wrapped on its way to you (for example, by an email client) without
-  affecting the key; the block itself has to arrive character for character.
-
 ### Proprietary license key validation
 
 ::: tip
 HyperFormula doesn't use an internet connection to validate your proprietary license key.
 :::
 
-To determine whether a user is still entitled to use a particular
-version of the software, HyperFormula compares the date in your
-proprietary license key against one of two references, depending on
-the license you purchased:
-* The HyperFormula build date, when the key ends maintenance on a set
-  date (versions released before that date keep working indefinitely)
-* The current date (in UTC), when the key ends usage on a set date
-
-This process doesn't require any connection to the server.
+Which versions of HyperFormula a key covers, and for how long, follows from the
+terms of your contract. Your key carries those terms, and HyperFormula applies
+them locally, without any connection to a server.
 
 ## Feature packages and add-ons
 
