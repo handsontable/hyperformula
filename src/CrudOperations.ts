@@ -197,7 +197,6 @@ export class CrudOperations {
     return this.clipboardOperations.clipboard === undefined
   }
 
-
   public clearClipboard(): void {
     this.clipboardOperations.clear()
   }
