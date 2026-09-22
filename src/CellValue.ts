@@ -54,8 +54,14 @@ export class DetailedCellError {
    * function's own arguments — including when it came from a nested call (its own
    * `originFunction` already claimed it), when it was propagated from elsewhere, when the
    * argument was a reference that could not be resolved, which the reference itself
-   * reports, or when the offending value sat INSIDE a range that the function ignores
+   * reports, or when the offending value sat inside a range that the function IGNORES
    * (`=AND(A1:A2,TRUE())` over text returns `TRUE`, so there is no error to attribute).
+   *
+   * When a function does NOT ignore it — `MULTINOMIAL` coerces every value to a number —
+   * a bad cell inside a range is attributed to the RANGE's own argument slot, since that
+   * is the argument the user wrote: `=MULTINOMIAL(1,A1:A3)` with text in `A3` reports `1`.
+   * The index names the argument to look at, not the cell; the address of the offending
+   * cell is not part of this field.
    * When a function is applied across an array, an element that fails coercion carries the
    * index alongside the function's own name, like any other coercion failure.
    */

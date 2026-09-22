@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Added `DetailedCellError.hasMessage`, so a consumer can tell a cell error that never carried a message (e.g. a custom function that omitted one) apart from one with a deliberately empty message — both previously surfaced identically as `message: ''`. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
-- Added `DetailedCellError.originFunction` and `DetailedCellError.argumentIndex`, so a consumer can tell which function or operator produced a cell error and, when it failed coercing one of its own arguments, which argument that was. The index counts the arguments as written in the formula, so it does not shift when a preceding argument is a range covering many cells. First occurrence wins: a function or operator that only reads or propagates an error never claims to have produced it. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Added `DetailedCellError.originFunction` and `DetailedCellError.argumentIndex`, so a consumer can tell which function or operator produced a cell error and, when it failed coercing one of its own arguments, which argument that was. The index counts the arguments as written in the formula, so it does not shift when a preceding argument is a range covering many cells, and a bad value inside a range is attributed to that range's own argument. First occurrence wins: a function or operator that only reads or propagates an error never claims to have produced it. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ### Changed
 
