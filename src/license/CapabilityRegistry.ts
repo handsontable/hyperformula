@@ -12,10 +12,15 @@ import {CAPABILITY_TABLE, CapabilityGrant, normalizeCapabilityToken} from './cap
  * {@link allowsFeature}.
  */
 export interface ResolvedCapabilities {
-  /** `true` short-circuits both {@link allowsFunction} and {@link allowsFeature} to `true`. */
-  unrestricted: boolean,
-  functions: ReadonlySet<string>,
-  features: ReadonlySet<FeatureId>,
+  /**
+   * `'all'` short-circuits {@link allowsFunction} to `true` for every function id, independently
+   * of {@link features}: a key can cover every function without covering every feature, or the
+   * other way round. A single `unrestricted: boolean` could not express that combination — it
+   * could only grant both axes together or neither (review of #1728, Kuba Sękowski).
+   */
+  functions: ReadonlySet<string> | 'all',
+  /** `'all'` short-circuits {@link allowsFeature} to `true` for every {@link FeatureId}. */
+  features: ReadonlySet<FeatureId> | 'all',
 }
 
 /**
@@ -58,18 +63,25 @@ export class CapabilityRegistry {
 
   /**
    * Expands an entitlement's capability tokens into the concrete functions and features they
-   * grant. An `unrestricted` entitlement short-circuits to an unrestricted result without
+   * grant. An `unrestricted` entitlement short-circuits to `'all'` on BOTH axes without
    * consulting the table at all. Tokens are matched case-insensitively (the table is keyed by
    * the normalized spelling — see {@link normalizeCapabilityToken}). Every grant stands on its
    * own — a token never refers to another — so this is a flat pass over the entitlement's own
    * tokens; an unrecognized token is skipped without an error, and a repeated one adds nothing.
+   *
+   * Setting `'all'` on both axes here, in the same object literal, is deliberate: this is the
+   * only place `entitlement.unrestricted` is read, so a future edit that touches one axis and
+   * not the other has nowhere else to be caught except the per-axis fail-open tests in
+   * `unit/license/capability-registry.spec.ts`. The axis a change forgets fails CLOSED, not
+   * open — silently turning a working gpl-v3/legacy install into a partial denial — which is why
+   * both are pinned separately rather than with one combined assertion.
    *
    * @param {LicenseEntitlement} entitlement - the entitlement to resolve, e.g. one built by
    * hand in a test or produced by the license-key payload adapter
    */
   public resolve(entitlement: LicenseEntitlement): ResolvedCapabilities {
     if (entitlement.unrestricted) {
-      return {unrestricted: true, functions: new Set<string>(), features: new Set<FeatureId>()}
+      return {functions: 'all', features: 'all'}
     }
 
     const functions = new Set<string>()
@@ -94,7 +106,7 @@ export class CapabilityRegistry {
       grant.features.forEach((feature) => features.add(feature))
     }
 
-    return {unrestricted: false, functions, features}
+    return {functions, features}
   }
 
   /**
@@ -114,14 +126,14 @@ export class CapabilityRegistry {
  * Whether a resolved entitlement allows calling the given function.
  */
 export function allowsFunction(resolved: ResolvedCapabilities, functionId: string): boolean {
-  return resolved.unrestricted || resolved.functions.has(functionId)
+  return resolved.functions === 'all' || resolved.functions.has(functionId)
 }
 
 /**
  * Whether a resolved entitlement allows using the given feature area of the public API.
  */
 export function allowsFeature(resolved: ResolvedCapabilities, feature: FeatureId): boolean {
-  return resolved.unrestricted || resolved.features.has(feature)
+  return resolved.features === 'all' || resolved.features.has(feature)
 }
 
 /**
