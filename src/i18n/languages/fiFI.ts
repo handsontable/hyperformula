@@ -38,6 +38,7 @@ const dictionary: RawTranslationPackage = {
     AVERAGE: 'KESKIARVO',
     AVERAGEA: 'KESKIARVOA',
     AVERAGEIF: 'KESKIARVO.JOS',
+    AVERAGEIFS: 'KESKIARVO.JOS.JOUKKO',
     BASE: 'PERUS',
     BIN2DEC: 'BINDES',
     BIN2HEX: 'BINHEKSA',
