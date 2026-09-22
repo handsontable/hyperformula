@@ -52,9 +52,8 @@ export class DetailedCellError {
    *
    * `undefined` whenever the error was not a coercion failure on one of the origin
    * function's own arguments — including when it came from a nested call (its own
-   * `originFunction` already claimed it), when it was propagated from elsewhere, when the
-   * argument was a reference that could not be resolved, which the reference itself
-   * reports, or when the offending value sat inside a range that the function IGNORES
+   * `originFunction` already claimed it), when it was propagated from elsewhere, or when
+   * the offending value sat inside a range that the function IGNORES
    * (`=AND(A1:A2,TRUE())` over text returns `TRUE`, so there is no error to attribute).
    *
    * When a function does NOT ignore it — `MULTINOMIAL` coerces every value to a number —
@@ -62,8 +61,14 @@ export class DetailedCellError {
    * is the argument the user wrote: `=MULTINOMIAL(1,A1:A3)` with text in `A3` reports `1`.
    * The index names the argument to look at, not the cell; the address of the offending
    * cell is not part of this field.
-   * When a function is applied across an array, an element that fails coercion carries the
-   * index alongside the function's own name, like any other coercion failure.
+   *
+   * Two cases currently report an index that is less useful than it looks, both measured:
+   * an argument that is a reference the engine cannot resolve is claimed by the function
+   * reading it (`=DATE(2020,A99999999999,1)` reports `DATE` with index `1`, rather than the
+   * reference reporting itself); and an error raised PER ELEMENT while a function is
+   * applied across an array carries an index with no `originFunction` at all
+   * (`=DATE(2020,A1:A2,1)` over text, under array arithmetic). Both are addressed later in
+   * this change set, not here.
    */
   public readonly argumentIndex?: number
 
