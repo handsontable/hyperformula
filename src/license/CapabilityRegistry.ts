@@ -62,9 +62,9 @@ export class CapabilityRegistry {
   /**
    * Expands an entitlement's capability tokens into the concrete functions and features they
    * grant. An `unrestricted` entitlement short-circuits to an unrestricted result without
-   * consulting the table at all. Expansion through `implies` is transitive and cycle-safe (a
-   * visited set guards against a token implying itself, directly or through others); an
-   * unrecognized token is skipped without an error.
+   * consulting the table at all. Every grant in the table stands on its own — a token never
+   * refers to another — so this is a flat pass over the entitlement's own tokens; an
+   * unrecognized token is skipped without an error, and a repeated one adds nothing twice.
    *
    * @param {LicenseEntitlement} entitlement - the entitlement to resolve, e.g. one built by
    * hand in a test or produced by PR 3's license-key payload adapter
@@ -76,23 +76,14 @@ export class CapabilityRegistry {
 
     const functions = new Set<string>()
     const features = new Set<FeatureId>()
-    const visited = new Set<string>()
-    const queue = [...entitlement.capabilities]
 
-    while (queue.length > 0) {
-      const token = queue.shift() as string
-      if (visited.has(token)) {
-        continue
-      }
-      visited.add(token)
-
+    for (const token of entitlement.capabilities) {
       const grant = this.table.get(token)
       if (grant === undefined) {
         continue
       }
       grant.functions.forEach((functionId) => functions.add(functionId))
       grant.features.forEach((feature) => features.add(feature))
-      grant.implies?.forEach((impliedToken) => queue.push(impliedToken))
     }
 
     return {unrestricted: false, functions, features}
