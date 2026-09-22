@@ -18,6 +18,7 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#ЗНАЧ!',
   },
   functions: {
+    CHOOSECOLS: 'ВЫБОРСТОЛБЦ',
     FILTER: 'FILTER',
     VSTACK: 'ВСТОЛБИК',
     HSTACK: 'ГСТОЛБИК',

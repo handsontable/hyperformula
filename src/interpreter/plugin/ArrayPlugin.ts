@@ -3,17 +3,65 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/** A CHOOSECOLS index classified without evaluating a formula expression. */
+type ChooseColsLiteralIndex =
+  | {kind: 'value', value: number}
+  | {kind: 'invalid'}
+  | {kind: 'unresolved'}
+
 export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ArrayPlugin> {
+  /**
+   * Classifies an index literal for static CHOOSECOLS result-size prediction.
+   *
+   * @param {Ast} argument - The column-index argument to inspect without evaluating formulas.
+   * @returns {ChooseColsLiteralIndex} A coerced literal value, an invalid marker, or an unresolved marker.
+   */
+  private parseChooseColsLiteralIndex(argument: Ast): ChooseColsLiteralIndex {
+    if (argument.type === AstNodeType.NUMBER) {
+      return {kind: 'value', value: Math.trunc(argument.value)}
+    }
+
+    if (argument.type === AstNodeType.STRING) {
+      const coercedValue = this.arithmeticHelper.coerceToMaybeNumber(argument.value)
+      if (coercedValue === undefined) {
+        return {kind: 'invalid'}
+      }
+      return {kind: 'value', value: Math.trunc(getRawValue(coercedValue))}
+    }
+
+    if (argument.type === AstNodeType.EMPTY || argument.type === AstNodeType.ERROR || argument.type === AstNodeType.ERROR_WITH_RAW_INPUT) {
+      return {kind: 'invalid'}
+    }
+
+    if (argument.type === AstNodeType.PLUS_UNARY_OP || argument.type === AstNodeType.MINUS_UNARY_OP) {
+      const index = this.parseChooseColsLiteralIndex(argument.value)
+      if (index.kind !== 'value') {
+        return index
+      }
+      return {
+        kind: 'value',
+        value: argument.type === AstNodeType.MINUS_UNARY_OP ? -index.value : index.value,
+      }
+    }
+
+    if (argument.type === AstNodeType.PARENTHESIS) {
+      return this.parseChooseColsLiteralIndex(argument.expression)
+    }
+
+    return {kind: 'unresolved'}
+  }
+
   public static implementedFunctions: ImplementedFunctions = {
     'ARRAYFORMULA': {
       method: 'arrayformula',
@@ -42,6 +90,17 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: FunctionArgumentType.RANGE},
       ],
       repeatLastArgs: 1,
+    },
+    'CHOOSECOLS': {
+      method: 'choosecols',
+      sizeOfResultArrayMethod: 'choosecolsArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+      ],
+      repeatLastArgs: 1,
+      vectorizationForbidden: true,
     },
     'VSTACK': {
       method: 'vstack',
@@ -164,6 +223,126 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const width = Math.max(...(subChecks).map(val => val.width))
     const height = Math.max(...(subChecks).map(val => val.height))
     return new ArraySize(width, height)
+  }
+
+  /**
+   * Corresponds to CHOOSECOLS(array, col_num1, [col_num2], ...).
+   *
+   * Returns the requested source columns in argument order. Positive indexes
+   * count from the left, negative indexes count from the right, and duplicate
+   * indexes duplicate their columns in the result.
+   *
+   * @param {ProcedureAst} ast - The parsed function-call AST node.
+   * @param {InterpreterState} state - The current interpreter evaluation state.
+   * @returns {InterpreterValue} The selected source columns or a spreadsheet error.
+   */
+  public choosecols(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CHOOSECOLS'),
+      (range: SimpleRangeValue, ...columnNumbers: number[]) => {
+        const sourceWidth = range.width()
+        const sourceHeight = range.height()
+
+        if (sourceHeight === 0 || sourceWidth === 0) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+        }
+
+        const columnIndexes = columnNumbers.map(columnNumber => Math.trunc(columnNumber))
+
+        if (columnIndexes.some(columnIndex =>
+          !Number.isFinite(columnIndex) || columnIndex === 0 || Math.abs(columnIndex) > sourceWidth
+        )) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.IndexBounds)
+        }
+
+        const zeroBasedColumnIndexes = columnIndexes.map(columnIndex =>
+          columnIndex > 0 ? columnIndex - 1 : sourceWidth + columnIndex
+        )
+
+        const sourceRange = range.range
+        const startsBelowFirstRow = sourceRange !== undefined
+          && !Number.isFinite(sourceRange.height())
+          && state.formulaAddress.row !== 0
+
+        if (startsBelowFirstRow) {
+          return new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult)
+        }
+
+        if (sourceRange !== undefined) {
+          const selectedColumns = zeroBasedColumnIndexes.map(columnIndex => {
+            const columnRange = AbsoluteCellRange.spanFrom(
+              sourceRange.getAddress(columnIndex, 0),
+              1,
+              sourceHeight,
+            )
+            return SimpleRangeValue.onlyRange(columnRange, this.dependencyGraph).data
+          })
+          const result = Array.from({length: sourceHeight}, (_, row) =>
+            selectedColumns.map(column => column[row][0])
+          )
+          return SimpleRangeValue.onlyValues(result)
+        }
+
+        const result = range.data.map(row =>
+          zeroBasedColumnIndexes.map(columnIndex => row[columnIndex])
+        )
+        return SimpleRangeValue.onlyValues(result)
+      }
+    )
+  }
+
+  /**
+   * Predicts the CHOOSECOLS spill size from the source height and index count.
+   *
+   * Invalid literals are rejected before spill allocation. A whole-column
+   * result is valid only in the first output row, then its source range
+   * supplies the materialized spill height.
+   *
+   * @param {ProcedureAst} ast - The parsed function-call AST node.
+   * @param {InterpreterState} state - The current interpreter evaluation state.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  public choosecolsArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 2) {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata('CHOOSECOLS')
+    const sourceSize = this.arraySizeForAst(
+      ast.args[0],
+      new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
+    )
+
+    const startsBelowFirstRow = !Number.isFinite(sourceSize.height) && state.formulaAddress.row !== 0
+    let sourceAst = ast.args[0]
+    while (sourceAst.type === AstNodeType.PARENTHESIS) {
+      sourceAst = sourceAst.expression
+    }
+    const sourceRange = sourceAst.type === AstNodeType.COLUMN_RANGE
+      ? AbsoluteCellRange.fromAstOrUndef(sourceAst, state.formulaAddress)
+      : undefined
+    const effectiveHeight = !Number.isFinite(sourceSize.height) && sourceRange !== undefined
+      ? sourceRange.effectiveHeight(this.dependencyGraph)
+      : sourceSize.height
+
+    if (startsBelowFirstRow || effectiveHeight < 1) {
+      return ArraySize.error()
+    }
+
+    for (const argument of ast.args.slice(1)) {
+      const index = this.parseChooseColsLiteralIndex(argument)
+      if (
+        index.kind === 'invalid'
+        || (index.kind === 'value' && (
+          !Number.isFinite(index.value)
+          || index.value === 0
+          || Math.abs(index.value) > sourceSize.width
+        ))
+      ) {
+        return ArraySize.error()
+      }
+    }
+
+    return new ArraySize(ast.args.length - 1, effectiveHeight)
   }
 
   /**
