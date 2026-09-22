@@ -373,7 +373,7 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
   const {state, expiredOn} = validityOf(terms)
 
   if (notifyConsole && !terms.silent) {
-    notifyLicenseKeyState(state, expiredOn)
+    notifyLicenseKeyState(state, expiredOn, terms.comparedAgainstReleaseDate ? 'release' : 'usage')
 
     if (state === LicenseKeyValidityState.VALID) {
       const noticeExpiryDate = expiryWithinNoticeWindow(terms)
