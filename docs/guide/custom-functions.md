@@ -1,3 +1,15 @@
+---
+tags:
+  - registerFunctionPlugin
+  - implementedFunctions
+  - runFunction
+  - FunctionArgumentType
+  - SimpleRangeValue
+  - CellError
+  - UDF
+  - user-defined function
+---
+
 # Custom functions
 
 Expand the function library of your application by adding custom functions.

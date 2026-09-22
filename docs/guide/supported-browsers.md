@@ -1,3 +1,13 @@
+---
+tags:
+  - full-icu
+  - IE11
+  - Internet Explorer
+  - mobile
+  - iOS
+  - Android
+---
+
 # Supported browsers
 
 Each release of HyperFormula is tested on the **two latest versions**

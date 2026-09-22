@@ -1,3 +1,11 @@
+---
+tags:
+  - Node.js version
+  - full-icu
+  - CommonJS
+  - backend
+---
+
 # Server-side installation
 
 ::: tip
@@ -38,3 +46,12 @@ const { HyperFormula } = require('hyperformula');
 
 // your code
 ```
+
+## Set up your coding agent
+
+HyperFormula ships an official Claude skill and machine-readable docs, so
+your AI coding agent can scaffold, configure, and debug HyperFormula
+correctly. That applies to a Node.js project as much as to a browser one.
+To install the skill in Claude Code, or to point Cursor, GitHub Copilot, or
+another agent at the docs, see
+[Set up your coding agent](setup-coding-agent.md).

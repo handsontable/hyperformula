@@ -10,14 +10,13 @@ import {FeatureId} from './LicenseEntitlement'
 export const CORE_TOKEN = 'core'
 
 /**
- * Describes what a capability token grants: a set of function ids, a set of {@link FeatureId}
- * values, and optionally other tokens it implies. `implies` is expanded recursively by
- * `CapabilityRegistry.resolve`, not by anything in this file.
+ * Describes what a capability token grants: a set of function ids and a set of {@link FeatureId}
+ * values. A grant never refers to another token — every one stands alone, so
+ * `CapabilityRegistry.resolve` reads the table in a single flat pass.
  */
 export interface CapabilityGrant {
   functions: string[],
   features: FeatureId[],
-  implies?: string[],
 }
 
 const coreGrant: CapabilityGrant = {
