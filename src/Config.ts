@@ -290,7 +290,8 @@ export class Config implements ConfigParams, ParserConfig {
     privatePool.set(this, {
       licenseKeyValidityState,
       licenseCapabilities,
-      isLicenseGateActive: licenseKeyValidityState !== LicenseKeyValidityState.VALID || !licenseCapabilities.unrestricted,
+      isLicenseGateActive: licenseKeyValidityState !== LicenseKeyValidityState.VALID ||
+        licenseCapabilities.functions !== 'all' || licenseCapabilities.features !== 'all',
       capabilityRegistry,
     })
 
