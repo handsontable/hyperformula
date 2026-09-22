@@ -46,12 +46,18 @@ export class DetailedCellError {
    * The zero-based index of the argument that was rejected, when `originFunction` names a
    * function whose own argument coercion produced this error.
    *
+   * The index counts the arguments AS WRITTEN in the formula. For a function that accepts
+   * ranges, a range is one argument however many cells it covers, so `=AND(A1:A100,"x")`
+   * reports `1` for `"x"` — the index describes the formula, not the data behind it.
+   *
    * `undefined` whenever the error was not a coercion failure on one of the origin
    * function's own arguments — including when it came from a nested call (its own
-   * `originFunction` already claimed it), when it was propagated from elsewhere, or when
-   * the argument was a reference that could not be resolved, which the reference itself
-   * reports. When a function is applied across an array, an element that fails coercion
-   * carries the index alongside the function's own name, like any other coercion failure.
+   * `originFunction` already claimed it), when it was propagated from elsewhere, when the
+   * argument was a reference that could not be resolved, which the reference itself
+   * reports, or when the offending value sat INSIDE a range that the function ignores
+   * (`=AND(A1:A2,TRUE())` over text returns `TRUE`, so there is no error to attribute).
+   * When a function is applied across an array, an element that fails coercion carries the
+   * index alongside the function's own name, like any other coercion failure.
    */
   public readonly argumentIndex?: number
 
