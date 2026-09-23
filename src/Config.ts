@@ -69,10 +69,13 @@ export class Config implements ConfigParams, ParserConfig {
     useColumnIndex: false,
     useStats: false,
     useArrayArithmetic: false,
+    arrayFunctionResultOverwritesData: false,
   }
 
   /** @inheritDoc */
   public readonly useArrayArithmetic: boolean
+  /** @inheritDoc */
+  public readonly arrayFunctionResultOverwritesData: boolean
   /** @inheritDoc */
   public readonly caseSensitive: boolean
   /** @inheritDoc */
@@ -203,6 +206,7 @@ export class Config implements ConfigParams, ParserConfig {
       timeFormats,
       thousandSeparator,
       useArrayArithmetic,
+      arrayFunctionResultOverwritesData,
       useStats,
       undoLimit,
       maxPendingLazyTransformations,
@@ -216,6 +220,7 @@ export class Config implements ConfigParams, ParserConfig {
     }
 
     this.useArrayArithmetic = configValueFromParam(useArrayArithmetic, 'boolean', 'useArrayArithmetic')
+    this.arrayFunctionResultOverwritesData = configValueFromParam(arrayFunctionResultOverwritesData, 'boolean', 'arrayFunctionResultOverwritesData')
     this.accentSensitive = configValueFromParam(accentSensitive, 'boolean', 'accentSensitive')
     this.caseSensitive = configValueFromParam(caseSensitive, 'boolean', 'caseSensitive')
     this.caseFirst = configValueFromParam(caseFirst, ['upper', 'lower', 'false'], 'caseFirst')

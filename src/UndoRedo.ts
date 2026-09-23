@@ -350,6 +350,7 @@ export class SetCellContentsUndoEntry extends BaseUndoEntry {
       newContent: RawCellContent,
       oldContent: [SimpleCellAddress, ClipboardCell],
     }[],
+    public readonly overwrittenCells: [SimpleCellAddress, ClipboardCell][] = [],
   ) {
     super()
   }
@@ -639,6 +640,12 @@ export class UndoRedo {
         this.operations.setCellEmpty(address)
       }
       this.operations.restoreCell(oldContentAddress, oldContent)
+    }
+    // Restore any cells that an array formula overwrote while spilling. This must run after
+    // the anchor formulas above are undone, so the spill (and its array-internal cells) is
+    // gone and the overwritten addresses are free to restore.
+    for (const [address, clipboardCell] of operation.overwrittenCells) {
+      this.operations.restoreCell(address, clipboardCell)
     }
   }
 
