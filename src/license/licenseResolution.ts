@@ -9,7 +9,7 @@ import {
   notifyLicenseKeyNotice,
   notifyLicenseKeyState,
 } from '../helpers/licenseKeyValidator'
-import {ALL_FEATURE_TOKENS, CAPABILITY_TABLE, CORE_TOKEN, normalizeCapabilityToken} from './capabilities'
+import {ALL_FEATURE_TOKENS, CAPABILITY_TABLE, normalizeCapabilityToken} from './capabilities'
 import {LicenseEntitlement, LicenseExpiry, unrestrictedEntitlement} from './LicenseEntitlement'
 import {detectLicenseKeyFormat} from './handsontable-license-key-parser/detectFormat'
 import {EntitlementKeyData, EntitlementProductGrant, extractEntitlementKeyData} from './handsontable-license-key-parser/extractKeyData'
@@ -132,12 +132,12 @@ function releaseDateTimestamp(): number | null {
 function licenseTermsOf(data: EntitlementKeyData): LicenseTerms {
   const grant: EntitlementProductGrant | undefined = data.products[HYPERFORMULA_PRODUCT_NAME]
 
-  // CORE_TOKEN is always granted, but note what it actually grants: the calculation operators -
-  // NOT a usable set of functions. A key whose only tokens this build does not recognize therefore
-  // evaluates operators and protected built-ins and returns #LIC! for every function call,
-  // silently, per HF-307 decision D3. That cliff is ratified as-is (D6-A): "this
-  // situation should never happen. There is no point in issuing a key if empty capabilities."
-  const capabilityTokens = [CORE_TOKEN]
+  // Nothing is granted implicitly: a key's functions are exactly what its own tokens name. A key
+  // whose tokens this build does not recognize therefore still evaluates the infix operators (they
+  // are not function calls) and the protected built-ins, and returns #LIC! for every function call,
+  // silently, per HF-307 decision D3. That cliff is ratified as-is (D6-A): "this situation should
+  // never happen. There is no point in issuing a key if empty capabilities."
+  const capabilityTokens: string[] = []
 
   if (grant !== undefined) {
     // Appended one by one rather than with `push(...grant.capabilities)`. The array comes from an
