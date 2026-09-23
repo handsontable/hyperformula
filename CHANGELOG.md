@@ -7,11 +7,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added support for whole-row, whole-column and whole-range results of the `INDEX` function. An index of `0` selects every row (`=INDEX(A1:C3, 0, 2)`) or every column (`=INDEX(A1:C3, 2, 0)`), matching Excel. The result is an array, so it needs free space in the sheet to spill into. [#1754](https://github.com/handsontable/hyperformula/pull/1754)
+
+### Changed
+
+- A **breaking change**: the `INDEX` function no longer defaults its third argument to `1`. As in Excel, a call that leaves the third argument out requires the range to be a single row or a single column, and reads the only index provided as the position along it: `=INDEX(A1:C1, 3)` returns the value of `C1` and `=INDEX(A1:A3, 2)` the value of `A2`, where the first previously returned a `#NUM!` error. Given a range with several rows and several columns there is nothing for that index to mean, so `=INDEX(A1:C3, 2)` now returns a `#REF!` error instead of the value in the first column. An argument left empty rather than left out is not the same thing: it is a column number of zero, so `=INDEX(A1:C3, 2, )` returns the whole second row. See the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html#changes-to-the-index-function). [#1754](https://github.com/handsontable/hyperformula/pull/1754)
+- A **breaking change**: the `INDEX` function returns a `#REF!` error instead of `#NUM!` when an index exceeds the size of the range, and a `#VALUE!` error with the "Value cannot be negative." message instead of "Argument cannot be less than 1." for a negative index. Both match Excel and the behavior already described in the [cell references guide](https://hyperformula.handsontable.com/docs/guide/cell-references.html). See the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html#changes-to-the-index-function). [#1754](https://github.com/handsontable/hyperformula/pull/1754)
+- A **breaking change**: the `INDEX` function is no longer [vectorized](https://hyperformula.handsontable.com/docs/guide/arrays.html#passing-arrays-to-scalar-functions-vectorization) in the array arithmetic mode. An array passed as an index argument is now resolved to a single value, as it already was outside that mode, instead of producing one result per element. Vectorization is incompatible with the array results that a zero index produces. See the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html#changes-to-the-index-function). [#1754](https://github.com/handsontable/hyperformula/pull/1754)
+
 ### Fixed
 
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
 - Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
+- Fixed the `INDEX` function silently returning the top-left cell of the range for a fractional index. Indices are now truncated toward zero, as in Excel, so `=INDEX(A1:C3, 2.9, 1)` returns the value of `A2`. See the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html#changes-to-the-index-function). [#1754](https://github.com/handsontable/hyperformula/pull/1754)
 - Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
 
 ## [3.4.0] - 2026-08-10

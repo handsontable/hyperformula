@@ -76,10 +76,10 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
   },
   INDEX: {
     category: 'Lookup and reference',
-    shortDescription: 'Returns the contents of a cell specified by row and column number. The column number is optional and defaults to 1.',
-    parameters: [{name: 'range', description: 'The range from which a value is returned.'}, {name: 'row', description: 'The row number within range (counting from 1) of the value to return.'}, {name: 'column', description: 'The column number within range (counting from 1) of the value to return. Defaults to 1 when omitted.'}],
+    shortDescription: 'Returns the contents of a cell specified by row and column number. A row of 0 returns the whole column, a column of 0 returns the whole row, and 0 for both returns the whole range.',
+    parameters: [{name: 'range', description: 'The range from which a value is returned.'}, {name: 'row', description: 'The row number within range (counting from 1) of the value to return. 0 selects every row of range. When column is left out of the formula, this is read as the position along range instead, and range has to be a single row or a single column.'}, {name: 'column', description: 'The column number within range (counting from 1) of the value to return. 0 selects every column of range. Leaving the argument out is not the same as passing 0: it requires range to be a single row or a single column.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    examples: ['=INDEX(A1:C10, 2, 3)', '=INDEX(A1:A10, 5)'],
+    examples: ['=INDEX(A1:C10, 2, 3)', '=INDEX(A1:A10, 5)', '=INDEX(A1:C10, 2, 0)', '=INDEX(A1:C10, 0, 3)'],
   },
   MATCH: {
     category: 'Lookup and reference',
