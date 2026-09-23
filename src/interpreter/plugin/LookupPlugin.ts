@@ -74,17 +74,11 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    */
   public vlookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('VLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
-      const range = rangeValue.range
-
-      if (range === undefined) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-      }
-
       if (index < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
 
-      if (index > range.width()) {
+      if (index > rangeValue.width()) {
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
 
@@ -105,16 +99,11 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    */
   public hlookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
-      const range = rangeValue.range
-      if (range === undefined) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-      }
-
       if (index < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
 
-      if (index > range.height()) {
+      if (index > rangeValue.height()) {
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
 
