@@ -153,7 +153,14 @@ export const buildLexerConfig = (config: ParserConfig): LexerConfig => {
   // cutoff this whole prefix scheme exists for, so Excel can never actually emit a prefixed OFFSET call
   // in any case — the asymmetry has no reachable real input, only hand-typed formulas (see the
   // "an upper-cased prefix is accepted on OFFSET, unlike everywhere else" test).
-  const OffsetProcedureName = createToken({ name: 'OffsetProcedureName', pattern: new RegExp(`(?:${EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN})?${offsetProcedureNameLiteral}`, 'i') })
+  // Unlike ProcedureName, this token does not include the '(' itself, so the prefixed form must look
+  // ahead for one: otherwise it would claim the start of a named expression such as `_xlfn.OFFSET_RATE`,
+  // which lexes as a single NamedExpression without prefix support. The unprefixed form keeps its
+  // pre-existing pattern unchanged.
+  const OffsetProcedureName = createToken({
+    name: 'OffsetProcedureName',
+    pattern: new RegExp(`(?:${EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN})${offsetProcedureNameLiteral}(?=(?:${whitespaceTokenRegexp.source})?\\()|${offsetProcedureNameLiteral}`, 'i'),
+  })
 
   let ArgSeparator: TokenType
   let inject: TokenType[]

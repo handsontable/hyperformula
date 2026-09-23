@@ -33,14 +33,14 @@ HyperFormula ignores these prefixes, so you can pass the formula straight to the
 
 | Prefix | Example |
 | --- | --- |
-| `_xlfn.` | `=_xlfn.IFS(A1>B1,"Pass","Fail")` |
+| `_xlfn.` | `=_xlfn.IFS(A1>B1,"Pass",A1<=B1,"Fail")` |
 | `_xlfn._xlws.` | `=_xlfn._xlws.FILTER(A1:A9,B1:B9>1)` |
 | `_xlws.` | `=_xlws.SORT(A1:A9)` |
 | `_xludf.` | `=_xludf.MY_FUNCTION()` |
 
 The `_xlpm.` prefix marks a `LAMBDA`/`LET` parameter name. HyperFormula does not support `LAMBDA` or `LET`, so a formula containing one returns `#NAME?` whether or not the prefix is present.
 
-[`getCellFormula()`](../api/classes/hyperformula.md#getcellformula) returns the formula without the prefix, so `=_xlfn.IFS(A1>B1,"Pass","Fail")` reads back as `=IFS(A1>B1,"Pass","Fail")`.
+[`getCellFormula()`](../api/classes/hyperformula.md#getcellformula) returns the formula without the prefix, so `=_xlfn.IFS(A1>B1,"Pass",A1<=B1,"Fail")` reads back as `=IFS(A1>B1,"Pass",A1<=B1,"Fail")`.
 
 A prefix does not add a function. If HyperFormula does not support the function itself, the cell holds a `#NAME?` error. See the [list of supported functions](built-in-functions.md).
 
