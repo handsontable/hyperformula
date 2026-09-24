@@ -75,15 +75,6 @@ In that case every licence-gated function call evaluates to a `#LIC!` error — 
 starts throwing, and `getAvailableFunctions()` still describes the full set of functions. A key
 problem never narrows what the library reports it can do.
 
-Arithmetic keeps working: operators such as `=A1+B1` are not function calls, so nothing gates them.
-`VERSION()` and `OFFSET()` are function calls, but they are protected built-ins that sit outside the
-licence system entirely, so they keep evaluating too. A sheet with a key problem therefore does not
-go blank.
-
-A **valid** key can print one notification too: if it expires on a set date and that date is
-within the notice period your license carries, the console names the last day the key covers. It
-is a heads-up only — nothing is restricted while a key is valid, and the message appears once.
-
 ## License key support
 
 If you have any issues with your license key, [contact our team](contact.md).
