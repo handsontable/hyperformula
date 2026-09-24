@@ -20,6 +20,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Changed the parser for the new proprietary license keys to the entitlement key format, following its upstream specification. This replaces the tagged key format, which was never issued to anyone. Classic 25-character license keys and `gpl-v3` are unaffected. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
 - Changed the license capability tokens to be matched case-insensitively, and to grant functions through the packaging group-token vocabulary only: `fun:all`, `fun:<family>.<A|B|C>`, and per-function `fun:<FUNCTION_NAME>` tokens. A key names the capabilities it grants, and the engine grants their union; it keeps no notion of which tokens make up a package. The callable forms of the calculation operators, such as `HF.ADD`, are granted by `fun:operator.A`, while the infix operators themselves work under any key. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
 
+### Deprecated
+
+- Deprecated the static `HyperFormula.getRegisteredFunctionNames()` method; it will be removed in one of the next major releases. Use the instance method of the same name instead — a static method has no engine, and therefore no configuration, in scope, so it answers for the global function registry: an engine configured with its own `functionPlugins` registers only those, and this method can list functions that engine cannot evaluate at all. The two are not interchangeable: the static one translates into any registered language without an engine, so migrating means building one, for example `HyperFormula.buildEmpty({ language: 'plPL' }).getRegisteredFunctionNames()`. [#1743](https://github.com/handsontable/hyperformula/pull/1743)
+
 ### Fixed
 
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)

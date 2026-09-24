@@ -596,7 +596,22 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns translated names of all registered functions for a given language
+   * Returns translated names of all registered functions for a given language.
+   *
+   * Answers for the GLOBAL function registry, because a static method has no engine, and therefore
+   * no configuration, in scope. An engine configured with its own `functionPlugins` registers only
+   * those, so this method can list functions that engine cannot evaluate at all. Use the instance
+   * method [[getRegisteredFunctionNames]] instead, which answers for the engine you actually hold —
+   * the same reasoning that made `getAvailableFunctions()` and `getFunctionDetails()` instance-only
+   * from their first release.
+   *
+   * The two are not interchangeable: this one translates into any registered language without
+   * building an engine, while the instance method answers only under its own instance's language.
+   * Migrating means building an engine:
+   * `HyperFormula.buildEmpty({ language: 'plPL' }).getRegisteredFunctionNames()`.
+   *
+   * @deprecated Use the instance method of the same name. This static method is deprecated and
+   * will be removed in one of the next major releases.
    *
    * @param {string} code - language code
    *
@@ -4543,6 +4558,11 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns translated names of all functions registered in this instance of HyperFormula
    * according to the language set in the configuration
+   *
+   * Answers for the instance's function REGISTRY — what is registered, not what the license key
+   * lets it evaluate — so it lists every registered function whatever the key grants. To build a
+   * function picker that never offers a function evaluating to `#LIC!`, use
+   * [[getAvailableFunctions]], which answers about availability.
    *
    * @example
    * ```js
