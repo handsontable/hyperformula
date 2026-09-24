@@ -52,9 +52,7 @@ them locally, without any connection to a server.
 
 ## Feature packages and add-ons
 
-A proprietary license key may grant the whole library, or only part of it. If your key covers
-everything you buy nothing new to think about, and neither does the GPLv3 key `gpl-v3`, which
-always grants everything.
+A proprietary license key may grant the whole library, or only part of it.
 
 If your key grants only part of the library, then:
 
