@@ -602,8 +602,8 @@ export class HyperFormula implements TypedEmitter {
    * no configuration, in scope. An engine configured with its own `functionPlugins` registers only
    * those, so this method can list functions that engine cannot evaluate at all. Use the instance
    * method [[getRegisteredFunctionNames]] instead, which answers for the engine you actually hold —
-   * the same reasoning that retired the static `getAvailableFunctions()` and `getFunctionDetails()`
-   * in 3.4.0.
+   * the same reasoning that made `getAvailableFunctions()` and `getFunctionDetails()` instance-only
+   * from their first release.
    *
    * The two are not interchangeable: this one translates into any registered language without
    * building an engine, while the instance method answers only under its own instance's language.
