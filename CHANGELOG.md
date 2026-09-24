@@ -7,6 +7,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added support for proprietary license keys that grant a subset of the library ("feature packages and add-ons"). A function your key does not include evaluates to a `#LIC!` error, and the corresponding parts of the API throw a `LicenseCapabilityMissingError`. Keys that grant everything, including `gpl-v3`, are unaffected. [#1728](https://github.com/handsontable/hyperformula/pull/1728) [#1729](https://github.com/handsontable/hyperformula/pull/1729) [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+- Added a one-time console notice when a license key's usage-based expiry date falls within its configured notice period, naming the key's last covered day ("valid until … (UTC)"). The notice is silenced by the key's own silent flag, and never fires for a key expiring on the perpetual (`release_until`) axis. Blocking behavior at and after expiry is unchanged. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+- Added grants to the two commercial add-on tokens: `spreadsheet` (the Spreadsheet Bundle) now grants the CRUD, undo/redo, clipboard, and batching feature areas, and `import_export` grants the reserved import/export feature that nothing gates on until the feature ships. A key naming neither add-on keeps every feature area it has today. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+
+### Changed
+
+- Changed `getAvailableFunctions()` and `getFunctionDetails()` to describe only the functions the instance's license key includes, so they no longer advertise a function that would evaluate to a `#LIC!` error. A missing, invalid, or expired key does not shorten the list. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+- Changed the console message for an expired proprietary license key to stop naming the installed version when the key ran out on the usage axis rather than the maintenance axis. A maintenance key stops covering releases, so an older build keeps working; a usage-based key stops being valid at all, and there is no version to fall back to. Classic 25-character license keys have only the maintenance axis, so their message is unchanged. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+- Changed the parser for the new proprietary license keys to the entitlement key format, following its upstream specification. This replaces the tagged key format, which was never issued to anyone. Classic 25-character license keys and `gpl-v3` are unaffected. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+- Changed the license capability tokens to be matched case-insensitively, and to grant functions through the packaging group-token vocabulary only: `fun:all`, `fun:<family>.<A|B|C>`, and per-function `fun:<FUNCTION_NAME>` tokens. A key names the capabilities it grants, and the engine grants their union; it keeps no notion of which tokens make up a package. The callable forms of the calculation operators, such as `HF.ADD`, are granted by `fun:operator.A`, while the infix operators themselves work under any key. [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+
 ### Fixed
 
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)

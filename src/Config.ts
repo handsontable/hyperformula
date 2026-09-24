@@ -16,12 +16,12 @@ import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} 
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {ConfigValueEmpty, ExpectedValueOfTypeError} from './errors'
 import {defaultStringifyCurrency, defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
-import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
 import {CapabilityRegistry, ResolvedCapabilities} from './license/CapabilityRegistry'
-import {unrestrictedEntitlement} from './license/LicenseEntitlement'
+import {resolveLicense} from './license/licenseResolution'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 import {ConfigParams, ConfigParamsList} from './ConfigParams'
@@ -180,7 +180,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly matchWholeCell: boolean
 
-  constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true) {
+  constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true, notifyLicenseMessages: boolean = true) {
     const {
       accentSensitive,
       caseSensitive,
@@ -279,13 +279,9 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
     this.context = context
 
-    const licenseKeyValidityState = checkLicenseKeyValidity(this.licenseKey)
+    const {validityState: licenseKeyValidityState, entitlement} = resolveLicense(this.licenseKey, notifyLicenseMessages)
     const capabilityRegistry = new CapabilityRegistry()
-    // PR 1 (HF-307) ships the gate infrastructure without a real license-key payload adapter —
-    // that lands in PR 3 as src/license/payloadAdapter.ts. Until then every entitlement resolves
-    // as unrestricted, so isLicenseGateActive below reduces to today's licenseKeyValidityState
-    // check and gate B in the interpreter never actually restricts a function.
-    const licenseCapabilities = capabilityRegistry.resolve(unrestrictedEntitlement())
+    const licenseCapabilities = capabilityRegistry.resolve(entitlement)
 
     privatePool.set(this, {
       licenseKeyValidityState,
@@ -346,7 +342,7 @@ export class Config implements ConfigParams, ParserConfig {
 
   /**
    * Whether gate B (the entitlement check in the interpreter) needs to run at all for this
-   * config. `false` — the common case, for `gpl-v3`, legacy keys, and an unrestricted typed
+   * config. `false` — the common case, for `gpl-v3`, legacy keys, and an unrestricted entitlement
    * key — is a single boolean read, cheaper than the string-enum comparison it replaces.
    *
    * @internal
@@ -370,12 +366,12 @@ export class Config implements ConfigParams, ParserConfig {
     return getFullConfigFromPartial(this)
   }
 
-  public mergeConfig(init: Partial<ConfigParams>): Config {
+  public mergeConfig(init: Partial<ConfigParams>, notifyLicenseMessages: boolean = true): Config {
     const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
     Config.warnDeprecatedOptions(init)
 
-    return new Config(mergedConfig, false)
+    return new Config(mergedConfig, false, notifyLicenseMessages)
   }
 
   private static warnDeprecatedOptions(options: Partial<ConfigParams>) {
