@@ -52,6 +52,18 @@ Canonical reference for everyone working on the HyperFormula source code: mainta
 - `src/DependencyGraph/` &mdash; cell dependency tracking and recalculation order
 - `src/CrudOperations.ts` &mdash; create/read/update/delete operations on sheets and cells
 
+### Parser cache ownership
+
+`ParserWithCaching` caches ASTs and parsing metadata by normalized formula hash.
+`maxParserCacheSize` bounds the cache; entries are evicted in least-recently-used
+order. A hash is therefore not a durable reference to a formula.
+
+Formula vertices, clipboard cells, and undo snapshots retain AST references
+directly. Transformations produce new ASTs rather than mutating those snapshots.
+`fetchCachedResultForAst()` reconstructs dependencies and function flags when an
+AST's cache entry has been evicted. New consumers that need to restore a formula
+must retain its AST, so it remains available independently of cache eviction.
+
 ### Function plugins (`src/interpreter/plugin/`)
 
 All spreadsheet functions are implemented as plugins extending `FunctionPlugin`. Each plugin:

@@ -8,6 +8,7 @@ tags:
   - useColumnIndex
   - chooseAddressMappingPolicy
   - maxPendingLazyTransformations
+  - maxParserCacheSize
 ---
 
 # Performance
@@ -71,6 +72,26 @@ const hf = HyperFormula.buildEmpty({
   maxPendingLazyTransformations: 100,
 })
 ```
+
+## Parser cache size
+
+HyperFormula reuses parsed formulas to avoid repeating parsing work. The
+[`maxParserCacheSize`](../api/interfaces/configparams.html#maxparsercachesize)
+option limits this cache to 10,000 entries by default. Once full, the cache
+discards the least recently used entries as new formulas are parsed.
+
+For long-running instances that process many distinct formulas, a smaller limit
+can reduce memory retained by the cache at the cost of more parsing work. The
+cache also lets cells share parsed formulas. If many cells reuse the same
+formulas, reducing the limit can increase total memory use by retaining more
+separate syntax trees. Measure with a representative workbook before tuning the
+limit. Set it to `0` to disable parser caching. Formula calculation, undo/redo,
+and clipboard operations continue to work with any supported cache limit.
+
+The limit counts cache entries, not bytes or cells. Formulas still needed by
+the workbook, undo/redo history, or clipboard remain in memory independently
+of the cache. Use [`undoLimit`](../api/interfaces/configparams.html#undolimit)
+to control the length of undo history separately.
 
 ## Suspending automatic recalculations
 
