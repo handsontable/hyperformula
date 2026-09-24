@@ -66,9 +66,6 @@ If your key grants only part of the library, then:
   [`getFunctionDetails()`](../api/classes/hyperformula.md#getfunctiondetails) describe only the
   functions your key includes, so a function picker built from them never offers a function that
   then fails.
-* [`getRegisteredFunctionNames()`](../api/classes/hyperformula.md#getregisteredfunctionnames)
-  answers a different question — which functions are registered in the instance — so your key
-  does not shorten it.
 
 Custom functions you register yourself are available whatever your key grants, as long as they use
 an id of their own. The licence covers built-in ids, so a plugin registered under a built-in id your
