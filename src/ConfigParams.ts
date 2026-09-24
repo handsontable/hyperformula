@@ -438,8 +438,10 @@ export interface ConfigParams {
    * Must be a non-negative safe integer. Set to `0` to disable parser caching.
    *
    * Least recently used entries are discarded when the limit is reached.
-   * Smaller limits reduce cache memory but may increase parsing work. This does
-   * not limit formulas retained by cells, named expressions, undo/redo or the clipboard.
+   * Smaller limits can reduce cache memory but may increase parsing work. They
+   * can also increase total memory when many cells reuse the same formulas,
+   * because those cells share cached syntax trees. This does not limit formulas
+   * retained by cells, named expressions, undo/redo or the clipboard.
    *
    * @default 10000
    * @category Engine
