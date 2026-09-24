@@ -111,9 +111,9 @@ export class CapabilityRegistry {
 
   /**
    * Returns the capability token a function id is covered by, or `undefined` if this registry's
-   * table does not cover it. The completeness invariant in
-   * `unit/license/capability-registry.spec.ts` guarantees every built-in registered in the
-   * static function registry is covered by the table, the core token, or the protected list —
+   * table does not cover it. The completeness invariant in the paired `hyperformula-tests` suite
+   * (`unit/license/capability-registry.spec.ts`) guarantees every built-in registered in the
+   * static function registry is covered by the table or the protected list —
    * so `undefined` for a function known to the current instance's function registry means it is
    * a custom, instance-registered function rather than an unlisted built-in.
    */
