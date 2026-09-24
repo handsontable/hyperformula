@@ -600,15 +600,11 @@ export class HyperFormula implements TypedEmitter {
    *
    * Answers for the GLOBAL function registry, because a static method has no engine, and therefore
    * no configuration, in scope. An engine configured with its own `functionPlugins` registers only
-   * those, so this method can list functions that engine cannot evaluate at all. Use the instance
-   * method [[getRegisteredFunctionNames]] instead, which answers for the engine you actually hold —
-   * the same reasoning that made `getAvailableFunctions()` and `getFunctionDetails()` instance-only
-   * from their first release.
+   * those, so this method can list functions that engine cannot evaluate at all.
    *
-   * The two are not interchangeable: this one translates into any registered language without
-   * building an engine, while the instance method answers only under its own instance's language.
-   * Migrating means building an engine:
-   * `HyperFormula.buildEmpty({ language: 'plPL' }).getRegisteredFunctionNames()`.
+   * The two forms answer different questions and neither replaces the other: this one translates
+   * into any registered language without building an engine, while the instance method of the same
+   * name answers for the engine you actually hold, under that instance's own language and license.
    *
    * @param {string} code - language code
    *

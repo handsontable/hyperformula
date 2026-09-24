@@ -23,6 +23,14 @@ export const BATCHING_FEATURE_TOKEN = 'feat:batching'
 /**
  * Grants {@link FeatureId.ImportExport} — a RESERVED grant: nothing in the public API is gated on
  * it yet, because HF-107 hasn't shipped the import/export feature it would gate.
+ *
+ * It is nevertheless a RECOGNIZED feature token, so naming it switches the opt-in fallback off
+ * like any other: a key whose only `feat:*` token is this one is granted import/export and NOTHING
+ * else — no CRUD, no undo, no clipboard, no named expressions, no batching. That is the opt-in rule
+ * working as ratified, and it is the operational contract it puts on the issuing side: once a key
+ * names this token it must also name every other area the customer bought. Pinned in
+ * `unit/license/feature-tokens.spec.ts`, because a token that gates nothing suppressing the whole
+ * fallback is exactly the kind of thing a later edit would undo without noticing.
  */
 export const IMPORT_EXPORT_FEATURE_TOKEN = 'feat:import_export'
 
@@ -47,7 +55,7 @@ export const FUN_ALL_TOKEN = 'fun:all'
  * under lowercasing. Surrounding whitespace is trimmed for a sharper reason than tidiness: every
  * rule that reads a token has to read the SAME token, and a padded one used to be read two
  * different ways at once — `' feat:crud'` failed the `feat:` prefix test that decides whether a key
- * speaks the feature vocabulary, so the key was granted all five feature areas instead of the one
+ * speaks the feature vocabulary, so the key was granted every feature area instead of the one
  * it named, while `'feat:crud '` passed that test and then missed the table, granting none.
  *
  * Normalization happens at LOOKUP, never at storage: an entitlement carries the key's own
@@ -237,8 +245,7 @@ const singleFunctionEntries: [string, CapabilityGrant][] = ALL_GATABLE_FUNCTIONS
  *
  * - function tokens, per §6 of the packaging design: `fun:all`, the group tokens
  *   `fun:<family>.<a|b|c>`, and one `fun:<CANONICAL_FUNCTION_NAME>` per canonical function;
- * - one `feat:*` token per gated API area;
- * - the two add-on tokens the key generator's schema mints, each naming the features it grants.
+ * - one `feat:*` token per gated API area.
  *
  * No token here names a package, and no grant refers to another token. Which tokens a commercial
  * package consists of is the generator's knowledge, expressed by the bigger licence simply

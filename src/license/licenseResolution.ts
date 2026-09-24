@@ -164,10 +164,10 @@ function licenseTermsOf(data: EntitlementKeyData): LicenseTerms {
   // The trigger is a feature token this version RECOGNIZES, not merely one that looks like a
   // feature token. An unrecognized `feat:*` token has to be inert (D3: "unrecognized token should
   // not grant the capability (silently ignored)"), and a purely syntactic prefix test makes it the
-  // opposite of inert - it suppresses the fallback, so the key ends up with ZERO of the five areas.
+  // opposite of inert - it suppresses the fallback, so the key ends up with ZERO gated areas.
   // Measured before this guard existed: a key carrying `functions_1` plus a single unknown
   // `feat:teleport` had CRUD, undo, clipboard, named expressions and batching all throwing, while
-  // the same key without that token had all five. That is the additive-safety rule inverted - an
+  // the same key without that token had them all. That is the additive-safety rule inverted - an
   // older build meeting a key minted by a newer generator, or a one-character typo at issuing time,
   // would revoke the whole gated API rather than ignore a word it does not know.
   const namesAKnownFeature = capabilityTokens.some((token) => {
