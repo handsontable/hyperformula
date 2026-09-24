@@ -33,7 +33,6 @@ import {ConfigParams, ConfigParamsList} from './ConfigParams'
 interface LicensePrivateState {
   licenseKeyValidityState: LicenseKeyValidityState,
   licenseCapabilities: ResolvedCapabilities,
-  isLicenseGateActive: boolean,
   capabilityRegistry: CapabilityRegistry,
 }
 
@@ -286,8 +285,6 @@ export class Config implements ConfigParams, ParserConfig {
     privatePool.set(this, {
       licenseKeyValidityState,
       licenseCapabilities,
-      isLicenseGateActive: licenseKeyValidityState !== LicenseKeyValidityState.VALID ||
-        licenseCapabilities.functions !== 'all' || licenseCapabilities.features !== 'all',
       capabilityRegistry,
     })
 
@@ -340,16 +337,6 @@ export class Config implements ConfigParams, ParserConfig {
     return (privatePool.get(this) as LicensePrivateState).licenseCapabilities
   }
 
-  /**
-   * Whether gate B (the entitlement check in the interpreter) needs to run at all for this
-   * config. `false` — the common case, for `gpl-v3`, legacy keys, and an unrestricted entitlement
-   * key — is a single boolean read, cheaper than the string-enum comparison it replaces.
-   *
-   * @internal
-   */
-  public get isLicenseGateActive(): boolean {
-    return (privatePool.get(this) as LicensePrivateState).isLicenseGateActive
-  }
 
   /**
    * The registry used to resolve this config's entitlement into {@link licenseCapabilities}.

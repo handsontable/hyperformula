@@ -20,6 +20,11 @@ export const CLIPBOARD_FEATURE_TOKEN = 'feat:clipboard'
 export const NAMED_EXPRESSIONS_FEATURE_TOKEN = 'feat:named_expressions'
 /** Grants {@link FeatureId.Batching}. */
 export const BATCHING_FEATURE_TOKEN = 'feat:batching'
+/**
+ * Grants {@link FeatureId.ImportExport} — a RESERVED grant: nothing in the public API is gated on
+ * it yet, because HF-107 hasn't shipped the import/export feature it would gate.
+ */
+export const IMPORT_EXPORT_FEATURE_TOKEN = 'feat:import_export'
 
 /**
  * Every feature token, in one list, for the opt-in rule in `licenseTermsOf`: a key naming no
@@ -28,23 +33,11 @@ export const BATCHING_FEATURE_TOKEN = 'feat:batching'
  */
 export const ALL_FEATURE_TOKENS = [
   CRUD_FEATURE_TOKEN, UNDO_REDO_FEATURE_TOKEN, CLIPBOARD_FEATURE_TOKEN,
-  NAMED_EXPRESSIONS_FEATURE_TOKEN, BATCHING_FEATURE_TOKEN,
+  NAMED_EXPRESSIONS_FEATURE_TOKEN, BATCHING_FEATURE_TOKEN, IMPORT_EXPORT_FEATURE_TOKEN,
 ]
 
 /** The whole implemented catalog of built-in functions, operator callable forms included. */
 export const FUN_ALL_TOKEN = 'fun:all'
-/**
- * Spreadsheet Bundle add-on (2026-08-12 packages meeting). Grants {@link FeatureId.Crud},
- * {@link FeatureId.UndoRedo}, {@link FeatureId.Clipboard} and {@link FeatureId.Batching} — see
- * {@link CAPABILITY_TABLE}.
- */
-export const SPREADSHEET_ADDON_TOKEN = 'spreadsheet'
-/**
- * Import/export add-on (2026-08-12 packages meeting). Grants {@link FeatureId.ImportExport}, a
- * RESERVED grant: nothing in the public API is gated on it yet, because HF-107 hasn't shipped the
- * import/export feature it would gate.
- */
-export const IMPORT_EXPORT_ADDON_TOKEN = 'import_export'
 
 /**
  * The canonical spelling of a capability token for table lookups.
@@ -258,15 +251,13 @@ const singleFunctionEntries: [string, CapabilityGrant][] = ALL_GATABLE_FUNCTIONS
  * it is added here, which the completeness invariant in `unit/license/capability-registry.spec.ts`
  * fails on.
  *
- * The five `feat:*` tokens carry the gated API areas, one feature each. A key may state them
- * explicitly; a key naming none is granted all five (the opt-in rule in `licenseTermsOf`); legacy
- * keys resolve to the unrestricted entitlement and never consult this table.
+ * The `feat:*` tokens carry the gated API areas, one feature each. A key may state them
+ * explicitly; a key naming none is granted all of them (the opt-in rule in `licenseTermsOf`);
+ * legacy keys resolve to the unrestricted entitlement and never consult this table.
  *
- * The two add-on tokens, wired per the 2026-08-12 packages meeting: `spreadsheet` backs the
- * 'Spreadsheet Bundle' add-on and grants {@link FeatureId.Crud}, {@link FeatureId.UndoRedo},
- * {@link FeatureId.Clipboard} and {@link FeatureId.Batching}. `import_export` backs the
- * import-export add-on and grants {@link FeatureId.ImportExport} — a RESERVED grant, since nothing
- * in the public API is gated on it yet: HF-107 hasn't shipped the feature it would gate.
+ * There is no entry for any add-on. An add-on is a commercial wrapper, and which capabilities it
+ * bundles is decided where keys are minted; the engine only ever reads the capabilities the key
+ * actually names. That is what lets pricing rename or re-bundle an add-on without a release here.
  */
 export const CAPABILITY_TABLE: ReadonlyMap<string, CapabilityGrant> = new Map([
   [CRUD_FEATURE_TOKEN, {functions: [], features: [FeatureId.Crud]}],
@@ -274,15 +265,7 @@ export const CAPABILITY_TABLE: ReadonlyMap<string, CapabilityGrant> = new Map([
   [CLIPBOARD_FEATURE_TOKEN, {functions: [], features: [FeatureId.Clipboard]}],
   [NAMED_EXPRESSIONS_FEATURE_TOKEN, {functions: [], features: [FeatureId.NamedExpressions]}],
   [BATCHING_FEATURE_TOKEN, {functions: [], features: [FeatureId.Batching]}],
-  // NamedExpressions is absent on purpose: the Spreadsheet Bundle was scoped at the 12.08 packages
-  // meeting to the four areas below, and named expressions was not among them. It is recorded here
-  // so the omission reads as the decision it is rather than as a transcription slip, and so that
-  // moving it into the bundle stays a product call rather than a silent edit.
-  [SPREADSHEET_ADDON_TOKEN, {
-    functions: [],
-    features: [FeatureId.Crud, FeatureId.UndoRedo, FeatureId.Clipboard, FeatureId.Batching],
-  }],
-  [IMPORT_EXPORT_ADDON_TOKEN, {functions: [], features: [FeatureId.ImportExport]}],
+  [IMPORT_EXPORT_FEATURE_TOKEN, {functions: [], features: [FeatureId.ImportExport]}],
   [FUN_ALL_TOKEN, {functions: [...ALL_GATABLE_FUNCTIONS], features: []}],
   ...groupEntries,
   ...singleFunctionEntries,

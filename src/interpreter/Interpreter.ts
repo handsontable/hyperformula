@@ -189,7 +189,7 @@ export class Interpreter {
         return this.unaryRangeWrapper(this.percentOp, result, state)
       }
       case AstNodeType.FUNCTION_CALL: {
-        if (this.config.isLicenseGateActive && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
+        if (!FunctionRegistry.functionIsProtected(ast.procedureName)) {
           const validityState = this.config.licenseKeyValidityState
           if (validityState !== LicenseKeyValidityState.VALID) {
             return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(validityState))

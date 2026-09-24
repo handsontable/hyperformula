@@ -610,9 +610,6 @@ export class HyperFormula implements TypedEmitter {
    * Migrating means building an engine:
    * `HyperFormula.buildEmpty({ language: 'plPL' }).getRegisteredFunctionNames()`.
    *
-   * @deprecated Use the instance method of the same name. This static method is deprecated and
-   * will be removed in one of the next major releases.
-   *
    * @param {string} code - language code
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
@@ -742,7 +739,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {Config} config - the instance's config, holding its resolved entitlement
    */
   private static licenseListsFunction(functionId: string, functionRegistry: FunctionRegistry, config: Config): boolean {
-    if (!config.isLicenseGateActive || FunctionRegistry.functionIsProtected(functionId)) {
+    if (FunctionRegistry.functionIsProtected(functionId)) {
       return true
     }
     const plugin = functionRegistry.getFunctionPlugin(functionId)
@@ -4914,10 +4911,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Throws an error if the current license entitlement does not grant the given feature.
-   * A no-op read (`isLicenseGateActive === false`) whenever this instance's entitlement is
-   * unrestricted, i.e. for every key this library fully understands today (HF-307 PR 1); the
-   * check only does work once a real license-key payload adapter (a later HF-307 PR) can
-   * produce a restricted entitlement.
    *
    * Where the line is drawn, so a later change does not move it by accident:
    * - **Gated:** methods that create value by mutating the sheet, the clipboard, the undo
@@ -4943,9 +4936,6 @@ export class HyperFormula implements TypedEmitter {
    * @internal
    */
   private ensureCapability(feature: FeatureId): void {
-    if (!this._config.isLicenseGateActive) {
-      return
-    }
     if (!allowsFeature(this._config.licenseCapabilities, feature)) {
       throw new LicenseCapabilityMissingError(feature)
     }

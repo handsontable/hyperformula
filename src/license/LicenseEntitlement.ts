@@ -10,9 +10,9 @@
  * but HF-307 decision D1 drops function-registration gating (and the `CustomFunctions` grant)
  * from this release, so no capability grant maps to it.
  *
- * `ImportExport` IS granted, by the `import_export` add-on token (2026-08-12 packages meeting) —
- * but it gates no public method yet, because HF-107 hasn't shipped the import/export feature it
- * would gate. The grant exists; the gate does not, yet.
+ * `ImportExport` IS granted, by the `feat:import_export` token — but it gates no public method
+ * yet, because HF-107 hasn't shipped the import/export feature it would gate. The grant exists;
+ * the gate does not, yet.
  */
 export const enum FeatureId {
   NamedExpressions = 'named_expressions',

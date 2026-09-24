@@ -85,7 +85,7 @@ export class BuildEngineFactory {
     if (namedExpressions.length === 0) {
       return
     }
-    if (config.isLicenseGateActive && !allowsFeature(config.licenseCapabilities, FeatureId.NamedExpressions)) {
+    if (!allowsFeature(config.licenseCapabilities, FeatureId.NamedExpressions)) {
       throw new LicenseCapabilityMissingError(FeatureId.NamedExpressions)
     }
   }
