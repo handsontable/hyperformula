@@ -46,18 +46,34 @@ const options = {
 HyperFormula doesn't use an internet connection to validate your proprietary license key.
 :::
 
-To determine whether a user is still entitled to use a particular
-version of the software, HyperFormula compares the time between
-two dates:
-* The HyperFormula build date
-* The date in your proprietary license key
+Which versions of HyperFormula a key covers, and for how long, follows from the
+terms of your contract. Your key carries those terms, and HyperFormula applies
+them locally, without any connection to a server.
 
-This process doesn't require any connection to the server.
+## Feature packages and add-ons
+
+A proprietary license key may grant the whole library, or only part of it.
+
+If your key grants only part of the library, then:
+
+* A function your key doesn't include evaluates to a `#LIC!` error, in the same way as any other
+  [error value](types-of-errors.md). Everything else in the sheet keeps calculating.
+* An API method your key doesn't include throws a `LicenseCapabilityMissingError` when you call
+  it. Getters never throw; `copy()` and `cut()` do, because they belong to the clipboard feature.
+* [`getAvailableFunctions()`](../api/classes/hyperformula.md#getavailablefunctions) and
+  [`getFunctionDetails()`](../api/classes/hyperformula.md#getfunctiondetails) describe only the
+  functions your key includes, so a function picker built from them never offers a function that
+  then fails.
+
 
 ## License key notifications
 
 If your license key is missing, invalid, or expired, you see a
 corresponding notification in the console.
+
+In that case every licence-gated function call evaluates to a `#LIC!` error — but no API method
+starts throwing, and `getAvailableFunctions()` still describes the full set of functions. A key
+problem never narrows what the library reports it can do.
 
 ## License key support
 

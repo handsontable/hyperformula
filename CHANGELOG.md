@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added support for the new license key format. A proprietary key can now grant a subset of the library: a function your key does not include evaluates to a `#LIC!` error, and the matching parts of the API throw a `LicenseCapabilityMissingError`. `getAvailableFunctions()` and `getFunctionDetails()` describe only the functions your key includes, so they no longer advertise one that would error. Keys that grant everything, classic 25-character keys and `gpl-v3` included, work exactly as before. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+
 ### Fixed
 
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)

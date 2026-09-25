@@ -38,11 +38,14 @@ import {
   ExpectedValueOfTypeError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
+  LicenseCapabilityMissingError,
   NotAFormulaError,
 } from './errors'
 import {Evaluator} from './Evaluator'
 import {ExportedChange, Exporter} from './Exporter'
 import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {allowsFeature, licenseAllowsFunction} from './license/CapabilityRegistry'
+import {FeatureId} from './license/LicenseEntitlement'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
 import {FUNCTION_DOCS} from './interpreter/functionMetadata'
@@ -253,6 +256,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when sheet is not an array of arrays
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -293,6 +297,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when any sheet is not an array of arrays
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -334,6 +339,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {Partial<ConfigParams>} configInput - engine configuration
    * @param {SerializedNamedExpression[]} namedExpressions - starting named expressions
+   *
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -589,7 +596,15 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns translated names of all registered functions for a given language
+   * Returns translated names of all registered functions for a given language.
+   *
+   * Answers for the GLOBAL function registry, because a static method has no engine, and therefore
+   * no configuration, in scope. An engine configured with its own `functionPlugins` registers only
+   * those, so this method can list functions that engine cannot evaluate at all.
+   *
+   * The two forms answer different questions and neither replaces the other: this one translates
+   * into any registered language without building an engine, while the instance method of the same
+   * name answers for the engine you actually hold, under that instance's own language and license.
    *
    * @param {string} code - language code
    *
@@ -700,25 +715,57 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Whether an instance's license lets it evaluate the given function id, and therefore whether the
+   * metadata API may describe it. Mirrors the gate-B branch the interpreter runs per function call
+   * (`Interpreter.evaluateAstWithoutPostprocessing`, the `FUNCTION_CALL` case), through the same
+   * [[licenseAllowsFunction]] rule and the same alias canonicalisation, so a listed function is
+   * always one that actually evaluates.
+   *
+   * Gate B only, deliberately — never the license key's validity state. A missing, invalid or expired
+   * key resolves to an unrestricted entitlement (the invariant `resolveLicense` documents), so it
+   * reaches this method with both `licenseCapabilities` axes set to `'all'` and every function
+   * stays listed.
+   * That is the intended answer: a key problem is reported on the console and by `#LIC!` in cells,
+   * and narrowing the catalogue to the two protected built-ins would leave an integrator who has not
+   * wired up their key yet with an empty function picker and no clue why. The list narrows only for
+   * a *valid* key that genuinely does not include a function — the case where the answer is useful.
+   *
+   * @param {string} functionId - the id as registered, which may be an alias
+   * @param {FunctionRegistry} functionRegistry - the engine's registry, which resolves the alias map
+   * @param {Config} config - the instance's config, holding its resolved entitlement
+   */
+  private static licenseListsFunction(functionId: string, functionRegistry: FunctionRegistry, config: Config): boolean {
+    if (FunctionRegistry.functionIsProtected(functionId)) {
+      return true
+    }
+    const plugin = functionRegistry.getFunctionPlugin(functionId)
+    const canonicalId = plugin?.aliases?.[functionId] ?? functionId
+    return licenseAllowsFunction(config.capabilityRegistry, config.licenseCapabilities, canonicalId)
+  }
+
+  /**
    * Builds the function list for every id registered in an engine's own registry. Documented functions use their
    * catalogue entry; custom functions are listed with their name only. Sorted by localized name with
    * `localeCompare`, so the order follows the host's collation rules, with the language-independent canonical name
    * as a stable tiebreaker for entries that share a localized name.
    *
-   * Takes the [[TranslationPackage]] rather than deriving it from a language code: an instance must describe its
-   * functions under the package its own evaluator uses (`Config.translationPackage`), which is a snapshot taken
+   * Takes the instance's whole [[Config]] rather than a language code: an instance must describe its functions
+   * under the translation package its own evaluator uses (`Config.translationPackage`), which is a snapshot taken
    * when the instance was built and can differ from whatever is registered globally for the same code today.
-   * Deriving it here instead would let this method report a localized name the instance refuses to evaluate.
+   * Deriving it here instead would let this method report a localized name the instance refuses to evaluate. The
+   * config also carries the resolved entitlement, for the same reason — see [[licenseListsFunction]].
    *
    * @param {FunctionRegistry} functionRegistry - the engine's registry, the source of both the ids and their plugins
-   * @param {TranslationPackage} language - the translation package to translate the names under
+   * @param {Config} config - the instance's config: the translation package and the resolved license entitlement
    */
-  private static buildAvailableFunctions(functionRegistry: FunctionRegistry, language: TranslationPackage): FunctionListEntry[] {
+  private static buildAvailableFunctions(functionRegistry: FunctionRegistry, config: Config): FunctionListEntry[] {
+    const language = config.translationPackage
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
     return functionRegistry.getListableFunctionIds()
       // The interpreter refuses to evaluate ids the active language has no translation entry for
       // (FunctionRegistry.getFunction), so an untranslated function would be advertised but uncallable.
       .filter(id => language.isFunctionTranslated(id))
+      .filter(id => HyperFormula.licenseListsFunction(id, functionRegistry, config))
       .map(id => {
         const resolved = HyperFormula.resolveFunctionMetadata(id, functionRegistry.getFunctionPlugin(id))
         if (resolved === undefined) {
@@ -742,12 +789,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - the language-independent function id (canonical id or alias)
    * @param {FunctionRegistry} functionRegistry - the engine's registry, which resolves the id to its plugin
-   * @param {TranslationPackage} language - the translation package to translate the names under
+   * @param {Config} config - the instance's config: the translation package and the resolved license entitlement
    */
-  private static buildFunctionDetailsFor(functionId: string, functionRegistry: FunctionRegistry, language: TranslationPackage): FunctionDetails | undefined {
-    // Mirrors the filter in buildAvailableFunctions: an id the active language cannot evaluate
-    // (no translation entry) gets no details either, so the list and the details always agree.
+  private static buildFunctionDetailsFor(functionId: string, functionRegistry: FunctionRegistry, config: Config): FunctionDetails | undefined {
+    const language = config.translationPackage
+    // Mirrors the filters in buildAvailableFunctions: an id the active language cannot evaluate
+    // (no translation entry), or one this instance's license does not grant, gets no details
+    // either, so the list and the details always agree.
     if (!language.isFunctionTranslated(functionId)) {
+      return undefined
+    }
+    if (!HyperFormula.licenseListsFunction(functionId, functionRegistry, config)) {
       return undefined
     }
     const resolved = HyperFormula.resolveFunctionMetadata(functionId, functionRegistry.getFunctionPlugin(functionId))
@@ -1219,6 +1271,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoOperationToUndoError]] when there is no operation running that can be undone
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the UndoRedo feature
    *
    * @example
    * ```js
@@ -1237,6 +1290,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Undo and Redo
    */
   public undo(): ExportedChange[] {
+    this.ensureCapability(FeatureId.UndoRedo)
     this._crudOperations.undo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1253,6 +1307,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoOperationToRedoError]] when there is no operation running that can be re-done
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the UndoRedo feature
    *
    * @example
    * ```js
@@ -1275,6 +1330,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Undo and Redo
    */
   public redo(): ExportedChange[] {
+    this.ensureCapability(FeatureId.UndoRedo)
     this._crudOperations.redo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1389,6 +1445,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a raw cell value
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[ExpectedValueOfTypeError]] if topLeftCornerAddress argument is of wrong type
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1407,6 +1464,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     this._crudOperations.setCellContents(topLeftCornerAddress, cellContents)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1427,6 +1485,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1459,6 +1518,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public swapRowIndexes(sheetId: number, rowMapping: [number, number][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setRowOrder(sheetId, rowMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1522,6 +1582,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1542,6 +1603,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public setRowOrder(sheetId: number, newRowOrder: number[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     const mapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
     return this.swapRowIndexes(sheetId, mapping)
@@ -1604,6 +1666,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1635,6 +1698,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public swapColumnIndexes(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setColumnOrder(sheetId, columnMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1695,6 +1759,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1713,6 +1778,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public setColumnOrder(sheetId: number, newColumnOrder: number[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     const mapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
     return this.swapColumnIndexes(sheetId, mapping)
@@ -1808,6 +1874,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1824,6 +1891,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public addRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.addRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1881,6 +1949,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1896,6 +1965,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public removeRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.removeRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1953,6 +2023,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1972,6 +2043,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public addColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.addColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2028,6 +2100,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2047,6 +2120,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public removeColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.removeColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2117,6 +2191,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
    * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2140,6 +2215,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public moveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     if (!isSimpleCellAddress(destinationLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner')
     }
@@ -2210,6 +2286,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
    * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2226,6 +2303,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public moveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(startRow, 'number', 'startRow')
     validateArgToType(numberOfRows, 'number', 'numberOfRows')
@@ -2292,6 +2370,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
    * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2314,6 +2393,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public moveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(startColumn, 'number', 'startColumn')
     validateArgToType(numberOfColumns, 'number', 'numberOfColumns')
@@ -2333,6 +2413,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Clipboard feature
    *
    * @example
    * ```js
@@ -2352,6 +2433,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public copy(source: SimpleCellRange): CellValue[][] {
+    this.ensureCapability(FeatureId.Clipboard)
     if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
@@ -2373,6 +2455,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Clipboard feature
    *
    * @example
    * ```js
@@ -2392,6 +2475,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public cut(source: SimpleCellRange): CellValue[][] {
+    this.ensureCapability(FeatureId.Clipboard)
     if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
@@ -2421,6 +2505,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NothingToPasteError]] when clipboard is empty
    * @throws [[TargetLocationHasArrayError]] when the selected target area has array inside
    * @throws [[ExpectedValueOfTypeError]] if targetLeftCorner is of wrong type
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Clipboard feature
    *
    * @example
    * ```js
@@ -2443,6 +2528,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
+    // Clipboard alone is enough, including for pasting a CUT - which relocates cells, the same
+    // mutation the public moveCells() requires Crud for. Granting the clipboard is taken to grant
+    // what the clipboard does, so this route is deliberately not gated on Crud as well.
+    this.ensureCapability(FeatureId.Clipboard)
     if (!isSimpleCellAddress(targetLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'targetLeftCorner')
     }
@@ -2750,6 +2839,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[SheetNameAlreadyTakenError]] when sheet with a given name already exists
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2769,6 +2859,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public addSheet(sheetName?: string): string {
+    this.ensureCapability(FeatureId.Crud)
     if (sheetName !== undefined) {
       validateArgToType(sheetName, 'string', 'sheetName')
     }
@@ -2824,6 +2915,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2844,6 +2936,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public removeSheet(sheetId: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     const displayName = this.sheetMapping.getSheetName(sheetId) as string
     this._crudOperations.removeSheet(sheetId)
@@ -2897,6 +2990,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2917,6 +3011,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public clearSheet(sheetId: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.clearSheet(sheetId)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2968,6 +3063,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when values argument is not an array of arrays
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2984,6 +3080,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public setSheetContent(sheetId: number, values: RawCellContent[][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setSheetContent(sheetId, values)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -3656,6 +3753,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SheetNameAlreadyTakenError]] when the provided sheet name already exists
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -3671,6 +3769,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public renameSheet(sheetId: number, newName: string): void {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(newName, 'string', 'newName')
     const oldName = this._crudOperations.renameSheet(sheetId, newName)
@@ -3693,6 +3792,8 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[evaluationSuspended]] always
    * @fires [[evaluationResumed]] after the recomputation of necessary values
    *
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Batching feature
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -3712,6 +3813,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public batch(batchOperations: () => void): ExportedChange[] {
+    this.ensureCapability(FeatureId.Batching)
     this.suspendEvaluation()
     this._crudOperations.beginUndoRedoBatchMode()
     try {
@@ -3733,6 +3835,8 @@ export class HyperFormula implements TypedEmitter {
    * To resume the evaluation use [[resumeEvaluation]].
    *
    * @fires [[evaluationSuspended]] always
+   *
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Batching feature
    *
    * @example
    * ```js
@@ -3759,6 +3863,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public suspendEvaluation(): void {
+    this.ensureCapability(FeatureId.Batching)
     this._evaluationSuspended = true
     this._emitter.emit(Events.EvaluationSuspended)
   }
@@ -3795,6 +3900,15 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public resumeEvaluation(): ExportedChange[] {
+    // Deliberately NOT gated, unlike suspendEvaluation and batch. This is the only exit from
+    // a suspended engine, and _evaluationSuspended survives rebuildWithConfig: an instance
+    // suspended while Batching was granted, whose entitlement then loses Batching via
+    // updateConfig, would be stuck suspended forever - every read throws
+    // EvaluationSuspendedError and the sole recovery path would throw
+    // LicenseCapabilityMissingError. Gating the two entry points is what makes the feature
+    // licensable; gating the release valve only strands the caller, which is the same reason
+    // teardown (clearClipboard, clearUndoStack, clearRedoStack) is ungated. See the note on
+    // ensureCapability.
     this._evaluationSuspended = false
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.EvaluationResumed, changes)
@@ -3882,6 +3996,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NamedExpressionNameIsInvalidError]] when the named-expression name is not valid
    * @throws [[NoRelativeAddressesAllowedError]] when the named-expression formula contains relative references
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -3902,6 +4017,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public addNamedExpression(expressionName: string, expression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4107,6 +4223,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
    * @throws [[ArrayFormulasNotSupportedError]] when the named expression formula is an array formula
    * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -4124,6 +4241,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public changeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4188,6 +4306,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NamedExpressionDoesNotExistError]] when the given expression does not exist.
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -4205,6 +4324,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public removeNamedExpression(expressionName: string, scope?: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4432,6 +4552,11 @@ export class HyperFormula implements TypedEmitter {
    * Returns translated names of all functions registered in this instance of HyperFormula
    * according to the language set in the configuration
    *
+   * Answers for the instance's function REGISTRY — what is registered, not what the license key
+   * lets it evaluate — so it lists every registered function whatever the key grants. To build a
+   * function picker that never offers a function evaluating to `#LIC!`, use
+   * [[getAvailableFunctions]], which answers about availability.
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -4517,6 +4642,18 @@ export class HyperFormula implements TypedEmitter {
    * plugin registered without translations for that language. A translation set to an empty string is not a missing
    * entry: it falls back to the canonical id, so the function stays listed under its canonical name.
    *
+   * A function the instance's license key does not include is omitted for the same reason: it would evaluate to a
+   * `#LIC!` error. The list therefore answers "what can this engine compute", not "what does this package contain".
+   * Two consequences worth knowing:
+   * - A missing, invalid or expired license key does **not** shorten the list. Such a key restricts nothing by
+   *   entitlement — it is reported on the console, and every licence-gated function call evaluates to `#LIC!` — so
+   *   the full catalogue is still described. `VERSION()` and `OFFSET()` are protected built-ins outside the licence
+   *   system, so they keep evaluating. Use it to build a function picker before a key is configured.
+   * - A custom (user-registered) function is omitted only if it took a built-in id the key excludes. The rule is
+   *   "not covered by the capability table", not "not user-registered", so a plugin registered under an id the
+   *   built-in catalogue already uses is treated as that built-in. Registered under an id of its own, a custom
+   *   function is never omitted. See {@link getFunctionDetails}, which states the same exception.
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -4530,9 +4667,9 @@ export class HyperFormula implements TypedEmitter {
   public getAvailableFunctions(): FunctionListEntry[] {
     return HyperFormula.buildAvailableFunctions(
       this._functionRegistry,
-      // The instance's own package, the one its evaluator uses — not a fresh global lookup, which could describe
-      // the functions under a package this instance never adopted.
-      this._config.translationPackage,
+      // The instance's own config: its translation package (not a fresh global lookup, which could describe the
+      // functions under a package this instance never adopted) and its resolved license entitlement.
+      this._config,
     )
   }
 
@@ -4543,9 +4680,10 @@ export class HyperFormula implements TypedEmitter {
    * documentation link (`documentationUrl`) and usage examples (`examples`) — every built-in authors both.
    * Resolves both built-in and custom (user-registered) functions, as well as aliases. An alias reports its
    * target's metadata (including examples, which spell the target's name) under the alias id, with the target id
-   * exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, or
-   * has no translation entry for the configured language (an untranslated id cannot be evaluated, so it is not
-   * described either, which keeps this method consistent with [[getAvailableFunctions]]).
+   * exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, has
+   * no translation entry for the configured language, or is not included in this instance's license key (neither an
+   * untranslated nor an unlicensed id can be evaluated, so neither is described — which keeps this method consistent
+   * with [[getAvailableFunctions]], including its behaviour for a missing, invalid or expired key).
    * For a custom function, `category` is `'Custom'`, there is no `shortDescription`, `documentationUrl` or
    * `examples`, and parameters are reported positionally (`Arg1`, `Arg2`, ...). A custom plugin registered over a
    * built-in id is the exception: the catalogue is keyed by function id, so it reports that built-in's authored
@@ -4574,8 +4712,8 @@ export class HyperFormula implements TypedEmitter {
    */
   public getFunctionDetails(canonicalName: string): FunctionDetails | undefined {
     validateArgToType(canonicalName, 'string', 'canonicalName')
-    // The instance's own package, the one its evaluator uses — see getAvailableFunctions.
-    return HyperFormula.buildFunctionDetailsFor(canonicalName, this._functionRegistry, this._config.translationPackage)
+    // The instance's own config, for the same reasons as getAvailableFunctions.
+    return HyperFormula.buildFunctionDetailsFor(canonicalName, this._functionRegistry, this._config)
   }
 
   /**
@@ -4768,6 +4906,38 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Throws an error if the current license entitlement does not grant the given feature.
+   *
+   * Where the line is drawn, so a later change does not move it by accident:
+   * - **Gated:** methods that create value by mutating the sheet, the clipboard, the undo
+   *   history, or the named-expression set.
+   * - **Not gated:** reads (`getCellValue`, `listNamedExpressions`,
+   *   `getAllNamedExpressionsSerialized`, the `isItPossibleTo*` predicates) and teardown or
+   *   cleanup that only ever removes state (`clearClipboard`, `clearUndoStack`,
+   *   `clearRedoStack`, `destroy`). Gating cleanup would let a restricted entitlement strand
+   *   an integration mid-teardown while giving a licensee nothing, and mirrors gate B, which
+   *   blocks *calling* a function rather than *reading* an already-computed value.
+   * - **Not gated, for the same reason:** `resumeEvaluation`, the sole exit from a suspended
+   *   engine. Gate the entry points (`suspendEvaluation`, `batch`) and the feature is
+   *   licensable; gate the release valve too and an entitlement change mid-suspension leaves
+   *   the instance permanently unusable. A capability check must never be reachable only on
+   *   the way out of a state it let the caller into.
+   *
+   * Note this checks gate B (entitlement) only, never gate A (key validity). That asymmetry
+   * with the interpreter's gate B - which checks key validity first - is deliberate: it keeps
+   * today's behaviour for a missing or invalid key, where formulas yield `#LIC!` but the CRUD
+   * API keeps working. A later PR that resolves an invalid key to a *restricted* entitlement
+   * rather than an unrestricted one would silently turn that into a breaking API change.
+   *
+   * @internal
+   */
+  private ensureCapability(feature: FeatureId): void {
+    if (!allowsFeature(this._config.licenseCapabilities, feature)) {
+      throw new LicenseCapabilityMissingError(feature)
+    }
+  }
+
+  /**
    * Parses a formula string and extracts its AST and dependencies.
    *
    * @internal
@@ -4793,7 +4963,10 @@ export class HyperFormula implements TypedEmitter {
    */
   private rebuildWithConfig(newParams: Partial<ConfigParams>): void {
     const newConfig = this._config.mergeConfig(newParams)
-    const configNewLanguage = this._config.mergeConfig({language: newParams.language})
+    // The second argument silences license console messages for this transient Config: it is
+    // built from the OUTGOING config purely to reserialize sheets, and must not print an expiry
+    // notice for the key the caller may be replacing in this very call.
+    const configNewLanguage = this._config.mergeConfig({language: newParams.language}, false)
     const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
     const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
 

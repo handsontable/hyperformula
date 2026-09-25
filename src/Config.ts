@@ -16,15 +16,27 @@ import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} 
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {ConfigValueEmpty, ExpectedValueOfTypeError} from './errors'
 import {defaultStringifyCurrency, defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
-import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
+import {CapabilityRegistry, ResolvedCapabilities} from './license/CapabilityRegistry'
+import {resolveLicense} from './license/licenseResolution'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 import {ConfigParams, ConfigParamsList} from './ConfigParams'
 
-const privatePool: WeakMap<Config, { licenseKeyValidityState: LicenseKeyValidityState }> = new WeakMap()
+/**
+ * The license-derived state kept off the public `ConfigParams` surface — see
+ * {@link Config.licenseCapabilities}.
+ */
+interface LicensePrivateState {
+  licenseKeyValidityState: LicenseKeyValidityState,
+  licenseCapabilities: ResolvedCapabilities,
+  capabilityRegistry: CapabilityRegistry,
+}
+
+const privatePool: WeakMap<Config, LicensePrivateState> = new WeakMap()
 
 export class Config implements ConfigParams, ParserConfig {
 
@@ -167,7 +179,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly matchWholeCell: boolean
 
-  constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true) {
+  constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true, notifyLicenseMessages: boolean = true) {
     const {
       accentSensitive,
       caseSensitive,
@@ -266,8 +278,14 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
     this.context = context
 
+    const {validityState: licenseKeyValidityState, entitlement} = resolveLicense(this.licenseKey, notifyLicenseMessages)
+    const capabilityRegistry = new CapabilityRegistry()
+    const licenseCapabilities = capabilityRegistry.resolve(entitlement)
+
     privatePool.set(this, {
-      licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
+      licenseKeyValidityState,
+      licenseCapabilities,
+      capabilityRegistry,
     })
 
     configCheckIfParametersNotInConflict(
@@ -305,19 +323,42 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public get licenseKeyValidityState(): LicenseKeyValidityState {
-    return (privatePool.get(this) as Config).licenseKeyValidityState
+    return (privatePool.get(this) as LicensePrivateState).licenseKeyValidityState
+  }
+
+  /**
+   * The functions and features this config's license entitles it to, already resolved from
+   * whatever tokens the license key carries. Proxied to its private counterpart for the same
+   * reason as {@link licenseKeyValidityState}: it must never become part of {@link getConfig}.
+   *
+   * @internal
+   */
+  public get licenseCapabilities(): ResolvedCapabilities {
+    return (privatePool.get(this) as LicensePrivateState).licenseCapabilities
+  }
+
+
+  /**
+   * The registry used to resolve this config's entitlement into {@link licenseCapabilities}.
+   * Exposed so the interpreter can tell a custom, instance-registered function apart from a
+   * built-in outside the capability table without constructing a second registry.
+   *
+   * @internal
+   */
+  public get capabilityRegistry(): CapabilityRegistry {
+    return (privatePool.get(this) as LicensePrivateState).capabilityRegistry
   }
 
   public getConfig(): ConfigParams {
     return getFullConfigFromPartial(this)
   }
 
-  public mergeConfig(init: Partial<ConfigParams>): Config {
+  public mergeConfig(init: Partial<ConfigParams>, notifyLicenseMessages: boolean = true): Config {
     const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
     Config.warnDeprecatedOptions(init)
 
-    return new Config(mergedConfig, false)
+    return new Config(mergedConfig, false, notifyLicenseMessages)
   }
 
   private static warnDeprecatedOptions(options: Partial<ConfigParams>) {
