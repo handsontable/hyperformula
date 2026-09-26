@@ -3,11 +3,13 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../../error-message'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst, simpleCellAddressFromString} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
+import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
@@ -111,6 +113,15 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
         {argumentType: FunctionArgumentType.NUMBER},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ]
+    },
+    'INDIRECT': {
+      method: 'indirect',
+      parameters: [
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: true},
+      ],
+      isVolatile: true,
+      vectorizationForbidden: true,
     },
     'NA': {
       method: 'na',
@@ -349,7 +360,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     } else if (argAst.type === AstNodeType.ROW_RANGE) {
       return this.config.maxColumns
     } else {
-      const val = this.evaluateAst(argAst, state)
+      const val = this.interpreter.evaluateAst(argAst, state, true)
       if (val instanceof SimpleRangeValue) {
         return val.width()
       } else if (val instanceof CellError) {
@@ -401,7 +412,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     } else if (argAst.type === AstNodeType.COLUMN_RANGE) {
       return this.config.maxRows
     } else {
-      const val = this.evaluateAst(argAst, state)
+      const val = this.interpreter.evaluateAst(argAst, state, true)
       if (val instanceof SimpleRangeValue) {
         return val.height()
       } else if (val instanceof CellError) {
@@ -429,6 +440,40 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
         return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
       }
       return rangeValue?.data?.[row - 1]?.[col - 1] ?? rangeValue?.data?.[0]?.[0] ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+    })
+  }
+
+  /**
+   * Resolves one same-sheet A1 address. The returned reference reads its value
+   * on demand, so dimension and identity consumers do not create value cycles.
+   */
+  public indirect(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('INDIRECT'), (text: string, mode: InternalScalarValue) => {
+      if (mode === '') {
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+      }
+      const a1 = coerceScalarToBoolean(mode)
+      if (a1 instanceof CellError) {
+        return a1
+      }
+      if (a1 === undefined) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+      }
+      if (!a1 || !/^\$?[A-Za-z]+\$?[1-9][0-9]*$/.test(text)) {
+        return new CellError(ErrorType.REF, ErrorMessage.BadRef)
+      }
+      const address = simpleCellAddressFromString(() => undefined, text, state.formulaAddress.sheet)
+      if (address === undefined || address.col >= this.config.maxColumns || address.row >= this.config.maxRows) {
+        return new CellError(ErrorType.REF, ErrorMessage.BadRef)
+      }
+      const range = AbsoluteCellRange.spanFrom(address, 1, 1)
+      return SimpleRangeValue.onlyRangeWithValueReader(range, this.dependencyGraph,
+        cell => {
+          if (state.runtimeValueReads !== undefined) {
+            state.runtimeValueReads.count++
+          }
+          return this.dependencyGraph.readCurrentValue(cell, state.formulaVertex)
+        })
     })
   }
 

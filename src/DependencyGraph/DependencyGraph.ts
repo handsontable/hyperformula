@@ -53,6 +53,9 @@ export class DependencyGraph {
   public readonly graph: Graph<Vertex>
   private changes: ContentChanges = ContentChanges.empty()
   public readonly sheetReferenceRegistrar: SheetReferenceRegistrar
+  private readonly runtimeDependencies = new Map<FormulaVertex, Map<string, SimpleCellAddress>>()
+  private readonly runtimeDependents = new Map<string, Set<FormulaVertex>>()
+  private currentValueReader?: (address: SimpleCellAddress, owner?: FormulaVertex) => InterpreterValue
 
   constructor(
     public readonly addressMapping: AddressMapping,
@@ -615,6 +618,64 @@ export class DependencyGraph {
     return this.addressMapping.getCellValue(address)
   }
 
+  /**
+   * Reads a resolved reference during evaluation. The evaluator establishes freshness.
+   */
+  public readCurrentValue(address: SimpleCellAddress, owner?: FormulaVertex): InterpreterValue {
+    return this.currentValueReader === undefined ? this.getCellValue(address) : this.currentValueReader(address, owner)
+  }
+
+  public setCurrentValueReader(reader: (address: SimpleCellAddress, owner?: FormulaVertex) => InterpreterValue): void {
+    this.currentValueReader = reader
+  }
+
+  /**
+   * Replaces only the runtime value reads owned by a formula. Static dependencies stay intact.
+   */
+  public replaceRuntimeDependencies(owner: FormulaVertex, addresses: SimpleCellAddress[]): void {
+    this.clearRuntimeDependencies(owner)
+    if (addresses.length === 0) {
+      return
+    }
+    const dependencies = new Map<string, SimpleCellAddress>()
+    for (const address of addresses) {
+      const key = this.runtimeAddressKey(address)
+      dependencies.set(key, address)
+      let dependents = this.runtimeDependents.get(key)
+      if (dependents === undefined) {
+        dependents = new Set()
+        this.runtimeDependents.set(key, dependents)
+      }
+      dependents.add(owner)
+    }
+    this.runtimeDependencies.set(owner, dependencies)
+  }
+
+  public runtimeDependentAddresses(address: SimpleCellAddress): SimpleCellAddress[] {
+    return [...(this.runtimeDependents.get(this.runtimeAddressKey(address)) ?? [])]
+      .filter(vertex => this.graph.hasNode(vertex))
+      .map(vertex => vertex.getAddress(this.lazilyTransformingAstService))
+  }
+
+  private clearRuntimeDependencies(owner: FormulaVertex): void {
+    const dependencies = this.runtimeDependencies.get(owner)
+    if (dependencies === undefined) {
+      return
+    }
+    for (const key of dependencies.keys()) {
+      const dependents = this.runtimeDependents.get(key)
+      dependents?.delete(owner)
+      if (dependents?.size === 0) {
+        this.runtimeDependents.delete(key)
+      }
+    }
+    this.runtimeDependencies.delete(owner)
+  }
+
+  private runtimeAddressKey(address: SimpleCellAddress): string {
+    return `${address.sheet}:${address.col}:${address.row}`
+  }
+
   public getRawValue(address: SimpleCellAddress): RawCellContent {
     if (this.isPlaceholder(address.sheet)) {
       return null
@@ -695,7 +756,7 @@ export class DependencyGraph {
       const dependenciesResult = this.formulaDependencyQuery(vertex)
       if (dependenciesResult !== undefined) {
         const [address, dependencies] = dependenciesResult
-        return dependencies.map((dependency: CellDependency) => {
+        const staticAddresses = dependencies.map((dependency: CellDependency) => {
           if (dependency instanceof NamedExpressionDependency) {
             return this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet).address
           } else if (isSimpleCellAddress(dependency)) {
@@ -704,6 +765,13 @@ export class DependencyGraph {
             return simpleCellRange(dependency.start, dependency.end)
           }
         })
+        if (!(vertex instanceof FormulaVertex)) {
+          return staticAddresses
+        }
+        const existing = new Set(staticAddresses.filter(isSimpleCellAddress).map(address => this.runtimeAddressKey(address)))
+        const runtimeAddresses = [...(this.runtimeDependencies.get(vertex)?.values() ?? [])]
+          .filter(address => !existing.has(this.runtimeAddressKey(address)))
+        return [...staticAddresses, ...runtimeAddresses]
       } else {
         return []
       }
@@ -1289,6 +1357,9 @@ export class DependencyGraph {
    * Removes a vertex from graph and reroutes its dependencies to other vertex. Also removes the edge vertexToKeep -> vertexToDelete if it exists.
    */
   private removeVertexAndRerouteDependencies(vertexToDelete: Vertex, vertexToKeep: Vertex) {
+    if (vertexToDelete instanceof FormulaVertex) {
+      this.clearRuntimeDependencies(vertexToDelete)
+    }
     const dependencies = this.graph.removeNode(vertexToDelete)
 
     this.graph.removeEdgeIfExists(vertexToKeep, vertexToDelete)
@@ -1306,6 +1377,9 @@ export class DependencyGraph {
    * Also cleans up placeholder sheets that have no remaining vertices (not needed anymore)
    */
   private removeVertexAndCleanupDependencies(inputVertex: Vertex) {
+    if (inputVertex instanceof FormulaVertex) {
+      this.clearRuntimeDependencies(inputVertex)
+    }
     const dependencies = new Set(this.graph.removeNode(inputVertex))
     const affectedSheets = new Set<number>()
 

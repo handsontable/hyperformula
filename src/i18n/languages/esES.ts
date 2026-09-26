@@ -122,6 +122,7 @@ export const dictionary: RawTranslationPackage = {
     IFNA: 'IFNA',
     IFS: 'SI.CONJUNTO',
     INDEX: 'INDICE',
+    INDIRECT: 'INDIRECTO',
     INT: 'ENTERO',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'PAGOINT',

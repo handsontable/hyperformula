@@ -79,9 +79,11 @@ export class Statistics {
    */
   public measure<T>(name: StatType, func: () => T): T {
     this.start(name)
-    const result = func()
-    this.end(name)
-    return result
+    try {
+      return func()
+    } finally {
+      this.end(name)
+    }
   }
 
   /**

@@ -45,11 +45,12 @@ export class TopSort<T> {
   public getTopSortedWithSccSubgraphFrom(
     modifiedNodeIds: number[],
     operatingFunction: (node: T) => boolean,
-    onCycle: (node: T) => void
+    onCycle: (node: T) => void,
+    beforeProcessing?: (cycled: T[]) => void,
   ): TopSortResult<T> {
     const modifiedNodeIdsReversed = modifiedNodeIds.reverse()
     modifiedNodeIdsReversed.forEach((id: number) => this.runDFS(id))
-    return this.postprocess(modifiedNodeIdsReversed, onCycle, operatingFunction)
+    return this.postprocess(modifiedNodeIdsReversed, onCycle, operatingFunction, beforeProcessing)
   }
 
   /**
@@ -155,7 +156,7 @@ export class TopSort<T> {
   /**
    * Postprocesses the result of Tarjan's algorithm.
    */
-  private postprocess(modifiedNodeIds: number[], onCycle: (node: T) => void, operatingFunction: (node: T) => boolean) {
+  private postprocess(modifiedNodeIds: number[], onCycle: (node: T) => void, operatingFunction: (node: T) => boolean, beforeProcessing?: (cycled: T[]) => void) {
     const shouldBeUpdatedMapping: boolean[] = []
 
     modifiedNodeIds.forEach((t: number) => {
@@ -165,6 +166,12 @@ export class TopSort<T> {
     const sorted: T[] = []
     const cycled: T[] = []
     this.order.reverse()
+
+    if (beforeProcessing !== undefined) {
+      beforeProcessing(this.order
+        .filter(t => this.sccNonSingletons[t] || this.getAdjacentNodeIds(t).includes(t))
+        .map(t => this.nodesSparseArray[t]))
+    }
 
     this.order.forEach((t: number) => {
       const adjacentNodes = this.getAdjacentNodeIds(t)

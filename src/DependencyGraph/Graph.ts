@@ -59,6 +59,8 @@ export class Graph<Node extends GraphNode> {
    * @private
    */
   private changingWithStructureNodeIds: NodeId[] = []
+  private readonly volatileNodes = new WeakSet<Node>()
+  private readonly volatileNodeIds = new Set<NodeId>()
 
   private nextId: NodeId = 0
 
@@ -133,6 +135,32 @@ export class Graph<Node extends GraphNode> {
   }
 
   /**
+   * Snapshots ordinary graph edges as prerequisite lists for demand scheduling.
+   * The address mapping can be temporarily inconsistent during structural edits,
+   * so demand scheduling uses existing graph edges rather than parsing addresses.
+   */
+  public dependencyNodes(): Map<Node, Node[]> {
+    const dependencies = new Map<Node, Node[]>()
+    this.nodesSparseArray.forEach((prerequisite, id) => {
+      if (prerequisite === undefined) {
+        return
+      }
+      this.edgesSparseArray[id].forEach(dependentId => {
+        const dependent = this.nodesSparseArray[dependentId]
+        if (dependent !== undefined) {
+          let nodes = dependencies.get(dependent)
+          if (nodes === undefined) {
+            nodes = []
+            dependencies.set(dependent, nodes)
+          }
+          nodes.push(prerequisite)
+        }
+      })
+    })
+    return dependencies
+  }
+
+  /**
    * Adds node to a graph if it does not exist yet.
    *
    * @param {Node} node - a node to be added
@@ -201,6 +229,8 @@ export class Graph<Node extends GraphNode> {
     delete this.nodesSparseArray[id]
     delete this.edgesSparseArray[id]
     this.infiniteRangeIds.delete(id)
+    this.volatileNodeIds.delete(id)
+    this.volatileNodes.delete(node)
     node.idInGraph = undefined
 
     return dependencies
@@ -271,11 +301,12 @@ export class Graph<Node extends GraphNode> {
   public getTopSortedWithSccSubgraphFrom(
     modifiedNodes: Node[],
     operatingFunction: (node: Node) => boolean,
-    onCycle: (node: Node) => void
+    onCycle: (node: Node) => void,
+    beforeProcessing?: (cycled: Node[]) => void,
   ): TopSortResult<Node> {
     const topSortAlgorithm = new TopSort<Node>(this.nodesSparseArray, this.edgesSparseArray)
     const modifiedNodesIds = modifiedNodes.map(node => node.idInGraph).filter(id => id !== undefined) as NodeId[]
-    return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodesIds, operatingFunction, onCycle)
+    return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodesIds, operatingFunction, onCycle, beforeProcessing)
   }
 
   /**
@@ -290,6 +321,18 @@ export class Graph<Node extends GraphNode> {
 
     this.dirtyAndVolatileNodeIds.rawValue.volatile.push(id)
     this.dirtyAndVolatileNodeIds.markAsModified()
+    this.volatileNodes.add(node)
+    this.volatileNodeIds.add(id)
+  }
+
+  /** Identifies vertices marked volatile by their registered functions. */
+  public isNodeVolatile(node: Node): boolean {
+    return this.volatileNodes.has(node)
+  }
+
+  /** Reports whether any currently stored vertex needs volatile evaluation. */
+  public hasVolatileNodes(): boolean {
+    return this.volatileNodeIds.size > 0
   }
 
   /**

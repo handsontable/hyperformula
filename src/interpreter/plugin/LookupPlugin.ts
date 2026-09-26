@@ -198,6 +198,11 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, isWildcardMatchMode: boolean, searchOptions: SearchOptions, searchStrategy: SearchStrategy): number {
+    // Runtime references must record a value read before the search strategy
+    // can consult the graph or its column index.
+    if (range.hasValueReader()) {
+      range = SimpleRangeValue.onlyValues(range.data)
+    }
     if (isWildcardMatchMode && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
       return searchStrategy.advancedFind(
         this.arithmeticHelper.eqMatcherFunction(key),
@@ -211,23 +216,28 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
   private doVlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, searchOptions: SearchOptions): InternalScalarValue {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
-    const range = rangeValue.range
-    let searchedRange
-    if (range === undefined) {
-      searchedRange = SimpleRangeValue.onlyValues(rangeValue.data.map((arg) => [arg[0]]))
-    } else {
-      searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, 1, range.height()), this.dependencyGraph)
+    let rowIndex: number
+    try {
+      const range = rangeValue.range
+      let searchedRange
+      if (range === undefined || rangeValue.hasValueReader()) {
+        searchedRange = SimpleRangeValue.onlyValues(rangeValue.data.map((arg) => [arg[0]]))
+      } else {
+        searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, 1, range.height()), this.dependencyGraph)
+      }
+      rowIndex = this.searchInRange(key, searchedRange, searchOptions.ordering === 'none', searchOptions, this.columnSearch)
+    } finally {
+      this.dependencyGraph.stats.end(StatType.VLOOKUP)
     }
-    const rowIndex = this.searchInRange(key, searchedRange, searchOptions.ordering === 'none', searchOptions, this.columnSearch)
 
-    this.dependencyGraph.stats.end(StatType.VLOOKUP)
+    const range = rangeValue.range
 
     if (rowIndex === -1) {
       return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
     }
 
     let value
-    if (range === undefined) {
+    if (range === undefined || rangeValue.hasValueReader()) {
       value = rangeValue.data[rowIndex][index]
     } else {
       const address = simpleCellAddress(range.sheet, range.start.col + index, range.start.row + rowIndex)
@@ -243,7 +253,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   private doHlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, searchOptions: SearchOptions): InternalScalarValue {
     const range = rangeValue.range
     let searchedRange
-    if (range === undefined) {
+    if (range === undefined || rangeValue.hasValueReader()) {
       searchedRange = SimpleRangeValue.onlyValues([rangeValue.data[0]])
     } else {
       searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, range.width(), 1), this.dependencyGraph)
@@ -255,7 +265,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
 
     let value
-    if (range === undefined) {
+    if (range === undefined || rangeValue.hasValueReader()) {
       value = rangeValue.data[index][colIndex]
     } else {
       const address = simpleCellAddress(range.sheet, range.start.col + colIndex, range.start.row + index)
@@ -312,7 +322,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     const searchOptions: SearchOptions = type === 0
       ? { ordering: 'none', ifNoMatch: 'returnNotFound' }
       : { ordering: type === -1 ? 'desc' : 'asc', ifNoMatch: type === -1 ? 'returnUpperBound' : 'returnLowerBound' }
-    const index = searchStrategy.find(key, rangeValue, searchOptions)
+    const index = this.searchInRange(key, rangeValue, false, searchOptions, searchStrategy)
 
     if (index === -1) {
       return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)

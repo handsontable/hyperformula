@@ -48,6 +48,18 @@ a circular reference.
 * Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
 * The TEXT function does not accept embedded double-quote literals in the format string. In Excel, `""` inside a format string is an escape sequence for a literal `"` character — e.g. `=TEXT(1234.5, "#,##0.00 ""zł""")` returns `"1,234.50 zł"`. If your application requires this escape sequence, supply a custom [`stringifyCurrency`](currency-handling.md) callback.
 
+### INDIRECT function
+
+HyperFormula resolves `INDIRECT(reference_text, [reference_mode])` at evaluation time. `reference_text` can be a literal, a cell value, or a formula result. The address is resolved on the sheet that contains the formula. `INDIRECT` is volatile, so it is recalculated when the workbook changes. Public precedent and dependent queries reflect the last value reference read by the formula.
+
+This implementation accepts one A1-style cell address, with optional `$` row and column markers. A range, sheet-qualified address, defined name, external workbook reference, or R1C1 reference returns `#REF!`. Set `reference_mode` to TRUE or omit it for A1 notation. FALSE requests R1C1 notation and returns `#REF!` in this implementation. Invalid or out-of-bounds address text also returns `#REF!`. An empty string for `reference_mode` returns `#VALUE!`; omitting required `reference_text` returns the engine's `#N/A` argument-count error.
+
+`INDIRECT` can be passed to reference-only functions such as `ROWS` without reading the referenced cell's value. For example, `=ROWS(INDIRECT("A1"))` in A1 returns 1. When an `INDIRECT` result reads an empty cell as its final value, it returns 0.
+
+When an `INDIRECT` value read creates a circular dependency, HyperFormula returns `#CYCLE!` for the formulas in that cycle, including cycles through ranges. `IFERROR` outside the cycle can handle that error; `IFERROR` inside the cycle does not remove the circular dependency.
+
+Custom functions with arguments using the built-in `INDIRECT` require a resumable plugin method. Existing custom methods continue to handle ordinary formulas. See [Migrating custom functions for INDIRECT](migrating-custom-functions-for-indirect.md) for examples and the explicit error returned by unmigrated dynamic calls.
+
 ### UNIQUE function
 
 * Comparison of values follows HyperFormula's own equality rules, which honor the `caseSensitive` and `accentSensitive` configuration options. By default comparison is case-insensitive.

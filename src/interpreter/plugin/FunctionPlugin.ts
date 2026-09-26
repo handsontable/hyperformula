@@ -24,6 +24,7 @@ import {
 } from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
+import {PendingValueRead} from '../PendingValueRead'
 import {
   ExtendedNumber,
   FormatInfo,
@@ -42,6 +43,8 @@ export interface ImplementedFunctions {
 }
 
 export interface FunctionMetadata {
+  /** Optional generator method that preserves plugin state across pending runtime reads. */
+  resumableMethod?: string,
   /**
    * Internal and engine.
    */
@@ -289,7 +292,66 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   }
 
   protected evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
-    return this.interpreter.evaluateAst(ast, state)
+    const preserveReference = (state.formulaVertex === undefined || this.interpreter.hasEvaluationCache()) &&
+      this.interpreter.containsIndirect(ast)
+    return this.interpreter.evaluateAst(ast, state, preserveReference)
+  }
+
+  /** Evaluates an argument while retaining this generator's local state across demand reads. */
+  protected *evaluateAstResumable(ast: Ast, state: InterpreterState, preserveReference = this.interpreter.containsIndirect(ast)): Generator<PendingValueRead, InterpreterValue, void> {
+    while (true) {
+      try {
+        return this.interpreter.evaluateAst(ast, state, preserveReference)
+      } catch (error) {
+        if (error instanceof PendingValueRead) {
+          yield error
+        } else {
+          throw error
+        }
+      }
+    }
+  }
+
+  /** Materializes a lazy range without replaying work before its pending read. */
+  protected *materializeRangeResumable(range: SimpleRangeValue): Generator<PendingValueRead, SimpleRangeValue, void> {
+    while (true) {
+      try {
+        void range.data
+        return range
+      } catch (error) {
+        if (error instanceof PendingValueRead) {
+          yield error
+        } else {
+          throw error
+        }
+      }
+    }
+  }
+
+  /** Prepares scalar arguments before entering the ordinary coercion and callback path. */
+  protected *runFunctionResumable(
+    args: Ast[], state: InterpreterState, metadata: FunctionMetadata,
+    functionImplementation: (...arg: any) => InterpreterValue,
+  ): Generator<PendingValueRead, RawInterpreterValue, void> {
+    const argumentMetadata = this.buildMetadataForEachArgumentValue(args.length, metadata)
+    const evaluatedArguments: [InterpreterValue, boolean, boolean][] = []
+    for (let i = 0; i < args.length; i++) {
+      const value = yield* this.evaluateAstResumable(args[i], state)
+      const isEmpty = args[i].type === AstNodeType.EMPTY
+      if (metadata.expandRanges && value instanceof SimpleRangeValue) {
+        yield* this.materializeRangeResumable(value)
+        for (const scalarValue of value.valuesFromTopLeftCorner()) {
+          evaluatedArguments.push([scalarValue, true, isEmpty])
+        }
+      } else {
+        if (value instanceof SimpleRangeValue &&
+          !([FunctionArgumentType.RANGE, FunctionArgumentType.ANY] as FunctionArgumentType[]).includes(argumentMetadata[i]?.argumentType)) {
+          yield* this.materializeRangeResumable(value)
+        }
+        evaluatedArguments.push([value, false, isEmpty])
+      }
+    }
+    return this.runFunctionWithEvaluatedArguments(evaluatedArguments, state, metadata, functionImplementation)
   }
 
   protected arraySizeForAst(ast: Ast, state: InterpreterState): ArraySize {
@@ -407,6 +469,38 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     functionImplementation: (...arg: any) => InterpreterValue,
   ): RawInterpreterValue => {
     const evaluatedArguments = this.evaluateArguments(args, state, metadata)
+    return this.runFunctionWithEvaluatedArguments(evaluatedArguments, state, metadata, functionImplementation)
+  }
+
+  /** Applies runFunction's validation and coercion to arguments evaluated by a resumable method. */
+  protected runFunctionWithPreparedArguments(
+    args: Ast[], values: InterpreterValue[], state: InterpreterState, metadata: FunctionMetadata,
+    functionImplementation: (...arg: any) => InterpreterValue,
+  ): RawInterpreterValue {
+    if (args.length !== values.length) {
+      throw new Error('Prepared argument count must match the AST argument count.')
+    }
+    const evaluatedArguments: [InterpreterValue, boolean, boolean][] = []
+    for (let i = 0; i < args.length; i++) {
+      const isEmpty = args[i].type === AstNodeType.EMPTY
+      const value = values[i]
+      if (metadata.expandRanges && value instanceof SimpleRangeValue) {
+        for (const scalarValue of value.valuesFromTopLeftCorner()) {
+          evaluatedArguments.push([scalarValue, true, isEmpty])
+        }
+      } else {
+        evaluatedArguments.push([value, false, isEmpty])
+      }
+    }
+    return this.runFunctionWithEvaluatedArguments(evaluatedArguments, state, metadata, functionImplementation)
+  }
+
+  private runFunctionWithEvaluatedArguments(
+    evaluatedArguments: [InterpreterValue, boolean, boolean][],
+    state: InterpreterState,
+    metadata: FunctionMetadata,
+    functionImplementation: (...arg: any) => InterpreterValue,
+  ): RawInterpreterValue {
     const argumentValues: InterpreterValue[] = evaluatedArguments.map(([value]) => value)
     const argumentIgnorableFlags = evaluatedArguments.map(([, ignorable]) => ignorable)
     const syntacticallyEmptyFlags = evaluatedArguments.map(([, , empty]) => empty)
@@ -598,6 +692,16 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
     if (cellReference !== undefined) {
       return this.returnNumberWrapper(referenceCallback(cellReference), metadata.returnNumberType)
+    }
+
+    if (arg.type === AstNodeType.FUNCTION_CALL && arg.procedureName === 'INDIRECT' && this.interpreter.isBuiltinFunction('INDIRECT')) {
+      const resolved = this.interpreter.evaluateAst(arg, state, true)
+      if (resolved instanceof CellError) {
+        return resolved
+      }
+      if (resolved instanceof SimpleRangeValue && resolved.range !== undefined) {
+        return this.returnNumberWrapper(referenceCallback(resolved.range.start), metadata.returnNumberType)
+      }
     }
 
     return this.runFunction(args, state, metadata, nonReferenceCallback)
