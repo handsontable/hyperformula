@@ -439,7 +439,11 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       if (col > rangeValue.width() || row > rangeValue.height()) {
         return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
       }
-      return rangeValue?.data?.[row - 1]?.[col - 1] ?? rangeValue?.data?.[0]?.[0] ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+      const value = rangeValue?.data?.[row - 1]?.[col - 1] ?? rangeValue?.data?.[0]?.[0] ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+      // Keep blank runtime references identifiable until the result's consumer applies coercion.
+      return value === EmptyValue && rangeValue.hasValueReader() && rangeValue.width() === 1 && rangeValue.height() === 1
+        ? rangeValue
+        : value
     })
   }
 
@@ -468,12 +472,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       }
       const range = AbsoluteCellRange.spanFrom(address, 1, 1)
       return SimpleRangeValue.onlyRangeWithValueReader(range, this.dependencyGraph,
-        cell => {
-          if (state.runtimeValueReads !== undefined) {
-            state.runtimeValueReads.count++
-          }
-          return this.dependencyGraph.readCurrentValue(cell, state.formulaVertex)
-        })
+        cell => this.dependencyGraph.readCurrentValue(cell, state.formulaVertex))
     })
   }
 

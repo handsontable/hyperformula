@@ -270,7 +270,7 @@ export class Interpreter {
         }
         const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
         if (pluginFunction !== undefined) {
-          const functionState = new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex, state.runtimeValueReads)
+          const functionState = new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex)
           const hasIndirectArgument = (state.formulaVertex === undefined || this.evaluationCache !== undefined) &&
             ast.args.some(arg => this.containsIndirect(arg))
           const resumable = hasIndirectArgument ? this.functionRegistry.getResumableFunction(ast.procedureName) : undefined

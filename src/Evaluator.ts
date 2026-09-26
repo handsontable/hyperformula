@@ -511,15 +511,23 @@ export class Evaluator {
       this.activeCalculation?.expressionResults.get(state.formulaVertex))
     let interpreterValue: InterpreterValue
     try {
-      interpreterValue = this.interpreter.evaluateAst(ast, state)
+      // Retain reference identity until the final cell value is materialized.
+      interpreterValue = this.interpreter.evaluateAst(ast, state, true)
+      if (interpreterValue instanceof SimpleRangeValue && interpreterValue.width() === 1 && interpreterValue.height() === 1) {
+        const range = interpreterValue
+        interpreterValue = range.data[0][0]
+        if (interpreterValue === EmptyValue && range.hasValueReader()) {
+          interpreterValue = 0
+        } else if (interpreterValue instanceof CellError && state.formulaVertex !== undefined) {
+          interpreterValue = interpreterValue.attachRootVertex(state.formulaVertex)
+        }
+      }
     } finally {
       this.interpreter.setEvaluationCache(undefined)
     }
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
-    } else if (interpreterValue === EmptyValue &&
-      (this.config.evaluateNullToZero || (state.runtimeValueReads?.count ?? 0) > 0 || state.formulaVertex !== undefined &&
-        (this.activeCalculation?.runtimeReads.get(state.formulaVertex)?.size ?? 0) > 0)) {
+    } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
       return 0
     } else {
       return interpreterValue

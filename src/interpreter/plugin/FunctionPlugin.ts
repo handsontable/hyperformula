@@ -26,6 +26,7 @@ import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
 import {PendingValueRead} from '../PendingValueRead'
 import {
+  EmptyValue,
   ExtendedNumber,
   FormatInfo,
   getRawValue,
@@ -201,6 +202,12 @@ export interface FunctionArgument {
    * (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`)
    */
   passSubtype?: boolean,
+
+  /**
+   * Converts a blank single-cell runtime reference to zero for value-selecting functions.
+   * Empty scalar arguments retain their usual coercion.
+   */
+  referenceEmptyAsZero?: boolean,
 
   /**
    * If an argument is missing, its value defaults to `defaultValue`.
@@ -389,7 +396,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
           if (coerce === undefined) {
             return undefined
           }
-          arg = coerce
+          arg = coerce === EmptyValue && coercedType.referenceEmptyAsZero && arg.hasValueReader() ? 0 : coerce
         }
       }
     }
@@ -593,11 +600,13 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   }
 
   protected vectorizeAndBroadcastArgumentsIfNecessary(isVectorizationOn: boolean, argumentValues: InterpreterValue[], argumentMetadata: FunctionArgument[], row: number, col: number): Maybe<InterpreterValue>[] {
-    return argumentValues.map((value, i) =>
-      isVectorizationOn && this.isRangePassedAsAScalarArgument(value, argumentMetadata[i])
-        ? this.vectorizeAndBroadcastRangeArgument(value, row, col)
-        : value
-    )
+    return argumentValues.map((value, i) => {
+      if (isVectorizationOn && this.isRangePassedAsAScalarArgument(value, argumentMetadata[i])) {
+        const scalar = this.vectorizeAndBroadcastRangeArgument(value, row, col)
+        return scalar === EmptyValue && argumentMetadata[i].referenceEmptyAsZero && value.hasValueReader() ? 0 : scalar
+      }
+      return value
+    })
   }
 
   protected vectorizeAndBroadcastRangeArgument(argumentValue: SimpleRangeValue, rowNum: number, colNum: number): Maybe<InterpreterValue> {

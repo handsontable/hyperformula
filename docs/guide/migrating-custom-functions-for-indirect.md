@@ -3,8 +3,6 @@ title: Migrating custom functions for INDIRECT
 description: Add resumable methods to HyperFormula custom functions that receive built-in INDIRECT arguments.
 tags:
   - migration
-  - custom functions
-  - INDIRECT
   - resumableMethod
 ---
 
