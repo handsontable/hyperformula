@@ -112,6 +112,9 @@ export class SimpleStrategy implements GraphBuilderStrategy {
                 const vertex = new ArrayFormulaVertex(parseResult.ast, address, new ArraySize(size.width, size.height))
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
                 this.dependencyGraph.addArrayVertex(address, vertex)
+                if (parseResult.hasVolatileFunction) {
+                  this.dependencyGraph.markAsVolatile(vertex)
+                }
               }
             }
           } else if (parsedCellContent instanceof CellContent.Empty) {

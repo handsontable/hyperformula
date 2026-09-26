@@ -531,6 +531,10 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
         const result = this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, syntacticallyEmptyFlags, functionImplementation, metadata.returnNumberType)
 
         if (result instanceof SimpleRangeValue) {
+          // A single runtime reference contributes its value to the result array.
+          if (result.hasValueReader() && result.width() === 1 && result.height() === 1) {
+            return result.data[0][0]
+          }
           throw new Error('Function returning array cannot be vectorized.')
         }
 
