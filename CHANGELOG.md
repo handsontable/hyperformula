@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added the `INDIRECT` function for volatile same-sheet A1 single-cell references, including runtime reads of formula targets and cycle handling through shared ranges.
+- Added resumable custom plugin methods for calls with `INDIRECT` arguments. Existing custom methods still handle ordinary calls; unmigrated dynamic calls return an explicit `#VALUE!` migration error.
+
 ### Fixed
 
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)

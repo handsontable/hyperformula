@@ -122,6 +122,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'IFNA',
     IFS: 'IFS',
     INDEX: 'INDEX',
+    INDIRECT: 'NEPŘÍMÝ.ODKAZ',
     INT: 'CELÁ.ČÁST',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'PLATBA.ÚROK',

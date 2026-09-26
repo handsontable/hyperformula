@@ -8,7 +8,7 @@ import {ArraySize} from './ArraySize'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
-import {InternalScalarValue, isExtendedNumber} from './interpreter/InterpreterValue'
+import {InternalScalarValue, InterpreterValue, isExtendedNumber} from './interpreter/InterpreterValue'
 
 /**
  * A class that represents a range of data.
@@ -33,6 +33,7 @@ export class SimpleRangeValue {
     public readonly range?: AbsoluteCellRange,
     private readonly dependencyGraph?: DependencyGraph,
     private _hasOnlyNumbers?: boolean,
+    private readonly readCellValue?: (address: SimpleCellAddress) => InterpreterValue,
   ) {
     this.size = _data === undefined
       ? new ArraySize(range!.effectiveWidth(dependencyGraph!), range!.effectiveHeight(dependencyGraph!))
@@ -76,6 +77,13 @@ export class SimpleRangeValue {
   }
 
   /**
+   * Keeps a resolved reference lazy until a value consumer requests its contents.
+   */
+  public static onlyRangeWithValueReader(range: AbsoluteCellRange, dependencyGraph: DependencyGraph, readCellValue: (address: SimpleCellAddress) => InterpreterValue): SimpleRangeValue {
+    return new SimpleRangeValue(undefined, range, dependencyGraph, undefined, readCellValue)
+  }
+
+  /**
    * A factory method. Returns a `SimpleRangeValue` object that contains a single value.
    */
   public static fromScalar(scalar: InternalScalarValue): SimpleRangeValue {
@@ -87,6 +95,11 @@ export class SimpleRangeValue {
    */
   public isAdHoc(): boolean {
     return this.range === undefined
+  }
+
+  /** Returns whether this reference must use its reader to obtain current cell values. */
+  public hasValueReader(): boolean {
+    return this.readCellValue !== undefined
   }
 
   /**
@@ -215,7 +228,7 @@ export class SimpleRangeValue {
 
     this._hasOnlyNumbers = true
     this._data = this.range!.addressesArrayMap(this.dependencyGraph!, cellFromRange => {
-      const value = this.dependencyGraph!.getCellValue(cellFromRange)
+      const value = this.readCellValue === undefined ? this.dependencyGraph!.getCellValue(cellFromRange) : this.readCellValue(cellFromRange)
       if (value instanceof SimpleRangeValue) {
         this._hasOnlyNumbers = false
         return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)

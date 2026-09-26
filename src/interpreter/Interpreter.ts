@@ -17,7 +17,7 @@ import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
 // noinspection TypeScriptPreferShortImport
-import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
+import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, ProcedureAst, RowRangeAst} from '../parser/Ast'
 import {Serialization} from '../Serialization'
 import {Statistics} from '../statistics/Statistics'
 import {
@@ -31,6 +31,7 @@ import {
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
 import {InterpreterState} from './InterpreterState'
+import {PendingValueRead} from './PendingValueRead'
 import {
   cloneNumber,
   EmptyValue,
@@ -42,8 +43,24 @@ import {
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import { AddressWithSheet } from '../parser/Address'
 
+/** A function can finish its method before its returned reference has a current value. */
+export interface EvaluationCacheSlot {
+  raw?: InterpreterValue,
+  result?: InterpreterValue,
+  execution?: Generator<PendingValueRead, InterpreterValue, void>,
+}
+
+export interface EvaluationCacheEntry extends EvaluationCacheSlot {
+  ast?: Ast,
+  preserveReference?: boolean,
+  children: EvaluationCacheEntry[],
+  nextChild: number,
+}
+
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
+  private evaluationCache?: EvaluationCacheEntry
+  private evaluationPath: EvaluationCacheEntry[] = []
 
   constructor(
     public readonly config: Config,
@@ -61,19 +78,90 @@ export class Interpreter {
     this.criterionBuilder = new CriterionBuilder(config)
   }
 
-  public evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
-    let val = this.evaluateAstWithoutPostprocessing(ast, state)
-    if (isExtendedNumber(val)) {
-      if (isNumberOverflow(getRawValue(val))) {
-        return new CellError(ErrorType.NUM, ErrorMessage.NaN)
-      } else {
-        val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
+  /** Retains each expression invocation separately while a formula waits for a runtime target. */
+  public setEvaluationCache(cache?: EvaluationCacheEntry): void {
+    this.evaluationCache = cache
+    this.evaluationPath.length = 0
+    if (cache !== undefined) {
+      cache.nextChild = 0
+      this.evaluationPath.push(cache)
+    }
+  }
+
+  /** A cell formula has this context only when it contains the built-in INDIRECT. */
+  public hasEvaluationCache(): boolean {
+    return this.evaluationCache !== undefined
+  }
+
+  /** Reports whether the current registration resolves to an engine built-in. */
+  public isBuiltinFunction(name: string): boolean {
+    return this.functionRegistry.isBuiltinFunction(name)
+  }
+
+  public evaluateAst(ast: Ast, state: InterpreterState, preserveReference = false): InterpreterValue {
+    // Keep ordinary formula evaluation free of suspension-cache bookkeeping.
+    if (this.evaluationCache === undefined) {
+      let val = this.evaluateAstWithoutPostprocessing(ast, state, preserveReference)
+      if (isExtendedNumber(val)) {
+        if (isNumberOverflow(getRawValue(val))) {
+          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+        } else {
+          val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
+        }
+      }
+      if (!preserveReference && val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
+        [[val]] = val.data
+      }
+      return wrapperForRootVertex(val, state.formulaVertex)
+    }
+
+    const parent = this.evaluationPath[this.evaluationPath.length - 1]
+    let slot: EvaluationCacheEntry | undefined
+    if (parent !== undefined) {
+      const index = parent.nextChild++
+      slot = parent.children[index]
+      if (slot?.ast !== ast || slot.preserveReference !== preserveReference) {
+        slot = {ast, preserveReference, children: [], nextChild: 0}
+        parent.children.splice(index, 0, slot)
+      }
+      if (slot.result !== undefined) {
+        return slot.result
+      }
+      if (slot.execution === undefined) {
+        slot.nextChild = 0
+      }
+      this.evaluationPath.push(slot)
+    }
+    try {
+      let val = slot?.raw ?? this.evaluateAstWithoutPostprocessing(ast, state, preserveReference, slot)
+      if (slot !== undefined) {
+        slot.raw = val
+      }
+      if (isExtendedNumber(val)) {
+        if (isNumberOverflow(getRawValue(val))) {
+          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+        } else {
+          val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
+        }
+      }
+      if (!preserveReference && val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
+        [[val]] = val.data
+      }
+      const result = wrapperForRootVertex(val, state.formulaVertex)
+      if (slot !== undefined) {
+        slot.result = result
+      }
+      return result
+    } catch (error) {
+      if (error instanceof PendingValueRead && parent !== undefined) {
+        parent.nextChild--
+      }
+      throw error
+    } finally {
+      if (slot !== undefined) {
+        this.evaluationPath.pop()
       }
     }
-    if (val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
-      [[val]] = val.data
-    }
-    return wrapperForRootVertex(val, state.formulaVertex)
   }
 
   /**
@@ -82,7 +170,7 @@ export class Interpreter {
    * @param {Ast} ast - abstract syntax tree of formula
    * @param {InterpreterState} state - interpreter state
    */
-  private evaluateAstWithoutPostprocessing(ast: Ast, state: InterpreterState): InterpreterValue {
+  private evaluateAstWithoutPostprocessing(ast: Ast, state: InterpreterState, preserveReference: boolean, slot?: EvaluationCacheSlot): InterpreterValue {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
         return EmptyValue
@@ -182,7 +270,46 @@ export class Interpreter {
         }
         const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
         if (pluginFunction !== undefined) {
-          return pluginFunction(ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex))
+          const functionState = new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex)
+          const hasIndirectArgument = (state.formulaVertex === undefined || this.evaluationCache !== undefined) &&
+            ast.args.some(arg => this.containsIndirect(arg))
+          const resumable = hasIndirectArgument ? this.functionRegistry.getResumableFunction(ast.procedureName) : undefined
+          if (resumable !== undefined) {
+            const execution = slot?.execution ?? resumable(ast, functionState)
+            if (slot !== undefined) {
+              slot.execution = execution
+            }
+            let step: IteratorResult<PendingValueRead, InterpreterValue>
+            try {
+              step = execution.next()
+            } catch (error) {
+              if (slot !== undefined) {
+                slot.execution = undefined
+              }
+              if (error instanceof PendingValueRead) {
+                return new CellError(ErrorType.VALUE, ErrorMessage.ResumablePluginRead(ast.procedureName))
+              }
+              throw error
+            }
+            if (step.done) {
+              if (slot !== undefined) {
+                slot.execution = undefined
+              }
+              return step.value
+            }
+            throw step.value
+          }
+          if (!this.functionRegistry.isBuiltinFunction(ast.procedureName) && hasIndirectArgument) {
+            return new CellError(ErrorType.VALUE, ErrorMessage.ResumablePluginRequired(ast.procedureName))
+          }
+          try {
+            return pluginFunction(ast, functionState)
+          } catch (error) {
+            if (error instanceof PendingValueRead && !this.functionRegistry.isBuiltinFunction(ast.procedureName)) {
+              return new CellError(ErrorType.VALUE, ErrorMessage.ResumablePluginRequired(ast.procedureName))
+            }
+            throw error
+          }
         } else {
           return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
         }
@@ -245,7 +372,7 @@ export class Interpreter {
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.PARENTHESIS: {
-        return this.evaluateAst(ast.expression, state)
+        return this.evaluateAst(ast.expression, state, preserveReference)
       }
       case AstNodeType.ARRAY: {
         let totalWidth: Maybe<number> = undefined
@@ -283,6 +410,38 @@ export class Interpreter {
       case AstNodeType.ERROR: {
         return ast.error
       }
+    }
+  }
+
+  /** Detects INDIRECT syntax in an argument, including nested expressions. */
+  public containsIndirect(ast: Ast): boolean {
+    switch (ast.type) {
+      case AstNodeType.FUNCTION_CALL:
+        return (ast.procedureName === 'INDIRECT' && this.functionRegistry.isBuiltinFunction('INDIRECT')) ||
+          ast.args.some(arg => this.containsIndirect(arg))
+      case AstNodeType.ARRAY:
+        return ast.args.some(row => row.some(arg => this.containsIndirect(arg)))
+      case AstNodeType.PARENTHESIS:
+        return this.containsIndirect(ast.expression)
+      case AstNodeType.PERCENT_OP:
+      case AstNodeType.PLUS_UNARY_OP:
+      case AstNodeType.MINUS_UNARY_OP:
+        return this.containsIndirect(ast.value)
+      case AstNodeType.CONCATENATE_OP:
+      case AstNodeType.EQUALS_OP:
+      case AstNodeType.NOT_EQUAL_OP:
+      case AstNodeType.LESS_THAN_OP:
+      case AstNodeType.GREATER_THAN_OP:
+      case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+      case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
+      case AstNodeType.MINUS_OP:
+      case AstNodeType.PLUS_OP:
+      case AstNodeType.TIMES_OP:
+      case AstNodeType.DIV_OP:
+      case AstNodeType.POWER_OP:
+        return this.containsIndirect(ast.left) || this.containsIndirect(ast.right)
+      default:
+        return false
     }
   }
 

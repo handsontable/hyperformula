@@ -81,6 +81,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=INDEX(A1:C10, 2, 3)', '=INDEX(A1:A10, 5)'],
   },
+  INDIRECT: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns the value of the same-sheet A1 cell address in `reference_text`.',
+    parameters: [{name: 'reference_text', description: 'A same-sheet A1 single-cell address supplied as text.'}, {name: 'reference_mode', description: 'TRUE or omitted interprets `reference_text` as an A1 address. FALSE requests R1C1 mode, which is unsupported and returns #REF!.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=INDIRECT("B1")', '=INDIRECT(D1)'],
+  },
   MATCH: {
     category: 'Lookup and reference',
     shortDescription: 'Returns the relative position of an item in an array that matches a specified value.',

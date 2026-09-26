@@ -76,6 +76,8 @@ export class ErrorMessage {
   public static SizeMismatch = 'Array dimensions mismatched.'
   public static ResultTooLong = 'Result exceeds the maximum allowed length.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
+  public static ResumablePluginRequired = (arg: string) => `Function ${arg} requires a resumable method for INDIRECT arguments.`
+  public static ResumablePluginRead = (arg: string) => `Resumable function ${arg} must yield pending value reads.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
   public static LicenseKey = (arg: string) => `License key is ${arg}.`
 }

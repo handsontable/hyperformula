@@ -7,7 +7,8 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalNoErrorScalarValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {EmptyValue, InternalNoErrorScalarValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
@@ -27,15 +28,15 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
       method: 'conditionalIf',
       parameters: [
         {argumentType: FunctionArgumentType.BOOLEAN},
-        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
-        {argumentType: FunctionArgumentType.SCALAR, defaultValue: false, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, referenceEmptyAsZero: true, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, referenceEmptyAsZero: true, defaultValue: false, passSubtype: true},
       ],
     },
     'IFS': {
       method: 'ifs',
       parameters: [
         {argumentType: FunctionArgumentType.BOOLEAN},
-        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, referenceEmptyAsZero: true, passSubtype: true},
       ],
       repeatLastArgs: 2,
     },
@@ -81,22 +82,22 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     'IFERROR': {
       method: 'iferror',
       parameters: [
-        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
-        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, referenceEmptyAsZero: true, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, referenceEmptyAsZero: true, passSubtype: true},
       ]
     },
     'IFNA': {
       method: 'ifna',
       parameters: [
-        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
-        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, referenceEmptyAsZero: true, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, referenceEmptyAsZero: true, passSubtype: true},
       ]
     },
     'CHOOSE': {
       method: 'choose',
       parameters: [
         {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
-        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, referenceEmptyAsZero: true, passSubtype: true},
       ],
       repeatLastArgs: 1,
     },
@@ -202,7 +203,8 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   }
 
   public switch(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('SWITCH'), (selector, ...args) => {
+    const values = ast.args.map(arg => this.evaluateAst(arg, state))
+    return this.runFunctionWithPreparedArguments(ast.args, values, state, this.metadata('SWITCH'), (selector, ...args) => {
       const n = args.length
       let i = 0
       for (; i + 1 < n; i += 2) {
@@ -210,15 +212,20 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
           continue
         }
         if (this.arithmeticHelper.eq(selector, args[i] as InternalNoErrorScalarValue)) {
-          return args[i + 1]
+          return this.selectedValue(args[i + 1], values[i + 2])
         }
       }
       if (i < n) {
-        return args[i]
+        return this.selectedValue(args[i], values[i + 1])
       } else {
         return new CellError(ErrorType.NA, ErrorMessage.NoDefault)
       }
     })
+  }
+
+  /** Coerces only the selected result, keeping SWITCH's comparison operands unchanged. */
+  private selectedValue(value: InternalScalarValue, reference: InterpreterValue): InternalScalarValue {
+    return value === EmptyValue && reference instanceof SimpleRangeValue && reference.hasValueReader() ? 0 : value
   }
 
   public iferror(ast: ProcedureAst, state: InterpreterState): InterpreterValue {

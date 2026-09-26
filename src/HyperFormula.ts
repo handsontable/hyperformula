@@ -14,6 +14,7 @@ import {
   getCellValueDetailedType,
   getCellValueFormat,
   getCellValueType,
+  equalSimpleCellAddress,
   isSimpleCellAddress,
   SimpleCellAddress
 } from './Cell'
@@ -3189,10 +3190,13 @@ export class HyperFormula implements TypedEmitter {
     } else {
       throw new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', address)
     }
-    if (vertex === undefined) {
-      return []
+    const staticDependents = vertex === undefined ? [] : this._dependencyGraph.getAdjacentNodesAddresses(vertex)
+    if (!isSimpleCellAddress(address)) {
+      return staticDependents
     }
-    return this._dependencyGraph.getAdjacentNodesAddresses(vertex)
+    const runtimeDependents = this._dependencyGraph.runtimeDependentAddresses(address)
+    return [...staticDependents, ...runtimeDependents.filter(runtimeAddress =>
+      !staticDependents.some(staticAddress => isSimpleCellAddress(staticAddress) && equalSimpleCellAddress(staticAddress, runtimeAddress)))]
   }
 
   /**

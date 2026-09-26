@@ -811,7 +811,8 @@ export function forceNormalizeString(str: string): string {
 }
 
 export function coerceRangeToScalar(arg: SimpleRangeValue, state: InterpreterState): Maybe<InternalScalarValue> {
-  if (arg.isAdHoc()) {
+  // A single-cell runtime reference supplies its value regardless of the caller's row.
+  if (arg.isAdHoc() || arg.hasValueReader() && arg.width() === 1 && arg.height() === 1) {
     return arg.data[0]?.[0]
   }
   const range = arg.range!

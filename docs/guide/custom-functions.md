@@ -376,6 +376,100 @@ This demo contains the implementation of both the
 [`GREET`](#add-a-simple-custom-function) and
 [`DOUBLE_RANGE`](#advanced-custom-function-example) custom functions.
 
+## Functions with INDIRECT arguments
+
+An argument using the built-in INDIRECT can request a cell whose formula is still being calculated.
+To preserve work already done by a custom function, add a generator method and
+name it with `resumableMethod`. Keep the existing `method` for ordinary calls.
+See [Migrating custom functions for INDIRECT](migrating-custom-functions-for-indirect.md)
+for the compatibility boundary and migration steps in one place.
+
+For example, an existing function may record work before `runFunction`:
+
+```js
+import { FunctionPlugin, FunctionArgumentType } from 'hyperformula';
+
+class ReviewPlugin extends FunctionPlugin {
+  entries = 0;
+
+  review(ast, state) {
+    const entry = ++this.entries;
+    return this.runFunction(ast.args, state, this.metadata('REVIEW'),
+      value => value + entry);
+  }
+}
+
+ReviewPlugin.implementedFunctions = {
+  REVIEW: {
+    method: 'review',
+    parameters: [{ argumentType: FunctionArgumentType.NUMBER }],
+  },
+};
+```
+
+To support `=REVIEW(INDIRECT("B1"))`, add:
+
+```js
+ReviewPlugin.implementedFunctions.REVIEW.resumableMethod = 'reviewResumable';
+
+ReviewPlugin.prototype.reviewResumable = function* (ast, state) {
+  const entry = ++this.entries;
+  return yield* this.runFunctionResumable(ast.args, state, this.metadata('REVIEW'),
+    value => value + entry);
+};
+```
+
+`runFunctionResumable` evaluates each argument once, then uses the same validation,
+coercion, and callback path as `runFunction`. The generator resumes after a
+pending target finishes, so `entry` and work done before the read are retained.
+For a method that deliberately evaluates the same argument more than once, keep
+each `yield* this.evaluateAstResumable(...)` call in the generator; they remain
+separate evaluations. Ordinary calls retain the existing method's behavior.
+
+If your method evaluates arguments itself, use `yield* this.evaluateAstResumable(ast, state)`.
+If it reads a returned range's data, use
+`yield* this.materializeRangeResumable(range)` before accessing `range.data`:
+
+```js
+*manualResumable(ast, state) {
+  const entry = ++this.entries;
+  const range = yield* this.evaluateAstResumable(ast.args[0], state);
+  yield* this.materializeRangeResumable(range);
+  return range.data[0][0] + entry;
+}
+```
+
+A `runFunction` callback that reads a range needs the same preparation before
+the callback runs. Pass the already evaluated values to
+`runFunctionWithPreparedArguments` so validation and coercion run without
+evaluating the ASTs again:
+
+```js
+*callbackResumable(ast, state) {
+  const range = yield* this.evaluateAstResumable(ast.args[0], state);
+  yield* this.materializeRangeResumable(range);
+  return this.runFunctionWithPreparedArguments(ast.args, [range], state,
+    this.metadata('CALLBACK'), reference => reference.data[0][0]);
+}
+```
+
+For multiple arguments, evaluate each once in the same order and pass one value
+per AST argument. The helper applies the same argument-count validation,
+range expansion, coercion, defaults, and callback handling as `runFunction`.
+Materialize only values that the function actually consumes; reference-only
+functions can inspect a range without reading its cells. Calling `runFunction`
+after preparing arguments evaluates them again, including address-producing
+expressions inside `INDIRECT`.
+
+**Migration boundary:** A custom function without `resumableMethod` still works
+for ordinary formulas. A call with the built-in INDIRECT in one of its arguments returns
+`#VALUE!` with a message requiring a resumable method, even if the referenced
+target was calculated earlier. The legacy method is not invoked for that call.
+A resumable method that makes a pending read without yielding through the
+helpers returns `#VALUE!` with a separate read error. This behavior prevents
+replaying a legacy method's side effects or accidentally appearing supported
+because of calculation order. The public calculation API remains synchronous.
+
 ## Function options
 
 You can set the following options for your function:
@@ -383,6 +477,7 @@ You can set the following options for your function:
 | Option                              | Type    | Description                                                                                                                                                                                                                                   |
 |-------------------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `method` (required)                 | String  | Name of the method that implements the custom function logic.                                                                                                                                                                                 |
+| `resumableMethod`                   | String  | Optional generator method for calls with built-in INDIRECT arguments. Required for a custom function whose arguments contain the built-in INDIRECT. Use the resumable argument and range helpers to preserve work across pending reads. |
 | `parameters`                        | Array   | Specification of the arguments accepted by the function and their [validation options](#argument-validation-options).                                                                                                                         |
 | `sizeOfResultArrayMethod`                   | String  | Name of the method that calculates the size of the result array. Not required for functions that never return an array.                                                                                                                       |
 | `returnNumberType`                  | String  | If the function returns a numeric value, this option indicates how to interpret the returned number.<br/>Possible values: `NUMBER_RAW, NUMBER_DATE, NUMBER_TIME, NUMBER_DATETIME, NUMBER_CURRENCY, NUMBER_PERCENT`.<br/>Default: `NUMBER_RAW` |
