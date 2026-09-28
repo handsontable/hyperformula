@@ -9,7 +9,7 @@ import {
   notifyLicenseKeyNotice,
   notifyLicenseKeyState,
 } from '../helpers/licenseKeyValidator'
-import {ALL_FEATURE_TOKENS, CAPABILITY_TABLE, normalizeCapabilityToken} from './capabilities'
+import {CAPABILITY_TABLE, normalizeCapabilityToken} from './capabilities'
 import {LicenseEntitlement, LicenseExpiry, unrestrictedEntitlement} from './LicenseEntitlement'
 import {detectLicenseKeyFormat} from './handsontable-license-key-parser/detectFormat'
 import {EntitlementKeyData, EntitlementProductGrant, extractEntitlementKeyData} from './handsontable-license-key-parser/extractKeyData'
@@ -25,14 +25,6 @@ const MILLISECONDS_PER_DAY = 86400000
  * whose other entries are simply not for us.
  */
 export const HYPERFORMULA_PRODUCT_NAME = 'hyperformula'
-
-/**
- * The prefix marking a capability token as granting a public-API feature area.
- *
- * Used to tell "this key names its feature grants" from "this key's vocabulary cannot express
- * one" — see the opt-in rule in {@link licenseTermsOf}.
- */
-const FEATURE_TOKEN_PREFIX = 'feat:'
 
 /**
  * Flag spellings that suppress console output.
@@ -147,37 +139,6 @@ function licenseTermsOf(data: EntitlementKeyData): LicenseTerms {
     // `RangeError: Maximum call stack size exceeded` out of `HyperFormula.buildFromArray` instead
     // of resolving to a verdict. A malformed or hostile key must produce INVALID, never a throw.
     grant.capabilities.forEach((token) => capabilityTokens.push(token))
-  }
-
-  // Feature tokens are OPT-IN, never opt-out. A key carrying at least one `feat:*` token demonstrably
-  // speaks the feature vocabulary, so it gets exactly the areas it names - that is what makes feature
-  // gating real (the ratified decision: "Feature gating should work"). A key carrying NONE cannot
-  // be saying "no features", because no vocabulary in circulation can express one: the key spec's
-  // current HyperFormula token list (rev 6 §2.2 - `functions_1..4`, `spreadsheet`,
-  // `import_export`) contains no `feat:*` entry at all. So absence means "this key does not talk
-  // about features", and the task's additive-safety rule - a grant may grow between versions,
-  // never shrink - makes the whole gated API the only safe reading.
-  //
-  // Reading absence as denial instead would hand a dead public API to every key myHOT can mint
-  // today, HyperFormula-only and Handsontable-only alike; both were verified doing exactly that
-  // before this rule existed.
-  // The trigger is a feature token this version RECOGNIZES, not merely one that looks like a
-  // feature token. An unrecognized `feat:*` token has to be inert (D3: "unrecognized token should
-  // not grant the capability (silently ignored)"), and a purely syntactic prefix test makes it the
-  // opposite of inert - it suppresses the fallback, so the key ends up with ZERO gated areas.
-  // Measured before this guard existed: a key carrying `functions_1` plus a single unknown
-  // `feat:teleport` had CRUD, undo, clipboard, named expressions and batching all throwing, while
-  // the same key without that token had them all. That is the additive-safety rule inverted - an
-  // older build meeting a key minted by a newer generator, or a one-character typo at issuing time,
-  // would revoke the whole gated API rather than ignore a word it does not know.
-  const namesAKnownFeature = capabilityTokens.some((token) => {
-    const normalized = normalizeCapabilityToken(token)
-
-    return normalized.indexOf(FEATURE_TOKEN_PREFIX) === 0 && CAPABILITY_TABLE.has(normalized)
-  })
-
-  if (!namesAKnownFeature) {
-    capabilityTokens.push(...ALL_FEATURE_TOKENS)
   }
 
   // Exactly one of the two date fields is present on an intact entry (the reader enforces it),

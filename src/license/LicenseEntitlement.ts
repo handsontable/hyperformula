@@ -9,10 +9,6 @@
  * `CustomFunctions` is reserved vocabulary: it exists so a license payload is free to carry it,
  * but HF-307 decision D1 drops function-registration gating (and the `CustomFunctions` grant)
  * from this release, so no capability grant maps to it.
- *
- * `ImportExport` IS granted, by the `feat:import_export` token — but it gates no public method
- * yet, because HF-107 hasn't shipped the import/export feature it would gate. The grant exists;
- * the gate does not, yet.
  */
 export const enum FeatureId {
   NamedExpressions = 'named_expressions',
@@ -21,7 +17,6 @@ export const enum FeatureId {
   UndoRedo = 'undo_redo',
   Batching = 'batching',
   CustomFunctions = 'custom_functions',
-  ImportExport = 'import_export',
 }
 
 /**
