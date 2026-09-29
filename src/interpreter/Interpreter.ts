@@ -31,7 +31,6 @@ import {
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
 import {InterpreterState} from './InterpreterState'
-import {PendingValueRead} from './PendingValueRead'
 import {
   cloneNumber,
   EmptyValue,
@@ -43,25 +42,12 @@ import {
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import { AddressWithSheet } from '../parser/Address'
 
-/**
- * One evaluated sub-expression of a formula that may restart after a pending read.
- * `raw` is the value before post-processing; `result` is the final value.
- */
-export interface EvaluationCacheEntry {
-  raw?: InterpreterValue,
-  result?: InterpreterValue,
-  ast?: Ast,
-  /** Resolved INDIRECT references of this formula, keyed by syntax-tree node, kept across restarts. */
-  indirectResults?: Map<Ast, InterpreterValue>,
-  preserveReference?: boolean,
-  children: EvaluationCacheEntry[],
-  nextChild: number,
-}
+/** Resolved INDIRECT references of one formula, keyed by syntax-tree node, kept across restarts. */
+export type IndirectResults = Map<Ast, InterpreterValue>
 
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
-  private evaluationCache?: EvaluationCacheEntry
-  private evaluationPath: EvaluationCacheEntry[] = []
+  private indirectResults?: IndirectResults
 
   constructor(
     public readonly config: Config,
@@ -79,19 +65,14 @@ export class Interpreter {
     this.criterionBuilder = new CriterionBuilder(config)
   }
 
-  /** Retains each expression invocation separately while a formula waits for a runtime target. */
-  public setEvaluationCache(cache?: EvaluationCacheEntry): void {
-    this.evaluationCache = cache
-    this.evaluationPath.length = 0
-    if (cache !== undefined) {
-      cache.nextChild = 0
-      this.evaluationPath.push(cache)
-    }
+  /** Sets the INDIRECT results of the formula being calculated; undefined outside a calculation. */
+  public setIndirectResults(results?: IndirectResults): void {
+    this.indirectResults = results
   }
 
-  /** A cell formula has this context only when it contains the built-in INDIRECT. */
-  public hasEvaluationCache(): boolean {
-    return this.evaluationCache !== undefined
+  /** A cell formula has INDIRECT results only when it contains the built-in INDIRECT. */
+  public hasIndirectResults(): boolean {
+    return this.indirectResults !== undefined
   }
 
   /** Reports whether the current registration resolves to an engine built-in. */
@@ -100,67 +81,18 @@ export class Interpreter {
   }
 
   public evaluateAst(ast: Ast, state: InterpreterState, preserveReference = false): InterpreterValue {
-    // Keep ordinary formula evaluation free of suspension-cache bookkeeping.
-    if (this.evaluationCache === undefined) {
-      let val = this.evaluateAstWithoutPostprocessing(ast, state, preserveReference)
-      if (isExtendedNumber(val)) {
-        if (isNumberOverflow(getRawValue(val))) {
-          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
-        } else {
-          val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
-        }
-      }
-      if (!preserveReference && val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
-        [[val]] = val.data
-      }
-      return wrapperForRootVertex(val, state.formulaVertex)
-    }
-
-    const parent = this.evaluationPath[this.evaluationPath.length - 1]
-    let slot: EvaluationCacheEntry | undefined
-    if (parent !== undefined) {
-      const index = parent.nextChild++
-      slot = parent.children[index]
-      if (slot?.ast !== ast || slot.preserveReference !== preserveReference) {
-        slot = {ast, preserveReference, children: [], nextChild: 0}
-        parent.children.splice(index, 0, slot)
-      }
-      if (slot.result !== undefined) {
-        return slot.result
-      }
-      slot.nextChild = 0
-      this.evaluationPath.push(slot)
-    }
-    try {
-      let val = slot?.raw ?? this.evaluateAstWithoutPostprocessing(ast, state, preserveReference)
-      if (slot !== undefined) {
-        slot.raw = val
-      }
-      if (isExtendedNumber(val)) {
-        if (isNumberOverflow(getRawValue(val))) {
-          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
-        } else {
-          val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
-        }
-      }
-      if (!preserveReference && val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
-        [[val]] = val.data
-      }
-      const result = wrapperForRootVertex(val, state.formulaVertex)
-      if (slot !== undefined) {
-        slot.result = result
-      }
-      return result
-    } catch (error) {
-      if (error instanceof PendingValueRead && parent !== undefined) {
-        parent.nextChild--
-      }
-      throw error
-    } finally {
-      if (slot !== undefined) {
-        this.evaluationPath.pop()
+    let val = this.evaluateAstWithoutPostprocessing(ast, state, preserveReference)
+    if (isExtendedNumber(val)) {
+      if (isNumberOverflow(getRawValue(val))) {
+        return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+      } else {
+        val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
       }
     }
+    if (!preserveReference && val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
+      [[val]] = val.data
+    }
+    return wrapperForRootVertex(val, state.formulaVertex)
   }
 
   /**
@@ -271,19 +203,11 @@ export class Interpreter {
         if (pluginFunction !== undefined) {
           const functionState = new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex)
           const isBuiltin = this.functionRegistry.isBuiltinFunction(ast.procedureName)
-          if (this.evaluationCache !== undefined) {
-            if (ast.procedureName === 'INDIRECT' && isBuiltin) {
-              return this.evaluateIndirectOnce(ast, () => pluginFunction(ast, functionState))
-            }
-            if (!isBuiltin && ast.args.some(arg => this.containsIndirect(arg))) {
-              // Make every INDIRECT target in the arguments current first, so the custom
-              // method runs once and never meets a pending read.
-              const needsValue = !this.functionRegistry.doesFunctionNeedArgumentToBeComputed(ast.procedureName)
-              ast.args.forEach(arg => this.resolveIndirectTargets(arg, functionState.arraysFlag, needsValue, state))
-            }
+          if (this.indirectResults !== undefined && ast.procedureName === 'INDIRECT' && isBuiltin) {
+            return this.evaluateIndirectOnce(ast, () => pluginFunction(ast, functionState))
           }
-          // A custom method can still meet a pending read the pre-pass cannot see (its own
-          // runtime read). It then propagates and the method is re-run, like a built-in.
+          // Targets were made current before the formula was evaluated. A method can still meet
+          // a pending read the pre-pass cannot see (its own runtime read); the formula is then re-run.
           return pluginFunction(ast, functionState)
         } else {
           return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
@@ -390,7 +314,7 @@ export class Interpreter {
 
   /** Evaluates a built-in INDIRECT call once per formula evaluation, including restarts. */
   private evaluateIndirectOnce(ast: ProcedureAst, evaluate: () => InterpreterValue): InterpreterValue {
-    const results = this.evaluationCache!.indirectResults ??= new Map()
+    const results = this.indirectResults!
     const stored = results.get(ast)
     if (stored !== undefined) {
       return stored
@@ -450,6 +374,11 @@ export class Interpreter {
       default:
         return
     }
+  }
+
+  /** Makes the targets of a formula's INDIRECT calls current before it is evaluated. */
+  public resolveFormulaIndirectTargets(ast: Ast, state: InterpreterState): void {
+    this.resolveIndirectTargets(ast, state.arraysFlag, true, state)
   }
 
   /** Detects INDIRECT syntax in an argument, including nested expressions. */
