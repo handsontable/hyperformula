@@ -43,15 +43,16 @@ import {
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import { AddressWithSheet } from '../parser/Address'
 
-/** A function can finish its method before its returned reference has a current value. */
-export interface EvaluationCacheSlot {
+/**
+ * One evaluated sub-expression of a formula that may restart after a pending read.
+ * `raw` is the value before post-processing; `result` is the final value.
+ */
+export interface EvaluationCacheEntry {
   raw?: InterpreterValue,
   result?: InterpreterValue,
-  execution?: Generator<PendingValueRead, InterpreterValue, void>,
-}
-
-export interface EvaluationCacheEntry extends EvaluationCacheSlot {
   ast?: Ast,
+  /** Resolved INDIRECT references of this formula, keyed by syntax-tree node, kept across restarts. */
+  indirectResults?: Map<Ast, InterpreterValue>,
   preserveReference?: boolean,
   children: EvaluationCacheEntry[],
   nextChild: number,
@@ -127,13 +128,11 @@ export class Interpreter {
       if (slot.result !== undefined) {
         return slot.result
       }
-      if (slot.execution === undefined) {
-        slot.nextChild = 0
-      }
+      slot.nextChild = 0
       this.evaluationPath.push(slot)
     }
     try {
-      let val = slot?.raw ?? this.evaluateAstWithoutPostprocessing(ast, state, preserveReference, slot)
+      let val = slot?.raw ?? this.evaluateAstWithoutPostprocessing(ast, state, preserveReference)
       if (slot !== undefined) {
         slot.raw = val
       }
@@ -170,7 +169,7 @@ export class Interpreter {
    * @param {Ast} ast - abstract syntax tree of formula
    * @param {InterpreterState} state - interpreter state
    */
-  private evaluateAstWithoutPostprocessing(ast: Ast, state: InterpreterState, preserveReference: boolean, slot?: EvaluationCacheSlot): InterpreterValue {
+  private evaluateAstWithoutPostprocessing(ast: Ast, state: InterpreterState, preserveReference: boolean): InterpreterValue {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
         return EmptyValue
@@ -271,45 +270,21 @@ export class Interpreter {
         const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
         if (pluginFunction !== undefined) {
           const functionState = new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex)
-          const hasIndirectArgument = (state.formulaVertex === undefined || this.evaluationCache !== undefined) &&
-            ast.args.some(arg => this.containsIndirect(arg))
-          const resumable = hasIndirectArgument ? this.functionRegistry.getResumableFunction(ast.procedureName) : undefined
-          if (resumable !== undefined) {
-            const execution = slot?.execution ?? resumable(ast, functionState)
-            if (slot !== undefined) {
-              slot.execution = execution
+          const isBuiltin = this.functionRegistry.isBuiltinFunction(ast.procedureName)
+          if (this.evaluationCache !== undefined) {
+            if (ast.procedureName === 'INDIRECT' && isBuiltin) {
+              return this.evaluateIndirectOnce(ast, () => pluginFunction(ast, functionState))
             }
-            let step: IteratorResult<PendingValueRead, InterpreterValue>
-            try {
-              step = execution.next()
-            } catch (error) {
-              if (slot !== undefined) {
-                slot.execution = undefined
-              }
-              if (error instanceof PendingValueRead) {
-                return new CellError(ErrorType.VALUE, ErrorMessage.ResumablePluginRead(ast.procedureName))
-              }
-              throw error
+            if (!isBuiltin && ast.args.some(arg => this.containsIndirect(arg))) {
+              // Make every INDIRECT target in the arguments current first, so the custom
+              // method runs once and never meets a pending read.
+              const needsValue = !this.functionRegistry.doesFunctionNeedArgumentToBeComputed(ast.procedureName)
+              ast.args.forEach(arg => this.resolveIndirectTargets(arg, functionState.arraysFlag, needsValue, state))
             }
-            if (step.done) {
-              if (slot !== undefined) {
-                slot.execution = undefined
-              }
-              return step.value
-            }
-            throw step.value
           }
-          if (!this.functionRegistry.isBuiltinFunction(ast.procedureName) && hasIndirectArgument) {
-            return new CellError(ErrorType.VALUE, ErrorMessage.ResumablePluginRequired(ast.procedureName))
-          }
-          try {
-            return pluginFunction(ast, functionState)
-          } catch (error) {
-            if (error instanceof PendingValueRead && !this.functionRegistry.isBuiltinFunction(ast.procedureName)) {
-              return new CellError(ErrorType.VALUE, ErrorMessage.ResumablePluginRequired(ast.procedureName))
-            }
-            throw error
-          }
+          // A custom method can still meet a pending read the pre-pass cannot see (its own
+          // runtime read). It then propagates and the method is re-run, like a built-in.
+          return pluginFunction(ast, functionState)
         } else {
           return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
         }
@@ -410,6 +385,70 @@ export class Interpreter {
       case AstNodeType.ERROR: {
         return ast.error
       }
+    }
+  }
+
+  /** Evaluates a built-in INDIRECT call once per formula evaluation, including restarts. */
+  private evaluateIndirectOnce(ast: ProcedureAst, evaluate: () => InterpreterValue): InterpreterValue {
+    const results = this.evaluationCache!.indirectResults ??= new Map()
+    const stored = results.get(ast)
+    if (stored !== undefined) {
+      return stored
+    }
+    const value = evaluate()
+    results.set(ast, value)
+    return value
+  }
+
+  /**
+   * Resolves the INDIRECT calls in an argument, innermost first, and makes the target of
+   * each one whose value is needed current. Mirrors the interpreter's array flag and the
+   * parser's dependency rule: a direct argument of a function with
+   * `doesNotNeedArgumentsToBeComputed` is used as a reference, so its target is not
+   * calculated; operators and other function calls need values again.
+   */
+  private resolveIndirectTargets(ast: Ast, arraysFlag: boolean, needsValue: boolean, state: InterpreterState): void {
+    switch (ast.type) {
+      case AstNodeType.FUNCTION_CALL: {
+        const flag = arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName)
+        const argumentsNeedValues = !this.functionRegistry.doesFunctionNeedArgumentToBeComputed(ast.procedureName)
+        ast.args.forEach(arg => this.resolveIndirectTargets(arg, flag, argumentsNeedValues, state))
+        if (ast.procedureName === 'INDIRECT' && this.functionRegistry.isBuiltinFunction('INDIRECT')) {
+          const reference = this.evaluateAst(ast, new InterpreterState(state.formulaAddress, arraysFlag, state.formulaVertex), true)
+          if (needsValue && reference instanceof SimpleRangeValue && reference.hasValueReader() && reference.range !== undefined) {
+            this.dependencyGraph.prepareRuntimeRead(reference.range.start, state.formulaVertex)
+          }
+        }
+        return
+      }
+      case AstNodeType.ARRAY:
+        ast.args.forEach(row => row.forEach(arg => this.resolveIndirectTargets(arg, arraysFlag, true, state)))
+        return
+      case AstNodeType.PARENTHESIS:
+        this.resolveIndirectTargets(ast.expression, arraysFlag, needsValue, state)
+        return
+      case AstNodeType.PERCENT_OP:
+      case AstNodeType.PLUS_UNARY_OP:
+      case AstNodeType.MINUS_UNARY_OP:
+        this.resolveIndirectTargets(ast.value, arraysFlag, true, state)
+        return
+      case AstNodeType.CONCATENATE_OP:
+      case AstNodeType.EQUALS_OP:
+      case AstNodeType.NOT_EQUAL_OP:
+      case AstNodeType.LESS_THAN_OP:
+      case AstNodeType.GREATER_THAN_OP:
+      case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+      case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
+      case AstNodeType.MINUS_OP:
+      case AstNodeType.PLUS_OP:
+      case AstNodeType.TIMES_OP:
+      case AstNodeType.DIV_OP:
+      case AstNodeType.POWER_OP:
+        this.resolveIndirectTargets(ast.left, arraysFlag, true, state)
+        this.resolveIndirectTargets(ast.right, arraysFlag, true, state)
+        return
+      default:
+        return
     }
   }
 

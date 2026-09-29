@@ -9,10 +9,6 @@ import {HyperFormula} from '../HyperFormula'
 import {TranslationSet} from '../i18n'
 import {Maybe} from '../Maybe'
 import {Interpreter} from './Interpreter'
-import {InterpreterValue} from './InterpreterValue'
-import {InterpreterState} from './InterpreterState'
-import {PendingValueRead} from './PendingValueRead'
-import {ProcedureAst} from '../parser'
 import {
   FunctionMetadata,
   FunctionPlugin,
@@ -23,7 +19,6 @@ import {
 import {VersionPlugin} from './plugin/VersionPlugin'
 
 export type FunctionTranslationsPackage = Record<string, TranslationSet>
-export type ResumablePluginFunction = (ast: ProcedureAst, state: InterpreterState) => Generator<PendingValueRead, InterpreterValue, void>
 
 function validateAndReturnMetadataFromName(functionId: string, plugin: FunctionPluginDefinition): FunctionMetadata {
   let entry = plugin.implementedFunctions[functionId]
@@ -196,9 +191,6 @@ export class FunctionRegistry {
     this.handleDeprecatedMetadata(functionId, metadata)
 
     if (Object.prototype.hasOwnProperty.call(plugin.prototype, methodName)) {
-      if (metadata.resumableMethod !== undefined && !Object.prototype.hasOwnProperty.call(plugin.prototype, metadata.resumableMethod)) {
-        throw FunctionPluginValidationError.functionMethodNotFound(metadata.resumableMethod, plugin.name)
-      }
       registry.set(functionId, plugin)
     } else {
       throw FunctionPluginValidationError.functionMethodNotFound(methodName, plugin.name)
@@ -279,17 +271,6 @@ export class FunctionRegistry {
     } else {
       return undefined
     }
-  }
-
-  /** Returns the generator method used for a function that can wait on runtime values. */
-  public getResumableFunction(functionId: string): Maybe<ResumablePluginFunction> {
-    const pluginEntry = this.functions.get(functionId)
-    const method = this.functionsMetadata.get(functionId)?.resumableMethod
-    if (pluginEntry === undefined || method === undefined || !this.config.translationPackage.isFunctionTranslated(functionId)) {
-      return undefined
-    }
-    const [, pluginInstance] = pluginEntry
-    return (ast, state) => (pluginInstance as unknown as Record<string, ResumablePluginFunction>)[method](ast, state)
   }
 
   public getArraySizeFunction(functionId: string): Maybe<PluginArraySizeFunctionType> {

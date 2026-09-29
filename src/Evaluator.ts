@@ -49,6 +49,7 @@ export class Evaluator {
     private readonly columnSearch: ColumnSearchStrategy,
   ) {
     this.dependencyGraph.setCurrentValueReader((address, owner) => this.readCurrentValue(address, owner))
+    this.dependencyGraph.setRuntimeReadPreparer((address, owner) => this.prepareRuntimeRead(address, owner))
   }
 
   public run(): void {
@@ -69,11 +70,7 @@ export class Evaluator {
         this.recomputeFormulas(cycled, sorted)
       })
     } finally {
-      try {
-        this.discardAllExpressionResults(calculation)
-      } finally {
-        this.activeCalculation = undefined
-      }
+      this.activeCalculation = undefined
     }
   }
 
@@ -102,11 +99,7 @@ export class Evaluator {
         )
       })
     } finally {
-      try {
-        this.discardAllExpressionResults(calculation)
-      } finally {
-        this.activeCalculation = undefined
-      }
+      this.activeCalculation = undefined
     }
     return changes
   }
@@ -149,6 +142,25 @@ export class Evaluator {
       }
     }
     return this.dependencyGraph.getCellValue(address)
+  }
+
+  /**
+   * Best-effort counterpart of readCurrentValue used before a custom function runs:
+   * requests a pending target without recording a read. A target that is already being
+   * calculated is left to the lazy read, which reports a cycle only if the value is read.
+   */
+  private prepareRuntimeRead(address: SimpleCellAddress, owner?: FormulaVertex): void {
+    const calculation = this.activeCalculation
+    if (calculation === undefined || owner === undefined) {
+      return
+    }
+    const target = this.dependencyGraph.getCell(address)
+    if (target === undefined || calculation.processing.has(target) || calculation.evaluating.has(target)) {
+      return
+    }
+    if (this.needsCalculation(target, calculation)) {
+      throw new PendingValueRead(target)
+    }
   }
 
   /** A back-edge marks only the vertices between its target and the current caller. */
@@ -322,7 +334,7 @@ export class Evaluator {
       if (vertex instanceof FormulaVertex) {
         calculation.evaluating.delete(vertex)
         calculation.runtimeReads.delete(vertex)
-        this.discardExpressionResults(vertex, calculation)
+        calculation.expressionResults.delete(vertex)
       }
       throw error
     }
@@ -331,7 +343,7 @@ export class Evaluator {
       const reads = calculation.runtimeReads.get(vertex)
       this.dependencyGraph.replaceRuntimeDependencies(vertex, [...(reads?.values() ?? [])])
       calculation.runtimeReads.delete(vertex)
-      this.discardExpressionResults(vertex, calculation)
+      calculation.expressionResults.delete(vertex)
     }
     calculation.completed.set(vertex, changed)
     return changed
@@ -346,10 +358,10 @@ export class Evaluator {
       vertex.clearCache()
       return
     }
-    this.discardExpressionResults(vertex, calculation)
     calculation.evaluating.delete(vertex)
     if (vertex instanceof FormulaVertex) {
       calculation.runtimeReads.delete(vertex)
+      calculation.expressionResults.delete(vertex)
     }
     if (calculation.initial) {
       if (vertex instanceof FormulaVertex) {
@@ -359,54 +371,6 @@ export class Evaluator {
       this.processVertexOnCycle(vertex, calculation.changes)
     }
     calculation.completed.set(vertex, true)
-  }
-
-  /** Closes suspended plugin methods when a formula is abandoned or completed. */
-  private discardExpressionResults(vertex: Vertex, calculation: CalculationContext): void {
-    if (!(vertex instanceof FormulaVertex)) {
-      return
-    }
-    const expressions = calculation.expressionResults.get(vertex)
-    calculation.expressionResults.delete(vertex)
-    const pending = expressions === undefined ? [] : [{entry: expressions, visited: false}]
-    let firstError: unknown
-    while (pending.length > 0) {
-      const {entry, visited} = pending.pop()!
-      if (!visited) {
-        pending.push({entry, visited: true})
-        for (const child of entry.children) {
-          pending.push({entry: child, visited: false})
-        }
-        continue
-      }
-      const execution = entry.execution
-      if (execution !== undefined) {
-        entry.execution = undefined
-        try {
-          execution.return(EmptyValue)
-        } catch (error) {
-          firstError ??= error
-        }
-      }
-    }
-    if (firstError !== undefined) {
-      throw firstError
-    }
-  }
-
-  /** Closes every formula owner's suspended methods even if one cleanup fails. */
-  private discardAllExpressionResults(calculation: CalculationContext): void {
-    let firstError: unknown
-    for (const vertex of [...calculation.expressionResults.keys()].reverse()) {
-      try {
-        this.discardExpressionResults(vertex, calculation)
-      } catch (error) {
-        firstError ??= error
-      }
-    }
-    if (firstError !== undefined) {
-      throw firstError
-    }
   }
 
   public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InterpreterValue {

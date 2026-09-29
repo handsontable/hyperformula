@@ -24,7 +24,6 @@ import {
 } from '../ArithmeticHelper'
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
-import {PendingValueRead} from '../PendingValueRead'
 import {
   EmptyValue,
   ExtendedNumber,
@@ -44,8 +43,6 @@ export interface ImplementedFunctions {
 }
 
 export interface FunctionMetadata {
-  /** Optional generator method that preserves plugin state across pending runtime reads. */
-  resumableMethod?: string,
   /**
    * Internal and engine.
    */
@@ -304,63 +301,6 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     return this.interpreter.evaluateAst(ast, state, preserveReference)
   }
 
-  /** Evaluates an argument while retaining this generator's local state across demand reads. */
-  protected *evaluateAstResumable(ast: Ast, state: InterpreterState, preserveReference = this.interpreter.containsIndirect(ast)): Generator<PendingValueRead, InterpreterValue, void> {
-    while (true) {
-      try {
-        return this.interpreter.evaluateAst(ast, state, preserveReference)
-      } catch (error) {
-        if (error instanceof PendingValueRead) {
-          yield error
-        } else {
-          throw error
-        }
-      }
-    }
-  }
-
-  /** Materializes a lazy range without replaying work before its pending read. */
-  protected *materializeRangeResumable(range: SimpleRangeValue): Generator<PendingValueRead, SimpleRangeValue, void> {
-    while (true) {
-      try {
-        void range.data
-        return range
-      } catch (error) {
-        if (error instanceof PendingValueRead) {
-          yield error
-        } else {
-          throw error
-        }
-      }
-    }
-  }
-
-  /** Prepares scalar arguments before entering the ordinary coercion and callback path. */
-  protected *runFunctionResumable(
-    args: Ast[], state: InterpreterState, metadata: FunctionMetadata,
-    functionImplementation: (...arg: any) => InterpreterValue,
-  ): Generator<PendingValueRead, RawInterpreterValue, void> {
-    const argumentMetadata = this.buildMetadataForEachArgumentValue(args.length, metadata)
-    const evaluatedArguments: [InterpreterValue, boolean, boolean][] = []
-    for (let i = 0; i < args.length; i++) {
-      const value = yield* this.evaluateAstResumable(args[i], state)
-      const isEmpty = args[i].type === AstNodeType.EMPTY
-      if (metadata.expandRanges && value instanceof SimpleRangeValue) {
-        yield* this.materializeRangeResumable(value)
-        for (const scalarValue of value.valuesFromTopLeftCorner()) {
-          evaluatedArguments.push([scalarValue, true, isEmpty])
-        }
-      } else {
-        if (value instanceof SimpleRangeValue &&
-          !([FunctionArgumentType.RANGE, FunctionArgumentType.ANY] as FunctionArgumentType[]).includes(argumentMetadata[i]?.argumentType)) {
-          yield* this.materializeRangeResumable(value)
-        }
-        evaluatedArguments.push([value, false, isEmpty])
-      }
-    }
-    return this.runFunctionWithEvaluatedArguments(evaluatedArguments, state, metadata, functionImplementation)
-  }
-
   protected arraySizeForAst(ast: Ast, state: InterpreterState): ArraySize {
     return this.arraySizePredictor.checkArraySizeForAst(ast, state)
   }
@@ -479,7 +419,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     return this.runFunctionWithEvaluatedArguments(evaluatedArguments, state, metadata, functionImplementation)
   }
 
-  /** Applies runFunction's validation and coercion to arguments evaluated by a resumable method. */
+  /** Applies runFunction's validation and coercion to arguments the caller has already evaluated. */
   protected runFunctionWithPreparedArguments(
     args: Ast[], values: InterpreterValue[], state: InterpreterState, metadata: FunctionMetadata,
     functionImplementation: (...arg: any) => InterpreterValue,
