@@ -56,6 +56,7 @@ export class DependencyGraph {
   private readonly runtimeDependencies = new Map<FormulaVertex, Map<string, SimpleCellAddress>>()
   private readonly runtimeDependents = new Map<string, Set<FormulaVertex>>()
   private currentValueReader?: (address: SimpleCellAddress, owner?: FormulaVertex) => InterpreterValue
+  private runtimeReadPreparer?: (address: SimpleCellAddress, owner?: FormulaVertex) => void
 
   constructor(
     public readonly addressMapping: AddressMapping,
@@ -627,6 +628,18 @@ export class DependencyGraph {
 
   public setCurrentValueReader(reader: (address: SimpleCellAddress, owner?: FormulaVertex) => InterpreterValue): void {
     this.currentValueReader = reader
+  }
+
+  /**
+   * Makes a runtime reference target current before a custom function reads it.
+   * Throws a pending read when the target must be calculated first; does nothing otherwise.
+   */
+  public prepareRuntimeRead(address: SimpleCellAddress, owner?: FormulaVertex): void {
+    this.runtimeReadPreparer?.(address, owner)
+  }
+
+  public setRuntimeReadPreparer(preparer: (address: SimpleCellAddress, owner?: FormulaVertex) => void): void {
+    this.runtimeReadPreparer = preparer
   }
 
   /**

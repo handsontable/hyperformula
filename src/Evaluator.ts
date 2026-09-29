@@ -49,6 +49,7 @@ export class Evaluator {
     private readonly columnSearch: ColumnSearchStrategy,
   ) {
     this.dependencyGraph.setCurrentValueReader((address, owner) => this.readCurrentValue(address, owner))
+    this.dependencyGraph.setRuntimeReadPreparer((address, owner) => this.prepareRuntimeRead(address, owner))
   }
 
   public run(): void {
@@ -149,6 +150,25 @@ export class Evaluator {
       }
     }
     return this.dependencyGraph.getCellValue(address)
+  }
+
+  /**
+   * Best-effort counterpart of readCurrentValue used before a custom function runs:
+   * requests a pending target without recording a read. A target that is already being
+   * calculated is left to the lazy read, which reports a cycle only if the value is read.
+   */
+  private prepareRuntimeRead(address: SimpleCellAddress, owner?: FormulaVertex): void {
+    const calculation = this.activeCalculation
+    if (calculation === undefined || owner === undefined) {
+      return
+    }
+    const target = this.dependencyGraph.getCell(address)
+    if (target === undefined || calculation.processing.has(target) || calculation.evaluating.has(target)) {
+      return
+    }
+    if (this.needsCalculation(target, calculation)) {
+      throw new PendingValueRead(target)
+    }
   }
 
   /** A back-edge marks only the vertices between its target and the current caller. */

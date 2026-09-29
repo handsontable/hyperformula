@@ -52,12 +52,16 @@ export interface EvaluationCacheSlot {
 
 export interface EvaluationCacheEntry extends EvaluationCacheSlot {
   ast?: Ast,
+  /** Resolved INDIRECT references of this formula, keyed by syntax-tree node, kept across restarts. */
+  indirectResults?: Map<Ast, InterpreterValue>,
   preserveReference?: boolean,
   children: EvaluationCacheEntry[],
   nextChild: number,
 }
 
 export class Interpreter {
+  /** Spike instrumentation: pending reads that reached a custom function body. */
+  public static pendingReadsInCustomFunctions = 0
   public readonly criterionBuilder: CriterionBuilder
   private evaluationCache?: EvaluationCacheEntry
   private evaluationPath: EvaluationCacheEntry[] = []
@@ -273,6 +277,15 @@ export class Interpreter {
           const functionState = new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex)
           const hasIndirectArgument = (state.formulaVertex === undefined || this.evaluationCache !== undefined) &&
             ast.args.some(arg => this.containsIndirect(arg))
+          const isBuiltin = this.functionRegistry.isBuiltinFunction(ast.procedureName)
+          if (ast.procedureName === 'INDIRECT' && isBuiltin && this.evaluationCache !== undefined) {
+            return this.evaluateIndirectOnce(ast, () => pluginFunction(ast, functionState))
+          }
+          if ((!isBuiltin || process.env.HF_SPIKE_ALL) && hasIndirectArgument && this.evaluationCache !== undefined) {
+            // Spike (option C): make every INDIRECT target in the arguments current first,
+            // so the custom method runs once and never meets a pending read.
+            ast.args.forEach(arg => this.resolveIndirectTargets(arg, functionState.arraysFlag, state))
+          }
           const resumable = hasIndirectArgument ? this.functionRegistry.getResumableFunction(ast.procedureName) : undefined
           if (resumable !== undefined) {
             const execution = slot?.execution ?? resumable(ast, functionState)
@@ -299,14 +312,16 @@ export class Interpreter {
             }
             throw step.value
           }
-          if (!this.functionRegistry.isBuiltinFunction(ast.procedureName) && hasIndirectArgument) {
-            return new CellError(ErrorType.VALUE, ErrorMessage.ResumablePluginRequired(ast.procedureName))
-          }
           try {
             return pluginFunction(ast, functionState)
           } catch (error) {
-            if (error instanceof PendingValueRead && !this.functionRegistry.isBuiltinFunction(ast.procedureName)) {
-              return new CellError(ErrorType.VALUE, ErrorMessage.ResumablePluginRequired(ast.procedureName))
+            if (error instanceof PendingValueRead && !isBuiltin) {
+              // Spike fallback: a custom method met a pending read the pre-pass could not see
+              // (e.g. its own runtime read). Re-run it like a built-in (option B).
+              Interpreter.pendingReadsInCustomFunctions++
+              if (process.env.HF_SPIKE_STRICT) {
+                throw new Error(`Spike: pending read reached custom function ${ast.procedureName}`)
+              }
             }
             throw error
           }
@@ -410,6 +425,66 @@ export class Interpreter {
       case AstNodeType.ERROR: {
         return ast.error
       }
+    }
+  }
+
+  /** Evaluates a built-in INDIRECT call once per formula evaluation, including restarts. */
+  private evaluateIndirectOnce(ast: ProcedureAst, evaluate: () => InterpreterValue): InterpreterValue {
+    const results = this.evaluationCache!.indirectResults ??= new Map()
+    const stored = results.get(ast)
+    if (stored !== undefined) {
+      return stored
+    }
+    const value = evaluate()
+    results.set(ast, value)
+    return value
+  }
+
+  /**
+   * Resolves the INDIRECT calls in an argument, innermost first, and makes each target
+   * current. Mirrors the array flag the interpreter would pass down to each call.
+   */
+  private resolveIndirectTargets(ast: Ast, arraysFlag: boolean, state: InterpreterState): void {
+    switch (ast.type) {
+      case AstNodeType.FUNCTION_CALL: {
+        const flag = arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName)
+        ast.args.forEach(arg => this.resolveIndirectTargets(arg, flag, state))
+        if (ast.procedureName === 'INDIRECT' && this.functionRegistry.isBuiltinFunction('INDIRECT')) {
+          const reference = this.evaluateAst(ast, new InterpreterState(state.formulaAddress, arraysFlag, state.formulaVertex), true)
+          if (reference instanceof SimpleRangeValue && reference.hasValueReader() && reference.range !== undefined) {
+            this.dependencyGraph.prepareRuntimeRead(reference.range.start, state.formulaVertex)
+          }
+        }
+        return
+      }
+      case AstNodeType.ARRAY:
+        ast.args.forEach(row => row.forEach(arg => this.resolveIndirectTargets(arg, arraysFlag, state)))
+        return
+      case AstNodeType.PARENTHESIS:
+        this.resolveIndirectTargets(ast.expression, arraysFlag, state)
+        return
+      case AstNodeType.PERCENT_OP:
+      case AstNodeType.PLUS_UNARY_OP:
+      case AstNodeType.MINUS_UNARY_OP:
+        this.resolveIndirectTargets(ast.value, arraysFlag, state)
+        return
+      case AstNodeType.CONCATENATE_OP:
+      case AstNodeType.EQUALS_OP:
+      case AstNodeType.NOT_EQUAL_OP:
+      case AstNodeType.LESS_THAN_OP:
+      case AstNodeType.GREATER_THAN_OP:
+      case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+      case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
+      case AstNodeType.MINUS_OP:
+      case AstNodeType.PLUS_OP:
+      case AstNodeType.TIMES_OP:
+      case AstNodeType.DIV_OP:
+      case AstNodeType.POWER_OP:
+        this.resolveIndirectTargets(ast.left, arraysFlag, state)
+        this.resolveIndirectTargets(ast.right, arraysFlag, state)
+        return
+      default:
+        return
     }
   }
 
