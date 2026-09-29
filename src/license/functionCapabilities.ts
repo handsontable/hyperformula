@@ -22,7 +22,10 @@
  * The doc freezes group names as API surface: once shipped inside license keys, a rename is a
  * breaking change.
  */
-const FUNCTION_GROUPS: ReadonlyMap<string, readonly string[]> = new Map([
+// Exported for the paired test suite's drift checks, which compare this transcription against the
+// packaging document group by group and member by member, and which silently stopped running when
+// these became module-private.
+export const FUNCTION_GROUPS: ReadonlyMap<string, readonly string[]> = new Map([
   ['fun:math.a', ['ABS', 'LOG', 'MOD', 'POWER', 'PRODUCT', 'ROUND', 'ROUNDDOWN', 'ROUNDUP', 'SQRT', 'SUM']],
   ['fun:stat.a', ['AVERAGE', 'COUNT', 'MAX', 'MIN']],
   ['fun:logic.a', ['IF']],
@@ -75,7 +78,7 @@ const FUNCTION_GROUPS: ReadonlyMap<string, readonly string[]> = new Map([
  * D1, which drops custom-function gating entirely. A function this table does not list is not
  * gated at all, which is exactly the treatment a custom function should get.
  */
-const UNGROUPED_FUNCTIONS = [
+export const UNGROUPED_FUNCTIONS = [
   'ACOSH', 'ACOT', 'ACOTH', 'ARABIC', 'ASINH', 'ATANH', 'AVEDEV', 'BASE', 'BESSELI', 'BESSELJ', 'BESSELK',
   'BESSELY', 'BETA.DIST', 'BETA.INV', 'BIN2DEC', 'BIN2HEX', 'BIN2OCT', 'BINOM.DIST', 'BINOM.INV', 'BITAND',
   'BITLSHIFT', 'BITOR', 'BITRSHIFT', 'BITXOR', 'CEILING.MATH', 'CEILING.PRECISE', 'CHISQ.DIST',

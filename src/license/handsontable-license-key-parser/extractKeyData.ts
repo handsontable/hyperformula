@@ -81,25 +81,21 @@ function isStringArray(value: unknown): value is string[] {
 }
 
 /**
- * Returns `true` when the value is a real calendar date in the `YYYY-MM-DD` format. A time
+ * Returns `true` when the value SPELLS a real calendar date in the `YYYY-MM-DD` format. A time
  * component, an offset, a numeric timestamp and a date that does not exist are all rejected —
  * the format is the whole contract, and a validator that accepted two spellings would hide a
  * timezone bug at generation instead of surfacing it.
  *
+ * Shape only, and deliberately so: the value is stringified first, exactly as upstream does, so a
+ * non-string that spells a date once stringified passes here. HyperFormula's own type check for
+ * that lives in `licenseResolution.ts`, outside this vendored copy — see
+ * `hyperformulaDateFieldIsWellTyped` there, and the divergence table in `PROVENANCE.md`.
+ *
  * @param {unknown} value - the value to check
  */
 function isIsoDate(value: unknown): boolean {
-  // `parseIsoDate` stringifies its argument before matching the `YYYY-MM-DD` shape, so a value
-  // that is not a string but spells a date once stringified — a single-element array is the
-  // realistic case — would pass a shape check the format makes fatal, and a malformed key would
-  // end up granting a RESTRICTED entitlement instead of taking the invalid-key path. The type is
-  // part of the shape, so it is rejected here rather than left to the stringifying matcher.
-  if (typeof value !== 'string') {
-    return false
-  }
-
   try {
-    parseIsoDate(value, 'license')
+    parseIsoDate(String(value), 'license')
 
     return true
   } catch (error) {

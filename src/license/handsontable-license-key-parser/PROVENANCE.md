@@ -61,8 +61,8 @@ also left out. Everything else in that file is ported.
 ## Deliberate divergences from upstream
 
 `allowJs` is off in HyperFormula's `tsconfig.json` and `strict` is on, so these files are a port
-rather than a copy. Beyond adding types, the semantics were kept identical except for the
-following, which a drift review should expect to see:
+rather than a copy. Beyond adding types, the semantics are identical to upstream's; the notes below are the shape of
+the port, not changes to what it accepts, and a drift review should expect to see them:
 
 1. **`detectFormat.ts` keeps its literals in a `Map`,** where upstream uses an object literal
    behind a `hasOwnProperty` guard. Same behaviour for every input (including `constructor` and
@@ -74,16 +74,18 @@ following, which a drift review should expect to see:
    `capabilities` and `flags` are verified element by element, and `notice` and `grace` are verified
    as non-negative integers. Everything the reader does not verify — unknown fields are preserved on
    purpose — sits behind an `unknown`-valued index signature, so consumers must narrow before use.
-4. **The date field is checked for type, not only for shape** (`isIsoDate` in `extractKeyData.ts`).
-   Upstream matches `String(value)` against `YYYY-MM-DD`, so a `usage_until` that is a single-element
-   array of the right string passes its shape check and the declared `string` type ends up wider than
-   the value. Here a non-string is rejected outright. This is the one divergence that CHANGES which
-   keys are accepted, so it is called out separately: a malformed key that upstream would carry into
-   a RESTRICTED entitlement takes the invalid-key path instead. The key spec's addendum (T7) makes
-   the field a real calendar date, so the stricter reading is the specified one and it is upstream
-   that deviates — but upstream has not adopted it (checked at `c50ef40a`, `develop` and `master`;
-   no pull request or issue proposes it), so this is a live fork of behaviour, not a re-port waiting
-   to happen. Re-check it at every drift review.
+4. **`isIsoDate` takes `String(value)`, as upstream does, and the type check lives outside.**
+   Upstream matches `String(value)` against `YYYY-MM-DD`, so a `usage_until` that is a
+   single-element array of the right string passes its shape check and the declared `string` type
+   ends up wider than the value. The key spec's addendum (T7) makes the field a real calendar date,
+   so the stricter reading is the specified one — but upstream has not adopted it (checked at
+   `c50ef40a`, `develop` and `master`; no pull request or issue proposes it).
+
+   Rather than fork upstream's source over it, HyperFormula checks the TYPE of its own entry's date
+   field in `licenseResolution.ts` (`hyperformulaDateFieldIsWellTyped`), before the payload is read
+   for terms, and a non-string there takes the invalid-key path. The behaviour a customer sees is
+   the same as when the check lived here; what changed is that this file no longer diverges, so a
+   drift review compares it to upstream byte for byte instead of reasoning about a patch.
 
 Upstream's `/* eslint-disable */` pragmas were dropped where HyperFormula's own ESLint config
 does not need them.

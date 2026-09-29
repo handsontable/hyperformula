@@ -27,6 +27,12 @@ const MILLISECONDS_PER_DAY = 86400000
 export const HYPERFORMULA_PRODUCT_NAME = 'hyperformula'
 
 /**
+ * The two date fields a product entry may carry, exactly one of which is present on an intact
+ * entry. Named here because {@link hyperformulaDateFieldIsWellTyped} has to reach them by name.
+ */
+const DATE_FIELD_NAMES = ['usage_until', 'release_until'] as const
+
+/**
  * Flag spellings that suppress console output.
  *
  * Three, because the key spec is not self-consistent: its normative flags table and its example
@@ -106,6 +112,37 @@ function releaseDateTimestamp(): number | null {
   const timestamp = Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10))
 
   return isNaN(timestamp) ? null : timestamp
+}
+
+/**
+ * Whether this product's entry spells its date field as a STRING, as the format requires.
+ *
+ * The vendored reader is a verbatim copy of upstream, and upstream checks the date's SHAPE
+ * without checking its type: `parseIsoDate` stringifies before matching `YYYY-MM-DD`, so
+ * `usage_until: ["2099-12-31"]` passes there and the declared `string` type ends up wider than
+ * the value. Left at that, a malformed key would resolve to a RESTRICTED entitlement instead of
+ * taking the invalid-key path.
+ *
+ * The key spec's addendum (T7) makes the field a real calendar date, so the stricter reading is
+ * the specified one — but upstream has not adopted it (checked at `c50ef40a`, `develop` and
+ * `master`), and diverging inside the vendored copy would mean carrying a patched fork of
+ * someone else's source through every drift review. So the check lives here instead, in the code
+ * this repository owns, and the copy next door stays byte-identical to upstream.
+ *
+ * Only HyperFormula's own entry is checked: another product's fields are not ours to validate,
+ * and rejecting a whole key over a malformed entry we never read would fail closed for a
+ * customer whose HyperFormula grant is intact.
+ *
+ * @param {EntitlementKeyData} data - the extracted key data
+ */
+function hyperformulaDateFieldIsWellTyped(data: EntitlementKeyData): boolean {
+  const grant = data.products[HYPERFORMULA_PRODUCT_NAME]
+
+  if (grant === undefined) {
+    return true
+  }
+
+  return DATE_FIELD_NAMES.every((field) => grant[field] === undefined || typeof grant[field] === 'string')
 }
 
 /**
@@ -322,7 +359,7 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
 
   const data = extractEntitlementKeyData(licenseKey)
 
-  if (data === null) {
+  if (data === null || !hyperformulaDateFieldIsWellTyped(data)) {
     if (notifyConsole) {
       notifyLicenseKeyState(LicenseKeyValidityState.INVALID)
     }
