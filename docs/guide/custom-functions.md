@@ -391,8 +391,12 @@ If that cell depends on the formula that calls your function, both cells return 
 | A1   | `=MY_ROWS(INDIRECT("B1"))` | `#CYCLE!` |
 | B1   | `=A1+1`                    | `#CYCLE!` |
 
-Built-in reference functions such as `ROW` or `ROWS` don't read the referenced value, so
-`=ROWS(INDIRECT("B1"))` in the same setup returns `1`, and B1 returns `2`.
+If your function only uses the reference, set
+[`doesNotNeedArgumentsToBeComputed`](#function-options) to `true`, as the built-in `ROW` and
+`ROWS` do. HyperFormula then doesn't calculate the targets of `INDIRECT` calls passed
+directly as arguments, so `=MY_ROWS(INDIRECT("B1"))` in the setup above returns `1`, and B1
+returns `2`. `INDIRECT` calls inside an operator, such as `INDIRECT("B1")+0`, are still
+calculated first, because their value is needed.
 
 ## Function options
 

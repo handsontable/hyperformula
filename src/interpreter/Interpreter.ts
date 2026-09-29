@@ -278,7 +278,8 @@ export class Interpreter {
             if (!isBuiltin && ast.args.some(arg => this.containsIndirect(arg))) {
               // Make every INDIRECT target in the arguments current first, so the custom
               // method runs once and never meets a pending read.
-              ast.args.forEach(arg => this.resolveIndirectTargets(arg, functionState.arraysFlag, state))
+              const needsValue = !this.functionRegistry.doesFunctionNeedArgumentToBeComputed(ast.procedureName)
+              ast.args.forEach(arg => this.resolveIndirectTargets(arg, functionState.arraysFlag, needsValue, state))
             }
           }
           // A custom method can still meet a pending read the pre-pass cannot see (its own
@@ -400,32 +401,36 @@ export class Interpreter {
   }
 
   /**
-   * Resolves the INDIRECT calls in an argument, innermost first, and makes each target
-   * current. Mirrors the array flag the interpreter would pass down to each call.
+   * Resolves the INDIRECT calls in an argument, innermost first, and makes the target of
+   * each one whose value is needed current. Mirrors the interpreter's array flag and the
+   * parser's dependency rule: a direct argument of a function with
+   * `doesNotNeedArgumentsToBeComputed` is used as a reference, so its target is not
+   * calculated; operators and other function calls need values again.
    */
-  private resolveIndirectTargets(ast: Ast, arraysFlag: boolean, state: InterpreterState): void {
+  private resolveIndirectTargets(ast: Ast, arraysFlag: boolean, needsValue: boolean, state: InterpreterState): void {
     switch (ast.type) {
       case AstNodeType.FUNCTION_CALL: {
         const flag = arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName)
-        ast.args.forEach(arg => this.resolveIndirectTargets(arg, flag, state))
+        const argumentsNeedValues = !this.functionRegistry.doesFunctionNeedArgumentToBeComputed(ast.procedureName)
+        ast.args.forEach(arg => this.resolveIndirectTargets(arg, flag, argumentsNeedValues, state))
         if (ast.procedureName === 'INDIRECT' && this.functionRegistry.isBuiltinFunction('INDIRECT')) {
           const reference = this.evaluateAst(ast, new InterpreterState(state.formulaAddress, arraysFlag, state.formulaVertex), true)
-          if (reference instanceof SimpleRangeValue && reference.hasValueReader() && reference.range !== undefined) {
+          if (needsValue && reference instanceof SimpleRangeValue && reference.hasValueReader() && reference.range !== undefined) {
             this.dependencyGraph.prepareRuntimeRead(reference.range.start, state.formulaVertex)
           }
         }
         return
       }
       case AstNodeType.ARRAY:
-        ast.args.forEach(row => row.forEach(arg => this.resolveIndirectTargets(arg, arraysFlag, state)))
+        ast.args.forEach(row => row.forEach(arg => this.resolveIndirectTargets(arg, arraysFlag, true, state)))
         return
       case AstNodeType.PARENTHESIS:
-        this.resolveIndirectTargets(ast.expression, arraysFlag, state)
+        this.resolveIndirectTargets(ast.expression, arraysFlag, needsValue, state)
         return
       case AstNodeType.PERCENT_OP:
       case AstNodeType.PLUS_UNARY_OP:
       case AstNodeType.MINUS_UNARY_OP:
-        this.resolveIndirectTargets(ast.value, arraysFlag, state)
+        this.resolveIndirectTargets(ast.value, arraysFlag, true, state)
         return
       case AstNodeType.CONCATENATE_OP:
       case AstNodeType.EQUALS_OP:
@@ -439,8 +444,8 @@ export class Interpreter {
       case AstNodeType.TIMES_OP:
       case AstNodeType.DIV_OP:
       case AstNodeType.POWER_OP:
-        this.resolveIndirectTargets(ast.left, arraysFlag, state)
-        this.resolveIndirectTargets(ast.right, arraysFlag, state)
+        this.resolveIndirectTargets(ast.left, arraysFlag, true, state)
+        this.resolveIndirectTargets(ast.right, arraysFlag, true, state)
         return
       default:
         return
