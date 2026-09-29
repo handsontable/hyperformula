@@ -296,7 +296,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   }
 
   protected evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
-    const preserveReference = (state.formulaVertex === undefined || this.interpreter.hasEvaluationCache()) &&
+    const preserveReference = (state.formulaVertex === undefined || this.interpreter.hasIndirectResults()) &&
       this.interpreter.containsIndirect(ast)
     return this.interpreter.evaluateAst(ast, state, preserveReference)
   }

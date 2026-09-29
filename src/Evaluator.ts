@@ -10,7 +10,7 @@ import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {ArrayFormulaVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
 import {FormulaVertex} from './DependencyGraph/FormulaVertex'
-import {EvaluationCacheEntry, Interpreter} from './interpreter/Interpreter'
+import {IndirectResults, Interpreter} from './interpreter/Interpreter'
 import {PendingValueRead} from './interpreter/PendingValueRead'
 import {InterpreterState} from './interpreter/InterpreterState'
 import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
@@ -31,13 +31,15 @@ interface CalculationContext {
   processing: Set<Vertex>,
   processingPath: Vertex[],
   runtimeCycleMembers: Set<Vertex>,
-  expressionResults: Map<FormulaVertex, EvaluationCacheEntry>,
+  indirectResults: Map<FormulaVertex, IndirectResults>,
   staticDependencies?: Map<Vertex, Vertex[]>,
   runtimeReads: Map<FormulaVertex, Map<string, SimpleCellAddress>>,
   changes: ContentChanges,
 }
 
 export class Evaluator {
+  /** Spike 2 instrumentation: pending reads that escaped the pre-pass. */
+  public static pendingReadsDuringEvaluation = 0
   private activeCalculation?: CalculationContext
 
   constructor(
@@ -114,7 +116,7 @@ export class Evaluator {
     return {
       initial, seeds, cycled: new Set(), completed: new Map(), evaluating: new Set(), processing: new Set(),
       processingPath: [], runtimeCycleMembers: new Set(),
-      expressionResults: new Map(),
+      indirectResults: new Map(),
       runtimeReads: new Map(), changes,
     }
   }
@@ -311,7 +313,7 @@ export class Evaluator {
       calculation.evaluating.add(vertex)
       calculation.runtimeReads.set(vertex, new Map())
       if (this.interpreter.containsIndirect(vertex.getFormula(this.lazilyTransformingAstService))) {
-        calculation.expressionResults.set(vertex, {children: [], nextChild: 0})
+        calculation.indirectResults.set(vertex, new Map())
       }
     }
     let changed: boolean
@@ -334,7 +336,7 @@ export class Evaluator {
       if (vertex instanceof FormulaVertex) {
         calculation.evaluating.delete(vertex)
         calculation.runtimeReads.delete(vertex)
-        calculation.expressionResults.delete(vertex)
+        calculation.indirectResults.delete(vertex)
       }
       throw error
     }
@@ -343,7 +345,7 @@ export class Evaluator {
       const reads = calculation.runtimeReads.get(vertex)
       this.dependencyGraph.replaceRuntimeDependencies(vertex, [...(reads?.values() ?? [])])
       calculation.runtimeReads.delete(vertex)
-      calculation.expressionResults.delete(vertex)
+      calculation.indirectResults.delete(vertex)
     }
     calculation.completed.set(vertex, changed)
     return changed
@@ -361,7 +363,7 @@ export class Evaluator {
     calculation.evaluating.delete(vertex)
     if (vertex instanceof FormulaVertex) {
       calculation.runtimeReads.delete(vertex)
-      calculation.expressionResults.delete(vertex)
+      calculation.indirectResults.delete(vertex)
     }
     if (calculation.initial) {
       if (vertex instanceof FormulaVertex) {
@@ -471,12 +473,26 @@ export class Evaluator {
   }
 
   private evaluateAstToCellValue(ast: Ast, state: InterpreterState): InterpreterValue {
-    this.interpreter.setEvaluationCache(state.formulaVertex === undefined ? undefined :
-      this.activeCalculation?.expressionResults.get(state.formulaVertex))
+    const cache = state.formulaVertex === undefined ? undefined : this.activeCalculation?.indirectResults.get(state.formulaVertex)
+    this.interpreter.setIndirectResults(cache)
     let interpreterValue: InterpreterValue
     try {
-      // Retain reference identity until the final cell value is materialized.
-      interpreterValue = this.interpreter.evaluateAst(ast, state, true)
+      if (cache !== undefined) {
+        // Spike 2: make every INDIRECT target current before the formula is evaluated.
+        this.interpreter.resolveFormulaIndirectTargets(ast, state)
+      }
+      try {
+        // Retain reference identity until the final cell value is materialized.
+        interpreterValue = this.interpreter.evaluateAst(ast, state, true)
+      } catch (error) {
+        if (error instanceof PendingValueRead) {
+          Evaluator.pendingReadsDuringEvaluation++
+          if (process.env.HF_SPIKE_STRICT) {
+            throw new Error('Spike 2: pending read during evaluation')
+          }
+        }
+        throw error
+      }
       if (interpreterValue instanceof SimpleRangeValue && interpreterValue.width() === 1 && interpreterValue.height() === 1) {
         const range = interpreterValue
         interpreterValue = range.data[0][0]
@@ -487,7 +503,7 @@ export class Evaluator {
         }
       }
     } finally {
-      this.interpreter.setEvaluationCache(undefined)
+      this.interpreter.setIndirectResults(undefined)
     }
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
