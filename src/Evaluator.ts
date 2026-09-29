@@ -70,11 +70,7 @@ export class Evaluator {
         this.recomputeFormulas(cycled, sorted)
       })
     } finally {
-      try {
-        this.discardAllExpressionResults(calculation)
-      } finally {
-        this.activeCalculation = undefined
-      }
+      this.activeCalculation = undefined
     }
   }
 
@@ -103,11 +99,7 @@ export class Evaluator {
         )
       })
     } finally {
-      try {
-        this.discardAllExpressionResults(calculation)
-      } finally {
-        this.activeCalculation = undefined
-      }
+      this.activeCalculation = undefined
     }
     return changes
   }
@@ -342,7 +334,7 @@ export class Evaluator {
       if (vertex instanceof FormulaVertex) {
         calculation.evaluating.delete(vertex)
         calculation.runtimeReads.delete(vertex)
-        this.discardExpressionResults(vertex, calculation)
+        calculation.expressionResults.delete(vertex)
       }
       throw error
     }
@@ -351,7 +343,7 @@ export class Evaluator {
       const reads = calculation.runtimeReads.get(vertex)
       this.dependencyGraph.replaceRuntimeDependencies(vertex, [...(reads?.values() ?? [])])
       calculation.runtimeReads.delete(vertex)
-      this.discardExpressionResults(vertex, calculation)
+      calculation.expressionResults.delete(vertex)
     }
     calculation.completed.set(vertex, changed)
     return changed
@@ -366,10 +358,10 @@ export class Evaluator {
       vertex.clearCache()
       return
     }
-    this.discardExpressionResults(vertex, calculation)
     calculation.evaluating.delete(vertex)
     if (vertex instanceof FormulaVertex) {
       calculation.runtimeReads.delete(vertex)
+      calculation.expressionResults.delete(vertex)
     }
     if (calculation.initial) {
       if (vertex instanceof FormulaVertex) {
@@ -379,54 +371,6 @@ export class Evaluator {
       this.processVertexOnCycle(vertex, calculation.changes)
     }
     calculation.completed.set(vertex, true)
-  }
-
-  /** Closes suspended plugin methods when a formula is abandoned or completed. */
-  private discardExpressionResults(vertex: Vertex, calculation: CalculationContext): void {
-    if (!(vertex instanceof FormulaVertex)) {
-      return
-    }
-    const expressions = calculation.expressionResults.get(vertex)
-    calculation.expressionResults.delete(vertex)
-    const pending = expressions === undefined ? [] : [{entry: expressions, visited: false}]
-    let firstError: unknown
-    while (pending.length > 0) {
-      const {entry, visited} = pending.pop()!
-      if (!visited) {
-        pending.push({entry, visited: true})
-        for (const child of entry.children) {
-          pending.push({entry: child, visited: false})
-        }
-        continue
-      }
-      const execution = entry.execution
-      if (execution !== undefined) {
-        entry.execution = undefined
-        try {
-          execution.return(EmptyValue)
-        } catch (error) {
-          firstError ??= error
-        }
-      }
-    }
-    if (firstError !== undefined) {
-      throw firstError
-    }
-  }
-
-  /** Closes every formula owner's suspended methods even if one cleanup fails. */
-  private discardAllExpressionResults(calculation: CalculationContext): void {
-    let firstError: unknown
-    for (const vertex of [...calculation.expressionResults.keys()].reverse()) {
-      try {
-        this.discardExpressionResults(vertex, calculation)
-      } catch (error) {
-        firstError ??= error
-      }
-    }
-    if (firstError !== undefined) {
-      throw firstError
-    }
   }
 
   public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InterpreterValue {

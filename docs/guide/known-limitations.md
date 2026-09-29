@@ -58,7 +58,7 @@ This implementation accepts one A1-style cell address, with optional `$` row and
 
 When an `INDIRECT` value read creates a circular dependency, HyperFormula returns `#CYCLE!` for the formulas in that cycle, including cycles through ranges. `IFERROR` outside the cycle can handle that error; `IFERROR` inside the cycle does not remove the circular dependency.
 
-Custom functions with arguments using the built-in `INDIRECT` require a resumable plugin method. Existing custom methods continue to handle ordinary formulas. See [Migrating custom functions for INDIRECT](migrating-custom-functions-for-indirect.md) for examples and the explicit error returned by unmigrated dynamic calls.
+Custom functions accept `INDIRECT` arguments without changes. HyperFormula calculates the referenced cell before a custom function runs, even if the function only inspects the reference, so a custom function can return `#CYCLE!` where a built-in reference function such as `ROWS` does not. See [Functions with INDIRECT arguments](custom-functions.md#functions-with-indirect-arguments).
 
 ### UNIQUE function
 

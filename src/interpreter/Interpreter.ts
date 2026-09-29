@@ -43,14 +43,13 @@ import {
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import { AddressWithSheet } from '../parser/Address'
 
-/** A function can finish its method before its returned reference has a current value. */
-export interface EvaluationCacheSlot {
+/**
+ * One evaluated sub-expression of a formula that may restart after a pending read.
+ * `raw` is the value before post-processing; `result` is the final value.
+ */
+export interface EvaluationCacheEntry {
   raw?: InterpreterValue,
   result?: InterpreterValue,
-  execution?: Generator<PendingValueRead, InterpreterValue, void>,
-}
-
-export interface EvaluationCacheEntry extends EvaluationCacheSlot {
   ast?: Ast,
   /** Resolved INDIRECT references of this formula, keyed by syntax-tree node, kept across restarts. */
   indirectResults?: Map<Ast, InterpreterValue>,
@@ -60,8 +59,6 @@ export interface EvaluationCacheEntry extends EvaluationCacheSlot {
 }
 
 export class Interpreter {
-  /** Spike instrumentation: pending reads that reached a custom function body. */
-  public static pendingReadsInCustomFunctions = 0
   public readonly criterionBuilder: CriterionBuilder
   private evaluationCache?: EvaluationCacheEntry
   private evaluationPath: EvaluationCacheEntry[] = []
@@ -131,13 +128,11 @@ export class Interpreter {
       if (slot.result !== undefined) {
         return slot.result
       }
-      if (slot.execution === undefined) {
-        slot.nextChild = 0
-      }
+      slot.nextChild = 0
       this.evaluationPath.push(slot)
     }
     try {
-      let val = slot?.raw ?? this.evaluateAstWithoutPostprocessing(ast, state, preserveReference, slot)
+      let val = slot?.raw ?? this.evaluateAstWithoutPostprocessing(ast, state, preserveReference)
       if (slot !== undefined) {
         slot.raw = val
       }
@@ -174,7 +169,7 @@ export class Interpreter {
    * @param {Ast} ast - abstract syntax tree of formula
    * @param {InterpreterState} state - interpreter state
    */
-  private evaluateAstWithoutPostprocessing(ast: Ast, state: InterpreterState, preserveReference: boolean, slot?: EvaluationCacheSlot): InterpreterValue {
+  private evaluateAstWithoutPostprocessing(ast: Ast, state: InterpreterState, preserveReference: boolean): InterpreterValue {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
         return EmptyValue
@@ -275,56 +270,20 @@ export class Interpreter {
         const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
         if (pluginFunction !== undefined) {
           const functionState = new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex)
-          const hasIndirectArgument = (state.formulaVertex === undefined || this.evaluationCache !== undefined) &&
-            ast.args.some(arg => this.containsIndirect(arg))
           const isBuiltin = this.functionRegistry.isBuiltinFunction(ast.procedureName)
-          if (ast.procedureName === 'INDIRECT' && isBuiltin && this.evaluationCache !== undefined) {
-            return this.evaluateIndirectOnce(ast, () => pluginFunction(ast, functionState))
-          }
-          if ((!isBuiltin || process.env.HF_SPIKE_ALL) && hasIndirectArgument && this.evaluationCache !== undefined) {
-            // Spike (option C): make every INDIRECT target in the arguments current first,
-            // so the custom method runs once and never meets a pending read.
-            ast.args.forEach(arg => this.resolveIndirectTargets(arg, functionState.arraysFlag, state))
-          }
-          const resumable = hasIndirectArgument ? this.functionRegistry.getResumableFunction(ast.procedureName) : undefined
-          if (resumable !== undefined) {
-            const execution = slot?.execution ?? resumable(ast, functionState)
-            if (slot !== undefined) {
-              slot.execution = execution
+          if (this.evaluationCache !== undefined) {
+            if (ast.procedureName === 'INDIRECT' && isBuiltin) {
+              return this.evaluateIndirectOnce(ast, () => pluginFunction(ast, functionState))
             }
-            let step: IteratorResult<PendingValueRead, InterpreterValue>
-            try {
-              step = execution.next()
-            } catch (error) {
-              if (slot !== undefined) {
-                slot.execution = undefined
-              }
-              if (error instanceof PendingValueRead) {
-                return new CellError(ErrorType.VALUE, ErrorMessage.ResumablePluginRead(ast.procedureName))
-              }
-              throw error
+            if (!isBuiltin && ast.args.some(arg => this.containsIndirect(arg))) {
+              // Make every INDIRECT target in the arguments current first, so the custom
+              // method runs once and never meets a pending read.
+              ast.args.forEach(arg => this.resolveIndirectTargets(arg, functionState.arraysFlag, state))
             }
-            if (step.done) {
-              if (slot !== undefined) {
-                slot.execution = undefined
-              }
-              return step.value
-            }
-            throw step.value
           }
-          try {
-            return pluginFunction(ast, functionState)
-          } catch (error) {
-            if (error instanceof PendingValueRead && !isBuiltin) {
-              // Spike fallback: a custom method met a pending read the pre-pass could not see
-              // (e.g. its own runtime read). Re-run it like a built-in (option B).
-              Interpreter.pendingReadsInCustomFunctions++
-              if (process.env.HF_SPIKE_STRICT) {
-                throw new Error(`Spike: pending read reached custom function ${ast.procedureName}`)
-              }
-            }
-            throw error
-          }
+          // A custom method can still meet a pending read the pre-pass cannot see (its own
+          // runtime read). It then propagates and the method is re-run, like a built-in.
+          return pluginFunction(ast, functionState)
         } else {
           return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
         }
