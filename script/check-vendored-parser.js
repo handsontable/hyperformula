@@ -186,6 +186,8 @@ async function main() {
   try {
     upstream = await listUpstream(pin.repository, pin.directory, pin.tag, auth)
   } catch (error) {
+    // Whatever the pin check already found is the more likely cause of this failure - say it first.
+    problems.forEach((p) => console.error(`\nFAIL  ${p}`))
     console.error(`\nFAIL  could not list ${pin.repository}/${pin.directory} at ${pin.tag}: HTTP ${error.message}.`)
     console.error(error.statusCode === 404
       ? '      404 from a private repository means the token has no access to it, the tag does not exist, or the directory does not exist at that ref. This is not drift.'
