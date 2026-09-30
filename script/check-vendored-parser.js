@@ -5,24 +5,20 @@
  */
 
 /*
- * Checks the vendored entitlement-key reader against the upstream sources it was ported from.
+ * Checks the vendored entitlement-key reader against the upstream it was copied from.
  *
- * `src/license/handsontable-license-key-parser/` mirrors `handsontable/license-key`. A local-only
- * fix there silently forks the two copies, and a forked checksum or parser rejects genuine
- * customer keys - so the pin has to be verified by measurement, not by someone remembering to look.
+ * `src/license/handsontable-license-key-parser/*.js` are byte-identical copies of
+ * `handsontable/license-key`. A local edit silently forks the two, and a forked checksum or parser
+ * rejects genuine customer keys - so the copies are verified by measurement, not by trust.
  *
- * What it does: reads `upstream.lock.json`, fetches each upstream file from the branch it tracks
- * (`master` - the released code, not the work in progress on `develop`), and compares its sha256
- * against the recorded one. A mismatch means upstream moved on while this port stayed behind.
+ * What it does: hashes each file in that directory, fetches the same file from the branch
+ * `upstream.json` tracks (`master` - the released code, not the work in progress on `develop`),
+ * hashes that, and compares. Any difference is reported, in either direction: a local edit and an
+ * upstream change look the same here, and both mean the copy has to be retaken.
  *
- * It deliberately does NOT fetch at the pinned commit. A commit is immutable, so that check would
- * pass forever and catch nothing - which is how a real change to `utils.js` sat unnoticed for two
- * days. The pin is what we compare against; the branch is what we compare.
- *
- * What it deliberately does NOT do: compare our files to upstream byte for byte. They are
- * TypeScript ports of JavaScript sources - `allowJs` is off and `strict` is on - so their bytes
- * cannot match, and a check that pretended otherwise would fail for a reason that is never drift.
- * PROVENANCE.md lists the shape differences a reviewer should expect.
+ * It compares against the BRANCH, not the recorded commit. A commit is immutable, so comparing
+ * against it would pass forever and catch nothing - which is how a real change to `utils.js` sat
+ * unnoticed for two days.
  *
  * Usage:
  *   npm run check:vendored-parser
@@ -40,7 +36,8 @@ const crypto = require('crypto')
 const https = require('https')
 const {execFileSync} = require('child_process')
 
-const LOCK = path.resolve(__dirname, '../src/license/handsontable-license-key-parser/upstream.lock.json')
+const DIR = path.resolve(__dirname, '../src/license/handsontable-license-key-parser')
+const PIN = path.join(DIR, 'upstream.json')
 
 function token() {
   const fromEnv = process.env.LICENSE_KEY_REPO_TOKEN || process.env.GH_TOKEN || process.env.GITHUB_TOKEN
@@ -86,65 +83,64 @@ function fetchFile(repo, filePath, ref, auth) {
 }
 
 async function main() {
-  const lock = JSON.parse(fs.readFileSync(LOCK, 'utf8'))
+  const pin = JSON.parse(fs.readFileSync(PIN, 'utf8'))
   const auth = token()
 
-  console.log(`vendored parser: pinned to ${lock.repository}@${lock.commit}, checked against ${lock.track}`)
+  console.log(`vendored parser: ${pin.repository}/${pin.directory} @ ${pin.track}, ${pin.files.length} files`)
 
   if (auth === null) {
     console.error('\nFAIL  no credentials for a private repository.')
     console.error('      Set LICENSE_KEY_REPO_TOKEN (or GH_TOKEN / GITHUB_TOKEN), or run `gh auth login`.')
-    console.error('      Failing rather than skipping: an unverified pin is not a verified one.')
+    console.error('      Failing rather than skipping: an unverified copy is not a verified one.')
     process.exit(1)
   }
 
   const problems = []
+  const hash = (buffer) => crypto.createHash('sha256').update(buffer).digest('hex')
 
-  for (const entry of lock.files) {
-    const upstreamPath = `${lock.directory}/${entry.upstream}`
-    let actual
+  for (const name of pin.files) {
+    const local = path.join(DIR, name)
 
-    try {
-      const body = await fetchFile(lock.repository, upstreamPath, lock.track, auth)
-
-      actual = crypto.createHash('sha256').update(body).digest('hex')
-    } catch (error) {
-      problems.push(`${entry.upstream}: could not be read (${error.message})`)
-      console.log(`  ????  ${entry.upstream}`)
+    if (!fs.existsSync(local)) {
+      problems.push(`${name}: named in upstream.json and missing from the directory`)
+      console.log(`  GONE  ${name}`)
       continue
     }
 
-    if (actual === entry.sha256) {
-      console.log(`  ok    ${entry.upstream}`)
-    } else {
-      problems.push(`${entry.upstream}: ${lock.track} is ${actual}, the pin says ${entry.sha256}`)
-      console.log(`  DRIFT ${entry.upstream}`)
+    let theirs
+
+    try {
+      theirs = hash(await fetchFile(pin.repository, `${pin.directory}/${name}`, pin.track, auth))
+    } catch (error) {
+      problems.push(`${name}: upstream could not be read (${error.message})`)
+      console.log(`  ????  ${name}`)
+      continue
     }
 
-    const vendored = path.resolve(path.dirname(LOCK), entry.vendored)
+    const ours = hash(fs.readFileSync(local))
 
-    if (!fs.existsSync(vendored)) {
-      problems.push(`${entry.vendored}: named in the lock file and missing from the directory`)
+    if (ours === theirs) {
+      console.log(`  ok    ${name}`)
+    } else {
+      problems.push(`${name}: this copy is ${ours}, ${pin.track} is ${theirs}`)
+      console.log(`  DIFF  ${name}`)
     }
   }
 
-  const vendoredFiles = fs.readdirSync(path.dirname(LOCK)).filter((name) => name.endsWith('.ts'))
-  const pinned = lock.files.map((entry) => entry.vendored)
-
-  vendoredFiles.filter((name) => pinned.indexOf(name) === -1).forEach((name) => {
-    problems.push(`${name}: present in the directory and named nowhere in the lock file, so nothing pins it`)
-  })
+  fs.readdirSync(DIR)
+    .filter((name) => name.endsWith('.js') && pin.files.indexOf(name) === -1)
+    .forEach((name) => problems.push(`${name}: a JavaScript file nothing in upstream.json accounts for`))
 
   if (problems.length === 0) {
-    console.log(`\nOK - ${lock.track} still matches the pin`)
+    console.log(`\nOK - every file is byte-identical to ${pin.track}`)
 
     return
   }
 
   console.error(`\n${problems.length} problem(s):`)
   problems.forEach((problem) => console.error(`  ${problem}`))
-  console.error(`\nUpstream ${lock.track} has moved on, or the directory and the pin disagree.`)
-  console.error('Re-port the changed file and update upstream.lock.json in the same commit.')
+  console.error('\nThe copies and upstream have diverged - either upstream moved, or something was')
+  console.error('edited here. Re-take the files and update upstream.json in the same commit.')
   process.exit(1)
 }
 

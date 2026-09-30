@@ -7,6 +7,11 @@ docs/examples/
 # 3rd party
 src/interpreter/plugin/3rdparty
 
+# Byte-identical copies of handsontable/license-key - see PROVENANCE.md in that directory.
+# Linting them would mean editing them, and editing them is the one thing they must not have.
+# The hand-written .d.ts beside them are ours and ARE linted.
+src/license/handsontable-license-key-parser/*.js
+
 # Configurations
 *.config.js
 karma.*

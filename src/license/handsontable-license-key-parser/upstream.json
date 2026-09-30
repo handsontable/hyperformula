@@ -1,0 +1,18 @@
+{
+  "_comment": [
+    "Where the JavaScript in this directory comes from. Machine-readable so CI can check it:",
+    "`npm run check:vendored-parser` hashes these files and the upstream ones and compares.",
+    "",
+    "No hashes are stored. The files ARE the copies, so a stored table would be a third thing",
+    "to keep in step. `track` is the branch to compare against - master, the released code;",
+    "`develop` there is work in progress. `commit` records which revision was taken.",
+    "",
+    "PROVENANCE.md says what this directory is and why. This file says where it came from."
+  ],
+  "repository": "handsontable/license-key",
+  "directory": "src/entitlement-key",
+  "track": "master",
+  "commit": "03810fd3c93160580e1b9665de6b38fca340e382",
+  "taken_on": "2026-09-30",
+  "files": ["constants.js", "detect-format.js", "extract-key-data.js", "utils.js", "sha512.js"]
+}
