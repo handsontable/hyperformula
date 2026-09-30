@@ -7,10 +7,10 @@ docs/examples/
 # 3rd party
 src/interpreter/plugin/3rdparty
 
-# Byte-identical copies of handsontable/license-key - see PROVENANCE.md in that directory.
-# Linting them would mean editing them, and editing them is the one thing they must not have.
-# The hand-written .d.ts beside them are ours and ARE linted.
-src/license/handsontable-license-key-parser/*.js
+# A byte-identical copy of handsontable/license-key's vendor/entitlement-key-reader - see
+# PROVENANCE.md in that directory. Linting it would mean editing it, and editing it is the one
+# thing it must not have; upstream runs strict tsc on it instead.
+src/license/handsontable-license-key-parser/*.ts
 
 # Configurations
 *.config.js

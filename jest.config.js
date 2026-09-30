@@ -48,10 +48,7 @@ module.exports = {
 
   // A map from regular expressions to paths to transformers
   transform: {
-    // `.js` is here for the vendored entitlement-key reader, which is upstream JavaScript copied
-    // verbatim (see src/license/handsontable-license-key-parser/PROVENANCE.md). It is ES modules,
-    // so without a transform Jest hands it to Node and fails on the first `export`.
-    "^.+\\.(ts|tsx|js)$": "ts-jest"
+    "^.+\\.(ts|tsx)$": "ts-jest"
   },
 
   watchPathIgnorePatterns: [

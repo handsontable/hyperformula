@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {ENTITLEMENT_KEY_CHECKSUM_LENGTH} from '../license/handsontable-license-key-parser/constants'
+import {CHECKSUM_LENGTH} from '../license/handsontable-license-key-parser/constants'
 import {checkKeySchema, extractTime} from './licenseKeyHelper'
 
 /**
@@ -161,7 +161,7 @@ export function notifyLicenseKeyNotice(licenseKey: string, expiryDate: Date): vo
  * it has ever warned about; 129 characters per entry bounds that to the checksum alone.
  */
 function noticeIdentityOf(licenseKey: string): string {
-  return licenseKey.trim().slice(-(ENTITLEMENT_KEY_CHECKSUM_LENGTH + 1))
+  return licenseKey.trim().slice(-(CHECKSUM_LENGTH + 1))
 }
 
 /**

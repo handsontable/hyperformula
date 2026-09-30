@@ -17,7 +17,7 @@
       "es2017"
     ],
     /* Specify library files to be included in the compilation. */
-    "allowJs": true,                          /* The vendored entitlement-key reader is upstream JavaScript, copied verbatim; see src/license/handsontable-license-key-parser/PROVENANCE.md. */
+    // "allowJs": true,                       /* Allow javascript files to be compiled. */
     // "checkJs": true,                       /* Report errors in .js files. */
     // "jsx": "preserve",                     /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
     // "declaration": true,                   /* Generates corresponding '.d.ts' file. */

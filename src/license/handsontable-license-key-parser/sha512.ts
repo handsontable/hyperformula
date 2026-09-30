@@ -55,7 +55,7 @@ const K = [
  * @param {number} value The 32-bit integer value.
  * @returns {string}
  */
-function toHex32(value) {
+function toHex32(value: number): string {
   return `00000000${(value >>> 0).toString(16)}`.slice(-8);
 }
 
@@ -69,8 +69,7 @@ function toHex32(value) {
  * @param {number[]|Uint8Array} bytes The bytes to calculate the checksum from.
  * @returns {string} The checksum as a 128-character hex string.
  */
-/* eslint-disable import/prefer-default-export */
-export function sha512(bytes) {
+export function sha512(bytes: number[] | Uint8Array): string {
   const byteLength = bytes.length;
   // The message is padded with the 0x80 byte, zeros, and the 128-bit big-endian
   // bit length so the total length is a multiple of 128 bytes.
@@ -100,15 +99,15 @@ export function sha512(bytes) {
     0x510e527f, 0xade682d1, 0x9b05688c, 0x2b3e6c1f,
     0x1f83d9ab, 0xfb41bd6b, 0x5be0cd19, 0x137e2179,
   ];
-  const wh = new Array(80);
-  const wl = new Array(80);
+  const wh: number[] = new Array<number>(80);
+  const wl: number[] = new Array<number>(80);
 
   for (let block = 0; block < blockCount; block += 1) {
     const offset = block * 128;
 
     // Prepare the message schedule.
     for (let i = 0; i < 16; i += 1) {
-      const o = offset + i * 8;
+      const o = offset + (i * 8);
 
       wh[i] = ((buffer[o] << 24) | (buffer[o + 1] << 16) | (buffer[o + 2] << 8) | buffer[o + 3]) >>> 0;
       wl[i] = ((buffer[o + 4] << 24) | (buffer[o + 5] << 16) | (buffer[o + 6] << 8) | buffer[o + 7]) >>> 0;
@@ -164,7 +163,7 @@ export function sha512(bytes) {
       const majh = (ah & bh) ^ (ah & ch) ^ (bh & ch);
       const majl = (al & bl) ^ (al & cl) ^ (bl & cl);
 
-      const t1LowSum = (hl >>> 0) + (bs1l >>> 0) + (chl >>> 0) + (K[i * 2 + 1] >>> 0) + (wl[i] >>> 0);
+      const t1LowSum = (hl >>> 0) + (bs1l >>> 0) + (chl >>> 0) + (K[(i * 2) + 1] >>> 0) + (wl[i] >>> 0);
       const t1l = t1LowSum >>> 0;
       const t1h = ((hh >>> 0) + (bs1h >>> 0) + (chh >>> 0) + (K[i * 2] >>> 0)
         + (wh[i] >>> 0) + Math.floor(t1LowSum / 0x100000000)) >>> 0;

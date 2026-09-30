@@ -23,8 +23,11 @@
  * breaking change.
  */
 // Exported for the paired suite's drift checks, which compare this transcription against the
-// packaging document group by group and member by member. Without the export those specs fail to
-// compile (TS2459) and report zero tests, so the checks are lost rather than merely failing.
+// packaging document group by group and member by member. Without the export the specs still run
+// and still go red, but they die on `Cannot read properties of undefined` instead of comparing
+// anything - so the comparison is lost while the suite looks merely broken. Measured on all three
+// paths: `tsc --noEmit` says nothing (tsconfig includes `src` only, so the specs are not in its
+// program), and Jest - which is what CI runs - throws at run time.
 export const FUNCTION_GROUPS: ReadonlyMap<string, readonly string[]> = new Map([
   ['fun:math.a', ['ABS', 'LOG', 'MOD', 'POWER', 'PRODUCT', 'ROUND', 'ROUNDDOWN', 'ROUNDUP', 'SQRT', 'SUM']],
   ['fun:stat.a', ['AVERAGE', 'COUNT', 'MAX', 'MIN']],

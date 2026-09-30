@@ -1,18 +1,30 @@
 {
   "_comment": [
-    "Where the JavaScript in this directory comes from. Machine-readable so CI can check it:",
-    "`npm run check:vendored-parser` hashes these files and the upstream ones and compares.",
+    "Where this directory comes from, machine-readable so `npm run check:vendored-parser` can hold",
+    "it to upstream: it fetches every file of the upstream directory at `tag` and compares bytes.",
+    "Nothing else may live here except `own_files`; a local-only file would shadow a copied one.",
     "",
-    "No hashes are stored. The files ARE the copies, so a stored table would be a third thing",
-    "to keep in step. `track` is the branch to compare against - master, the released code;",
-    "`develop` there is work in progress. `commit` records which revision was taken.",
+    "`allowed_divergences` is the ONE place a local edit is permitted, and each entry has to say",
+    "why and when it goes away. The checker substitutes `local` for `upstream` in the fetched file",
+    "before comparing, so the moment upstream changes that line the entry stops matching, the",
+    "check fails, and the shim gets removed rather than forgotten.",
     "",
-    "PROVENANCE.md says what this directory is and why. This file says where it came from."
+    "A newer upstream tag also fails the check: the copy is taken from a tagged release, and a",
+    "release we have not looked at is the event the reviewer asked to be told about."
   ],
   "repository": "handsontable/license-key",
-  "directory": "src/entitlement-key",
-  "track": "master",
+  "directory": "vendor/entitlement-key-reader",
+  "tag": "4.0.1",
   "commit": "03810fd3c93160580e1b9665de6b38fca340e382",
   "taken_on": "2026-09-30",
-  "files": ["constants.js", "detect-format.js", "extract-key-data.js", "utils.js", "sha512.js"]
+  "own_files": ["PROVENANCE.md", "upstream.json"],
+  "allowed_divergences": [
+    {
+      "file": "extractKeyData.ts",
+      "why": "TypeScript 4.0.8 (HyperFormula's) does not narrow `unknown` through `!== null && typeof === 'object'`; upstream compiles under ^5.9.3. One cast makes the file compile here. Semantics unchanged.",
+      "until": "upstream ships the cast (or HyperFormula moves to TypeScript >= 4.9) - then delete this entry and re-take the file",
+      "upstream": "      Object.keys(current).forEach(key => pending.push((current as Record<string, unknown>)[key]));",
+      "local":    "      Object.keys(current as object).forEach(key => pending.push((current as Record<string, unknown>)[key]));"
+    }
+  ]
 }

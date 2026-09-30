@@ -11,9 +11,10 @@ import {
 } from '../helpers/licenseKeyValidator'
 import {CAPABILITY_TABLE, normalizeCapabilityToken} from './capabilities'
 import {LicenseEntitlement, LicenseExpiry, unrestrictedEntitlement} from './LicenseEntitlement'
-import {detectLicenseKeyFormat} from './handsontable-license-key-parser/detect-format'
-import {EntitlementKeyData, EntitlementProductGrant, extractEntitlementKeyData} from './handsontable-license-key-parser/extract-key-data'
-import {parseIsoDate} from './handsontable-license-key-parser/utils'
+import {detectLicenseKeyFormat} from './handsontable-license-key-parser/detectFormat'
+import {extractEntitlementKeyData} from './handsontable-license-key-parser/extractKeyData'
+import {EntitlementKeyData, ProductEntitlement} from './handsontable-license-key-parser/types'
+import {parseIsoDateToTimestamp} from './handsontable-license-key-parser/encoding'
 
 /** Milliseconds in a day, used to turn a grace period in days into a deadline. */
 const MILLISECONDS_PER_DAY = 86400000
@@ -112,7 +113,7 @@ function releaseDateTimestamp(): number | null {
  * Reads HyperFormula's terms out of an intact entitlement key payload.
  *
  * Total on purpose: the vendored reader has already rejected every malformed shape, so every
- * field read here is exactly what {@link EntitlementProductGrant} promises. A payload without a
+ * field read here is exactly what {@link ProductEntitlement} promises. A payload without a
  * `hyperformula` entry — including `products: {}` — is a VALID key that grants this library
  * nothing and never expires for it; per HF-307 decision D6-A that cliff is silent. Note this
  * differs from the typed-key format this replaces, where a key licensed to another product
@@ -122,7 +123,7 @@ function releaseDateTimestamp(): number | null {
  * @param {EntitlementKeyData} data - the extracted key data
  */
 function licenseTermsOf(data: EntitlementKeyData): LicenseTerms {
-  const grant: EntitlementProductGrant | undefined = data.products[HYPERFORMULA_PRODUCT_NAME]
+  const grant: ProductEntitlement | undefined = data.products[HYPERFORMULA_PRODUCT_NAME]
 
   // Nothing is granted implicitly: a key's functions are exactly what its own tokens name. A key
   // whose tokens this build does not recognize therefore still evaluates the infix operators (they
@@ -148,7 +149,7 @@ function licenseTermsOf(data: EntitlementKeyData): LicenseTerms {
   // of UTC by a day.
   const expiryDate = grant === undefined ? undefined : (grant.usage_until ?? grant.release_until)
   const comparedAgainstReleaseDate = grant !== undefined && grant.release_until !== undefined
-  const expiryTimestamp = expiryDate === undefined ? null : parseIsoDate(expiryDate, 'expiration').timestamp
+  const expiryTimestamp = expiryDate === undefined ? null : parseIsoDateToTimestamp(expiryDate)
   const flags = grant === undefined ? [] : grant.flags
   // A release-date comparison has no grace period: it is static, so there is no window to be
   // inside of.

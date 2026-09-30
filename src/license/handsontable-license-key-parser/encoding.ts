@@ -1,68 +1,11 @@
+/* eslint-disable no-bitwise */
+
 /**
  * The base64 alphabet.
  *
  * @type {string}
  */
 const BASE64_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-/**
- * Recursively freezes the value (and every nested object). Used to make a
- * verified schema immutable so it cannot drift from what was validated.
- *
- * @param {*} value The value to freeze.
- * @returns {*}
- */
-export function deepFreeze(value) {
-  if (value !== null && typeof value === 'object') {
-    Object.keys(value).forEach((key) => deepFreeze(value[key]));
-    Object.freeze(value);
-  }
-
-  return value;
-}
-
-/**
- * Parses the date in the "YYYY-MM-DD" format into its numeric parts and the
- * epoch milliseconds of its UTC midnight. Throws when the date is malformed
- * or does not exist in the calendar.
- *
- * @param {string} isoDate The date to parse.
- * @param {string} dateLabel The date name used in the error message.
- * @returns {{ year: number, month: number, day: number, timestamp: number }}
- */
-export function parseIsoDate(isoDate, dateLabel) {
-  // Only a string is a date. Checked before the text test on purpose: an array
-  // like `['2027-08-12']` stringifies to a valid date, would pass, and would
-  // then be written into the payload as an array.
-  const match = typeof isoDate === 'string' ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate) : null;
-
-  if (match === null) {
-    throw new Error(`The ${dateLabel} date (${isoDate}) has to be passed in the "YYYY-MM-DD" format.`);
-  }
-
-  const year = parseInt(match[1], 10);
-  const month = parseInt(match[2], 10);
-  const day = parseInt(match[3], 10);
-
-  // Date.UTC maps years 0-99 to 1900-1999, which would make the round-trip
-  // check below report a "not a valid calendar date" lie.
-  if (year < 100) {
-    throw new Error(`The ${dateLabel} date (${isoDate}) has to use a four-digit year of 100 or later.`);
-  }
-
-  const timestamp = Date.UTC(year, month - 1, day);
-  const date = new Date(timestamp);
-
-  // An impossible date (e.g. "2027-02-30") makes `Date.UTC` roll over to
-  // the next month, so a round-trip comparison catches it.
-  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
-    throw new Error(`The ${dateLabel} date (${isoDate}) is not a valid calendar date.`);
-  }
-
-  return {
-    year, month, day, timestamp,
-  };
-}
 
 /**
  * Encodes the string as UTF-8 bytes. The plain implementation is used on purpose.
@@ -72,7 +15,7 @@ export function parseIsoDate(isoDate, dateLabel) {
  * @param {string} string The string to encode.
  * @returns {number[]}
  */
-export function stringToUtf8Bytes(string) {
+export function stringToUtf8Bytes(string: string): number[] {
   const bytes = [];
 
   for (let i = 0; i < string.length; i += 1) {
@@ -84,16 +27,15 @@ export function stringToUtf8Bytes(string) {
 
       if (lowSurrogate >= 0xdc00 && lowSurrogate <= 0xdfff) {
         codePoint = ((codePoint - 0xd800) * 0x400) + (lowSurrogate - 0xdc00) + 0x10000;
-        i += 1; // eslint-disable-line no-plusplus
+        i += 1;
       }
     }
 
     if (codePoint < 0x80) {
       bytes.push(codePoint);
     } else if (codePoint < 0x800) {
-      bytes.push(0xc0 | (codePoint >> 6), 0x80 | (codePoint & 0x3f)); // eslint-disable-line no-bitwise
+      bytes.push(0xc0 | (codePoint >> 6), 0x80 | (codePoint & 0x3f));
     } else if (codePoint < 0x10000) {
-      /* eslint-disable no-bitwise */
       bytes.push(
         0xe0 | (codePoint >> 12),
         0x80 | ((codePoint >> 6) & 0x3f),
@@ -106,7 +48,6 @@ export function stringToUtf8Bytes(string) {
         0x80 | ((codePoint >> 6) & 0x3f),
         0x80 | (codePoint & 0x3f),
       );
-      /* eslint-enable no-bitwise */
     }
   }
 
@@ -119,8 +60,7 @@ export function stringToUtf8Bytes(string) {
  * @param {number[]} bytes The bytes to decode.
  * @returns {string}
  */
-export function utf8BytesToString(bytes) {
-  /* eslint-disable no-bitwise */
+export function utf8BytesToString(bytes: number[]): string {
   let string = '';
   let i = 0;
 
@@ -151,7 +91,6 @@ export function utf8BytesToString(bytes) {
       string += String.fromCharCode(codePoint);
     }
   }
-  /* eslint-enable no-bitwise */
 
   return string;
 }
@@ -162,8 +101,7 @@ export function utf8BytesToString(bytes) {
  * @param {number[]} bytes The bytes to encode.
  * @returns {string}
  */
-export function bytesToBase64(bytes) {
-  /* eslint-disable no-bitwise */
+export function bytesToBase64(bytes: number[]): string {
   let base64 = '';
 
   for (let i = 0; i < bytes.length; i += 3) {
@@ -177,7 +115,6 @@ export function bytesToBase64(bytes) {
       ? '=' : BASE64_ALPHABET.charAt(((byte2 & 0x0f) << 2) | (byte3 === undefined ? 0 : byte3 >> 6));
     base64 += byte3 === undefined ? '=' : BASE64_ALPHABET.charAt(byte3 & 0x3f);
   }
-  /* eslint-enable no-bitwise */
 
   return base64;
 }
@@ -189,14 +126,13 @@ export function bytesToBase64(bytes) {
  * @param {string} base64 The base64 string to decode.
  * @returns {number[]|null}
  */
-export function base64ToBytes(base64) {
+export function base64ToBytes(base64: string): number[] | null {
   const normalized = `${base64}`.replace(/-/g, '+').replace(/_/g, '/').replace(/=+$/, '');
 
   if (!/^[A-Za-z0-9+/]*$/.test(normalized) || normalized.length % 4 === 1) {
     return null;
   }
 
-  /* eslint-disable no-bitwise */
   const bytes = [];
 
   for (let i = 0; i < normalized.length; i += 4) {
@@ -217,7 +153,6 @@ export function base64ToBytes(base64) {
       bytes.push(((chunk[2] & 0x03) << 6) | chunk[3]);
     }
   }
-  /* eslint-enable no-bitwise */
 
   return bytes;
 }
@@ -229,7 +164,7 @@ export function base64ToBytes(base64) {
  * @param {string} string The string to encode.
  * @returns {string}
  */
-export function stringToBase64Url(string) {
+export function stringToBase64Url(string: string): string {
   return bytesToBase64(stringToUtf8Bytes(string))
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
@@ -243,8 +178,49 @@ export function stringToBase64Url(string) {
  * @param {string} base64 The base64 string to decode.
  * @returns {string|null}
  */
-export function base64ToString(base64) {
+export function base64ToString(base64: string): string | null {
   const bytes = base64ToBytes(base64);
 
   return bytes === null ? null : utf8BytesToString(bytes);
+}
+
+/**
+ * Parses a date in the "YYYY-MM-DD" format into the epoch milliseconds of its
+ * UTC midnight. Returns `null` when the date is malformed or does not exist in
+ * the calendar (for example "2027-02-30"). Unlike the generator side, the
+ * reader never throws on a bad date - a broken payload simply makes the key
+ * unreadable.
+ *
+ * @param {*} isoDate The date to parse. Anything but a string is not a date.
+ * @returns {number|null}
+ */
+export function parseIsoDateToTimestamp(isoDate: unknown): number | null {
+  // Only a string is a date. Checked before the text test on purpose: an array
+  // like `['2027-08-12']` stringifies to a valid date and would otherwise pass.
+  const match = typeof isoDate === 'string' ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate) : null;
+
+  if (match === null) {
+    return null;
+  }
+
+  const year = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10);
+  const day = parseInt(match[3], 10);
+
+  // Date.UTC maps years 0-99 to 1900-1999, which would make the round-trip
+  // check below report a "not a valid calendar date" lie.
+  if (year < 100) {
+    return null;
+  }
+
+  const timestamp = Date.UTC(year, month - 1, day);
+  const date = new Date(timestamp);
+
+  // An impossible date (e.g. "2027-02-30") makes `Date.UTC` roll over to
+  // the next month, so a round-trip comparison catches it.
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+    return null;
+  }
+
+  return timestamp;
 }
