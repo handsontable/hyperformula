@@ -1,30 +1,32 @@
 {
   "_comment": [
-    "Where this directory comes from, machine-readable so `npm run check:vendored-parser` can hold",
-    "it to upstream: it fetches every file of the upstream directory at `tag` and compares bytes.",
-    "Nothing else may live here except `own_files`; a local-only file would shadow a copied one.",
+    "Where this directory comes from, machine-readable so `npm run check:vendored-parser` can hold it",
+    "to upstream: it fetches every file of the upstream directory at `tag`, checks that `tag` still",
+    "points at `commit`, and compares bytes. Nothing else may live here except `own_files`; a",
+    "local-only file would shadow a copied one.",
     "",
-    "`allowed_divergences` is the ONE place a local edit is permitted, and each entry has to say",
-    "why and when it goes away. The checker substitutes `local` for `upstream` in the fetched file",
-    "before comparing, so the moment upstream changes that line the entry stops matching, the",
-    "check fails, and the shim gets removed rather than forgotten.",
-    "",
-    "A newer upstream tag also fails the check: the copy is taken from a tagged release, and a",
-    "release we have not looked at is the event the reviewer asked to be told about."
+    "`allowed_divergences` is the ONE place a local edit is permitted, and each entry has to say why",
+    "and when it goes away. The checker substitutes `local` for `upstream` in the fetched file before",
+    "comparing. A tag is immutable, so this does not notice upstream fixing the line on its branches;",
+    "what it notices is a NEWER TAG (the check fails on one), and on re-taking the copy at that tag",
+    "the swap stops matching, so the shim has to come out rather than ride along."
   ],
   "repository": "handsontable/license-key",
   "directory": "vendor/entitlement-key-reader",
   "tag": "4.0.1",
   "commit": "03810fd3c93160580e1b9665de6b38fca340e382",
   "taken_on": "2026-09-30",
-  "own_files": ["PROVENANCE.md", "upstream.json"],
+  "own_files": [
+    "PROVENANCE.md",
+    "upstream.json"
+  ],
   "allowed_divergences": [
     {
       "file": "extractKeyData.ts",
       "why": "TypeScript 4.0.8 (HyperFormula's) does not narrow `unknown` through `!== null && typeof === 'object'`; upstream compiles under ^5.9.3. One cast makes the file compile here. Semantics unchanged.",
-      "until": "upstream ships the cast (or HyperFormula moves to TypeScript >= 4.9) - then delete this entry and re-take the file",
+      "until": "upstream ships the cast (or HyperFormula moves to TypeScript >= 4.5, measured: 4.4.4 fails, 4.5.5 passes) - then delete this entry and re-take the file",
       "upstream": "      Object.keys(current).forEach(key => pending.push((current as Record<string, unknown>)[key]));",
-      "local":    "      Object.keys(current as object).forEach(key => pending.push((current as Record<string, unknown>)[key]));"
+      "local": "      Object.keys(current as object).forEach(key => pending.push((current as Record<string, unknown>)[key]));"
     }
   ]
 }

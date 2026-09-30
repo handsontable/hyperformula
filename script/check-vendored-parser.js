@@ -17,9 +17,12 @@
  *   - fails on a local file upstream does not have (other than `own_files`) - a shadowing
  *     `foo.ts` beside a copied `foo.ts` would otherwise win module resolution silently;
  *   - fails on an upstream file that is missing locally;
+ *   - checks that the pinned `tag` still points at the pinned `commit`, so a moved tag or an edited
+ *     pin does not pass as the copy it is not;
  *   - applies `allowed_divergences` - each a single exact line swap with a stated reason and expiry -
- *     to the fetched text before comparing. If upstream changes that line, the swap no longer
- *     matches and the check fails, so a shim cannot outlive the bug it works around;
+ *     to the fetched text before comparing. Tags are immutable, so this cannot see upstream fix the
+ *     line on a branch; on the next tag the swap stops matching and the check fails, so a shim
+ *     cannot outlive the tag it was written against;
  *   - fails when upstream has a NEWER tag than the pin: the copy is taken from releases, and a
  *     release nobody has looked at is exactly what the reviewer asked to be told about.
  *
@@ -216,6 +219,14 @@ async function main() {
 
   try {
     const tags = JSON.parse((await get(`/repos/${pin.repository}/tags?per_page=20`, 'application/vnd.github+json', auth)).toString('utf8'))
+    const pinned = tags.find((t) => t.name === pin.tag)
+
+    if (pinned === undefined) {
+      problems.push(`tag ${pin.tag} is not among upstream's tags - the pin names a release that does not exist`)
+    } else if (pinned.commit.sha !== pin.commit) {
+      problems.push(`tag ${pin.tag} points at ${pinned.commit.sha.slice(0, 9)}, the pin says ${pin.commit.slice(0, 9)} - the tag moved or the pin was edited`)
+    }
+
     const newer = tags.map((t) => t.name).filter((name) => /^\d+\.\d+\.\d+$/.test(name) && semverGreater(name, pin.tag))
 
     if (newer.length > 0) {

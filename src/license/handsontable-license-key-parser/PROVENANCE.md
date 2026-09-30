@@ -16,9 +16,11 @@ disagree about the same key.
 
 `extractKeyData.ts`, one line: `Object.keys(current)` → `Object.keys(current as object)`. HyperFormula
 compiles with TypeScript 4.0.8, which does not narrow `unknown` through `!== null && typeof ===
-'object'`; upstream compiles under 5.9. The cast changes no behaviour. It is recorded in
-`upstream.json` with its reason, and the check below applies it before comparing - so the day
-upstream changes that line, the entry stops matching, the check fails, and the shim comes out.
+'object'`; upstream compiles under 5.9, and TypeScript 4.5 is where the line starts to compile
+uncast. The cast changes no behaviour. It is recorded in `upstream.json` with its reason, and the
+check below applies it before comparing. A tag is immutable, so the check does not see upstream fix
+the line on a branch; it sees the next tag - a newer tag fails the check - and re-taking the copy at
+that tag makes the entry stop matching, so the shim comes out instead of riding along.
 
 ## Checking it
 
