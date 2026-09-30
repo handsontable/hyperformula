@@ -21,6 +21,9 @@ on:
   schedule:
     - cron: '17 6 * * 1-5' # weekday mornings: a newer upstream tag is news even when nothing here changed
 
+permissions:
+  contents: read
+
 jobs:
   drift:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
