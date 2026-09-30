@@ -13,34 +13,42 @@ parser rejects genuine customer keys.
 | Tag | `4.0.0` |
 | Commit | `c50ef40a6` (the `4.0.0` release commit; on `develop` as `1acddafa8`) |
 | Ported on | 2026-08-20 |
-| Reference docs | the format and design notes kept alongside the upstream sources; the byte-level rules are also specified in the key spec's "Technical implementation" addendum (T1–T14) |
+| Reference docs | the format and design notes kept alongside the upstream sources; the byte-level rules are also specified in the key spec's "Technical implementation" addendum (T1-T14) |
 
-## Files
+## Port, not copy — and what that means for drift
 
-Hashes are of the **upstream** `.js` sources at the tag above, so drift is detectable without
-storing a copy of them here.
+These files are **TypeScript ports of upstream's JavaScript**, not byte-identical copies, and they
+cannot be copies while `allowJs` is off and `strict` is on in `tsconfig.json`. A `.ts` file and the
+`.js` it was ported from never share a hash, so "compare our bytes to upstream's" is not a check
+that can exist in this shape. What differs is listed under *Deliberate divergences* below; none of
+it changes which keys are accepted.
 
-| This directory | Upstream `src/entitlement-key/` | Upstream sha256 |
-|---|---|---|
-| `constants.ts` | `constants.js` | `6e2ad68d1a316abdec3f89bf04260a2cc4098f76525427d919f22cb25fb077d6` |
-| `detectFormat.ts` | `detect-format.js` | `7dc037fd70e7c64078a0fe29b42cb33ecf25e8f4d8963ae9bfb16b69479d267f` |
-| `extractKeyData.ts` | `extract-key-data.js` | `afd0858768879764ea016d2bc4fca692a0cd12214c1dfda6932d7ed9e4f32e45` |
-| `utils.ts` | `utils.js` | `135a8396bb22f424160fc651e899931d4be807df9b94c6dd24bb1cf6526e0541` |
-| `sha512.ts` | `sha512.js` | `668dd1109160b92965a1f9a9c5fb78dfdc1e5b7e93f635a147ae8a6bb2a5d837` |
-
-### Checking for drift
-
-The check is manual and needs read access to the private repository — HyperFormula's own CI
-cannot do it, which is exactly why the hashes are written down here.
+What IS checked, by measurement rather than by someone remembering to look:
 
 ```bash
-git clone git@github.com:handsontable/license-key.git
-cd license-key/src/entitlement-key
-sha256sum constants.js detect-format.js extract-key-data.js utils.js sha512.js
+npm run check:vendored-parser
 ```
 
-Any hash that differs from the table means upstream moved. Re-read the changed file and re-port
-it, then update this table together with the code in the same commit.
+It reads `upstream.lock.json` — the pin: the commit, and a sha256 per upstream file — fetches each
+file at that commit and compares. A mismatch means **upstream moved**, which is the event that
+matters: it is the moment this port stops mirroring the code it is supposed to mirror. The script
+also fails if a file is in the directory without being pinned, or pinned without being present.
+
+It needs read access to the private repository, through `LICENSE_KEY_REPO_TOKEN`, `GH_TOKEN`,
+`GITHUB_TOKEN` or a logged-in `gh`. Without credentials it **fails** rather than passing quietly:
+an unverified pin is not a verified one, and a check that reports success when it could not look is
+worse than no check.
+
+When upstream moves: re-port the changed file and update its hash in `upstream.lock.json` in the
+same commit, so the diff shows the two together.
+
+### If byte-identity is wanted
+
+It is reachable, and it is the remaining half of option 1: vendor upstream's `.js` verbatim, turn
+`allowJs` on, and hand-write a `.d.ts` per file. The check then becomes a direct hash of our own
+files, with no lock table at all. Measured as compatible with this repository's TypeScript
+(4.0.8 accepts `allowJs` together with `declaration`). It is a build-configuration change, so it
+is not made here without a decision.
 
 ## Not vendored, on purpose
 
@@ -78,8 +86,19 @@ the port, not changes to what it accepts, and a drift review should expect to se
    Upstream matches `String(value)` against `YYYY-MM-DD`, so a `usage_until` that is a
    single-element array of the right string passes its shape check and the declared `string` type
    ends up wider than the value. The key spec's addendum (T7) makes the field a real calendar date,
-   so the stricter reading is the specified one — but upstream has not adopted it (checked at
-   `c50ef40a`, `develop` and `master`; no pull request or issue proposes it).
+   so the stricter reading is the specified one.
+
+   **Upstream has since adopted it.** Commit `6862da557` on `master` (2026-09-28, DEV-3031) changed
+   `parseIsoDate` to `typeof isoDate === 'string' ? … : null`, with the same reasoning. An earlier
+   revision of this file said upstream had not adopted it and that no pull request proposed it;
+   that was true when written and is not true now — `npm run check:vendored-parser` is what found
+   it, on its first run against `master`.
+
+   So this divergence is on its way out, and re-porting `utils.js` closes it. One thing to decide
+   with the re-port rather than sleepwalk into: upstream's check rejects the WHOLE key when any
+   product's date is mistyped, while `hyperformulaDateFieldIsWellTyped` deliberately only takes the
+   invalid-key path for HyperFormula's own entry, on the grounds that another product's fields are
+   not ours to validate. Re-porting reverses that choice.
 
    Rather than fork upstream's source over it, HyperFormula checks the TYPE of its own entry's date
    field in `licenseResolution.ts` (`hyperformulaDateFieldIsWellTyped`), before the payload is read
