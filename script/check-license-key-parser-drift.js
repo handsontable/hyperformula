@@ -27,7 +27,7 @@
  *   - fails when upstream has a NEWER tag than the pin: the copy is taken from releases, and a
  *     release nobody has looked at is exactly what the reviewer asked to be told about.
  *
- * Usage:  npm run check:vendored-parser
+ * Usage:  npm run check:license-key-parser-drift
  *
  * Needs read access to a private repository: LICENSE_KEY_REPO_TOKEN, GH_TOKEN, GITHUB_TOKEN, or
  * a logged-in `gh`. Without one it FAILS - "could not verify" is not "verified" - and a 401/403/404

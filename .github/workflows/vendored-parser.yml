@@ -14,7 +14,7 @@ on:
     types: [ opened, reopened, synchronize ]
     paths:
       - 'src/license/handsontable-license-key-parser/**'
-      - 'script/check-vendored-parser.js'
+      - 'script/check-license-key-parser-drift.js'
       - '.github/workflows/vendored-parser.yml'
   push:
     branches: [ master, develop ]
@@ -36,6 +36,6 @@ jobs:
         with:
           node-version: '22'
       - name: Compare the vendored reader with upstream
-        run: node script/check-vendored-parser.js
+        run: node script/check-license-key-parser-drift.js
         env:
           LICENSE_KEY_REPO_TOKEN: ${{ secrets.LICENSE_KEY_REPO_TOKEN }}
