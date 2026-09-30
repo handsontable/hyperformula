@@ -10,8 +10,8 @@
  *
  * Transcribed 1:1 from section 6 of the internal packaging design document ("HF function groups
  * and packages"), so that a re-transcription is a reviewable diff against the doc's published
- * counts. Module-private: the groups reach the outside only as entries of
- * {@link FUNCTION_CAPABILITY_TABLE}, which is where a test has to read them from.
+ * counts. Exported so the paired suite can compare it group by group; the table below is the
+ * only thing production code reads it through.
  *
  * `fun:info.a` and `fun:lookup.a` name nothing but the two protected built-ins, `VERSION` and
  * `OFFSET` (see `FunctionRegistry._protectedPlugins`). The doc calls that a "technical
@@ -22,9 +22,9 @@
  * The doc freezes group names as API surface: once shipped inside license keys, a rename is a
  * breaking change.
  */
-// Exported for the paired test suite's drift checks, which compare this transcription against the
-// packaging document group by group and member by member, and which silently stopped running when
-// these became module-private.
+// Exported for the paired suite's drift checks, which compare this transcription against the
+// packaging document group by group and member by member. Without the export those specs fail to
+// compile (TS2459) and report zero tests, so the checks are lost rather than merely failing.
 export const FUNCTION_GROUPS: ReadonlyMap<string, readonly string[]> = new Map([
   ['fun:math.a', ['ABS', 'LOG', 'MOD', 'POWER', 'PRODUCT', 'ROUND', 'ROUNDDOWN', 'ROUNDUP', 'SQRT', 'SUM']],
   ['fun:stat.a', ['AVERAGE', 'COUNT', 'MAX', 'MIN']],
@@ -78,7 +78,7 @@ export const FUNCTION_GROUPS: ReadonlyMap<string, readonly string[]> = new Map([
  * D1, which drops custom-function gating entirely. A function this table does not list is not
  * gated at all, which is exactly the treatment a custom function should get.
  */
-export const UNGROUPED_FUNCTIONS = [
+const UNGROUPED_FUNCTIONS = [
   'ACOSH', 'ACOT', 'ACOTH', 'ARABIC', 'ASINH', 'ATANH', 'AVEDEV', 'BASE', 'BESSELI', 'BESSELJ', 'BESSELK',
   'BESSELY', 'BETA.DIST', 'BETA.INV', 'BIN2DEC', 'BIN2HEX', 'BIN2OCT', 'BINOM.DIST', 'BINOM.INV', 'BITAND',
   'BITLSHIFT', 'BITOR', 'BITRSHIFT', 'BITXOR', 'CEILING.MATH', 'CEILING.PRECISE', 'CHISQ.DIST',
