@@ -31,23 +31,54 @@ function zeroForInfinite(value: InternalScalarValue) {
   }
 }
 
+/**
+ * Moments of a set of numbers, composable so that the value of a range can be cached and reused
+ * for a larger range.
+ *
+ * Besides the sum and the count, it keeps the sums of deviations and of squared deviations from a
+ * `shift`: the first value added. Deviations from a nearby value stay small, so the variance
+ * computed from them keeps its significant digits when the mean is large relative to the spread
+ * (measurement data such as 10000000.001, 10000000.002, ...), where the textbook one-pass form
+ * `sum(x^2) - sum(x)^2 / n` subtracts two nearly equal numbers and loses them all.
+ */
 class MomentsAggregate {
 
-  public static empty = new MomentsAggregate(0, 0, 0)
+  public static empty = new MomentsAggregate(0, 0, 0, 0, 0)
 
   constructor(
-    public readonly sumsq: number,
     public readonly sum: number,
     public readonly count: number,
+    public readonly shift: number,
+    public readonly shiftedSum: number,
+    public readonly shiftedSumOfSquares: number,
   ) {
   }
 
   public static single(arg: number): MomentsAggregate {
-    return new MomentsAggregate(arg * arg, arg, 1)
+    return new MomentsAggregate(arg, 1, arg, 0, 0)
   }
 
-  public compose(other: MomentsAggregate) {
-    return new MomentsAggregate(this.sumsq + other.sumsq, this.sum + other.sum, this.count + other.count)
+  /**
+   * Combines two aggregates. The result keeps this aggregate's `shift`; the other one's shifted sums
+   * are re-expressed relative to it. An empty aggregate is the identity: rebasing onto its zero
+   * shift would turn the shifted sums back into the plain sums of `x` and `x^2`.
+   */
+  public compose(other: MomentsAggregate): MomentsAggregate {
+    if (this.count === 0) {
+      return other
+    }
+    if (other.count === 0) {
+      return this
+    }
+
+    const shiftDifference = other.shift - this.shift
+    return new MomentsAggregate(
+      this.sum + other.sum,
+      this.count + other.count,
+      this.shift,
+      this.shiftedSum + other.shiftedSum + other.count * shiftDifference,
+      this.shiftedSumOfSquares + other.shiftedSumOfSquares + 2 * shiftDifference * other.shiftedSum + other.count * shiftDifference * shiftDifference,
+    )
   }
 
   public averageValue(): Maybe<number> {
@@ -60,7 +91,7 @@ class MomentsAggregate {
 
   public varSValue(): Maybe<number> {
     if (this.count > 1) {
-      return (this.sumsq - (this.sum * this.sum) / this.count) / (this.count - 1)
+      return this.sumOfSquaredDeviations() / (this.count - 1)
     } else {
       return undefined
     }
@@ -68,10 +99,26 @@ class MomentsAggregate {
 
   public varPValue(): Maybe<number> {
     if (this.count > 0) {
-      return (this.sumsq - (this.sum * this.sum) / this.count) / this.count
+      return this.sumOfSquaredDeviations() / this.count
     } else {
       return undefined
     }
+  }
+
+  /**
+   * The sum of squared deviations from the mean `m = sum / count`, which a two-pass computation
+   * (and Excel) sums directly. With `S1`, `S2` the shifted sums and `n` the count:
+   *
+   *   sum((x - m)^2) = (S2 - S1^2 / n) + n * ((shift - m) + S1 / n)^2
+   *
+   * The first term is the spread about the exact mean; the second adds the effect of `m` being
+   * rounded, which keeps the result in agreement with Excel (e.g. for identical values whose mean is
+   * not exactly representable).
+   */
+  private sumOfSquaredDeviations(): number {
+    const mean = this.sum / this.count
+    const meanOffset = (this.shift - mean) + this.shiftedSum / this.count
+    return (this.shiftedSumOfSquares - this.shiftedSum * this.shiftedSum / this.count) + this.count * meanOffset * meanOffset
   }
 }
 
