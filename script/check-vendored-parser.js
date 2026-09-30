@@ -21,8 +21,9 @@
  *     pin does not pass as the copy it is not;
  *   - applies `allowed_divergences` - each a single exact line swap with a stated reason and expiry -
  *     to the fetched text before comparing. Tags are immutable, so this cannot see upstream fix the
- *     line on a branch; on the next tag the swap stops matching and the check fails, so a shim
- *     cannot outlive the tag it was written against;
+ *     line on a branch; the next tag fails the check (newer-tag rule), and at the re-take the swap
+ *     stops matching once upstream has changed the line, so an upstream fix cannot be missed. A tag
+ *     that leaves the line alone carries the shim forward; `until` is a note, not a check;
  *   - fails when upstream has a NEWER tag than the pin: the copy is taken from releases, and a
  *     release nobody has looked at is exactly what the reviewer asked to be told about.
  *
@@ -154,6 +155,32 @@ async function main() {
   }
 
   const problems = []
+
+  // The pin first: a tag that moved, or a pin edited by hand, is named as that - before any
+  // listing at the tag can fail for a different reason and blame access.
+  try {
+    const tags = JSON.parse((await get(`/repos/${pin.repository}/tags?per_page=20`, 'application/vnd.github+json', auth)).toString('utf8'))
+    const pinned = tags.find((t) => t.name === pin.tag)
+
+    if (pinned === undefined) {
+      problems.push(`tag ${pin.tag} is not among upstream's tags - the pin names a release that does not exist`)
+    } else if (pinned.commit.sha !== pin.commit) {
+      problems.push(`tag ${pin.tag} points at ${pinned.commit.sha.slice(0, 9)}, the pin says ${pin.commit.slice(0, 9)} - the tag moved or the pin was edited`)
+    }
+
+    const pinIsRelease = /^\d+\.\d+\.\d+$/.test(pin.tag)
+    const newer = pinIsRelease
+      ? tags.map((t) => t.name).filter((name) => /^\d+\.\d+\.\d+$/.test(name) && semverGreater(name, pin.tag))
+      : []
+
+    if (newer.length > 0) {
+      problems.push(`upstream has released ${newer.join(', ')} after ${pin.tag}. Review the change and re-take the copy from the newest tag.`)
+    }
+  } catch (error) {
+    problems.push(`could not list upstream tags (HTTP ${error.message}) - access, not drift`)
+  }
+
+
   let upstream
 
   try {
@@ -161,7 +188,7 @@ async function main() {
   } catch (error) {
     console.error(`\nFAIL  could not list ${pin.repository}/${pin.directory} at ${pin.tag}: HTTP ${error.message}.`)
     console.error(error.statusCode === 404
-      ? '      404 from a private repository means the token has no access to it, or the tag does not exist. This is not drift.'
+      ? '      404 from a private repository means the token has no access to it, the tag does not exist, or the directory does not exist at that ref. This is not drift.'
       : '      This is an access or network problem, not drift.')
     process.exit(1)
   }
@@ -216,25 +243,6 @@ async function main() {
     problems.push(`${rel}: exists here and not in upstream - a local file in this directory shadows or extends the copy; move it out`)
     console.log(`  EXTRA ${rel}`)
   })
-
-  try {
-    const tags = JSON.parse((await get(`/repos/${pin.repository}/tags?per_page=20`, 'application/vnd.github+json', auth)).toString('utf8'))
-    const pinned = tags.find((t) => t.name === pin.tag)
-
-    if (pinned === undefined) {
-      problems.push(`tag ${pin.tag} is not among upstream's tags - the pin names a release that does not exist`)
-    } else if (pinned.commit.sha !== pin.commit) {
-      problems.push(`tag ${pin.tag} points at ${pinned.commit.sha.slice(0, 9)}, the pin says ${pin.commit.slice(0, 9)} - the tag moved or the pin was edited`)
-    }
-
-    const newer = tags.map((t) => t.name).filter((name) => /^\d+\.\d+\.\d+$/.test(name) && semverGreater(name, pin.tag))
-
-    if (newer.length > 0) {
-      problems.push(`upstream has released ${newer.join(', ')} after ${pin.tag}. Review the change and re-take the copy from the newest tag.`)
-    }
-  } catch (error) {
-    problems.push(`could not list upstream tags (HTTP ${error.message}) - access, not drift`)
-  }
 
   if (problems.length === 0) {
     console.log(`\nOK - the directory is upstream's ${pin.directory} at ${pin.tag}, byte for byte${divergences.size ? `, with ${divergences.size} declared divergence(s)` : ''}`)

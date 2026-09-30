@@ -8,8 +8,9 @@
     "`allowed_divergences` is the ONE place a local edit is permitted, and each entry has to say why",
     "and when it goes away. The checker substitutes `local` for `upstream` in the fetched file before",
     "comparing. A tag is immutable, so this does not notice upstream fixing the line on its branches;",
-    "what it notices is a NEWER TAG (the check fails on one), and on re-taking the copy at that tag",
-    "the swap stops matching, so the shim has to come out rather than ride along."
+    "what it notices is a NEWER TAG (the check fails on one), and at the re-take the swap stops matching",
+    "once upstream has changed the line. A tag that leaves the line alone carries the shim forward;",
+    "`until` is a note for whoever re-takes, not something the checker evaluates."
   ],
   "repository": "handsontable/license-key",
   "directory": "vendor/entitlement-key-reader",

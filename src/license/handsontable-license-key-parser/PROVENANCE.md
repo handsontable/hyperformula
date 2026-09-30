@@ -19,8 +19,9 @@ compiles with TypeScript 4.0.8, which does not narrow `unknown` through `!== nul
 'object'`; upstream compiles under 5.9, and TypeScript 4.5 is where the line starts to compile
 uncast. The cast changes no behaviour. It is recorded in `upstream.json` with its reason, and the
 check below applies it before comparing. A tag is immutable, so the check does not see upstream fix
-the line on a branch; it sees the next tag - a newer tag fails the check - and re-taking the copy at
-that tag makes the entry stop matching, so the shim comes out instead of riding along.
+the line on a branch; it sees the next tag - a newer tag fails the check - and at the re-take the swap
+stops matching once upstream has changed the line, so the fix cannot be missed. A tag that leaves the
+line alone carries the shim forward; the `until` field is a note for the person re-taking, not a check.
 
 ## Checking it
 
@@ -28,8 +29,9 @@ that tag makes the entry stop matching, so the shim comes out instead of riding 
 npm run check:vendored-parser
 ```
 
-Lists the upstream directory at the pinned tag and compares every file byte for byte. Fails on any
-difference, on a file here that upstream does not have (a shadowing `.ts` would win module
+Checks that the pinned tag still resolves to the pinned commit, lists the upstream directory at that
+tag and compares every file byte for byte. Fails on a moved tag or an edited pin, on any difference,
+on a file here that upstream does not have (a shadowing `.ts` would win module
 resolution silently), on an upstream file missing here, and on a **newer upstream tag** than the
 pin. Without credentials to the private repository it fails rather than skips.
 
