@@ -190,9 +190,8 @@ export class Interpreter {
       }
       case AstNodeType.FUNCTION_CALL: {
         if (!FunctionRegistry.functionIsProtected(ast.procedureName)) {
-          const validityState = this.config.licenseKeyValidityState
-          if (validityState !== LicenseKeyValidityState.VALID) {
-            return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(validityState))
+          if (this.config.licenseBlocksEvaluation) {
+            return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState))
           }
 
           const canonicalId = this.canonicalFunctionId(ast.procedureName)

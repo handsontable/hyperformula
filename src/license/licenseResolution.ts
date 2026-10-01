@@ -30,15 +30,26 @@ export const HYPERFORMULA_PRODUCT_NAME = 'hyperformula'
 /**
  * Lifecycle states in which an entitlement key still lets this build evaluate formulas.
  *
- * The soft-stop states are here on purpose. HF-307 decision D5-A keeps hard blocking in this
- * release and defers the rev 5 §4.1 windows to a follow-up; the notice was built anyway, the
- * soft-stop message was not, so the grace period stays valid and quiet.
+ * The soft-stop states are here on purpose: the grace period stays valid and quiet. HF-307
+ * decision D5-A deferred the rev 5 §4.1 windows; the notice was built anyway, the soft-stop
+ * message was not. What happens after the grace period is {@link EXPIRED_WITHOUT_BLOCKING_STATES}.
  */
 const VALID_STATES: LicenseState[] = [
   'usage_valid', 'usage_notice', 'usage_soft_stop',
   'trial_valid', 'trial_notice', 'trial_soft_stop',
   'release_valid',
 ]
+
+/**
+ * Lifecycle states in which a non-trial key has run out but still lets this build evaluate
+ * formulas, printing an error to the console instead. Decided on #1728 (2026-10-01): "Don't block.
+ * It should just print an error in console." This matches the reader's guide (18.1 never blocks a
+ * paying customer) and rev 5 §4.1. A trial hard stop still blocks.
+ *
+ * The key keeps its own grants: the reader reports it as licensed, so an expired key is never
+ * granted more than the same key was granted while it was current.
+ */
+const EXPIRED_WITHOUT_BLOCKING_STATES: LicenseState[] = ['usage_hard_stop', 'release_expired']
 
 /** Lifecycle states in which a key that is still valid prints its expiry notice. */
 const NOTICE_STATES: LicenseState[] = ['usage_notice', 'trial_notice']
@@ -50,8 +61,14 @@ const NOTICE_STATES: LicenseState[] = ['usage_notice', 'trial_notice']
  * string, and parsing it twice would let them disagree about what it says.
  */
 export interface ResolvedLicense {
-  /** Gate A — may this instance evaluate formulas at all. */
+  /** The key's state, as reported by `VERSION()` and the console messages. */
   validityState: LicenseKeyValidityState,
+  /**
+   * Gate A — `true` when function calls must return `#LIC!`. Usually `validityState !== VALID`;
+   * the exception is an expired non-trial entitlement key, which reports `EXPIRED` but keeps
+   * evaluating (see {@link EXPIRED_WITHOUT_BLOCKING_STATES}).
+   */
+  blocksEvaluation: boolean,
   /** Gate B — which functions and API features the key grants. */
   entitlement: LicenseEntitlement,
 }
@@ -164,8 +181,11 @@ function entitlementOf(entry: ProductEntitlement, isTrial: boolean, silent: bool
  */
 export function resolveLicense(licenseKey: string, notifyConsole: boolean = true): ResolvedLicense {
   if (detectLicenseKeyFormat(licenseKey) !== 'entitlement') {
+    const validityState = checkLicenseKeyValidity(licenseKey)
+
     return {
-      validityState: checkLicenseKeyValidity(licenseKey),
+      validityState,
+      blocksEvaluation: validityState !== LicenseKeyValidityState.VALID,
       entitlement: unrestrictedEntitlement(),
     }
   }
@@ -185,16 +205,18 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
       notifyLicenseKeyState(LicenseKeyValidityState.INVALID)
     }
 
-    return {validityState: LicenseKeyValidityState.INVALID, entitlement: unrestrictedEntitlement()}
+    return {validityState: LicenseKeyValidityState.INVALID, blocksEvaluation: true, entitlement: unrestrictedEntitlement()}
   }
 
   const {entitlement: entry, lifecycle, channels} = license
   const expiry = expiryOf(entry)
+  const expiredWithoutBlocking = EXPIRED_WITHOUT_BLOCKING_STATES.indexOf(lifecycle.state) !== -1
   const isValid = VALID_STATES.indexOf(lifecycle.state) !== -1
   const state = isValid ? LicenseKeyValidityState.VALID : LicenseKeyValidityState.EXPIRED
+  const axis = expiry.kind === 'release' ? 'release' : 'usage'
 
   if (notifyConsole && channels.console) {
-    notifyLicenseKeyState(state, isValid ? undefined : firstUncoveredDay(expiry), expiry.kind === 'release' ? 'release' : 'usage')
+    notifyLicenseKeyState(state, isValid ? undefined : firstUncoveredDay(expiry), axis, expiredWithoutBlocking)
 
     if (NOTICE_STATES.indexOf(lifecycle.state) !== -1) {
       notifyLicenseKeyNotice(licenseKey, new Date(parseIsoDateToTimestamp(expiry.date) as number))
@@ -203,6 +225,9 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
 
   return {
     validityState: state,
-    entitlement: isValid ? entitlementOf(entry, lifecycle.isTrial, !channels.console) : unrestrictedEntitlement(),
+    blocksEvaluation: !isValid && !expiredWithoutBlocking,
+    entitlement: isValid || expiredWithoutBlocking
+      ? entitlementOf(entry, lifecycle.isTrial, !channels.console)
+      : unrestrictedEntitlement(),
   }
 }

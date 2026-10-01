@@ -99,11 +99,15 @@ export function resetLicenseKeyNotificationForTests(): void {
  * @param {LicenseExpiryAxis} [expiryAxis] - which axis the key ran out along. Defaults to
  * `release`, which is the only axis the classic 25-character format has, so its message is
  * unchanged.
+ * @param {boolean} [asError] - print with `console.error` instead of `console.warn`. Used for an
+ * expired entitlement key that no longer blocks evaluation, where the console line is the only
+ * consequence left (decided on #1728, 2026-10-01).
  */
 export function notifyLicenseKeyState(
   state: LicenseKeyValidityState,
   keyValidityDate?: Date,
   expiryAxis: LicenseExpiryAxis = 'release',
+  asError: boolean = false,
 ): void {
   if (_notified || state === LicenseKeyValidityState.VALID) {
     return
@@ -113,7 +117,11 @@ export function notifyLicenseKeyState(
     ? {}
     : {keyValidityDate: formatDate(keyValidityDate), axis: expiryAxis}
 
-  console.warn(consoleMessages[state](vars))
+  if (asError) {
+    console.error(consoleMessages[state](vars))
+  } else {
+    console.warn(consoleMessages[state](vars))
+  }
   _notified = true
 }
 

@@ -32,6 +32,7 @@ import {ConfigParams, ConfigParamsList} from './ConfigParams'
  */
 interface LicensePrivateState {
   licenseKeyValidityState: LicenseKeyValidityState,
+  licenseBlocksEvaluation: boolean,
   licenseCapabilities: ResolvedCapabilities,
   capabilityRegistry: CapabilityRegistry,
 }
@@ -278,12 +279,13 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
     this.context = context
 
-    const {validityState: licenseKeyValidityState, entitlement} = resolveLicense(this.licenseKey, notifyLicenseMessages)
+    const {validityState: licenseKeyValidityState, blocksEvaluation: licenseBlocksEvaluation, entitlement} = resolveLicense(this.licenseKey, notifyLicenseMessages)
     const capabilityRegistry = new CapabilityRegistry()
     const licenseCapabilities = capabilityRegistry.resolve(entitlement)
 
     privatePool.set(this, {
       licenseKeyValidityState,
+      licenseBlocksEvaluation,
       licenseCapabilities,
       capabilityRegistry,
     })
@@ -324,6 +326,16 @@ export class Config implements ConfigParams, ParserConfig {
    */
   public get licenseKeyValidityState(): LicenseKeyValidityState {
     return (privatePool.get(this) as LicensePrivateState).licenseKeyValidityState
+  }
+
+  /**
+   * Gate A: `true` when function calls must evaluate to `#LIC!`. Proxied to its private
+   * counterpart for the same reason as {@link licenseKeyValidityState}.
+   *
+   * @internal
+   */
+  public get licenseBlocksEvaluation(): boolean {
+    return (privatePool.get(this) as LicensePrivateState).licenseBlocksEvaluation
   }
 
   /**
