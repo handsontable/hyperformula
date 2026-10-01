@@ -30,9 +30,9 @@ export const HYPERFORMULA_PRODUCT_NAME = 'hyperformula'
 /**
  * Lifecycle states in which an entitlement key still lets this build evaluate formulas.
  *
- * The soft-stop states are here on purpose: HF-307 decision D5-A builds the notice and the hard
- * stop for 3.5.0, not the soft-stop message, so the grace period behaves as it did before the
- * reader was adopted — valid and quiet.
+ * The soft-stop states are here on purpose. HF-307 decision D5-A keeps hard blocking in this
+ * release and defers the rev 5 §4.1 windows to a follow-up; the notice was built anyway, the
+ * soft-stop message was not, so the grace period stays valid and quiet.
  */
 const VALID_STATES: LicenseState[] = [
   'usage_valid', 'usage_notice', 'usage_soft_stop',

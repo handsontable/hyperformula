@@ -47,11 +47,11 @@ export interface LicenseExpiry {
  *
  * This is the contract every later HF-307 task consumes: {@link CapabilityRegistry} turns it
  * into a `ResolvedCapabilities` set, gate B in the interpreter reads that set, and PR 2's
- * `ensureCapability` reads it for the public API. Until PR 3 lands the real license-key payload
- * adapter, instances of this are built by hand in tests rather than read from a real key.
+ * `ensureCapability` reads it for the public API. `resolveLicense` builds it from the
+ * configured key.
  */
 export interface LicenseEntitlement {
-  /** `true` for every key this library fully understands today (`gpl-v3`, legacy keys). */
+  /** `true` for every key that restricts nothing: legacy keys, `gpl-v3`, and any missing, invalid or expired key. */
   unrestricted: boolean,
   /** Capability tokens this entitlement grants, recognized by this library version. */
   capabilities: ReadonlySet<string>,
@@ -77,7 +77,8 @@ export interface LicenseEntitlement {
 }
 
 /**
- * The unrestricted entitlement: legacy keys and `gpl-v3` resolve to this today.
+ * The unrestricted entitlement: legacy keys, `gpl-v3`, and every missing, invalid or expired
+ * entitlement key resolve to this.
  *
  * HF-307 decision D3 (fail-closed, silent) means an entitlement key whose tokens this library version
  * does not recognize at all no longer maps here — it resolves to an entitlement with an empty,
