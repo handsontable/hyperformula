@@ -71,13 +71,12 @@ If your key grants only part of the library, then:
 If your license key is missing, invalid, or expired, you see a
 corresponding notification in the console.
 
-A missing or invalid key, an expired trial key, and an expired key in the classic 25-character
-format make every licence-gated function call evaluate to a `#LIC!` error — but no API method
-starts throwing, and `getAvailableFunctions()` still describes the full set of functions. A key
-problem never narrows what the library reports it can do.
+A missing or invalid key makes every licence-gated function call evaluate to a `#LIC!` error — but
+no API method starts throwing, and `getAvailableFunctions()` still describes the full set of
+functions. A key problem never narrows what the library reports it can do.
 
-Any other expired key in the new format keeps working with what it grants, and prints an error in
-the console.
+Depending on your license terms, an expired key either behaves the same way, or keeps working with
+what it grants and prints an error in the console.
 
 ## License key support
 
