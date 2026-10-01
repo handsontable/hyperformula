@@ -26,7 +26,7 @@ line alone carries the shim forward; the `until` field is a note for the person 
 ## Checking it
 
 ```bash
-npm run check:vendored-parser
+npm run check:license-key-parser-drift
 ```
 
 Checks that the pinned tag still resolves to the pinned commit, lists the upstream directory at that
@@ -37,12 +37,13 @@ pin. Without credentials to the private repository it fails rather than skips.
 
 ## What HyperFormula uses from it
 
-`extractEntitlementKeyData`, `detectLicenseKeyFormat`, `parseIsoDateToTimestamp`, `CHECKSUM_LENGTH`,
-and the types - from `src/license/licenseResolution.ts` and `src/helpers/licenseKeyValidator.ts`,
-which sit beside the copy, as upstream's guide prescribes. The reader also offers
-`readEntitlementLicense` / `classifyEntitlement` / `getLicenseGrants` (window evaluation and grant
-picking); HyperFormula evaluates windows in `licenseResolution.ts` and does not use those yet.
-Consolidating onto them is a separate decision.
+`readEntitlementLicense`, the single entry point upstream prescribes, plus `detectLicenseKeyFormat`,
+`toIsoBuildDate`, `parseIsoDateToTimestamp`, `CHECKSUM_LENGTH` and the types - from
+`src/license/licenseResolution.ts` and `src/helpers/licenseKeyValidator.ts`, which sit beside the
+copy, as upstream's guide prescribes. The reader verifies the key, picks HyperFormula's entry,
+places it in its lifecycle window and reads its flags. HyperFormula keeps what the guide leaves to
+the product: the meaning of the capability tokens (`src/license/capabilities.ts`) and the console
+messages.
 
 Upstream's `README.md` in this directory is the integration guide; `AGENTS.md` is theirs too.
 
@@ -54,6 +55,6 @@ emitted from these sources by `tsc`, as for any other `.ts` here.
 
 ## Related
 
-- `src/license/licenseResolution.ts` - the consumer: routes on `detectLicenseKeyFormat` and turns
-  the extracted payload into an entitlement.
+- `src/license/licenseResolution.ts` - the consumer: routes on `detectLicenseKeyFormat`, reads the
+  key with `readEntitlementLicense` and turns the result into an entitlement.
 - `src/license/capabilities.ts` - the capability table the payload's tokens are resolved against.

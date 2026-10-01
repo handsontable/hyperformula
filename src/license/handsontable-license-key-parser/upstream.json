@@ -1,6 +1,6 @@
 {
   "_comment": [
-    "Where this directory comes from, machine-readable so `npm run check:vendored-parser` can hold it",
+    "Where this directory comes from, machine-readable so `npm run check:license-key-parser-drift` can hold it",
     "to upstream: it fetches every file of the upstream directory at `tag`, checks that `tag` still",
     "points at `commit`, and compares bytes. Nothing else may live here except `own_files`; a",
     "local-only file would shadow a copied one.",

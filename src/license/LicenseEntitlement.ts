@@ -65,8 +65,8 @@ export interface LicenseEntitlement {
   /**
    * When `true`, resolving this entitlement must not print a console message of any kind.
    *
-   * Set from the key's own flags ONLY — the key spec spells that flag three different ways across
-   * revisions and even within one revision, and all are honoured. An unrecognized token does NOT
+   * Set from the key's own `no-console-warns` flag ONLY, as the vendored reader reads it (its
+   * `channels.console`). An unrecognized token does NOT
    * set it: HF-307 decision D3 makes the *grant* silent (an unknown token grants nothing, with no
    * message and no diagnostics getter), which is a different thing from muting the key's console
    * output. Coupling them suppressed expiry notices as a side effect of a vocabulary mismatch, and

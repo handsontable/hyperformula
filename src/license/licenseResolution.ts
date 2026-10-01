@@ -12,31 +12,36 @@ import {
 import {CAPABILITY_TABLE, normalizeCapabilityToken} from './capabilities'
 import {LicenseEntitlement, LicenseExpiry, unrestrictedEntitlement} from './LicenseEntitlement'
 import {detectLicenseKeyFormat} from './handsontable-license-key-parser/detectFormat'
-import {extractEntitlementKeyData} from './handsontable-license-key-parser/extractKeyData'
-import {EntitlementKeyData, ProductEntitlement} from './handsontable-license-key-parser/types'
+import {readEntitlementLicense} from './handsontable-license-key-parser/readLicense'
+import {toIsoBuildDate} from './handsontable-license-key-parser/buildDate'
 import {parseIsoDateToTimestamp} from './handsontable-license-key-parser/encoding'
+import {LicenseState, ProductEntitlement} from './handsontable-license-key-parser/types'
 
 /** Milliseconds in a day, used to turn a grace period in days into a deadline. */
 const MILLISECONDS_PER_DAY = 86400000
 
 /**
- * The name of HyperFormula's own product entry in an entitlement key payload. Every product
- * entry carries its own capabilities, dates and windows, so this is the only entry this library
- * reads — a key granting other products alongside (or instead of) HyperFormula is a valid key
- * whose other entries are simply not for us.
+ * The name of HyperFormula's own product entry in an entitlement key payload. A key that grants
+ * other products but not this one is not a license for HyperFormula (the reader returns
+ * `product_missing`), however many other products it grants.
  */
 export const HYPERFORMULA_PRODUCT_NAME = 'hyperformula'
 
 /**
- * Flag spellings that suppress console output.
+ * Lifecycle states in which an entitlement key still lets this build evaluate formulas.
  *
- * Three, because the key spec is not self-consistent: its normative flags table and its example
- * payload (rev 6 §2.3 and §2) say `no-console-warns`, while the runtime-behaviour sections of the
- * same revision (§4.3, §5.2) say `silent-console`, and earlier revisions said plain `silent`. A key
- * minted against any of those readings must be honoured — a SaaS deployment that asked for silence
- * and got console warnings is the failure this list exists to prevent.
+ * The soft-stop states are here on purpose: HF-307 decision D5-A builds the notice and the hard
+ * stop for 3.5.0, not the soft-stop message, so the grace period behaves as it did before the
+ * reader was adopted — valid and quiet.
  */
-const SILENT_CONSOLE_FLAGS = ['silent', 'silent-console', 'no-console-warns']
+const VALID_STATES: LicenseState[] = [
+  'usage_valid', 'usage_notice', 'usage_soft_stop',
+  'trial_valid', 'trial_notice', 'trial_soft_stop',
+  'release_valid',
+]
+
+/** Lifecycle states in which a key that is still valid prints its expiry notice. */
+const NOTICE_STATES: LicenseState[] = ['usage_notice', 'trial_notice']
 
 /**
  * Both halves of the license decision, resolved from one reading of the key.
@@ -52,231 +57,70 @@ export interface ResolvedLicense {
 }
 
 /**
- * What HyperFormula needs from an entitlement key, read from its own product entry.
+ * The expiry details an entitlement records, read off HyperFormula's own entry.
  *
- * The entry's shape is guaranteed by the vendored reader ({@link extractEntitlementKeyData}
- * returns `null` for anything malformed), so unlike the typed-key adapter this replaces, nothing
- * here re-checks field types or reconciles competing payload shapes: the entitlement format is
- * the only shape there is, and a key granting HyperFormula nothing is simply a key with no
- * `hyperformula` entry.
+ * A `release_until` date has no grace period: it is compared with the build date, which never
+ * moves, so there is no window to be inside of.
+ *
+ * @param {ProductEntitlement} entry - HyperFormula's entry of an intact key
  */
-interface LicenseTerms {
-  capabilityTokens: string[],
-  expiry: LicenseExpiry,
-  /** Epoch milliseconds of the last licensed day, or `null` when the key never expires. */
-  expiryTimestamp: number | null,
-  /** `true` compares against the build release date, `false` against the clock. */
-  comparedAgainstReleaseDate: boolean,
-  graceDays: number,
-  isTrial: boolean,
-  silent: boolean,
-}
-
-/**
- * The build's release date as epoch milliseconds (UTC midnight), or `null` when it is unknown or
- * malformed.
- *
- * Read from the same `HT_RELEASE_DATE` (`DD/MM/YYYY`) the legacy validator uses, but **parsed
- * differently on purpose**, and the difference is observable — so do not "simplify" either one to
- * match the other without reading this.
- *
- * This function uses `Date.UTC`. The legacy validator builds the same value with
- * `new Date(month/day/year)`, which is parsed in the host's LOCAL zone. East of UTC the two land on
- * different day numbers for one and the same release date:
- *
- * ```text
- * HT_RELEASE_DATE=10/08/2026        legacy (local)   this function (UTC)
- *   TZ=UTC, TZ=America/Los_Angeles      20675              20675     agree
- *   TZ=Asia/Tokyo                       20674              20675     differ by a day
- *   TZ=Pacific/Kiritimati               20674              20675     differ by a day
- * ```
- *
- * UTC is the required reading for an entitlement key: key spec rev 6 §1.2 makes offline/online
- * parity a hard rule — the offline check and a future online check must return the same verdict
- * for the same key at the same instant — and any rule reading a local clock breaks it. The legacy
- * path keeps its local parse because legacy behaviour is frozen for this release; switching it
- * would move the expiry verdict of already-issued legacy keys by a day for every customer east
- * of UTC.
- *
- * The consequence, flagged rather than hidden: two customers east of UTC, one on a legacy key and
- * one on an equivalent entitlement key, can disagree by a day about whether this build is covered.
- * Reconciling them is a product decision, not a refactor.
- */
-function releaseDateTimestamp(): number | null {
-  const [day, month, year] = (process.env.HT_RELEASE_DATE ?? '').split('/')
-  const timestamp = Date.UTC(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10))
-
-  return isNaN(timestamp) ? null : timestamp
-}
-
-/**
- * Reads HyperFormula's terms out of an intact entitlement key payload.
- *
- * Total on purpose: the vendored reader has already rejected every malformed shape, so every
- * field read here is exactly what {@link ProductEntitlement} promises. A payload without a
- * `hyperformula` entry — including `products: {}` — is a VALID key that grants this library
- * nothing and never expires for it; per HF-307 decision D6-A that cliff is silent. Note this
- * differs from the typed-key format this replaces, where a key licensed to another product
- * carried the expiry HyperFormula was checked against: an entitlement key's product entries each
- * carry their own terms, so another product's dates are not ours to read.
- *
- * @param {EntitlementKeyData} data - the extracted key data
- */
-function licenseTermsOf(data: EntitlementKeyData): LicenseTerms {
-  const grant: ProductEntitlement | undefined = data.products[HYPERFORMULA_PRODUCT_NAME]
-
-  // Nothing is granted implicitly: a key's functions are exactly what its own tokens name. A key
-  // whose tokens this build does not recognize therefore still evaluates the infix operators (they
-  // are not function calls) and the protected built-ins, and returns #LIC! for every function call,
-  // silently, per HF-307 decision D3. That cliff is ratified as-is (D6-A): "this situation should
-  // never happen. There is no point in issuing a key if empty capabilities."
-  const capabilityTokens: string[] = []
-
-  if (grant !== undefined) {
-    // Appended one by one rather than with `push(...grant.capabilities)`. The array comes from an
-    // attacker-influenced payload and the format sets no size limit (the spec addendum lists
-    // "payload size" as an open question on its own page), and spreading an array into a call puts
-    // one argument per stack slot: measured, a checksum-valid key carrying 125 000 tokens threw
-    // `RangeError: Maximum call stack size exceeded` out of `HyperFormula.buildFromArray` instead
-    // of resolving to a verdict. A malformed or hostile key must produce INVALID, never a throw.
-    grant.capabilities.forEach((token) => capabilityTokens.push(token))
-  }
-
-  // Exactly one of the two date fields is present on an intact entry (the reader enforces it),
-  // and the date used and the axis it is compared against come from that same field. The date is
-  // carried as the payload's own `YYYY-MM-DD` string, never routed through `Date` formatting -
-  // the key spec's fixture J11 exists because `toISOString()` shortens every licence issued east
-  // of UTC by a day.
-  const expiryDate = grant === undefined ? undefined : (grant.usage_until ?? grant.release_until)
-  const comparedAgainstReleaseDate = grant !== undefined && grant.release_until !== undefined
-  const expiryTimestamp = expiryDate === undefined ? null : parseIsoDateToTimestamp(expiryDate)
-  const flags = grant === undefined ? [] : grant.flags
-  // A release-date comparison has no grace period: it is static, so there is no window to be
-  // inside of.
-  const graceDays = comparedAgainstReleaseDate || grant === undefined ? 0 : grant.grace
+function expiryOf(entry: ProductEntitlement): LicenseExpiry {
+  const comparedAgainstReleaseDate = entry.release_until !== undefined
 
   return {
-    capabilityTokens,
-    expiry: expiryDate === undefined || expiryTimestamp === null
-      ? {kind: 'none', date: null, noticeDays: 0, graceDays: 0}
-      : {
-        kind: comparedAgainstReleaseDate ? 'release' : 'usage',
-        date: expiryDate,
-        // Read off HyperFormula's OWN entry, which is what makes the shape gate structural here:
-        // the tagged format took its terms from the LICENSED product's entry, so a `notice` field
-        // another product added for its own purposes could switch HyperFormula's console output
-        // on (fixed under gate in the previous PR). An entitlement key carries per-entry terms, so
-        // another product's `notice` is not reachable from here at all.
-        noticeDays: grant === undefined ? 0 : grant.notice,
-        graceDays,
-      },
-    expiryTimestamp,
-    comparedAgainstReleaseDate,
-    graceDays,
-    isTrial: flags.indexOf('trial') !== -1,
-    // Every spelling the key spec uses for "suppress console output" - see SILENT_CONSOLE_FLAGS.
-    // The key's flags are the ONLY source of silence: an earlier revision also silenced any key
-    // carrying an unrecognized token, which suppressed strictly more than D3 asks for (it would
-    // have swallowed expiry notices too). That was confirmed an implementation error.
-    silent: flags.some((flag) => SILENT_CONSOLE_FLAGS.indexOf(flag) !== -1),
+    kind: comparedAgainstReleaseDate ? 'release' : 'usage',
+    date: (comparedAgainstReleaseDate ? entry.release_until : entry.usage_until) as string,
+    noticeDays: entry.notice,
+    graceDays: comparedAgainstReleaseDate ? 0 : entry.grace,
   }
 }
 
 /**
- * Whether an intact entitlement key is still valid, and if not, the day it stopped being valid.
+ * The first day an expired key no longer covers, which is the convention the legacy validator
+ * already uses for the same message (it reports `keyValidityDays + 1`).
  *
- * A key with no expiry never expires. Otherwise the expiration date is INCLUSIVE of its last
- * valid day, and a grace period extends it further. A date compared against the build's release
- * date involves no clock at all, which is what keeps an air-gapped install with a wrong system
- * clock working.
- *
- * An unknown release date resolves to "not expired", matching what the legacy validator already
- * does when `HT_RELEASE_DATE` is missing: a build that cannot tell its own age must not start
- * rejecting keys that customers paid for.
- *
- * @param {LicenseTerms} terms - the terms of the key
+ * @param {LicenseExpiry} expiry - the expiry of the key
  */
-function validityOf(terms: LicenseTerms): {state: LicenseKeyValidityState, expiredOn?: Date} {
-  if (terms.expiryTimestamp === null) {
-    return {state: LicenseKeyValidityState.VALID}
-  }
+function firstUncoveredDay(expiry: LicenseExpiry): Date {
+  const lastLicensedDay = parseIsoDateToTimestamp(expiry.date) as number
 
-  const now = terms.comparedAgainstReleaseDate ? releaseDateTimestamp() : Date.now()
-
-  if (now === null) {
-    return {state: LicenseKeyValidityState.VALID}
-  }
-
-  const deadline = terms.expiryTimestamp + MILLISECONDS_PER_DAY + (terms.graceDays * MILLISECONDS_PER_DAY)
-
-  return now < deadline
-    ? {state: LicenseKeyValidityState.VALID}
-    // The reported day is the first day NOT covered, which is the convention the legacy validator
-    // already uses for the same message (it reports `keyValidityDays + 1`).
-    : {state: LicenseKeyValidityState.EXPIRED, expiredOn: new Date(deadline)}
+  return new Date(lastLicensedDay + MILLISECONDS_PER_DAY + (expiry.graceDays * MILLISECONDS_PER_DAY))
 }
 
 /**
- * The day a VALID key's usage-until expiry falls on, if the current UTC instant is within its
- * notice window — `null` otherwise, which covers "no notice window configured" (`noticeDays` is
- * `0`, which is also what a key with no HyperFormula entry resolves to) just as much as "not close
- * enough yet" or "already past its usage-until day".
- *
- * Deliberately blind to `graceDays`: notice is about the usage_until axis itself, not about the
- * grace extension past it. Key spec rev 6 §4.1 sequences notice, then a soft-stop window, then the
- * hard-stop this build already enforces; only the hard stop and this notice are built for 3.5.0
- * (decision D5-A), so the window checked here ends exactly where the soft-stop phase would
- * begin, rather than reaching into grace and printing a notice for a key already past its expiry.
- *
- * `release_until`-axis keys never reach here with a non-`null` result — `kind` is `'usage'` only
- * when the date came from `usage_until` (see {@link licenseTermsOf}) — matching the spec's rule
- * that notice and grace have no effect on that axis. The converse holds too now: the tagged
- * format let an entry with no date of its own fall through to the key envelope's `exp`, so
- * `'usage'` did not imply `usage_until`; an entitlement key has no envelope date to fall back to.
- *
- * @param {LicenseTerms} terms - the terms of the key
- */
-function expiryWithinNoticeWindow(terms: LicenseTerms): Date | null {
-  if (terms.expiry.kind !== 'usage' || terms.expiry.noticeDays <= 0 || terms.expiryTimestamp === null) {
-    return null
-  }
-
-  // The window ends at the first instant no longer on the usage_until day — the same boundary
-  // `validityOf` uses before adding its grace term — and opens `notice` days before the licensed
-  // day ITSELF, not before that end. Counting back from the end would shorten the window by a day:
-  // the date-semantics fixtures pin 2027-06-13T00:00:00Z for usage_until 2027-08-12 with notice 60,
-  // and a trial whose notice equals its whole term must warn from the day it is issued.
-  const usageAxisDeadline = terms.expiryTimestamp + MILLISECONDS_PER_DAY
-  const noticeWindowStart = terms.expiryTimestamp - (terms.expiry.noticeDays * MILLISECONDS_PER_DAY)
-  const now = Date.now()
-
-  return now >= noticeWindowStart && now < usageAxisDeadline ? new Date(terms.expiryTimestamp) : null
-}
-
-/**
- * Turns the terms of an intact, unexpired entitlement key into the entitlement it grants.
+ * Turns HyperFormula's entry of a valid entitlement key into the entitlement it grants.
  *
  * Per HF-307 decision D3 this is fail-closed and silent: a token this version does not recognize
  * is recorded in `unrecognizedCapabilities` and grants nothing, without a warning, a message, or
  * anything public to read it back from. "Silent" there means the *grant* is silent — whether the
- * key's console messages are suppressed is decided solely by its `flags` (`terms.silent`), never
+ * key's console messages are suppressed is decided solely by its `no-console-warns` flag, never
  * by the presence of an unrecognized token; coupling the two suppressed expiry notices as a side
  * effect of a vocabulary mismatch, and was confirmed an implementation error.
  *
- * @param {LicenseTerms} terms - the terms of the key
+ * @param {ProductEntitlement} entry - HyperFormula's entry of a valid key
+ * @param {boolean} isTrial - whether the key carries the `trial` flag
+ * @param {boolean} silent - whether the key closes the console channel
  */
-function entitlementOf(terms: LicenseTerms): LicenseEntitlement {
-  const unrecognizedCapabilities = terms.capabilityTokens.filter(
+function entitlementOf(entry: ProductEntitlement, isTrial: boolean, silent: boolean): LicenseEntitlement {
+  // Appended one by one rather than with `push(...entry.capabilities)`. The array comes from an
+  // attacker-influenced payload and the format sets no size limit, and spreading an array into a
+  // call puts one argument per stack slot: measured, a checksum-valid key carrying 125 000 tokens
+  // threw `RangeError: Maximum call stack size exceeded` out of `HyperFormula.buildFromArray`
+  // instead of resolving to a verdict.
+  const capabilityTokens: string[] = []
+  entry.capabilities.forEach((token) => capabilityTokens.push(token))
+
+  const unrecognizedCapabilities = capabilityTokens.filter(
     (token) => !CAPABILITY_TABLE.has(normalizeCapabilityToken(token)),
   )
 
   return {
     unrestricted: false,
-    capabilities: new Set(terms.capabilityTokens),
+    capabilities: new Set(capabilityTokens),
     unrecognizedCapabilities,
-    expiry: terms.expiry,
-    silent: terms.silent,
-    isTrial: terms.isTrial,
+    expiry: expiryOf(entry),
+    silent,
+    isTrial,
   }
 }
 
@@ -290,6 +134,11 @@ function entitlementOf(terms: LicenseTerms): LicenseEntitlement {
  * completely unchanged, which is what keeps this from touching existing behaviour. A string that
  * carries a bracketed block routes here even when the block is garbage: such a key is INVALID,
  * not a legacy key that happens to contain brackets.
+ *
+ * An entitlement key is read by the vendored {@link readEntitlementLicense}, the single entry
+ * point upstream prescribes for products: it verifies the block, picks HyperFormula's entry,
+ * places it in its lifecycle window and reads its flags. Only the meaning of the capability
+ * tokens and the console messages live here.
  *
  * **The invariant this function exists to protect.** Only a VALID entitlement key resolves to a
  * restricted entitlement. Every other outcome — missing, invalid, or expired, for an entitlement
@@ -321,9 +170,17 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
     }
   }
 
-  const data = extractEntitlementKeyData(licenseKey)
+  // Read exactly as the bundler inlines it - see the reader's README, rule 4. A missing or
+  // malformed `HT_RELEASE_DATE` becomes '', which the reader treats as "build date unknown" and
+  // fails open on, as the legacy validator does.
+  const license = readEntitlementLicense(licenseKey, {
+    product: HYPERFORMULA_PRODUCT_NAME,
+    buildDate: toIsoBuildDate(process.env.HT_RELEASE_DATE),
+  })
 
-  if (data === null) {
+  if (!license.licensed) {
+    // `unreadable` (a broken block) and `product_missing` (a key for other products only) are
+    // both reported as an invalid key, and neither restricts anything.
     if (notifyConsole) {
       notifyLicenseKeyState(LicenseKeyValidityState.INVALID)
     }
@@ -331,23 +188,21 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
     return {validityState: LicenseKeyValidityState.INVALID, entitlement: unrestrictedEntitlement()}
   }
 
-  const terms = licenseTermsOf(data)
-  const {state, expiredOn} = validityOf(terms)
+  const {entitlement: entry, lifecycle, channels} = license
+  const expiry = expiryOf(entry)
+  const isValid = VALID_STATES.indexOf(lifecycle.state) !== -1
+  const state = isValid ? LicenseKeyValidityState.VALID : LicenseKeyValidityState.EXPIRED
 
-  if (notifyConsole && !terms.silent) {
-    notifyLicenseKeyState(state, expiredOn, terms.comparedAgainstReleaseDate ? 'release' : 'usage')
+  if (notifyConsole && channels.console) {
+    notifyLicenseKeyState(state, isValid ? undefined : firstUncoveredDay(expiry), expiry.kind === 'release' ? 'release' : 'usage')
 
-    if (state === LicenseKeyValidityState.VALID) {
-      const noticeExpiryDate = expiryWithinNoticeWindow(terms)
-
-      if (noticeExpiryDate !== null) {
-        notifyLicenseKeyNotice(licenseKey, noticeExpiryDate)
-      }
+    if (NOTICE_STATES.indexOf(lifecycle.state) !== -1) {
+      notifyLicenseKeyNotice(licenseKey, new Date(parseIsoDateToTimestamp(expiry.date) as number))
     }
   }
 
   return {
     validityState: state,
-    entitlement: state === LicenseKeyValidityState.VALID ? entitlementOf(terms) : unrestrictedEntitlement(),
+    entitlement: isValid ? entitlementOf(entry, lifecycle.isTrial, !channels.console) : unrestrictedEntitlement(),
   }
 }
