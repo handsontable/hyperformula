@@ -115,9 +115,9 @@ const ENTITLEMENT_CONSOLE_NOTIFICATIONS: Partial<Record<LicenseState, Entitlemen
 }
 
 /**
- * Identities (see {@link keyIdentityOf}) of entitlement keys that have already printed their
- * message. Per key, as the specification asks ("each distinct message once per key per page") and
- * as Handsontable does: two keys on one page are two licenses. Kept apart from {@link _notified},
+ * Entitlement messages already printed, each as a key identity (see {@link keyIdentityOf}) plus
+ * the message text: "each distinct message once per key per page", as the specification asks. Two
+ * keys on one page are two licenses, and one key moving into a new state is a new message. Kept apart from {@link _notified},
  * which serves classic 25-character keys and stays a single flag, unchanged.
  */
 const _notifiedEntitlementKeys = new Set<string>()
@@ -166,12 +166,6 @@ export function notifyLicenseKeyState(state: LicenseKeyValidityState, keyValidit
  * @param {EntitlementMessageParams} params - the key's own date and days remaining
  */
 export function notifyEntitlementKey(licenseKey: string, state: LicenseState | 'invalid', params: EntitlementMessageParams): void {
-  const identity = keyIdentityOf(licenseKey)
-
-  if (_notifiedEntitlementKeys.has(identity)) {
-    return
-  }
-
   const notification: EntitlementConsoleNotification | undefined = state === 'invalid'
     ? {severity: 'warn', message: () => consoleMessages.invalid({})}
     : ENTITLEMENT_CONSOLE_NOTIFICATIONS[state]
@@ -180,10 +174,20 @@ export function notifyEntitlementKey(licenseKey: string, state: LicenseState | '
     return
   }
 
+  // Keyed by the key AND the text, not the key alone: on a page that stays open while a key moves
+  // from its notice window into expiry, the expiry message is a different message and must still
+  // print. A soft stop and a hard stop share one text, so the hard stop does not repeat it.
+  const text = notification.message(params)
+  const identity = `${keyIdentityOf(licenseKey)}\n${text}`
+
+  if (_notifiedEntitlementKeys.has(identity)) {
+    return
+  }
+
   if (notification.severity === 'error') {
-    console.error(notification.message(params))
+    console.error(text)
   } else {
-    console.warn(notification.message(params))
+    console.warn(text)
   }
   _notifiedEntitlementKeys.add(identity)
 }
