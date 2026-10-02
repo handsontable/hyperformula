@@ -225,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'AMMORT.ANNUO',
     T: 'T',
+    TAKE: 'INCLUDI',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'BOT.EQUIV',
