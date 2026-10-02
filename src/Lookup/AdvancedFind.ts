@@ -12,7 +12,7 @@ import {
   RawNoErrorScalarValue
 } from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {AdvancedFindOptions, SearchOptions} from './SearchStrategy'
+import {AdvancedFindOptions, ApproximateMatchPolicy, SearchOptions} from './SearchStrategy'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {compare, findLastOccurrenceInOrderedRange} from '../interpreter/binarySearch'
 
@@ -42,7 +42,7 @@ export abstract class AdvancedFind {
     return NOT_FOUND
   }
 
-  protected basicFind(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchCoordinate: 'col' | 'row', { ordering, ifNoMatch, approximateMatchPolicy, returnOccurrence }: SearchOptions): number {
+  protected basicFind(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchCoordinate: 'col' | 'row', { ordering, ifNoMatch, approximateMatchPolicy = 'sameType', returnOccurrence }: SearchOptions): number {
     const normalizedSearchKey = typeof searchKey === 'string' ? forceNormalizeString(searchKey) : searchKey
     const range = rangeValue.range
 
@@ -73,7 +73,7 @@ export abstract class AdvancedFind {
    * @param {RawNoErrorScalarValue} searchKey - Normalized lookup value.
    * @param {InternalScalarValue[]} searchArray - Values to search from the top-left corner of the lookup array.
    * @param {('returnLowerBound'|'returnUpperBound'|'returnNotFound')} ifNoMatch - Whether an absent exact value requests a lower bound, upper bound, or no result.
-   * @param {SearchOptions['approximateMatchPolicy']} approximateMatchPolicy - Cross-type candidate policy for approximate bounds.
+   * @param {ApproximateMatchPolicy} approximateMatchPolicy - Cross-type candidate policy for approximate bounds.
    * @param {('first'|'last')} returnOccurrence - Which exact duplicate to return and the direction used to scan candidates.
    * @returns {number} The zero-based index into `searchArray`, or `NOT_FOUND` (-1) when nothing matches.
    *
@@ -87,7 +87,7 @@ export abstract class AdvancedFind {
    *
    * @internal
    */
-  protected findNormalizedValue(searchKey: RawNoErrorScalarValue, searchArray: InternalScalarValue[], ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound', approximateMatchPolicy: SearchOptions['approximateMatchPolicy'], returnOccurrence: 'first' | 'last' = 'first'): number {
+  protected findNormalizedValue(searchKey: RawNoErrorScalarValue, searchArray: InternalScalarValue[], ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound', approximateMatchPolicy: ApproximateMatchPolicy, returnOccurrence: 'first' | 'last' = 'first'): number {
     const normalizedArray = searchArray
       .map(getRawValue)
       .map(val => typeof val === 'string' ? forceNormalizeString(val) : val)

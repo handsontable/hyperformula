@@ -24,8 +24,10 @@ import {ColumnIndex} from './ColumnIndex'
  *   `MATCH`, `VLOOKUP`, and `HLOOKUP` use this policy.
  * - `'totalOrder'` accepts cross-type candidates and orders them with the lookup comparator.
  *   `XLOOKUP` uses this policy to match Microsoft Excel.
- * - Exact matches are unaffected. The policy is required so every search strategy receives an
- *   explicit choice and linear, indexed, and binary paths cannot silently diverge.
+ * - Exact matches are unaffected. Every search strategy resolves the policy in one place
+ *   (`AdvancedFind.basicFind`), so linear, indexed, and binary paths cannot diverge.
+ *
+ * When `SearchOptions.approximateMatchPolicy` is omitted, `'sameType'` is used.
  *
  * @internal
  */
@@ -36,14 +38,14 @@ export type ApproximateMatchPolicy = 'sameType' | 'totalOrder'
  *
  * @property {('asc'|'desc'|'none')} ordering - Ordering assumed by the selected search algorithm.
  * @property {('returnLowerBound'|'returnUpperBound'|'returnNotFound')} ifNoMatch - Result requested when an exact value is absent.
- * @property {ApproximateMatchPolicy} approximateMatchPolicy - Cross-type candidate policy for approximate bounds; exact matches ignore it.
+ * @property {ApproximateMatchPolicy} [approximateMatchPolicy='sameType'] - Cross-type candidate policy for approximate bounds; exact matches ignore it.
  * @property {('first'|'last')} [returnOccurrence] - Which exact duplicate to return.
  * @internal
  */
 export interface SearchOptions {
   ordering: 'asc' | 'desc' | 'none',
   ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound',
-  approximateMatchPolicy: ApproximateMatchPolicy,
+  approximateMatchPolicy?: ApproximateMatchPolicy,
   returnOccurrence?: 'first' | 'last',
 }
 
