@@ -63,6 +63,7 @@ export class DependencyGraph {
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
     public readonly functionRegistry: FunctionRegistry,
     public readonly namedExpressions: NamedExpressions,
+    private readonly config: Config,
   ) {
     this.graph = new Graph<Vertex>(this.dependencyQueryVertices)
     this.sheetReferenceRegistrar = new SheetReferenceRegistrar(sheetMapping, addressMapping)
@@ -82,7 +83,8 @@ export class DependencyGraph {
       stats,
       lazilyTransformingAstService,
       functionRegistry,
-      namedExpressions
+      namedExpressions,
+      config
     )
   }
 
@@ -468,7 +470,7 @@ export class DependencyGraph {
 
   public isThereSpaceForArray(arrayVertex: ArrayFormulaVertex): boolean {
     const range = arrayVertex.getRangeOrUndef()
-    if (range === undefined) {
+    if (range === undefined || range.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
       return false
     }
     for (const address of range.addresses(this)) {
