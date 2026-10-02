@@ -6,19 +6,14 @@
 import {
   checkLicenseKeyValidity,
   LicenseKeyValidityState,
-  notifyLicenseKeyNotice,
-  notifyLicenseKeyState,
+  notifyEntitlementKey,
 } from '../helpers/licenseKeyValidator'
 import {CAPABILITY_TABLE, normalizeCapabilityToken} from './capabilities'
 import {LicenseEntitlement, LicenseExpiry, unrestrictedEntitlement} from './LicenseEntitlement'
 import {detectLicenseKeyFormat} from './handsontable-license-key-parser/detectFormat'
 import {readEntitlementLicense} from './handsontable-license-key-parser/readLicense'
 import {toIsoBuildDate} from './handsontable-license-key-parser/buildDate'
-import {parseIsoDateToTimestamp} from './handsontable-license-key-parser/encoding'
 import {LicenseState, ProductEntitlement} from './handsontable-license-key-parser/types'
-
-/** Milliseconds in a day, used to turn a grace period in days into a deadline. */
-const MILLISECONDS_PER_DAY = 86400000
 
 /**
  * The name of HyperFormula's own product entry in an entitlement key payload. A key that grants
@@ -30,9 +25,9 @@ export const HYPERFORMULA_PRODUCT_NAME = 'hyperformula'
 /**
  * Lifecycle states in which an entitlement key still lets this build evaluate formulas.
  *
- * The soft-stop states are here on purpose: the grace period stays valid and quiet. HF-307
- * decision D5-A deferred the rev 5 §4.1 windows; the notice was built anyway, the soft-stop
- * message was not. What happens after the grace period is {@link EXPIRED_WITHOUT_BLOCKING_STATES}.
+ * The soft-stop states are here on purpose: the grace period keeps evaluating and prints the
+ * specification's error (see `notifyEntitlementKey`). What happens after the grace period is
+ * {@link EXPIRED_WITHOUT_BLOCKING_STATES}.
  */
 const VALID_STATES: LicenseState[] = [
   'usage_valid', 'usage_notice', 'usage_soft_stop',
@@ -50,9 +45,6 @@ const VALID_STATES: LicenseState[] = [
  * granted more than the same key was granted while it was current.
  */
 const EXPIRED_WITHOUT_BLOCKING_STATES: LicenseState[] = ['usage_hard_stop', 'release_expired']
-
-/** Lifecycle states in which a key that is still valid prints its expiry notice. */
-const NOTICE_STATES: LicenseState[] = ['usage_notice', 'trial_notice']
 
 /**
  * Both halves of the license decision, resolved from one reading of the key.
@@ -90,18 +82,6 @@ function expiryOf(entry: ProductEntitlement): LicenseExpiry {
     noticeDays: entry.notice,
     graceDays: comparedAgainstReleaseDate ? 0 : entry.grace,
   }
-}
-
-/**
- * The first day an expired key no longer covers, which is the convention the legacy validator
- * already uses for the same message (it reports `keyValidityDays + 1`).
- *
- * @param {LicenseExpiry} expiry - the expiry of the key
- */
-function firstUncoveredDay(expiry: LicenseExpiry): Date {
-  const lastLicensedDay = parseIsoDateToTimestamp(expiry.date) as number
-
-  return new Date(lastLicensedDay + MILLISECONDS_PER_DAY + (expiry.graceDays * MILLISECONDS_PER_DAY))
 }
 
 /**
@@ -202,25 +182,21 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
     // `unreadable` (a broken block) and `product_missing` (a key for other products only) are
     // both reported as an invalid key, and neither restricts anything.
     if (notifyConsole) {
-      notifyLicenseKeyState(LicenseKeyValidityState.INVALID)
+      notifyEntitlementKey(licenseKey, 'invalid', {licensedUntil: null, daysRemaining: null})
     }
 
     return {validityState: LicenseKeyValidityState.INVALID, blocksEvaluation: true, entitlement: unrestrictedEntitlement()}
   }
 
   const {entitlement: entry, lifecycle, channels} = license
-  const expiry = expiryOf(entry)
   const expiredWithoutBlocking = EXPIRED_WITHOUT_BLOCKING_STATES.indexOf(lifecycle.state) !== -1
   const isValid = VALID_STATES.indexOf(lifecycle.state) !== -1
   const state = isValid ? LicenseKeyValidityState.VALID : LicenseKeyValidityState.EXPIRED
-  const axis = expiry.kind === 'release' ? 'release' : 'usage'
 
+  // The message is chosen by the reader's state and prints the key's own date (rev 5/6 §4.1, the
+  // same table Handsontable uses). The `no-console-warns` flag closes the channel.
   if (notifyConsole && channels.console) {
-    notifyLicenseKeyState(state, isValid ? undefined : firstUncoveredDay(expiry), axis, expiredWithoutBlocking)
-
-    if (NOTICE_STATES.indexOf(lifecycle.state) !== -1) {
-      notifyLicenseKeyNotice(licenseKey, new Date(parseIsoDateToTimestamp(expiry.date) as number))
-    }
+    notifyEntitlementKey(licenseKey, lifecycle.state, {licensedUntil: lifecycle.licensedUntil, daysRemaining: lifecycle.daysRemaining})
   }
 
   return {

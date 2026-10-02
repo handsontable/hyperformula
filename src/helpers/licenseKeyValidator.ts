@@ -4,6 +4,7 @@
  */
 
 import {CHECKSUM_LENGTH} from '../license/handsontable-license-key-parser/constants'
+import {LicenseState} from '../license/handsontable-license-key-parser/types'
 import {checkKeySchema, extractTime} from './licenseKeyHelper'
 
 /**
@@ -17,12 +18,6 @@ export const enum LicenseKeyValidityState {
 }
 
 type LicenseKeyInvalidState = Exclude<LicenseKeyValidityState, LicenseKeyValidityState.VALID>
-
-/**
- * Which deadline a key ran out against: the date of the build in use (`release`) or the wall
- * clock (`usage`).
- */
-export type LicenseExpiryAxis = 'release' | 'usage'
 
 interface TemplateVars {
   [key: string]: string,
@@ -42,133 +37,168 @@ type MessageDescriptor = {
  */
 const consoleMessages: ConsoleMessages = {
   invalid: () => 'The license key for HyperFormula is invalid.',
-  // Two wordings, because a key can run out along either of two axes and only one of them is
-  // about the build you installed. A maintenance key stops covering RELEASES after its date, so
-  // an older version keeps working and the fix is to install one; a usage-based key stops being
-  // valid at all, and telling its holder the key "is not valid for the installed version" sends
-  // them to downgrade, which changes nothing.
-  expired: ({keyValidityDate, axis}) => axis === 'usage'
-    ? `The license key for HyperFormula expired on ${keyValidityDate}.`
-    : `The license key for HyperFormula expired on ${keyValidityDate}, and is not valid for the installed version.`,
+  expired: ({keyValidityDate}) => 'The license key for HyperFormula expired' +
+    ` on ${keyValidityDate}, and is not valid for the installed version.`,
   missing: () => 'The license key for HyperFormula is missing.',
 }
 
 let _notified = false
 
 /**
- * Identities (see {@link noticeIdentityOf}) of license keys that have already printed their
- * expiry-approaching notice.
- *
- * Deliberately keyed per key rather than a single boolean like {@link _notified}
- * above: that flag reports one of a handful of states that mean the same thing regardless of
- * which key triggered them ("a key is invalid", "a key is missing"), so once-per-page-load is the
- * right behaviour for it. Two different keys approaching their OWN expiry are two different
- * events, and a page that swaps keys (or a test suite that builds one engine per key) must still
- * warn for the second one even though the first already consumed a shared flag.
+ * What an entitlement-key console message is built from: the date exactly as the key carries it
+ * (never rebuilt from a timestamp) and the whole UTC days left until it.
  */
-const _noticedKeys = new Set<string>()
+export interface EntitlementMessageParams {
+  licensedUntil: string | null,
+  daysRemaining: number | null,
+}
+
+/**
+ * One console notification for an entitlement-key lifecycle state: its severity and its text. Kept
+ * as one record so a state cannot get a text without a severity. A warning while the license still
+ * works, an error once it has run out.
+ */
+interface EntitlementConsoleNotification {
+  severity: 'warn' | 'error',
+  message: (params: EntitlementMessageParams) => string,
+}
+
+const PURCHASE_LICENSE_TEXT = 'To continue using HyperFormula, you need to purchase a license.'
+
+/**
+ * A `usage_until` date is compared against the clock in UTC, so it is printed with the marker; a
+ * `release_until` date involves no clock and carries none.
+ */
+function utcDay(isoDate: string | null): string {
+  return `${isoDate} (UTC)`
+}
+
+function expiryClause(days: number | null): string {
+  return days === 0 ? 'expires today' : `expires in ${days} ${days === 1 ? 'day' : 'days'}`
+}
+
+function subscriptionExpiredMessage({licensedUntil}: EntitlementMessageParams): string {
+  return `Your HyperFormula subscription license expired on ${utcDay(licensedUntil)}. To continue using the software, contact sales@handsontable.com to purchase a valid license key.`
+}
+
+/**
+ * The console message for each entitlement-key lifecycle state that talks to the developer: the
+ * specification's text (rev 5/6 §4.1, §4.2, as the vendored reader's README carries it), the same
+ * table Handsontable prints (`handsontable/src/helpers/mixed.ts`, `entitlementConsoleNotifications`),
+ * so one key reads the same in both products. Silent states (inside the term, a build covered by its
+ * maintenance date) have no entry. A non-trial key past its grace keeps the soft-stop message: it
+ * never blocks a paying customer (decided on #1728, 2026-10-01).
+ */
+const ENTITLEMENT_CONSOLE_NOTIFICATIONS: Partial<Record<LicenseState, EntitlementConsoleNotification>> = {
+  trial_notice: {
+    severity: 'warn',
+    message: ({daysRemaining}) => `Your HyperFormula license key ${expiryClause(daysRemaining)}. ${PURCHASE_LICENSE_TEXT}`,
+  },
+  trial_soft_stop: {
+    severity: 'error',
+    message: ({licensedUntil}) => `Your HyperFormula trial license key expired on ${utcDay(licensedUntil)}. ${PURCHASE_LICENSE_TEXT}`,
+  },
+  trial_hard_stop: {
+    severity: 'error',
+    message: ({licensedUntil}) => `Your HyperFormula trial license key expired on ${utcDay(licensedUntil)}. You may no longer use HyperFormula under the trial license. To continue using the software, contact sales@handsontable.com to purchase a valid license.`,
+  },
+  usage_notice: {
+    severity: 'warn',
+    message: ({licensedUntil}) => `Your HyperFormula subscription license expires on ${utcDay(licensedUntil)}. To renew your license, contact sales@handsontable.com.`,
+  },
+  usage_soft_stop: {severity: 'error', message: subscriptionExpiredMessage},
+  usage_hard_stop: {severity: 'error', message: subscriptionExpiredMessage},
+  release_expired: {
+    severity: 'error',
+    message: ({licensedUntil}) => `The license key for HyperFormula expired on ${licensedUntil}, and is not valid for the installed version ${process.env.HT_VERSION as string}. Renew your license key or downgrade to a version released on or before ${licensedUntil}. If you need any help, contact us at sales@handsontable.com.`,
+  },
+}
+
+/**
+ * Identities (see {@link keyIdentityOf}) of entitlement keys that have already printed their
+ * message. Per key, as the specification asks ("each distinct message once per key per page") and
+ * as Handsontable does: two keys on one page are two licenses. Kept apart from {@link _notified},
+ * which serves classic 25-character keys and stays a single flag, unchanged.
+ */
+const _notifiedEntitlementKeys = new Set<string>()
 
 /**
  * Clears the once-per-page-load flag {@link notifyLicenseKeyState} keeps, and the per-key set
- * {@link notifyLicenseKeyNotice} keeps.
+ * {@link notifyEntitlementKey} keeps.
  *
  * Exists for tests only. Both are module-level and never otherwise reset, so without this the
- * whole console-message path is unobservable: the first spec to build any engine consumes the single
- * warning and every later assertion sees silence regardless of what the code does. Making the reset
- * explicit beats the alternatives — depending on spec-file order is flaky, and under Karma every
- * spec shares one browser context, so order tricks do not work there at all.
+ * whole console-message path is unobservable: the first spec to build any engine consumes the
+ * message and every later assertion sees silence regardless of what the code does. Under Karma
+ * every spec shares one browser context, so spec-order tricks do not work there at all.
  *
  * @internal
  */
 export function resetLicenseKeyNotificationForTests(): void {
   _notified = false
-  _noticedKeys.clear()
+  _notifiedEntitlementKeys.clear()
 }
 
 /**
- * Prints the console message for a non-valid license key state, at most once per page load.
- *
- * Extracted so the entitlement-key path in `src/license/licenseResolution.ts` reports the same states
- * with the same wording and the same once-only behaviour, without duplicating the message table
- * or getting a second `_notified` flag of its own — two flags would let a page print two
- * warnings for one key.
+ * Prints the console message for a classic 25-character key's non-valid state, at most once per
+ * page load. Unchanged from before HF-307.
  *
  * @param {LicenseKeyValidityState} state - the state to report; `VALID` prints nothing
- * @param {Date} [keyValidityDate] - the day the key stopped being valid, used by the `expired`
- * message
- * @param {LicenseExpiryAxis} [expiryAxis] - which axis the key ran out along. Defaults to
- * `release`, which is the only axis the classic 25-character format has, so its message is
- * unchanged.
- * @param {boolean} [asError] - print with `console.error` instead of `console.warn`. Used for an
- * expired entitlement key that no longer blocks evaluation, where the console line is the only
- * consequence left (decided on #1728, 2026-10-01).
+ * @param {Date} [keyValidityDate] - the day the key stopped being valid, used by the `expired` message
  */
-export function notifyLicenseKeyState(
-  state: LicenseKeyValidityState,
-  keyValidityDate?: Date,
-  expiryAxis: LicenseExpiryAxis = 'release',
-  asError: boolean = false,
-): void {
+export function notifyLicenseKeyState(state: LicenseKeyValidityState, keyValidityDate?: Date): void {
   if (_notified || state === LicenseKeyValidityState.VALID) {
     return
   }
 
-  const vars: TemplateVars = keyValidityDate === undefined
-    ? {}
-    : {keyValidityDate: formatDate(keyValidityDate), axis: expiryAxis}
+  const vars: TemplateVars = keyValidityDate === undefined ? {} : {keyValidityDate: formatDate(keyValidityDate)}
 
-  if (asError) {
-    console.error(consoleMessages[state](vars))
-  } else {
-    console.warn(consoleMessages[state](vars))
-  }
+  console.warn(consoleMessages[state](vars))
   _notified = true
 }
 
 /**
- * Prints a one-time notice that a VALID entitlement key's usage-until expiry is approaching, at
- * most once per distinct license key.
+ * Prints the console message for an entitlement key, at most once per distinct key per page.
+ * `'invalid'` (a broken block, or a key for other products only) reuses the classic invalid-key
+ * text, as Handsontable does: the specification leaves that message open (§4.5).
  *
- * Called from `src/license/licenseResolution.ts`'s `resolveLicense`, alongside
- * {@link notifyLicenseKeyState} — see that function's doc for why the two share this module
- * instead of each keeping a message table and a flag of their own.
- *
- * The wording is rev 5 §3.2's own subscription clause ("valid until {date} (UTC)"), naming the
- * key's LAST covered day. It deliberately does not say "expires on": the pre-existing expired
- * message reports the first day NOT covered (`validityOf`'s convention, +1 day), and two messages
- * for the same key must not name two different days for the same boundary. "Valid until Aug 25"
- * followed later by "expired on Aug 26" is consistent; "expires on Aug 25" followed by
- * "expired on Aug 26" is a support ticket.
- *
- * @param {string} licenseKey - the raw key string; only its identity is retained, see below
- * @param {Date} expiryDate - the last covered day of the key's usage-until axis, at UTC midnight
+ * @param {string} licenseKey - the raw key; only its identity is retained
+ * @param {LicenseState | 'invalid'} state - the reader's lifecycle state, or `'invalid'`
+ * @param {EntitlementMessageParams} params - the key's own date and days remaining
  */
-export function notifyLicenseKeyNotice(licenseKey: string, expiryDate: Date): void {
-  const identity = noticeIdentityOf(licenseKey)
+export function notifyEntitlementKey(licenseKey: string, state: LicenseState | 'invalid', params: EntitlementMessageParams): void {
+  const identity = keyIdentityOf(licenseKey)
 
-  if (_noticedKeys.has(identity)) {
+  if (_notifiedEntitlementKeys.has(identity)) {
     return
   }
 
-  console.warn(`The HyperFormula license key is valid until ${formatDate(expiryDate)} (UTC). To renew the license, contact sales@handsontable.com.`)
-  _noticedKeys.add(identity)
+  const notification: EntitlementConsoleNotification | undefined = state === 'invalid'
+    ? {severity: 'warn', message: () => consoleMessages.invalid({})}
+    : ENTITLEMENT_CONSOLE_NOTIFICATIONS[state]
+
+  if (notification === undefined) {
+    return
+  }
+
+  if (notification.severity === 'error') {
+    console.error(notification.message(params))
+  } else {
+    console.warn(notification.message(params))
+  }
+  _notifiedEntitlementKeys.add(identity)
 }
 
 /**
- * The warn-once identity of a key: its trailing 129 characters, after trimming — for an intact
- * entitlement key, the sha512 checksum plus the closing bracket that ends the machine-readable
- * block, unique per distinct key content.
+ * The identity of a key: its trailing 129 characters, after trimming — for an intact entitlement
+ * key, the sha512 checksum plus the closing bracket, unique per distinct key content.
  *
- * Trimmed because the reader ignores trailing whitespace (it looks for the block, not for the end
- * of the string), so `'KEY'` and `'KEY\n'` are one license and must be one identity here too.
- * Reading from the END rather than the start also makes the whole artifact and its bare `[...]`
- * block — which the format says are equally valid spellings of the same license — one identity.
- *
- * Truncated because the set retains its entries for the life of the process: a multi-tenant server
- * building one engine per customer-supplied key would otherwise accumulate every full key string
- * it has ever warned about; 129 characters per entry bounds that to the checksum alone.
+ * Trimmed because the reader ignores surrounding whitespace, so `'KEY'` and `'KEY\n'` are one
+ * license and must be one identity here too. Read from the END, so the whole artifact and its bare
+ * `[...]` block, which the format treats as the same license, are one identity. Truncated because
+ * the set lives as long as the page: a server building one engine per customer key would otherwise
+ * keep every full key string it has ever seen.
  */
-function noticeIdentityOf(licenseKey: string): string {
+function keyIdentityOf(licenseKey: string): string {
   return licenseKey.trim().slice(-(CHECKSUM_LENGTH + 1))
 }
 

@@ -2,8 +2,9 @@
 
 This directory is a copy of `handsontable/license-key`'s **`vendor/entitlement-key-reader/`**,
 the TypeScript reader that repository publishes for products to copy. It is taken whole, from a
-tagged release, and not edited here: fix upstream, then re-take. A local fix makes two products
-disagree about the same key.
+tagged release, and edited here in one declared line only (below), which the HyperFormula owner
+accepted on 2026-10-01 ("Let's keep this solution for now", #1728). Anything else is fixed upstream
+and re-taken: a local fix makes two products disagree about the same key.
 
 | | |
 |---|---|
