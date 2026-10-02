@@ -1,0 +1,41 @@
+name: Vendored parser
+
+# The entitlement-key reader under src/license/handsontable-license-key-parser/ is a verbatim
+# copy of a private upstream directory. This job is the drift check that copy's integration guide
+# asks for: it fails when any byte differs from the pinned tag, when a file shadows the copy, or
+# when upstream has released a newer tag. See PROVENANCE.md in that directory.
+#
+# It needs LICENSE_KEY_REPO_TOKEN - a read-only token for handsontable/license-key - as a repository
+# secret. Without it the check fails on purpose ("could not verify" is not "verified"), so this job
+# stays red until the secret is set. Pull requests from forks never receive secrets and are skipped.
+
+on:
+  pull_request:
+    types: [ opened, reopened, synchronize ]
+    paths:
+      - 'src/license/handsontable-license-key-parser/**'
+      - 'script/check-license-key-parser-drift.js'
+      - '.github/workflows/vendored-parser.yml'
+  push:
+    branches: [ master, develop ]
+  schedule:
+    - cron: '17 6 * * 1-5' # weekday mornings: a newer upstream tag is news even when nothing here changed
+
+permissions:
+  contents: read
+
+jobs:
+  drift:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+      - name: Setup Node.js 22
+        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
+        with:
+          node-version: '22'
+      - name: Compare the vendored reader with upstream
+        run: node script/check-license-key-parser-drift.js
+        env:
+          LICENSE_KEY_REPO_TOKEN: ${{ secrets.LICENSE_KEY_REPO_TOKEN }}
