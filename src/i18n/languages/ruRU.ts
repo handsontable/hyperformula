@@ -103,6 +103,7 @@ const dictionary: RawTranslationPackage = {
     EOMONTH: 'КОНМЕСЯЦА',
     ERF: 'ФОШ',
     ERFC: 'ДФОШ',
+    'ERF.PRECISE': 'ERF.PRECISE',
     EVEN: 'ЧЁТН',
     EXACT: 'СОВПАД',
     EXP: 'EXP',

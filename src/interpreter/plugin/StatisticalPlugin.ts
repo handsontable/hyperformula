@@ -47,6 +47,12 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
         {argumentType: FunctionArgumentType.NUMBER}
       ]
     },
+    'ERF.PRECISE': {
+      method: 'erfprecise',
+      parameters: [
+        {argumentType: FunctionArgumentType.NUMBER}
+      ]
+    },
     'EXPON.DIST': {
       method: 'expondist',
       parameters: [
@@ -438,6 +444,10 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
 
   public erfc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ERFC'), erfc)
+  }
+
+  public erfprecise(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ERF.PRECISE'), erf)
   }
 
   public expondist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {

@@ -143,6 +143,13 @@ export const ENGINEERING_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=ERFC(1)', '=ERFC(0.5)'],
   },
+  'ERF.PRECISE': {
+    category: 'Engineering',
+    shortDescription: 'Returns values of the Gaussian error integral.',
+    parameters: [{name: 'x', description: 'The upper limit of the integral, calculated from 0 to x.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=ERF.PRECISE(1)', '=ERF.PRECISE(-0.5)'],
+  },
   HEX2BIN: {
     category: 'Engineering',
     shortDescription: 'The result is the binary number for the hexadecimal number entered.',
