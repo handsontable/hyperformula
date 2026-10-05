@@ -132,6 +132,15 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
         {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
+    'BINOM.DIST.RANGE': {
+      method: 'binomialdistrange',
+      parameters: [
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, minValue: 0},
+      ]
+    },
     'BINOM.INV': {
       method: 'binomialinv',
       parameters: [
@@ -537,6 +546,39 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
         } else {
           return binomial.pdf(succ, trials, prob)
         }
+      }
+    )
+  }
+
+  public binomialdistrange(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BINOM.DIST.RANGE'),
+      (trials: number, prob: number, succ: number, succUpper?: number) => {
+        trials = Math.trunc(trials)
+        succ = Math.trunc(succ)
+        succUpper = succUpper === undefined ? succ : Math.trunc(succUpper)
+        if (succ > succUpper || succUpper > trials) {
+          return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
+        }
+        let sum = 0
+        if (prob === 0 || prob === 1) {
+          for (let i = succ; i <= succUpper; i++) {
+            sum += binomial.pdf(i, trials, prob)
+          }
+          return sum
+        }
+        // work in log space: the factorial-based pdf loses precision for large numbers of trials
+        const m = Math.min(succ, trials - succ)
+        let logCombination = 0
+        for (let j = 1; j <= m; j++) {
+          logCombination += Math.log((trials - m + j) / j)
+        }
+        const logRatio = Math.log(prob) - Math.log1p(-prob)
+        let logPmf = logCombination + succ * Math.log(prob) + (trials - succ) * Math.log1p(-prob)
+        for (let i = succ; i <= succUpper; i++) {
+          sum += Math.exp(logPmf)
+          logPmf += Math.log((trials - i) / (i + 1)) + logRatio
+        }
+        return sum
       }
     )
   }

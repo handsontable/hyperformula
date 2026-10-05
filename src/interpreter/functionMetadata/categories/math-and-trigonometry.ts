@@ -129,6 +129,20 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=COMBINA(4, 3)', '=COMBINA(10, 2)'],
   },
+  PERMUT: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the number of permutations of a given number of items chosen from a set (without repetitions).',
+    parameters: [{name: 'number', description: 'The total number of items; truncated to an integer.'}, {name: 'number_chosen', description: 'The number of items in each permutation; truncated to an integer and must not exceed number.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=PERMUT(5, 2)', '=PERMUT(10, 3)'],
+  },
+  PERMUTATIONA: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the number of permutations of a given number of items chosen from a set (with repetitions).',
+    parameters: [{name: 'number', description: 'The total number of items; truncated to an integer.'}, {name: 'number_chosen', description: 'The number of items in each permutation, where an item may repeat; truncated to an integer.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=PERMUTATIONA(3, 2)', '=PERMUTATIONA(2, 10)'],
+  },
   COS: {
     category: 'Math and trigonometry',
     shortDescription: 'Returns the cosine of the given angle (in radians).',
