@@ -6,6 +6,7 @@ import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-s
 import starlightThemeRapide from 'starlight-theme-rapide';
 import starlightPageActions from 'starlight-page-actions';
 import { sidebar } from './src/sidebar.mjs';
+import { remarkDocsData } from './src/plugins/remark-docs-data.mjs';
 
 // BUILD_MODE is set by the deployment pipeline. Production-only third-party
 // scripts (analytics) are injected only when it equals 'production'.
@@ -114,6 +115,7 @@ export default defineConfig({
   ],
 
   markdown: {
+    remarkPlugins: [remarkDocsData],
     shikiConfig: {
       themes: {
         light: 'github-light',

@@ -1,31 +1,30 @@
 # Documentation deployment guidelines
 
-The HyperFormula documentation is built with Astro + Starlight and deployed via Netlify. Unlike Handsontable, HyperFormula serves a **single documentation version** -- there is no `prod-docs/<MAJOR.MINOR>` branch model.
+The HyperFormula documentation is built with Astro + Starlight and deployed to Cloudflare Workers. Unlike Handsontable, HyperFormula serves a **single documentation version** -- there is no `prod-docs/<MAJOR.MINOR>` branch model.
 
 ## Where it's deployed
 
-- **Production:** [https://hyperformula.handsontable.com/docs/](https://hyperformula.handsontable.com/docs/)
-- **PR deploy previews:** Netlify builds a per-PR preview and posts the URL as a check on the PR. The preview URL pattern is set by the Netlify project's deploy-context configuration.
+The documentation site is deployed as the `hyperformula-docs` Worker in the Handsontable Cloudflare account (`15111272c53ed0aaf84a908f0c9c7f8b`). Deployments are driven by [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/), the Git integration configured on the Cloudflare side -- the repository holds no deployment workflow, API token, or account secret.
+
+| Trigger | Command run by Workers Builds | Result |
+| --- | --- | --- |
+| push to `master` | `npx wrangler deploy` | production deployment |
+| push to any other branch, and every pull request | `npx wrangler versions upload` | preview deployment at `https://<branch>-hyperformula-docs.handsoncode.workers.dev`, posted as a pull request comment |
+
+Build settings in the Cloudflare dashboard, under **Workers & Pages > hyperformula-docs > Settings > Build**: build command `npm run docs:build:cf`, deploy command `npx wrangler deploy`, non-production branch deploy command `npx wrangler versions upload`, production branch `master`, non-production branch builds enabled.
+
+Production traffic reaches this Worker through the `hyperformula-website` Worker, which proxies `/docs*` to `https://hyperformula-docs.handsoncode.workers.dev` (the `DOCS_ORIGIN` constant in that project). The production URL is [https://hyperformula.handsontable.com/docs/](https://hyperformula.handsontable.com/docs/).
 
 ## How a deploy works
 
-The Netlify build is driven by [`netlify.toml`](../netlify.toml) at the **repository root** (not under `docs/`):
+Configuration in the repository:
 
-```toml
-[build]
-  command = "npm run docs:build"
-  publish = "docs/dist"
+- [`wrangler.jsonc`](../wrangler.jsonc) -- Worker name, asset directory (`cf-dist/`), and asset routing.
+- [`worker/index.js`](../worker/index.js) -- resolves directory and extensionless URLs and serves the 404 page.
+- [`docs/public/_headers`](./public/_headers) -- asset cache headers; `docs/public/_redirects` is generated (see Redirects below). Both are moved to the root of the asset directory by [`script/prepare-cf-assets.js`](../script/prepare-cf-assets.js).
+- [`.nvmrc`](../.nvmrc) -- Node.js version used by the build.
 
-[build.environment]
-  NODE_VERSION = "22"
-```
-
-On every push to a tracked branch, Netlify:
-
-1. Checks out the branch.
-2. Runs `npm install` at the repo root.
-3. Runs `npm run docs:build` from the repo root.
-4. Publishes the contents of `docs/dist/`.
+Astro writes the build to `docs/dist/` without the `/docs/` URL prefix in file paths, so `script/prepare-cf-assets.js` assembles the asset directory: `docs/dist/` is copied to `cf-dist/docs/`, mirroring the URL space, and `_headers`/`_redirects` move to the `cf-dist/` root where the Workers asset router reads them.
 
 ## The `docs:build` pipeline
 
@@ -34,21 +33,24 @@ The root `package.json` script chains the full pipeline:
 ```bash
 npm run docs:build
 # ↓ expands to:
-npm run bundle-all && npm run typedoc:build-api && cd docs && npm ci && npm run build
+npm run docs:generate-function-docs && npm run bundle-all && npm run typedoc:build-api && cd docs && npm ci && npm run build
 ```
 
 Step by step:
 
 | Step | What it does |
 |---|---|
+| `npm run docs:generate-function-docs` | Regenerates the gitignored built-in-functions guide page from HyperFormula's function metadata (see `docs/README.md`). |
 | `npm run bundle-all` | Compiles and bundles the HyperFormula library itself into `dist/` (UMD, ES, CommonJS). The docs reference the local build, so this must run first. |
 | `npm run typedoc:build-api` | Runs TypeDoc against the HyperFormula source to generate the API reference Markdown into `docs/api/`. |
 | `cd docs && npm ci` | Installs docs-only dependencies (Astro, Starlight, plugins). |
-| `npm run build` (inside `docs/`) | Runs `generate:content && astro build` -- the preprocessor copies / transforms content into `src/content/docs/`, then Astro builds the static site into `docs/dist/`. |
+| `npm run build` (inside `docs/`) | Runs `generate:content && astro build` -- normalizes the TypeDoc output into `src/content/docs/api/`, regenerates `public/_redirects` and the Markdown companions, then Astro builds the static site into `docs/dist/`. |
+
+`npm run docs:build:cf` (what Workers Builds runs) is `docs:build` plus the `cf-dist/` assembly described above.
 
 ## GitHub Actions (CI verification)
 
-[`.github/workflows/build-docs.yml`](../.github/workflows/build-docs.yml) runs **build verification** -- it does **not** deploy. Netlify handles deployment independently.
+[`.github/workflows/build-docs.yml`](../.github/workflows/build-docs.yml) runs **build verification** -- it does **not** deploy. Workers Builds handles deployment independently.
 
 The workflow triggers on:
 
@@ -62,11 +64,11 @@ npm ci
 npm run docs:build
 ```
 
-A failing build blocks the PR. Use this to catch broken links, missing examples, or bad markdown before Netlify gets the chance to publish.
+A failing build blocks the PR. Use this to catch broken links, missing examples, or bad markdown before a deploy publishes them.
 
 ## Redirects
 
-`docs/dist/_redirects` is auto-generated by [`scripts/generate-content.mjs`](./scripts/generate-content.mjs) on every build. It contains 301 redirects from the legacy VuePress `.html` URLs to the new clean Starlight URLs, so external bookmarks from the VuePress era continue to resolve:
+`docs/public/_redirects` is auto-generated by [`scripts/generate-content.mjs`](./scripts/generate-content.mjs) on every build. It contains the asset-root redirect (`/` → `/docs/`, which makes preview URLs usable without appending the path) and 301 redirects from the legacy VuePress `.html` URLs to the clean Starlight URLs, so external bookmarks from the VuePress era continue to resolve:
 
 ```text
 /docs/guide/basic-usage.html  /docs/guide/basic-usage  301
@@ -78,19 +80,24 @@ To add a custom redirect, edit `scripts/generate-content.mjs` (the redirect-gene
 
 ## Triggering a deploy manually
 
-There is no manual deploy command in this repo. To trigger a deploy:
+Regular deployments go through Workers Builds; deploying by hand is only needed for debugging. From the repo root:
 
-- **For an in-progress branch:** push commits; Netlify rebuilds the deploy preview.
-- **For production:** merge to `master`; Netlify rebuilds the production site.
-- **For a forced rebuild without code changes:** use Netlify's UI to clear cache and redeploy the latest commit, or push an empty commit (`git commit --allow-empty -m "chore: trigger docs rebuild"`).
+```bash
+npm run docs:build:cf     # build the documentation and assemble cf-dist/
+npx wrangler dev          # serve the built site locally at http://localhost:8787
+npm run docs:preview:cf   # upload a preview version (does not touch production)
+npm run docs:deploy:cf    # deploy to production
+```
+
+When changing the asset routing, verify it with browser navigation headers, not plain requests: `curl -H "Sec-Fetch-Mode: navigate" -H "Sec-Fetch-Dest: document"`. The asset router treats navigation requests differently from other requests, so a plain `curl` check can pass while browsers get a 404.
 
 ## Local production build (smoke-test before pushing)
 
-To reproduce what Netlify will run, from the repo root:
+To reproduce what Workers Builds will run, from the repo root:
 
 ```bash
-npm run docs:build
-npx serve docs/dist
+npm run docs:build:cf
+npx wrangler dev
 ```
 
 Or, for an Astro-native preview (skips library + TypeDoc rebuild, useful after a recent `docs:build`):
@@ -104,9 +111,8 @@ npm run preview
 
 To set realistic expectations for future migration work:
 
-- **No `starlight-page-actions` plugin** -- so no "View in Markdown", "Copy Markdown", or "Ask AI" buttons. See the migration gap report for details.
-- **No `markdownRoutesIntegration`** -- `dist/_md/` is not generated.
+- **No per-page "View as Markdown" link or coding-agent wizard** -- the `.md` companions and `llms-full.txt` are generated (see `docs/README.md`), but the UI affordances from the VuePress site are not ported yet.
 - **No version-switcher dropdown** -- the header shows a static `v<x.y.z>` badge from the library's package.json.
-- **No Algolia DocSearch** -- search uses Starlight's default (Pagefind), built into the static output.
-- **No staging environment** distinct from PR deploy previews. PRs get a Netlify preview URL; there is no persistent `dev.hyperformula.handsontable.com` mirror.
-- **No Playwright visual regression** -- changes are reviewed manually via the deploy preview.
+- **No Algolia DocSearch** -- search uses Starlight's default (Pagefind), built into the static output; the per-page search `tags` frontmatter is accepted but not yet indexed.
+- **No staging environment** distinct from per-branch preview deployments.
+- **No Playwright visual regression** -- changes are reviewed manually via the preview deployment.
