@@ -45,7 +45,7 @@ export interface CapabilityGrant {
  * No token here names a package, and no grant refers to another token. Which tokens a commercial
  * package consists of is the generator's knowledge, expressed by the bigger licence simply
  * listing more tokens — so a key's function set is the union of everything it names that this
- * table recognizes, and an unrecognized token is inert (strict-shape/lenient-vocabulary, T7).
+ * table recognizes, and an unrecognized token is inert.
  * Legacy keys resolve to the unrestricted entitlement and never consult this table at all.
  *
  * There is no entry for any add-on. An add-on is a commercial wrapper, and which capabilities it

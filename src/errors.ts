@@ -397,7 +397,7 @@ export class AliasAlreadyExisting extends Error {
 /**
  * Error thrown when a public API method is called for a {@link FeatureId} that the current
  * license entitlement does not grant. Mirrors gate B's `ErrorMessage.LicenseCapability`, but
- * this one guards the API surface itself (HF-307 PR 2) rather than a formula evaluation, so it
+ * this one guards the API surface itself rather than a formula evaluation, so it
  * is thrown synchronously instead of surfacing as a cell error.
  *
  * This list names every method that can throw it - `resumeEvaluation` is deliberately NOT among

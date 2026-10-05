@@ -8,7 +8,7 @@ import {CAPABILITY_TABLE, CapabilityGrant, normalizeCapabilityToken} from './cap
 
 /**
  * The capabilities a resolved {@link LicenseEntitlement} grants, ready for gate B (the
- * interpreter) and PR 2's `ensureCapability` to query through {@link allowsFunction} and
+ * interpreter) and `ensureCapability` to query through {@link allowsFunction} and
  * {@link allowsFeature}.
  */
 export interface ResolvedCapabilities {
@@ -16,7 +16,7 @@ export interface ResolvedCapabilities {
    * `'all'` short-circuits {@link allowsFunction} to `true` for every function id, independently
    * of {@link features}: a key can cover every function without covering every feature, or the
    * other way round. A single `unrestricted: boolean` could not express that combination — it
-   * could only grant both axes together or neither (review of #1728, Kuba Sękowski).
+   * could only grant both axes together or neither.
    */
   functions: ReadonlySet<string> | 'all',
   /** `'all'` short-circuits {@link allowsFeature} to `true` for every {@link FeatureId}. */
@@ -143,12 +143,11 @@ export function allowsFeature(resolved: ResolvedCapabilities, feature: FeatureId
  * at all is allowed. {@link CapabilityRegistry.capabilityOf} returns `undefined` only for an id no
  * token lists, which the completeness invariant in `unit/license/capability-registry.spec.ts`
  * guarantees is not an unlisted built-in but a custom, instance-registered function — exempt from
- * gate B by decision D1. Everything the table does cover has to be granted by the entitlement.
+ * gate B, because custom functions are never gated. Everything the table does cover has to be granted by the entitlement.
  *
  * Extracted so the interpreter and the function metadata API cannot drift apart. The metadata API
  * exists to describe the functions an instance can actually evaluate, so a second spelling of this
- * rule would eventually let it advertise a function that then returns `#LIC!` — the exact failure
- * removing the static metadata methods (HF-349) was meant to prevent.
+ * rule would eventually let it advertise a function that then returns `#LIC!`.
  *
  * Note this is gate B only: it says nothing about {@link LicenseKeyValidityState}. Callers that
  * also need gate A check it separately, because the two gates have different answers for the same

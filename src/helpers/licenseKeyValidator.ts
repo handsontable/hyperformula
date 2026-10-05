@@ -83,11 +83,11 @@ function subscriptionExpiredMessage({licensedUntil}: EntitlementMessageParams): 
 
 /**
  * The console message for each entitlement-key lifecycle state that talks to the developer: the
- * specification's text (rev 5/6 §4.1, §4.2, as the vendored reader's README carries it), the same
+ * specification's text (as the vendored reader's README carries it), the same
  * table Handsontable prints (`handsontable/src/helpers/mixed.ts`, `entitlementConsoleNotifications`),
  * so one key reads the same in both products. Silent states (inside the term, a build covered by its
  * maintenance date) have no entry. A non-trial key past its grace keeps the soft-stop message: it
- * never blocks a paying customer (decided on #1728, 2026-10-01).
+ * never blocks a paying customer.
  */
 const ENTITLEMENT_CONSOLE_NOTIFICATIONS: Partial<Record<LicenseState, EntitlementConsoleNotification>> = {
   trial_notice: {
@@ -140,7 +140,7 @@ export function resetLicenseKeyNotificationForTests(): void {
 
 /**
  * Prints the console message for a classic 25-character key's non-valid state, at most once per
- * page load. Unchanged from before HF-307.
+ * page load. Entitlement keys do not go through this function.
  *
  * @param {LicenseKeyValidityState} state - the state to report; `VALID` prints nothing
  * @param {Date} [keyValidityDate] - the day the key stopped being valid, used by the `expired` message
@@ -159,7 +159,7 @@ export function notifyLicenseKeyState(state: LicenseKeyValidityState, keyValidit
 /**
  * Prints the console message for an entitlement key, at most once per distinct key per page.
  * `'invalid'` (a broken block, or a key for other products only) reuses the classic invalid-key
- * text, as Handsontable does: the specification leaves that message open (§4.5).
+ * text, as Handsontable does: the specification leaves that message open.
  *
  * @param {string} licenseKey - the raw key; only its identity is retained
  * @param {LicenseState | 'invalid'} state - the reader's lifecycle state, or `'invalid'`

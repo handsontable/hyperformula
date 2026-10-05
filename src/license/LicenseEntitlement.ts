@@ -7,8 +7,7 @@
  * Identifies a feature area of the public API that a license entitlement can gate.
  *
  * `CustomFunctions` is reserved vocabulary: it exists so a license payload is free to carry it,
- * but HF-307 decision D1 drops function-registration gating (and the `CustomFunctions` grant)
- * from this release, so no capability grant maps to it.
+ * but registering a custom function is never gated, so no capability grant maps to it.
  */
 export const enum FeatureId {
   NamedExpressions = 'named_expressions',
@@ -24,9 +23,8 @@ export const enum FeatureId {
  *
  * `date` is kept as a calendar string rather than an epoch, and is INCLUSIVE of its last valid
  * day:
- * - `kind === 'usage'`: compared against the current instant in **UTC**. An earlier revision of
- *   the key spec called for the client's LOCAL calendar date; that was reversed, because the
- *   offline check and a future online check have to return the same verdict for the same key at
+ * - `kind === 'usage'`: compared against the current instant in **UTC**, not the client's LOCAL
+ *   calendar date, because the offline check and a future online check have to return the same verdict for the same key at
  *   the same instant, and any rule that reads a local clock breaks that parity. The practical
  *   cost is that a customer far west of UTC loses the tail of their last local day.
  * - `kind === 'release'`: compared against the library's build date; no clock is involved, which
@@ -45,9 +43,8 @@ export interface LicenseExpiry {
  * The resolved set of things a license grants, independent of how the underlying license key
  * was parsed.
  *
- * This is the contract every later HF-307 task consumes: {@link CapabilityRegistry} turns it
- * into a `ResolvedCapabilities` set, gate B in the interpreter reads that set, and PR 2's
- * `ensureCapability` reads it for the public API. `resolveLicense` builds it from the
+ * {@link CapabilityRegistry} turns it into a `ResolvedCapabilities` set, gate B in the
+ * interpreter reads that set, and `ensureCapability` reads it for the public API. `resolveLicense` builds it from the
  * configured key.
  */
 export interface LicenseEntitlement {
@@ -57,7 +54,7 @@ export interface LicenseEntitlement {
   capabilities: ReadonlySet<string>,
   /**
    * Tokens present on the license payload that this library version does not recognize.
-   * Kept for diagnostics and tests; per HF-307 decision D3 nothing public reads this field — an
+   * Kept for diagnostics and tests; nothing public reads this field — an
    * unrecognized token never grants a capability, and it does so silently.
    */
   unrecognizedCapabilities: readonly string[],
@@ -67,10 +64,9 @@ export interface LicenseEntitlement {
    *
    * Set from the key's own `no-console-warns` flag ONLY, as the vendored reader reads it (its
    * `channels.console`). An unrecognized token does NOT
-   * set it: HF-307 decision D3 makes the *grant* silent (an unknown token grants nothing, with no
-   * message and no diagnostics getter), which is a different thing from muting the key's console
-   * output. Coupling them suppressed expiry notices as a side effect of a vocabulary mismatch, and
-   * was confirmed an implementation error.
+   * set it: an unknown token makes the *grant* silent (it grants nothing, with no message and no
+   * diagnostics getter), which is a different thing from muting the key's console output.
+   * Coupling them would suppress expiry notices as a side effect of a vocabulary mismatch.
    */
   silent: boolean,
   isTrial: boolean,
@@ -80,8 +76,8 @@ export interface LicenseEntitlement {
  * The unrestricted entitlement: legacy keys, `gpl-v3`, and every missing, invalid or expired
  * entitlement key resolve to this.
  *
- * HF-307 decision D3 (fail-closed, silent) means an entitlement key whose tokens this library version
- * does not recognize at all no longer maps here — it resolves to an entitlement with an empty,
+ * Unrecognized tokens fail closed and silently, so an entitlement key whose tokens this library
+ * version does not recognize at all does not map here — it resolves to an entitlement with an empty,
  * silent capability set instead of falling back to unrestricted access. Do not reuse this
  * function for that case.
  */

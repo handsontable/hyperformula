@@ -9,8 +9,8 @@ import {FeatureId} from './LicenseEntitlement'
  * One entry per single-area feature token. `feat:all` is derived from this list rather than
  * spelled out beside it, so a new gated area reaches it by being added here and nowhere else.
  *
- * {@link FeatureId.CustomFunctions} deliberately has no token: HF-307 decision D1 drops
- * function-registration gating, so nothing may grant it.
+ * {@link FeatureId.CustomFunctions} deliberately has no token: registering a custom function is
+ * never gated, so nothing may grant it.
  */
 const singleFeatureEntries: [string, readonly FeatureId[]][] = [
   ['feat:crud', [FeatureId.Crud]],

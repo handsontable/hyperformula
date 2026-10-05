@@ -10,8 +10,7 @@
  *
  * Transcribed 1:1 from section 6 of the internal packaging design document ("HF function groups
  * and packages"), so that a re-transcription is a reviewable diff against the doc's published
- * counts. Exported so the paired suite can compare it group by group; the table below is the
- * only thing production code reads it through.
+ * counts. The table below is the only thing production code reads it through.
  *
  * `fun:info.a` and `fun:lookup.a` name nothing but the two protected built-ins, `VERSION` and
  * `OFFSET` (see `FunctionRegistry._protectedPlugins`). The doc calls that a "technical
@@ -77,8 +76,8 @@ export const FUNCTION_GROUPS: ReadonlyMap<string, readonly string[]> = new Map([
  * Enumerated rather than taken from the function registry at run time, even though "everything
  * not in a group" would be the shorter way to say it. Reading the registry would sweep in
  * functions registered through `HyperFormula.registerFunctionPlugin`, putting a user's OWN custom
- * function under a licence token and returning `#LIC!` for it — the opposite of HF-307 decision
- * D1, which drops custom-function gating entirely. A function this table does not list is not
+ * function under a licence token and returning `#LIC!` for it, while custom functions must never
+ * be gated. A function this table does not list is not
  * gated at all, which is exactly the treatment a custom function should get.
  */
 const UNGROUPED_FUNCTIONS = [
@@ -130,8 +129,8 @@ const singleFunctionEntries: [string, readonly string[]][] = ALL_FUNCTIONS.map((
 ])
 
 /**
- * The `fun:*` half of the vocabulary, keyed by NORMALIZED token spelling, per §6 of the packaging
- * design: `fun:all`, the group tokens `fun:<family>.<a|b|c>`, and one
+ * The `fun:*` half of the vocabulary, keyed by NORMALIZED token spelling, as the packaging design
+ * defines it: `fun:all`, the group tokens `fun:<family>.<a|b|c>`, and one
  * `fun:<CANONICAL_FUNCTION_NAME>` per canonical function.
  *
  * Every grant is STATIC. Nothing here is derived from the function registry at run time, so a

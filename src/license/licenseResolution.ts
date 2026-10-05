@@ -37,9 +37,9 @@ const VALID_STATES: LicenseState[] = [
 
 /**
  * Lifecycle states in which a non-trial key has run out but still lets this build evaluate
- * formulas, printing an error to the console instead. Decided on #1728 (2026-10-01): "Don't block.
- * It should just print an error in console." This matches the reader's guide (18.1 never blocks a
- * paying customer) and rev 5 §4.1. A trial hard stop still blocks.
+ * formulas, printing an error to the console instead. An expired license never blocks a paying
+ * customer, as the reader's guide and the key specification both say. A trial hard stop still
+ * blocks.
  *
  * The key keeps its own grants: the reader reports it as licensed, so an expired key is never
  * granted more than the same key was granted while it was current.
@@ -87,12 +87,12 @@ function expiryOf(entry: ProductEntitlement): LicenseExpiry {
 /**
  * Turns HyperFormula's entry of a valid entitlement key into the entitlement it grants.
  *
- * Per HF-307 decision D3 this is fail-closed and silent: a token this version does not recognize
+ * This is fail-closed and silent: a token this version does not recognize
  * is recorded in `unrecognizedCapabilities` and grants nothing, without a warning, a message, or
  * anything public to read it back from. "Silent" there means the *grant* is silent — whether the
  * key's console messages are suppressed is decided solely by its `no-console-warns` flag, never
- * by the presence of an unrecognized token; coupling the two suppressed expiry notices as a side
- * effect of a vocabulary mismatch, and was confirmed an implementation error.
+ * by the presence of an unrecognized token; coupling the two would suppress expiry notices as a
+ * side effect of a vocabulary mismatch.
  *
  * @param {ProductEntitlement} entry - HyperFormula's entry of a valid key
  * @param {boolean} isTrial - whether the key carries the `trial` flag
@@ -124,8 +124,8 @@ function entitlementOf(entry: ProductEntitlement, isTrial: boolean, silent: bool
 /**
  * Resolves a license key into both gates' inputs.
  *
- * Routing follows the vendored {@link detectLicenseKeyFormat}, whose test order is normative
- * (key spec addendum, T12): the literals, then the trailing bracketed block that marks an
+ * Routing follows the vendored {@link detectLicenseKeyFormat}, whose test order is normative: the
+ * literals, then the trailing bracketed block that marks an
  * entitlement key, then the legacy 25-character shape. Everything that is not an entitlement key
  * — `gpl-v3`, a legacy key, an empty string — falls through to {@link checkLicenseKeyValidity}
  * completely unchanged, which is what keeps this from touching existing behaviour. A string that
@@ -141,10 +141,10 @@ function entitlementOf(entry: ProductEntitlement, isTrial: boolean, silent: bool
  * restricted entitlement. Every other outcome — missing, invalid, or expired, for an entitlement
  * key as much as for a legacy one — resolves to {@link unrestrictedEntitlement}. That asymmetry is
  * deliberate and load-bearing: gate A already stops formula evaluation on its own (a bad key
- * yields `#LIC!` in cells), while gate B additionally makes PR 2's `ensureCapability` throw from
+ * yields `#LIC!` in cells), while gate B additionally makes `ensureCapability` throw from
  * the CRUD API. Letting a bad key restrict the entitlement would turn today's "formulas fail,
  * the API still works" into "the API throws", which is a silent breaking change for every
- * existing user whose key lapsed. D3's fail-closed rule governs unrecognized tokens INSIDE an
+ * existing user whose key lapsed. The fail-closed rule governs unrecognized tokens INSIDE an
  * otherwise valid key; it is not a rule about invalid keys, and conflating the two is exactly
  * the mistake this comment is here to prevent.
  *
@@ -193,8 +193,8 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
   const isValid = VALID_STATES.indexOf(lifecycle.state) !== -1
   const state = isValid ? LicenseKeyValidityState.VALID : LicenseKeyValidityState.EXPIRED
 
-  // The message is chosen by the reader's state and prints the key's own date (rev 5/6 §4.1, the
-  // same table Handsontable uses). The `no-console-warns` flag closes the channel.
+  // The message is chosen by the reader's state and prints the key's own date (the key
+  // specification's text, the same table Handsontable uses). The `no-console-warns` flag closes the channel.
   if (notifyConsole && channels.console) {
     notifyEntitlementKey(licenseKey, lifecycle.state, {licensedUntil: lifecycle.licensedUntil, daysRemaining: lifecycle.daysRemaining})
   }

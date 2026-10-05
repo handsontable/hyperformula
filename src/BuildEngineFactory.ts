@@ -75,7 +75,7 @@ export class BuildEngineFactory {
 
   /**
    * Throws if `namedExpressions` is non-empty and `config`'s entitlement does not grant
-   * {@link FeatureId.NamedExpressions} (HF-307 PR 2, task 2.3 - the build-time counterpart of
+   * {@link FeatureId.NamedExpressions} (the build-time counterpart of
    * {@link HyperFormula.ensureCapability}). An empty list is never checked: building an engine
    * with no named expressions never touches the feature. Deliberately not called from
    * {@link rebuildWithConfig}, which re-serializes named expressions an already-built instance
