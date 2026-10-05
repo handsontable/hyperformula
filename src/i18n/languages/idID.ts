@@ -399,6 +399,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'KEYAKINAN.T',
     DEVSQ: 'KUADRAT.SIMPANG',
     GEOMEAN: 'RATA.GEO',
+    GESTEP: 'GESTEP',
     HARMEAN: 'RATA.HARM',
     CRITBINOM: 'KRIT.BINOM',
     'COVARIANCE.P': 'KOVAR.P',
