@@ -103,6 +103,7 @@ const dictionary: RawTranslationPackage = {
     EOMONTH: 'LAATSTE.DAG',
     ERF: 'FOUTFUNCTIE',
     ERFC: 'FOUT.COMPLEMENT',
+    'ERF.PRECISE': 'ERF.PRECISE',
     EVEN: 'EVEN',
     EXACT: 'GELIJK',
     EXP: 'EXP',

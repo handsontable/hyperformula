@@ -103,6 +103,7 @@ const dictionary: RawTranslationPackage = {
     EOMONTH: 'KUUKAUSI.LOPPU',
     ERF: 'VIRHEFUNKTIO',
     ERFC: 'VIRHEFUNKTIO.KOMPLEMENTTI',
+    'ERF.PRECISE': 'ERF.PRECISE',
     EVEN: 'PARILLINEN',
     EXACT: 'VERTAA',
     EXP: 'EKSPONENTTI',
