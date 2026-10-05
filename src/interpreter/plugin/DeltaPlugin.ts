@@ -17,11 +17,24 @@ export class DeltaPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
       ]
     },
+    'GESTEP': {
+      method: 'gestep',
+      parameters: [
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+      ]
+    },
   }
 
   public delta(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DELTA'),
       (left: number, right: number) => (left === right ? 1 : 0)
+    )
+  }
+
+  public gestep(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('GESTEP'),
+      (num: number, step: number) => (num >= step ? 1 : 0)
     )
   }
 }

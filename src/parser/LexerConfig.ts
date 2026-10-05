@@ -92,7 +92,7 @@ export const buildLexerConfig = (config: ParserConfig): LexerConfig => {
   const WhiteSpace = createToken({ name: 'WhiteSpace', pattern: whitespaceTokenRegexp })
   const ArrayRowSeparator = createToken({name: 'ArrayRowSep', pattern: config.arrayRowSeparator})
   const ArrayColSeparator = createToken({name: 'ArrayColSep', pattern: config.arrayColumnSeparator})
-  const NumberLiteral = createToken({ name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`) })
+  const NumberLiteral = createToken({ name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`, 'i') })
   const OffsetProcedureName = createToken({ name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i') })
 
   let ArgSeparator: TokenType
