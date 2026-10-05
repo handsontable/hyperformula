@@ -38,6 +38,18 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
         {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ],
     },
+    'RANK.EQ': {
+      method: 'rankEq',
+      parameters: [
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+      ],
+    },
+  }
+
+  public static aliases = {
+    RANK: 'RANK.EQ',
   }
 
   /**
@@ -97,6 +109,34 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         return vals[n - 1]
+      }
+    )
+  }
+
+  /**
+   * Corresponds to RANK.EQ(number, ref, [order]) and RANK(number, ref, [order]).
+   *
+   * Returns the rank of a number within a range; tied numbers share the top rank of the group.
+   * Order 0 (default) ranks descending, any other value ranks ascending. Only numeric cells of `ref` are considered.
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   */
+  public rankEq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('RANK.EQ'),
+      (target: number, range: SimpleRangeValue, order: number) => {
+        const values = range.valuesFromTopLeftCorner()
+        const numbers = values.filter((value): value is number => typeof value === 'number')
+        const errorInRange = values.find((value): value is CellError => value instanceof CellError)
+        if (errorInRange !== undefined) {
+          return errorInRange
+        }
+        if (!numbers.includes(target)) {
+          return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+        }
+        const isAscending = order !== 0
+        const better = numbers.filter(value => isAscending ? value < target : value > target)
+        return better.length + 1
       }
     )
   }
