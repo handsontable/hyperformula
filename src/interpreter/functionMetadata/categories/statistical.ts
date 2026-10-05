@@ -430,6 +430,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=POISSON.DIST(3, 5, FALSE())', '=POISSON.DIST(3, 5, TRUE())'],
   },
+  'RANK.AVG': {
+    category: 'Statistical',
+    shortDescription: 'Returns the rank of a number in a range of numbers; tied values get the average of their ranks.',
+    parameters: [{name: 'number', description: 'The number whose rank to find.'}, {name: 'ref', description: 'The range of numbers to rank within; non-numeric cells are ignored.'}, {name: 'order', description: 'Optional. 0 or omitted ranks in descending order; any other number ranks in ascending order.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=RANK.AVG(A2, A1:A10)', '=RANK.AVG(A2, A1:A10, 1)'],
+  },
   'QUARTILE.EXC': {
     category: 'Statistical',
     shortDescription: 'Returns the quartile of a data set, based on exclusive percentile values.',
