@@ -44,9 +44,9 @@ From the `docs` directory:
 
 - `npm run dev` -- Generates content, then starts the local docs server at `localhost:4321/docs/`.
 - `npm run start` -- Alias for `npm run dev`.
-- `npm run build` -- Generates content, then builds the production output into `dist/`.
+- `npm run build` -- Generates content, builds the production output into `dist/`, then resolves the docs-data counters in the Markdown companions emitted by `starlight-page-actions`.
 - `npm run preview` -- Previews the built output locally.
-- `npm run generate:content` -- Runs `scripts/generate-content.mjs` to normalize the TypeDoc output into `src/content/docs/api/` and regenerate `public/_redirects`.
+- `npm run generate:content` -- Runs `scripts/generate-content.mjs` to normalize the TypeDoc output into `src/content/docs/api/` and regenerate `public/_redirects` and `public/llms-full.txt`.
 - `npm run test:build` -- Smoke-test the production build via `scripts/test-build.mjs`.
 - `npm run docs:lint` -- Runs ESLint on `.js,.mjs,.ts,.astro` files in `src/`.
 
@@ -92,7 +92,8 @@ docs/                            # All documentation files
 │       └── components/          # Per-component styles (header, footer, content, interactive-example)
 │
 ├── scripts/                     # Docs build helpers
-│   ├── generate-content.mjs     # Normalizes TypeDoc output, regenerates public/_redirects
+│   ├── generate-content.mjs     # Normalizes TypeDoc output, regenerates _redirects + llms-full.txt
+│   ├── postprocess-md.mjs       # Resolves docs-data counters in the built .md companions
 │   └── test-build.mjs           # Production-build smoke test
 │
 ├── public/                      # Static assets served as-is (logos, images, favicons)

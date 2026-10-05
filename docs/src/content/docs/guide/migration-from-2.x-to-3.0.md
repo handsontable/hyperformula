@@ -1,4 +1,5 @@
 ---
+slug: guide/migration-from-2-x-to-3-0
 title: "Migrating from 2.x to 3.0"
 tags:
   - migration

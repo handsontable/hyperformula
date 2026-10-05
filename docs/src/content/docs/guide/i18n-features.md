@@ -21,7 +21,7 @@ Each of HyperFormula's [built-in functions](/docs/guide/built-in-functions) and 
 
 You can easily [switch between languages](/docs/guide/localizing-functions) ([`language`](/docs/api/interfaces/configparams#language)).
 
-When adding a [custom function](/docs/guide/custom-functions), you can define the function's [name](/docs/guide/custom-functions#3-add-your-function-s-names) in every language that you support.
+When adding a [custom function](/docs/guide/custom-functions), you can define the function's [name](/docs/guide/custom-functions#3-add-your-functions-names) in every language that you support.
 
 To support more languages, add a [custom language pack](/docs/guide/localizing-functions).
 

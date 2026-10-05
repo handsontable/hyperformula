@@ -44,7 +44,7 @@ Step by step:
 | `npm run bundle-all` | Compiles and bundles the HyperFormula library itself into `dist/` (UMD, ES, CommonJS). The docs reference the local build, so this must run first. |
 | `npm run typedoc:build-api` | Runs TypeDoc against the HyperFormula source to generate the API reference Markdown into `docs/api/`. |
 | `cd docs && npm ci` | Installs docs-only dependencies (Astro, Starlight, plugins). |
-| `npm run build` (inside `docs/`) | Runs `generate:content && astro build` -- normalizes the TypeDoc output into `src/content/docs/api/`, regenerates `public/_redirects` and the Markdown companions, then Astro builds the static site into `docs/dist/`. |
+| `npm run build` (inside `docs/`) | Runs `generate:content && astro build && postprocess-md` -- normalizes the TypeDoc output into `src/content/docs/api/`, regenerates `public/_redirects` and `public/llms-full.txt`, Astro builds the static site into `docs/dist/` (with per-page `.md` companions from `starlight-page-actions`), then resolves the docs-data counters in those companions. |
 
 `npm run docs:build:cf` (what Workers Builds runs) is `docs:build` plus the `cf-dist/` assembly described above.
 
@@ -111,7 +111,7 @@ npm run preview
 
 To set realistic expectations for future migration work:
 
-- **No per-page "View as Markdown" link or coding-agent wizard** -- the `.md` companions and `llms-full.txt` are generated (see `docs/README.md`), but the UI affordances from the VuePress site are not ported yet.
+- **No coding-agent wizard** -- the `.md` companions, the per-page View/Copy Markdown actions (`starlight-page-actions`), and `llms-full.txt` are all generated, but the interactive agent-setup wizard from the VuePress site is not ported yet.
 - **No version-switcher dropdown** -- the header shows a static `v<x.y.z>` badge from the library's package.json.
 - **No Algolia DocSearch** -- search uses Starlight's default (Pagefind), built into the static output; the per-page search `tags` frontmatter is accepted but not yet indexed.
 - **No staging environment** distinct from per-branch preview deployments.

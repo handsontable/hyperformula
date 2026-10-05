@@ -1,4 +1,5 @@
 ---
+slug: guide/migration-from-0-6-to-1-0
 title: "Migrating from 0.6 to 1.0"
 tags:
   - migration

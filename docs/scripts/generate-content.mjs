@@ -128,18 +128,17 @@ function generateRedirects() {
 }
 
 /**
- * Agent-friendly Markdown outputs (HF-154): a clean `.md` companion for every
- * guide page plus the homepage, served next to the rendered page (append `.md`
- * to the page URL), and the `llms-full.txt` corpus at the docs root. Content is
- * already Starlight-flavoured markdown with absolute `/docs/...` links, so a
- * companion is the source file with frontmatter dropped, the H1 restored from
- * the title, and the `{{ $page.* }}` counters resolved.
+ * The `llms-full.txt` corpus (HF-154): every guide page plus the homepage,
+ * concatenated into one LLM-friendly Markdown file at the docs root. Content is
+ * already Starlight-flavoured markdown with absolute `/docs/...` links; the
+ * `{{ $page.* }}` counters are resolved against the build-time docs data.
  *
- * The interactive pieces of HF-154 (the coding-agent wizard, the per-page
- * "View as Markdown" link) are not ported yet; these build outputs keep the
- * published URLs alive in the meantime.
+ * Per-page `.md` companions are emitted by the `starlight-page-actions` plugin
+ * during `astro build` (together with the per-page View/Copy Markdown actions);
+ * `scripts/postprocess-md.mjs` resolves the counters in those files after the
+ * build. The coding-agent wizard from the VuePress site is not ported yet.
  */
-function generateMarkdownOutputs() {
+function generateLlmsCorpus() {
   const docsContent = resolve(docsDir, 'src/content/docs');
   const corpus = [
     '# HyperFormula documentation — full corpus',
@@ -158,12 +157,8 @@ function generateMarkdownOutputs() {
     const fm = raw.match(/^---\n([^]*?)\n---\n/);
     const title = fm && fm[1].match(/^title: "(.*)"$/m);
     const body = substituteDocsData(fm ? raw.slice(fm[0].length) : raw).replace(/^\n+/, '');
-    const companion = `${title ? `# ${title[1]}\n\n` : ''}${body}`;
-    const dest = resolve(docsDir, 'public', rel);
 
-    mkdirSync(dirname(dest), { recursive: true });
-    writeFileSync(dest, companion);
-    corpus.push('', '---', '', companion.trimEnd());
+    corpus.push('', '---', '', `${title ? `# ${title[1]}\n\n` : ''}${body}`.trimEnd());
     pageCount += 1;
   }
 
@@ -174,9 +169,9 @@ function generateMarkdownOutputs() {
 
 const apiCount = generateApi();
 const redirectCount = generateRedirects();
-const markdownCount = generateMarkdownOutputs();
+const corpusCount = generateLlmsCorpus();
 
 // eslint-disable-next-line no-console
 console.log(
-  `[generate-content] wrote ${apiCount} API page(s), ${redirectCount} redirects, and ${markdownCount} Markdown companion(s) + llms-full.txt`
+  `[generate-content] wrote ${apiCount} API page(s), ${redirectCount} redirects, and llms-full.txt (${corpusCount} pages)`
 );

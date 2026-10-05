@@ -1,4 +1,5 @@
 ---
+slug: guide/migration-from-1-x-to-2-0
 title: "Migrating from 1.x to 2.0"
 tags:
   - migration

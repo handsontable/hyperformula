@@ -275,10 +275,10 @@ Depending on what was cut, the data is stored as:
 <div class="example container">
   <div>
     <div>
-      <button id="copy" class="button run">
+      <button id="copy-button" class="button run">
         Copy
       </button>
-      <button id="paste" class="button button-outline reset">
+      <button id="paste-button" class="button button-outline reset">
         Paste
       </button>
       <button id="reset" class="button button-outline reset">
@@ -353,8 +353,8 @@ function reinitializeData() {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const copyButton = document.querySelector('.example #copy');
-  const pasteButton = document.querySelector('.example #paste');
+  const copyButton = document.querySelector('.example #copy-button');
+  const pasteButton = document.querySelector('.example #paste-button');
   const resetButton = document.querySelector('.example #reset');
 
   copyButton.addEventListener('click', () => {

@@ -413,7 +413,7 @@ function rewriteHref(href, slug, isImage) {
 
   if (absSlug.startsWith('..')) return null;
 
-  absSlug = absSlug.replace(/\/?(index|README)$/i, '');
+  absSlug = absSlug.replace(/(^|\/)(index|README)$/i, '$1').replace(/\/$/, '');
   absSlug = slugifyPath(absSlug);
 
   const out = `${BASE}/${absSlug}`.replace(/\/+$/, '') || `${BASE}/`;

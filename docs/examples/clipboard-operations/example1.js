@@ -46,8 +46,8 @@ function reinitializeData() {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const copyButton = document.querySelector('.example #copy');
-  const pasteButton = document.querySelector('.example #paste');
+  const copyButton = document.querySelector('.example #copy-button');
+  const pasteButton = document.querySelector('.example #paste-button');
   const resetButton = document.querySelector('.example #reset');
 
   copyButton.addEventListener('click', () => {

@@ -10,7 +10,7 @@
     "generate:content": "node scripts/generate-content.mjs",
     "dev": "npm run generate:content && astro dev",
     "start": "npm run dev",
-    "build": "npm run generate:content && astro build",
+    "build": "npm run generate:content && astro build && node scripts/postprocess-md.mjs",
     "preview": "astro preview",
     "test:build": "node scripts/test-build.mjs",
     "docs:lint": "eslint --ext .js,.mjs,.ts,.astro src"
