@@ -55,9 +55,9 @@
   "unpkg": "dist/hyperformula.min.js",
   "typings": "./typings/index.d.ts",
   "scripts": {
-    "docs:dev": "npm run docs:generate-function-docs && npm run typedoc:build-api && cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress dev docs --silent --no-clear-screen --no-cache",
-    "docs:build": "npm run docs:generate-function-docs && npm run bundle-all && npm run typedoc:build-api && cross-env NODE_OPTIONS=--openssl-legacy-provider vuepress build docs",
-    "docs:build:cf": "rimraf docs/.vuepress/dist && npm run docs:build && node script/prepare-cf-assets.js",
+    "docs:dev": "npm run docs:generate-function-docs && npm run typedoc:build-api && cd docs && npm run dev",
+    "docs:build": "npm run docs:generate-function-docs && npm run bundle-all && npm run typedoc:build-api && cd docs && npm ci && npm run build",
+    "docs:build:cf": "npm run docs:build && node script/prepare-cf-assets.js",
     "docs:deploy:cf": "wrangler deploy",
     "docs:preview:cf": "wrangler versions upload",
     "docs:code-examples:generate-js": "bash docs/code-examples-generator.sh",

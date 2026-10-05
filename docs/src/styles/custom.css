@@ -1,0 +1,9 @@
+/*
+ * HyperFormula docs theme entry point (referenced from astro.config customCss).
+ * Imports the modular partials; keep theme rules in those files, not here.
+ */
+@import './base/variables.css';
+@import './components/content.css';
+@import './components/header.css';
+@import './components/footer.css';
+@import './components/interactive-example.css';

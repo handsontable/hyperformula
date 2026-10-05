@@ -1,0 +1,19 @@
+---
+// Extends Starlight's default <Head>: loads Inter (to match HT typography), then
+// renders Starlight's head, then loads the interactive example runner.
+import Default from '@astrojs/starlight/components/Head.astro';
+---
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+/>
+
+<Default><slot /></Default>
+
+<script>
+  import '../scripts/example-runner.ts';
+  import '../scripts/theme-toggle.ts';
+</script>

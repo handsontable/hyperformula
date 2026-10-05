@@ -1,0 +1,287 @@
+---
+/**
+ * Custom Starlight header mirroring Handsontable's layout:
+ * - Row 1: brand (logo + version pill) · search · GitHub stars · theme toggle
+ * - Row 2: primary nav (Guide · API · Demo) · Support dropdown
+ *
+ * Uses Starlight's own <Search> for the search box and the sun/moon
+ * ThemeSelect override for the theme button.
+ */
+import Search from '@astrojs/starlight/components/Search.astro';
+import ThemeSelect from './ThemeSelect.astro';
+import { DOCS_DATA } from '../plugins/docs-data.mjs';
+
+const base = (import.meta.env.BASE_URL || '/docs').replace(/\/+$/, '');
+
+// Each nav item carries its own active-path matcher because Demo lives under
+// /guide/demo (so a blanket /guide prefix would also light up the Demo tab on
+// any guide page).
+const demoPath = `${base}/guide/demo`;
+const navItems: Array<{
+  label: string;
+  href: string;
+  icon: 'guide' | 'api' | 'demo' | 'github';
+  external?: boolean;
+  match?: (p: string) => boolean;
+}> = [
+  {
+    label: 'Guide',
+    href: `${base}/guide/basic-usage`,
+    icon: 'guide',
+    match: (p) => p.startsWith(`${base}/guide`) && !p.startsWith(demoPath),
+  },
+  {
+    label: 'API',
+    href: `${base}/api`,
+    icon: 'api',
+    match: (p) => p.startsWith(`${base}/api`),
+  },
+  {
+    label: 'Demo',
+    href: demoPath,
+    icon: 'demo',
+    match: (p) => p.startsWith(demoPath),
+  },
+  {
+    label: 'GitHub',
+    href: 'https://github.com/handsontable/hyperformula',
+    icon: 'github',
+    external: true,
+  },
+];
+
+const supportItems = [
+  { label: 'GitHub Issues', href: 'https://github.com/handsontable/hyperformula/issues' },
+  { label: 'Contact', href: 'https://handsontable.com/contact' },
+  { label: 'Commercial license', href: 'https://handsontable.com/get-a-quote' },
+];
+
+const path = Astro.url.pathname.replace(/\/+$/, '');
+---
+
+<div class="hf-header">
+  <div class="hf-header__row hf-header__row--brand">
+    <a
+      class="hf-brand"
+      href="https://hyperformula.handsontable.com/"
+      aria-label="HyperFormula homepage"
+    >
+      <img class="hf-brand__logo" src={`${base}/hf-logo-blue.svg`} alt="HyperFormula" />
+      <span class="hf-brand__version">v{DOCS_DATA.version}</span>
+    </a>
+
+    <div class="hf-header__search">
+      <Search />
+    </div>
+
+    <div class="hf-header__actions">
+      <a
+        class="hf-stars"
+        href="https://github.com/handsontable/hyperformula"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="HyperFormula on GitHub"
+      >
+        <svg class="hf-stars__icon" viewBox="0 0 16 16" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+          ></path>
+        </svg>
+        <span class="hf-stars__count" data-hf-stars>—</span>
+      </a>
+
+      <ThemeSelect />
+    </div>
+  </div>
+
+  <div class="hf-header__row hf-header__row--nav">
+    <nav class="hf-nav" aria-label="Primary">
+      {
+        navItems.map(({ label, href, external, match, icon }) => (
+          <a
+            class="hf-nav__link"
+            href={href}
+            aria-current={match && match(path) ? 'page' : undefined}
+            {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+          >
+            {icon === 'guide' && (
+              <svg
+                class="hf-nav__icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+            )}
+            {icon === 'api' && (
+              <svg
+                class="hf-nav__icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M7 8l-4 4l4 4" />
+                <path d="M17 8l4 4l-4 4" />
+                <path d="M14 4l-4 16" />
+              </svg>
+            )}
+            {icon === 'demo' && (
+              <svg class="hf-nav__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M6 4l14 8-14 8z" />
+              </svg>
+            )}
+            {icon === 'github' && (
+              <svg class="hf-nav__icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path
+                  d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+                />
+              </svg>
+            )}
+            {label}
+          </a>
+        ))
+      }
+
+      <div class="hf-support" data-hf-support>
+      <button
+        type="button"
+        class="hf-nav__link hf-support__btn"
+        aria-haspopup="true"
+        aria-expanded="false"
+        data-hf-support-toggle
+      >
+        <svg
+          class="hf-nav__icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z" />
+          <path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+        </svg>
+        Support
+        <svg viewBox="0 0 12 12" aria-hidden="true" class="hf-support__chev">
+          <path
+            d="M2 4l4 4 4-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+      </button>
+      <ul class="hf-support__menu" role="menu" hidden>
+        {
+          supportItems.map(({ label, href }) => (
+            <li role="none">
+              <a role="menuitem" href={href} target="_blank" rel="noopener noreferrer">
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    </nav>
+  </div>
+</div>
+
+<script>
+  // GitHub star count — cached in localStorage for a day to spare the unauth'd
+  // GitHub API rate limit.
+  (function () {
+    const STARS_KEY = 'hf-gh-stars';
+    const TTL_MS = 24 * 60 * 60 * 1000;
+
+    function format(n: number) {
+      if (n >= 10000) return `${(n / 1000).toFixed(1)}k`;
+      if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+      return String(n);
+    }
+
+    function paint(count: number) {
+      document.querySelectorAll<HTMLElement>('[data-hf-stars]').forEach((el) => {
+        el.textContent = format(count);
+      });
+    }
+
+    try {
+      const cached = localStorage.getItem(STARS_KEY);
+      if (cached) {
+        const { count, expires } = JSON.parse(cached);
+        if (typeof count === 'number' && Date.now() < expires) {
+          paint(count);
+          return;
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+
+    fetch('https://api.github.com/repos/handsontable/hyperformula')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        const count = data?.stargazers_count;
+        if (typeof count !== 'number') return;
+        paint(count);
+        try {
+          localStorage.setItem(STARS_KEY, JSON.stringify({ count, expires: Date.now() + TTL_MS }));
+        } catch {
+          /* ignore */
+        }
+      })
+      .catch(() => {
+        /* network failure → leave placeholder */
+      });
+  })();
+
+  // Support dropdown — open/close + outside-click + Escape.
+  (function () {
+    const wrappers = document.querySelectorAll<HTMLElement>('[data-hf-support]');
+
+    wrappers.forEach((wrap) => {
+      const btn = wrap.querySelector<HTMLButtonElement>('[data-hf-support-toggle]');
+      const menu = wrap.querySelector<HTMLUListElement>('.hf-support__menu');
+      if (!btn || !menu) return;
+
+      function close() {
+        btn.setAttribute('aria-expanded', 'false');
+        menu.hidden = true;
+      }
+      function open() {
+        btn.setAttribute('aria-expanded', 'true');
+        menu.hidden = false;
+      }
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (btn.getAttribute('aria-expanded') === 'true') close();
+        else open();
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!wrap.contains(e.target as Node)) close();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') close();
+      });
+    });
+  })();
+</script>
