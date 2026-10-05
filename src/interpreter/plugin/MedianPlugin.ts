@@ -125,11 +125,9 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
   public rankEq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('RANK.EQ'),
       (target: number, range: SimpleRangeValue, order: number) => {
-        const values = range.valuesFromTopLeftCorner()
-        const numbers = values.filter((value): value is number => typeof value === 'number')
-        const errorInRange = values.find((value): value is CellError => value instanceof CellError)
-        if (errorInRange !== undefined) {
-          return errorInRange
+        const numbers = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if (numbers instanceof CellError) {
+          return numbers
         }
         if (!numbers.includes(target)) {
           return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
