@@ -38,6 +38,9 @@ export const collections = {
 
         /** Sidebar badge label (e.g. "New", "Updated"). */
         menuTag: z.string().optional(),
+
+        /** Search keywords per page (HF-353); indexed by the search follow-up, accepted now so frontmatter validates. */
+        tags: z.array(z.string()).optional(),
       }),
     }),
   }),

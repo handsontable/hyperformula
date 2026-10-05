@@ -23,6 +23,7 @@ export const sidebar = [
       { label: 'Advanced usage', link: '/guide/advanced-usage' },
       { label: 'Configuration options', link: '/guide/configuration-options' },
       { label: 'License key', link: '/guide/license-key' },
+      { label: 'Set up your coding agent', link: '/guide/setup-coding-agent' },
     ],
   },
   {
@@ -68,6 +69,7 @@ export const sidebar = [
       { label: 'Internationalization features', link: '/guide/i18n-features' },
       { label: 'Localizing functions', link: '/guide/localizing-functions' },
       { label: 'Date and time handling', link: '/guide/date-and-time-handling' },
+      { label: 'Currency handling', link: '/guide/currency-handling' },
     ],
   },
   {
@@ -106,7 +108,6 @@ export const sidebar = [
       { label: 'Supported browsers', link: '/guide/supported-browsers' },
       { label: 'Dependencies', link: '/guide/dependencies' },
       { label: 'Licensing', link: '/guide/licensing' },
-      { label: 'Support', link: '/guide/support' },
     ],
   },
   {
