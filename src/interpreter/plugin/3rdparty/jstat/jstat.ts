@@ -21,46 +21,67 @@
  THE SOFTWARE.
  */
 
+const SQRT_PI = Math.sqrt(Math.PI)
+
+/**
+ * erf(x) for 0 <= x < 2 from its series exp(-x^2) * 2 / sqrt(pi) * sum(2^n * x^(2n + 1) / (2n + 1)!!).
+ * All terms are positive, so there is no cancellation, and the relative error stays near 1e-16 down to the
+ * smallest numbers (the earlier 1 - exp(...) form lost every digit below about 1e-16).
+ */
+function erfSeries(x: number): number {
+  const xx = x * x
+  let term = x
+  let sum = x
+  for (let n = 0; n < 500; n++) {
+    term *= 2 * xx / (2 * n + 3)
+    sum += term
+    if (term < sum * 1e-17) {
+      break
+    }
+  }
+  return 2 / SQRT_PI * Math.exp(-xx) * sum
+}
+
+/**
+ * erfc(x) for x >= 1 from the continued fraction exp(-x^2) / sqrt(pi) / (x + (1/2) / (x + 1 / (x + (3/2) / (x + ...)))),
+ * evaluated from the tail. Accurate to about 1e-16 relative, also where erfc is tiny and 1 - erf(x) would be 0.
+ */
+function erfcFraction(x: number): number {
+  let tail = 0
+  for (let k = 300; k >= 1; k--) {
+    tail = (k / 2) / (x + tail)
+  }
+  return Math.exp(-x * x) / SQRT_PI / (x + tail)
+}
+
 export function erf(x: number): number {
-  const cof = [-1.3026537197817094, 6.4196979235649026e-1, 1.9476473204185836e-2,
-    -9.561514786808631e-3, -9.46595344482036e-4, 3.66839497852761e-4,
-    4.2523324806907e-5, -2.0278578112534e-5, -1.624290004647e-6,
-    1.303655835580e-6, 1.5626441722e-8, -8.5238095915e-8,
-    6.529054439e-9, 5.059343495e-9, -9.91364156e-10,
-    -2.27365122e-10, 9.6467911e-11, 2.394038e-12,
-    -6.886027e-12, 8.94487e-13, 3.13092e-13,
-    -1.12708e-13, 3.81e-16, 7.106e-15,
-    -1.523e-15, -9.4e-17, 1.21e-16,
-    -2.8e-17]
-  let j = cof.length - 1
-  let isneg = false
-  let d = 0
-  let dd = 0
-  let t, ty, tmp, res
-
-  if (x === 0) {
-    return 0
+  if (x === 0 || Number.isNaN(x)) {
+    return x
   }
-  if (x < 0) {
-    x = -x
-    isneg = true
+  const abs = Math.abs(x)
+  let result
+  if (abs < 2) {
+    result = erfSeries(abs)
+  } else if (abs < 6.5) {
+    result = 1 - erfcFraction(abs)
+  } else {
+    result = 1
   }
-
-  t = 2 / (2 + x)
-  ty = 4 * t - 2
-
-  for (; j > 0; j--) {
-    tmp = d
-    d = ty * d - dd + cof[j]
-    dd = tmp
-  }
-
-  res = t * Math.exp(-x * x + 0.5 * (cof[0] + ty * d) - dd)
-  return isneg ? res - 1 : 1 - res
+  return x < 0 ? -result : result
 }
 
 export function erfc(x: number): number {
-  return 1 - erf(x)
+  if (Number.isNaN(x)) {
+    return x
+  }
+  if (x < 0) {
+    return 2 - erfc(-x)
+  }
+  if (x < 1) {
+    return 1 - erfSeries(x)
+  }
+  // erfc(27.3) is below the smallest double
+  return x < 27.3 ? erfcFraction(x) : 0
 }
 
 function erfcinv(p: number): number {
