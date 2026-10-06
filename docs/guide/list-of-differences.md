@@ -116,6 +116,11 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | NORMSDIST     | =NORMSDIST(0, TRUE())                                          |          0.5 |  Wrong number |    Wrong number |
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
+| TAKE          | =TAKE(A1:A3, 0)                                                |          N/A | No such function. |           CALC  |
+| TAKE          | =TAKE(Data!A:A, , 1)                                           | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | No such function. | Spills all 1,048,576 rows from row 1, with blank source cells as 0; returns SPILL below row 1. |
+| DROP          | =DROP(A1:A3, 3)                                                |          N/A | No such function. |           CALC  |
+| DROP          | =DROP(Data!A:A, 1)                                             | Spills to the source sheet's current height minus one row; returns SPILL below row 2. | No such function. | Spills all 1,048,575 remaining rows, with blank source cells as 0; returns SPILL below row 2. |
+| DROP          | =DROP(A1:C3, {1,2})                                            | Uses the first count and drops one row. | No such function. | Returns a 1x2 array of VALUE errors. |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |

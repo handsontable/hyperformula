@@ -31,6 +31,7 @@ import {
 import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
 import {InterpreterState} from './InterpreterState'
+import {FunctionPluginDefinition} from './plugin/FunctionPlugin'
 import {
   cloneNumber,
   EmptyValue,
@@ -59,6 +60,18 @@ export class Interpreter {
   ) {
     this.functionRegistry.initializePlugins(this)
     this.criterionBuilder = new CriterionBuilder(config)
+  }
+
+  /**
+   * Checks whether a function is implemented by a specific plugin in this interpreter's engine instance.
+   *
+   * @param {string} functionId - The canonical function identifier.
+   * @param {FunctionPluginDefinition} plugin - The plugin class to compare with the registered implementation.
+   * @returns {boolean} `true` when the function is implemented by the given plugin class.
+   * @internal
+   */
+  public isFunctionImplementedBy(functionId: string, plugin: FunctionPluginDefinition): boolean {
+    return this.functionRegistry.getFunctionPlugin(functionId) === plugin
   }
 
   public evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
