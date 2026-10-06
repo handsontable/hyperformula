@@ -36,7 +36,8 @@ function unlicensed(reason: UnlicensedReason): EntitlementLicense {
 
 /**
  * Reads an entitlement license key for one product, in one call: verifies the
- * block, picks the product's entry, places it in its lifecycle window, reads
+ * whole key (the checksum covers the prose and the block), picks the product's
+ * entry, places it in its lifecycle window, reads
  * its silencing flags and resolves what it unlocks.
  *
  * This is the single entry point a product needs. Route a key here only when

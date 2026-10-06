@@ -194,13 +194,12 @@ export function notifyEntitlementKey(licenseKey: string, state: LicenseState | '
 
 /**
  * The identity of a key: its trailing 129 characters, after trimming — for an intact entitlement
- * key, the sha512 checksum plus the closing bracket, unique per distinct key content.
- *
- * Trimmed because the reader ignores surrounding whitespace, so `'KEY'` and `'KEY\n'` are one
- * license and must be one identity here too. Read from the END, so the whole artifact and its bare
- * `[...]` block, which the format treats as the same license, are one identity. Truncated because
- * the set lives as long as the page: a server building one engine per customer key would otherwise
- * keep every full key string it has ever seen.
+ * key, the sha512 checksum plus the closing bracket. The checksum covers the whole key, its
+ * sentences and its payload, so it is unique per distinct key. It does not change when a mail client
+ * rewraps the sentences or the key is put on one line, which the reader treats as the same key, so
+ * those are one identity here too. Surrounding whitespace is ignored for the same reason. Truncated
+ * because the set lives as long as the page: a server building one engine per customer key would
+ * otherwise keep every full key string it has ever seen.
  */
 function keyIdentityOf(licenseKey: string): string {
   return licenseKey.trim().slice(-(CHECKSUM_LENGTH + 1))

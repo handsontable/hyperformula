@@ -10,7 +10,7 @@ and re-taken: a local fix makes two products disagree about the same key.
 |---|---|
 | Repository | `handsontable/license-key` (private) |
 | Directory | `vendor/entitlement-key-reader` |
-| Tag | `4.0.1` (`03810fd3c`, 2026-09-28) |
+| Tag | `5.0.0` (`d9e53902a`, 2026-10-05) |
 | Pin | `upstream.json` |
 
 ## One declared divergence

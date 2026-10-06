@@ -124,7 +124,10 @@ export interface LicenseTimeReference {
 /**
  * Why an entitlement key does not license the product that reads it:
  *
- *   - `unreadable`       the block is missing, tampered with or malformed,
+ *   - `unreadable`       the key fails verification: the block is missing,
+ *                        tampered with or malformed, the prose was edited or
+ *                        removed (the checksum covers it), or text other than
+ *                        whitespace follows the block,
  *   - `product_missing`  the key is intact but grants other products only.
  *
  * Both are reported to the user as an invalid key; the split exists so a
