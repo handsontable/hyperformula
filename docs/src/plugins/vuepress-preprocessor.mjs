@@ -411,7 +411,17 @@ function rewriteHref(href, slug, isImage) {
     absSlug = posix.normalize(posix.join(dir, pathPart));
   }
 
-  if (absSlug.startsWith('..')) return null;
+  // TypeDoc sometimes writes links one level too deep (e.g. `../../api/...` from
+  // `api/globals.md`, which sits one directory shallower than the link assumes).
+  // Those escaped the docs root and were previously left verbatim — broken on the
+  // rendered page. If what remains after the `..` segments is rooted in a known
+  // top-level tree, treat it as docs-root-relative; otherwise leave it alone.
+  if (absSlug.startsWith('..')) {
+    const recovered = absSlug.replace(/^(\.\.\/)+/, '');
+
+    if (!/^(api|guide)\//.test(recovered)) return null;
+    absSlug = recovered;
+  }
 
   absSlug = absSlug.replace(/(^|\/)(index|README)$/i, '$1').replace(/\/$/, '');
   absSlug = slugifyPath(absSlug);

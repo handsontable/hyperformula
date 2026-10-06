@@ -119,7 +119,7 @@ better performance in the application you develop; it will result
 in faster calculation across the whole HyperFormula instance.
 
 Batching can also be useful when you decide to use HyperFormula
-on the [server-side](server-side-installation). Several operations
+on the [server-side](/docs/guide/server-side-installation). Several operations
 can be sent as a single one.
 
 ## What you can't batch

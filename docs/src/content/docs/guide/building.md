@@ -84,7 +84,7 @@ HyperFormula main test suite is maintained outside of this repository. You can f
 
 The tests are done with Jest and Karma. The same test suite should
 pass in both of them because the library might be used
-[server-side](server-side-installation) or in a browser, so you have
+[server-side](/docs/guide/server-side-installation) or in a browser, so you have
 to be sure that both environments are fine.
 
 * `npm run test` - runs the linter and all tests

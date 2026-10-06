@@ -19,7 +19,7 @@ Undo and redo work together as a synced pair, so each time you
 **undo** some action it is put onto a **redo** stack.
 
 **Named expressions** behave just like any other
-[CRUD operation](basic-operations).
+[CRUD operation](/docs/guide/basic-operations).
 
 ## isThereSomething* methods
 

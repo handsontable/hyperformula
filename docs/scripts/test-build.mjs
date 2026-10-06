@@ -179,11 +179,22 @@ for (const [pageUrl, { html }] of pages) {
       continue;
     }
 
-    // Anything left is meant to be internal to our site.
-    if (!href.startsWith(BASE)) continue; // skip stray relative refs (e.g., /img/x in plugins)
+    // Anything left is meant to be internal to our site. Page-relative hrefs
+    // (`../llms-full.txt`, `foo.md`) are resolved against the page URL — they
+    // used to be skipped here, which let broken links from unconverted
+    // VuePress/TypeDoc markdown through unnoticed.
+    let resolved = href;
+
+    if (!href.startsWith('/')) {
+      const pageDir = pageUrl.endsWith('/') ? pageUrl : `${pageUrl}/`;
+      const u = new URL(href, `https://x${pageDir}`);
+
+      resolved = u.pathname + u.hash;
+    }
+    if (!resolved.startsWith(BASE)) continue; // off-site root paths (e.g., /img/x in plugins)
 
     totalInternal++;
-    const [path, anchor] = href.includes('#') ? href.split('#') : [href, null];
+    const [path, anchor] = resolved.includes('#') ? resolved.split('#') : [resolved, null];
     const cleanPath = path.replace(/\/+$/, '') || `${BASE}/`;
     const candidates = urlToFiles(cleanPath);
 

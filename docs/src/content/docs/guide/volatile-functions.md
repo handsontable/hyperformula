@@ -101,4 +101,4 @@ There is a way to mark a custom function as volatile:
 ```
 
 You can find more information about creating custom functions in
-[this section](custom-functions).
+[this section](/docs/guide/custom-functions).
