@@ -143,12 +143,33 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=TEXT(1234.5, "0.00")', '=TEXT(TODAY(), "YYYY-MM-DD")'],
   },
+  TEXTAFTER: {
+    category: 'Text',
+    shortDescription: 'Returns the text that occurs after the instance_num-th occurrence of delimiter. A negative instance_num counts occurrences from the end of text. Returns if_not_found, or #N/A when it is omitted, if the delimiter is not found.',
+    parameters: [{name: 'text', description: 'The text to search.'}, {name: 'delimiter', description: 'The text (or array of texts) that marks the point after which the result starts.'}, {name: 'instance_num', description: 'Which occurrence of delimiter to use, truncated to an integer. A negative value counts from the end of text. Defaults to 1.'}, {name: 'match_mode', description: '0 (default) for case-sensitive matching, 1 for case-insensitive matching.'}, {name: 'match_end', description: '1 to treat the end of text as a delimiter, 0 (default) otherwise.'}, {name: 'if_not_found', description: 'The value returned when delimiter is not found. Defaults to #N/A.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TEXTAFTER("a-b-c", "-")', '=TEXTAFTER("a-b-c", "-", -1)'],
+  },
+  TEXTBEFORE: {
+    category: 'Text',
+    shortDescription: 'Returns the text that occurs before the instance_num-th occurrence of delimiter. A negative instance_num counts occurrences from the end of text. Returns if_not_found, or #N/A when it is omitted, if the delimiter is not found.',
+    parameters: [{name: 'text', description: 'The text to search.'}, {name: 'delimiter', description: 'The text (or array of texts) that marks the point before which the result ends.'}, {name: 'instance_num', description: 'Which occurrence of delimiter to use, truncated to an integer. A negative value counts from the end of text. Defaults to 1.'}, {name: 'match_mode', description: '0 (default) for case-sensitive matching, 1 for case-insensitive matching.'}, {name: 'match_end', description: '1 to treat the end of text as a delimiter, 0 (default) otherwise.'}, {name: 'if_not_found', description: 'The value returned when delimiter is not found. Defaults to #N/A.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TEXTBEFORE("a-b-c", "-")', '=TEXTBEFORE("a-b-c", "-", 2)'],
+  },
   TEXTJOIN: {
     category: 'Text',
     shortDescription: 'Joins text from multiple strings and/or ranges with a delimiter. Supports array/range delimiters that cycle through gaps. When ignore_empty is TRUE, empty strings are skipped. Returns #VALUE! if result exceeds 32,767 characters.',
     parameters: [{name: 'delimiter', description: 'The text (or range/array of texts, cycled through the gaps) inserted between joined values.'}, {name: 'ignore_empty', description: 'When TRUE, empty strings among the joined values are skipped instead of producing an extra delimiter.'}, {name: 'text1', description: 'A text value, cell reference, or range to join. Further text values or ranges can be passed as additional arguments and are appended in order.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=TEXTJOIN(", ", TRUE(), A1:A3)', '=TEXTJOIN("-", FALSE(), "a", "b", "c")'],
+  },
+  TEXTSPLIT: {
+    category: 'Text',
+    shortDescription: 'Splits text into an array: col_delimiter separates columns and row_delimiter separates rows. Rows shorter than the widest one are padded with pad_with. The result spills only when its arguments are literals.',
+    parameters: [{name: 'text', description: 'The text to split.'}, {name: 'col_delimiter', description: 'The text (or array of texts) that separates columns. Leave empty to split into rows only.'}, {name: 'row_delimiter', description: 'The text (or array of texts) that separates rows. When omitted, the result has a single row.'}, {name: 'ignore_empty', description: 'When TRUE, empty pieces are skipped. Defaults to FALSE.'}, {name: 'match_mode', description: '0 (default) for case-sensitive matching, 1 for case-insensitive matching.'}, {name: 'pad_with', description: 'The value that fills the missing cells of short rows. Defaults to #N/A.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TEXTSPLIT("a,b,c", ",")', '=TEXTSPLIT("a,b;c,d", ",", ";")'],
   },
   TRIM: {
     category: 'Text',
