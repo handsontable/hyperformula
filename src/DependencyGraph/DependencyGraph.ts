@@ -1119,6 +1119,12 @@ export class DependencyGraph {
     this.addressMapping.setCell(address, vertex)
 
     if (range === undefined) {
+      // An unbounded result that cannot be placed never gets space. Marking it
+      // now, rather than at evaluation, keeps the vertex at its corner cell, so
+      // overwriting it while evaluation is suspended can still clean it up.
+      if (vertex instanceof ArrayFormulaVertex) {
+        vertex.setNoSpace()
+      }
       return
     }
 
