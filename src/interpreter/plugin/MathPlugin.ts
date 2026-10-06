@@ -190,7 +190,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
           return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
         }
         let ret = 1
-        for (let i = 0; i < k; i++) {
+        for (let i = 0; i < k && Number.isFinite(ret); i++) {
           ret *= n - i
         }
         return Number.isFinite(ret) ? ret : new CellError(ErrorType.NUM, ErrorMessage.NaN)
