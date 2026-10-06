@@ -559,26 +559,32 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
         if (succ > succUpper || succUpper > trials) {
           return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
         }
-        let sum = 0
         if (prob === 0 || prob === 1) {
+          let degenerate = 0
           for (let i = succ; i <= succUpper; i++) {
-            sum += binomial.pdf(i, trials, prob)
+            degenerate += binomial.pdf(i, trials, prob)
           }
-          return sum
+          return Math.min(degenerate, 1)
         }
-        // work in log space: the factorial-based pdf loses precision for large numbers of trials
+        // Work in log space (the factorial-based pdf overflows for large numbers of trials) and add with Neumaier
+        // compensation: a plain running sum over up to millions of terms loses digits, and at 10^7 trials it pushed the
+        // total of a full range above 1.
         const m = Math.min(succ, trials - succ)
-        let logCombination = 0
+        const logCombination = new CompensatedSum()
         for (let j = 1; j <= m; j++) {
-          logCombination += Math.log((trials - m + j) / j)
+          logCombination.add(Math.log((trials - m + j) / j))
         }
         const logRatio = Math.log(prob) - Math.log1p(-prob)
-        let logPmf = logCombination + succ * Math.log(prob) + (trials - succ) * Math.log1p(-prob)
+        const logPmf = new CompensatedSum()
+        logPmf.add(logCombination.value())
+        logPmf.add(succ * Math.log(prob))
+        logPmf.add((trials - succ) * Math.log1p(-prob))
+        const sum = new CompensatedSum()
         for (let i = succ; i <= succUpper; i++) {
-          sum += Math.exp(logPmf)
-          logPmf += Math.log((trials - i) / (i + 1)) + logRatio
+          sum.add(Math.exp(logPmf.value()))
+          logPmf.add(Math.log((trials - i) / (i + 1)) + logRatio)
         }
-        return sum
+        return Math.min(sum.value(), 1)
       }
     )
   }
@@ -883,3 +889,21 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
   }
 }
 
+/**
+ * Neumaier's compensated summation: keeps the rounding error of each addition in a separate term, so the error of a
+ * sum of n terms stays near one rounding instead of growing with n.
+ */
+class CompensatedSum {
+  private sum = 0
+  private compensation = 0
+
+  public add(term: number): void {
+    const total = this.sum + term
+    this.compensation += Math.abs(this.sum) >= Math.abs(term) ? (this.sum - total) + term : (term - total) + this.sum
+    this.sum = total
+  }
+
+  public value(): number {
+    return this.sum + this.compensation
+  }
+}
