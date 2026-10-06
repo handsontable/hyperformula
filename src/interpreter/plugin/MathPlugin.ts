@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue, RawInterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
@@ -182,10 +182,6 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
   }
 
   public permut(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    // whole-column and whole-row ranges are not implicitly intersected in a scalar slot
-    if (ast.args.some(arg => arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE)) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-    }
     return this.runFunction(ast.args, state, this.metadata('PERMUT'),
       (n: number, k: number) => {
         n = Math.trunc(n)
