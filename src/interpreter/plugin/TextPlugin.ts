@@ -894,6 +894,23 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     if (node.type === AstNodeType.NUMBER) {
       return node.value.toString()
     }
+    const signed = TextPlugin.signedNumberLiteral(node)
+    if (signed !== undefined) {
+      return signed.toString()
+    }
+    return undefined
+  }
+
+  /**
+   * Reads a number literal with a leading sign (`-12.5`, `+12.5`), which the parser keeps as a unary operator node.
+   *
+   * @param {Ast} node - The AST node
+   * @returns {Maybe<number>} - The signed number, or undefined if the node is not such a literal
+   */
+  private static signedNumberLiteral(node: Ast): Maybe<number> {
+    if ((node.type === AstNodeType.MINUS_UNARY_OP || node.type === AstNodeType.PLUS_UNARY_OP) && node.value.type === AstNodeType.NUMBER) {
+      return node.type === AstNodeType.MINUS_UNARY_OP ? -node.value.value : node.value.value
+    }
     return undefined
   }
 
@@ -930,6 +947,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     }
     if (node.type === AstNodeType.NUMBER) {
       return node.value
+    }
+    const signed = TextPlugin.signedNumberLiteral(node)
+    if (signed !== undefined) {
+      return signed
     }
     if (node.type === AstNodeType.FUNCTION_CALL && node.args.length === 0) {
       if (node.procedureName === 'TRUE') {
