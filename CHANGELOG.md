@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - Fixed the validation of classic (25-character) license keys depending on the time zone: east of UTC, a key that expired the day before the build was released was still accepted, and west of UTC, the console message printed an expiry date one day too early. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+- Fixed number literals with an uppercase exponent marker, such as `=1E5` or `=1E-3`, being rejected as a parse error; the lowercase form was already accepted. [#1788](https://github.com/handsontable/hyperformula/pull/1788)
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
 - Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
