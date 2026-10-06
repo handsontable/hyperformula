@@ -98,6 +98,7 @@ const dictionary: RawTranslationPackage = {
     DELTA: 'DELTA',
     DOLLARDE: 'DECTAL',
     DOLLARFR: 'BRÅK',
+    DROP: 'UTESLUT',
     EDATE: 'EDATUM',
     EFFECT: "EFFRÄNTA",
     EOMONTH: 'SLUTMÅNAD',

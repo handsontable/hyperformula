@@ -98,6 +98,7 @@ export const dictionary: RawTranslationPackage = {
     DELTA: 'DELTA',
     DOLLARDE: 'MONEDA.DEC',
     DOLLARFR: 'MONEDA.FRAC',
+    DROP: 'EXCLUIR',
     EDATE: 'FECHA.MES',
     EFFECT: "INT.EFECTIVO",
     EOMONTH: 'FIN.MES',

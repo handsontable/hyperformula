@@ -98,6 +98,7 @@ const dictionary: RawTranslationPackage = {
     DELTA: 'SAMA.ARVO',
     DOLLARDE: 'VALUUTTA.DES',
     DOLLARFR: 'VALUUTTA.MURTO',
+    DROP: 'HYLKÄÄ',
     EDATE: 'PÄIVÄ.KUUKAUSI',
     EFFECT: "KORKO.EFEKT",
     EOMONTH: 'KUUKAUSI.LOPPU',

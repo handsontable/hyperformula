@@ -98,6 +98,7 @@ const dictionary: RawTranslationPackage = {
     DELTA: 'DELTA',
     DOLLARDE: 'DOLLARDE',
     DOLLARFR: 'DOLLARBR',
+    DROP: 'UTELAT',
     EDATE: 'DAG.ETTER',
     EFFECT: "EFFEKTIV.RENTE",
     EOMONTH: 'MÅNEDSSLUTT',

@@ -16,11 +16,11 @@ import {BooleanPlugin} from './BooleanPlugin'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
- * Classifies a TAKE count expression whose value may be known before evaluation.
+ * Classifies a TAKE or DROP count expression whose value may be known before evaluation.
  *
  * @internal
  */
-type TakeLiteralNumber =
+type LiteralCount =
   | {kind: 'value', value: number}
   | {kind: 'invalid'}
   | {kind: 'unresolved'}
@@ -31,18 +31,18 @@ type TakeLiteralNumber =
  *
  * @internal
  */
-type TakeLiteralDimension = TakeLiteralNumber | {kind: 'unbounded'}
+type TakeLiteralDimension = LiteralCount | {kind: 'unbounded'}
 
 export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ArrayPlugin> {
   /**
-   * Evaluates the dependency-free subset of TAKE count expressions used for
-   * static result-size prediction.
+   * Evaluates the dependency-free subset of TAKE and DROP count expressions
+   * used for static result-size prediction.
    *
    * @param {Ast | undefined} argument - The count expression to inspect before evaluation.
-   * @returns {TakeLiteralDimension} The constant value, an invalid-literal marker, or an unresolved marker.
+   * @returns {LiteralCount} The constant value, an invalid-literal marker, or an unresolved marker.
    * @internal
    */
-  private parseTakeLiteralNumber(argument: Ast | undefined): TakeLiteralNumber {
+  private parseLiteralCount(argument: Ast | undefined): LiteralCount {
     if (argument?.type === AstNodeType.NUMBER) {
       return {kind: 'value', value: argument.value}
     }
@@ -60,7 +60,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     }
 
     if (argument?.type === AstNodeType.PLUS_UNARY_OP || argument?.type === AstNodeType.MINUS_UNARY_OP) {
-      const dimension = this.parseTakeLiteralNumber(argument.value)
+      const dimension = this.parseLiteralCount(argument.value)
       if (dimension.kind !== 'value') {
         return dimension
       }
@@ -68,11 +68,11 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     }
 
     if (argument?.type === AstNodeType.PARENTHESIS) {
-      return this.parseTakeLiteralNumber(argument.expression)
+      return this.parseLiteralCount(argument.expression)
     }
 
     if (argument?.type === AstNodeType.PERCENT_OP) {
-      const dimension = this.parseTakeLiteralNumber(argument.value)
+      const dimension = this.parseLiteralCount(argument.value)
       if (dimension.kind !== 'value') {
         return dimension
       }
@@ -95,8 +95,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       || argument?.type === AstNodeType.DIV_OP
       || argument?.type === AstNodeType.POWER_OP
     ) {
-      const left = this.parseTakeLiteralNumber(argument.left)
-      const right = this.parseTakeLiteralNumber(argument.right)
+      const left = this.parseLiteralCount(argument.left)
+      const right = this.parseLiteralCount(argument.right)
       if (left.kind === 'invalid' || right.kind === 'invalid') {
         return {kind: 'invalid'}
       }
@@ -143,14 +143,14 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       return {kind: 'unbounded'}
     }
 
-    const dimension = this.parseTakeLiteralNumber(argument)
+    const dimension = this.parseLiteralCount(argument)
     return dimension.kind === 'value'
       ? {kind: 'value', value: Math.abs(Math.trunc(dimension.value))}
       : dimension
   }
 
   /**
-   * Resolves a direct TAKE source reference without evaluating its values.
+   * Resolves a direct TAKE or DROP source reference without evaluating its values.
    * The range supplies materialized dimensions only; spill placement never
    * depends on its sheet.
    *
@@ -159,14 +159,104 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * @returns {AbsoluteCellRange | undefined} The source range, or `undefined` for a computed array.
    * @internal
    */
-  private takeSourceRange(argument: Ast, state: InterpreterState): AbsoluteCellRange | undefined {
+  private directSourceRange(argument: Ast, state: InterpreterState): AbsoluteCellRange | undefined {
     if (argument.type === AstNodeType.PARENTHESIS) {
-      return this.takeSourceRange(argument.expression, state)
+      return this.directSourceRange(argument.expression, state)
     }
     if (argument.type === AstNodeType.CELL_RANGE || argument.type === AstNodeType.COLUMN_RANGE || argument.type === AstNodeType.ROW_RANGE) {
       return AbsoluteCellRange.fromAstOrUndef(argument, state.formulaAddress)
     }
     return undefined
+  }
+
+  /**
+   * Classifies a DROP count before evaluation. An omitted or empty count
+   * drops nothing, so it resolves to zero.
+   *
+   * @param {Ast | undefined} argument - The count expression to classify.
+   * @returns {LiteralCount} The constant count, an invalid-literal marker, or an unresolved marker.
+   * @internal
+   */
+  private parseDropLiteralCount(argument: Ast | undefined): LiteralCount {
+    if (argument === undefined || argument.type === AstNodeType.EMPTY) {
+      return {kind: 'value', value: 0}
+    }
+    return this.parseLiteralCount(argument)
+  }
+
+  /**
+   * Predicts how many rows or columns of the source remain after DROP.
+   *
+   * An unresolved count may drop nothing, so the source dimension is the upper
+   * bound. An unbounded source (a whole column or row) is measured by its
+   * effective size. In a spreadsheet such a result reaches the sheet edge, so
+   * it fits only when the formula starts no further from the first row or
+   * column than the number of rows or columns dropped; otherwise the dimension
+   * stays unbounded, which makes array-space validation report a spill error.
+   *
+   * @param {number} sourceDimension - The predicted source height or width, possibly unbounded.
+   * @param {LiteralCount} count - The classified count; must not be invalid.
+   * @param {number} anchor - The formula's row or column index along the same axis.
+   * @param {number} effectiveDimension - The effective source height or width along the same axis.
+   * @returns {number} The remaining dimension, zero when everything is dropped, or `Infinity` for a spill.
+   * @internal
+   */
+  private predictDropDimension(sourceDimension: number, count: LiteralCount, anchor: number, effectiveDimension: number): number {
+    const requestedDrop = count.kind === 'value' ? Math.abs(Math.trunc(count.value)) : 0
+
+    if (!Number.isFinite(sourceDimension) && count.kind === 'value' && anchor > requestedDrop) {
+      return Number.POSITIVE_INFINITY
+    }
+
+    const boundedDimension = Number.isFinite(sourceDimension) ? sourceDimension : effectiveDimension
+    return boundedDimension - Math.min(requestedDrop, boundedDimension)
+  }
+
+  /**
+   * Measures a TAKE or DROP source whose predicted size is unbounded. A direct
+   * whole-column or whole-row reference is measured by its effective size; a
+   * computed array falls back to the configured sheet limits.
+   *
+   * @param {Ast} argument - The source expression to measure.
+   * @param {InterpreterState} state - The formula state used to resolve relative addresses.
+   * @returns {ArraySize} The effective source size.
+   * @internal
+   */
+  private effectiveSourceSize(argument: Ast, state: InterpreterState): ArraySize {
+    const sourceRange = this.directSourceRange(argument, state)
+    return new ArraySize(
+      sourceRange?.effectiveWidth(this.dependencyGraph) ?? this.config.maxColumns,
+      sourceRange?.effectiveHeight(this.dependencyGraph) ?? this.config.maxRows,
+    )
+  }
+
+  /**
+   * Returns a block of a source array as values. An address-backed source is
+   * read only inside the block, so the cost is proportional to the result
+   * rather than to the source. The block is returned as values rather than as
+   * a range so that it coerces to a scalar like any other array result.
+   *
+   * @param {SimpleRangeValue} source - The evaluated source array.
+   * @param {number} startRow - The first row of the block, relative to the source.
+   * @param {number} startColumn - The first column of the block, relative to the source.
+   * @param {number} height - The number of rows in the block.
+   * @param {number} width - The number of columns in the block.
+   * @returns {SimpleRangeValue} The block's values.
+   * @internal
+   */
+  private sliceSourceArray(source: SimpleRangeValue, startRow: number, startColumn: number, height: number, width: number): SimpleRangeValue {
+    const sourceRange = source.range
+
+    if (sourceRange !== undefined) {
+      const blockRange = AbsoluteCellRange.spanFrom(sourceRange.getAddress(startColumn, startRow), width, height)
+      return SimpleRangeValue.onlyValues(SimpleRangeValue.onlyRange(blockRange, this.dependencyGraph).data)
+    }
+
+    const block = source.data
+      .slice(startRow, startRow + height)
+      .map(row => row.slice(startColumn, startColumn + width))
+
+    return SimpleRangeValue.onlyValues(block)
   }
 
   public static implementedFunctions: ImplementedFunctions = {
@@ -197,6 +287,17 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: FunctionArgumentType.RANGE},
       ],
       repeatLastArgs: 1,
+    },
+    'DROP': {
+      method: 'drop',
+      sizeOfResultArrayMethod: 'dropArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 0},
+      ],
+      vectorizationForbidden: true,
     },
     'TAKE': {
       method: 'take',
@@ -369,26 +470,81 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         const columnsToTake = Math.min(Math.abs(requestedColumns), sourceWidth)
         const startRow = requestedRows > 0 ? 0 : sourceHeight - rowsToTake
         const startColumn = requestedColumns > 0 ? 0 : sourceWidth - columnsToTake
-        const sourceRange = range.range
 
-        if (sourceRange !== undefined) {
-          // Keep address-backed ranges lazy to avoid materializing cells outside the TAKE result.
-          const resultRange = AbsoluteCellRange.spanFrom(
-            sourceRange.getAddress(startColumn, startRow),
-            columnsToTake,
-            rowsToTake,
-          )
-          const result = SimpleRangeValue.onlyRange(resultRange, this.dependencyGraph).data
-          return SimpleRangeValue.onlyValues(result)
-        }
-
-        const result = range.data
-          .slice(startRow, startRow + rowsToTake)
-          .map(row => row.slice(startColumn, startColumn + columnsToTake))
-
-        return SimpleRangeValue.onlyValues(result)
+        return this.sliceSourceArray(range, startRow, startColumn, rowsToTake, columnsToTake)
       }
     )
+  }
+
+  /**
+   * Corresponds to DROP(array, rows, [columns]).
+   *
+   * Removes rows and columns from the beginning (positive counts) or the end
+   * (negative counts) of the source array and returns the rest. Counts are
+   * truncated toward zero; a zero, omitted, or empty count drops nothing.
+   * Dropping every row or every column returns a #N/A error.
+   *
+   * @param {ProcedureAst} ast - The parsed DROP call.
+   * @param {InterpreterState} state - The current formula evaluation state.
+   * @returns {InterpreterValue} The remaining source values or a spreadsheet error.
+   */
+  public drop(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DROP'),
+      (range: SimpleRangeValue, rows: number, columns: number) => {
+        const rowsToDrop = Math.min(Math.abs(Math.trunc(rows)), range.height())
+        const columnsToDrop = Math.min(Math.abs(Math.trunc(columns)), range.width())
+        const remainingRows = range.height() - rowsToDrop
+        const remainingColumns = range.width() - columnsToDrop
+
+        if (remainingRows === 0 || remainingColumns === 0) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArray)
+        }
+
+        const startRow = rows > 0 ? rowsToDrop : 0
+        const startColumn = columns > 0 ? columnsToDrop : 0
+
+        return this.sliceSourceArray(range, startRow, startColumn, remainingRows, remainingColumns)
+      }
+    )
+  }
+
+  /**
+   * Calculates the spilled array size of DROP. Statically known counts give
+   * the exact size; counts that depend on other cells use the source size as
+   * the upper bound. Dropping every row or column from a known count is
+   * reported as an invalid size, so the formula evaluates to its #N/A error
+   * instead of reserving space.
+   *
+   * @param {ProcedureAst} ast - The parsed DROP call.
+   * @param {InterpreterState} state - The formula state whose address anchors the spill.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  public dropArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 2 || ast.args.length > 3) {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata('DROP')
+    const sourceSize = this.arraySizeForAst(
+      ast.args[0],
+      new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
+    )
+    const rowCount = this.parseDropLiteralCount(ast.args[1])
+    const columnCount = this.parseDropLiteralCount(ast.args[2])
+
+    if (rowCount.kind === 'invalid' || columnCount.kind === 'invalid') {
+      return ArraySize.error()
+    }
+
+    const effectiveSourceSize = this.effectiveSourceSize(ast.args[0], state)
+    const height = this.predictDropDimension(sourceSize.height, rowCount, state.formulaAddress.row, effectiveSourceSize.height)
+    const width = this.predictDropDimension(sourceSize.width, columnCount, state.formulaAddress.col, effectiveSourceSize.width)
+
+    if (height < 1 || width < 1) {
+      return ArraySize.error()
+    }
+
+    return new ArraySize(width, height)
   }
 
   /**
@@ -435,13 +591,9 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       : sourceSize.width
     const startsBelowFirstRow = rowDimension.kind === 'unbounded' && !Number.isFinite(height) && state.formulaAddress.row !== 0
     const startsRightOfFirstColumn = columnDimension.kind === 'unbounded' && !Number.isFinite(width) && state.formulaAddress.col !== 0
-    const sourceRange = this.takeSourceRange(ast.args[0], state)
-    const effectiveHeight = !Number.isFinite(height)
-      ? sourceRange?.effectiveHeight(this.dependencyGraph) ?? this.config.maxRows
-      : height
-    const effectiveWidth = !Number.isFinite(width)
-      ? sourceRange?.effectiveWidth(this.dependencyGraph) ?? this.config.maxColumns
-      : width
+    const effectiveSourceSize = this.effectiveSourceSize(ast.args[0], state)
+    const effectiveHeight = !Number.isFinite(height) ? effectiveSourceSize.height : height
+    const effectiveWidth = !Number.isFinite(width) ? effectiveSourceSize.width : width
 
     if (startsBelowFirstRow || startsRightOfFirstColumn) {
       return new ArraySize(width, height)

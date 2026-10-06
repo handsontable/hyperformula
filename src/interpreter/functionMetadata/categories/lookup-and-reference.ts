@@ -39,6 +39,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=COLUMNS(A1:C5)', '=COLUMNS(A1:F1)'],
   },
+  DROP: {
+    category: 'Lookup and reference',
+    shortDescription: 'Removes specified rows or columns from the beginning or end of an array.',
+    parameters: [{name: 'array', description: 'The array or range from which to remove rows or columns.'}, {name: 'rows', description: 'The number of rows to remove; a negative value removes rows from the end. Zero or an empty argument removes no rows.'}, {name: 'columns', description: 'The number of columns to remove; a negative value removes columns from the end. When omitted, empty, or zero, no columns are removed.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=DROP(A1:C5, 2)', '=DROP(A1:C5, -1, -1)', '=DROP(A1:C5, , 1)'],
+  },
   FILTER: {
     category: 'Lookup and reference',
     shortDescription: 'Filters an array, based on multiple conditions (boolean arrays).',
