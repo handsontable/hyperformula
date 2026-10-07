@@ -120,6 +120,25 @@ export function divideDoubleDouble(x: DoubleDouble, k: number): DoubleDouble {
 }
 
 /**
+ * Quotient of two double-doubles.
+ *
+ * A zero or non-finite divisor, or a non-finite quotient, gives the plain double quotient, so infinities,
+ * zeros and NaNs are the same as in ordinary arithmetic.
+ *
+ * @param {DoubleDouble} x - dividend
+ * @param {DoubleDouble} y - divisor
+ * @returns {DoubleDouble} `x / y`
+ */
+export function divideDoubleDoubles(x: DoubleDouble, y: DoubleDouble): DoubleDouble {
+  const quotient = x.hi / y.hi
+  if (!Number.isFinite(quotient) || !Number.isFinite(y.hi)) {
+    return {hi: quotient, lo: 0}
+  }
+  const remainder = addDoubleDouble(x, scaleDoubleDouble({hi: -y.hi, lo: -y.lo}, quotient))
+  return twoSum(quotient, remainder.hi / y.hi)
+}
+
+/**
  * Rounds a double-double to the nearest double.
  *
  * @param {DoubleDouble} x - the value to round
