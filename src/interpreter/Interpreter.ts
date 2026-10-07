@@ -12,8 +12,7 @@ import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
 import {FormulaVertex} from '../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../error-message'
-import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
-import {CapabilityRegistry, licenseAllowsFunction, ResolvedCapabilities} from '../license/CapabilityRegistry'
+import {FunctionCallLicenseGate} from '../license/FunctionCallLicenseGate'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
@@ -46,18 +45,8 @@ import { AddressWithSheet } from '../parser/Address'
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
 
-  /*
-   * The license decisions applied to every function call, read once from the config instead of
-   * through its getters (a WeakMap lookup each) on the hottest path of evaluation. They cannot go
-   * stale: a Config never changes once built, and `updateConfig` builds a new engine, and with it a
-   * new Interpreter.
-   */
-  private readonly licenseBlocksEvaluation: boolean
-  private readonly licenseKeyValidityState: LicenseKeyValidityState
-  private readonly capabilityRegistry: CapabilityRegistry
-  private readonly licenseCapabilities: ResolvedCapabilities
-  /** `false` for a key that grants every function, which lets a call skip the alias and table lookups. */
-  private readonly licenseRestrictsFunctions: boolean
+  /** Decides which function calls the license stops; see {@link FunctionCallLicenseGate}. */
+  private readonly functionCallLicenseGate: FunctionCallLicenseGate
 
   constructor(
     public readonly config: Config,
@@ -73,11 +62,7 @@ export class Interpreter {
   ) {
     this.functionRegistry.initializePlugins(this)
     this.criterionBuilder = new CriterionBuilder(config)
-    this.licenseBlocksEvaluation = config.licenseBlocksEvaluation
-    this.licenseKeyValidityState = config.licenseKeyValidityState
-    this.capabilityRegistry = config.capabilityRegistry
-    this.licenseCapabilities = config.licenseCapabilities
-    this.licenseRestrictsFunctions = config.licenseCapabilities.functions !== 'all'
+    this.functionCallLicenseGate = new FunctionCallLicenseGate(config, functionRegistry)
   }
 
   public evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
@@ -196,15 +181,9 @@ export class Interpreter {
         return this.unaryRangeWrapper(this.percentOp, result, state)
       }
       case AstNodeType.FUNCTION_CALL: {
-        if (!FunctionRegistry.functionIsProtected(ast.procedureName)) {
-          if (this.licenseBlocksEvaluation) {
-            return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.licenseKeyValidityState))
-          }
-
-          if (this.licenseRestrictsFunctions
-            && !licenseAllowsFunction(this.capabilityRegistry, this.licenseCapabilities, this.functionRegistry.getCanonicalFunctionId(ast.procedureName))) {
-            return new CellError(ErrorType.LIC, ErrorMessage.LicenseCapability(ast.procedureName))
-          }
+        const licenseError = this.functionCallLicenseGate.stoppedCallError(ast.procedureName)
+        if (licenseError !== undefined) {
+          return licenseError
         }
         const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
         if (pluginFunction !== undefined) {
