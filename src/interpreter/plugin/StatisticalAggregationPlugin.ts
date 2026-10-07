@@ -379,15 +379,24 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         const yDeviations = deviationsFromMean(ret[0])
         const xDeviations = deviationsFromMean(ret[1])
         const xSumOfSquares = sumOfProducts(xDeviations, xDeviations)
+        if (xSumOfSquares.hi === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
         if (!Number.isFinite(roundDoubleDouble(xSumOfSquares))) {
           return new CellError(ErrorType.NUM, ErrorMessage.NaN)
         }
         const productsSum = sumOfProducts(yDeviations, xDeviations)
         const slope = divideDoubleDoubles(productsSum, xSumOfSquares)
-        const explained = multiplyDoubleDouble(slope, productsSum)
-        const residual = subtractDoubleDouble(sumOfProducts(yDeviations, yDeviations), explained)
+        // when the slope overflows, the explained sum of squares Sxy^2 / Sxx can still be finite
+        const explained = Number.isFinite(slope.hi)
+          ? multiplyDoubleDouble(slope, productsSum)
+          : divideDoubleDoubles(multiplyDoubleDouble(productsSum, productsSum), xSumOfSquares)
+        const residual = roundDoubleDouble(subtractDoubleDouble(sumOfProducts(yDeviations, yDeviations), explained))
+        if (!Number.isFinite(residual)) {
+          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+        }
         // the residual is non-negative; a tiny negative rounding remainder counts as 0
-        return Math.sqrt(Math.max(0, roundDoubleDouble(residual)) / (n - 2))
+        return Math.sqrt(Math.max(0, residual) / (n - 2))
       })
   }
 
@@ -408,6 +417,9 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         }
         const xDeviations = deviationsFromMean(ret[1])
         const xSumOfSquares = sumOfProducts(xDeviations, xDeviations)
+        if (xSumOfSquares.hi === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
         if (!Number.isFinite(roundDoubleDouble(xSumOfSquares))) {
           return new CellError(ErrorType.NUM, ErrorMessage.NaN)
         }
