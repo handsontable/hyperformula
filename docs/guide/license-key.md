@@ -70,18 +70,24 @@ If your key grants only part of the library, then:
   functions your key includes, so a function picker built from them never offers a function that
   then fails.
 
-
 ## License key notifications
 
 If your license key is missing, invalid, or expired, you see a
 corresponding notification in the console.
 
-A missing or invalid key makes every licence-gated function call evaluate to a `#LIC!` error — but
-no API method starts throwing, and `getAvailableFunctions()` still describes the full set of
-functions. A key problem never narrows what the library reports it can do.
+A missing or invalid key blocks the library:
 
-Depending on your license terms, an expired key either behaves the same way, or keeps working with
-what it grants and prints an error in the console.
+* Every function call evaluates to a `#LIC!` error, except `VERSION()` and `OFFSET()`.
+* Every license-gated API method throws a `LicenseCapabilityMissingError` that names the key's
+  state, for example: `License key is missing. Feature crud is not available.` The gated methods
+  are the ones that edit cells, rows, columns, and sheets, `copy()`, `cut()`, `paste()`, `undo()`,
+  `redo()`, `batch()`, `suspendEvaluation()`, and the methods that add, change, or remove named
+  expressions. Building an engine with named expressions throws the same error.
+* Getters and clean-up methods, such as `clearClipboard()` and `resumeEvaluation()`, keep working,
+  and `getAvailableFunctions()` still describes the full set of functions.
+
+Depending on your license terms, an expired key either blocks the library in the same way, or keeps
+working with what it grants and prints an error in the console.
 
 ## License key support
 
