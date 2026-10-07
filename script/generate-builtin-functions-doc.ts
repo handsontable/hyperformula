@@ -24,15 +24,10 @@ const TEMPLATE_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.tmpl.m
 const DOC_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.md')
 const LANGUAGE = 'enGB'
 /**
- * The GPLv3 key. Two reasons to name a key here, one current and one not yet:
- *
- * - Today it only keeps the build quiet. Function availability is **not** license-gated: every key, and no key at
- *   all, yields the same function set. But the metadata API is instance-scoped, so this page is now generated from
- *   an engine, and constructing one without a key logs "The license key for HyperFormula is missing." — noise the
- *   static path never produced, because it built no engine.
- * - Once entitlement lands (HF-307), the engine's key *will* decide which functions the metadata API reports.
- *   Naming the fully-entitled key now means that change cannot silently narrow the published reference to one tier;
- *   the page must always document the complete function set (HF-349).
+ * The GPLv3 key, which restricts nothing. The metadata API is instance-scoped and an engine reports only the
+ * functions its key grants, so this page has to be generated with a fully entitled key: the published reference
+ * must always document the complete function set. The key also keeps the build quiet, because constructing an
+ * engine without one logs "The license key for HyperFormula is missing."
  */
 const LICENSE_KEY = 'gpl-v3'
 

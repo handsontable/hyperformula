@@ -7,12 +7,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added support for the new license key format. A proprietary key can now grant a subset of the library: a function your key does not include evaluates to a `#LIC!` error, and the matching parts of the API throw a `LicenseCapabilityMissingError`. `getAvailableFunctions()` and `getFunctionDetails()` describe only the functions your key includes. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+
+### Changed
+
+- Changed the `VERSION` function to return only the HyperFormula version (e.g. `HyperFormula v3.4.0`), without the license key status. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+- Changed the API methods gated by the license key to throw a `LicenseCapabilityMissingError` when the key is missing or invalid, when a classic key has expired, or when a trial key is past its grace period. The gated methods are the ones that edit cells, rows, columns, and sheets, `copy()`, `cut()`, `paste()`, `undo()`, `redo()`, `batch()`, `suspendEvaluation()`, and the methods that add, change, or remove named expressions. Building an engine with named expressions throws the same error, and the matching `isItPossibleTo*()` methods, `isThereSomethingToUndo()`, and `isThereSomethingToRedo()` return `false`. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+
 ### Fixed
 
+- Fixed the validation of classic (25-character) license keys depending on the time zone: east of UTC, a key that expired the day before the build was released was still accepted, and west of UTC, the console message printed an expiry date one day too early. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
 - Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
 - Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
+- Fixed a bug where moving or pasting a formula with an undefined name to another sheet incorrectly added an empty global named expression. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
 
 ## [3.4.0] - 2026-08-10
 
