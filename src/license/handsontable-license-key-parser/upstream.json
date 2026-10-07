@@ -1,0 +1,33 @@
+{
+  "_comment": [
+    "Where this directory comes from, machine-readable so `npm run check:license-key-parser-drift` can hold it",
+    "to upstream: it fetches every file of the upstream directory at `tag`, checks that `tag` still",
+    "points at `commit`, and compares bytes. Nothing else may live here except `own_files`; a",
+    "local-only file would shadow a copied one.",
+    "",
+    "`allowed_divergences` is the ONE place a local edit is permitted, and each entry has to say why",
+    "and when it goes away. The checker substitutes `local` for `upstream` in the fetched file before",
+    "comparing. A tag is immutable, so this does not notice upstream fixing the line on its branches;",
+    "what it notices is a NEWER TAG (the check fails on one), and at the re-take the swap stops matching",
+    "once upstream has changed the line. A tag that leaves the line alone carries the shim forward;",
+    "`until` is a note for whoever re-takes, not something the checker evaluates."
+  ],
+  "repository": "handsontable/license-key",
+  "directory": "vendor/entitlement-key-reader",
+  "tag": "5.1.1",
+  "commit": "12466071875bfb3b807e8321d9d5e9c9a8551b09",
+  "taken_on": "2026-10-07",
+  "own_files": [
+    "PROVENANCE.md",
+    "upstream.json"
+  ],
+  "allowed_divergences": [
+    {
+      "file": "extractKeyData.ts",
+      "why": "TypeScript 4.0.8 (HyperFormula's) does not narrow `unknown` through `!== null && typeof === 'object'`; upstream compiles under ^5.9.3. One cast makes the file compile here. Semantics unchanged.",
+      "until": "upstream ships the cast (or HyperFormula moves to TypeScript >= 4.5, measured: 4.4.4 fails, 4.5.5 passes) - then delete this entry and re-take the file",
+      "upstream": "      Object.keys(current).forEach(key => pending.push((current as Record<string, unknown>)[key]));",
+      "local": "      Object.keys(current as object).forEach(key => pending.push((current as Record<string, unknown>)[key]));"
+    }
+  ]
+}
