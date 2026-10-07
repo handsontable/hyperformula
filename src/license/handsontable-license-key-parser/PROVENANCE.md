@@ -39,14 +39,12 @@ pin. Without credentials to the private repository it fails rather than skips.
 ## What HyperFormula uses from it
 
 `readEntitlementLicense`, the single entry point upstream prescribes, plus `detectLicenseKeyFormat`,
-`toIsoBuildDate`, `CHECKSUM_LENGTH`, `sha512`, `stringToUtf8Bytes` and the types - from
-`src/license/licenseResolution.ts`, `src/helpers/licenseKeyValidator.ts` and
-`src/interpreter/plugin/VersionPlugin.ts`, which sit outside the copy, as upstream's guide
-prescribes. The reader verifies the key (the checksum and, from format version 2, the prose
+`toIsoBuildDate` and the types - from
+`src/license/licenseResolution.ts` and `src/helpers/licenseKeyValidator.ts`, which sit outside the
+copy, as upstream's guide prescribes. The reader verifies the key (the checksum and, from format version 2, the prose
 digest), picks HyperFormula's entry, places it in its lifecycle window and reads its flags.
 HyperFormula keeps what the guide leaves to the product: the meaning of the capability tokens
-(`src/license/capabilities.ts`), the console messages, and the identity a key is printed once
-under. The test suite mints keys with the test-only exports `canonicalizeProse`,
+(`src/license/capabilities.ts`) and the console messages. The test suite mints keys with the test-only exports `canonicalizeProse`,
 `computeProseDigest`, `computePayloadChecksum` and `stringToBase64Url`, as upstream's README shows.
 
 Upstream's `README.md` in this directory is the integration guide; `AGENTS.md` is theirs too.

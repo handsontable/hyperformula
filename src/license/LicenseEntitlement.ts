@@ -6,16 +6,15 @@
 /**
  * Identifies a feature area of the public API that a license entitlement can gate.
  *
- * `CustomFunctions` is reserved vocabulary: it exists so a license payload is free to carry it,
- * but registering a custom function is never gated, so no capability grant maps to it.
+ * Public, as the type of [[LicenseCapabilityMissingError]]'s `feature`, so that a caller can tell
+ * which feature a call needed without parsing the error message.
  */
-export const enum FeatureId {
+export enum FeatureId {
   NamedExpressions = 'named_expressions',
   Clipboard = 'clipboard',
   Crud = 'crud',
   UndoRedo = 'undo_redo',
   Batching = 'batching',
-  CustomFunctions = 'custom_functions',
 }
 
 /**
@@ -52,12 +51,6 @@ export interface LicenseEntitlement {
   unrestricted: boolean,
   /** Capability tokens this entitlement grants, recognized by this library version. */
   capabilities: ReadonlySet<string>,
-  /**
-   * Tokens present on the license payload that this library version does not recognize.
-   * Kept for diagnostics and tests; nothing public reads this field — an
-   * unrecognized token never grants a capability, and it does so silently.
-   */
-  unrecognizedCapabilities: readonly string[],
   expiry: LicenseExpiry,
   /**
    * When `true`, resolving this entitlement must not print a console message of any kind.
@@ -85,7 +78,6 @@ export function unrestrictedEntitlement(): LicenseEntitlement {
   return {
     unrestricted: true,
     capabilities: new Set<string>(),
-    unrecognizedCapabilities: [],
     expiry: {kind: 'none', date: null, noticeDays: 0, graceDays: 0},
     silent: false,
     isTrial: false,

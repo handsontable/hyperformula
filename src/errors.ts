@@ -397,7 +397,9 @@ export class AliasAlreadyExisting extends Error {
 
 /**
  * Error thrown when a public API method is called for a {@link FeatureId} that the current
- * license entitlement does not grant. Mirrors gate B's `ErrorMessage.LicenseCapability`, but
+ * license entitlement does not grant, or when the license key itself blocks every gated feature
+ * (missing, invalid, or expired in a way that blocks evaluation); the message then names the
+ * key's state instead. Mirrors gate B's `ErrorMessage.LicenseCapability`, but
  * this one guards the API surface itself rather than a formula evaluation, so it
  * is thrown synchronously instead of surfacing as a cell error.
  *
@@ -438,6 +440,9 @@ export class AliasAlreadyExisting extends Error {
  * @see [[suspendEvaluation]]
  */
 export class LicenseCapabilityMissingError extends Error {
+  /** The gated feature the call needed. */
+  public readonly feature: FeatureId
+
   /**
    * @param {FeatureId} feature - the gated feature that was called
    * @param {LicenseKeyValidityState} [blockingState] - the key's state when the key itself blocks
@@ -448,5 +453,6 @@ export class LicenseCapabilityMissingError extends Error {
     super(blockingState === undefined
       ? `Feature ${feature} is not included in your license.`
       : `License key is ${blockingState}. Feature ${feature} is not available.`)
+    this.feature = feature
   }
 }

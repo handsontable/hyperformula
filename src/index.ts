@@ -52,6 +52,7 @@ import enGB from './i18n/languages/enGB'
 import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition, FunctionArgumentType, ImplementedFunctions, FunctionMetadata, EmptyValue} from './interpreter'
 import {FunctionCategory, FunctionDetails, FunctionListEntry, FunctionParameterDescription} from './interpreter/functionMetadata/FunctionDescription'
 import {FormatInfo} from './interpreter/InterpreterValue'
+import {FeatureId} from './license/LicenseEntitlement'
 import * as plugins from './interpreter/plugin'
 import {SimpleRangeValue} from './SimpleRangeValue'
 import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
@@ -65,6 +66,7 @@ import {ConfigParams} from './ConfigParams'
 class HyperFormulaNS extends HyperFormula {
   public static HyperFormula = HyperFormula
   public static ErrorType = ErrorType
+  public static FeatureId = FeatureId
   public static CellError = CellError
   public static CellType = CellType
   public static CellValueType = CellValueType
@@ -152,6 +154,7 @@ export {
   CellValueType,
   CellValueDetailedType,
   ErrorType,
+  FeatureId,
   ExportedCellChange,
   ExportedNamedExpressionChange,
   DetailedCellError,

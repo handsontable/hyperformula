@@ -7,8 +7,8 @@ import {
   checkLicenseKeyValidity,
   LicenseKeyValidityState,
   notifyEntitlementKey,
+  notifyUnlicensedEntitlementKey,
 } from '../helpers/licenseKeyValidator'
-import {CAPABILITY_TABLE, normalizeCapabilityToken} from './capabilities'
 import {LicenseEntitlement, LicenseExpiry, unrestrictedEntitlement} from './LicenseEntitlement'
 import {detectLicenseKeyFormat} from './handsontable-license-key-parser/detectFormat'
 import {readEntitlementLicense} from './handsontable-license-key-parser/readLicense'
@@ -87,9 +87,8 @@ function expiryOf(entry: ProductEntitlement): LicenseExpiry {
 /**
  * Turns HyperFormula's entry of a valid entitlement key into the entitlement it grants.
  *
- * This is fail-closed and silent: a token this version does not recognize
- * is recorded in `unrecognizedCapabilities` and grants nothing, without a warning, a message, or
- * anything public to read it back from. "Silent" there means the *grant* is silent — whether the
+ * This is fail-closed and silent: a token this version does not recognize grants nothing, without
+ * a warning, a message, or anything public to read it back from. "Silent" there means the *grant* is silent — whether the
  * key's console messages are suppressed is decided solely by its `no-console-warns` flag, never
  * by the presence of an unrecognized token; coupling the two would suppress expiry notices as a
  * side effect of a vocabulary mismatch.
@@ -99,22 +98,13 @@ function expiryOf(entry: ProductEntitlement): LicenseExpiry {
  * @param {boolean} silent - whether the key closes the console channel
  */
 function entitlementOf(entry: ProductEntitlement, isTrial: boolean, silent: boolean): LicenseEntitlement {
-  // Appended one by one rather than with `push(...entry.capabilities)`. The array comes from an
-  // attacker-influenced payload and the format sets no size limit, and spreading an array into a
-  // call puts one argument per stack slot: measured, a checksum-valid key carrying 125 000 tokens
-  // threw `RangeError: Maximum call stack size exceeded` out of `HyperFormula.buildFromArray`
-  // instead of resolving to a verdict.
-  const capabilityTokens: string[] = []
-  entry.capabilities.forEach((token) => capabilityTokens.push(token))
-
-  const unrecognizedCapabilities = capabilityTokens.filter(
-    (token) => !CAPABILITY_TABLE.has(normalizeCapabilityToken(token)),
-  )
-
   return {
     unrestricted: false,
-    capabilities: new Set(capabilityTokens),
-    unrecognizedCapabilities,
+    // Never spread into a call (`push(...entry.capabilities)`): the array comes from an
+    // attacker-influenced payload with no size limit, and a spread puts one argument per stack
+    // slot - measured, a checksum-valid key carrying 125 000 tokens threw `RangeError: Maximum
+    // call stack size exceeded` out of `HyperFormula.buildFromArray`.
+    capabilities: new Set(entry.capabilities),
     expiry: expiryOf(entry),
     silent,
     isTrial,
@@ -180,7 +170,7 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
     // `unreadable` (a broken block, or edited or missing prose) and `product_missing` (a key for other products only) both
     // resolve to an invalid key that restricts nothing; only their console messages differ.
     if (notifyConsole) {
-      notifyEntitlementKey(licenseKey, license.reason, {licensedUntil: null, daysRemaining: null})
+      notifyUnlicensedEntitlementKey(license.reason)
     }
 
     return {validityState: LicenseKeyValidityState.INVALID, blocksEvaluation: true, entitlement: unrestrictedEntitlement()}
@@ -194,7 +184,8 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
   // The message is chosen by the reader's state and prints the key's own date (the key
   // specification's text, the same table Handsontable uses). The `no-console-warns` flag closes the channel.
   if (notifyConsole && channels.console) {
-    notifyEntitlementKey(licenseKey, lifecycle.state, {licensedUntil: lifecycle.licensedUntil, daysRemaining: lifecycle.daysRemaining})
+    // The reader sets `licensedUntil` for every key it licenses: the entry's own governing date.
+    notifyEntitlementKey(lifecycle.state, {licensedUntil: lifecycle.licensedUntil as string, daysRemaining: lifecycle.daysRemaining})
   }
 
   return {

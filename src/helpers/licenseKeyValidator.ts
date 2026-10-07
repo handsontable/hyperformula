@@ -3,9 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {stringToUtf8Bytes} from '../license/handsontable-license-key-parser/encoding'
-import {sha512} from '../license/handsontable-license-key-parser/sha512'
-import {LicenseState, UnlicensedReason} from '../license/handsontable-license-key-parser/types'
+import {LicenseState, UnlicensedReason} from '../license/handsontable-license-key-parser'
 import {checkKeySchema, extractTime} from './licenseKeyHelper'
 
 /**
@@ -46,38 +44,51 @@ const consoleMessages: ConsoleMessages = {
 let _notified = false
 
 /**
- * What an entitlement-key console message is built from: the date exactly as the key carries it
+ * What an entitlement-key lifecycle message is built from: the date exactly as the key carries it
  * (never rebuilt from a timestamp) and the whole UTC days left until it.
  */
 export interface EntitlementMessageParams {
-  licensedUntil: string | null,
+  licensedUntil: string,
+  /** `null` for a `release_until` key, which is compared with the build date and reads no clock. */
   daysRemaining: number | null,
 }
 
 /**
- * One console notification for an entitlement-key lifecycle state: its severity and its text. Kept
- * as one record so a state cannot get a text without a severity. A warning while the license still
- * works, an error once it has run out.
+ * One console notification for an entitlement key: its severity and its text. Kept as one record
+ * so a state cannot get a text without a severity. A warning while the license still works, an
+ * error once it has run out.
  */
-interface EntitlementConsoleNotification {
+interface EntitlementConsoleNotification<Params> {
   severity: 'warn' | 'error',
-  message: (params: EntitlementMessageParams) => string,
+  message: (params: Params) => string,
 }
 
 const PURCHASE_LICENSE_TEXT = 'To continue using HyperFormula, you need to purchase a license.'
 
 /**
- * A `usage_until` date is compared against the clock in UTC, so it is printed with the marker; a
- * `release_until` date involves no clock and carries none.
+ * Formats a `usage_until` date for a message. It is compared against the clock in UTC, so it is
+ * printed with the marker; a `release_until` date involves no clock and is printed without one.
+ *
+ * @param {string} isoDate - the date as the key carries it, `YYYY-MM-DD`
  */
-function utcDay(isoDate: string | null): string {
+function utcDay(isoDate: string): string {
   return `${isoDate} (UTC)`
 }
 
-function expiryClause(days: number | null): string {
+/**
+ * The countdown of a trial notice: `expires today`, `expires in 1 day` or `expires in N days`.
+ *
+ * @param {number} days - the whole UTC days left until the last licensed day
+ */
+function expiryClause(days: number): string {
   return days === 0 ? 'expires today' : `expires in ${days} ${days === 1 ? 'day' : 'days'}`
 }
 
+/**
+ * The message of a subscription past its `usage_until` date, inside its grace period or after it.
+ *
+ * @param {EntitlementMessageParams} params - the key's own date
+ */
 function subscriptionExpiredMessage({licensedUntil}: EntitlementMessageParams): string {
   return `Your HyperFormula subscription license expired on ${utcDay(licensedUntil)}. To continue using the software, contact sales@handsontable.com to purchase a valid license key.`
 }
@@ -90,10 +101,11 @@ function subscriptionExpiredMessage({licensedUntil}: EntitlementMessageParams): 
  * maintenance date) have no entry. A non-trial key past its grace keeps the soft-stop message: it
  * never blocks a paying customer.
  */
-const ENTITLEMENT_CONSOLE_NOTIFICATIONS: Partial<Record<LicenseState, EntitlementConsoleNotification>> = {
+const ENTITLEMENT_CONSOLE_NOTIFICATIONS: Partial<Record<LicenseState, EntitlementConsoleNotification<EntitlementMessageParams>>> = {
   trial_notice: {
     severity: 'warn',
-    message: ({daysRemaining}) => `Your HyperFormula license key ${expiryClause(daysRemaining)}. ${PURCHASE_LICENSE_TEXT}`,
+    // A trial in its notice window is always a `usage_until` key, so the reader counted its days.
+    message: ({daysRemaining}) => `Your HyperFormula license key ${expiryClause(daysRemaining as number)}. ${PURCHASE_LICENSE_TEXT}`,
   },
   trial_soft_stop: {
     severity: 'error',
@@ -119,7 +131,7 @@ const ENTITLEMENT_CONSOLE_NOTIFICATIONS: Partial<Record<LicenseState, Entitlemen
  * The console message for each reason an entitlement key does not license HyperFormula. Both are
  * errors: neither key evaluates formulas.
  */
-const UNLICENSED_CONSOLE_NOTIFICATIONS: Record<UnlicensedReason, EntitlementConsoleNotification> = {
+const UNLICENSED_CONSOLE_NOTIFICATIONS: Record<UnlicensedReason, EntitlementConsoleNotification<void>> = {
   unreadable: {
     severity: 'error',
     message: () => 'The license key for HyperFormula is invalid. If you need any help, contact us at support@handsontable.com.',
@@ -131,19 +143,10 @@ const UNLICENSED_CONSOLE_NOTIFICATIONS: Record<UnlicensedReason, EntitlementCons
 }
 
 /**
- * Entitlement messages already printed, each as a key identity (see {@link keyIdentityOf}) plus
- * the message text: "each distinct message once per key per page", as the specification asks. Two
- * keys on one page are two licenses, and one key moving into a new state is a new message. Kept apart from {@link _notified},
- * which serves classic 25-character keys and stays a single flag, unchanged.
- */
-const _notifiedEntitlementKeys = new Set<string>()
-
-/**
- * Clears the once-per-page-load flag {@link notifyLicenseKeyState} keeps, and the per-key set
- * {@link notifyEntitlementKey} keeps.
+ * Clears the once-per-page-load flag {@link notifyLicenseKeyState} keeps.
  *
- * Exists for tests only. Both are module-level and never otherwise reset, so without this the
- * whole console-message path is unobservable: the first spec to build any engine consumes the
+ * Exists for tests only. The flag is module-level and never otherwise reset, so without this the
+ * classic-key message path is unobservable: the first spec to build any engine consumes the
  * message and every later assertion sees silence regardless of what the code does. Under Karma
  * every spec shares one browser context, so spec-order tricks do not work there at all.
  *
@@ -151,7 +154,6 @@ const _notifiedEntitlementKeys = new Set<string>()
  */
 export function resetLicenseKeyNotificationForTests(): void {
   _notified = false
-  _notifiedEntitlementKeys.clear()
 }
 
 /**
@@ -173,59 +175,45 @@ export function notifyLicenseKeyState(state: LicenseKeyValidityState, keyValidit
 }
 
 /**
- * Prints the console message for an entitlement key, at most once per distinct key per page.
+ * Prints the console message for an entitlement key's lifecycle state, every time a key is
+ * resolved: unlike classic keys, entitlement keys keep no record of what they already printed.
+ * States inside the term print nothing.
  *
- * @param {string} licenseKey - the raw key; only its identity is retained
- * @param {LicenseState | UnlicensedReason} state - the reader's lifecycle state, or why the key does not license HyperFormula
+ * @param {LicenseState} state - the reader's lifecycle state
  * @param {EntitlementMessageParams} params - the key's own date and days remaining
  */
-export function notifyEntitlementKey(licenseKey: string, state: LicenseState | UnlicensedReason, params: EntitlementMessageParams): void {
-  const notification: EntitlementConsoleNotification | undefined = state === 'unreadable' || state === 'product_missing'
-    ? UNLICENSED_CONSOLE_NOTIFICATIONS[state]
-    : ENTITLEMENT_CONSOLE_NOTIFICATIONS[state]
+export function notifyEntitlementKey(state: LicenseState, params: EntitlementMessageParams): void {
+  const notification = ENTITLEMENT_CONSOLE_NOTIFICATIONS[state]
 
-  if (notification === undefined) {
-    return
+  if (notification !== undefined) {
+    printNotification(notification.severity, notification.message(params))
   }
+}
 
-  // Keyed by the key AND the text, not the key alone: on a page that stays open while a key moves
-  // from its notice window into expiry, the expiry message is a different message and must still
-  // print. A soft stop and a hard stop share one text, so the hard stop does not repeat it.
-  const text = notification.message(params)
-  const identity = `${keyIdentityOf(licenseKey)}\n${text}`
+/**
+ * Prints the console message for an entitlement key that does not license HyperFormula, every
+ * time such a key is resolved.
+ *
+ * @param {UnlicensedReason} reason - why the reader does not license HyperFormula with the key
+ */
+export function notifyUnlicensedEntitlementKey(reason: UnlicensedReason): void {
+  const notification = UNLICENSED_CONSOLE_NOTIFICATIONS[reason]
 
-  if (_notifiedEntitlementKeys.has(identity)) {
-    return
-  }
+  printNotification(notification.severity, notification.message())
+}
 
-  if (notification.severity === 'error') {
+/**
+ * Prints `text` on the console channel that matches `severity`.
+ *
+ * @param {'warn' | 'error'} severity - `warn` while the license still works, `error` once it does not
+ * @param {string} text - the message
+ */
+function printNotification(severity: 'warn' | 'error', text: string): void {
+  if (severity === 'error') {
     console.error(text)
   } else {
     console.warn(text)
   }
-  _notifiedEntitlementKeys.add(identity)
-}
-
-/**
- * The identity of a key: the SHA-512 of the key with every character the reader ignores removed,
- * unique per distinct key content. A rewrapped key and its one-line form are one license to the
- * reader, so they are one identity here too. Two keys that share a block but differ in their prose
- * are two keys - the payload carries a digest of the prose - so they are two identities. Hashed
- * because the set lives as long as the page: a server building one engine per customer key would
- * otherwise keep every full key string it has ever seen.
- */
-function keyIdentityOf(licenseKey: string): string {
-  return sha512(stringToUtf8Bytes(withoutIgnoredCharacters(licenseKey).normalize('NFC')))
-}
-
-/**
- * The text without the characters the reader ignores anywhere in a key: every line break or tab
- * saved as text (`\n`, `\r`, `\t`, as a `.env` file stores one), then every whitespace character.
- * Removed in the reader's order, escapes first; `\s` is exactly the set of characters the reader
- * treats as whitespace.
- */
-function withoutIgnoredCharacters(text: string): string {
-  return text.replace(/\\[nrt]/g, '').replace(/\s+/g, '')
 }
 
 /**
