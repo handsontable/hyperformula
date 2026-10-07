@@ -6,6 +6,8 @@
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {sumOfSquaredDeviations} from '../deviationSums'
+import {divideDoubleDouble, roundDoubleDouble} from '../doubleDouble'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue, isExtendedNumber, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
@@ -341,9 +343,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return new CellError(ErrorType.DIV_BY_ZERO)
       }
 
-      const mean = values.reduce((a, b) => a + b, 0) / values.length
-      const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1)
-      return Math.sqrt(variance)
+      return Math.sqrt(roundDoubleDouble(divideDoubleDouble(sumOfSquaredDeviations(values), values.length - 1)))
     })
   }
 
@@ -366,9 +366,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return new CellError(ErrorType.DIV_BY_ZERO)
       }
 
-      const mean = values.reduce((a, b) => a + b, 0) / values.length
-      const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length
-      return Math.sqrt(variance)
+      return Math.sqrt(roundDoubleDouble(divideDoubleDouble(sumOfSquaredDeviations(values), values.length)))
     })
   }
 
@@ -390,8 +388,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return new CellError(ErrorType.DIV_BY_ZERO)
       }
 
-      const mean = values.reduce((a, b) => a + b, 0) / values.length
-      return values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1)
+      return roundDoubleDouble(divideDoubleDouble(sumOfSquaredDeviations(values), values.length - 1))
     })
   }
 
@@ -414,8 +411,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return new CellError(ErrorType.DIV_BY_ZERO)
       }
 
-      const mean = values.reduce((a, b) => a + b, 0) / values.length
-      return values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length
+      return roundDoubleDouble(divideDoubleDouble(sumOfSquaredDeviations(values), values.length))
     })
   }
 
