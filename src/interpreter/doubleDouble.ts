@@ -28,7 +28,32 @@ const SPLITTER = 134217729
 const SPLIT_LIMIT = 2 ** 996
 
 /**
+ * The largest product magnitude for which the product of the split high halves (at most `|a * b|`
+ * times (1 + 2^-26)^2) cannot overflow (2^1023).
+ */
+const PRODUCT_LIMIT = 2 ** 1023
+
+/**
+ * An exact power-of-two scale (2^53) for the larger factor of a product above `PRODUCT_LIMIT` or with
+ * a factor above `SPLIT_LIMIT`, so that splitting it cannot overflow.
+ */
+const FACTOR_SCALE = 2 ** 53
+
+/**
+ * The largest dividend magnitude that `divideDoubleDouble` and `divideDoubleDoubles` divide directly
+ * (2^1000). Above it, the quotient times the divisor can round to infinity, so the dividend is scaled
+ * down by `DIVIDEND_SCALE` first.
+ */
+const DIVIDEND_LIMIT = 2 ** 1000
+
+/** An exact power-of-two scale for dividends above `DIVIDEND_LIMIT` (2^64). */
+const DIVIDEND_SCALE = 2 ** 64
+
+/**
  * The exact sum of two doubles, as a double-double (TwoSum).
+ *
+ * The rounding error is computed from the addend of larger magnitude (Fast2Sum), which is exact and,
+ * unlike the branch-free form, cannot overflow while the sum is finite.
  *
  * @param {number} a - first addend
  * @param {number} b - second addend
@@ -36,33 +61,50 @@ const SPLIT_LIMIT = 2 ** 996
  */
 export function twoSum(a: number, b: number): DoubleDouble {
   const hi = a + b
-  const bVirtual = hi - a
-  return {hi, lo: (a - (hi - bVirtual)) + (b - bVirtual)}
+  return {hi, lo: Math.abs(a) >= Math.abs(b) ? b - (hi - a) : a - (hi - b)}
 }
 
 /**
  * The exact product of two doubles, as a double-double (TwoProduct).
  *
- * Factors up to 2^996 (about 6.7e299) are split and multiplied exactly. Larger factors are multiplied
- * directly, which keeps the result finite whenever the plain product is finite.
+ * When a factor exceeds 2^996 or the product exceeds 2^1023, the larger factor is scaled by 2^-53
+ * (exactly) so the splitting cannot overflow, and the error term is scaled back.
  *
  * @param {number} a - first factor
  * @param {number} b - second factor
- * @returns {DoubleDouble} `a * b`, with no rounding error unless a factor exceeds 2^996 or the product
- * overflows
+ * @returns {DoubleDouble} `a * b`, with no rounding error whenever the product is finite and at least
+ * 2^-969 in magnitude; an infinite or NaN product has `lo` 0
  */
 export function twoProduct(a: number, b: number): DoubleDouble {
   const hi = a * b
-  if (Math.abs(a) > SPLIT_LIMIT || Math.abs(b) > SPLIT_LIMIT) {
+  if (Math.abs(a) <= SPLIT_LIMIT && Math.abs(b) <= SPLIT_LIMIT && Math.abs(hi) <= PRODUCT_LIMIT) {
+    return {hi, lo: productError(a, b, hi)}
+  }
+  if (!Number.isFinite(hi)) {
     return {hi, lo: 0}
   }
+  const [larger, smaller] = Math.abs(a) >= Math.abs(b) ? [a, b] : [b, a]
+  const largerScaled = larger / FACTOR_SCALE
+  return {hi, lo: productError(largerScaled, smaller, largerScaled * smaller) * FACTOR_SCALE}
+}
+
+/**
+ * The rounding error of `a * b`, where `hi` is `a * b` rounded (Dekker's product with Veltkamp
+ * splitting). Exact when both factors are at most `SPLIT_LIMIT` and `|hi|` is at most `PRODUCT_LIMIT`.
+ *
+ * @param {number} a - first factor
+ * @param {number} b - second factor
+ * @param {number} hi - `a * b` rounded to a double
+ * @returns {number} `a * b - hi`
+ */
+function productError(a: number, b: number, hi: number): number {
   const aScaled = SPLITTER * a
   const aHigh = aScaled - (aScaled - a)
   const aLow = a - aHigh
   const bScaled = SPLITTER * b
   const bHigh = bScaled - (bScaled - b)
   const bLow = b - bHigh
-  return {hi, lo: ((aHigh * bHigh - hi) + aHigh * bLow + aLow * bHigh) + aLow * bLow}
+  return ((aHigh * bHigh - hi) + aHigh * bLow + aLow * bHigh) + aLow * bLow
 }
 
 /**
@@ -80,6 +122,17 @@ export function addDoubleDouble(x: DoubleDouble, y: DoubleDouble): DoubleDouble 
   const lo = sum.lo + x.lo + y.lo
   const hi = sum.hi + lo
   return {hi, lo: lo - (hi - sum.hi)}
+}
+
+/**
+ * Difference of two double-doubles.
+ *
+ * @param {DoubleDouble} x - minuend
+ * @param {DoubleDouble} y - subtrahend
+ * @returns {DoubleDouble} `x - y`; a difference that is infinite or NaN is the plain double difference
+ */
+export function subtractDoubleDouble(x: DoubleDouble, y: DoubleDouble): DoubleDouble {
+  return addDoubleDouble(x, {hi: -y.hi, lo: -y.lo})
 }
 
 /**
@@ -114,6 +167,9 @@ export function scaleDoubleDouble(x: DoubleDouble, k: number): DoubleDouble {
  * @returns {DoubleDouble} `x / k`
  */
 export function divideDoubleDouble(x: DoubleDouble, k: number): DoubleDouble {
+  if (Math.abs(x.hi) > DIVIDEND_LIMIT && Number.isFinite(x.hi)) {
+    return multiplyByPowerOfTwo(divideDoubleDouble(multiplyByPowerOfTwo(x, 1 / DIVIDEND_SCALE), k), DIVIDEND_SCALE)
+  }
   const quotient = x.hi / k
   const product = twoProduct(quotient, k)
   return twoSum(quotient, ((x.hi - product.hi) - product.lo + x.lo) / k)
@@ -134,8 +190,22 @@ export function divideDoubleDoubles(x: DoubleDouble, y: DoubleDouble): DoubleDou
   if (!Number.isFinite(quotient) || !Number.isFinite(y.hi)) {
     return {hi: quotient, lo: 0}
   }
-  const remainder = addDoubleDouble(x, scaleDoubleDouble({hi: -y.hi, lo: -y.lo}, quotient))
+  if (Math.abs(x.hi) > DIVIDEND_LIMIT) {
+    return multiplyByPowerOfTwo(divideDoubleDoubles(multiplyByPowerOfTwo(x, 1 / DIVIDEND_SCALE), y), DIVIDEND_SCALE)
+  }
+  const remainder = subtractDoubleDouble(x, scaleDoubleDouble(y, quotient))
   return twoSum(quotient, remainder.hi / y.hi)
+}
+
+/**
+ * Product of a double-double and a power of two, which is exact unless it overflows or underflows.
+ *
+ * @param {DoubleDouble} x - double-double factor
+ * @param {number} powerOfTwo - a power of two
+ * @returns {DoubleDouble} `x * powerOfTwo`
+ */
+export function multiplyByPowerOfTwo(x: DoubleDouble, powerOfTwo: number): DoubleDouble {
+  return {hi: x.hi * powerOfTwo, lo: x.lo * powerOfTwo}
 }
 
 /**

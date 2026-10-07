@@ -6,8 +6,7 @@
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {sumOfSquaredDeviations} from '../deviationSums'
-import {divideDoubleDouble, roundDoubleDouble} from '../doubleDouble'
+import {variance} from '../deviationSums'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue, isExtendedNumber, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
@@ -343,7 +342,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return new CellError(ErrorType.DIV_BY_ZERO)
       }
 
-      return Math.sqrt(roundDoubleDouble(divideDoubleDouble(sumOfSquaredDeviations(values), values.length - 1)))
+      return Math.sqrt(variance(values, 1))
     })
   }
 
@@ -366,7 +365,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return new CellError(ErrorType.DIV_BY_ZERO)
       }
 
-      return Math.sqrt(roundDoubleDouble(divideDoubleDouble(sumOfSquaredDeviations(values), values.length)))
+      return Math.sqrt(variance(values, 0))
     })
   }
 
@@ -388,7 +387,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return new CellError(ErrorType.DIV_BY_ZERO)
       }
 
-      return roundDoubleDouble(divideDoubleDouble(sumOfSquaredDeviations(values), values.length - 1))
+      return variance(values, 1)
     })
   }
 
@@ -411,7 +410,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return new CellError(ErrorType.DIV_BY_ZERO)
       }
 
-      return roundDoubleDouble(divideDoubleDouble(sumOfSquaredDeviations(values), values.length))
+      return variance(values, 0)
     })
   }
 

@@ -27,13 +27,12 @@ import {
   sumsqerr,
   variance
 } from './3rdparty/jstat/jstat'
-import {sumOfProductsOfDeviations, sumOfSquaredDeviations} from '../deviationSums'
+import {covariance, deviationsFromMean, sumOfProducts, sumOfSquaredDeviations} from '../deviationSums'
 import {
-  addDoubleDouble,
-  divideDoubleDouble,
   divideDoubleDoubles,
   multiplyDoubleDouble,
   roundDoubleDouble,
+  subtractDoubleDouble,
 } from '../doubleDouble'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
@@ -289,7 +288,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n === 1) {
           return 0
         }
-        return roundDoubleDouble(divideDoubleDouble(sumOfProductsOfDeviations(ret[0], ret[1]), n))
+        return covariance(ret[0], ret[1], 0)
       })
   }
 
@@ -308,7 +307,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n <= 1) {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
         }
-        return roundDoubleDouble(divideDoubleDouble(sumOfProductsOfDeviations(ret[0], ret[1]), n - 1))
+        return covariance(ret[0], ret[1], 1)
       })
   }
 
@@ -377,10 +376,16 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n <= 2) {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.ThreeValues)
         }
-        const sumOfProducts = sumOfProductsOfDeviations(ret[0], ret[1])
-        const slope = divideDoubleDoubles(sumOfProducts, sumOfSquaredDeviations(ret[1]))
-        const explained = multiplyDoubleDouble(slope, sumOfProducts)
-        const residual = addDoubleDouble(sumOfSquaredDeviations(ret[0]), {hi: -explained.hi, lo: -explained.lo})
+        const yDeviations = deviationsFromMean(ret[0])
+        const xDeviations = deviationsFromMean(ret[1])
+        const xSumOfSquares = sumOfProducts(xDeviations, xDeviations)
+        if (!Number.isFinite(roundDoubleDouble(xSumOfSquares))) {
+          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+        }
+        const productsSum = sumOfProducts(yDeviations, xDeviations)
+        const slope = divideDoubleDoubles(productsSum, xSumOfSquares)
+        const explained = multiplyDoubleDouble(slope, productsSum)
+        const residual = subtractDoubleDouble(sumOfProducts(yDeviations, yDeviations), explained)
         // the residual is non-negative; a tiny negative rounding remainder counts as 0
         return Math.sqrt(Math.max(0, roundDoubleDouble(residual)) / (n - 2))
       })
@@ -401,7 +406,12 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n <= 1) {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
         }
-        return roundDoubleDouble(divideDoubleDoubles(sumOfProductsOfDeviations(ret[0], ret[1]), sumOfSquaredDeviations(ret[1])))
+        const xDeviations = deviationsFromMean(ret[1])
+        const xSumOfSquares = sumOfProducts(xDeviations, xDeviations)
+        if (!Number.isFinite(roundDoubleDouble(xSumOfSquares))) {
+          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+        }
+        return roundDoubleDouble(divideDoubleDoubles(sumOfProducts(deviationsFromMean(ret[0]), xDeviations), xSumOfSquares))
       })
   }
 

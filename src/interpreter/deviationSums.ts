@@ -8,7 +8,10 @@ import {
   divideDoubleDouble,
   DOUBLE_DOUBLE_ZERO,
   DoubleDouble,
+  multiplyByPowerOfTwo,
   multiplyDoubleDouble,
+  roundDoubleDouble,
+  subtractDoubleDouble,
 } from './doubleDouble'
 
 /**
@@ -23,12 +26,30 @@ import {
 /**
  * The mean of the values.
  *
+ * When the running total overflows, the values are summed scaled down by a power of two no smaller
+ * than their count, so that no partial sum can exceed the largest double, and the mean is scaled back.
+ *
  * @param {number[]} values - a non-empty array of numbers
  * @returns {DoubleDouble} the mean, without rounding to a double
  */
 function mean(values: number[]): DoubleDouble {
-  const total = values.reduce<DoubleDouble>((sum, value) => addDoubleDouble(sum, {hi: value, lo: 0}), DOUBLE_DOUBLE_ZERO)
-  return divideDoubleDouble(total, values.length)
+  const total = sum(values)
+  if (Number.isFinite(total.hi)) {
+    return divideDoubleDouble(total, values.length)
+  }
+  const scale = 2 ** Math.ceil(Math.log2(values.length))
+  const scaledTotal = sum(values.map((value) => value / scale))
+  return multiplyByPowerOfTwo(divideDoubleDouble(scaledTotal, values.length), scale)
+}
+
+/**
+ * The sum of the values.
+ *
+ * @param {number[]} values - an array of numbers
+ * @returns {DoubleDouble} the sum, without rounding to a double
+ */
+function sum(values: number[]): DoubleDouble {
+  return values.reduce<DoubleDouble>((total, value) => addDoubleDouble(total, {hi: value, lo: 0}), DOUBLE_DOUBLE_ZERO)
 }
 
 /**
@@ -37,9 +58,9 @@ function mean(values: number[]): DoubleDouble {
  * @param {number[]} values - a non-empty array of numbers
  * @returns {DoubleDouble[]} `value - mean` for each value, without rounding
  */
-function deviationsFromMean(values: number[]): DoubleDouble[] {
+export function deviationsFromMean(values: number[]): DoubleDouble[] {
   const center = mean(values)
-  return values.map((value) => addDoubleDouble({hi: value, lo: 0}, {hi: -center.hi, lo: -center.lo}))
+  return values.map((value) => subtractDoubleDouble({hi: value, lo: 0}, center))
 }
 
 /**
@@ -65,12 +86,35 @@ export function sumOfProductsOfDeviations(first: number[], second: number[]): Do
 }
 
 /**
+ * The variance of the values: the sum of squared deviations divided by `n - deltaDegreesOfFreedom`.
+ *
+ * @param {number[]} values - a non-empty array of numbers
+ * @param {number} deltaDegreesOfFreedom - 0 for the population variance, 1 for the sample variance
+ * @returns {number} the variance, rounded once to a double
+ */
+export function variance(values: number[], deltaDegreesOfFreedom: number): number {
+  return roundDoubleDouble(divideDoubleDouble(sumOfSquaredDeviations(values), values.length - deltaDegreesOfFreedom))
+}
+
+/**
+ * The covariance of two arrays: the sum of products of deviations divided by `n - deltaDegreesOfFreedom`.
+ *
+ * @param {number[]} first - a non-empty array of numbers
+ * @param {number[]} second - an array of the same length as `first`
+ * @param {number} deltaDegreesOfFreedom - 0 for the population covariance, 1 for the sample covariance
+ * @returns {number} the covariance, rounded once to a double
+ */
+export function covariance(first: number[], second: number[], deltaDegreesOfFreedom: number): number {
+  return roundDoubleDouble(divideDoubleDouble(sumOfProductsOfDeviations(first, second), first.length - deltaDegreesOfFreedom))
+}
+
+/**
  * The sum of the products of paired double-doubles.
  *
  * @param {DoubleDouble[]} first - the first factors
  * @param {DoubleDouble[]} second - the second factors, of the same length
  * @returns {DoubleDouble} `sum(first[i] * second[i])`
  */
-function sumOfProducts(first: DoubleDouble[], second: DoubleDouble[]): DoubleDouble {
+export function sumOfProducts(first: DoubleDouble[], second: DoubleDouble[]): DoubleDouble {
   return first.reduce<DoubleDouble>((sum, deviation, index) => addDoubleDouble(sum, multiplyDoubleDouble(deviation, second[index])), DOUBLE_DOUBLE_ZERO)
 }

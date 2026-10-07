@@ -19,6 +19,7 @@ import {
   multiplyDoubleDouble,
   roundDoubleDouble,
   scaleDoubleDouble,
+  subtractDoubleDouble,
   twoSum,
 } from '../doubleDouble'
 import {InterpreterState} from '../InterpreterState'
@@ -49,15 +50,23 @@ function zeroForInfinite(value: InternalScalarValue) {
  * `shift`: the first value added. Both sums are double-double. Measured from a nearby value, the
  * deviations stay small, which avoids the cancellation of the textbook one-pass form
  * `sum(x^2) - sum(x)^2 / n` for data with a large mean and a small spread (for example 10000000.001,
- * 10000000.002, ...). The variance is the correctly rounded value for the stored values, and the
- * standard deviation, its square root, is within one unit in the last place of the exact value.
+ * 10000000.002, ...). The variance and the standard deviation are accurate to about one unit in the
+ * last place of the exact values for the stored numbers. Double-double arithmetic does not guarantee
+ * correct rounding.
+ *
+ * It also keeps the plain sum and sum of squares. When the deviations from the shift are so large
+ * (about 1e154 and above) that the shifted sums overflow, the variance falls back to the one-pass form
+ * used before, with the same accuracy as before: it loses about `log10(2n)` digits to cancellation.
+ * It is `#NUM!` when the plain sum of squares overflows too, as before, although the shifted sums of
+ * the same values in another order can be finite.
  */
 class MomentsAggregate {
 
-  public static empty = new MomentsAggregate(0, 0, 0, DOUBLE_DOUBLE_ZERO, DOUBLE_DOUBLE_ZERO)
+  public static empty = new MomentsAggregate(0, 0, 0, 0, DOUBLE_DOUBLE_ZERO, DOUBLE_DOUBLE_ZERO)
 
   constructor(
     public readonly sum: number,
+    public readonly sumOfSquares: number,
     public readonly count: number,
     public readonly shift: number,
     public readonly shiftedSum: DoubleDouble,
@@ -65,8 +74,14 @@ class MomentsAggregate {
   ) {
   }
 
+  /**
+   * The moments of one value, which is also the shift.
+   *
+   * @param {number} arg - the value
+   * @returns {MomentsAggregate} an aggregate of the single value
+   */
   public static single(arg: number): MomentsAggregate {
-    return new MomentsAggregate(arg, 1, arg, DOUBLE_DOUBLE_ZERO, DOUBLE_DOUBLE_ZERO)
+    return new MomentsAggregate(arg, arg * arg, 1, arg, DOUBLE_DOUBLE_ZERO, DOUBLE_DOUBLE_ZERO)
   }
 
   /**
@@ -88,6 +103,7 @@ class MomentsAggregate {
       // the common case of adding one value: its deviation is the shift difference itself
       return new MomentsAggregate(
         this.sum + other.sum,
+        this.sumOfSquares + other.sumOfSquares,
         this.count + 1,
         this.shift,
         addDoubleDouble(this.shiftedSum, shiftDifference),
@@ -103,19 +119,12 @@ class MomentsAggregate {
     )
     return new MomentsAggregate(
       this.sum + other.sum,
+      this.sumOfSquares + other.sumOfSquares,
       this.count + other.count,
       this.shift,
       addDoubleDouble(this.shiftedSum, rebasedSum),
       addDoubleDouble(this.shiftedSumOfSquares, rebasedSumOfSquares),
     )
-  }
-
-  public averageValue(): Maybe<number> {
-    if (this.count > 0) {
-      return this.sum / this.count
-    } else {
-      return undefined
-    }
   }
 
   public varSValue(): Maybe<number> {
@@ -137,11 +146,20 @@ class MomentsAggregate {
   /**
    * The sum of squared deviations from the mean, `S2 - S1^2 / n` with `S1`, `S2` the shifted sums
    * and `n` the count, as a double-double: the variance divides it before rounding once.
+   *
+   * `S1^2 / n` is evaluated as `S1 * (S1 / n)`, so it cannot overflow while `S2` is finite
+   * (`S1^2 / n <= S2`), even when `S1^2` alone would exceed the largest double. When the shifted sums
+   * overflow, it falls back to `sum(x^2) - sum(x)^2 / n` in plain doubles, evaluated as before unless
+   * `sum(x)^2` overflows.
    */
   private sumOfSquaredDeviations(): DoubleDouble {
-    const squaredSumOverCount = divideDoubleDouble(multiplyDoubleDouble(this.shiftedSum, this.shiftedSum), this.count)
-    const result = addDoubleDouble(this.shiftedSumOfSquares, {hi: -squaredSumOverCount.hi, lo: -squaredSumOverCount.lo})
-    return result
+    const squaredSumOverCount = multiplyDoubleDouble(this.shiftedSum, divideDoubleDouble(this.shiftedSum, this.count))
+    const result = subtractDoubleDouble(this.shiftedSumOfSquares, squaredSumOverCount)
+    if (Number.isFinite(roundDoubleDouble(result))) {
+      return result
+    }
+    const onePass = this.sumOfSquares - this.sum * this.sum / this.count
+    return {hi: Number.isFinite(onePass) ? onePass : this.sumOfSquares - this.sum * (this.sum / this.count), lo: 0}
   }
 }
 
@@ -368,17 +386,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   }
 
   public averagea(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    const result = this.reduce<MomentsAggregate>(ast.args, state, MomentsAggregate.empty, '_AGGREGATE_A',
-      (left, right) => left.compose(right),
-      (arg): MomentsAggregate => MomentsAggregate.single(getRawValue(arg)),
-      numbersBooleans
-    )
-
-    if (result instanceof CellError) {
-      return result
-    } else {
-      return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
-    }
+    return this.averageOf(ast.args, state, '_AVERAGE_A', numbersBooleans)
   }
 
   public vars(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
@@ -509,13 +517,29 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   }
 
   private doAverage(args: Ast[], state: InterpreterState): InternalScalarValue {
-    const result = this.reduceAggregate(args, state)
+    return this.averageOf(args, state, '_AVERAGE', strictlyNumbers)
+  }
 
-    if (result instanceof CellError) {
-      return result
-    } else {
-      return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+  /**
+   * The plain sum of the values divided by their count, as in AVERAGE and AVERAGEA. The sum and the
+   * count are cached per range under their own keys, so AVERAGE does not compute the variance sums.
+   *
+   * @param {Ast[]} args - the function arguments
+   * @param {InterpreterState} state - interpreter state
+   * @param {string} cacheKey - prefix of the range cache keys for the sum and the count
+   * @param {coercionOperation} coercion - which values count
+   * @returns {InternalScalarValue} the average, `#DIV/0!` when there are no values, or the first error
+   */
+  private averageOf(args: Ast[], state: InterpreterState, cacheKey: string, coercion: coercionOperation): InternalScalarValue {
+    const sum = this.reduce(args, state, 0, `${cacheKey}_SUM`, (left, right) => left + right, getRawValue, coercion)
+    if (sum instanceof CellError) {
+      return sum
     }
+    const count = this.reduce(args, state, 0, `${cacheKey}_COUNT`, (left, right) => left + right, () => 1, coercion)
+    if (count instanceof CellError) {
+      return count
+    }
+    return count > 0 ? sum / count : new CellError(ErrorType.DIV_BY_ZERO)
   }
 
   private doVarS(args: Ast[], state: InterpreterState): InternalScalarValue {
