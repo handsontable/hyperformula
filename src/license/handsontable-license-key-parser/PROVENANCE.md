@@ -18,7 +18,7 @@ and re-taken: a local fix makes two products disagree about the same key.
 `extractKeyData.ts`, one line: `Object.keys(current)` → `Object.keys(current as object)`. HyperFormula
 compiles with TypeScript 4.0.8, which does not narrow `unknown` through `!== null && typeof ===
 'object'`; upstream compiles under 5.9, and TypeScript 4.5 is where the line starts to compile
-uncast. The cast changes no behaviour. It is recorded in `upstream.json` with its reason, and the
+uncast. The cast changes no behavior. It is recorded in `upstream.json` with its reason, and the
 check below applies it before comparing. A tag is immutable, so the check does not see upstream fix
 the line on a branch; it sees the next tag - a newer tag fails the check - and at the re-take the swap
 stops matching once upstream has changed the line, so the fix cannot be missed. A tag that leaves the
@@ -31,7 +31,7 @@ npm run check:license-key-parser-drift
 ```
 
 Checks that the pinned tag still resolves to the pinned commit, lists the upstream directory at that
-tag and compares every file byte for byte. Fails on a moved tag or an edited pin, on any difference,
+commit and compares every file git tracks here with it byte for byte. Fails on a moved tag or an edited pin, on any difference,
 on a file here that upstream does not have (a shadowing `.ts` would win module
 resolution silently), on an upstream file missing here, and on a **newer upstream tag** than the
 pin. Without credentials to the private repository it fails rather than skips.

@@ -88,24 +88,39 @@ function get(apiPath, accept, auth) {
     })
 
     request.on('timeout', () => request.destroy(new Error(`no response within ${REQUEST_TIMEOUT_MS / 1000} s`)))
-    request.on('error', reject)
+    // Anything the socket reports - a timeout, a refused or dropped connection, a failed DNS lookup -
+    // is a network problem; describeFailure tells it apart from an HTTP status or a bad response.
+    request.on('error', (error) => {
+      error.network = true
+      reject(error)
+    })
   })
 }
 
+/** HTTP statuses that mean the token cannot see the repository, the ref or the path. */
+const ACCESS_STATUSES = [401, 403, 404]
+
 /**
  * Why a request failed, worded so that it is never mistaken for drift: a 301 is a renamed or moved
- * repository (a configuration problem), any other HTTP status is an access problem, and an error
- * with no status (a timeout, a dropped connection) is a network problem.
+ * repository (a configuration problem), 401/403/404 are access problems, any other HTTP status is a
+ * problem on GitHub's side (an outage or a rate limit), a socket error is a network problem, and
+ * anything else is a response this check could not read.
  */
 function describeFailure(error) {
   if (error.statusCode === 301) {
     return 'HTTP 301: the repository moved or was renamed - update `repository` in upstream.json. A configuration problem, not drift'
   }
-  if (error.statusCode !== undefined) {
+  if (ACCESS_STATUSES.indexOf(error.statusCode) !== -1) {
     return `HTTP ${error.statusCode} - access, not drift`
   }
+  if (error.statusCode !== undefined) {
+    return `HTTP ${error.statusCode} - a GitHub API problem (an outage or a rate limit), not drift`
+  }
+  if (error.network === true) {
+    return `${error.message} - a network problem, not drift`
+  }
 
-  return `${error.message} - a network problem, not drift`
+  return `${error.message} - an unexpected response from the GitHub API, not drift`
 }
 
 const sha256 = (buffer) => crypto.createHash('sha256').update(buffer).digest('hex')
@@ -189,14 +204,16 @@ function listTracked(root) {
  * that converts line endings to CRLF does not read as drift. An edit is compared once it is staged.
  */
 function readTracked(root, rel) {
-  return execFileSync('git', ['show', `:${gitPath(path.join(root, rel))}`], {cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024})
+  // `:./` resolves the path from REPO_ROOT, as `git ls-files` does above; a bare `:` would resolve
+  // it from the top of the work tree, which is not REPO_ROOT when this repository sits inside another.
+  return execFileSync('git', ['show', `:./${gitPath(path.join(root, rel))}`], {cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024})
 }
 
 async function main() {
   const pin = JSON.parse(fs.readFileSync(PIN, 'utf8'))
   const auth = token()
 
-  console.log(`vendored reader: ${pin.repository}/${pin.directory} @ ${pin.tag}`)
+  console.log(`vendored reader: ${pin.repository}/${pin.directory} @ ${pin.tag} (${pin.commit.slice(0, 9)})`)
 
   if (auth === null) {
     console.error('\nFAIL  no credentials for a private repository.')
@@ -244,9 +261,9 @@ async function main() {
   } catch (error) {
     // Whatever the pin check already found is the more likely cause of this failure - say it first.
     problems.forEach((p) => console.error(`\nFAIL  ${p}`))
-    console.error(`\nFAIL  could not list ${pin.repository}/${pin.directory} at ${pin.tag}: ${describeFailure(error)}.`)
+    console.error(`\nFAIL  could not list ${pin.repository}/${pin.directory} at commit ${pin.commit.slice(0, 9)}: ${describeFailure(error)}.`)
     if (error.statusCode === 404) {
-      console.error('      404 from a private repository means the token has no access to it, the tag does not exist, or the directory does not exist at that ref.')
+      console.error('      404 from a private repository means the token has no access to it, the pinned commit does not exist upstream, or the directory does not exist at that commit.')
     }
     process.exit(1)
   }
@@ -258,7 +275,7 @@ async function main() {
 
   for (const [rel, apiPath] of upstream) {
     if (!tracked.has(rel)) {
-      problems.push(`${rel}: in upstream at ${pin.tag}, missing here`)
+      problems.push(`${rel}: in upstream at ${pin.tag} (${pin.commit.slice(0, 9)}), missing here`)
       console.log(`  GONE  ${rel}`)
       continue
     }
@@ -291,7 +308,7 @@ async function main() {
     if (sha256(Buffer.from(ours)) === sha256(Buffer.from(theirs))) {
       console.log(`  ok    ${rel}${shim ? '   (1 allowed divergence applied)' : ''}`)
     } else {
-      problems.push(`${rel}: differs from upstream at ${pin.tag}`)
+      problems.push(`${rel}: differs from upstream at ${pin.tag} (${pin.commit.slice(0, 9)})`)
       console.log(`  DIFF  ${rel}`)
     }
   }
@@ -302,7 +319,7 @@ async function main() {
   })
 
   if (problems.length === 0) {
-    console.log(`\nOK - the directory is upstream's ${pin.directory} at ${pin.tag}, byte for byte${divergences.size ? `, with ${divergences.size} declared divergence(s)` : ''}`)
+    console.log(`\nOK - the directory is upstream's ${pin.directory} at ${pin.tag} (${pin.commit.slice(0, 9)}), byte for byte${divergences.size ? `, with ${divergences.size} declared divergence(s)` : ''}`)
 
     return
   }
