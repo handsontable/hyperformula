@@ -3,7 +3,6 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {CHECKSUM_LENGTH} from '../license/handsontable-license-key-parser/constants'
 import {stringToUtf8Bytes} from '../license/handsontable-license-key-parser/encoding'
 import {sha512} from '../license/handsontable-license-key-parser/sha512'
 import {LicenseState, UnlicensedReason} from '../license/handsontable-license-key-parser/types'
@@ -217,22 +216,6 @@ export function notifyEntitlementKey(licenseKey: string, state: LicenseState | U
  */
 function keyIdentityOf(licenseKey: string): string {
   return sha512(stringToUtf8Bytes(withoutIgnoredCharacters(licenseKey).normalize('NFC')))
-}
-
-/**
- * The checksum of an entitlement key: the last 128 characters of its block. The block is found
- * the way the reader finds it - the last `[` and the first `]` after it - and read without the
- * characters the reader ignores, so a key wrapped inside its block, or followed by a line break,
- * reports the same checksum as its one-line form.
- *
- * @param {string} licenseKey - an entitlement key, as the user passed it
- * @returns {string} the checksum
- */
-export function entitlementKeyChecksumOf(licenseKey: string): string {
-  const blockStart = licenseKey.lastIndexOf('[')
-  const blockEnd = licenseKey.indexOf(']', blockStart + 1)
-
-  return withoutIgnoredCharacters(licenseKey.slice(blockStart + 1, blockEnd)).slice(-CHECKSUM_LENGTH)
 }
 
 /**
