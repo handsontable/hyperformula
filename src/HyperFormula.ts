@@ -2428,16 +2428,17 @@ export class HyperFormula implements TypedEmitter {
    *  ['1', '2', '3', '=RAND()', '=SUM(A1:C1)'],
    * ], { licenseKey: 'gpl-v3' });
    *
+   * // move column B before column D; the SUM range follows its cells and becomes A1:B1
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, for this example:
    * // [{
-   * //   address: { sheet: 0, col: 1, row: 0 },
-   * //   newValue: 0.16210054671639,
-   * //  }, {
    * //   address: { sheet: 0, col: 4, row: 0 },
-   * //   newValue: 6.16210054671639,
+   * //   newValue: 4,
+   * //  }, {
+   * //   address: { sheet: 0, col: 3, row: 0 },
+   * //   newValue: 0.16210054671639,
    * // }]
-   * const changes = hfInstance.moveColumns(0, 1, 1, 2);
+   * const changes = hfInstance.moveColumns(0, 1, 1, 3);
    * ```
    *
    * @category Columns
@@ -4121,10 +4122,10 @@ export class HyperFormula implements TypedEmitter {
    * ], { licenseKey: 'gpl-v3' });
    *
    * // add a named expression, only 'Sheet1' (sheetId=0) considered as it is the scope
-   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 'Sheet1');
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
    *
-   * // returns the calculated value of a passed named expression, '142' for this example
-   * const myFormula = hfInstance.getNamedExpressionValue('prettyName', 'Sheet1');
+   * // returns the calculated value of a passed named expression, 142 for this example
+   * const myFormula = hfInstance.getNamedExpressionValue('prettyName', 0);
    * ```
    *
    * @category Named Expressions
@@ -4312,8 +4313,8 @@ export class HyperFormula implements TypedEmitter {
    * // add a named expression, scope limited to 'Sheet1' (sheetId=0)
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
    *
-   * // change the named expression
-   * const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!$A$1+200');
+   * // change the named expression in the same scope
+   * const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!$A$1+200', 0);
    * ```
    *
    * @category Named Expressions
@@ -4479,7 +4480,7 @@ export class HyperFormula implements TypedEmitter {
    * // add two named expressions and one scoped
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
    * hfInstance.addNamedExpression('anotherPrettyName', '=Sheet1!$A$2+100');
-   * hfInstance.addNamedExpression('prettyName3', '=Sheet1!$A$3+100', 0);
+   * hfInstance.addNamedExpression('alsoPrettyName', '=Sheet1!$A$3+100', 0);
    *
    * // get all expressions serialized
    * // should return:
