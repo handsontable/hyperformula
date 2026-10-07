@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {besseli, besselj, besselk, bessely} from './3rdparty/bessel/bessel'
 import {
   beta,
@@ -37,20 +37,20 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
     'ERF': {
       method: 'erf',
       parameters: [
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, optionalArg: true},
       ]
     },
     'ERFC': {
       method: 'erfc',
       parameters: [
-        {argumentType: FunctionArgumentType.NUMBER}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ERF.PRECISE': {
       method: 'erfprecise',
       parameters: [
-        {argumentType: FunctionArgumentType.NUMBER}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'EXPON.DIST': {
@@ -432,22 +432,47 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
     POISSONDIST: 'POISSON.DIST',
   }
 
+  /**
+   * Converts an argument the way Excel does for the error functions: numbers, dates, numeric text and empty cells are
+   * accepted, while a boolean or the empty text is #VALUE!. Errors are passed on.
+   */
+  private strictNumber(value: InternalScalarValue): number | CellError {
+    if (value instanceof CellError) {
+      return value
+    }
+    if (typeof value === 'boolean' || value === '') {
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+    }
+    const coerced = this.coerceScalarToNumberOrError(value)
+    return coerced instanceof CellError ? coerced : getRawValue(coerced)
+  }
+
   public erf(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('ERF'), (lowerBound, upperBound) => {
-      if (upperBound === undefined) {
-        return erf(lowerBound)
-      } else {
-        return erf(upperBound) - erf(lowerBound)
+    return this.runFunction(ast.args, state, this.metadata('ERF'), (lower: InternalScalarValue, upper?: InternalScalarValue) => {
+      const lowerBound = this.strictNumber(lower)
+      if (lowerBound instanceof CellError) {
+        return lowerBound
       }
+      if (upper === undefined) {
+        return erf(lowerBound)
+      }
+      const upperBound = this.strictNumber(upper)
+      return upperBound instanceof CellError ? upperBound : erf(upperBound) - erf(lowerBound)
     })
   }
 
   public erfc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('ERFC'), erfc)
+    return this.runFunction(ast.args, state, this.metadata('ERFC'), (x: InternalScalarValue) => {
+      const value = this.strictNumber(x)
+      return value instanceof CellError ? value : erfc(value)
+    })
   }
 
   public erfprecise(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('ERF.PRECISE'), erf)
+    return this.runFunction(ast.args, state, this.metadata('ERF.PRECISE'), (x: InternalScalarValue) => {
+      const value = this.strictNumber(x)
+      return value instanceof CellError ? value : erf(value)
+    })
   }
 
   public expondist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
