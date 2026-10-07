@@ -532,22 +532,8 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
         if (startDate > endDate) {
           [startDate, endDate] = [endDate, startDate]
         }
-        switch (mode) {
-          case 0:
-            return this.days360Core(startDate, endDate, false) / 360
-          case 1:
-            return (endDate - startDate) / this.dateTimeHelper.yearLengthForBasis(
-              this.dateTimeHelper.numberToSimpleDate(startDate),
-              this.dateTimeHelper.numberToSimpleDate(endDate)
-            )
-          case 2:
-            return (endDate - startDate) / 360
-          case 3:
-            return (endDate - startDate) / 365
-          case 4:
-            return this.days360Core(startDate, endDate, true) / 360
-        }
-        throw new Error('Should not be reachable.')
+        const {dayCount, yearDays} = this.dateTimeHelper.dayCountByBasis(startDate, endDate, mode)
+        return dayCount / yearDays
       }
     )
   }
