@@ -41,6 +41,15 @@ export interface ProductEntitlement {
  * known ones.
  */
 export interface EntitlementKeyData {
+  /**
+   * The format version of the key: 1 for a key without `v` in its payload
+   * (the first keys), the value of `v` otherwise. The checksum and the shape
+   * are verified for every version. The prose is verified only from version
+   * 2: a version 1 key reads with an edited prose, as its bare block, or with
+   * text after the block, exactly as it did when it was issued. A product may
+   * use the number to decide how to treat such a key.
+   */
+  readonly version: number;
   readonly products: { readonly [productName: string]: ProductEntitlement };
 }
 
@@ -124,7 +133,12 @@ export interface LicenseTimeReference {
 /**
  * Why an entitlement key does not license the product that reads it:
  *
- *   - `unreadable`       the block is missing, tampered with or malformed,
+ *   - `unreadable`       the key fails verification: the block is missing,
+ *                        tampered with or malformed, or - for a version 2
+ *                        key - the prose was edited or removed (the prose
+ *                        digest covers it) or text other than whitespace
+ *                        follows the block. A version 1 key never covered
+ *                        its prose, so neither makes it unreadable,
  *   - `product_missing`  the key is intact but grants other products only.
  *
  * Both are reported to the user as an invalid key; the split exists so a
@@ -138,6 +152,11 @@ export type UnlicensedReason = 'unreadable' | 'product_missing';
  * When `licensed` is `true`, `entitlement`, `lifecycle` and `channels` describe
  * that product and `grants` lists exactly what the key unlocks.
  *
+ * `version` is the format version of the key (1 for a key without `v`, whose
+ * prose is not checked) whenever the key could be read - also for
+ * `product_missing`. It is `null` only for an unreadable key, and the union
+ * narrows it: check `reason` and `version` is a `number` or `null`.
+ *
  * When `licensed` is `false`, the product must report an invalid key.
  * `entitlement` and `lifecycle` are `null`, both channels are open (the flags
  * that close them could not be read), and `grants` is unrestricted - an
@@ -149,6 +168,7 @@ export type EntitlementLicense =
   | {
     readonly licensed: true;
     readonly reason: null;
+    readonly version: number;
     readonly entitlement: ProductEntitlement;
     readonly lifecycle: LicenseLifecycle;
     readonly channels: LicenseChannels;
@@ -156,7 +176,17 @@ export type EntitlementLicense =
   }
   | {
     readonly licensed: false;
-    readonly reason: UnlicensedReason;
+    readonly reason: 'product_missing';
+    readonly version: number;
+    readonly entitlement: null;
+    readonly lifecycle: null;
+    readonly channels: LicenseChannels;
+    readonly grants: LicenseGrants;
+  }
+  | {
+    readonly licensed: false;
+    readonly reason: 'unreadable';
+    readonly version: null;
     readonly entitlement: null;
     readonly lifecycle: null;
     readonly channels: LicenseChannels;

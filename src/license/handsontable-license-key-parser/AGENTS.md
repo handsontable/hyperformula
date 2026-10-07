@@ -11,7 +11,9 @@ In both places:
 - **Product-specific code lives outside this directory**: the product name, the build date, the literal keys, the messages and the capability-token gates.
 - **Call `readEntitlementLicense(key, { product, buildDate })`** for a key that `detectLicenseKeyFormat` reports as `'entitlement'`. Legacy and literal keys are the product's own path.
 - **Never convert a license date through `Date`.** Print `lifecycle.licensedUntil` as it is. Pass the build date as bare `YYYY-MM-DD` text (`toIsoBuildDate` converts `DD/MM/YYYY`).
-- **Do not "repair" a key** by removing whitespace inside the `[...]` block. Trimming the whole key is fine.
+- **Tell users to keep the key on one line** (in `.env`, CI secrets, YAML or code). The reader ignores whitespace and a line break saved as `\n`, but a shell or `.env` value can be cut short by a quote inside the key. The README's "Where users keep the key" table lists what works.
+- **Pass the whole key, and do not "repair" it.** A version 2 key covers the prose too (a digest in the payload), so never cut a key down to its `[...]` block or strip characters from it. Trimming the whole key is fine. A version 1 key (no `v`) never covered its prose - do not treat a readable key as proof its sentences are unedited; check `version`.
+- **Every format version keeps the payload checksum and the prose digest.** That is what lets a product that only knows an older version read a newer key. In `license-key`, a change that bumps `v` may add fields, never change those two - a change that must is a new format, not a new version.
 - **An unlicensed key unlocks everything** (`UNRESTRICTED_GRANTS`). Never gate features away from a key that failed to read.
 - **`no-ui-warns` silences UI warnings, not the trial hard-stop block.**
 - **Everything the reader returns is frozen** and typed read-only. Copy an array before sorting or changing it.

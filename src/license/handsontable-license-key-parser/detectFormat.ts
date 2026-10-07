@@ -21,8 +21,9 @@ const LEGACY_KEY = /^[0-9a-fA-F]{25}$/;
  * read the legacy format.
  *
  * Surrounding whitespace is ignored: a key pasted out of an email or a chat
- * window commonly carries a trailing space or newline. Whitespace INSIDE the
- * brackets is not - see `extractEntitlementKeyData`.
+ * window commonly carries a trailing space or newline. `extractEntitlementKeyData`
+ * ignores whitespace inside the brackets too, so a block a mail client
+ * wrapped still reads.
  *
  * @param {*} licenseKey The license key to inspect.
  * @param {string[]} [literalKeys] The plain words this product accepts as a key

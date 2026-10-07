@@ -40,6 +40,11 @@ const options = {
 }
 ```
 
+If your key is a few sentences of text followed by a block in square brackets (`[...]`), pass the
+whole key, exactly as you received it. The key covers its text, so a key cut down to the bracketed
+block, or with any word changed, is invalid. Whitespace and line breaks don't matter, including a
+line break saved as `\n` in a `.env` file, but keeping the key on one line is the safest choice.
+
 ### Proprietary license key validation
 
 ::: tip

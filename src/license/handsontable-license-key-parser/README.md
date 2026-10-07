@@ -16,6 +16,7 @@ What it does **not** do:
 
 - [Copy it into a product](#copy-it-into-a-product)
 - [The key in 60 seconds](#the-key-in-60-seconds)
+- [Where users keep the key](#where-users-keep-the-key)
 - [Integrate it in five steps](#integrate-it-in-five-steps)
 - [What to do in each state](#what-to-do-in-each-state)
 - [Rules you must not break](#rules-you-must-not-break)
@@ -66,8 +67,18 @@ This is a Handsontable license key for Acme Corp, issued on 2026-08-12. It inclu
 [eyJwcm9kdWN0cyI6eyJoYW5k...<payload>...<128 hex characters of SHA-512>]
 ```
 
-- **The prose is never read.** It is not covered by the checksum either, so a key still works after a mail client rewraps it. A user may paste the whole text or the `[...]` block alone - both read the same.
-- **The block** is `[`, a base64url (URL-safe, unpadded) JSON payload, the SHA-512 hex of that encoded payload (128 lowercase characters), and `]`. The block is the **last** `[` in the string and the first `]` after it.
+- **The prose is never parsed, but it is covered** (version 2, every key issued now). The payload carries a digest of it, so a key whose sentences were edited or removed is invalid - the `[...]` block alone is **not** a key. A version 1 key (`license-key` 4.x, trial keys in production) never covered its prose: its bare block, an edited prose and text after its block all read, as they did when it was issued. Only the whitespace and the Unicode composition of the prose are ignored: a key still works after a mail client rewraps it (also inside a word or between two CJK characters), collapses the blank line, stores it decomposed, or after it is put on one line.
+- **The block** is `[`, a base64url (URL-safe, unpadded) JSON payload, the checksum (128 lowercase hex characters), and `]`. The block is the **last** `[` in the string and the first `]` after it. Whitespace inside the block is ignored, so a block a mail client wrapped still reads. In a version 2 key only whitespace (or a line break saved as `\n`) may follow it.
+- **The checksum** is the SHA-512 hex of the UTF-8 bytes of the encoded payload.
+- **The prose digest** (`prose` in the payload) is the first 64 characters of the SHA-512 hex of the UTF-8 bytes of `canonical(prose)`, where `prose` is everything in front of the `[` and `canonical` is the prose with every line break or tab saved as text (`\n`, `\r`, `\t`) and every whitespace character removed, then put in Unicode NFC. The characters are listed exactly, as `PROSE_WHITESPACE` in `extractKeyData.ts`: TAB, LF, VT, FF, CR, SPACE, U+00A0, U+1680, U+2000-U+200A, U+2028, U+2029, U+202F, U+205F, U+3000 and U+FEFF. A version 2 key with an empty prose is invalid.
+- **The format version** is `v` in the payload. The reader accepts two kinds of key and returns the version with the data:
+
+  | Version | `v` | Checksum | Prose checked? | Issued by |
+  | --- | --- | --- | --- | --- |
+  | 1 | absent | SHA-512 of the payload | no | `license-key` 4.x |
+  | 2 | `2` | SHA-512 of the payload | yes, by the digest | `license-key` from DEV-3286 on |
+
+  A newer `v` than the reader knows is accepted: later versions only add fields and keep the payload checksum and the digest. That is also why a version 2 key reads in a product that only knows version 1 (Handsontable 18.1.x) - such a product does not check the prose.
 - **The payload** lists what is licensed, per product:
 
   ```json
@@ -80,13 +91,17 @@ This is a Handsontable license key for Acme Corp, issued on 2026-08-12. It inclu
         "grace": 0,
         "flags": ["no-console-warns", "no-ui-warns"]
       }
-    }
+    },
+    "v": 2,
+    "prose": "<64 hex characters>"
   }
   ```
 
 | Field | Meaning |
 | --- | --- |
 | `products` | Keyed by product name. **Presence means licensed.** A key may grant several products; each has its own dates and flags. |
+| `v` | The format version. Absent in the first keys (version 1). |
+| `prose` | The digest of the prose, from version 2. The reader checks it; your product never needs it. |
 | `capabilities` | Opaque tokens. The key says *what is granted*; your product decides *what each token unlocks*. |
 | `usage_until` | The last licensed day, inclusive, in UTC. Measured against the clock. A subscription or a trial. |
 | `release_until` | Builds released on or before this day may run forever. Measured against your build date, never the clock. A perpetual license. |
@@ -95,6 +110,33 @@ This is a Handsontable license key for Acme Corp, issued on 2026-08-12. It inclu
 | `flags` | `trial`, `no-console-warns`, `no-ui-warns`, `custom`. Present or absent - there is no `false`. |
 
 Exactly **one** of `usage_until` / `release_until` is present. There is no contract type, tier, package name or holder in the payload - "subscription" or "perpetual" is only visible as which date is present.
+
+## Where users keep the key
+
+Users paste the key into code, `.env` files, CI secrets, container settings and YAML. The reader ignores every whitespace character and a line break or tab saved as text (`\n`, `\r`, `\t`), so most of these work. What breaks a key is a store that **loses part of it** or **changes a character** - most often a quote. The prose can contain `"` (around the project name) and `'` (in a company name such as `O'Brien`).
+
+Tell your users to keep the key **on one line**. The `license-key` generator prints that form, and it is the same key: the reader ignores the line breaks it no longer has.
+
+Checked by hand on 2026-10-05, with real keys pushed through the real parsers (`dotenv` 16.6.1, `js-yaml` 3.14, `bash`). This is not part of CI, so check again before relying on a row if those tools change:
+
+| Where the key is kept | Valid |
+| --- | --- |
+| Code: a string with real line breaks, or the one-line form | yes |
+| A JSON config, parsed (`\n` in the JSON) | yes |
+| YAML: `\|` block, `>` folded block | yes |
+| YAML: a double-quoted string | only with the key's own `"` escaped - the prose contains `"` around the project name |
+| `.env`, the one-line form - unquoted, `"..."` or `'...'` | yes |
+| `.env`, line breaks saved as `\n` - unquoted, `"..."` or `'...'` | yes |
+| `.env`, real line breaks inside `"..."` or `'...'` | only if the key has no `"` / `'` of that kind |
+| `.env`, real line breaks, **unquoted** | **no** - only the first line is kept |
+| Docker `--env-file`, CI secret fields that store `\n` as text | yes |
+| A shell script: `KEY="$(cat key.txt)"` | yes |
+| A shell script: the key pasted inside `"..."` or `'...'` | **no** if the key contains that quote - the shell ends the value there |
+| JSON text used as it is, without parsing it | **no** - the quotes and the escapes stay in |
+| Line breaks saved twice-escaped (`\\n`) | **no** - a stray backslash is left |
+| A word processor that turned `"` into `“` `”` (curly quotes) | **no** - that is a changed character |
+
+Do not "fix" a key on the way in - see rule 5 below. If a user's key reads as `unreadable`, the message should ask them to paste the key exactly as it was issued, on one line.
 
 ## Integrate it in five steps
 
@@ -140,7 +182,7 @@ export function checkLicense(rawKey: unknown): LicenseGrants {
   const license = readEntitlementLicense(key, { product: PRODUCT, buildDate: BUILD_DATE });
 
   if (!license.licensed) {
-    // The block is broken, or the key licenses other products only.
+    // The key is broken, edited (version 2), or it licenses other products only.
     // license.reason is 'unreadable' or 'product_missing' - both are an invalid key to the user.
     reportInvalidKey();
 
@@ -220,7 +262,7 @@ Each of these has broken a real implementation, or a specification fixture exist
 2. **`usage_until` is inclusive.** The license is valid until the UTC midnight that *follows* it. The hard stop starts at `usage_until + 1 + grace` days, `00:00:00Z`. Day counts are calendar days (UTC midnight to UTC midnight), never milliseconds divided and floored. `notice: 0` means no warning window at all.
 3. **A `release_until` license never reads the clock.** A perpetual key must read the same with the clock set to 1999 or 2035, or on an offline machine.
 4. **Fail open on a missing build date, and only on a missing one.** If the build date is missing (`undefined`, `null`, empty), a `release_until` license reads as `release_valid` - a broken build must never tell a paying customer their license lapsed. A build date in the wrong format is your bug and throws; convert with `toIsoBuildDate`. Read the build constant exactly as your bundler inlines it - do not wrap `process.env.X` in a `typeof process` guard, which the bundler does not inline and which then blanks the date.
-5. **Do not repair a key.** Surrounding whitespace is fine to trim. Whitespace, line breaks or anything else *inside* the brackets makes the key invalid - stripping it would accept keys the generator never issued.
+5. **Pass the whole key, and do not repair it.** Surrounding whitespace is fine to trim, and so is nothing else - the reader already ignores whitespace and a line break saved as `\n`, in the prose and inside the block (see [Where users keep the key](#where-users-keep-the-key)). Do not cut the key down to its `[...]` block, and do not strip quotes or other characters from it: a version 2 key covers its prose, so the block alone or a changed sentence is invalid. Do not treat a readable key as proof that its sentences are unedited, either - a version 1 key never covered them (check `version`).
 6. **Be strict about shape, lenient about vocabulary.** Unknown products, capability tokens, flags and extra fields are kept and ignored. A key your build does not fully understand must still read. Only a malformed shape (both dates, no date, a bad date, a negative window) makes a key invalid.
 7. **Never branch on a contract type or a package name.** The payload has neither. Decide by which date is present and by the `trial` flag - which is what the state names already encode.
 8. **The capability-token meaning lives in your product.** Keep the list of tokens your build understands next to your feature gates. Tokens are only ever added to a product, never removed, so a gate on an existing token stays valid.
@@ -242,6 +284,9 @@ A new product needs the same five things: a product name agreed with my.handsont
 
 Handsontable already ships an earlier port of this reader in `handsontable/src/utils/entitlementLicenseKey/` (DEV-2562). This directory is that port made general, with the same state names and window rules. The differences, when switching Handsontable over:
 
+- **the prose is covered and the key has a version** (`license-key` 5.0.0, DEV-3253; DEV-3286) - the 18.1.x port checks the payload checksum only and accepts the bare `[...]` block. It reads 4.x keys and version 2 keys, without checking their prose. A port of the unreleased 5.0.0 rule (Handsontable `develop` after DEV-3254) rejects both and has to be replaced by this reader before it ships,
+- whitespace inside the block is ignored - the port rejects a wrapped block,
+- the data carries `version`,
 - the product name is passed in (`readEntitlementLicense(key, { product })`) instead of being built in,
 - `detectLicenseKeyFormat(key, literalKeys)` takes the literal keys and returns `'literal'` for them, where the port returns `'non-commercial-and-evaluation'` (Handsontable only calls `isEntitlementKey`, which is unchanged),
 - a date that is not a string, such as `["2027-08-12"]`, makes the key invalid - the port still accepts it,
@@ -270,20 +315,27 @@ npm install && npm run build
 npm run generate-entitlement-key --record='{"holder":"Test Fixture","issued":"2026-08-12","licenses":[{"product":"hyperformula","contractType":"perpetual","agreement":"perpetual-2.0","package":"Pro","mode":"internal","date":"2027-03-31","notice":0,"grace":0}]}'
 ```
 
-For the shapes the generator refuses (both dates, a bad date, an unknown token), build the block yourself in a test-only helper - kept in a `__tests__/` directory beside the copy, and never imported from your source:
+For the shapes the generator refuses (both dates, a bad date, an unknown token), build the key yourself in a test-only helper - kept in a `__tests__/` directory beside the copy, and never imported from your source:
 
 ```ts
-import { sha512 } from '../entitlementKeyReader/sha512';
-import { stringToUtf8Bytes, stringToBase64Url } from '../entitlementKeyReader/encoding';
+import { canonicalizeProse, computePayloadChecksum, computeProseDigest } from '../entitlementKeyReader/extractKeyData';
+import { stringToBase64Url } from '../entitlementKeyReader/encoding';
 
-export function buildTestKey(payload: object): string {
-  const encoded = stringToBase64Url(JSON.stringify(payload));
+// A version 2 payload carries a digest of the prose, so a test key needs one.
+const PROSE = 'This is a test license key.';
 
-  return `[${encoded}${sha512(stringToUtf8Bytes(encoded))}]`;
+export function buildTestKey(payload: { products: object }): string {
+  const encoded = stringToBase64Url(JSON.stringify({
+    ...payload,
+    v: 2,
+    prose: computeProseDigest(canonicalizeProse(PROSE)),
+  }));
+
+  return `${PROSE}\n\n[${encoded}${computePayloadChecksum(encoded)}]`;
 }
 ```
 
-This is not a secret: the checksum recipe ships in every product bundle by design. The key protects integrity (a typo or a broken paste cannot pass), not authenticity.
+This is not a secret: the checksum recipe ships in every product bundle by design. The key protects integrity (a typo, a broken paste or - in a version 2 key - an edited sentence cannot pass), not authenticity.
 
 ## API reference
 
@@ -292,10 +344,14 @@ This is not a secret: the checksum recipe ships in every product bundle by desig
 The one call a product needs. Verifies the block, picks the product's entry, classifies it, reads its flags and resolves its grants.
 
 ```text
-licensed:      { licensed: true, reason: null, entitlement, lifecycle, channels, grants }
-not licensed:  { licensed: false, reason: 'unreadable' | 'product_missing', entitlement: null,
+licensed:      { licensed: true, reason: null, version, entitlement, lifecycle, channels, grants }
+not licensed:  { licensed: false, reason: 'unreadable' | 'product_missing', version, entitlement: null,
                  lifecycle: null, channels: { console: true, ui: true }, grants: UNRESTRICTED_GRANTS }
 ```
+
+`version` is the format version of the key - `1` for a key without `v` (its prose is not checked), `2` for one issued now - so a product can treat an older key differently. It is `null` only for an unreadable key.
+
+What to do with `version === 1`: **accept it.** Trial keys in that format are in production. Do not treat `version` as a security signal either: anyone can turn a version 2 key into a version 1 key by dropping `v` and `prose` and recomputing the checksum - the checksum is not a signature. `version` only says what was checked, for example to log it or to word a support message.
 
 The result is frozen all the way down, in both cases.
 
@@ -316,9 +372,9 @@ The argument checks run before the key is read, so they fail whatever key a test
 
 Tells the shape of a key without validating it. `'entitlement'` means "a `[...]` block is present", not "valid". `literalKeys` are compared trimmed and case-insensitively; a blank entry, and a missing or non-array list, are ignored. `isEntitlementKey(licenseKey)` is the one-line form of the entitlement check.
 
-### `extractEntitlementKeyData(licenseKey)` -> `{ products } | null`
+### `extractEntitlementKeyData(licenseKey)` -> `{ version, products } | null`
 
-The verified, frozen payload, or `null` for any unreadable key. `validateEntitlementKey(licenseKey)` returns the same as a boolean. `getProductEntitlement(data, product)` returns one product's entry or `null`, reading own properties only.
+The verified, frozen payload, or `null` for any unreadable key. `version` is the format version (1 for a key without `v`). `validateEntitlementKey(licenseKey)` returns the same as a boolean. `getProductEntitlement(data, product)` returns one product's entry or `null`, reading own properties only.
 
 ### `classifyEntitlement(entitlement, { now, buildDate })` -> `LicenseLifecycle`
 
@@ -347,7 +403,7 @@ Which channels the entry's flags leave open.
 | `index.ts` | the public exports |
 | `readLicense.ts` | `readEntitlementLicense` |
 | `detectFormat.ts` | `detectLicenseKeyFormat`, `isEntitlementKey` |
-| `extractKeyData.ts` | the block reader: checksum, decode, shape checks, the one-entry cache |
+| `extractKeyData.ts` | the key reader: the checksum, the format version and the prose digest, decode, shape checks, the one-entry cache |
 | `classify.ts` | the lifecycle windows and the channels |
 | `grants.ts` | capability queries |
 | `buildDate.ts` | `toIsoBuildDate` |

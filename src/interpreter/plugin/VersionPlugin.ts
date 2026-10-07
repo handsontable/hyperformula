@@ -3,8 +3,9 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {LicenseKeyValidityState} from '../../helpers/licenseKeyValidator'
+import {entitlementKeyChecksumOf, LicenseKeyValidityState} from '../../helpers/licenseKeyValidator'
 import {HyperFormula} from '../../HyperFormula'
+import {detectLicenseKeyFormat} from '../../license/handsontable-license-key-parser/detectFormat'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
@@ -38,7 +39,11 @@ export class VersionPlugin extends FunctionPlugin implements FunctionPluginTypec
       } else if (LICENSE_STATUS_MAP.has(validityState)) {
         status = LICENSE_STATUS_MAP.get(validityState)
       } else if (validityState === LicenseKeyValidityState.VALID) {
-        status = licenseKey.slice(-5)
+        // An entitlement key may end in its closing bracket, whitespace or a line break saved as
+        // text, so its status is read from the checksum, not from the end of the string.
+        status = detectLicenseKeyFormat(licenseKey) === 'entitlement'
+          ? entitlementKeyChecksumOf(licenseKey).slice(-5)
+          : licenseKey.slice(-5)
       }
 
       return `HyperFormula v${HyperFormula.version}, ${status}`

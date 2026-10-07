@@ -133,9 +133,9 @@ function entitlementOf(entry: ProductEntitlement, isTrial: boolean, silent: bool
  * not a legacy key that happens to contain brackets.
  *
  * An entitlement key is read by the vendored {@link readEntitlementLicense}, the single entry
- * point upstream prescribes for products: it verifies the block, picks HyperFormula's entry,
- * places it in its lifecycle window and reads its flags. Only the meaning of the capability
- * tokens and the console messages live here.
+ * point upstream prescribes for products: it verifies the key (the checksum and the prose
+ * digest), picks HyperFormula's entry, places it in its lifecycle window and reads its flags. Only
+ * the meaning of the capability tokens and the console messages live here.
  *
  * **The invariant this function exists to protect.** Only a VALID entitlement key resolves to a
  * restricted entitlement. Every other outcome — missing, invalid, or expired, for an entitlement
@@ -177,7 +177,7 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
   })
 
   if (!license.licensed) {
-    // `unreadable` (a broken block) and `product_missing` (a key for other products only) both
+    // `unreadable` (a broken block, or edited or missing prose) and `product_missing` (a key for other products only) both
     // resolve to an invalid key that restricts nothing; only their console messages differ.
     if (notifyConsole) {
       notifyEntitlementKey(licenseKey, license.reason, {licensedUntil: null, daysRemaining: null})

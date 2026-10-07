@@ -1,5 +1,5 @@
 import type { EntitlementKeyData, ProductEntitlement } from './types';
-import { CHECKSUM_LENGTH, DATE_FIELDS } from './constants';
+import { CHECKSUM_LENGTH, DATE_FIELDS, PROSE_DIGEST_LENGTH } from './constants';
 import { sha512 } from './sha512';
 import { base64ToString, stringToUtf8Bytes, parseIsoDateToTimestamp } from './encoding';
 
@@ -12,6 +12,111 @@ import { base64ToString, stringToUtf8Bytes, parseIsoDateToTimestamp } from './en
  */
 const ENCODED_PAYLOAD = /^[A-Za-z0-9\-_]+$/;
 const CHECKSUM = /^[0-9a-f]+$/;
+
+/**
+ * The whitespace removed from the prose before its digest is taken: TAB, LF,
+ * VT, FF, CR, SPACE, NO-BREAK SPACE, OGHAM SPACE MARK, the U+2000-U+200A spaces,
+ * LINE SEPARATOR, PARAGRAPH SEPARATOR, NARROW NO-BREAK SPACE, MEDIUM
+ * MATHEMATICAL SPACE, IDEOGRAPHIC SPACE and the BOM.
+ *
+ * Listed explicitly instead of `\s`, whose set has changed between JavaScript
+ * engines (U+180E) and differs in other languages (U+0085), so a reader written
+ * anywhere can reproduce it exactly.
+ *
+ * @type {RegExp}
+ */
+const PROSE_WHITESPACE = /[\t\n\v\f\r \u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]+/g;
+
+/**
+ * A line break or tab that was saved as text - a backslash followed by "n",
+ * "r" or "t" - also removed before the digest of the prose is taken.
+ *
+ * Several places a key is stored keep a line break that way rather than as a
+ * real one: a single-quoted or unquoted `.env` value, Docker's `--env-file`,
+ * and many CI secret fields. The block survives that intact, so without this
+ * a genuine key would fail only because of how it was stored. The generator
+ * strips backslashes from every free-text field, so a key it issues never
+ * carries one of its own.
+ *
+ * @type {RegExp}
+ */
+const ESCAPED_WHITESPACE = /\\[nrt]/g;
+
+/**
+ * Removes every escaped line break or tab (`\n`, `\r`, `\t` saved as text)
+ * and then every whitespace character - the first two steps of
+ * `canonicalizeProse`, and all that is done to the content of the block.
+ *
+ * The block is one long word, so a mail client or an editor that wraps the key
+ * can break it across lines - and a `.env` file can save that line break as
+ * the text `\n`. Neither base64url nor hex contains whitespace or a backslash,
+ * so removing them cannot change a genuine block. The block is not put in NFC:
+ * it is ASCII, and anything else in it fails the alphabet check anyway.
+ *
+ * The escapes go first, so a backslash, a space and "n" stay three characters.
+ *
+ * @param {string} text The text to strip.
+ * @returns {string}
+ */
+function removeWhitespace(text: string): string {
+  return text.replace(ESCAPED_WHITESPACE, '').replace(PROSE_WHITESPACE, '');
+}
+
+/**
+ * Brings the human-readable text of a key to the form the prose digest covers:
+ * every escaped line break or tab (`\n`, `\r`, `\t` saved as text) and every
+ * whitespace character removed, then Unicode NFC.
+ *
+ * Only the whitespace, its escaped forms and the Unicode composition are
+ * ignored. A mail client that rewraps the text - also between two CJK
+ * characters or inside a word - collapses a blank line, a `.env` file that
+ * saves a line break as `\n`, or a system that stores "u" + U+0308 for "u"
+ * leaves the key valid. A changed, added or removed letter, digit or symbol
+ * does not.
+ *
+ * Exported for test helpers; products call `extractEntitlementKeyData`.
+ *
+ * @param {string} prose The text in front of the machine-readable block.
+ * @returns {string}
+ */
+export function canonicalizeProse(prose: string): string {
+  // NFC runs last: a line break between a letter and its combining mark (an
+  // NFD copy rewrapped there) has to be gone before the two can compose.
+  return removeWhitespace(prose).normalize('NFC');
+}
+
+/**
+ * Computes the checksum that closes the block of every key: the SHA-512
+ * (lowercase hex) of the UTF-8 bytes of the encoded payload. It is the same in
+ * every format version, which is what lets a reader that only knows version 1
+ * read a newer key.
+ *
+ * Named apart from the 5.0.0 `computeChecksum(canonicalProse, encodedPayload)`
+ * on purpose: a test helper written for that one fails to import instead of
+ * hashing the wrong input.
+ *
+ * Exported for test helpers; products call `extractEntitlementKeyData`.
+ *
+ * @param {string} encodedPayload The base64url payload.
+ * @returns {string}
+ */
+export function computePayloadChecksum(encodedPayload: string): string {
+  return sha512(stringToUtf8Bytes(encodedPayload));
+}
+
+/**
+ * Computes the prose digest a version 2 payload carries as `prose`: the first
+ * 64 hex characters of the SHA-512 of the UTF-8 bytes of the canonical prose.
+ *
+ * Exported for test helpers; products call `extractEntitlementKeyData`.
+ *
+ * @param {string} canonicalProse The prose, already passed through
+ *                                `canonicalizeProse`.
+ * @returns {string}
+ */
+export function computeProseDigest(canonicalProse: string): string {
+  return sha512(stringToUtf8Bytes(canonicalProse)).slice(0, PROSE_DIGEST_LENGTH);
+}
 
 /**
  * Reports own-property presence without trusting a payload's inherited or
@@ -170,6 +275,68 @@ function normalizeProductEntry(entry: unknown): ProductEntitlement | null {
 }
 
 /**
+ * Reads the format version of a payload: 1 when it has no `v` (the keys issued
+ * before the field existed), the value of `v` otherwise. Returns `null` when
+ * `v` is there but is not a whole number of at least 2 - no generator ever
+ * wrote such a key.
+ *
+ * A version newer than this reader knows is accepted. A later version may add
+ * fields, but it keeps the block checksum and the prose digest, so this reader
+ * still verifies everything it knows about.
+ *
+ * Only an own `v` counts. Read through the prototype chain, one property
+ * another script set on `Object.prototype` would decide how every key reads.
+ *
+ * @param {Record<string, unknown>} payload The decoded payload.
+ * @returns {number|null}
+ */
+function readFormatVersion(payload: Record<string, unknown>): number | null {
+  if (!hasOwn(payload, 'v')) {
+    return 1;
+  }
+  if (!isNonNegativeInteger(payload.v) || payload.v < 2) {
+    return null;
+  }
+
+  return payload.v;
+}
+
+/**
+ * Tells whether a version 2 key covers its prose: nothing but whitespace
+ * follows the block, the prose is not empty, and its digest is the one the
+ * payload carries.
+ *
+ * Text after the block would be words nothing covers. A key always states its
+ * terms, so the bare block is rejected even with a digest computed over empty
+ * prose.
+ *
+ * @param {string} licenseKey The whole key.
+ * @param {number} blockStart The index of the block's "[".
+ * @param {number} blockEnd The index of the block's "]".
+ * @param {Record<string, unknown>} payload The decoded payload.
+ * @returns {boolean}
+ */
+function coversProse(
+  licenseKey: string,
+  blockStart: number,
+  blockEnd: number,
+  payload: Record<string, unknown>,
+): boolean {
+  // Judged by the same rule as the prose, so a trailing line break saved as
+  // text ("\n") is allowed too.
+  if (canonicalizeProse(licenseKey.slice(blockEnd + 1)) !== '') {
+    return false;
+  }
+
+  const canonicalProse = canonicalizeProse(licenseKey.slice(0, blockStart));
+
+  return canonicalProse !== ''
+    && hasOwn(payload, 'prose')
+    && typeof payload.prose === 'string'
+    && computeProseDigest(canonicalProse) === payload.prose;
+}
+
+/**
  * Reads and verifies one key. Split out from the memoized public entry point so
  * the memo can wrap every exit path uniformly.
  *
@@ -191,7 +358,7 @@ function readEntitlementKeyData(licenseKey: string): EntitlementKeyData | null {
     return null;
   }
 
-  const content = licenseKey.slice(blockStart + 1, blockEnd);
+  const content = removeWhitespace(licenseKey.slice(blockStart + 1, blockEnd));
 
   if (content.length <= CHECKSUM_LENGTH) {
     return null;
@@ -203,7 +370,8 @@ function readEntitlementKeyData(licenseKey: string): EntitlementKeyData | null {
   if (!ENCODED_PAYLOAD.test(encodedPayload) || !CHECKSUM.test(checksum)) {
     return null;
   }
-  if (sha512(stringToUtf8Bytes(encodedPayload)) !== checksum) {
+
+  if (computePayloadChecksum(encodedPayload) !== checksum) {
     return null;
   }
 
@@ -222,6 +390,17 @@ function readEntitlementKeyData(licenseKey: string): EntitlementKeyData | null {
   }
 
   if (!isPlainObject(payload) || !isPlainObject(payload.products)) {
+    return null;
+  }
+
+  const version = readFormatVersion(payload);
+
+  if (version === null) {
+    return null;
+  }
+  // The prose is canonicalized only here, after the checksum passed: a version
+  // 1 key and a broken one never pay for the NFC pass.
+  if (version >= 2 && !coversProse(licenseKey, blockStart, blockEnd, payload)) {
     return null;
   }
 
@@ -245,7 +424,7 @@ function readEntitlementKeyData(licenseKey: string): EntitlementKeyData | null {
     return null;
   }
 
-  return deepFreeze({ products });
+  return deepFreeze({ version, products });
 }
 
 // A product typically reads its key more than once per start-up (a console
@@ -259,16 +438,24 @@ let memoizedData: EntitlementKeyData | null = null;
  * Extracts the machine-readable data from an entitlement license key.
  *
  * The checksum is verified first, so the returned data is guaranteed to belong
- * to an intact block. A malformed or tampered key reads as `null` - reporting
- * an invalid key is the caller's job, not this function's.
+ * to an intact key. A malformed or tampered key reads as `null` - reporting an
+ * invalid key is the caller's job, not this function's.
  *
- * Only the bracketed block matters. The prose in front of it is neither parsed
- * nor covered by the checksum, so the caller may pass the whole key or just the
- * `[...]` block, and rewrapped or re-pasted prose still validates. The block
- * itself has to be intact: its alphabet has no whitespace, so a newline inside
- * it makes the key unreadable, exactly as it does for the key generator. Do not
- * "repair" such a key by stripping whitespace inside the brackets - that would
- * accept keys the generator rejects.
+ * The checksum is the SHA-512 of the encoded payload in every version. The
+ * payload's `v` decides what else is checked:
+ *
+ *   - version 2 and later (`v` in the payload): the payload's `prose` digest
+ *     has to match the text in front of the block, and only whitespace may
+ *     follow the block. A key whose prose was edited or removed (the bare
+ *     `[...]` block) reads as `null`.
+ *   - version 1 (no `v`), as license-key 4.x issued it: neither is checked,
+ *     exactly as 4.x did not - the bare block, an edited prose and text after
+ *     the block all read. Trial keys in that format are in production.
+ *
+ * The caller passes the whole key. The prose is never parsed, and its
+ * whitespace and Unicode composition are ignored, so rewrapped or re-pasted
+ * prose still validates. Whitespace inside the block is ignored too, so a
+ * block wrapped by a mail client still validates.
  *
  * Unknown products, capability tokens and flags are all tolerated, so nothing
  * about reading a key depends on the commercial vocabulary.

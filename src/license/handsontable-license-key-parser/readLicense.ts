@@ -18,25 +18,33 @@ import { resolveBuildDate } from './buildDate';
 const OPEN_CHANNELS: LicenseChannels = Object.freeze({ console: true, ui: true });
 
 /**
- * Builds the result for a key that does not license the product.
+ * Builds the result for a key that does not license the product. The
+ * overloads tie the version to the reason: a key that grants other products
+ * was read, so it has one; an unreadable key has none.
  *
  * @param {UnlicensedReason} reason Why the key does not license the product.
+ * @param {number|null} version The format version of the key, or `null` when
+ *                              it could not be read.
  * @returns {EntitlementLicense}
  */
-function unlicensed(reason: UnlicensedReason): EntitlementLicense {
+function unlicensed(reason: 'unreadable', version: null): EntitlementLicense;
+function unlicensed(reason: 'product_missing', version: number): EntitlementLicense;
+function unlicensed(reason: UnlicensedReason, version: number | null): EntitlementLicense {
   return Object.freeze({
     licensed: false,
     reason,
+    version,
     entitlement: null,
     lifecycle: null,
     channels: OPEN_CHANNELS,
     grants: UNRESTRICTED_GRANTS,
-  });
+  }) as EntitlementLicense;
 }
 
 /**
  * Reads an entitlement license key for one product, in one call: verifies the
- * block, picks the product's entry, places it in its lifecycle window, reads
+ * key (the checksum, and from version 2 the prose digest), picks the product's
+ * entry, places it in its lifecycle window, reads
  * its silencing flags and resolves what it unlocks.
  *
  * This is the single entry point a product needs. Route a key here only when
@@ -92,13 +100,13 @@ export function readEntitlementLicense(
   const keyData = extractEntitlementKeyData(licenseKey);
 
   if (keyData === null) {
-    return unlicensed('unreadable');
+    return unlicensed('unreadable', null);
   }
 
   const entitlement = getProductEntitlement(keyData, product);
 
   if (entitlement === null) {
-    return unlicensed('product_missing');
+    return unlicensed('product_missing', keyData.version);
   }
 
   // The clock is read once, so every window boundary is measured against the
@@ -115,6 +123,7 @@ export function readEntitlementLicense(
   return Object.freeze({
     licensed: true,
     reason: null,
+    version: keyData.version,
     entitlement,
     lifecycle,
     channels: resolveChannels(entitlement),

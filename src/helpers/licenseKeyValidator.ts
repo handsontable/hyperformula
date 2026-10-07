@@ -4,6 +4,8 @@
  */
 
 import {CHECKSUM_LENGTH} from '../license/handsontable-license-key-parser/constants'
+import {stringToUtf8Bytes} from '../license/handsontable-license-key-parser/encoding'
+import {sha512} from '../license/handsontable-license-key-parser/sha512'
 import {LicenseState, UnlicensedReason} from '../license/handsontable-license-key-parser/types'
 import {checkKeySchema, extractTime} from './licenseKeyHelper'
 
@@ -206,17 +208,41 @@ export function notifyEntitlementKey(licenseKey: string, state: LicenseState | U
 }
 
 /**
- * The identity of a key: its trailing 129 characters, after trimming — for an intact entitlement
- * key, the sha512 checksum plus the closing bracket, unique per distinct key content.
- *
- * Trimmed because the reader ignores surrounding whitespace, so `'KEY'` and `'KEY\n'` are one
- * license and must be one identity here too. Read from the END, so the whole artifact and its bare
- * `[...]` block, which the format treats as the same license, are one identity. Truncated because
- * the set lives as long as the page: a server building one engine per customer key would otherwise
- * keep every full key string it has ever seen.
+ * The identity of a key: the SHA-512 of the key with every character the reader ignores removed,
+ * unique per distinct key content. A rewrapped key and its one-line form are one license to the
+ * reader, so they are one identity here too. Two keys that share a block but differ in their prose
+ * are two keys - the payload carries a digest of the prose - so they are two identities. Hashed
+ * because the set lives as long as the page: a server building one engine per customer key would
+ * otherwise keep every full key string it has ever seen.
  */
 function keyIdentityOf(licenseKey: string): string {
-  return licenseKey.trim().slice(-(CHECKSUM_LENGTH + 1))
+  return sha512(stringToUtf8Bytes(withoutIgnoredCharacters(licenseKey).normalize('NFC')))
+}
+
+/**
+ * The checksum of an entitlement key: the last 128 characters of its block. The block is found
+ * the way the reader finds it - the last `[` and the first `]` after it - and read without the
+ * characters the reader ignores, so a key wrapped inside its block, or followed by a line break,
+ * reports the same checksum as its one-line form.
+ *
+ * @param {string} licenseKey - an entitlement key, as the user passed it
+ * @returns {string} the checksum
+ */
+export function entitlementKeyChecksumOf(licenseKey: string): string {
+  const blockStart = licenseKey.lastIndexOf('[')
+  const blockEnd = licenseKey.indexOf(']', blockStart + 1)
+
+  return withoutIgnoredCharacters(licenseKey.slice(blockStart + 1, blockEnd)).slice(-CHECKSUM_LENGTH)
+}
+
+/**
+ * The text without the characters the reader ignores anywhere in a key: every line break or tab
+ * saved as text (`\n`, `\r`, `\t`, as a `.env` file stores one), then every whitespace character.
+ * Removed in the reader's order, escapes first; `\s` is exactly the set of characters the reader
+ * treats as whitespace.
+ */
+function withoutIgnoredCharacters(text: string): string {
+  return text.replace(/\\[nrt]/g, '').replace(/\s+/g, '')
 }
 
 /**
