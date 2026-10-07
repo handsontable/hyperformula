@@ -4732,8 +4732,8 @@ export class HyperFormula implements TypedEmitter {
    *   console, and every license-gated function call evaluates to `#LIC!` — so the full catalog is still described.
    *   `VERSION()` and `OFFSET()` are protected built-ins outside the license system, so they keep evaluating. Use it to
    *   build a function picker before a key is configured. An expired key that keeps evaluating (a subscription past
-   *   its grace period, or a key whose `release_until` is before this build) keeps its own grants, so the list stays
-   *   exactly what it was while the key was current.
+   *   its grace period, or a perpetual key whose maintenance doesn't cover this build) keeps its own grants, so the
+   *   list stays exactly what it was while the key was current.
    * - A custom (user-registered) function is omitted only if it took a built-in id the key excludes. The rule is
    *   "not covered by the capability table", not "not user-registered", so a plugin registered under an id the
    *   built-in catalog already uses is treated as that built-in. Registered under an id of its own, a custom
