@@ -11,6 +11,16 @@ import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
+import {
+  addDoubleDouble,
+  divideDoubleDouble,
+  DOUBLE_DOUBLE_ZERO,
+  DoubleDouble,
+  multiplyDoubleDouble,
+  roundDoubleDouble,
+  scaleDoubleDouble,
+  twoSum,
+} from '../doubleDouble'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
@@ -31,23 +41,73 @@ function zeroForInfinite(value: InternalScalarValue) {
   }
 }
 
+/**
+ * Moments of a set of numbers, composable so that the value of a range can be cached and reused
+ * for a larger range.
+ *
+ * Besides the sum and the count, it keeps the sums of deviations and of squared deviations from a
+ * `shift`: the first value added. Both sums are double-double. Measured from a nearby value, the
+ * deviations stay small, which avoids the cancellation of the textbook one-pass form
+ * `sum(x^2) - sum(x)^2 / n` for data with a large mean and a small spread (for example 10000000.001,
+ * 10000000.002, ...). The variance is the correctly rounded value for the stored values, and the
+ * standard deviation, its square root, is within one unit in the last place of the exact value.
+ */
 class MomentsAggregate {
 
-  public static empty = new MomentsAggregate(0, 0, 0)
+  public static empty = new MomentsAggregate(0, 0, 0, DOUBLE_DOUBLE_ZERO, DOUBLE_DOUBLE_ZERO)
 
   constructor(
-    public readonly sumsq: number,
     public readonly sum: number,
     public readonly count: number,
+    public readonly shift: number,
+    public readonly shiftedSum: DoubleDouble,
+    public readonly shiftedSumOfSquares: DoubleDouble,
   ) {
   }
 
   public static single(arg: number): MomentsAggregate {
-    return new MomentsAggregate(arg * arg, arg, 1)
+    return new MomentsAggregate(arg, 1, arg, DOUBLE_DOUBLE_ZERO, DOUBLE_DOUBLE_ZERO)
   }
 
-  public compose(other: MomentsAggregate) {
-    return new MomentsAggregate(this.sumsq + other.sumsq, this.sum + other.sum, this.count + other.count)
+  /**
+   * Combines two aggregates. The result keeps this aggregate's `shift`; the other one's shifted sums
+   * are re-expressed relative to it. An empty aggregate is the identity: composing with it returns the
+   * other aggregate unchanged, with its own shift.
+   */
+  public compose(other: MomentsAggregate): MomentsAggregate {
+    if (this.count === 0) {
+      return other
+    }
+    if (other.count === 0) {
+      return this
+    }
+
+    const shiftDifference = twoSum(other.shift, -this.shift)
+
+    if (other.count === 1) {
+      // the common case of adding one value: its deviation is the shift difference itself
+      return new MomentsAggregate(
+        this.sum + other.sum,
+        this.count + 1,
+        this.shift,
+        addDoubleDouble(this.shiftedSum, shiftDifference),
+        addDoubleDouble(this.shiftedSumOfSquares, multiplyDoubleDouble(shiftDifference, shiftDifference)),
+      )
+    }
+
+    // other's sums rebased: S1 + n*d and S2 + 2*d*S1 + n*d^2
+    const rebasedSum = addDoubleDouble(other.shiftedSum, scaleDoubleDouble(shiftDifference, other.count))
+    const rebasedSumOfSquares = addDoubleDouble(
+      addDoubleDouble(other.shiftedSumOfSquares, scaleDoubleDouble(multiplyDoubleDouble(shiftDifference, other.shiftedSum), 2)),
+      scaleDoubleDouble(multiplyDoubleDouble(shiftDifference, shiftDifference), other.count),
+    )
+    return new MomentsAggregate(
+      this.sum + other.sum,
+      this.count + other.count,
+      this.shift,
+      addDoubleDouble(this.shiftedSum, rebasedSum),
+      addDoubleDouble(this.shiftedSumOfSquares, rebasedSumOfSquares),
+    )
   }
 
   public averageValue(): Maybe<number> {
@@ -60,7 +120,7 @@ class MomentsAggregate {
 
   public varSValue(): Maybe<number> {
     if (this.count > 1) {
-      return (this.sumsq - (this.sum * this.sum) / this.count) / (this.count - 1)
+      return roundDoubleDouble(divideDoubleDouble(this.sumOfSquaredDeviations(), this.count - 1))
     } else {
       return undefined
     }
@@ -68,10 +128,20 @@ class MomentsAggregate {
 
   public varPValue(): Maybe<number> {
     if (this.count > 0) {
-      return (this.sumsq - (this.sum * this.sum) / this.count) / this.count
+      return roundDoubleDouble(divideDoubleDouble(this.sumOfSquaredDeviations(), this.count))
     } else {
       return undefined
     }
+  }
+
+  /**
+   * The sum of squared deviations from the mean, `S2 - S1^2 / n` with `S1`, `S2` the shifted sums
+   * and `n` the count, as a double-double: the variance divides it before rounding once.
+   */
+  private sumOfSquaredDeviations(): DoubleDouble {
+    const squaredSumOverCount = divideDoubleDouble(multiplyDoubleDouble(this.shiftedSum, this.shiftedSum), this.count)
+    const result = addDoubleDouble(this.shiftedSumOfSquares, {hi: -squaredSumOverCount.hi, lo: -squaredSumOverCount.lo})
+    return result
   }
 }
 
