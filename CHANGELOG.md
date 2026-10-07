@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Changed the `VERSION` function to return only the HyperFormula version (e.g. `HyperFormula v3.4.0`), without the license key status. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+- Changed the API methods gated by the license key to throw a `LicenseCapabilityMissingError` when the key is missing or invalid, when a classic key has expired, or when a trial key is past its grace period. The gated methods are the ones that edit cells, rows, columns, and sheets, `copy()`, `cut()`, `paste()`, `undo()`, `redo()`, `batch()`, `suspendEvaluation()`, and the methods that add, change, or remove named expressions. Building an engine with named expressions throws the same error, and the matching `isItPossibleTo*()` methods return `false`. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
 
 ### Fixed
 
