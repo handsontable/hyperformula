@@ -36,10 +36,11 @@ const VALID_STATES: LicenseState[] = [
 ]
 
 /**
- * Lifecycle states in which a non-trial key has run out but still lets this build evaluate
- * formulas, printing an error to the console instead. An expired license never blocks a paying
- * customer, as the reader's guide and the key specification both say. A trial hard stop still
- * blocks.
+ * Lifecycle states in which a key has run out but still lets this build evaluate formulas,
+ * printing an error to the console instead: a subscription past its grace period, and any key whose
+ * `release_until` is before the build. An expired license never blocks a paying customer, as the
+ * reader's guide and the key specification both say. A trial past its grace period
+ * (`trial_hard_stop`) still blocks.
  *
  * The key keeps its own grants: the reader reports it as licensed, so an expired key is never
  * granted more than the same key was granted while it was current.
@@ -53,12 +54,12 @@ const EXPIRED_WITHOUT_BLOCKING_STATES: LicenseState[] = ['usage_hard_stop', 'rel
  * string, and parsing it twice would let them disagree about what it says.
  */
 export interface ResolvedLicense {
-  /** The key's state, as reported by `VERSION()` and the console messages. */
+  /** The key's state, as the console messages and the `#LIC!` and E3 error messages report it. */
   validityState: LicenseKeyValidityState,
   /**
    * Gate A — `true` when function calls must return `#LIC!`. Usually `validityState !== VALID`;
-   * the exception is an expired non-trial entitlement key, which reports `EXPIRED` but keeps
-   * evaluating (see {@link EXPIRED_WITHOUT_BLOCKING_STATES}).
+   * the exception is an entitlement key in one of {@link EXPIRED_WITHOUT_BLOCKING_STATES}, which
+   * reports `EXPIRED` but keeps evaluating.
    */
   blocksEvaluation: boolean,
   /** Gate B — which functions and API features the key grants. */
@@ -118,7 +119,7 @@ function entitlementOf(entry: ProductEntitlement, isTrial: boolean, silent: bool
  * literals, then the trailing bracketed block that marks an
  * entitlement key, then the legacy 25-character shape. Everything that is not an entitlement key
  * — `gpl-v3`, a legacy key, an empty string — falls through to {@link checkLicenseKeyValidity}
- * completely unchanged, which is what keeps this from touching existing behaviour. A string that
+ * completely unchanged, which is what keeps this from touching existing behavior. A string that
  * carries a bracketed block routes here even when the block is garbage: such a key is INVALID,
  * not a legacy key that happens to contain brackets.
  *
@@ -127,13 +128,14 @@ function entitlementOf(entry: ProductEntitlement, isTrial: boolean, silent: bool
  * digest), picks HyperFormula's entry, places it in its lifecycle window and reads its flags. Only
  * the meaning of the capability tokens and the console messages live here.
  *
- * **The invariant this function exists to protect.** Only a VALID entitlement key resolves to a
- * restricted entitlement. Every other outcome — missing, invalid, or expired, for an entitlement
- * key as much as for a legacy one — resolves to {@link unrestrictedEntitlement}. A bad key is
- * stopped by gate A alone, through `blocksEvaluation`: formulas yield `#LIC!` and every gated API
- * feature throws with the key's state (see `ensureFeatureAllowed`). Gate B never reports a bad
- * key, so its "not included in your license" error is reserved for a valid key that lacks the
- * grant. The fail-closed rule governs unrecognized tokens INSIDE an otherwise valid key; it is not
+ * **The invariant this function exists to protect.** Only an entitlement key that lets this build
+ * evaluate — a valid one, or one in {@link EXPIRED_WITHOUT_BLOCKING_STATES} — resolves to a
+ * restricted entitlement, and an expired one keeps exactly the grants it had while current. Every
+ * key that blocks evaluation (a missing or invalid key, an expired classic key, or a trial past its grace period) resolves to
+ * {@link unrestrictedEntitlement}, and so does every classic key. A key that blocks is stopped by
+ * gate A alone, through `blocksEvaluation`: formulas yield `#LIC!` and every gated API feature throws
+ * with the key's state (see `ensureFeatureAllowed`). Gate B never reports such a key, so its "not
+ * included in your license" error is reserved for a key that evaluates but lacks the grant. The fail-closed rule governs unrecognized tokens INSIDE an otherwise valid key; it is not
  * a rule about invalid keys.
  *
  * A checksum-valid key whose payload shape cannot be read is INVALID, not a crash and not a free

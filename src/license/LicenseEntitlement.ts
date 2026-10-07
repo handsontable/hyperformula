@@ -47,9 +47,17 @@ export interface LicenseExpiry {
  * configured key.
  */
 export interface LicenseEntitlement {
-  /** `true` for every key that restricts nothing: legacy keys, `gpl-v3`, and any missing, invalid or expired key. */
+  /**
+   * `true` for every key that restricts nothing: classic keys, `gpl-v3`, and any key that blocks
+   * evaluation (a missing or invalid key, an expired classic key, or a trial past its grace
+   * period). An entitlement key that has expired but keeps evaluating is not one of them: it keeps
+   * its own grants.
+   */
   unrestricted: boolean,
-  /** Capability tokens this entitlement grants, recognized by this library version. */
+  /**
+   * The capability tokens the key carries, spelled as the key spells them, recognized or not. Only
+   * the ones this library version recognizes grant anything.
+   */
   capabilities: ReadonlySet<string>,
   expiry: LicenseExpiry,
   /**
@@ -57,8 +65,8 @@ export interface LicenseEntitlement {
    *
    * Set from the key's own `no-console-warns` flag ONLY, as the vendored reader reads it (its
    * `channels.console`). An unrecognized token does NOT
-   * set it: an unknown token makes the *grant* silent (it grants nothing, with no message and no
-   * diagnostics getter), which is a different thing from muting the key's console output.
+   * set it: an unknown token makes the *grant* silent (it grants nothing, and nothing reports it),
+   * which is a different thing from muting the key's console output.
    * Coupling them would suppress expiry notices as a side effect of a vocabulary mismatch.
    */
   silent: boolean,
@@ -66,8 +74,9 @@ export interface LicenseEntitlement {
 }
 
 /**
- * The unrestricted entitlement: legacy keys, `gpl-v3`, and every missing, invalid or expired
- * entitlement key resolve to this.
+ * The unrestricted entitlement: classic keys, `gpl-v3`, and every key that blocks evaluation (a
+ * missing or invalid key, an expired classic key, or a trial past its grace period) resolve to
+ * this. An entitlement key that has expired but keeps evaluating does not: it keeps its own grants.
  *
  * Unrecognized tokens fail closed and silently, so an entitlement key whose tokens this library
  * version does not recognize at all does not map here — it resolves to an entitlement with an empty,

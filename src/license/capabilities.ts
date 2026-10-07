@@ -43,7 +43,7 @@ export interface CapabilityGrant {
  * that a consumer holding a grant cannot reach back into a sub-table's arrays.
  *
  * No token here names a package, and no grant refers to another token. Which tokens a commercial
- * package consists of is the generator's knowledge, expressed by the bigger licence simply
+ * package consists of is the generator's knowledge, expressed by the bigger license simply
  * listing more tokens — so a key's function set is the union of everything it names that this
  * table recognizes, and an unrecognized token is inert.
  * Legacy keys resolve to the unrestricted entitlement and never consult this table at all.
@@ -70,7 +70,7 @@ export const CAPABILITY_TABLE: ReadonlyMap<string, CapabilityGrant> = new Map<st
  * vocabulary, and tolerating case on the other tokens costs nothing since none of them collide
  * under lowercasing. Surrounding whitespace is trimmed because a key's token list is text a human
  * edited somewhere upstream: `'feat:crud '` is the token its author meant, and a padded spelling
- * that silently grants nothing is a support ticket, not a licence restriction.
+ * that silently grants nothing is a support ticket, not a license restriction.
  *
  * Normalization happens at LOOKUP, never at storage: an entitlement carries the key's own
  * spellings (they are diagnostics), and {@link CAPABILITY_TABLE} is keyed by the normalized form.

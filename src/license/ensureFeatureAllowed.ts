@@ -9,12 +9,25 @@ import {allowsFeature} from './CapabilityRegistry'
 import {FeatureId} from './LicenseEntitlement'
 
 /**
- * Throws {@link LicenseCapabilityMissingError} unless the license lets the caller use `feature`.
+ * Whether the license lets the caller use `feature`. Checks both gates, in the same order the
+ * interpreter does for functions:
+ * - gate A first: a key whose state blocks evaluation (a missing or invalid key, an expired classic
+ *   key, or a trial past its grace period) blocks every gated feature, whatever the entitlement says;
+ * - then gate B: a key that evaluates must grant `feature`.
  *
- * Checks both gates, in the same order the interpreter does for functions:
- * - gate A first: a key whose state blocks evaluation (missing, invalid, or expired past any
- *   grace period) blocks every gated feature, whatever the entitlement says;
- * - then gate B: a valid key must grant `feature`.
+ * The one rule behind {@link ensureFeatureAllowed} and the `isItPossibleTo*` predicates, so a
+ * predicate never answers `true` for a call that then throws a license error.
+ *
+ * @param {Config} config - the config whose resolved license is checked
+ * @param {FeatureId} feature - the gated feature being asked about
+ */
+export function isFeatureAllowed(config: Config, feature: FeatureId): boolean {
+  return !config.licenseBlocksEvaluation && allowsFeature(config.licenseCapabilities, feature)
+}
+
+/**
+ * Throws {@link LicenseCapabilityMissingError} unless {@link isFeatureAllowed}. When the key itself
+ * blocks evaluation, the error names the key's state.
  *
  * Shared by the build-time named-expressions check and `HyperFormula.ensureCapability`, so the two
  * cannot disagree about the same key.
@@ -23,10 +36,8 @@ import {FeatureId} from './LicenseEntitlement'
  * @param {FeatureId} feature - the gated feature being called
  */
 export function ensureFeatureAllowed(config: Config, feature: FeatureId): void {
-  if (config.licenseBlocksEvaluation) {
-    throw new LicenseCapabilityMissingError(feature, config.licenseKeyValidityState)
+  if (isFeatureAllowed(config, feature)) {
+    return
   }
-  if (!allowsFeature(config.licenseCapabilities, feature)) {
-    throw new LicenseCapabilityMissingError(feature)
-  }
+  throw new LicenseCapabilityMissingError(feature, config.licenseBlocksEvaluation ? config.licenseKeyValidityState : undefined)
 }

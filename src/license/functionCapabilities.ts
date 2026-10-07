@@ -70,7 +70,7 @@ const FUNCTION_GROUPS: ReadonlyMap<string, readonly string[]> = new Map([
  * Enumerated rather than taken from the function registry at run time, even though "everything
  * not in a group" would be the shorter way to say it. Reading the registry would sweep in
  * functions registered through `HyperFormula.registerFunctionPlugin`, putting a user's OWN custom
- * function under a licence token and returning `#LIC!` for it, while custom functions must never
+ * function under a license token and returning `#LIC!` for it, while custom functions must never
  * be gated. A function this table does not list is not
  * gated at all, which is exactly the treatment a custom function should get.
  */
