@@ -1339,6 +1339,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Checks if there is at least one operation that can be undone.
+   * Returns `false` also when the license key does not allow the UndoRedo feature (see [[LicenseCapabilityMissingError]]).
    *
    * For more information, see the [Undo-Redo guide](/guide/undo-redo.md).
    *
@@ -1361,11 +1362,15 @@ export class HyperFormula implements TypedEmitter {
    * @category Undo and Redo
    */
   public isThereSomethingToUndo(): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.UndoRedo)) {
+      return false
+    }
     return this._crudOperations.isThereSomethingToUndo()
   }
 
   /**
    * Checks if there is at least one operation that can be re-done.
+   * Returns `false` also when the license key does not allow the UndoRedo feature (see [[LicenseCapabilityMissingError]]).
    *
    * For more information, see the [Undo-Redo guide](/guide/undo-redo.md).
    *
@@ -1380,6 +1385,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Undo and Redo
    */
   public isThereSomethingToRedo(): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.UndoRedo)) {
+      return false
+    }
     return this._crudOperations.isThereSomethingToRedo()
   }
 
@@ -5000,8 +5008,9 @@ export class HyperFormula implements TypedEmitter {
    * - **Gated:** methods that create value by mutating the sheet, the clipboard, the undo
    *   history, or the named-expression set.
    * - **Not gated:** reads (`getCellValue`, `listNamedExpressions`,
-   *   `getAllNamedExpressionsSerialized`, the `isItPossibleTo*` predicates, which answer `false`
-   *   instead of throwing when the method they ask about is not allowed) and teardown or
+   *   `getAllNamedExpressionsSerialized`, the `isItPossibleTo*` predicates and
+   *   `isThereSomethingToUndo`/`isThereSomethingToRedo`, which answer `false` instead of throwing
+   *   when the method they ask about is not allowed) and teardown or
    *   cleanup that only ever removes state (`clearClipboard`, `clearUndoStack`,
    *   `clearRedoStack`, `destroy`). Gating cleanup would let a restricted entitlement strand
    *   an integration mid-teardown while giving a licensee nothing, and mirrors gate B, which
@@ -5023,7 +5032,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Whether the current license allows the given feature: the answer [[ensureCapability]] acts on,
-   * for the `isItPossibleTo*` predicates, which answer `false` instead of throwing.
+   * for the `isItPossibleTo*` predicates and `isThereSomethingToUndo`/`isThereSomethingToRedo`,
+   * which answer `false` instead of throwing.
    *
    * @internal
    */

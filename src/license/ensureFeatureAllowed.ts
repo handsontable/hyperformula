@@ -15,8 +15,9 @@ import {FeatureId} from './LicenseEntitlement'
  *   key, or a trial past its grace period) blocks every gated feature, whatever the entitlement says;
  * - then gate B: a key that evaluates must grant `feature`.
  *
- * The one rule behind {@link ensureFeatureAllowed} and the `isItPossibleTo*` predicates, so a
- * predicate never answers `true` for a call that then throws a license error.
+ * The one rule behind {@link ensureFeatureAllowed}, the `isItPossibleTo*` predicates and
+ * `isThereSomethingToUndo`/`isThereSomethingToRedo`, so a predicate never answers `true` for a call
+ * that then throws a license error.
  *
  * @param {Config} config - the config whose resolved license is checked
  * @param {FeatureId} feature - the gated feature being asked about

@@ -65,7 +65,9 @@ If your key grants only part of the library, then:
   [error value](types-of-errors.md). Everything else in the sheet keeps calculating.
 * An API method your key doesn't include throws a `LicenseCapabilityMissingError` when you call
   it. Getters never throw; `copy()` and `cut()` do, because they belong to the clipboard feature.
-  The matching `isItPossibleTo*()` methods, such as `isItPossibleToAddRows()`, return `false`.
+  The matching `isItPossibleTo*()` methods, such as `isItPossibleToAddRows()`, return `false`,
+  and so do `isThereSomethingToUndo()` and `isThereSomethingToRedo()` when your key doesn't
+  include undo and redo.
 * [`getAvailableFunctions()`](../api/classes/hyperformula.md#getavailablefunctions) and
   [`getFunctionDetails()`](../api/classes/hyperformula.md#getfunctiondetails) describe only the
   functions your key includes, so a function picker built from them never offers a function that
@@ -84,7 +86,8 @@ A missing or invalid key blocks the library:
   are the ones that edit cells, rows, columns, and sheets, `copy()`, `cut()`, `paste()`, `undo()`,
   `redo()`, `batch()`, `suspendEvaluation()`, and the methods that add, change, or remove named
   expressions. Building an engine with named expressions throws the same error.
-* The `isItPossibleTo*()` methods return `false` for every gated method.
+* The `isItPossibleTo*()` methods return `false` for every gated method, and
+  `isThereSomethingToUndo()` and `isThereSomethingToRedo()` return `false`.
 * Getters and clean-up methods, such as `clearClipboard()` and `resumeEvaluation()`, keep working,
   and `getAvailableFunctions()` still describes the full set of functions.
 
