@@ -30,7 +30,7 @@ operation together with their absolute addresses and new values.
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // multiple operations in a single callback will trigger evaluation only once
 // and only one set of changes will be returned as a combined result of all
@@ -58,7 +58,7 @@ operation together with their absolute addresses and new values.
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // suspend the evaluation
 hfInstance.suspendEvaluation();
@@ -82,7 +82,7 @@ When you need to check if the evaluation is suspended you can
 call the [`isEvaluationSuspended`](../api/classes/hyperformula.md#isevaluationsuspended) method.
 
 ```javascript
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // suspend the evaluation
 hfInstance.suspendEvaluation();

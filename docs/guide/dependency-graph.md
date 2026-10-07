@@ -87,7 +87,7 @@ node and avoid duplicating the work during computation.
 To get the immediate precedents of a cell or a range (the in-neighbors of the cell node or the range node), use the [`getCellPrecedents()`](../api/classes/hyperformula.html#getcellprecedents) method:
 
 ```js
-const hfInstance = HyperFormula.buildFromArray([[ '1', '2', '=A1', '=B1+C1' ]]);
+const hfInstance = HyperFormula.buildFromArray([[ '1', '2', '=A1', '=B1+C1' ]], { licenseKey: 'gpl-v3' });
 
 hfInstance.getCellPrecedents({ sheet: 0, col: 3, row: 0 });
 // returns [{ sheet: 0, col: 1, row: 0 }, { sheet: 0, col: 2, row: 0 }]
@@ -98,7 +98,7 @@ hfInstance.getCellPrecedents({ sheet: 0, col: 3, row: 0 });
 To get the immediate dependents of a cell or a range (the out-neighbors of the cell node or the range node), use the [`getCellDependents()`](../api/classes/hyperformula.html#getcelldependents) method:
 
 ```js
-const hfInstance = HyperFormula.buildFromArray([[ '1', '=A1', '=A1+B1', '=B1+C1' ]])
+const hfInstance = HyperFormula.buildFromArray([[ '1', '=A1', '=A1+B1', '=B1+C1' ]], { licenseKey: 'gpl-v3' })
 
 hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0 })
 // returns [{ sheet: 0, col: 1, row: 0 }, { sheet: 0, col: 2, row: 0 }]
