@@ -21,6 +21,7 @@
     "@astrojs/starlight": "^0.38.2",
     "@expressive-code/plugin-collapsible-sections": "^0.41.7",
     "@expressive-code/plugin-line-numbers": "^0.41.7",
+    "@fontsource/inter": "^5.3.0",
     "astro": "^6.1.1",
     "gray-matter": "^4.0.3",
     "hyperformula": "^3.3.0",
