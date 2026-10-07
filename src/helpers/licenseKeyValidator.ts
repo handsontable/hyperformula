@@ -4,7 +4,7 @@
  */
 
 import {CHECKSUM_LENGTH} from '../license/handsontable-license-key-parser/constants'
-import {LicenseState} from '../license/handsontable-license-key-parser/types'
+import {LicenseState, UnlicensedReason} from '../license/handsontable-license-key-parser/types'
 import {checkKeySchema, extractTime} from './licenseKeyHelper'
 
 /**
@@ -115,6 +115,21 @@ const ENTITLEMENT_CONSOLE_NOTIFICATIONS: Partial<Record<LicenseState, Entitlemen
 }
 
 /**
+ * The console message for each reason an entitlement key does not license HyperFormula. Both are
+ * errors: neither key evaluates formulas.
+ */
+const UNLICENSED_CONSOLE_NOTIFICATIONS: Record<UnlicensedReason, EntitlementConsoleNotification> = {
+  unreadable: {
+    severity: 'error',
+    message: () => 'The license key for HyperFormula is invalid. If you need any help, contact us at support@handsontable.com.',
+  },
+  product_missing: {
+    severity: 'error',
+    message: () => 'The license key does not include a license for HyperFormula. To purchase one, contact sales@handsontable.com.',
+  },
+}
+
+/**
  * Entitlement messages already printed, each as a key identity (see {@link keyIdentityOf}) plus
  * the message text: "each distinct message once per key per page", as the specification asks. Two
  * keys on one page are two licenses, and one key moving into a new state is a new message. Kept apart from {@link _notified},
@@ -158,16 +173,14 @@ export function notifyLicenseKeyState(state: LicenseKeyValidityState, keyValidit
 
 /**
  * Prints the console message for an entitlement key, at most once per distinct key per page.
- * `'invalid'` (a broken block, or a key for other products only) reuses the classic invalid-key
- * text, as Handsontable does: the specification leaves that message open.
  *
  * @param {string} licenseKey - the raw key; only its identity is retained
- * @param {LicenseState | 'invalid'} state - the reader's lifecycle state, or `'invalid'`
+ * @param {LicenseState | UnlicensedReason} state - the reader's lifecycle state, or why the key does not license HyperFormula
  * @param {EntitlementMessageParams} params - the key's own date and days remaining
  */
-export function notifyEntitlementKey(licenseKey: string, state: LicenseState | 'invalid', params: EntitlementMessageParams): void {
-  const notification: EntitlementConsoleNotification | undefined = state === 'invalid'
-    ? {severity: 'warn', message: () => consoleMessages.invalid({})}
+export function notifyEntitlementKey(licenseKey: string, state: LicenseState | UnlicensedReason, params: EntitlementMessageParams): void {
+  const notification: EntitlementConsoleNotification | undefined = state === 'unreadable' || state === 'product_missing'
+    ? UNLICENSED_CONSOLE_NOTIFICATIONS[state]
     : ENTITLEMENT_CONSOLE_NOTIFICATIONS[state]
 
   if (notification === undefined) {
@@ -222,7 +235,8 @@ export function checkLicenseKeyValidity(licenseKey: string): LicenseKeyValidityS
 
   } else if (typeof licenseKey === 'string' && checkKeySchema(licenseKey)) {
     const [day, month, year] = (process.env.HT_RELEASE_DATE || '').split('/')
-    const releaseDays = Math.floor(new Date(`${month}/${day}/${year}`).getTime() / 8.64e7)
+    // UTC, not `new Date('MM/DD/YYYY')`: local parsing puts the release day one day early east of UTC.
+    const releaseDays = Math.floor(Date.UTC(Number(year), Number(month) - 1, Number(day)) / 8.64e7)
     const keyValidityDays = extractTime(licenseKey)
 
     messageDescriptor.expiryDate = new Date((keyValidityDays + 1) * 8.64e7)

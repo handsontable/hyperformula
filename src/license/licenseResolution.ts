@@ -139,14 +139,12 @@ function entitlementOf(entry: ProductEntitlement, isTrial: boolean, silent: bool
  *
  * **The invariant this function exists to protect.** Only a VALID entitlement key resolves to a
  * restricted entitlement. Every other outcome — missing, invalid, or expired, for an entitlement
- * key as much as for a legacy one — resolves to {@link unrestrictedEntitlement}. That asymmetry is
- * deliberate and load-bearing: gate A already stops formula evaluation on its own (a bad key
- * yields `#LIC!` in cells), while gate B additionally makes `ensureCapability` throw from
- * the CRUD API. Letting a bad key restrict the entitlement would turn today's "formulas fail,
- * the API still works" into "the API throws", which is a silent breaking change for every
- * existing user whose key lapsed. The fail-closed rule governs unrecognized tokens INSIDE an
- * otherwise valid key; it is not a rule about invalid keys, and conflating the two is exactly
- * the mistake this comment is here to prevent.
+ * key as much as for a legacy one — resolves to {@link unrestrictedEntitlement}. A bad key is
+ * stopped by gate A alone, through `blocksEvaluation`: formulas yield `#LIC!` and every gated API
+ * feature throws with the key's state (see `ensureFeatureAllowed`). Gate B never reports a bad
+ * key, so its "not included in your license" error is reserved for a valid key that lacks the
+ * grant. The fail-closed rule governs unrecognized tokens INSIDE an otherwise valid key; it is not
+ * a rule about invalid keys.
  *
  * A checksum-valid key whose payload shape cannot be read is INVALID, not a crash and not a free
  * pass: every payload field is untrusted, so nothing here may assume a shape the vendored reader
@@ -179,10 +177,10 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
   })
 
   if (!license.licensed) {
-    // `unreadable` (a broken block) and `product_missing` (a key for other products only) are
-    // both reported as an invalid key, and neither restricts anything.
+    // `unreadable` (a broken block) and `product_missing` (a key for other products only) both
+    // resolve to an invalid key that restricts nothing; only their console messages differ.
     if (notifyConsole) {
-      notifyEntitlementKey(licenseKey, 'invalid', {licensedUntil: null, daysRemaining: null})
+      notifyEntitlementKey(licenseKey, license.reason, {licensedUntil: null, daysRemaining: null})
     }
 
     return {validityState: LicenseKeyValidityState.INVALID, blocksEvaluation: true, entitlement: unrestrictedEntitlement()}

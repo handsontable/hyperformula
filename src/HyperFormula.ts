@@ -38,13 +38,13 @@ import {
   ExpectedValueOfTypeError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
-  LicenseCapabilityMissingError,
   NotAFormulaError,
 } from './errors'
 import {Evaluator} from './Evaluator'
 import {ExportedChange, Exporter} from './Exporter'
 import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
-import {allowsFeature, licenseAllowsFunction} from './license/CapabilityRegistry'
+import {licenseAllowsFunction} from './license/CapabilityRegistry'
+import {ensureFeatureAllowed} from './license/ensureFeatureAllowed'
 import {FeatureId} from './license/LicenseEntitlement'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
@@ -4906,7 +4906,8 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Throws an error if the current license entitlement does not grant the given feature.
+   * Throws an error if the current license does not allow the given feature: either the key's
+   * state blocks every gated feature (missing, invalid or expired), or the key does not grant it.
    *
    * Where the line is drawn, so a later change does not move it by accident:
    * - **Gated:** methods that create value by mutating the sheet, the clipboard, the undo
@@ -4923,18 +4924,13 @@ export class HyperFormula implements TypedEmitter {
    *   the instance permanently unusable. A capability check must never be reachable only on
    *   the way out of a state it let the caller into.
    *
-   * Note this checks gate B (entitlement) only, never gate A (key validity). That asymmetry
-   * with the interpreter's gate B - which checks key validity first - is deliberate: it keeps
-   * today's behaviour for a missing or invalid key, where formulas yield `#LIC!` but the CRUD
-   * API keeps working. A later PR that resolves an invalid key to a *restricted* entitlement
-   * rather than an unrestricted one would silently turn that into a breaking API change.
+   * Must stay the first statement of every gated method, so a blocking key is reported before
+   * any argument validation.
    *
    * @internal
    */
   private ensureCapability(feature: FeatureId): void {
-    if (!allowsFeature(this._config.licenseCapabilities, feature)) {
-      throw new LicenseCapabilityMissingError(feature)
-    }
+    ensureFeatureAllowed(this._config, feature)
   }
 
   /**

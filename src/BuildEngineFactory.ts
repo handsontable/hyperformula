@@ -10,7 +10,7 @@ import {Config} from './Config'
 import {CrudOperations} from './CrudOperations'
 import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph} from './DependencyGraph'
-import {LicenseCapabilityMissingError, SheetSizeLimitExceededError} from './errors'
+import {SheetSizeLimitExceededError} from './errors'
 import {Evaluator} from './Evaluator'
 import {Exporter} from './Exporter'
 import {GraphBuilder} from './GraphBuilder'
@@ -19,7 +19,7 @@ import {ArithmeticHelper} from './interpreter/ArithmeticHelper'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {allowsFeature} from './license/CapabilityRegistry'
+import {ensureFeatureAllowed} from './license/ensureFeatureAllowed'
 import {FeatureId} from './license/LicenseEntitlement'
 import {buildColumnSearchStrategy, ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {NamedExpressions} from './NamedExpressions'
@@ -74,7 +74,7 @@ export class BuildEngineFactory {
   }
 
   /**
-   * Throws if `namedExpressions` is non-empty and `config`'s entitlement does not grant
+   * Throws if `namedExpressions` is non-empty and `config`'s license does not allow
    * {@link FeatureId.NamedExpressions} (the build-time counterpart of
    * {@link HyperFormula.ensureCapability}). An empty list is never checked: building an engine
    * with no named expressions never touches the feature. Deliberately not called from
@@ -85,9 +85,7 @@ export class BuildEngineFactory {
     if (namedExpressions.length === 0) {
       return
     }
-    if (!allowsFeature(config.licenseCapabilities, FeatureId.NamedExpressions)) {
-      throw new LicenseCapabilityMissingError(FeatureId.NamedExpressions)
-    }
+    ensureFeatureAllowed(config, FeatureId.NamedExpressions)
   }
 
   private static buildEngine(config: Config, sheets: Sheets = {}, inputNamedExpressions: SerializedNamedExpression[] = [], stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {

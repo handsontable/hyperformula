@@ -4,6 +4,7 @@
  */
 
 import {SimpleCellAddress} from './Cell'
+import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {FeatureId} from './license/LicenseEntitlement'
 
 /**
@@ -437,7 +438,15 @@ export class AliasAlreadyExisting extends Error {
  * @see [[suspendEvaluation]]
  */
 export class LicenseCapabilityMissingError extends Error {
-  constructor(feature: FeatureId) {
-    super(`Feature ${feature} is not included in your license.`)
+  /**
+   * @param {FeatureId} feature - the gated feature that was called
+   * @param {LicenseKeyValidityState} [blockingState] - the key's state when the key itself blocks
+   * every gated feature (missing, invalid or expired); omit when the key is valid but does not
+   * grant `feature`
+   */
+  constructor(feature: FeatureId, blockingState?: LicenseKeyValidityState) {
+    super(blockingState === undefined
+      ? `Feature ${feature} is not included in your license.`
+      : `License key is ${blockingState}. Feature ${feature} is not available.`)
   }
 }
