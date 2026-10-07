@@ -738,9 +738,7 @@ export class HyperFormula implements TypedEmitter {
     if (FunctionRegistry.functionIsProtected(functionId)) {
       return true
     }
-    const plugin = functionRegistry.getFunctionPlugin(functionId)
-    const canonicalId = plugin?.aliases?.[functionId] ?? functionId
-    return licenseAllowsFunction(config.capabilityRegistry, config.licenseCapabilities, canonicalId)
+    return licenseAllowsFunction(config.capabilityRegistry, config.licenseCapabilities, functionRegistry.getCanonicalFunctionId(functionId))
   }
 
   /**

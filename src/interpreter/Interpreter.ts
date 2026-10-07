@@ -13,7 +13,7 @@ import {DependencyGraph} from '../DependencyGraph'
 import {FormulaVertex} from '../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
-import {licenseAllowsFunction} from '../license/CapabilityRegistry'
+import {CapabilityRegistry, licenseAllowsFunction, ResolvedCapabilities} from '../license/CapabilityRegistry'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
@@ -46,6 +46,19 @@ import { AddressWithSheet } from '../parser/Address'
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
 
+  /*
+   * The license decisions applied to every function call, read once from the config instead of
+   * through its getters (a WeakMap lookup each) on the hottest path of evaluation. They cannot go
+   * stale: a Config never changes once built, and `updateConfig` builds a new engine, and with it a
+   * new Interpreter.
+   */
+  private readonly licenseBlocksEvaluation: boolean
+  private readonly licenseKeyValidityState: LicenseKeyValidityState
+  private readonly capabilityRegistry: CapabilityRegistry
+  private readonly licenseCapabilities: ResolvedCapabilities
+  /** `false` for a key that grants every function, which lets a call skip the alias and table lookups. */
+  private readonly licenseRestrictsFunctions: boolean
+
   constructor(
     public readonly config: Config,
     public readonly dependencyGraph: DependencyGraph,
@@ -60,17 +73,11 @@ export class Interpreter {
   ) {
     this.functionRegistry.initializePlugins(this)
     this.criterionBuilder = new CriterionBuilder(config)
-  }
-
-  /**
-   * Resolves a function id to the name it is covered by in the capability table. A function
-   * registered purely as an alias of another one (`plugin.aliases`) must gate identically to
-   * its canonical name — otherwise calling a gated function through its alias would silently
-   * bypass the entitlement check.
-   */
-  private canonicalFunctionId(functionId: string): string {
-    const plugin = this.functionRegistry.getFunctionPlugin(functionId)
-    return plugin?.aliases?.[functionId] ?? functionId
+    this.licenseBlocksEvaluation = config.licenseBlocksEvaluation
+    this.licenseKeyValidityState = config.licenseKeyValidityState
+    this.capabilityRegistry = config.capabilityRegistry
+    this.licenseCapabilities = config.licenseCapabilities
+    this.licenseRestrictsFunctions = config.licenseCapabilities.functions !== 'all'
   }
 
   public evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
@@ -190,12 +197,12 @@ export class Interpreter {
       }
       case AstNodeType.FUNCTION_CALL: {
         if (!FunctionRegistry.functionIsProtected(ast.procedureName)) {
-          if (this.config.licenseBlocksEvaluation) {
-            return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState))
+          if (this.licenseBlocksEvaluation) {
+            return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.licenseKeyValidityState))
           }
 
-          const canonicalId = this.canonicalFunctionId(ast.procedureName)
-          if (!licenseAllowsFunction(this.config.capabilityRegistry, this.config.licenseCapabilities, canonicalId)) {
+          if (this.licenseRestrictsFunctions
+            && !licenseAllowsFunction(this.capabilityRegistry, this.licenseCapabilities, this.functionRegistry.getCanonicalFunctionId(ast.procedureName))) {
             return new CellError(ErrorType.LIC, ErrorMessage.LicenseCapability(ast.procedureName))
           }
         }
