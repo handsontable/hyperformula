@@ -12,9 +12,9 @@
  * from a tagged release, and do not edit the copy ... add a drift check to CI"). This is that check.
  *
  * What it does, per `upstream.json`:
- *   - lists the upstream directory at the pinned `tag` and compares EVERY file byte for byte
- *     against the local one - upstream's `diff -r`, without needing a clone;
- *   - fails on a local file upstream does not have (other than `own_files`) - a shadowing
+ *   - lists the upstream directory at the pinned `commit` and compares EVERY file byte for byte
+ *     against the local one as git tracks it - upstream's `diff -r`, without needing a clone;
+ *   - fails on a tracked local file upstream does not have (other than `own_files`) - a shadowing
  *     `foo.ts` beside a copied `foo.ts` would otherwise win module resolution silently;
  *   - fails on an upstream file that is missing locally;
  *   - checks that the pinned `tag` still points at the pinned `commit`, so a moved tag or an edited
@@ -42,7 +42,8 @@ const crypto = require('crypto')
 const https = require('https')
 const {execFileSync} = require('child_process')
 
-const DIR = path.resolve(__dirname, '../src/license/handsontable-license-key-parser')
+const REPO_ROOT = path.resolve(__dirname, '..')
+const DIR = path.resolve(REPO_ROOT, 'src/license/handsontable-license-key-parser')
 const PIN = path.join(DIR, 'upstream.json')
 
 function token() {
@@ -58,12 +59,16 @@ function token() {
   }
 }
 
+/** How long a request may wait for the API before the check gives up on it. */
+const REQUEST_TIMEOUT_MS = 30000
+
 function get(apiPath, accept, auth) {
   return new Promise((resolve, reject) => {
-    https.get({
+    const request = https.get({
       hostname: 'api.github.com',
       path: apiPath,
       headers: {'Accept': accept, 'User-Agent': 'hyperformula-vendored-parser-check', 'Authorization': `Bearer ${auth}`},
+      timeout: REQUEST_TIMEOUT_MS,
     }, (response) => {
       const chunks = []
 
@@ -80,23 +85,65 @@ function get(apiPath, accept, auth) {
           reject(error)
         }
       })
-    }).on('error', reject)
+    })
+
+    request.on('timeout', () => request.destroy(new Error(`no response within ${REQUEST_TIMEOUT_MS / 1000} s`)))
+    request.on('error', reject)
   })
+}
+
+/**
+ * Why a request failed, worded so that it is never mistaken for drift: a 301 is a renamed or moved
+ * repository (a configuration problem), any other HTTP status is an access problem, and an error
+ * with no status (a timeout, a dropped connection) is a network problem.
+ */
+function describeFailure(error) {
+  if (error.statusCode === 301) {
+    return 'HTTP 301: the repository moved or was renamed - update `repository` in upstream.json. A configuration problem, not drift'
+  }
+  if (error.statusCode !== undefined) {
+    return `HTTP ${error.statusCode} - access, not drift`
+  }
+
+  return `${error.message} - a network problem, not drift`
 }
 
 const sha256 = (buffer) => crypto.createHash('sha256').update(buffer).digest('hex')
 
-function semverGreater(a, b) {
-  const pa = a.split('.').map(Number)
-  const pb = b.split('.').map(Number)
+/**
+ * The `[major, minor, patch]` a tag names, or `null` for a tag that is not a version. A leading `v`
+ * is ignored, and so is a prerelease suffix (`-rc.1`): a prerelease counts as newer than the pin
+ * only when the version it leads up to is newer.
+ */
+function baseVersionOf(tag) {
+  const match = /^v?(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z.-]+)?$/.exec(tag)
 
+  return match === null ? null : [Number(match[1]), Number(match[2]), Number(match[3])]
+}
+
+/** Whether version `a` (`[major, minor, patch]`) is greater than version `b`. */
+function versionGreater(a, b) {
   for (let i = 0; i < 3; i++) {
-    if ((pa[i] || 0) !== (pb[i] || 0)) {
-      return (pa[i] || 0) > (pb[i] || 0)
+    if (a[i] !== b[i]) {
+      return a[i] > b[i]
     }
   }
 
   return false
+}
+
+/** Every tag of an upstream repository, following the pagination, 100 per page. */
+async function listTags(repo, auth) {
+  const tags = []
+
+  for (let page = 1; ; page++) {
+    const batch = JSON.parse((await get(`/repos/${repo}/tags?per_page=100&page=${page}`, 'application/vnd.github+json', auth)).toString('utf8'))
+
+    tags.push(...batch)
+    if (batch.length < 100) {
+      return tags
+    }
+  }
 }
 
 /** Every file under an upstream directory at a ref, recursively, as `relative path -> api path`. */
@@ -121,24 +168,28 @@ async function listUpstream(repo, dir, ref, auth) {
   return out
 }
 
-/** Every file under the local directory, recursively, relative. */
-function listLocal(root) {
-  const out = []
-  const walk = (sub) => {
-    fs.readdirSync(path.join(root, sub), {withFileTypes: true}).forEach((entry) => {
-      const rel = sub ? `${sub}/${entry.name}` : entry.name
+/** A path under the repository root as git spells it: relative, with forward slashes. */
+const gitPath = (absolute) => path.relative(REPO_ROOT, absolute).split(path.sep).join('/')
 
-      if (entry.isDirectory()) {
-        walk(rel)
-      } else {
-        out.push(rel)
-      }
-    })
-  }
+/**
+ * Every file git tracks under the local directory, recursively, relative to it. Untracked files
+ * (`.DS_Store`, editor leftovers) are not part of the copy, so they are not compared.
+ */
+function listTracked(root) {
+  const prefix = `${gitPath(root)}/`
 
-  walk('')
+  return execFileSync('git', ['ls-files', '-z', '--', prefix], {cwd: REPO_ROOT, encoding: 'utf8'})
+    .split('\0')
+    .filter((file) => file !== '')
+    .map((file) => file.slice(prefix.length))
+}
 
-  return out
+/**
+ * A tracked file's content as git stores it (the index), not as it was checked out, so a checkout
+ * that converts line endings to CRLF does not read as drift. An edit is compared once it is staged.
+ */
+function readTracked(root, rel) {
+  return execFileSync('git', ['show', `:${gitPath(path.join(root, rel))}`], {cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024})
 }
 
 async function main() {
@@ -159,7 +210,7 @@ async function main() {
   // The pin first: a tag that moved, or a pin edited by hand, is named as that - before any
   // listing at the tag can fail for a different reason and blame access.
   try {
-    const tags = JSON.parse((await get(`/repos/${pin.repository}/tags?per_page=20`, 'application/vnd.github+json', auth)).toString('utf8'))
+    const tags = await listTags(pin.repository, auth)
     const pinned = tags.find((t) => t.name === pin.tag)
 
     if (pinned === undefined) {
@@ -168,41 +219,45 @@ async function main() {
       problems.push(`tag ${pin.tag} points at ${pinned.commit.sha.slice(0, 9)}, the pin says ${pin.commit.slice(0, 9)} - the tag moved or the pin was edited`)
     }
 
-    const pinIsRelease = /^\d+\.\d+\.\d+$/.test(pin.tag)
-    const newer = pinIsRelease
-      ? tags.map((t) => t.name).filter((name) => /^\d+\.\d+\.\d+$/.test(name) && semverGreater(name, pin.tag))
-      : []
+    const pinVersion = baseVersionOf(pin.tag)
+    const newer = pinVersion === null
+      ? []
+      : tags.map((t) => t.name).filter((name) => {
+        const version = baseVersionOf(name)
+
+        return version !== null && versionGreater(version, pinVersion)
+      })
 
     if (newer.length > 0) {
       problems.push(`upstream has released ${newer.join(', ')} after ${pin.tag}. Review the change and re-take the copy from the newest tag.`)
     }
   } catch (error) {
-    problems.push(`could not list upstream tags (HTTP ${error.message}) - access, not drift`)
+    problems.push(`could not list upstream tags: ${describeFailure(error)}`)
   }
 
 
   let upstream
 
   try {
-    upstream = await listUpstream(pin.repository, pin.directory, pin.tag, auth)
+    // At the pinned commit, not the tag: a tag moved after the check above cannot change what is compared.
+    upstream = await listUpstream(pin.repository, pin.directory, pin.commit, auth)
   } catch (error) {
     // Whatever the pin check already found is the more likely cause of this failure - say it first.
     problems.forEach((p) => console.error(`\nFAIL  ${p}`))
-    console.error(`\nFAIL  could not list ${pin.repository}/${pin.directory} at ${pin.tag}: HTTP ${error.message}.`)
-    console.error(error.statusCode === 404
-      ? '      404 from a private repository means the token has no access to it, the tag does not exist, or the directory does not exist at that ref. This is not drift.'
-      : '      This is an access or network problem, not drift.')
+    console.error(`\nFAIL  could not list ${pin.repository}/${pin.directory} at ${pin.tag}: ${describeFailure(error)}.`)
+    if (error.statusCode === 404) {
+      console.error('      404 from a private repository means the token has no access to it, the tag does not exist, or the directory does not exist at that ref.')
+    }
     process.exit(1)
   }
 
   const divergences = new Map((pin.allowed_divergences || []).map((d) => [d.file, d]))
   const own = new Set(pin.own_files || [])
-  const local = listLocal(DIR).filter((rel) => !own.has(rel))
+  const tracked = new Set(listTracked(DIR))
+  const local = Array.from(tracked).filter((rel) => !own.has(rel))
 
   for (const [rel, apiPath] of upstream) {
-    const localPath = path.join(DIR, rel)
-
-    if (!fs.existsSync(localPath)) {
+    if (!tracked.has(rel)) {
       problems.push(`${rel}: in upstream at ${pin.tag}, missing here`)
       console.log(`  GONE  ${rel}`)
       continue
@@ -211,9 +266,9 @@ async function main() {
     let theirs
 
     try {
-      theirs = (await get(`/repos/${pin.repository}/contents/${apiPath}?ref=${encodeURIComponent(pin.tag)}`, 'application/vnd.github.raw', auth)).toString('utf8')
+      theirs = (await get(`/repos/${pin.repository}/contents/${apiPath}?ref=${encodeURIComponent(pin.commit)}`, 'application/vnd.github.raw', auth)).toString('utf8')
     } catch (error) {
-      problems.push(`${rel}: upstream could not be read (HTTP ${error.message}) - access, not drift`)
+      problems.push(`${rel}: upstream could not be read: ${describeFailure(error)}`)
       console.log(`  ????  ${rel}`)
       continue
     }
@@ -231,7 +286,7 @@ async function main() {
       theirs = theirs.replace(shim.upstream, shim.local)
     }
 
-    const ours = fs.readFileSync(localPath, 'utf8')
+    const ours = readTracked(DIR, rel)
 
     if (sha256(Buffer.from(ours)) === sha256(Buffer.from(theirs))) {
       console.log(`  ok    ${rel}${shim ? '   (1 allowed divergence applied)' : ''}`)
