@@ -25,8 +25,11 @@ dev*.html
 
 /test/hyperformula-tests/
 
-# Generated at docs:build from built-in-functions.tmpl.md (HF-249 single-source); do not commit.
-docs/guide/built-in-functions.md
+# Generated at docs:build from _built-in-functions.tmpl.md (HF-249 single-source); do not commit.
+docs/src/content/docs/guide/built-in-functions.md
+
+# Cloudflare Workers asset directory assembled by script/prepare-cf-assets.js
+/cf-dist/
 
 # Wrangler (Cloudflare Workers) local state
 .wrangler

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+
+# Generated API reference — TypeDoc output processed by scripts/generate-content.mjs.
+# Guide pages, the homepage, and 404 are now authored directly in src/content/docs/
+# and tracked in git; only the API tree is regenerated on every build.
+src/content/docs/api/
+
+# Generated redirects (legacy .html → clean URLs) and the llms-full.txt corpus,
+# both written by scripts/generate-content.mjs on every build.
+public/_redirects
+public/llms-full.txt

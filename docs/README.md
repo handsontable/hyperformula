@@ -1,118 +1,110 @@
 # HyperFormula documentation
 
-HyperFormula comes with a dedicated, regularly-updated documentation portal.
+We treat documentation as an integral part of the HyperFormula developer experience.
 
-View the documentation's latest production version at https://handsontable.com/docs/hyperformula.
+View the documentation's latest production version at [hyperformula.handsontable.com/docs/](https://hyperformula.handsontable.com/docs/).
 
-## About HyperFormula documentation
+**See also:**
 
-The HyperFormula documentation is built with [VuePress](https://vuepress.vuejs.org/), a Vue-powered Static Site Generator.
+- [Documentation standards](./CLAUDE.md) -- authoring rules for humans and AI agents
+- [Documentation editing guidelines](./README-EDITING.md) -- practical reference for frontmatter, markdown containers, links, and interactive examples
+- [Documentation deployment guidelines](./README-DEPLOYMENT.md) -- Cloudflare Workers Builds and the `docs:build` pipeline
 
-When editing the docs, you can use features described [here](https://vuepress.vuejs.org/guide/markdown.html).
+## Getting started
 
-## Getting started with HyperFormula documentation
+The docs site is built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.build). **Requires Node 22.12+** (Astro 6 minimum; separate from the HyperFormula library's Node version).
 
-To start a local HyperFormula docs server:
-
-1. Make sure you're running [Node.js](https://nodejs.org/en/) 14+.
-2. From the main `hyperformula` directory, install the docs dependencies:
-    ```bash
-    npm install
-    ```
-3. From the main `hyperformula` directory, build HyperFormula:
+1. From the repository root, generate the build products the content depends on (one-time per checkout, and after changing function metadata):
    ```bash
-   npm run bundle-all
+   npm install
+   npm run docs:generate-function-docs && npm run typedoc:build-api
    ```
-4. From the main `hyperformula` directory, create a dev build of the docs and start your local docs server:
+2. From the `docs` directory, install dependencies:
    ```bash
-   npm run docs:dev
+   npm install
    ```
-5. In your browser, go to: http://localhost:8080/hyperformula/.
+3. Start the local docs server:
+   ```bash
+   npm run dev
+   ```
+4. In your browser, go to [http://localhost:4321/docs/](http://localhost:4321/docs/).
 
-## HyperFormula documentation npm scripts
+> **Note:** Content collection files (`.md` under `src/content/docs/`) are cached by Astro's data store. After editing `.md` content files, restart the dev server with `npm run dev -- --force` to invalidate the cache. CSS and component changes are picked up by HMR automatically.
 
-From the `hyperformula` directory, you can run the following npm scripts:
+## npm scripts
 
-* `npm run docs:dev` - Starts a local docs server at http://localhost:8080/hyperformula/.
-* `npm run docs:build` - Builds the docs output into `/docs/.vuepress/dist`.
-* `npm run docs:generate-function-docs` - Regenerates the built-in functions guide page from the function metadata API. Runs automatically as the first step of `docs:dev` and `docs:build`.
+From the repository root:
 
-## Deployment
+- `npm run docs:dev` -- Regenerates the built-in functions page and the TypeDoc API reference, then starts the local docs server.
+- `npm run docs:build` -- Full production build: function docs, library bundles, TypeDoc, then the Astro site into `docs/dist/`.
+- `npm run docs:build:cf` -- `docs:build` plus assembly of the Cloudflare asset directory (see [README-DEPLOYMENT.md](./README-DEPLOYMENT.md)).
+- `npm run docs:generate-function-docs` -- Regenerates the built-in functions guide page from the function metadata API. Runs automatically as the first step of `docs:dev` and `docs:build`.
 
-The documentation site is deployed to Cloudflare Workers as the `hyperformula-docs` Worker in the Handsontable account (`15111272c53ed0aaf84a908f0c9c7f8b`). Deployments are driven by [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/), the Git integration configured on the Cloudflare side &mdash; the repository holds no deployment workflow, API token, or account secret.
+From the `docs` directory:
 
-| Trigger | Command run by Workers Builds | Result |
-| --- | --- | --- |
-| push to `master` | `npx wrangler deploy` | production deployment |
-| push to any other branch, and every pull request | `npx wrangler versions upload` | preview deployment at `https://<branch>-hyperformula-docs.handsoncode.workers.dev`, posted as a pull request comment |
-
-Configuration in the repository:
-
-- `wrangler.jsonc` &mdash; Worker name, asset directory, and asset routing.
-- `worker/index.js` &mdash; resolves directory and extensionless URLs and serves the 404 page, so that the URL behaviour matches the previous hosting.
-- `docs/.vuepress/cf/_headers`, `docs/.vuepress/cf/_redirects` &mdash; asset headers and redirects, copied into the root of the build output by `script/prepare-cf-assets.js`.
-- `.nvmrc` &mdash; Node.js version used by the build.
-
-The asset directory is `docs/.vuepress/dist`, while VuePress writes to `docs/.vuepress/dist/docs` (see `docs/.vuepress/build.config.js`). This keeps the `/docs/` prefix that every document is built with, so the site is served under `https://hyperformula.handsontable.com/docs/`.
-
-Production traffic reaches this Worker through the `hyperformula-website` Worker, which proxies `/docs*` to `https://hyperformula-docs.handsoncode.workers.dev` (the `DOCS_ORIGIN` constant in that project).
-
-Build settings in the Cloudflare dashboard, under **Workers & Pages > hyperformula-docs > Settings > Build**: build command `npm run docs:build:cf`, deploy command `npx wrangler deploy`, non-production branch deploy command `npx wrangler versions upload`, production branch `master`, non-production branch builds enabled.
-
-Deploying by hand is only needed for debugging; regular deployments go through Workers Builds.
-
-```bash
-npm run docs:build:cf     # build the documentation and prepare the asset directory
-npx wrangler dev          # serve the built site locally at http://localhost:8787
-npm run docs:preview:cf   # upload a preview version (does not touch production)
-npm run docs:deploy:cf    # deploy to production
-```
-
-When changing the asset routing, verify it with browser navigation headers, not plain requests: `curl -H "Sec-Fetch-Mode: navigate" -H "Sec-Fetch-Dest: document"`. The asset router treats navigation requests differently from other requests, so a plain `curl` check can pass while browsers get a 404.
+- `npm run dev` -- Generates content, then starts the local docs server at `localhost:4321/docs/`.
+- `npm run start` -- Alias for `npm run dev`.
+- `npm run build` -- Generates content, builds the production output into `dist/`, then resolves the docs-data counters in the Markdown companions emitted by `starlight-page-actions`.
+- `npm run preview` -- Previews the built output locally.
+- `npm run generate:content` -- Runs `scripts/generate-content.mjs` to normalize the TypeDoc output into `src/content/docs/api/` and regenerate `public/_redirects` and `public/llms-full.txt`.
+- `npm run test:build` -- Smoke-test the production build via `scripts/test-build.mjs`.
+- `npm run docs:lint` -- Runs ESLint on `.js,.mjs,.ts,.astro` files in `src/`.
 
 ## Built-in functions guide page
 
-The built-in functions guide page `docs/guide/built-in-functions.md` is a **build product** and is
-**gitignored** &mdash; do not commit or hand-edit it. It is generated from two committed sources:
+The built-in functions guide page `src/content/docs/guide/built-in-functions.md` is a **build product** and is
+**gitignored** -- do not commit or hand-edit it. It is generated from two committed sources:
 
-- **prose** (intro, tips) lives in `docs/guide/built-in-functions.tmpl.md`, which holds the empty
+- **prose** (frontmatter, intro, tips) lives in `src/content/docs/guide/built-in-functions.tmpl.md`, which holds the empty
   `AUTOGENERATED:CATEGORIES` and `AUTOGENERATED:FUNCTIONS` markers where the generated regions go;
 - the **category list** (the page's table of contents) and the **function table** are both rendered from
   HyperFormula's API (`getAvailableFunctions`/`getFunctionDetails`), i.e. from the catalogue in
-  `src/interpreter/functionMetadata/`, in a single pass &mdash; so the list links to exactly the sections the page has.
+  `src/interpreter/functionMetadata/`, in a single pass -- so the list links to exactly the sections the page has.
 
-`npm run docs:generate-function-docs` splices both regions into the template and writes the gitignored page; it runs
-automatically as the first step of `npm run docs:build` and `npm run docs:dev`. To change the wording, edit the
-template; to change a function's row, edit its catalogue metadata.
+`npm run docs:generate-function-docs` (repository root) splices both regions into the template and writes the gitignored
+page; it runs automatically as the first step of `npm run docs:build` and `npm run docs:dev`. To change the wording, edit
+the template; to change a function's row, edit its catalogue metadata.
 
-## HyperFormula docs directory structure
+## Directory structure
 
 ```bash
-docs                            # All documentation files
-├── .vuepress                   # All VuePress files
-│   ├── components              # Vue components
-│   ├── dist                    # The docs output. Both the docs and the API reference are built into this folder.
-│   ├── plugins                 # VuePress plugins, incl. md-companions (see below)
-│   ├── public                  # Public assets
-│   ├── styles                  # Style-related files
-│   ├── subtheme                # Subtheme files
-│   ├── templates               # HTML templates
-│   ├── theme                   # Local theme extending the default theme (see below)
-│   ├── config.js               # VuePress configuration
-│   ├── enhanceApp.js           # VuePress app-level enhancements
-│   └── highlight.js            # Code highlight configuration
-├── api                         # The API reference files, generated automatically from JsDoc. Do not edit!
-├── guide                       # The docs source files: Markdown content. built-in-functions.md is the one exception: a generated build product (see above)
-├── api-ref-readme.md           # The API reference welcome page
-├── index.md                    # The main docs portal welcome page
-└── README.md                   # The file you're looking at right now!
+docs/                            # All documentation files
+├── astro.config.mjs             # Astro + Starlight configuration
+├── tsconfig.json                # TypeScript configuration
+├── package.json                 # Docs-only dependencies and scripts
+├── CLAUDE.md                    # Documentation authoring standards
+├── AGENTS.md                    # → symlink to CLAUDE.md
+├── README.md                    # The file you're looking at right now
+│
+├── src/                         # Astro source
+│   ├── components/              # Astro component overrides (Header, Footer, Head, ThemeSelect)
+│   ├── content/                 # Starlight content collection
+│   │   └── docs/                # Starlight content root
+│   │       ├── guide/           # Guide pages -- authored here (built-in-functions.md is generated; see above)
+│   │       ├── api/             # API reference (auto-generated from TypeDoc; do not edit)
+│   │       └── index.md         # Home page
+│   ├── content.config.ts        # Content collection schema (extends Starlight's docsSchema)
+│   ├── plugins/                 # Build-time plugins (vuepress-preprocessor, docs-data)
+│   ├── scripts/                 # Client-side runtime (example-runner, theme-toggle)
+│   ├── sidebar.mjs              # Sidebar navigation tree
+│   └── styles/                  # CSS partials
+│       ├── base/                # Tokens (variables.css)
+│       └── components/          # Per-component styles (header, footer, content, interactive-example)
+│
+├── scripts/                     # Docs build helpers
+│   ├── generate-content.mjs     # Normalizes TypeDoc output, regenerates _redirects + llms-full.txt
+│   ├── postprocess-md.mjs       # Resolves docs-data counters in the built .md companions
+│   └── test-build.mjs           # Production-build smoke test
+│
+├── public/                      # Static assets served as-is (logos, images, favicons)
+└── examples/                    # Live example source files referenced from `::: example` blocks
 ```
 
-## Agent-friendly build outputs
+## Content sources
 
-`npm run docs:build` produces docs meant to be read by both people and AI coding agents:
+Guide pages are authored directly in `src/content/docs/guide/` and tracked in git. The API reference under
+`src/content/docs/api/` is auto-generated from TypeDoc; do not edit those files by hand. See
+[CLAUDE.md §11](./CLAUDE.md#11-content-sources) for the full set of rules.
 
-* **HTML + Markdown per page** &mdash; every guide page is built as both an `.html` page and a companion `.md` file with the same content, via the `md-companions` VuePress plugin (`.vuepress/plugins/md-companions`). The companion lives next to its HTML page, e.g. `guide/basic-usage.html` and `guide/basic-usage.md`.
-* **`llms-full.txt`** &mdash; all guide pages concatenated into one Markdown file at the docs root (`/docs/llms-full.txt`), so an agent can fetch the whole corpus in a single request instead of crawling page by page.
-* **"View as Markdown" link** &mdash; every guide page shows a small link near the top of its content that navigates to that page's `.md` companion (rendered via the local theme in `.vuepress/theme`, which overrides the default theme's `Layout.vue`).
-* **"Set up your coding agent" page** &mdash; [`guide/setup-coding-agent.md`](guide/setup-coding-agent.md) explains how to point Claude Code, Cursor, Copilot, and other agents at these machine-readable docs, and embeds the `CodingAgentWizard` component: an interactive picker that shows the right setup instructions for the agent you choose.
+The `docs/.vuepress/` tree is the retired VuePress configuration, kept temporarily for reference during the migration;
+it no longer builds the site and is scheduled for removal.

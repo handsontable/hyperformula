@@ -1,8 +1,8 @@
 # Common files
 node_modules
 
-# example files
-docs/examples/
+# Docs site — separate Astro package with its own toolchain
+docs/
 
 # 3rd party
 src/interpreter/plugin/3rdparty

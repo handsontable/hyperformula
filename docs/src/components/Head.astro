@@ -1,0 +1,22 @@
+---
+// Extends Starlight's default <Head>: loads Inter (to match HT typography), then
+// renders Starlight's head, then loads the interactive example runner.
+//
+// Inter is self-hosted via @fontsource rather than Google Fonts: a cross-origin
+// render-blocking stylesheet cost ~1.3 s of first paint on slow connections
+// (Lighthouse, Moto G / slow 4G), while the self-hosted files ship from our own
+// origin under the immutable-cache rule for hashed assets. @fontsource sets
+// `font-display: swap`, so text renders on the fallback stack immediately.
+import Default from '@astrojs/starlight/components/Head.astro';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+---
+
+<Default><slot /></Default>
+
+<script>
+  import '../scripts/example-runner.ts';
+  import '../scripts/theme-toggle.ts';
+</script>

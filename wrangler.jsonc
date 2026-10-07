@@ -1,10 +1,11 @@
 /**
  * Cloudflare Workers configuration for the HyperFormula documentation site.
  *
- * The asset directory is the VuePress `dist` root, not `dist/docs`, so that every
- * document keeps the `/docs/` prefix it is built with (see
- * `docs/.vuepress/build.config.js`). `worker/index.js` resolves directory and
- * extensionless URLs; see the comment there.
+ * The asset directory is `cf-dist/`, assembled by `script/prepare-cf-assets.js`:
+ * the Astro build output copied under `cf-dist/docs/` so that every document
+ * keeps the `/docs/` prefix it is served with (`base` in `docs/astro.config.mjs`),
+ * with `_headers` and `_redirects` at the asset root. `worker/index.js` resolves
+ * directory and extensionless URLs; see the comment there.
  *
  * Deployments are driven by Workers Builds (Git integration configured in the
  * Cloudflare dashboard):
@@ -18,7 +19,7 @@
   "preview_urls": true,
   "main": "./worker/index.js",
   "assets": {
-    "directory": "./docs/.vuepress/dist",
+    "directory": "./cf-dist",
     "binding": "ASSETS",
     // Both left at their defaults on purpose:
     // - `html_handling: "none"` keeps `.html` URLs from being redirected to extensionless ones,

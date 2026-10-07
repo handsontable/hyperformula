@@ -1,0 +1,105 @@
+/* HT-style spreadsheet-grid footer + social row. */
+
+.hf-footer {
+  margin-top: 4rem;
+  font-family: var(--sl-font);
+  font-size: 0.875rem;
+  color: var(--sl-color-gray-3);
+}
+
+.hf-footer__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-top: 1px solid var(--sl-color-hairline-light);
+  border-bottom: 1px solid var(--sl-color-hairline-light);
+}
+
+.hf-footer__cell {
+  list-style: none;
+  border-inline-end: 1px solid var(--sl-color-hairline-light);
+}
+
+.hf-footer__cell:last-child {
+  border-inline-end: none;
+}
+
+.hf-footer__cell > a {
+  display: block;
+  padding: 1rem;
+  color: var(--sl-color-gray-2);
+  text-decoration: none;
+  transition: color 120ms, background 120ms;
+}
+
+.hf-footer__cell > a:hover {
+  color: var(--sl-color-white);
+  background: var(--sl-color-gray-6);
+}
+
+.hf-footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.hf-footer__social {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hf-footer__social li {
+  list-style: none;
+}
+
+.hf-footer__social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  color: var(--sl-color-gray-3);
+  border: 1px solid var(--sl-color-hairline-light);
+  transition: color 120ms, border-color 120ms, background 120ms;
+}
+
+.hf-footer__social a:hover {
+  color: var(--sl-color-white);
+  border-color: var(--sl-color-gray-4);
+  background: var(--sl-color-gray-6);
+}
+
+.hf-footer__social svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.hf-footer__copy {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--sl-color-gray-3);
+}
+
+@media (max-width: 50rem) {
+  .hf-footer__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .hf-footer__cell:nth-child(3n) {
+    border-inline-end: none;
+  }
+
+  .hf-footer__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

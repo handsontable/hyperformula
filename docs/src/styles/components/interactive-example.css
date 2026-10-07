@@ -1,0 +1,73 @@
+/* Interactive example demos (.hf-example), injected by the content preprocessor. */
+
+.hf-example {
+  margin-block: 1.5rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: var(--hf-radius, 8px);
+  overflow: hidden;
+}
+
+.hf-example__preview {
+  padding: 1rem;
+  background: var(--sl-color-bg);
+}
+
+.hf-example__preview.is-loading {
+  opacity: 0.6;
+}
+
+/* The demo source code sits directly under its preview. */
+.hf-example__source {
+  border-top: 1px solid var(--sl-color-gray-5);
+}
+
+.hf-example__source > summary {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-2);
+  user-select: none;
+}
+
+.hf-example__source > summary:hover {
+  color: var(--sl-color-white);
+}
+
+.hf-example__source .expressive-code {
+  margin: 0;
+}
+
+/* Example demo table (used by several demos) renders on its own surface. */
+.hf-example table.spreadsheet {
+  border-collapse: collapse;
+}
+
+.hf-example table.spreadsheet th,
+.hf-example table.spreadsheet td {
+  border: 1px solid var(--sl-color-gray-5);
+  padding: 0.25rem 0.5rem;
+}
+
+/*
+ * The demos' own CSS hardcodes `color: #606c76` on `.example` and
+ * `background-color: #f6f8fa` on every other table row — both designed for a
+ * white page background. In dark mode that paints alternating rows blinding
+ * white with invisible dark text. Re-tint to the docs surface tokens.
+ */
+:root[data-theme='dark'] .hf-example .example {
+  color: var(--sl-color-gray-2);
+}
+
+:root[data-theme='dark'] .hf-example .example table tr {
+  color: var(--sl-color-gray-2);
+}
+
+:root[data-theme='dark'] .hf-example .example table tr:nth-child(2n) {
+  background-color: var(--sl-color-gray-8);
+}
+
+:root[data-theme='dark'] .hf-example .example table thead tr,
+:root[data-theme='dark'] .hf-example .example table.spreadsheet thead tr th {
+  background-color: var(--sl-color-gray-7);
+  color: var(--sl-color-white);
+}

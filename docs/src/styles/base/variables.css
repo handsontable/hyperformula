@@ -1,0 +1,107 @@
+/*
+ * HyperFormula docs theme tokens — matches the Handsontable docs palette
+ * exactly: oklch neutral grey scale, soft (non-white) body text, and the
+ * Starlight text-invert override that disables Starlight's "active item =
+ * inverted text on accent bg" behavior. Hex fallback covered for browsers
+ * without oklch via @supports.
+ */
+
+:root {
+  /* Brand blue — used sparingly */
+  --sl-color-accent-low: #1a3a6b;
+  --sl-color-accent: #2856ea;
+  --sl-color-accent-high: #a8c8ff;
+
+  /* Typography */
+  --sl-font: 'Inter', system-ui, -apple-system, sans-serif;
+  --sl-text-base: 1rem;
+  --sl-line-height: 1.7;
+  --sl-nav-height: 6.625rem;
+  --sl-content-gap-y: 1.25rem;
+
+  /* Neutral grey scale — oklch, no blue cast */
+  --sl-color-white: oklch(90% 0 0);
+  --sl-color-gray-1: oklch(80% 0 0);
+  --sl-color-gray-2: oklch(72% 0 0);
+  --sl-color-gray-3: oklch(65% 0 0);
+  --sl-color-gray-4: oklch(48% 0 0);
+  --sl-color-gray-5: oklch(29% 0 0);
+  --sl-color-gray-6: oklch(23% 0 0);
+  --sl-color-gray-7: oklch(20.5% 0 0);
+  --sl-color-gray-8: oklch(17% 0 0);
+  --sl-color-gray-9: oklch(14% 0 0);
+  --sl-color-black: oklch(11% 0 0);
+
+  /* Text / surfaces. Page, header and sidebar share the same near-black canvas
+   * (Handsontable pattern). Code/aside surfaces sit on the slightly darker
+   * `block-bg` for inset depth. */
+  --sl-color-text: var(--sl-color-gray-2);
+  --sl-color-text-accent: var(--sl-color-accent-low);
+  --sl-color-text-invert: var(--sl-color-text);
+  --sl-color-bg: var(--sl-color-black);
+  --sl-color-bg-nav: var(--sl-color-black);
+  --sl-color-bg-sidebar: var(--sl-color-black);
+  --sl-color-bg-inline-code: var(--sl-color-gray-7);
+  --sl-color-backdrop-overlay: oklch(24% 0 0 / 0.7);
+  --sl-color-hover-bg: oklch(23% 0 0);
+  --sl-color-block-bg: #121212;
+
+  --hf-radius: 6px;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #e6f3ff;
+  --sl-color-accent: #1a42e8;
+  --sl-color-accent-high: #0d47a1;
+
+  --sl-color-white: oklch(30% 0 0);
+  --sl-color-gray-1: oklch(36% 0 0);
+  --sl-color-gray-2: oklch(36% 0 0);
+  --sl-color-gray-3: oklch(44% 0 0);
+  --sl-color-gray-4: oklch(82% 0 0);
+  --sl-color-gray-5: oklch(92% 0 0);
+  --sl-color-gray-6: oklch(94% 0 0);
+  --sl-color-gray-7: oklch(96% 0 0);
+  --sl-color-black: oklch(98% 0 0);
+
+  --sl-color-backdrop-overlay: oklch(84% 0 0 / 0.7);
+  --sl-color-hover-bg: oklch(96% 0 0);
+  --sl-color-text-accent: var(--sl-color-accent-low);
+  --sl-color-text-invert: var(--sl-color-text);
+  --sl-color-bg: var(--sl-color-black);
+  --sl-color-bg-nav: var(--sl-color-black);
+  --sl-color-bg-sidebar: var(--sl-color-black);
+  --sl-color-block-bg: #f5f5f5;
+}
+
+/* Hex fallback for browsers without oklch (Safari <15.4, Chrome <111, FF <113). */
+@supports not (color: oklch(0% 0 0)) {
+  :root {
+    --sl-color-white: #e6e6e6;
+    --sl-color-gray-1: #cccccc;
+    --sl-color-gray-2: #b8b8b8;
+    --sl-color-gray-3: #a0a0a0;
+    --sl-color-gray-4: #707070;
+    --sl-color-gray-5: #3b3b3b;
+    --sl-color-gray-6: #2e2e2e;
+    --sl-color-gray-7: #292929;
+    --sl-color-gray-8: #222222;
+    --sl-color-gray-9: #1c1c1c;
+    --sl-color-black: #161616;
+    --sl-color-hover-bg: #3b3b3b;
+    --sl-color-backdrop-overlay: rgba(28, 28, 28, 0.7);
+  }
+
+  :root[data-theme='light'] {
+    --sl-color-white: #404040;
+    --sl-color-gray-1: #595959;
+    --sl-color-gray-2: #595959;
+    --sl-color-gray-3: #6e6e6e;
+    --sl-color-gray-4: #cfcfcf;
+    --sl-color-gray-5: #e6e6e6;
+    --sl-color-gray-6: #ededed;
+    --sl-color-gray-7: #f4f4f4;
+    --sl-color-black: #fafafa;
+    --sl-color-hover-bg: #f4f4f4;
+  }
+}

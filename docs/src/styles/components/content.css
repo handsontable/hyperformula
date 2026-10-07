@@ -1,0 +1,186 @@
+/* Content-area component styles. */
+
+/*
+ * Match Handsontable's wider canvas on big screens. Starlight's `.page` wraps
+ * the entire layout (header + sidebar + content + footer); capping it to
+ * 1500px and centering keeps line length pleasant without feeling cramped.
+ */
+.page {
+  max-width: 1500px;
+  margin-inline: auto;
+}
+
+/*
+ * Starlight's sidebar uses `position: fixed; left: 0` so it stays put while
+ * scrolling. That detaches it from the centered `.page`, leaving a big gap
+ * between the sidebar (glued to viewport edge) and the content (centered) on
+ * wide screens. Slide the fixed sidebar in by the same horizontal margin
+ * `.page` has so the sidebar sits flush against the content again.
+ */
+@media (min-width: 1500px) {
+  .sidebar-pane {
+    left: calc((100vw - 1500px) / 2) !important;
+  }
+}
+
+/*
+ * Diagrams (the high-level design diagram on "Key concepts", dependency-graph
+ * ranges, etc.) are SVG/PNG drawn for a light canvas — their connector lines
+ * are near-black and disappear on the dark theme background. Give *local*
+ * content images a light backing in dark mode so they stay legible. External
+ * images (shields/Snyk/FOSSA/codecov badges, the logo) are excluded so they
+ * render on their own background instead of in a white chip.
+ */
+:root[data-theme='dark'] .sl-markdown-content img:not([src^='http']) {
+  background: #fff;
+  border-radius: var(--hf-radius, 8px);
+  padding: 0.75rem;
+}
+
+/*
+ * Badges, logos and other external images keep their own (transparent)
+ * background — never the diagram white canvas — so the homepage badge row
+ * stays clean in dark mode.
+ */
+.sl-markdown-content img[src^='http'] {
+  background: transparent;
+  padding: 0;
+}
+
+/*
+ * Centered HTML paragraphs (homepage logo, tagline, badge row) lay out as a
+ * wrapping flex row so the shields/Snyk/FOSSA/codecov badges sit in neat,
+ * spaced rows instead of a ragged stack.
+ */
+.sl-markdown-content p[align='center'] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem 0.5rem;
+}
+
+.sl-markdown-content p[align='center'] br {
+  display: none;
+}
+
+/* TypeDoc/VuePress <Badge text="…"/> flags (Static, Readonly, Optional, …). */
+.hf-badge {
+  display: inline-block;
+  margin-inline-start: 0.4em;
+  padding: 0.05em 0.55em;
+  border-radius: 999px;
+  font-size: 0.7em;
+  font-weight: 600;
+  line-height: 1.6;
+  vertical-align: middle;
+  background: var(--sl-color-accent-low);
+  color: var(--sl-color-accent-high);
+}
+
+/* <details> blocks converted from VuePress `::: details`. */
+.sl-markdown-content details {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: var(--hf-radius, 8px);
+  padding: 0.5rem 1rem;
+  margin-block: 1rem;
+}
+
+.sl-markdown-content details > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/*
+ * Sidebar styling — mirrors Handsontable's docs sidebar:
+ *   - Group chevron sits to the LEFT of the label (not the right).
+ *   - Active item: brand-blue text + a full-height, non-rounded brand-blue
+ *     left rail, no filled background.
+ *   - Group labels remain bold neutral white.
+ */
+
+/* Move the disclosure chevron to the left of the group label and tighten the
+ * gap. starlight-theme-rapide sets `flex-direction: row-reverse` on summary
+ * to put its chevron on the right — we force `row` here and use `order: -1`
+ * on the chevron so it consistently lands BEFORE the label (Handsontable
+ * pattern). */
+.sidebar details > summary,
+nav.sidebar-content details > summary,
+.sidebar-content details > summary {
+  flex-direction: row !important;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--sl-color-white);
+}
+
+.sidebar details > summary > svg.caret,
+nav.sidebar-content details > summary > svg.caret,
+.sidebar-content details > summary > svg.caret {
+  order: -1;
+  margin-inline: 0 0.25rem;
+  color: var(--sl-color-gray-3);
+}
+
+/* Active link: brand-blue text on a transparent surface. The rail is drawn by
+ * Starlight on the parent <li> (rule below) so it sits flush at the sidebar
+ * gutter — matching Handsontable. */
+:where(starlight-menu-button) ~ nav a[aria-current='page'],
+.sidebar a[aria-current='page'],
+nav.sidebar-content a[aria-current='page'] {
+  background: transparent !important;
+  color: var(--sl-color-accent) !important;
+  font-weight: 600;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/*
+ * Starlight already paints a 1px accent-high border-inline-start on the LI
+ * wrapping the active link. Re-color it to a saturated 3px brand-blue rail so
+ * the gutter shows a single, clean indicator (no second hairline beside it).
+ */
+.sidebar li:has(> a[aria-current='page']),
+nav.sidebar-content li:has(> a[aria-current='page']) {
+  border-inline-start: 3px solid var(--sl-color-accent) !important;
+}
+
+/*
+ * Right-hand "On this page" ToC active item — Starlight defaults it to
+ * `--sl-color-text-accent` (= accent-low = #1a3a6b in our palette), which is
+ * unreadable navy on dark. Use the saturated brand blue + a subtle left rail
+ * to match the main sidebar's treatment.
+ */
+starlight-toc a[aria-current='true'],
+starlight-toc nav a[aria-current='true'] {
+  color: var(--sl-color-accent) !important;
+  border-inline-start-color: var(--sl-color-accent) !important;
+  font-weight: 600;
+}
+
+/*
+ * Slim themed scrollbar — matches Handsontable's 4px-wide, 2px-radius look.
+ * Firefox uses `scrollbar-*`; Chromium/WebKit use `::-webkit-scrollbar-*`.
+ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sl-color-gray-5) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--sl-color-gray-5);
+  border-radius: 2px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--sl-color-gray-4);
+}
