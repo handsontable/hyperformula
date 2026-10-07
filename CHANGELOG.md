@@ -18,7 +18,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
-- Fixed an array function stopped by the license key reserving its spill range: it filled the whole range with `#LIC!`, or showed `#SPILL!` instead of `#LIC!` when a cell in that range was not empty. It now evaluates to `#LIC!` in its own cell only. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
 - Fixed the validation of classic (25-character) license keys depending on the time zone: east of UTC, a key that expired the day before the build was released was still accepted, and west of UTC, the console message printed an expiry date one day too early. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
