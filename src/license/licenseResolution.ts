@@ -23,29 +23,41 @@ import {LicenseState, ProductEntitlement} from './handsontable-license-key-parse
 export const HYPERFORMULA_PRODUCT_NAME = 'hyperformula'
 
 /**
- * Lifecycle states in which an entitlement key still lets this build evaluate formulas.
- *
- * The soft-stop states are here on purpose: the grace period keeps evaluating and prints the
- * specification's error (see `notifyEntitlementKey`). What happens after the grace period is
- * {@link EXPIRED_WITHOUT_BLOCKING_STATES}.
+ * What one lifecycle state of a licensed entitlement key means for this build: the validity state it
+ * reports, and whether it blocks evaluation.
  */
-const VALID_STATES: LicenseState[] = [
-  'usage_valid', 'usage_notice', 'usage_soft_stop',
-  'trial_valid', 'trial_notice', 'trial_soft_stop',
-  'release_valid',
-]
+interface LifecycleVerdict {
+  validityState: LicenseKeyValidityState.VALID | LicenseKeyValidityState.EXPIRED,
+  blocksEvaluation: boolean,
+}
 
 /**
- * Lifecycle states in which a key has run out but still lets this build evaluate formulas,
- * printing an error to the console instead: a subscription past its grace period, and any key whose
- * `release_until` is before the build. An expired license never blocks a paying customer, as the
- * reader's guide and the key specification both say. A trial past its grace period
- * (`trial_hard_stop`) still blocks.
+ * The verdict for every lifecycle state the vendored reader reports. A `Record` over
+ * {@link LicenseState}, so a state added upstream fails compilation here until it is classified,
+ * instead of falling into a default.
  *
- * The key keeps its own grants: the reader reports it as licensed, so an expired key is never
- * granted more than the same key was granted while it was current.
+ * - The valid and notice states, and `release_valid`, report VALID and evaluate.
+ * - The soft-stop states report VALID and evaluate on purpose: the grace period keeps working and
+ *   prints the specification's error (see `notifyEntitlementKey`).
+ * - A subscription past its grace period (`usage_hard_stop`) and a key whose `release_until` is
+ *   before the build (`release_expired`) report EXPIRED but keep evaluating, printing an error to
+ *   the console instead. An expired license never blocks a paying customer, as the reader's guide
+ *   and the key specification both say. Such a key keeps its own grants: the reader reports it as
+ *   licensed, so it is never granted more than the same key was granted while it was current.
+ * - A trial past its grace period (`trial_hard_stop`) reports EXPIRED and blocks.
  */
-const EXPIRED_WITHOUT_BLOCKING_STATES: LicenseState[] = ['usage_hard_stop', 'release_expired']
+const LIFECYCLE_VERDICTS: Record<LicenseState, LifecycleVerdict> = {
+  usage_valid: {validityState: LicenseKeyValidityState.VALID, blocksEvaluation: false},
+  usage_notice: {validityState: LicenseKeyValidityState.VALID, blocksEvaluation: false},
+  usage_soft_stop: {validityState: LicenseKeyValidityState.VALID, blocksEvaluation: false},
+  usage_hard_stop: {validityState: LicenseKeyValidityState.EXPIRED, blocksEvaluation: false},
+  trial_valid: {validityState: LicenseKeyValidityState.VALID, blocksEvaluation: false},
+  trial_notice: {validityState: LicenseKeyValidityState.VALID, blocksEvaluation: false},
+  trial_soft_stop: {validityState: LicenseKeyValidityState.VALID, blocksEvaluation: false},
+  trial_hard_stop: {validityState: LicenseKeyValidityState.EXPIRED, blocksEvaluation: true},
+  release_valid: {validityState: LicenseKeyValidityState.VALID, blocksEvaluation: false},
+  release_expired: {validityState: LicenseKeyValidityState.EXPIRED, blocksEvaluation: false},
+}
 
 /**
  * Both halves of the license decision, resolved from one reading of the key.
@@ -58,8 +70,8 @@ export interface ResolvedLicense {
   validityState: LicenseKeyValidityState,
   /**
    * Gate A — `true` when function calls must return `#LIC!`. Usually `validityState !== VALID`;
-   * the exception is an entitlement key in one of {@link EXPIRED_WITHOUT_BLOCKING_STATES}, which
-   * reports `EXPIRED` but keeps evaluating.
+   * the exception is an entitlement key whose {@link LIFECYCLE_VERDICTS} entry reports `EXPIRED`
+   * but keeps evaluating.
    */
   blocksEvaluation: boolean,
   /** Gate B — which functions and API features the key grants. */
@@ -129,9 +141,10 @@ function entitlementOf(entry: ProductEntitlement, isTrial: boolean, silent: bool
  * the meaning of the capability tokens and the console messages live here.
  *
  * **The invariant this function exists to protect.** Only an entitlement key that lets this build
- * evaluate — a valid one, or one in {@link EXPIRED_WITHOUT_BLOCKING_STATES} — resolves to a
- * restricted entitlement, and an expired one keeps exactly the grants it had while current. Every
- * key that blocks evaluation (a missing or invalid key, an expired classic key, or a trial past its grace period) resolves to
+ * evaluate — a valid one, or an expired one whose {@link LIFECYCLE_VERDICTS} entry does not
+ * block — resolves to a restricted entitlement, and an expired one keeps exactly the grants it had
+ * while current. Every key that blocks evaluation (a missing or invalid key, an expired classic key,
+ * or a trial past its grace period) resolves to
  * {@link unrestrictedEntitlement}, and so does every classic key. A key that blocks is stopped by
  * gate A alone, through `blocksEvaluation`: formulas yield `#LIC!` and every gated API feature throws
  * with the key's state (see `ensureFeatureAllowed`). Gate B never reports such a key, so its "not
@@ -179,9 +192,7 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
   }
 
   const {entitlement: entry, lifecycle, channels} = license
-  const expiredWithoutBlocking = EXPIRED_WITHOUT_BLOCKING_STATES.indexOf(lifecycle.state) !== -1
-  const isValid = VALID_STATES.indexOf(lifecycle.state) !== -1
-  const state = isValid ? LicenseKeyValidityState.VALID : LicenseKeyValidityState.EXPIRED
+  const {validityState, blocksEvaluation} = LIFECYCLE_VERDICTS[lifecycle.state]
 
   // The message is chosen by the reader's state and prints the key's own date (the key
   // specification's text, the same table Handsontable uses). The `no-console-warns` flag closes the channel.
@@ -191,10 +202,10 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
   }
 
   return {
-    validityState: state,
-    blocksEvaluation: !isValid && !expiredWithoutBlocking,
-    entitlement: isValid || expiredWithoutBlocking
-      ? entitlementOf(entry, lifecycle.isTrial, !channels.console)
-      : unrestrictedEntitlement(),
+    validityState,
+    blocksEvaluation,
+    entitlement: blocksEvaluation
+      ? unrestrictedEntitlement()
+      : entitlementOf(entry, lifecycle.isTrial, !channels.console),
   }
 }
