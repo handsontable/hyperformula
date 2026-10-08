@@ -30,7 +30,8 @@ export class DeltaPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
   /**
    * Converts an argument the way Excel does for these functions: numbers, dates, numeric text and empty cells are
-   * accepted, while a boolean or the empty text is #VALUE!. Errors are passed on.
+   * accepted, while a boolean or the empty text is #VALUE!. Errors are passed on. The second argument is checked first,
+   * as Excel does, so an error or a type error in it wins over one in the first argument.
    */
   private strictNumber(value: InternalScalarValue): number | CellError {
     if (value instanceof CellError) {
@@ -46,12 +47,12 @@ export class DeltaPlugin extends FunctionPlugin implements FunctionPluginTypeche
   public delta(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DELTA'),
       (left: InternalScalarValue, right: InternalScalarValue) => {
-        const a = this.strictNumber(left)
         const b = this.strictNumber(right)
-        if (a instanceof CellError) {
-          return a
+        const a = this.strictNumber(left)
+        if (b instanceof CellError) {
+          return b
         }
-        return b instanceof CellError ? b : (a === b ? 1 : 0)
+        return a instanceof CellError ? a : (a === b ? 1 : 0)
       }
     )
   }
@@ -59,12 +60,12 @@ export class DeltaPlugin extends FunctionPlugin implements FunctionPluginTypeche
   public gestep(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('GESTEP'),
       (num: InternalScalarValue, step: InternalScalarValue) => {
-        const a = this.strictNumber(num)
         const b = this.strictNumber(step)
-        if (a instanceof CellError) {
-          return a
+        const a = this.strictNumber(num)
+        if (b instanceof CellError) {
+          return b
         }
-        return b instanceof CellError ? b : (a >= b ? 1 : 0)
+        return a instanceof CellError ? a : (a >= b ? 1 : 0)
       }
     )
   }
