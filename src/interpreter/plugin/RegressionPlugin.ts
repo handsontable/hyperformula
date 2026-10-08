@@ -138,15 +138,16 @@ function isOmittedArgument(ast: ProcedureAst, index: number): boolean {
 }
 
 /**
- * Reads the `const` or `stats` option of TREND, GROWTH and LOGEST as Excel does: a blank cell is FALSE, numbers and
- * booleans are coerced, and text (also numeric text and an empty string) is #VALUE!. An error read from a cell
- * reference is #VALUE!; any other error, such as `NA()` written in the formula, is returned as is.
+ * Reads the `const` or `stats` option of TREND, GROWTH and LOGEST as Excel does: a blank cell is FALSE, numbers,
+ * booleans and the text "TRUE" or "FALSE" (in any letter case) are coerced as in LINEST, and other text (also numeric
+ * text and an empty string) is #VALUE!. An error read from a cell reference is #VALUE!; any other error, such as
+ * `NA()` written in the formula, is returned as is.
  */
 function regressionOption(value: InternalScalarValue, ast: Ast | undefined): boolean | CellError {
   if (value instanceof CellError) {
     return ast?.type === AstNodeType.CELL_REFERENCE ? new CellError(ErrorType.VALUE, ErrorMessage.WrongType) : value
   }
-  const option = typeof value === 'string' ? undefined : coerceScalarToBoolean(value)
+  const option = regressionBoolean(value)
   return typeof option === 'boolean' ? option : new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
 }
 
