@@ -351,7 +351,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   LOGEST: {
     category: 'Statistical',
-    shortDescription: 'Returns the bases and constant of the exponential curve y = b·m1^x1·…·mk^xk fitted by least squares, and optional statistics. `known_y` values must be positive.',
+    shortDescription: 'Returns the bases and constant of the exponential curve y = b·m1^x1·…·mk^xk fitted by least squares, and optional statistics. `known_y` values must be positive.<br>`stats` must be a constant: a cell reference or a calculated `stats` returns `#VALUE!`; see the [known limitations](https://hyperformula.handsontable.com/docs/guide/known-limitations.html#trend-growth-and-logest-functions).',
     parameters: [
       {name: 'known_y', description: 'A numeric range of observed dependent values.'},
       {name: 'known_x', description: 'Optional numeric predictors. If omitted, uses sequential values starting at 1 with the shape of `known_y`.'},
