@@ -685,7 +685,17 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     }
 
     const instance = Math.trunc(instanceNum)
-    if (instance === 0 || (text.length > 0 && Math.abs(instance) > text.length)) {
+    if (instance === 0) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.IndexBounds)
+    }
+
+    // An empty delimiter matches at once: at the start of the text for a positive instance_num and at its end for a negative one.
+    if (delimiters.length > 0 && delimiters.every(delimiter => delimiter === '')) {
+      const position = instance > 0 ? 0 : text.length
+      return extractText({start: position, end: position})
+    }
+
+    if (text.length > 0 && Math.abs(instance) > text.length) {
       return new CellError(ErrorType.VALUE, ErrorMessage.IndexBounds)
     }
 
