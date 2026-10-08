@@ -152,8 +152,30 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
       ],
       repeatLastArgs: 1,
     },
+    'KURT': {
+      method: 'kurt',
+      parameters: [
+        {argumentType: FunctionArgumentType.ANY},
+      ],
+      repeatLastArgs: 1,
+    },
+    'MODE.SNGL': {
+      method: 'modesngl',
+      parameters: [
+        {argumentType: FunctionArgumentType.ANY},
+      ],
+      repeatLastArgs: 1,
+    },
+    'TRIMMEAN': {
+      method: 'trimmean',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+      ],
+    },
   }
   public static aliases = {
+    MODE: 'MODE.SNGL',
     COVAR: 'COVARIANCE.P',
     FTEST: 'F.TEST',
     PEARSON: 'CORREL',
@@ -530,6 +552,98 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
         return coerced.reduce((a, b) => a + Math.pow((b - avg) / s, 3), 0) / n
+      })
+  }
+
+  /**
+   * Corresponds to KURT(Number1, Number2, ...).
+   *
+   * Returns the sample excess kurtosis of the given numbers.
+   *
+   * @param ast
+   * @param state
+   */
+  public kurt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('KURT'),
+      (...args: RawInterpreterValue[]) => {
+        const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
+        if (coerced instanceof CellError) {
+          return coerced
+        }
+        const n = coerced.length
+        if (n < 4) {
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.FourValues)
+        }
+        const avg = mean(coerced)
+        const s = stdev(coerced, true)
+        if (s === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        const fourthMoment = coerced.reduce((a, b) => a + Math.pow((b - avg) / s, 4), 0)
+        return fourthMoment * n * (n + 1) / ((n - 1) * (n - 2) * (n - 3)) - 3 * Math.pow(n - 1, 2) / ((n - 2) * (n - 3))
+      })
+  }
+
+  /**
+   * Corresponds to MODE(Number1, Number2, ...) and MODE.SNGL(Number1, Number2, ...).
+   *
+   * Returns the most frequent number; on a tie, the one that occurs first. Text and boolean values are ignored.
+   *
+   * @param ast
+   * @param state
+   */
+  public modesngl(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('MODE.SNGL'),
+      (...args: InterpreterValue[]) => {
+        const values: number[] = []
+        for (const arg of args) {
+          const scalars: InternalScalarValue[] = arg instanceof SimpleRangeValue ? arg.valuesFromTopLeftCorner() : [arg]
+          const numbers = this.arithmeticHelper.manyToExactNumbers(scalars)
+          if (numbers instanceof CellError) {
+            return numbers
+          }
+          values.push(...numbers)
+        }
+        const occurrences = new Map<number, number>()
+        values.forEach(value => occurrences.set(value, (occurrences.get(value) ?? 0) + 1))
+        let mode: number | undefined
+        let modeOccurrences = 1
+        for (const value of values) {
+          const count = occurrences.get(value) as number
+          if (count > modeOccurrences) {
+            mode = value
+            modeOccurrences = count
+          }
+        }
+        return mode ?? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+      })
+  }
+
+  /**
+   * Corresponds to TRIMMEAN(array, percent).
+   *
+   * Returns the mean of the values left after dropping floor(n * percent / 2) of the smallest and the same
+   * number of the largest values.
+   *
+   * @param ast
+   * @param state
+   */
+  public trimmean(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TRIMMEAN'),
+      (range: SimpleRangeValue, percent: number) => {
+        if (percent < 0 || percent >= 1) {
+          return new CellError(ErrorType.NUM, percent < 0 ? ErrorMessage.ValueSmall : ErrorMessage.ValueLarge)
+        }
+        const values = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if (values instanceof CellError) {
+          return values
+        }
+        if (values.length === 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.OneValue)
+        }
+        values.sort((a, b) => a - b)
+        const trimmedPerSide = Math.floor(values.length * percent / 2)
+        return mean(values.slice(trimmedPerSide, values.length - trimmedPerSide))
       })
   }
 }
