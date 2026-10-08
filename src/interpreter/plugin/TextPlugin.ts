@@ -602,7 +602,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         const padValue = (padWith === undefined || padWith === EmptyValue)
           ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
           : padWith
-        const width = Math.max(...rows.map(row => row.length))
+        const width = rows.reduce((max, row) => Math.max(max, row.length), 0)
 
         return SimpleRangeValue.onlyValues(rows.map(row => [...row, ...Array<InternalScalarValue>(width - row.length).fill(padValue)]))
       }
@@ -645,7 +645,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       return ArraySize.scalar()
     }
 
-    return new ArraySize(Math.max(...rows.map(row => row.length)), rows.length)
+    return new ArraySize(rows.reduce((max, row) => Math.max(max, row.length), 0), rows.length)
   }
 
   /**
