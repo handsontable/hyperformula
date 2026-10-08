@@ -160,7 +160,7 @@ Now, you're ready to use your GREET function in a formula.
 
 ```js
 // build a HyperFormula instance where you can use your function directly
-const hfInstance = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']]);
+const hfInstance = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']], { licenseKey: 'gpl-v3' });
 
 // read the value of cell B1
 const result = hfInstance.getCellValue({ sheet: 0, col: 1, row: 0 });

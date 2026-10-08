@@ -19,7 +19,6 @@ import {
   centralF,
   chisquare,
   corrcoeff,
-  covariance,
   geomean,
   mean,
   normal,
@@ -28,6 +27,12 @@ import {
   sumsqerr,
   variance
 } from './3rdparty/jstat/jstat'
+import {covariance, regressionSums, RegressionSums, sumOfSquaredDeviations} from '../deviationSums'
+import {
+  divideDoubleDoubles,
+  multiplyByTwoToThe,
+  roundDoubleDouble,
+} from '../doubleDouble'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 export class StatisticalAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<StatisticalAggregationPlugin> {
@@ -185,7 +190,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (coerced.length === 0) {
           return 0
         }
-        return sumsqerr(coerced)
+        return sumOfSquaredDeviations(coerced)
       })
   }
 
@@ -282,7 +287,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n === 1) {
           return 0
         }
-        return covariance(ret[0], ret[1]) * (n - 1) / n
+        return covariance(ret[0], ret[1], 0)
       })
   }
 
@@ -301,7 +306,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n <= 1) {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
         }
-        return covariance(ret[0], ret[1])
+        return covariance(ret[0], ret[1], 1)
       })
   }
 
@@ -370,7 +375,11 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n <= 2) {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.ThreeValues)
         }
-        return Math.sqrt((sumsqerr(ret[0]) - Math.pow(covariance(ret[0], ret[1]) * (n - 1), 2) / sumsqerr(ret[1])) / (n - 2))
+        const sums = nonDegenerateRegressionSums(ret[0], ret[1], true)
+        if (sums instanceof CellError) {
+          return sums
+        }
+        return multiplyByTwoToThe(Math.sqrt(roundDoubleDouble(sums.residualSumOfSquares) / (n - 2)), sums.yExponent)
       })
   }
 
@@ -389,7 +398,12 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n <= 1) {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
         }
-        return covariance(ret[0], ret[1]) * (n - 1) / sumsqerr(ret[1])
+        const sums = nonDegenerateRegressionSums(ret[0], ret[1], false)
+        if (sums instanceof CellError) {
+          return sums
+        }
+        const scaledSlope = roundDoubleDouble(divideDoubleDoubles(sums.productsSum, sums.xSumOfSquares))
+        return multiplyByTwoToThe(scaledSlope, sums.yExponent - sums.xExponent)
       })
   }
 
@@ -518,6 +532,23 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         return coerced.reduce((a, b) => a + Math.pow((b - avg) / s, 3), 0) / n
       })
   }
+}
+
+/**
+ * The sums of a simple linear regression of `knownYs` on `knownXs`, or `#DIV/0!` when all the x values
+ * are equal, so that the slope is undefined.
+ *
+ * @param {number[]} knownYs - a non-empty array of the dependent values
+ * @param {number[]} knownXs - an array of the independent values, of the same length as `knownYs`
+ * @param {boolean} withResidualSumOfSquares - whether to compute `residualSumOfSquares`
+ * @returns {RegressionSums | CellError} the scaled sums, or the error
+ */
+function nonDegenerateRegressionSums(knownYs: number[], knownXs: number[], withResidualSumOfSquares: boolean): RegressionSums | CellError {
+  const sums = regressionSums(knownYs, knownXs, withResidualSumOfSquares)
+  if (sums.xSumOfSquares.hi === 0) {
+    return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.EqualXValues)
+  }
+  return sums
 }
 
 function parseTwoArrays(dataX: SimpleRangeValue, dataY: SimpleRangeValue): CellError | [number[], number[]] {

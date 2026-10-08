@@ -107,6 +107,7 @@ This configuration aligns HyperFormula with the default behavior of Google Sheet
 ```js
 // define options
 const options = {
+  licenseKey: 'gpl-v3',
   dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
   timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
   currencySymbol: ['$', 'USD'],

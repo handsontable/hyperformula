@@ -593,9 +593,9 @@ step "2. Create release/$VERSION in hyperformula-tests, then sync the suite"
 run npm run test:setup-private
 
 # 3. Bump version + release date (each half skipped when already correct, so a
-CURRENT_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
 #    re-run after a later failure does not rewrite files it already wrote)
 step "3. Bump version + HT_RELEASE_DATE"
+CURRENT_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
 if [[ "$CURRENT_VERSION" == "$VERSION" ]]; then
   skip "package.json already at $VERSION"
 elif $DRY_RUN; then

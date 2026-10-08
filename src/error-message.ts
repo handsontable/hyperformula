@@ -50,6 +50,7 @@ export class ErrorMessage {
   public static OneValue = 'Needs at least one value.'
   public static TwoValues = 'Range needs to contain at least two elements.'
   public static ThreeValues = 'Range needs to contain at least three elements.'
+  public static EqualXValues = 'All x values are equal.'
   public static IndexBounds = 'Index out of bounds.'
   public static IndexLarge = 'Index too large.'
   public static Formula = 'Expected formula.'
@@ -80,4 +81,5 @@ export class ErrorMessage {
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
   public static LicenseKey = (arg: string) => `License key is ${arg}.`
+  public static LicenseCapability = (functionName: string) => `Function ${functionName} is not included in your license.`
 }

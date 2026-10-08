@@ -135,7 +135,7 @@ export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
   // repeatLastArgs) is authored separately in `PROTECTED_FUNCTION_METADATA`.
   VERSION: {
     category: 'Information',
-    shortDescription: 'Returns the HyperFormula version and the license key status as a single text value, e.g. "HyperFormula v3.0.0, 1" (a status code, or the last five characters of the license key).',
+    shortDescription: 'Returns the HyperFormula version as a text value, e.g. "HyperFormula v3.0.0".',
     parameters: [],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=VERSION()'],
