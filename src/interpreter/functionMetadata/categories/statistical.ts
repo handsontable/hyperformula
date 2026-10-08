@@ -241,6 +241,17 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=FISHERINV(0.5)'],
   },
+  'FORECAST.LINEAR': {
+    category: 'Statistical',
+    shortDescription: 'Returns the value at `x` of the least-squares line through the pairs of `known_y` and `known_x`. Pairs with a non-numeric value are skipped.',
+    parameters: [
+      {name: 'x', description: 'The value of the independent variable at which to predict a value.'},
+      {name: 'known_y', description: 'The range of dependent (y) values.'},
+      {name: 'known_x', description: 'The range of independent (x) values, with the same number of cells as `known_y`.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=FORECAST.LINEAR(7, A1:A6, B1:B6)'],
+  },
   GAMMA: {
     category: 'Statistical',
     shortDescription: 'Returns value of Gamma function.',
@@ -296,6 +307,16 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'sample_s', description: 'The number of successes in the sample.'}, {name: 'number_sample', description: 'The size of the sample.'}, {name: 'population_s', description: 'The number of successes in the population.'}, {name: 'number_population', description: 'The size of the population.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=HYPGEOM.DIST(1, 4, 8, 20, FALSE())', '=HYPGEOM.DIST(1, 4, 8, 20, TRUE())'],
+  },
+  INTERCEPT: {
+    category: 'Statistical',
+    shortDescription: 'Returns the intercept of the least-squares line through the pairs of `known_y` and `known_x`. Pairs with a non-numeric value are skipped.',
+    parameters: [
+      {name: 'known_y', description: 'The range of dependent (y) values.'},
+      {name: 'known_x', description: 'The range of independent (x) values, with the same number of cells as `known_y`.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=INTERCEPT(A1:A10, B1:B10)'],
   },
   LARGE: {
     category: 'Statistical',
