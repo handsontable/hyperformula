@@ -128,8 +128,11 @@ export class MomentsAggregate {
   }
 
   /**
-   * The moments of an array of numbers, added one by one in order, the same way as the values of a
-   * range are folded for VAR.S, VAR.P, STDEV.S and STDEV.P, so that the results are the same.
+   * The moments of an array of numbers, added one by one in order, with the first value as the shift.
+   *
+   * VAR.S, VAR.P, STDEV.S and STDEV.P fold a single uncached range the same way. When they reuse the
+   * cached aggregate of a smaller range or get several arguments, they compose partial aggregates in a
+   * different order, so their results can differ from this one in the last bits.
    *
    * @param {number[]} values - the values
    * @returns {MomentsAggregate} an aggregate of the values

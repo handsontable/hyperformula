@@ -27,7 +27,7 @@ import {
   sumsqerr,
   variance
 } from './3rdparty/jstat/jstat'
-import {covariance, regressionSums, sumOfSquaredDeviations} from '../deviationSums'
+import {covariance, regressionSums, RegressionSums, sumOfSquaredDeviations} from '../deviationSums'
 import {
   divideDoubleDoubles,
   multiplyByTwoToThe,
@@ -377,9 +377,9 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n <= 2) {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.ThreeValues)
         }
-        const sums = regressionSums(ret[0], ret[1], true)
-        if (sums.xSumOfSquares.hi === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+        const sums = nonDegenerateRegressionSums(ret[0], ret[1], true)
+        if (sums instanceof CellError) {
+          return sums
         }
         // at the scale of the sums, the slope and the explained sum of squares Sxy^2 / Sxx <= Syy are finite
         const explained = multiplyDoubleDouble(divideDoubleDoubles(sums.productsSum, sums.xSumOfSquares), sums.productsSum)
@@ -404,9 +404,9 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n <= 1) {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
         }
-        const sums = regressionSums(ret[0], ret[1], false)
-        if (sums.xSumOfSquares.hi === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+        const sums = nonDegenerateRegressionSums(ret[0], ret[1], false)
+        if (sums instanceof CellError) {
+          return sums
         }
         const scaledSlope = roundDoubleDouble(divideDoubleDoubles(sums.productsSum, sums.xSumOfSquares))
         return multiplyByTwoToThe(scaledSlope, sums.yExponent - sums.xExponent)
@@ -538,6 +538,23 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         return coerced.reduce((a, b) => a + Math.pow((b - avg) / s, 3), 0) / n
       })
   }
+}
+
+/**
+ * The sums of a simple linear regression of `knownYs` on `knownXs`, or `#DIV/0!` when all the x values
+ * are equal, so that the slope is undefined.
+ *
+ * @param {number[]} knownYs - a non-empty array of the dependent values
+ * @param {number[]} knownXs - an array of the independent values, of the same length as `knownYs`
+ * @param {boolean} withYSumOfSquares - whether to compute `ySumOfSquares`
+ * @returns {RegressionSums | CellError} the scaled sums, or the error
+ */
+function nonDegenerateRegressionSums(knownYs: number[], knownXs: number[], withYSumOfSquares: boolean): RegressionSums | CellError {
+  const sums = regressionSums(knownYs, knownXs, withYSumOfSquares)
+  if (sums.xSumOfSquares.hi === 0) {
+    return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.EqualXValues)
+  }
+  return sums
 }
 
 function parseTwoArrays(dataX: SimpleRangeValue, dataY: SimpleRangeValue): CellError | [number[], number[]] {
