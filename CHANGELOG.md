@@ -12,8 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
 - Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
-- Fixed the variance and standard deviation functions (`VAR`, `STDEV` and their variants, and the matching `SUBTOTAL` modes) returning `0`, `#NUM!`, or a negative variance on data with a large mean and a small spread. [#1784](https://github.com/handsontable/hyperformula/pull/1784)
-- Fixed `DEVSQ`, `COVARIANCE`, `SLOPE`, `STEYX`, and the `DSTDEV` and `DVAR` functions losing digits on data with a large mean and a small spread. [#1798](https://github.com/handsontable/hyperformula/pull/1798)
+- Fixed the `VAR`, `STDEV`, `DEVSQ`, `COVARIANCE`, `SLOPE`, `STEYX`, `DVAR` and `DSTDEV` functions, their variants, and the matching `SUBTOTAL` modes losing precision on data with a large mean and a small spread. [#1784](https://github.com/handsontable/hyperformula/pull/1784)
+- Fixed a bug where `SLOPE` and `STEYX` returned `#NUM!` or an arbitrary number instead of `#DIV/0!` when all the x values are equal. [#1784](https://github.com/handsontable/hyperformula/pull/1784)
+- Fixed a bug where `STEYX` returned `#NUM!` instead of `0` for points that lie exactly on a line. [#1784](https://github.com/handsontable/hyperformula/pull/1784)
 - Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
 
 ## [3.4.0] - 2026-08-10
