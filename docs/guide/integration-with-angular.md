@@ -259,4 +259,4 @@ The service above is already SSR-safe — HyperFormula has no browser-only API d
 
 ## Demo
 
-For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.4.x/angular-demo?v=' + $page.buildDateURIEncoded">Angular demo on Stackblitz</a>.
+For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/angular-demo?v=' + $page.buildDateURIEncoded">Angular demo on Stackblitz</a>.
