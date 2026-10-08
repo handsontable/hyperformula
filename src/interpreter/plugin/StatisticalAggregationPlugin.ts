@@ -30,6 +30,7 @@ import {
 import {covariance, deviationsFromMean, sumOfProducts, sumOfSquaredDeviations} from '../deviationSums'
 import {
   divideDoubleDoubles,
+  DoubleDouble,
   multiplyDoubleDouble,
   roundDoubleDouble,
   subtractDoubleDouble,
@@ -376,15 +377,12 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n <= 2) {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.ThreeValues)
         }
+        const xMoments = xDeviationsAndSumOfSquares(ret[1])
+        if (xMoments instanceof CellError) {
+          return xMoments
+        }
+        const {xDeviations, xSumOfSquares} = xMoments
         const yDeviations = deviationsFromMean(ret[0])
-        const xDeviations = deviationsFromMean(ret[1])
-        const xSumOfSquares = sumOfProducts(xDeviations, xDeviations)
-        if (xSumOfSquares.hi === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
-        }
-        if (!Number.isFinite(roundDoubleDouble(xSumOfSquares))) {
-          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
-        }
         const productsSum = sumOfProducts(yDeviations, xDeviations)
         const slope = divideDoubleDoubles(productsSum, xSumOfSquares)
         // when the slope overflows, the explained sum of squares Sxy^2 / Sxx can still be finite
@@ -415,14 +413,11 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n <= 1) {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
         }
-        const xDeviations = deviationsFromMean(ret[1])
-        const xSumOfSquares = sumOfProducts(xDeviations, xDeviations)
-        if (xSumOfSquares.hi === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+        const xMoments = xDeviationsAndSumOfSquares(ret[1])
+        if (xMoments instanceof CellError) {
+          return xMoments
         }
-        if (!Number.isFinite(roundDoubleDouble(xSumOfSquares))) {
-          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
-        }
+        const {xDeviations, xSumOfSquares} = xMoments
         return roundDoubleDouble(divideDoubleDoubles(sumOfProducts(deviationsFromMean(ret[0]), xDeviations), xSumOfSquares))
       })
   }
@@ -552,6 +547,25 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         return coerced.reduce((a, b) => a + Math.pow((b - avg) / s, 3), 0) / n
       })
   }
+}
+
+/**
+ * The deviations of the x values of SLOPE or STEYX from their mean and the sum of their squares.
+ *
+ * @param {number[]} values - the x values
+ * @returns {CellError | {xDeviations: DoubleDouble[], xSumOfSquares: DoubleDouble}} `#DIV/0!` when all the
+ * x values are equal, `#NUM!` when the sum of squares overflows
+ */
+function xDeviationsAndSumOfSquares(values: number[]): CellError | {xDeviations: DoubleDouble[], xSumOfSquares: DoubleDouble} {
+  const xDeviations = deviationsFromMean(values)
+  const xSumOfSquares = sumOfProducts(xDeviations, xDeviations)
+  if (xSumOfSquares.hi === 0) {
+    return new CellError(ErrorType.DIV_BY_ZERO)
+  }
+  if (!Number.isFinite(roundDoubleDouble(xSumOfSquares))) {
+    return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+  }
+  return {xDeviations, xSumOfSquares}
 }
 
 function parseTwoArrays(dataX: SimpleRangeValue, dataY: SimpleRangeValue): CellError | [number[], number[]] {

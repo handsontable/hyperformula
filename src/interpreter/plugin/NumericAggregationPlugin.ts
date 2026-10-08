@@ -484,7 +484,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   }
 
   public averagea(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    return this.averageOf(ast.args, state, '_AVERAGE_A', numbersBooleans)
+    return this.doAverageA(ast.args, state)
   }
 
   public vars(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
@@ -616,6 +616,10 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
 
   private doAverage(args: Ast[], state: InterpreterState): InternalScalarValue {
     return this.averageOf(args, state, '_AVERAGE', strictlyNumbers)
+  }
+
+  private doAverageA(args: Ast[], state: InterpreterState): InternalScalarValue {
+    return this.averageOf(args, state, '_AVERAGE_A', numbersBooleans)
   }
 
   /**
