@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
 - Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
+- Fixed `setCellContents` returning a `#ERROR!` parsing error instead of `#SPILL!` for an array formula whose whole-column or whole-row result cannot fit, such as `=SORT(A:A)` entered below the first row. The result now matches the one for the same formula loaded with `buildFromSheets`. [#1797](https://github.com/handsontable/hyperformula/pull/1797)
 - Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
 - Fixed a bug where moving or pasting a formula with an undefined name to another sheet incorrectly added an empty global named expression. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
 

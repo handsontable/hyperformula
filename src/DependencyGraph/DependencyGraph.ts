@@ -1110,13 +1110,23 @@ export class DependencyGraph {
 
   private exchangeOrAddFormulaVertex(vertex: FormulaVertex): void {
     const address = vertex.getAddress(this.lazilyTransformingAstService)
-    const range = AbsoluteCellRange.spanFrom(address, vertex.width, vertex.height)
+    const range = AbsoluteCellRange.spanFromOrUndef(address, vertex.width, vertex.height)
     const oldNode = this.shrinkPossibleArrayAndGetCell(address)
-    if (vertex instanceof ArrayFormulaVertex) {
+    if (vertex instanceof ArrayFormulaVertex && range !== undefined) {
       this.setArray(range, vertex)
     }
     this.exchangeOrAddGraphNode(oldNode, vertex)
     this.addressMapping.setCell(address, vertex)
+
+    if (range === undefined) {
+      // An unbounded result that cannot be placed never gets space. Marking it
+      // now, rather than at evaluation, keeps the vertex at its corner cell, so
+      // overwriting it while evaluation is suspended can still clean it up.
+      if (vertex instanceof ArrayFormulaVertex) {
+        vertex.setNoSpace()
+      }
+      return
+    }
 
     if (vertex instanceof ArrayFormulaVertex) {
       if (!this.isThereSpaceForArray(vertex)) {
