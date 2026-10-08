@@ -104,6 +104,7 @@ HyperFormula.registerLanguage('es', spanish);
 
 // Use it in your configuration
 const hf = HyperFormula.buildEmpty({
+  licenseKey: 'gpl-v3',
   language: 'es'
 });
 ```
