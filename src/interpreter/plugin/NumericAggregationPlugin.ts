@@ -14,6 +14,8 @@ import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {AverageResult} from './AverageResult'
+import {MomentsAggregate} from './MomentsAggregate'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 import {RangeVertex} from '../../DependencyGraph'
 
@@ -28,50 +30,6 @@ function zeroForInfinite(value: InternalScalarValue) {
     return 0
   } else {
     return value
-  }
-}
-
-class MomentsAggregate {
-
-  public static empty = new MomentsAggregate(0, 0, 0)
-
-  constructor(
-    public readonly sumsq: number,
-    public readonly sum: number,
-    public readonly count: number,
-  ) {
-  }
-
-  public static single(arg: number): MomentsAggregate {
-    return new MomentsAggregate(arg * arg, arg, 1)
-  }
-
-  public compose(other: MomentsAggregate) {
-    return new MomentsAggregate(this.sumsq + other.sumsq, this.sum + other.sum, this.count + other.count)
-  }
-
-  public averageValue(): Maybe<number> {
-    if (this.count > 0) {
-      return this.sum / this.count
-    } else {
-      return undefined
-    }
-  }
-
-  public varSValue(): Maybe<number> {
-    if (this.count > 1) {
-      return (this.sumsq - (this.sum * this.sum) / this.count) / (this.count - 1)
-    } else {
-      return undefined
-    }
-  }
-
-  public varPValue(): Maybe<number> {
-    if (this.count > 0) {
-      return (this.sumsq - (this.sum * this.sum) / this.count) / this.count
-    } else {
-      return undefined
-    }
   }
 }
 
@@ -298,17 +256,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   }
 
   public averagea(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    const result = this.reduce<MomentsAggregate>(ast.args, state, MomentsAggregate.empty, '_AGGREGATE_A',
-      (left, right) => left.compose(right),
-      (arg): MomentsAggregate => MomentsAggregate.single(getRawValue(arg)),
-      numbersBooleans
-    )
-
-    if (result instanceof CellError) {
-      return result
-    } else {
-      return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
-    }
+    return this.doAverageA(ast.args, state)
   }
 
   public vars(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
@@ -353,8 +301,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      const val = result.varSValue()
-      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return result.stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     }
   }
 
@@ -364,8 +311,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      const val = result.varPValue()
-      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return result.stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     }
   }
 
@@ -439,13 +385,33 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   }
 
   private doAverage(args: Ast[], state: InterpreterState): InternalScalarValue {
-    const result = this.reduceAggregate(args, state)
+    return this.averageOf(args, state, '_AVERAGE', strictlyNumbers)
+  }
 
+  private doAverageA(args: Ast[], state: InterpreterState): InternalScalarValue {
+    return this.averageOf(args, state, '_AVERAGE_A', numbersBooleans)
+  }
+
+  /**
+   * The plain sum of the values divided by their count, as in AVERAGE and AVERAGEA. The sum and the
+   * count are folded in one pass and cached per range, so AVERAGE does not compute the variance sums.
+   *
+   * @param {Ast[]} args - the function arguments
+   * @param {InterpreterState} state - interpreter state
+   * @param {string} cacheKey - the range cache key
+   * @param {coercionOperation} coercion - which values count
+   * @returns {InternalScalarValue} the average, `#DIV/0!` when there are no values, or the first error
+   */
+  private averageOf(args: Ast[], state: InterpreterState, cacheKey: string, coercion: coercionOperation): InternalScalarValue {
+    const result = this.reduce<AverageResult>(args, state, AverageResult.empty, cacheKey,
+      (left, right) => left.compose(right),
+      (arg) => AverageResult.single(getRawValue(arg)),
+      coercion,
+    )
     if (result instanceof CellError) {
       return result
-    } else {
-      return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     }
+    return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
   }
 
   private doVarS(args: Ast[], state: InterpreterState): InternalScalarValue {
@@ -474,8 +440,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      const val = result.varSValue()
-      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return result.stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     }
   }
 
@@ -485,8 +450,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      const val = result.varPValue()
-      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return result.stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     }
   }
 
