@@ -605,6 +605,23 @@ else
   echo "    package.json version -> $VERSION"
 fi
 
+# The check:licenses script excludes this package from its own license check
+# (GPL-3.0-only is not on its allow list), and license-checker matches that
+# exclusion by exact name@version only - so it has to follow the version, or the
+# check fails for every release after the one it names. Read on its own rather
+# than inside the version bump above, so that a re-run still fixes a stale one.
+LICENSE_EXCLUDED_VERSION="$(node -e 'const s=(require("./package.json").scripts||{})["check:licenses"]||"";const m=/hyperformula@([^";\s]+)/.exec(s);process.stdout.write(m?m[1]:"")' 2>/dev/null || true)"
+if [[ -z "$LICENSE_EXCLUDED_VERSION" ]]; then
+  warn "package.json has no check:licenses script excluding hyperformula@<version>, so its exclusion was not updated - if the script changed, make sure it still excludes hyperformula@$VERSION and commit it on release/$VERSION."
+elif [[ "$LICENSE_EXCLUDED_VERSION" == "$VERSION" ]]; then
+  skip "check:licenses already excludes hyperformula@$VERSION"
+elif $DRY_RUN; then
+  echo "    (set check:licenses to exclude hyperformula@$VERSION instead of hyperformula@$LICENSE_EXCLUDED_VERSION)"
+else
+  CF_V="$VERSION" node -e 'const f="package.json",j=require("./"+f);j.scripts["check:licenses"]=j.scripts["check:licenses"].replace(/hyperformula@[^";\s]+/,"hyperformula@"+process.env.CF_V);require("fs").writeFileSync(f,JSON.stringify(j,null,2)+"\n")'
+  echo "    check:licenses exclusion -> hyperformula@$VERSION"
+fi
+
 # Read the current date only once the file is known to exist and carry the key:
 # under 'set -Eeuo pipefail' a sed against a missing file fails the assignment
 # and trips the ERR trap, which would kill the run before the guard below could

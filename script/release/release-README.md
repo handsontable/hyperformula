@@ -124,9 +124,12 @@ describe decisions made from stale refs. The script marks these fetches
    that existed only locally used to make every resume fail here. Pushing it now
    also publishes it for CI and for the other developers who add tests during
    the freeze.
-3. **Sets the version and the release date** — `version` in `package.json` and
-   `HT_RELEASE_DATE` in `ht.config.js`. Each is skipped when it already matches,
-   so a re-run does not rewrite files it already wrote.
+3. **Sets the version and the release date** — `version` in `package.json`, the
+   `hyperformula@<version>` exclusion in its `check:licenses` script, and
+   `HT_RELEASE_DATE` in `ht.config.js`. The exclusion has to follow the version
+   because `license-checker` matches it by exact `name@version`; a stale one makes
+   `npm run check:licenses` fail on the package itself. Each is skipped when it
+   already matches, so a re-run does not rewrite files it already wrote.
 4. **Reinstalls dependencies** and regenerates the lock file — skipped when
    `package-lock.json` already names the new version *and* `node_modules` exists.
    Both are required: an interrupted install can leave the lock file written and
