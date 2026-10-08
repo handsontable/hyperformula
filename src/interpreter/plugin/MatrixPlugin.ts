@@ -39,10 +39,12 @@ function arraySizeForPoolFunction(inputArray: ArraySize, windowSize: number, str
 }
 
 /**
- * Checks whether a square pooling window tiles the input array exactly, so that no window reaches outside of it.
+ * Checks whether the square pooling windows fit the input array exactly: no window reaches outside of it, and
+ * the last window in each direction ends at its last row or column.
  *
  * The window size and the stride have to be positive integers, the window has to fit inside the input array,
- * and both of its dimensions, reduced by the window size, have to be whole multiples of the stride.
+ * and both of its dimensions, reduced by the window size, have to be whole multiples of the stride. A stride
+ * greater than the window size is allowed: the windows then skip the rows and columns between them.
  *
  * @param inputArray - dimensions of the pooled input array
  * @param windowSize - side length of the square pooling window
@@ -154,9 +156,10 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
    * Corresponds to MAXPOOL(Range, Window_size, Stride).
    *
    * Reduces the input range to the maximum value of every window of `Window_size` x `Window_size` cells,
-   * moving the window by `Stride` cells. The window has to fit inside the range and the range dimensions,
-   * reduced by the window size, have to be whole multiples of the stride. Otherwise, the function
-   * returns the #VALUE! error.
+   * moving the window by `Stride` cells; a stride greater than the window size skips the rows and columns
+   * between the windows. The window has to fit inside the range and the range dimensions, reduced by the
+   * window size, have to be whole multiples of the stride. Otherwise, the function returns the #VALUE! error.
+   * A window size or stride that is not a positive integer returns the #NUM! error.
    */
   public maxpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MAXPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
@@ -186,9 +189,10 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
    * Corresponds to MEDIANPOOL(Range, Window_size, Stride).
    *
    * Reduces the input range to the median value of every window of `Window_size` x `Window_size` cells,
-   * moving the window by `Stride` cells. The window has to fit inside the range and the range dimensions,
-   * reduced by the window size, have to be whole multiples of the stride. Otherwise, the function
-   * returns the #VALUE! error.
+   * moving the window by `Stride` cells; a stride greater than the window size skips the rows and columns
+   * between the windows. The window has to fit inside the range and the range dimensions, reduced by the
+   * window size, have to be whole multiples of the stride. Otherwise, the function returns the #VALUE! error.
+   * A window size or stride that is not a positive integer returns the #NUM! error.
    */
   public medianpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MEDIANPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
