@@ -71,6 +71,12 @@ a circular reference.
 
 * Very large or very small input magnitudes can reduce numerical accuracy. Intermediate calculations, such as residual sums of squares, can still overflow or underflow, producing `#NUM!` or inaccurate statistics. Rescale inputs to more moderate units where possible. See [LINEST numerical differences](list-of-differences.md#linest) for compatibility considerations.
 
+### TREND, GROWTH and LOGEST functions
+
+* `TREND` and `GROWTH` determine their result size before evaluation: from `new_x`, or from `known_y` when `new_x` is omitted. If an input expression returns a different size at evaluation, they return `#VALUE!`.
+
+* `LOGEST` returns the same layout as `LINEST`, and the `LINEST` limitations above apply to it: `stats` must be a constant, and the result width is determined from the predictor dimensions before evaluation.
+
 ### OFFSET function
 
 HyperFormula resolves the OFFSET function at parse time rather than during evaluation. The parser inspects the arguments and rewrites the expression into a plain cell reference or range. This keeps the dependency graph accurate but imposes several restrictions.

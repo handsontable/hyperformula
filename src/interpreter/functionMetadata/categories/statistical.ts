@@ -294,6 +294,18 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=GEOMEAN(1, 2, 3)', '=GEOMEAN(A1:A10)'],
   },
+  GROWTH: {
+    category: 'Statistical',
+    shortDescription: 'Returns values of the exponential curve y = b·m^x fitted by least squares to `known_y`, at the points `new_x`. `known_y` values must be positive.',
+    parameters: [
+      {name: 'known_y', description: 'A numeric range of observed dependent values.'},
+      {name: 'known_x', description: 'Optional numeric predictors. If omitted, uses sequential values starting at 1 with the shape of `known_y`.'},
+      {name: 'new_x', description: 'Optional points at which to predict values, with one column (or row) per predictor. If omitted, uses `known_x`.'},
+      {name: 'const', description: 'Whether to fit the constant b. Defaults to TRUE; FALSE sets b to 1.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=GROWTH(A1:A6, B1:B6, B7:B9)', '=GROWTH(A1:A6, B1:C6, B7:C9, FALSE())'],
+  },
   HARMEAN: {
     category: 'Statistical',
     shortDescription: 'Returns the harmonic average.',
@@ -336,6 +348,18 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     ],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=LINEST(A1:A10, B1:C10)', '=LINEST(A1:A10, B1:C10, TRUE(), TRUE())'],
+  },
+  LOGEST: {
+    category: 'Statistical',
+    shortDescription: 'Returns the bases and constant of the exponential curve y = b·m1^x1·…·mk^xk fitted by least squares, and optional statistics. `known_y` values must be positive.',
+    parameters: [
+      {name: 'known_y', description: 'A numeric range of observed dependent values.'},
+      {name: 'known_x', description: 'Optional numeric predictors. If omitted, uses sequential values starting at 1 with the shape of `known_y`.'},
+      {name: 'const', description: 'Whether to fit the constant b. Defaults to TRUE; FALSE sets b to 1.'},
+      {name: 'stats', description: 'Whether to return five rows including regression statistics of the fit to the natural logarithm of `known_y`. Defaults to FALSE. Must be a constant; cell references and computed expressions are unsupported.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=LOGEST(A1:A10, B1:C10)', '=LOGEST(A1:A10, B1:C10, TRUE(), TRUE())'],
   },
   'LOGNORM.DIST': {
     category: 'Statistical',
@@ -602,6 +626,18 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'degrees', description: 'The number of degrees of freedom.'}, {name: 'tails', description: 'The number of distribution tails to return: 1 for right-tailed, or 2 for two-tailed.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=TDIST(1, 10, 1)', '=TDIST(1, 10, 2)'],
+  },
+  TREND: {
+    category: 'Statistical',
+    shortDescription: 'Returns values of the least-squares line fitted to `known_y`, at the points `new_x`.',
+    parameters: [
+      {name: 'known_y', description: 'A numeric range of observed dependent values.'},
+      {name: 'known_x', description: 'Optional numeric predictors. If omitted, uses sequential values starting at 1 with the shape of `known_y`.'},
+      {name: 'new_x', description: 'Optional points at which to predict values, with one column (or row) per predictor. If omitted, uses `known_x`.'},
+      {name: 'const', description: 'Whether to fit an intercept. Defaults to TRUE; FALSE fits through zero.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TREND(A1:A6, B1:B6, B7:B9)', '=TREND(A1:A6, B1:C6, B7:C9, FALSE())'],
   },
   'VAR.P': {
     category: 'Statistical',
