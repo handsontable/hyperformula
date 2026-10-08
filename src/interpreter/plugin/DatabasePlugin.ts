@@ -6,12 +6,12 @@
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {variance} from '../deviationSums'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue, isExtendedNumber, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 import {CriterionLambda} from '../Criterion'
+import {MomentsAggregate} from './MomentsAggregate'
 
 /**
  * Parsed criterion for a single cell in the criteria range.
@@ -338,11 +338,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return values
       }
 
-      if (values.length <= 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
-      }
-
-      return Math.sqrt(variance(values, 1))
+      return MomentsAggregate.of(values).stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     })
   }
 
@@ -361,11 +357,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return values
       }
 
-      if (values.length === 0) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
-      }
-
-      return Math.sqrt(variance(values, 0))
+      return MomentsAggregate.of(values).stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     })
   }
 
@@ -383,11 +375,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return values
       }
 
-      if (values.length <= 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
-      }
-
-      return variance(values, 1)
+      return MomentsAggregate.of(values).varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     })
   }
 
@@ -406,11 +394,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return values
       }
 
-      if (values.length === 0) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
-      }
-
-      return variance(values, 0)
+      return MomentsAggregate.of(values).varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     })
   }
 

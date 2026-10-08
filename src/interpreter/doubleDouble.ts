@@ -209,6 +209,22 @@ export function multiplyByPowerOfTwo(x: DoubleDouble, powerOfTwo: number): Doubl
 }
 
 /**
+ * Product of a double and `2^exponent`, for exponents beyond the range of a finite power of two.
+ *
+ * The power is applied in two halves of the same sign, so that neither half overflows or underflows
+ * and an intermediate product overflows only when the result does. The product is exact unless it
+ * overflows or is subnormal; a subnormal product can be rounded twice.
+ *
+ * @param {number} value - the double factor
+ * @param {number} exponent - an integer, at most 2046 in magnitude
+ * @returns {number} `value * 2^exponent`
+ */
+export function multiplyByTwoToThe(value: number, exponent: number): number {
+  const half = Math.trunc(exponent / 2)
+  return value * 2 ** half * 2 ** (exponent - half)
+}
+
+/**
  * Rounds a double-double to the nearest double.
  *
  * @param {DoubleDouble} x - the value to round

@@ -27,10 +27,10 @@ import {
   sumsqerr,
   variance
 } from './3rdparty/jstat/jstat'
-import {covariance, deviationsFromMean, sumOfProducts, sumOfSquaredDeviations} from '../deviationSums'
+import {covariance, regressionSums, sumOfSquaredDeviations} from '../deviationSums'
 import {
   divideDoubleDoubles,
-  DoubleDouble,
+  multiplyByTwoToThe,
   multiplyDoubleDouble,
   roundDoubleDouble,
   subtractDoubleDouble,
@@ -192,7 +192,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (coerced.length === 0) {
           return 0
         }
-        return roundDoubleDouble(sumOfSquaredDeviations(coerced))
+        return sumOfSquaredDeviations(coerced)
       })
   }
 
@@ -377,24 +377,15 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n <= 2) {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.ThreeValues)
         }
-        const xMoments = xDeviationsAndSumOfSquares(ret[1])
-        if (xMoments instanceof CellError) {
-          return xMoments
+        const sums = regressionSums(ret[0], ret[1], true)
+        if (sums.xSumOfSquares.hi === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
         }
-        const {xDeviations, xSumOfSquares} = xMoments
-        const yDeviations = deviationsFromMean(ret[0])
-        const productsSum = sumOfProducts(yDeviations, xDeviations)
-        const slope = divideDoubleDoubles(productsSum, xSumOfSquares)
-        // when the slope overflows, the explained sum of squares Sxy^2 / Sxx can still be finite
-        const explained = Number.isFinite(slope.hi)
-          ? multiplyDoubleDouble(slope, productsSum)
-          : divideDoubleDoubles(multiplyDoubleDouble(productsSum, productsSum), xSumOfSquares)
-        const residual = roundDoubleDouble(subtractDoubleDouble(sumOfProducts(yDeviations, yDeviations), explained))
-        if (!Number.isFinite(residual)) {
-          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
-        }
+        // at the scale of the sums, the slope and the explained sum of squares Sxy^2 / Sxx <= Syy are finite
+        const explained = multiplyDoubleDouble(divideDoubleDoubles(sums.productsSum, sums.xSumOfSquares), sums.productsSum)
+        const residual = roundDoubleDouble(subtractDoubleDouble(sums.ySumOfSquares, explained))
         // the residual is non-negative; a tiny negative rounding remainder counts as 0
-        return Math.sqrt(Math.max(0, residual) / (n - 2))
+        return multiplyByTwoToThe(Math.sqrt(Math.max(0, residual) / (n - 2)), sums.yExponent)
       })
   }
 
@@ -413,12 +404,12 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (n <= 1) {
           return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
         }
-        const xMoments = xDeviationsAndSumOfSquares(ret[1])
-        if (xMoments instanceof CellError) {
-          return xMoments
+        const sums = regressionSums(ret[0], ret[1], false)
+        if (sums.xSumOfSquares.hi === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
         }
-        const {xDeviations, xSumOfSquares} = xMoments
-        return roundDoubleDouble(divideDoubleDoubles(sumOfProducts(deviationsFromMean(ret[0]), xDeviations), xSumOfSquares))
+        const scaledSlope = roundDoubleDouble(divideDoubleDoubles(sums.productsSum, sums.xSumOfSquares))
+        return multiplyByTwoToThe(scaledSlope, sums.yExponent - sums.xExponent)
       })
   }
 
@@ -547,25 +538,6 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         return coerced.reduce((a, b) => a + Math.pow((b - avg) / s, 3), 0) / n
       })
   }
-}
-
-/**
- * The deviations of the x values of SLOPE or STEYX from their mean and the sum of their squares.
- *
- * @param {number[]} values - the x values
- * @returns {CellError | {xDeviations: DoubleDouble[], xSumOfSquares: DoubleDouble}} `#DIV/0!` when all the
- * x values are equal, `#NUM!` when the sum of squares overflows
- */
-function xDeviationsAndSumOfSquares(values: number[]): CellError | {xDeviations: DoubleDouble[], xSumOfSquares: DoubleDouble} {
-  const xDeviations = deviationsFromMean(values)
-  const xSumOfSquares = sumOfProducts(xDeviations, xDeviations)
-  if (xSumOfSquares.hi === 0) {
-    return new CellError(ErrorType.DIV_BY_ZERO)
-  }
-  if (!Number.isFinite(roundDoubleDouble(xSumOfSquares))) {
-    return new CellError(ErrorType.NUM, ErrorMessage.NaN)
-  }
-  return {xDeviations, xSumOfSquares}
 }
 
 function parseTwoArrays(dataX: SimpleRangeValue, dataY: SimpleRangeValue): CellError | [number[], number[]] {

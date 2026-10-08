@@ -11,22 +11,11 @@ import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
-import {
-  addDoubleDouble,
-  divideDoubleDouble,
-  DOUBLE_DOUBLE_ZERO,
-  DoubleDouble,
-  multiplyByPowerOfTwo,
-  multiplyDoubleDouble,
-  roundDoubleDouble,
-  scaleDoubleDouble,
-  subtractDoubleDouble,
-  twoSum,
-} from '../doubleDouble'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {AverageResult} from './AverageResult'
+import {MomentsAggregate} from './MomentsAggregate'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 import {RangeVertex} from '../../DependencyGraph'
 
@@ -41,223 +30,6 @@ function zeroForInfinite(value: InternalScalarValue) {
     return 0
   } else {
     return value
-  }
-}
-
-/**
- * The largest scaled sum of squared deviations a `MomentsAggregate` keeps (2^960). Above it, the
- * aggregate raises its exponent. Every scaled deviation is then at most 2^480, so rebasing the sums of
- * two aggregates cannot overflow.
- */
-const MAX_SCALED_SUM_OF_SQUARES = 2 ** 960
-
-/**
- * The largest scaled difference of shifts that two aggregates are rebased with (2^470). Above it, the
- * exponent is raised first.
- */
-const MAX_SCALED_SHIFT_DIFFERENCE = 2 ** 470
-
-/**
- * The smallest exponent `e >= 0` (up to one) for which `magnitude * 2^-e` is at most `limit`.
- *
- * @param {number} magnitude - a non-negative finite number
- * @param {number} limit - a positive power of two
- * @returns {number} the exponent
- */
-function exponentToFit(magnitude: number, limit: number): number {
-  return magnitude <= limit ? 0 : Math.ceil(Math.log2(magnitude / limit))
-}
-
-/**
- * Moments of a set of numbers, composable so that the value of a range can be cached and reused
- * for a larger range.
- *
- * Besides the count, it keeps the sums of deviations `S1` and of squared deviations `S2` from a
- * `shift`: the first value added. Both sums are double-double. Measured from a nearby value, the
- * deviations stay small, which avoids the cancellation of the textbook one-pass form
- * `sum(x^2) - sum(x)^2 / n` for data with a large mean and a small spread (for example 10000000.001,
- * 10000000.002, ...). The variance and the standard deviation are accurate to about one unit in the
- * last place of the exact values for the stored numbers. Double-double arithmetic does not guarantee
- * correct rounding.
- *
- * The deviations are stored multiplied by `2^-exponent`, which is exact, so that the sums cannot
- * overflow. The exponent is 0 until the scaled sum of squares exceeds `MAX_SCALED_SUM_OF_SQUARES`
- * (deviations of about 1e144 and above), and grows as needed. The variance is `#NUM!` only when it
- * exceeds the largest double, whatever the order of the values.
- */
-class MomentsAggregate {
-
-  public static empty = new MomentsAggregate(0, 0, 0, DOUBLE_DOUBLE_ZERO, DOUBLE_DOUBLE_ZERO)
-
-  /**
-   * @param {number} count - the number of values
-   * @param {number} shift - the value the deviations are measured from
-   * @param {number} exponent - the deviations are stored multiplied by `2^-exponent`
-   * @param {DoubleDouble} shiftedSum - `S1`, the sum of `(x - shift) * 2^-exponent`
-   * @param {DoubleDouble} shiftedSumOfSquares - `S2`, the sum of `((x - shift) * 2^-exponent)^2`
-   */
-  constructor(
-    public readonly count: number,
-    public readonly shift: number,
-    public readonly exponent: number,
-    public readonly shiftedSum: DoubleDouble,
-    public readonly shiftedSumOfSquares: DoubleDouble,
-  ) {
-  }
-
-  /**
-   * The moments of one value, which is also the shift.
-   *
-   * @param {number} arg - the value
-   * @returns {MomentsAggregate} an aggregate of the single value
-   */
-  public static single(arg: number): MomentsAggregate {
-    return new MomentsAggregate(1, arg, 0, DOUBLE_DOUBLE_ZERO, DOUBLE_DOUBLE_ZERO)
-  }
-
-  /**
-   * An aggregate whose exponent is raised, if needed, so that its scaled sum of squares is at most
-   * `MAX_SCALED_SUM_OF_SQUARES`.
-   *
-   * @param {number} count - the number of values
-   * @param {number} shift - the value the deviations are measured from
-   * @param {number} exponent - the exponent of the given sums
-   * @param {DoubleDouble} shiftedSum - the scaled sum of deviations
-   * @param {DoubleDouble} shiftedSumOfSquares - the scaled sum of squared deviations
-   * @returns {MomentsAggregate} the aggregate
-   */
-  private static normalized(count: number, shift: number, exponent: number, shiftedSum: DoubleDouble, shiftedSumOfSquares: DoubleDouble): MomentsAggregate {
-    const excess = exponentToFit(Math.abs(shiftedSumOfSquares.hi), MAX_SCALED_SUM_OF_SQUARES)
-    if (excess === 0) {
-      return new MomentsAggregate(count, shift, exponent, shiftedSum, shiftedSumOfSquares)
-    }
-    const raise = Math.ceil(excess / 2)
-    return new MomentsAggregate(count, shift, exponent + raise,
-      multiplyByPowerOfTwo(shiftedSum, 2 ** -raise),
-      multiplyByPowerOfTwo(shiftedSumOfSquares, 2 ** (-2 * raise)),
-    )
-  }
-
-  /**
-   * Combines two aggregates. The result keeps this aggregate's `shift`; the other one's shifted sums
-   * are re-expressed relative to it, at the larger exponent of the two (raised further when the
-   * difference of the shifts needs it). An empty aggregate is the identity: composing with it returns
-   * the other aggregate unchanged, with its own shift.
-   *
-   * @param {MomentsAggregate} other - the aggregate to add
-   * @returns {MomentsAggregate} the aggregate of the values of both
-   */
-  public compose(other: MomentsAggregate): MomentsAggregate {
-    if (this.count === 0) {
-      return other
-    }
-    if (other.count === 0) {
-      return this
-    }
-
-    // the common case: no rescaling, because both aggregates have the same exponent or the other one
-    // is a single value, whose shifted sums are 0 at any exponent
-    if (other.exponent === this.exponent || (other.count === 1 && this.exponent > 0)) {
-      const exponent = this.exponent
-      const shiftDifference = exponent === 0
-        ? twoSum(other.shift, -this.shift)
-        : twoSum(other.shift * 2 ** -exponent, -this.shift * 2 ** -exponent)
-      if (Math.abs(shiftDifference.hi) <= MAX_SCALED_SHIFT_DIFFERENCE) {
-        return this.composeScaled(other, exponent, this.shiftedSum, this.shiftedSumOfSquares, other.shiftedSum, other.shiftedSumOfSquares, shiftDifference)
-      }
-    }
-
-    // halving the shifts first keeps their difference finite
-    const shiftDifferenceExponent = exponentToFit(Math.abs(other.shift / 2 - this.shift / 2), MAX_SCALED_SHIFT_DIFFERENCE / 2)
-    const exponent = Math.max(this.exponent, other.exponent, shiftDifferenceExponent)
-    const thisRaise = exponent - this.exponent
-    const otherRaise = exponent - other.exponent
-    const scale = 2 ** -exponent
-    return this.composeScaled(other, exponent,
-      multiplyByPowerOfTwo(this.shiftedSum, 2 ** -thisRaise),
-      multiplyByPowerOfTwo(this.shiftedSumOfSquares, 2 ** (-2 * thisRaise)),
-      multiplyByPowerOfTwo(other.shiftedSum, 2 ** -otherRaise),
-      multiplyByPowerOfTwo(other.shiftedSumOfSquares, 2 ** (-2 * otherRaise)),
-      twoSum(other.shift * scale, -this.shift * scale),
-    )
-  }
-
-  public varSValue(): Maybe<number> {
-    if (this.count > 1) {
-      return this.variance(this.count - 1)
-    } else {
-      return undefined
-    }
-  }
-
-  public varPValue(): Maybe<number> {
-    if (this.count > 0) {
-      return this.variance(this.count)
-    } else {
-      return undefined
-    }
-  }
-
-  /**
-   * Adds the other aggregate's sums, already scaled to `exponent`, to this aggregate's sums, also
-   * scaled to `exponent`.
-   *
-   * @param {MomentsAggregate} other - the aggregate to add
-   * @param {number} exponent - the common exponent
-   * @param {DoubleDouble} shiftedSum - this aggregate's `S1` at `exponent`
-   * @param {DoubleDouble} shiftedSumOfSquares - this aggregate's `S2` at `exponent`
-   * @param {DoubleDouble} otherShiftedSum - the other aggregate's `S1` at `exponent`
-   * @param {DoubleDouble} otherShiftedSumOfSquares - the other aggregate's `S2` at `exponent`
-   * @param {DoubleDouble} shiftDifference - `(other.shift - this.shift) * 2^-exponent`
-   * @returns {MomentsAggregate} the aggregate of the values of both
-   */
-  private composeScaled(
-    other: MomentsAggregate,
-    exponent: number,
-    shiftedSum: DoubleDouble,
-    shiftedSumOfSquares: DoubleDouble,
-    otherShiftedSum: DoubleDouble,
-    otherShiftedSumOfSquares: DoubleDouble,
-    shiftDifference: DoubleDouble,
-  ): MomentsAggregate {
-    const count = this.count + other.count
-    if (other.count === 1) {
-      // the common case of adding one value: its deviation is the shift difference itself
-      return MomentsAggregate.normalized(count, this.shift, exponent,
-        addDoubleDouble(shiftedSum, shiftDifference),
-        addDoubleDouble(shiftedSumOfSquares, multiplyDoubleDouble(shiftDifference, shiftDifference)),
-      )
-    }
-
-    // other's sums rebased: S1 + n*d and S2 + 2*d*S1 + n*d^2
-    const rebasedSum = addDoubleDouble(otherShiftedSum, scaleDoubleDouble(shiftDifference, other.count))
-    const rebasedSumOfSquares = addDoubleDouble(
-      addDoubleDouble(otherShiftedSumOfSquares, scaleDoubleDouble(multiplyDoubleDouble(shiftDifference, otherShiftedSum), 2)),
-      scaleDoubleDouble(multiplyDoubleDouble(shiftDifference, shiftDifference), other.count),
-    )
-    return MomentsAggregate.normalized(count, this.shift, exponent,
-      addDoubleDouble(shiftedSum, rebasedSum),
-      addDoubleDouble(shiftedSumOfSquares, rebasedSumOfSquares),
-    )
-  }
-
-  /**
-   * The sum of squared deviations from the mean, `S2 - S1^2 / n` with `S1`, `S2` the shifted sums and
-   * `n` the count, divided by `divisor` and rounded once.
-   *
-   * `S1^2 / n` is evaluated as `S1 * (S1 / n)`, which cannot overflow because `S1^2 / n <= S2`. The
-   * quotient is computed at the scale of the sums and then multiplied by `2^(2 * exponent)` in two
-   * steps, so that the power of two itself cannot overflow; the result overflows only when the
-   * variance exceeds the largest double.
-   *
-   * @param {number} divisor - `n - 1` for the sample variance, `n` for the population variance
-   * @returns {number} the variance
-   */
-  private variance(divisor: number): number {
-    const squaredSumOverCount = multiplyDoubleDouble(this.shiftedSum, divideDoubleDouble(this.shiftedSum, this.count))
-    const sumOfSquaredDeviations = subtractDoubleDouble(this.shiftedSumOfSquares, squaredSumOverCount)
-    const scale = 2 ** this.exponent
-    return roundDoubleDouble(divideDoubleDouble(sumOfSquaredDeviations, divisor)) * scale * scale
   }
 }
 
@@ -529,8 +301,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      const val = result.varSValue()
-      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return result.stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     }
   }
 
@@ -540,8 +311,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      const val = result.varPValue()
-      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return result.stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     }
   }
 
@@ -670,8 +440,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      const val = result.varSValue()
-      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return result.stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     }
   }
 
@@ -681,8 +450,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      const val = result.varPValue()
-      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return result.stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     }
   }
 
