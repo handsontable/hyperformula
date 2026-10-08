@@ -6,6 +6,7 @@
 import {
   addDoubleDouble,
   divideDoubleDouble,
+  divideDoubleDoubles,
   DOUBLE_DOUBLE_ZERO,
   DoubleDouble,
   multiplyByPowerOfTwo,
@@ -84,8 +85,11 @@ export interface RegressionSums {
   readonly xSumOfSquares: DoubleDouble,
   /** `sum((x - mean(x)) * (y - mean(y))) * 2^(-xExponent - yExponent)` */
   readonly productsSum: DoubleDouble,
-  /** `sum((y - mean(y))^2) * 2^(-2 * yExponent)`, when requested */
-  readonly ySumOfSquares: DoubleDouble,
+  /**
+   * `sum((y - mean(y) - slope * (x - mean(x)))^2) * 2^(-2 * yExponent)`, the residual sum of squares,
+   * when requested
+   */
+  readonly residualSumOfSquares: DoubleDouble,
   /** the exponent of the power of two the x deviations are scaled by */
   readonly xExponent: number,
   /** the exponent of the power of two the y deviations are scaled by */
@@ -128,20 +132,53 @@ export function covariance(first: number[], second: number[], deltaDegreesOfFree
  * array at its own scale.
  *
  * Unless all the x values are equal, the scaled sum of squares of x is at least about 2^-908, so the
- * scaled slope `productsSum / xSumOfSquares` is finite whenever `ySumOfSquares` is.
+ * scaled slope `productsSum / xSumOfSquares` is finite whenever the sum of squared y deviations is,
+ * and so is every residual, whose square is at most the residual sum of squares.
  *
  * @param {number[]} knownYs - a non-empty array of the dependent values
  * @param {number[]} knownXs - an array of the independent values, of the same length as `knownYs`
- * @param {boolean} withYSumOfSquares - whether to compute `ySumOfSquares`; otherwise it is 0
+ * @param {boolean} withResidualSumOfSquares - whether to compute `residualSumOfSquares`; otherwise it is 0
  * @returns {RegressionSums} the scaled sums and the exponents of the scales
  */
-export function regressionSums(knownYs: number[], knownXs: number[], withYSumOfSquares: boolean): RegressionSums {
-  const {sums: [xSumOfSquares, productsSum, ySumOfSquares], firstExponent, secondExponent} = pairedSums(knownXs, knownYs,
-    (x, y) => withYSumOfSquares
-      ? [sumOfProducts(x, x), sumOfProducts(y, x), sumOfProducts(y, y)]
-      : [sumOfProducts(x, x), sumOfProducts(y, x), DOUBLE_DOUBLE_ZERO],
+export function regressionSums(knownYs: number[], knownXs: number[], withResidualSumOfSquares: boolean): RegressionSums {
+  const {sums: [xSumOfSquares, productsSum, residualSumOfSquares], firstExponent, secondExponent} = pairedSums(knownXs, knownYs,
+    (x, y) => {
+      const xSquaresSum = sumOfProducts(x, x)
+      const xyProductsSum = sumOfProducts(y, x)
+      return [xSquaresSum, xyProductsSum, withResidualSumOfSquares ? sumOfSquaredResiduals(y, x, xSquaresSum, xyProductsSum) : DOUBLE_DOUBLE_ZERO]
+    },
   )
-  return {xSumOfSquares, productsSum, ySumOfSquares, xExponent: firstExponent, yExponent: secondExponent}
+  return {xSumOfSquares, productsSum, residualSumOfSquares, xExponent: firstExponent, yExponent: secondExponent}
+}
+
+/**
+ * The sum of squared residuals of a simple linear regression, from the deviations of y and x.
+ *
+ * The residuals are computed one by one rather than as `sum(dy^2) - productsSum^2 / xSumOfSquares`,
+ * which cancels when the points lie almost on a line: each residual is then the small difference of
+ * a deviation and its fitted value, which double-double keeps to about 2^-106 of the deviation.
+ *
+ * The rounding errors of the two means shift every residual by the same amount, the error of the y
+ * mean minus the slope times the error of the x mean, which can exceed the residuals themselves when
+ * the slope is large. The exact residuals sum to 0, so they are centered on their mean, which
+ * removes that shift, before they are squared.
+ *
+ * @param {DoubleDouble[]} yDeviations - the deviations of y from its mean
+ * @param {DoubleDouble[]} xDeviations - the deviations of x from its mean, at the same scale as the sums
+ * @param {DoubleDouble} xSumOfSquares - `sum(dx^2)`
+ * @param {DoubleDouble} productsSum - `sum(dy * dx)`
+ * @returns {DoubleDouble} `sum((dy - slope * dx)^2)`, or 0 when all the x values are equal
+ */
+function sumOfSquaredResiduals(yDeviations: DoubleDouble[], xDeviations: DoubleDouble[], xSumOfSquares: DoubleDouble, productsSum: DoubleDouble): DoubleDouble {
+  if (xSumOfSquares.hi === 0) {
+    return DOUBLE_DOUBLE_ZERO
+  }
+  const slope = divideDoubleDoubles(productsSum, xSumOfSquares)
+  const residuals = yDeviations.map((deviation, index) => subtractDoubleDouble(deviation, multiplyDoubleDouble(slope, xDeviations[index])))
+  const residualsSum = residuals.reduce((total, residual) => addDoubleDouble(total, residual), DOUBLE_DOUBLE_ZERO)
+  const residualsMean = divideDoubleDouble(residualsSum, residuals.length)
+  const centeredResiduals = residuals.map((residual) => subtractDoubleDouble(residual, residualsMean))
+  return sumOfProducts(centeredResiduals, centeredResiduals)
 }
 
 /**

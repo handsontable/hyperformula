@@ -31,9 +31,7 @@ import {covariance, regressionSums, RegressionSums, sumOfSquaredDeviations} from
 import {
   divideDoubleDoubles,
   multiplyByTwoToThe,
-  multiplyDoubleDouble,
   roundDoubleDouble,
-  subtractDoubleDouble,
 } from '../doubleDouble'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
@@ -381,11 +379,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         if (sums instanceof CellError) {
           return sums
         }
-        // at the scale of the sums, the slope and the explained sum of squares Sxy^2 / Sxx <= Syy are finite
-        const explained = multiplyDoubleDouble(divideDoubleDoubles(sums.productsSum, sums.xSumOfSquares), sums.productsSum)
-        const residual = roundDoubleDouble(subtractDoubleDouble(sums.ySumOfSquares, explained))
-        // the residual is non-negative; a tiny negative rounding remainder counts as 0
-        return multiplyByTwoToThe(Math.sqrt(Math.max(0, residual) / (n - 2)), sums.yExponent)
+        return multiplyByTwoToThe(Math.sqrt(roundDoubleDouble(sums.residualSumOfSquares) / (n - 2)), sums.yExponent)
       })
   }
 
@@ -546,11 +540,11 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
  *
  * @param {number[]} knownYs - a non-empty array of the dependent values
  * @param {number[]} knownXs - an array of the independent values, of the same length as `knownYs`
- * @param {boolean} withYSumOfSquares - whether to compute `ySumOfSquares`
+ * @param {boolean} withResidualSumOfSquares - whether to compute `residualSumOfSquares`
  * @returns {RegressionSums | CellError} the scaled sums, or the error
  */
-function nonDegenerateRegressionSums(knownYs: number[], knownXs: number[], withYSumOfSquares: boolean): RegressionSums | CellError {
-  const sums = regressionSums(knownYs, knownXs, withYSumOfSquares)
+function nonDegenerateRegressionSums(knownYs: number[], knownXs: number[], withResidualSumOfSquares: boolean): RegressionSums | CellError {
+  const sums = regressionSums(knownYs, knownXs, withResidualSumOfSquares)
   if (sums.xSumOfSquares.hi === 0) {
     return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.EqualXValues)
   }
