@@ -11,6 +11,7 @@ import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue, isExtend
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 import {CriterionLambda} from '../Criterion'
+import {MomentsAggregate} from './MomentsAggregate'
 
 /**
  * Parsed criterion for a single cell in the criteria range.
@@ -337,13 +338,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return values
       }
 
-      if (values.length <= 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
-      }
-
-      const mean = values.reduce((a, b) => a + b, 0) / values.length
-      const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1)
-      return Math.sqrt(variance)
+      return MomentsAggregate.of(values).stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     })
   }
 
@@ -362,13 +357,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return values
       }
 
-      if (values.length === 0) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
-      }
-
-      const mean = values.reduce((a, b) => a + b, 0) / values.length
-      const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length
-      return Math.sqrt(variance)
+      return MomentsAggregate.of(values).stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     })
   }
 
@@ -386,12 +375,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return values
       }
 
-      if (values.length <= 1) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
-      }
-
-      const mean = values.reduce((a, b) => a + b, 0) / values.length
-      return values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1)
+      return MomentsAggregate.of(values).varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     })
   }
 
@@ -410,12 +394,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return values
       }
 
-      if (values.length === 0) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
-      }
-
-      const mean = values.reduce((a, b) => a + b, 0) / values.length
-      return values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length
+      return MomentsAggregate.of(values).varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
     })
   }
 

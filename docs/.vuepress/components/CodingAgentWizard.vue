@@ -40,8 +40,8 @@ export default {
         {
           id: 'cursor',
           label: 'Cursor',
-          snippet: 'Add to your AGENTS.md / rules file:\nHyperFormula docs (LLM-friendly): https://hyperformula.handsontable.com/docs/llms-full.txt',
-          note: 'Cursor has no Claude-skill installer yet — point it at the full docs corpus instead.',
+          snippet: 'Add to .cursor/mcp.json:\n{\n  "mcpServers": {\n    "handsontable-docs": { "url": "https://docs-assistant.handsontable.com/mcp" }\n  }\n}',
+          note: 'Connects Cursor to the first-party docs MCP server (docs guides, API reference, code recipes, release notes, blog posts, and GitHub issues). Alternatively, point a rules file at the full docs corpus: <code>https://hyperformula.handsontable.com/docs/llms-full.txt</code>.',
         },
         {
           id: 'copilot',
@@ -53,7 +53,7 @@ export default {
           id: 'other',
           label: 'Other / API',
           snippet: 'curl -s https://hyperformula.handsontable.com/docs/llms-full.txt',
-          note: 'Fetch the full corpus, or upload the skill folder from <code>handsontable/handsontable-skills</code> to the Claude API.',
+          note: 'Fetch the full corpus, upload the skill folder from <code>handsontable/handsontable-skills</code> to the Claude API, or connect any MCP-capable agent to <code>https://docs-assistant.handsontable.com/mcp</code>.',
         },
       ],
     };

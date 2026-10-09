@@ -1,3 +1,11 @@
+---
+tags:
+  - operator precedence
+  - order of operations
+  - parenthesis
+  - brackets
+---
+
 # Order of precedence
 
 HyperFormula supports multiple [operators](types-of-operators.md) that

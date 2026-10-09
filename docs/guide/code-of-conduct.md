@@ -1,3 +1,13 @@
+---
+tags:
+  - CoC
+  - Contributor Covenant
+  - harassment
+  - report abuse
+  - unacceptable behavior
+  - community guidelines
+---
+
 # Code of conduct
 
 ## Our Pledge

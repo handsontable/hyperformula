@@ -1,3 +1,13 @@
+---
+tags:
+  - ARRAYFORMULA
+  - useArrayArithmetic
+  - ARRAY_CONSTRAIN
+  - spilling
+  - arrayRowSeparator
+  - arrayColumnSeparator
+---
+
 # Array formulas
 
 Use array formulas to perform an operation (or call a function) on multiple cells at a time.

@@ -1,3 +1,14 @@
+---
+tags:
+  - UMD
+  - ESM
+  - bundles
+  - TypeScript typings
+  - Jest
+  - Karma
+  - ESLint
+---
+
 # Building
 
 The build process uses Webpack and Babel, as well as npm tasks

@@ -1,3 +1,16 @@
+---
+tags:
+  - defined names
+  - global scope
+  - variables
+  - named constants
+  - structured references
+  - addNamedExpression
+  - changeNamedExpression
+  - removeNamedExpression
+  - listNamedExpressions
+---
+
 # Named expressions
 
 An expression can be assigned a human-friendly name. Thanks to this you can
@@ -71,6 +84,7 @@ For examples of valid and invalid expression names, see the following table:
 | ASP.NET     | Valid    |
 | A1          | Invalid  |
 | $A$1        | Invalid  |
+| Name1       | Invalid  |
 | RC          | Invalid  |
 
 ## Using named expressions in formulas
@@ -102,6 +116,28 @@ When array arithmetic is enabled (`useArrayArithmetic: true`), named ranges stil
 - A bare `=myRange + 1` does not spill — it returns a `#VALUE!` error rather than producing one result per element.
 - Inside an aggregate the operator becomes element-wise. `=SUM(myRange + 1)` adds 1 to every element and then sums, so for `myRange` covering values `1..5` it returns `20` (`SUM(2, 3, 4, 5, 6)`), not the single reduced value of the default mode.
 
+## Named columns
+
+To address a column by name, register a named expression that points at the column (or at the data range), then use that name in the formula:
+
+```javascript
+hfInstance.addNamedExpression('ColSales', '=Sheet1!$A:$A');
+hfInstance.setCellContents({ sheet: 0, col: 2, row: 0 }, [['=SUM(ColSales)']]);
+```
+
+- The address inside the named expression must be **absolute** (`$A:$A` or `Sheet1!$A:$A`). Relative `A:A` is not allowed.
+- If row 1 is a header, `$A:$A` includes it. For data only, use `$A$2:$A`.
+- Do not put header text in the formula. Map each header to a named expression in application code.
+
+### Why SUM(Name1:Name5) does not work
+
+HyperFormula does not support Excel-style structured references such as `Table[Column]`, and it does not treat column headers as formula addresses. A formula like `=SUM(Name1:Name5)` is not a reference to columns named Name1 and Name5.
+
+Two separate problems often get stacked in that example:
+
+1. **Illegal name.** `Name1` matches A1 notation (column NAME, row 1), so it cannot be registered as a named expression. Use `ColSales` or `Name_1` instead. See [Naming rules](#naming-rules).
+2. **Range operator.** `:` does not accept named expressions as endpoints. Even with legal names, `Name_1:Name_5` is a parse error. See [Range restraints](cell-references.md#range-restraints).
+
 ## Available methods
 
 These are the basic methods that can be used to add and manipulate named
@@ -130,11 +166,11 @@ const namedExpressions = [
 ];
 
 // Create engine with named expressions
-const hfInstance = HyperFormula.buildEmpty({}, namedExpressions);
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' }, namedExpressions);
 // or
-const hfInstance = HyperFormula.buildFromArray(sheetData, {}, namedExpressions);
+const hfInstance = HyperFormula.buildFromArray(sheetData, { licenseKey: 'gpl-v3' }, namedExpressions);
 // or  
-const hfInstance = HyperFormula.buildFromSheets(sheetsData, {}, namedExpressions);
+const hfInstance = HyperFormula.buildFromSheets(sheetsData, { licenseKey: 'gpl-v3' }, namedExpressions);
 ```
 
 **After engine creation**: You can add a named expression by using the `addNamedExpression` method. It accepts name for the expression, the expression as a raw cell content, and optionally the scope. If you do not define the scope it will be set to global, meaning the expression name will be valid for the whole workbook. If you want to add many of them, it is advised to do so in a [batch](batch-operations.md). This method returns [an array of changed cells](basic-operations.md#changes-array).

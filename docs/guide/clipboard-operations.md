@@ -1,3 +1,10 @@
+---
+tags:
+  - clearClipboard
+  - isClipboardEmpty
+  - system clipboard
+---
+
 # Clipboard operations
 
 Through a set of dedicated methods, HyperFormula supports clipboard operations, such as copying, cutting,
@@ -13,7 +20,7 @@ To copy the contents of a cell or range, use the [`copy()`](../api/classes/hyper
 ```javascript
 const hfInstance = HyperFormula.buildFromArray([
   ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // copy [ [ 2 ] ]
 const clipboardContent = hfInstance.copy({
@@ -33,7 +40,7 @@ Any CRUD operation called after the [`cut()`](../api/classes/hyperformula.md#cut
 ```javascript
 const hfInstance = HyperFormula.buildFromArray([
   ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // returns the values that were cut: [ [ 1 ] ]
 const clipboardContent = hfInstance.cut({
@@ -51,7 +58,7 @@ To paste the contents of a cell or range, use the [`paste()`](../api/classes/hyp
 ```javascript
 const hfInstance = HyperFormula.buildFromArray([
   ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // [ [ 2 ] ] was copied
 const clipboardContent = hfInstance.copy({

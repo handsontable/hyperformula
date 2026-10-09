@@ -1,3 +1,15 @@
+---
+tags:
+  - speed
+  - slow
+  - memory
+  - optimize
+  - recalculate
+  - useColumnIndex
+  - chooseAddressMappingPolicy
+  - maxPendingLazyTransformations
+---
+
 # Performance
 
 We implemented various techniques to boost the performance of

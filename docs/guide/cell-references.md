@@ -1,3 +1,14 @@
+---
+tags:
+  - A1 notation
+  - dollar sign
+  - mixed references
+  - cross-sheet references
+  - column range
+  - "#CYCLE!"
+  - circular dependency
+---
+
 # Cell references
 
 A formula can reference one or more cells and automatically update its
@@ -121,7 +132,7 @@ This example shows the change after the move operation was done:
 // build with a simple dataset
 const hfInstance = HyperFormula.buildFromArray([
  ['=B2', '=A1', ''],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // these are the coordinates for a move operation
 const source = { sheet: 0, col: 1, row: 0 };
@@ -193,7 +204,7 @@ You can reference ranges:
 
 The following restraints apply:
 - You can't mix two different types of range references together (=A1:B).
-- Range expressions can't contain [named expressions](/guide/named-expressions.md).
+- Range expressions can't contain [named expressions](/guide/named-expressions.md) (`=Name_1:Name_5` is a parse error). To name a whole column, see [Named columns](/guide/named-expressions.md#named-columns).
 - At the moment, HyperFormula doesn't support multi-cell range references (=A1:B2:C3).
 
 ::: tip
