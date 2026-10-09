@@ -34,6 +34,22 @@ See a full list of differences between HyperFormula, Microsoft Excel, and Google
 **Contents:**
 [[toc]]
 
+## LINEST
+
+Unlike Excel, HyperFormula requires a constant `stats` argument because the output dimensions are determined before evaluation. For example, `=LINEST(A1:A10,B1:B10,TRUE(),D1)` returns `#VALUE!`; use `TRUE()` or `FALSE()` directly for `stats`. See [LINEST limitations](known-limitations.md#linest-function) for supported constants and input-sizing requirements.
+
+Numerical results can differ for nearly dependent predictors and nearly perfect fits. Coefficient standard errors are sensitive to conditioning, and the F statistic is sensitive to residuals close to machine precision. For an effectively perfect multiple regression, Excel and HyperFormula can return different large finite F values even when the coefficients agree.
+
+Very large or very small input scales can also cause substantial differences in coefficients and statistics, including for a single predictor with a non-perfect fit. HyperFormula does not reproduce Excel's loss of predictors or zero standard errors observed at extreme scales. Rescaling inputs to more moderate units can reduce numerical errors in both engines.
+
+## TREND, GROWTH and LOGEST
+
+Like `LINEST`, these functions determine their result size before evaluation. `LOGEST` requires a constant `stats` argument, as `LINEST` does: `=LOGEST(A1:A10,B1:B10,TRUE(),D1)` returns `#VALUE!`. The numerical differences described for `LINEST` also apply to the statistics returned by `LOGEST`, which are those of the fit to the natural logarithm of `known_y`.
+
+An array passed as `const` (or as `stats` in `LOGEST`) is not evaluated element by element. Microsoft Excel returns one result for each element, for example for `=TREND(A1:A6,B1:B6,C1:C3,{TRUE(),FALSE()})`; HyperFormula uses the first element as `const`, and returns `#VALUE!` for an array `stats`.
+
+A single cell that holds an error, passed as `known_x` or `new_x`, returns that error before the other arguments are checked. Microsoft Excel returns `#VALUE!`. For example, `=TREND(A1:A6,B1:B6,C1)` where C1 contains `=1/0` returns `#DIV/0!` in HyperFormula. An error inside a range of several cells returns `#VALUE!`, as in Microsoft Excel.
+
 ## General functionalities
 
 | Functionality                                      | Examples                                                                  | HyperFormula                                                                                                                                                                                                                                                                                                                                                 | Google Sheets                                                                                                                  | Microsoft Excel                                                                                                                |
