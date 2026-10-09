@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added support for the new license key format. A proprietary key can now grant a subset of the library: a function your key does not include evaluates to a `#LIC!` error, and the matching parts of the API throw a `LicenseCapabilityMissingError`. `getAvailableFunctions()` and `getFunctionDetails()` describe only the functions your key includes. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
 - Added new functions: ACCRINTM, DISC, INTRATE, PRICEDISC, RECEIVED, YIELDDISC. [#1799](https://github.com/handsontable/hyperformula/pull/1799)
-- Added new functions: COUPDAYBS, COUPDAYS, COUPDAYSNC, COUPNCD, COUPNUM, COUPPCD.
+- Added new functions: COUPDAYBS, COUPDAYS, COUPDAYSNC, COUPNCD, COUPNUM, COUPPCD. [#1804](https://github.com/handsontable/hyperformula/pull/1804)
 
 ### Changed
 
