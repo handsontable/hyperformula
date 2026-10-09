@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Added new functions: ACCRINTM, DISC, INTRATE, PRICEDISC, RECEIVED, YIELDDISC. [#1799](https://github.com/handsontable/hyperformula/pull/1799)
-- Added new functions: COUPDAYBS, COUPDAYS, COUPDAYSNC, COUPNCD, COUPNUM, COUPPCD.
+- Added new functions: COUPDAYBS, COUPDAYS, COUPDAYSNC, COUPNCD, COUPNUM, COUPPCD. [#1804](https://github.com/handsontable/hyperformula/pull/1804)
 
 ## [3.5.0] - 2026-10-09
 
