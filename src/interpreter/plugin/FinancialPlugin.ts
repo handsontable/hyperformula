@@ -348,6 +348,33 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
       ],
     },
+    'COUPDAYBS': {
+      method: 'coupdaybs',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPDAYSNC': {
+      method: 'coupdaysnc',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPDAYS': {
+      method: 'coupdays',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
     'FVSCHEDULE': {
       method: 'fvschedule',
       parameters: [
@@ -921,6 +948,65 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  /**
+   * Corresponds to COUPDAYBS(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the number of days from the previous coupon date to the settlement date, counted by `basis`.
+   *
+   * @param ast
+   * @param state
+   */
+  public coupdaybs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPDAYBS',
+      (schedule: CouponSchedule) => this.daysBeforeSettlement(schedule)
+    )
+  }
+
+  /**
+   * Corresponds to COUPDAYSNC(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the number of days from the settlement date to the next coupon date. Basis 0 counts it as Excel does:
+   * the 30/360 length of the coupon period minus COUPDAYBS, so it is not always the direct 30/360 count.
+   *
+   * @param ast
+   * @param state
+   */
+  public coupdaysnc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPDAYSNC',
+      (schedule: CouponSchedule) => {
+        if (schedule.basis === 0) {
+          return this.thirtyDayPeriodLength(schedule) - this.daysBeforeSettlement(schedule)
+        }
+        const next = this.dateTimeHelper.dateToNumber(schedule.next)
+        return this.dateTimeHelper.dayCountByBasis(schedule.settlement, next, schedule.basis).dayCount
+      }
+    )
+  }
+
+  /**
+   * Corresponds to COUPDAYS(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the number of days in the coupon period that contains the settlement date: 360 / `frequency` for bases
+   * 0, 2 and 4, 365 / `frequency` for basis 3, and the actual length of the period, as Excel computes it, for basis 1.
+   *
+   * @param ast
+   * @param state
+   */
+  public coupdays(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPDAYS',
+      (schedule: CouponSchedule) => {
+        switch (schedule.basis) {
+          case 1:
+            return this.actualCouponPeriodLength(schedule)
+          case 3:
+            return 365 / schedule.frequency
+          default:
+            return 360 / schedule.frequency
+        }
+      }
+    )
+  }
+
   public fvschedule(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FVSCHEDULE'),
       (value: number, ratios: SimpleRangeValue) => {
@@ -1168,7 +1254,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   }
 
   /**
-   * Runs COUPPCD, COUPNCD and COUPNUM, which share the arguments
+   * Runs COUPPCD, COUPNCD, COUPNUM, COUPDAYBS, COUPDAYSNC and COUPDAYS, which share the arguments
    * (settlement, maturity, frequency, [basis]).
    *
    * Validates in Excel's order: settlement, maturity, settlement before maturity, then an empty settlement, maturity
@@ -1322,6 +1408,80 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
       return periods
     }
     return periods + 1
+  }
+
+  /**
+   * Returns the number of days from the previous coupon date to settlement, counted by the schedule's basis.
+   */
+  private daysBeforeSettlement(schedule: CouponSchedule): number {
+    const previous = this.dateTimeHelper.dateToNumber(schedule.previous)
+    return this.dateTimeHelper.dayCountByBasis(previous, schedule.settlement, schedule.basis).dayCount
+  }
+
+  /**
+   * Returns the 30/360 length of the coupon period, from the previous to the next coupon date, as Excel counts it for
+   * COUPDAYSNC with basis 0: day 31 and the last day of February count as day 30 at both ends. The two dates are
+   * exactly 12 / `frequency` months apart, so only their days change the length (for example 179 days from
+   * 28 February to 29 August).
+   */
+  private thirtyDayPeriodLength(schedule: CouponSchedule): number {
+    return 360 / schedule.frequency + this.thirtyDayMonthDay(schedule.next) - this.thirtyDayMonthDay(schedule.previous)
+  }
+
+  /**
+   * Returns the day of the month of `date` in a 30-day month: 30 for day 31 and for the last day of February,
+   * otherwise the day itself.
+   */
+  private thirtyDayMonthDay(date: SimpleDate): number {
+    const isFebruaryEnd = date.month === 2 && date.day === this.dateTimeHelper.daysInMonth(date.year, 2)
+    return date.day === 31 || isFebruaryEnd ? 30 : date.day
+  }
+
+  /**
+   * Returns the length in days of the coupon period that contains settlement, as Excel's COUPDAYS computes it for
+   * basis 1. It is not always the next coupon date minus the previous one.
+   *
+   * 1. Step back from maturity one period at a time, each date keeping the previous date's day clamped to its month
+   *    (so 31 March, 30 September, 30 March: the day can only go down). Stop at the last date whose next step back is
+   *    on or before settlement: the period end.
+   * 2. Step back once from the period end with the end-of-month rule of `couponDate`: the period start.
+   * 3. If the period start is still after settlement, it becomes the period end and step 2 repeats. This happens at
+   *    most once.
+   *
+   * The result is the period end minus the period start. Constant time: the period end is the drifted date
+   * `count - 1` periods back, or `count - 2` when that one is already on or before settlement.
+   */
+  private actualCouponPeriodLength(schedule: CouponSchedule): number {
+    const {settlement, maturity, frequency, count} = schedule
+    let periodEnd = this.driftedCouponDate(maturity, count - 1, frequency)
+    if (count >= 2 && this.dateTimeHelper.dateToNumber(periodEnd) <= settlement) {
+      periodEnd = this.driftedCouponDate(maturity, count - 2, frequency)
+    }
+    let periodStart = this.couponDate(periodEnd, -1, frequency)
+    if (this.dateTimeHelper.dateToNumber(periodStart) > settlement) {
+      periodEnd = periodStart
+      periodStart = this.couponDate(periodEnd, -1, frequency)
+    }
+    return this.dateTimeHelper.dateToNumber(periodEnd) - this.dateTimeHelper.dateToNumber(periodStart)
+  }
+
+  /**
+   * Returns `maturity` stepped back `periods` coupon periods, each step keeping the previous date's day clamped to the
+   * length of its month, so the day can drift down (31 March, 30 September, 30 March).
+   *
+   * Constant time: the drifted day is the smallest of maturity's day and the lengths of the months visited, and those
+   * months repeat every year, so after `2 * frequency` steps (two Februaries, at least one in a non-leap year) the
+   * day no longer changes.
+   */
+  private driftedCouponDate(maturity: SimpleDate, periods: number, frequency: number): SimpleDate {
+    const monthsPerPeriod = 12 / frequency
+    let day = maturity.day
+    for (let step = 1; step <= Math.min(periods, 2 * frequency); step++) {
+      const visited = offsetMonth(maturity, -step * monthsPerPeriod)
+      day = Math.min(day, this.dateTimeHelper.daysInMonth(visited.year, visited.month))
+    }
+    const target = offsetMonth(maturity, -periods * monthsPerPeriod)
+    return {...target, day: Math.min(day, this.dateTimeHelper.daysInMonth(target.year, target.month))}
   }
 }
 
