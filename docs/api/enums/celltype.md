@@ -6,7 +6,7 @@
 
 • **ARRAY**: = "ARRAY"
 
-*Defined in [src/Cell.ts:56](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L56)*
+*Defined in [src/Cell.ts:56](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L56)*
 
 ___
 
@@ -14,7 +14,7 @@ ___
 
 • **ARRAYFORMULA**: = "ARRAYFORMULA"
 
-*Defined in [src/Cell.ts:58](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L58)*
+*Defined in [src/Cell.ts:58](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L58)*
 
 ___
 
@@ -22,7 +22,7 @@ ___
 
 • **EMPTY**: = "EMPTY"
 
-*Defined in [src/Cell.ts:57](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L57)*
+*Defined in [src/Cell.ts:57](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L57)*
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **FORMULA**: = "FORMULA"
 
-*Defined in [src/Cell.ts:54](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L54)*
+*Defined in [src/Cell.ts:54](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L54)*
 
 ___
 
@@ -38,4 +38,4 @@ ___
 
 • **VALUE**: = "VALUE"
 
-*Defined in [src/Cell.ts:55](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L55)*
+*Defined in [src/Cell.ts:55](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L55)*

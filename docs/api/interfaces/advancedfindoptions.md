@@ -6,4 +6,4 @@
 
 • **returnOccurrence**? : *"first" | "last"*
 
-*Defined in [src/Lookup/SearchStrategy.ts:24](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L24)*
+*Defined in [src/Lookup/SearchStrategy.ts:24](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L24)*

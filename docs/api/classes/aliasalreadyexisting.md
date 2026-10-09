@@ -12,7 +12,7 @@ Error thrown when alias to a function is already defined.
 
 \+ **new AliasAlreadyExisting**(`name`: string, `pluginName`: string): *[AliasAlreadyExisting](aliasalreadyexisting.md)*
 
-*Defined in [src/errors.ts:390](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L390)*
+*Defined in [src/errors.ts:392](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L392)*
 
 **Parameters:**
 

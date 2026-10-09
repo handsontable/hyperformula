@@ -6,7 +6,7 @@
 
 \+ **new ColumnIndex**(`dependencyGraph`: DependencyGraph, `config`: [Config](config.md), `stats`: [Statistics](statistics.md)): *[ColumnIndex](columnindex.md)*
 
-*Defined in [src/Lookup/ColumnIndex.ts:43](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L43)*
+*Defined in [src/Lookup/ColumnIndex.ts:43](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L43)*
 
 **Parameters:**
 
@@ -24,7 +24,7 @@ Name | Type |
 
 ▸ **add**(`value`: RawInterpreterValue, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/Lookup/ColumnIndex.ts:54](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L54)*
+*Defined in [src/Lookup/ColumnIndex.ts:54](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L54)*
 
 **Parameters:**
 
@@ -41,7 +41,7 @@ ___
 
 ▸ **addColumns**(`columnsSpan`: [ColumnsSpan](columnsspan.md)): *void*
 
-*Defined in [src/Lookup/ColumnIndex.ts:165](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L165)*
+*Defined in [src/Lookup/ColumnIndex.ts:165](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L165)*
 
 **Parameters:**
 
@@ -57,7 +57,7 @@ ___
 
 ▸ **advancedFind**(`keyMatcher`: function, `range`: [SimpleRangeValue](simplerangevalue.md), `options`: [AdvancedFindOptions](../interfaces/advancedfindoptions.md)): *number*
 
-*Defined in [src/Lookup/ColumnIndex.ts:161](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L161)*
+*Defined in [src/Lookup/ColumnIndex.ts:161](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L161)*
 
 **Parameters:**
 
@@ -83,7 +83,7 @@ ___
 
 ▸ **applyChanges**(`contentChanges`: [CellValueChange](../interfaces/cellvaluechange.md)[]): *void*
 
-*Defined in [src/Lookup/ColumnIndex.ts:88](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L88)*
+*Defined in [src/Lookup/ColumnIndex.ts:88](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L88)*
 
 **Parameters:**
 
@@ -99,7 +99,7 @@ ___
 
 ▸ **change**(`oldValue`: RawInterpreterValue | undefined, `newValue`: RawInterpreterValue, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/Lookup/ColumnIndex.ts:80](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L80)*
+*Defined in [src/Lookup/ColumnIndex.ts:80](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L80)*
 
 **Parameters:**
 
@@ -117,7 +117,7 @@ ___
 
 ▸ **ensureRecentData**(`sheet`: number, `col`: number, `value`: RawInterpreterValue): *void*
 
-*Defined in [src/Lookup/ColumnIndex.ts:233](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L233)*
+*Defined in [src/Lookup/ColumnIndex.ts:233](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L233)*
 
 **Parameters:**
 
@@ -135,7 +135,7 @@ ___
 
 ▸ **find**(`searchKey`: RawNoErrorScalarValue, `rangeValue`: [SimpleRangeValue](simplerangevalue.md), `__namedParameters`: object): *number*
 
-*Defined in [src/Lookup/ColumnIndex.ts:110](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L110)*
+*Defined in [src/Lookup/ColumnIndex.ts:110](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L110)*
 
 **Parameters:**
 
@@ -148,7 +148,7 @@ ___
 Name | Type |
 ------ | ------ |
 `ifNoMatch` | "returnLowerBound" &#124; "returnUpperBound" &#124; "returnNotFound" |
-`ordering` | "asc" &#124; "desc" &#124; "none" |
+`ordering` | "none" &#124; "asc" &#124; "desc" |
 `returnOccurrence` | undefined &#124; "first" &#124; "last" |
 
 **Returns:** *number*
@@ -159,7 +159,7 @@ ___
 
 ▸ **forceApplyPostponedTransformations**(): *void*
 
-*Defined in [src/Lookup/ColumnIndex.ts:192](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L192)*
+*Defined in [src/Lookup/ColumnIndex.ts:192](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L192)*
 
 Forces all ValueIndex entries to apply any pending lazy transformations,
 bringing every entry up to the current LazilyTransformingAstService version.
@@ -173,7 +173,7 @@ ___
 
 ▸ **getColumnMap**(`sheet`: number, `col`: number): *[ColumnMap](../globals.md#columnmap)*
 
-*Defined in [src/Lookup/ColumnIndex.ts:205](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L205)*
+*Defined in [src/Lookup/ColumnIndex.ts:205](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L205)*
 
 **Parameters:**
 
@@ -190,7 +190,7 @@ ___
 
 ▸ **getValueIndex**(`sheet`: number, `col`: number, `value`: RawInterpreterValue): *[ValueIndex](../interfaces/valueindex.md)*
 
-*Defined in [src/Lookup/ColumnIndex.ts:220](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L220)*
+*Defined in [src/Lookup/ColumnIndex.ts:220](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L220)*
 
 **Parameters:**
 
@@ -208,7 +208,7 @@ ___
 
 ▸ **moveValues**(`sourceRange`: IterableIterator‹[RawScalarValue, [SimpleCellAddress](../interfaces/simplecelladdress.md)]›, `toRight`: number, `toBottom`: number, `toSheet`: number): *void*
 
-*Defined in [src/Lookup/ColumnIndex.ts:96](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L96)*
+*Defined in [src/Lookup/ColumnIndex.ts:96](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L96)*
 
 **Parameters:**
 
@@ -227,7 +227,7 @@ ___
 
 ▸ **remove**(`value`: RawInterpreterValue | undefined, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/Lookup/ColumnIndex.ts:66](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L66)*
+*Defined in [src/Lookup/ColumnIndex.ts:66](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L66)*
 
 **Parameters:**
 
@@ -244,7 +244,7 @@ ___
 
 ▸ **removeColumns**(`columnsSpan`: [ColumnsSpan](columnsspan.md)): *void*
 
-*Defined in [src/Lookup/ColumnIndex.ts:174](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L174)*
+*Defined in [src/Lookup/ColumnIndex.ts:174](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L174)*
 
 **Parameters:**
 
@@ -260,7 +260,7 @@ ___
 
 ▸ **removeSheet**(`sheetId`: number): *void*
 
-*Defined in [src/Lookup/ColumnIndex.ts:183](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L183)*
+*Defined in [src/Lookup/ColumnIndex.ts:183](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L183)*
 
 **Parameters:**
 
@@ -276,7 +276,7 @@ ___
 
 ▸ **removeValues**(`range`: IterableIterator‹[RawScalarValue, [SimpleCellAddress](../interfaces/simplecelladdress.md)]›): *void*
 
-*Defined in [src/Lookup/ColumnIndex.ts:104](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L104)*
+*Defined in [src/Lookup/ColumnIndex.ts:104](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L104)*
 
 **Parameters:**
 

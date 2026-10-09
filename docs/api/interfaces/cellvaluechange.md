@@ -6,7 +6,7 @@
 
 • **address**: *[SimpleCellAddress](simplecelladdress.md)*
 
-*Defined in [src/ContentChanges.ts:11](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ContentChanges.ts#L11)*
+*Defined in [src/ContentChanges.ts:11](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ContentChanges.ts#L11)*
 
 ___
 
@@ -14,7 +14,7 @@ ___
 
 • **oldValue**? : *InterpreterValue*
 
-*Defined in [src/ContentChanges.ts:13](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ContentChanges.ts#L13)*
+*Defined in [src/ContentChanges.ts:13](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ContentChanges.ts#L13)*
 
 ___
 
@@ -22,4 +22,4 @@ ___
 
 • **value**: *InterpreterValue*
 
-*Defined in [src/ContentChanges.ts:12](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ContentChanges.ts#L12)*
+*Defined in [src/ContentChanges.ts:12](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ContentChanges.ts#L12)*

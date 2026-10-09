@@ -8,7 +8,7 @@ Achieve nearly full compatibility wih Google Sheets, using the right HyperFormul
 
 While HyperFormula conforms to the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard, it also follows industry practices set by other spreadsheets such as Microsoft Excel or Google Sheets.
 
-That said, there are cases when HyperFormula can't be compatible with all three at the same time, because of inconsistencies (between the OpenDocument standard, Microsoft Excel and Google Sheets), limitations of HyperFormula at its current development stage (version `3.4.0`), or limitations of Microsoft Excel or Google Sheets themselves. For the full list of such differences, see [this](list-of-differences.md) page.
+That said, there are cases when HyperFormula can't be compatible with all three at the same time, because of inconsistencies (between the OpenDocument standard, Microsoft Excel and Google Sheets), limitations of HyperFormula at its current development stage (version `3.5.0`), or limitations of Microsoft Excel or Google Sheets themselves. For the full list of such differences, see [this](list-of-differences.md) page.
 
 Still, with the right configuration, you can achieve nearly full compatibility.
 
@@ -92,11 +92,12 @@ Google Sheets' `TEXT` function supports a wide range of date, time, and currency
 
 ## Full configuration
 
-This configuration aligns HyperFormula with the default behavior of Google Sheets (set to locale `en-US`), as closely as possible at this development stage (version `3.4.0`).
+This configuration aligns HyperFormula with the default behavior of Google Sheets (set to locale `en-US`), as closely as possible at this development stage (version `3.5.0`).
 
 ```js
 // define options
 const options = {
+  licenseKey: 'gpl-v3',
   dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
   timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
   currencySymbol: ['$', 'USD'],

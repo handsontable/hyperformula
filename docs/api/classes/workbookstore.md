@@ -6,7 +6,7 @@
 
 ▸ **add**(`namedExpression`: [InternalNamedExpression](internalnamedexpression.md)): *void*
 
-*Defined in [src/NamedExpressions.ts:55](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L55)*
+*Defined in [src/NamedExpressions.ts:55](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L55)*
 
 **Parameters:**
 
@@ -22,7 +22,7 @@ ___
 
 ▸ **get**(`expressionName`: string): *[Maybe](../globals.md#maybe)‹[InternalNamedExpression](internalnamedexpression.md)›*
 
-*Defined in [src/NamedExpressions.ts:59](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L59)*
+*Defined in [src/NamedExpressions.ts:59](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L59)*
 
 **Parameters:**
 
@@ -38,7 +38,7 @@ ___
 
 ▸ **getAllNamedExpressions**(): *[InternalNamedExpression](internalnamedexpression.md)[]*
 
-*Defined in [src/NamedExpressions.ts:80](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L80)*
+*Defined in [src/NamedExpressions.ts:80](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L80)*
 
 **Returns:** *[InternalNamedExpression](internalnamedexpression.md)[]*
 
@@ -48,7 +48,7 @@ ___
 
 ▸ **getExisting**(`expressionName`: string): *[Maybe](../globals.md#maybe)‹[InternalNamedExpression](internalnamedexpression.md)›*
 
-*Defined in [src/NamedExpressions.ts:63](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L63)*
+*Defined in [src/NamedExpressions.ts:63](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L63)*
 
 **Parameters:**
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **has**(`expressionName`: string): *boolean*
 
-*Defined in [src/NamedExpressions.ts:45](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L45)*
+*Defined in [src/NamedExpressions.ts:45](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L45)*
 
 **Parameters:**
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **isNameAvailable**(`expressionName`: string): *boolean*
 
-*Defined in [src/NamedExpressions.ts:49](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L49)*
+*Defined in [src/NamedExpressions.ts:49](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L49)*
 
 **Parameters:**
 
@@ -96,7 +96,7 @@ ___
 
 ▸ **remove**(`expressionName`: string): *void*
 
-*Defined in [src/NamedExpressions.ts:72](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L72)*
+*Defined in [src/NamedExpressions.ts:72](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L72)*
 
 **Parameters:**
 

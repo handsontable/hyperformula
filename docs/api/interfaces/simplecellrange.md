@@ -6,7 +6,7 @@
 
 • **end**: *[SimpleCellAddress](simplecelladdress.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:26](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L26)*
+*Defined in [src/AbsoluteCellRange.ts:26](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L26)*
 
 ___
 
@@ -14,4 +14,4 @@ ___
 
 • **start**: *[SimpleCellAddress](simplecelladdress.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:25](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L25)*
+*Defined in [src/AbsoluteCellRange.ts:25](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L25)*

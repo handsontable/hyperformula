@@ -8,7 +8,7 @@ Error thrown when the sheet of a given name already exists.
 
 \+ **new SheetNameAlreadyTakenError**(`sheetName`: string): *[SheetNameAlreadyTakenError](sheetnamealreadytakenerror.md)*
 
-*Defined in [src/errors.ts:29](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L29)*
+*Defined in [src/errors.ts:31](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L31)*
 
 **Parameters:**
 

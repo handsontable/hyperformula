@@ -6,7 +6,7 @@
 
 ▸ **addAll**(`other`: [ContentChanges](contentchanges.md)): *[ContentChanges](contentchanges.md)*
 
-*Defined in [src/ContentChanges.ts:29](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ContentChanges.ts#L29)*
+*Defined in [src/ContentChanges.ts:29](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ContentChanges.ts#L29)*
 
 **Parameters:**
 
@@ -22,7 +22,7 @@ ___
 
 ▸ **addChange**(`newValue`: InterpreterValue, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `oldValue?`: InterpreterValue): *void*
 
-*Defined in [src/ContentChanges.ts:36](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ContentChanges.ts#L36)*
+*Defined in [src/ContentChanges.ts:36](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ContentChanges.ts#L36)*
 
 **Parameters:**
 
@@ -40,7 +40,7 @@ ___
 
 ▸ **exportChanges**‹**T**›(`exporter`: [ChangeExporter](../interfaces/changeexporter.md)‹T›): *T[]*
 
-*Defined in [src/ContentChanges.ts:40](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ContentChanges.ts#L40)*
+*Defined in [src/ContentChanges.ts:40](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ContentChanges.ts#L40)*
 
 **Type parameters:**
 
@@ -60,7 +60,7 @@ ___
 
 ▸ **getChanges**(): *[ChangeList](../globals.md#changelist)*
 
-*Defined in [src/ContentChanges.ts:53](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ContentChanges.ts#L53)*
+*Defined in [src/ContentChanges.ts:53](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ContentChanges.ts#L53)*
 
 **Returns:** *[ChangeList](../globals.md#changelist)*
 
@@ -70,7 +70,7 @@ ___
 
 ▸ **isEmpty**(): *boolean*
 
-*Defined in [src/ContentChanges.ts:57](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ContentChanges.ts#L57)*
+*Defined in [src/ContentChanges.ts:57](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ContentChanges.ts#L57)*
 
 **Returns:** *boolean*
 
@@ -80,6 +80,6 @@ ___
 
 ▸ **empty**(): *[ContentChanges](contentchanges.md)‹›*
 
-*Defined in [src/ContentChanges.ts:25](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ContentChanges.ts#L25)*
+*Defined in [src/ContentChanges.ts:25](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ContentChanges.ts#L25)*
 
 **Returns:** *[ContentChanges](contentchanges.md)‹›*

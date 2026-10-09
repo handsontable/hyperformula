@@ -38,7 +38,7 @@ ___
 
 ▸ **cannotRegisterFunctionWithId**(`functionId`: string): *[ProtectedFunctionError](protectedfunctionerror.md)*
 
-*Defined in [src/errors.ts:334](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L334)*
+*Defined in [src/errors.ts:336](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L336)*
 
 **Parameters:**
 
@@ -54,7 +54,7 @@ ___
 
 ▸ **cannotUnregisterFunctionWithId**(`functionId`: string): *[ProtectedFunctionError](protectedfunctionerror.md)*
 
-*Defined in [src/errors.ts:338](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L338)*
+*Defined in [src/errors.ts:340](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L340)*
 
 **Parameters:**
 
@@ -70,6 +70,6 @@ ___
 
 ▸ **cannotUnregisterProtectedPlugin**(): *[ProtectedFunctionError](protectedfunctionerror.md)*
 
-*Defined in [src/errors.ts:342](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L342)*
+*Defined in [src/errors.ts:344](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L344)*
 
 **Returns:** *[ProtectedFunctionError](protectedfunctionerror.md)*

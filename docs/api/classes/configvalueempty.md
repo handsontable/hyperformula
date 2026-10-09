@@ -18,7 +18,7 @@ The following methods accept [ConfigParams](../interfaces/configparams.md) as a 
 
 \+ **new ConfigValueEmpty**(`paramName`: string): *[ConfigValueEmpty](configvalueempty.md)*
 
-*Defined in [src/errors.ts:193](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L193)*
+*Defined in [src/errors.ts:195](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L195)*
 
 **Parameters:**
 

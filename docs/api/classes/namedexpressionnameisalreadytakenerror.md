@@ -8,7 +8,7 @@ Error thrown when the given named expression already exists in the workbook and 
 
 \+ **new NamedExpressionNameIsAlreadyTakenError**(`expressionName`: string): *[NamedExpressionNameIsAlreadyTakenError](namedexpressionnameisalreadytakenerror.md)*
 
-*Defined in [src/errors.ts:83](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L83)*
+*Defined in [src/errors.ts:85](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L85)*
 
 **Parameters:**
 

@@ -6,7 +6,7 @@
 
 • **size**: *[ArraySize](../classes/arraysize.md)*
 
-*Defined in [src/ArrayValue.ts:12](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L12)*
+*Defined in [src/ArrayValue.ts:12](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L12)*
 
 ## Methods
 
@@ -14,7 +14,7 @@
 
 ▸ **get**(`col`: number, `row`: number): *InternalScalarValue*
 
-*Defined in [src/ArrayValue.ts:18](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L18)*
+*Defined in [src/ArrayValue.ts:18](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L18)*
 
 **Parameters:**
 
@@ -31,7 +31,7 @@ ___
 
 ▸ **height**(): *number*
 
-*Defined in [src/ArrayValue.ts:16](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L16)*
+*Defined in [src/ArrayValue.ts:16](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L16)*
 
 **Returns:** *number*
 
@@ -41,7 +41,7 @@ ___
 
 ▸ **simpleRangeValue**(): *[SimpleRangeValue](../classes/simplerangevalue.md) | [CellError](../classes/cellerror.md)*
 
-*Defined in [src/ArrayValue.ts:20](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L20)*
+*Defined in [src/ArrayValue.ts:20](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L20)*
 
 **Returns:** *[SimpleRangeValue](../classes/simplerangevalue.md) | [CellError](../classes/cellerror.md)*
 
@@ -51,6 +51,6 @@ ___
 
 ▸ **width**(): *number*
 
-*Defined in [src/ArrayValue.ts:14](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L14)*
+*Defined in [src/ArrayValue.ts:14](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L14)*
 
 **Returns:** *number*

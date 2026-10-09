@@ -6,7 +6,7 @@
 
 • **exportChange**: *function*
 
-*Defined in [src/ContentChanges.ts:17](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ContentChanges.ts#L17)*
+*Defined in [src/ContentChanges.ts:17](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ContentChanges.ts#L17)*
 
 #### Type declaration:
 

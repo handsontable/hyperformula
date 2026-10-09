@@ -6,7 +6,7 @@
 
 • **licenseKey**: *string*
 
-*Defined in [src/ConfigParams.ts:182](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L182)*
+*Defined in [src/ConfigParams.ts:182](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L182)*
 
 Sets your HyperFormula license key.
 
@@ -26,7 +26,7 @@ ___
 
 • **chooseAddressMappingPolicy**: *ChooseAddressMapping*
 
-*Defined in [src/ConfigParams.ts:55](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L55)*
+*Defined in [src/ConfigParams.ts:55](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L55)*
 
 Sets the address mapping policy to be used.
 
@@ -45,7 +45,7 @@ ___
 
 • **context**: *unknown*
 
-*Defined in [src/ConfigParams.ts:63](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L63)*
+*Defined in [src/ConfigParams.ts:63](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L63)*
 
 A generic parameter that can be used to pass data to custom functions.
 
@@ -59,7 +59,7 @@ ___
 
 • **evaluateNullToZero**: *boolean*
 
-*Defined in [src/ConfigParams.ts:125](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L125)*
+*Defined in [src/ConfigParams.ts:125](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L125)*
 
 When set to `true`, formulas evaluating to `null` evaluate to `0` instead.
 
@@ -71,7 +71,7 @@ ___
 
 • **maxColumns**: *number*
 
-*Defined in [src/ConfigParams.ts:228](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L228)*
+*Defined in [src/ConfigParams.ts:228](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L228)*
 
 Sets the maximum number of columns.
 
@@ -83,7 +83,7 @@ ___
 
 • **maxPendingLazyTransformations**: *number*
 
-*Defined in [src/ConfigParams.ts:435](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L435)*
+*Defined in [src/ConfigParams.ts:435](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L435)*
 
 Controls memory usage for long-running instances by limiting the number of
 pending lazy transformations before cleanup occurs.
@@ -103,7 +103,7 @@ ___
 
 • **maxRows**: *number*
 
-*Defined in [src/ConfigParams.ts:222](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L222)*
+*Defined in [src/ConfigParams.ts:222](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L222)*
 
 Sets the maximum number of rows.
 
@@ -115,7 +115,7 @@ ___
 
 • **useArrayArithmetic**: *boolean*
 
-*Defined in [src/ConfigParams.ts:392](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L392)*
+*Defined in [src/ConfigParams.ts:392](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L392)*
 
 When set to `true`, array arithmetic is enabled globally.
 
@@ -131,7 +131,7 @@ ___
 
 • **useColumnIndex**: *boolean*
 
-*Defined in [src/ConfigParams.ts:404](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L404)*
+*Defined in [src/ConfigParams.ts:404](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L404)*
 
 When set to `true`, switches column search strategy from binary search to column index.
 
@@ -149,7 +149,7 @@ ___
 
 • **useStats**: *boolean*
 
-*Defined in [src/ConfigParams.ts:412](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L412)*
+*Defined in [src/ConfigParams.ts:412](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L412)*
 
 When set to `true`, enables gathering engine statistics and timings.
 
@@ -165,7 +165,7 @@ ___
 
 • **arrayColumnSeparator**: *"," | ";"*
 
-*Defined in [src/ConfigParams.ts:208](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L208)*
+*Defined in [src/ConfigParams.ts:208](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L208)*
 
 Sets a column separator symbol for array notation.
 
@@ -179,7 +179,7 @@ ___
 
 • **arrayRowSeparator**: *";" | "|"*
 
-*Defined in [src/ConfigParams.ts:216](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L216)*
+*Defined in [src/ConfigParams.ts:216](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L216)*
 
 Sets a row separator symbol for array notation.
 
@@ -193,7 +193,7 @@ ___
 
 • **functionArgSeparator**: *string*
 
-*Defined in [src/ConfigParams.ts:105](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L105)*
+*Defined in [src/ConfigParams.ts:105](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L105)*
 
 Sets a separator character that separates procedure arguments in formulas.
 
@@ -209,7 +209,7 @@ ___
 
 • **functionPlugins**: *any[]*
 
-*Defined in [src/ConfigParams.ts:134](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L134)*
+*Defined in [src/ConfigParams.ts:134](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L134)*
 
 Lists additional function plugins to be used by the formula interpreter.
 
@@ -223,7 +223,7 @@ ___
 
 • **ignoreWhiteSpace**: *"standard" | "any"*
 
-*Defined in [src/ConfigParams.ts:160](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L160)*
+*Defined in [src/ConfigParams.ts:160](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L160)*
 
 Controls the set of whitespace characters that are allowed inside a formula.
 
@@ -239,7 +239,7 @@ ___
 
 • **language**: *string*
 
-*Defined in [src/ConfigParams.ts:150](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L150)*
+*Defined in [src/ConfigParams.ts:150](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L150)*
 
 Sets a translation package for function and error names.
 
@@ -255,7 +255,7 @@ ___
 
 • **undoLimit**: *number*
 
-*Defined in [src/ConfigParams.ts:420](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L420)*
+*Defined in [src/ConfigParams.ts:420](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L420)*
 
 Sets the number of elements kept in the undo history.
 
@@ -271,7 +271,7 @@ ___
 
 • **dateFormats**: *string[]*
 
-*Defined in [src/ConfigParams.ts:95](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L95)*
+*Defined in [src/ConfigParams.ts:95](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L95)*
 
 Sets the date formats accepted by the date-parsing function.
 
@@ -301,7 +301,7 @@ ___
 
 • **leapYear1900**: *boolean*
 
-*Defined in [src/ConfigParams.ts:170](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L170)*
+*Defined in [src/ConfigParams.ts:170](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L170)*
 
 Sets year 1900 as a leap year.
 
@@ -317,7 +317,7 @@ ___
 
 • **nullDate**: *[SimpleDate](simpledate.md)*
 
-*Defined in [src/ConfigParams.ts:238](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L238)*
+*Defined in [src/ConfigParams.ts:238](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L238)*
 
 Internally, each date is represented as a number of days that passed since `nullDate`.
 
@@ -333,7 +333,7 @@ ___
 
 • **nullYear**: *number*
 
-*Defined in [src/ConfigParams.ts:252](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L252)*
+*Defined in [src/ConfigParams.ts:252](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L252)*
 
 Sets the interpretation of two-digit year values.
 
@@ -353,7 +353,7 @@ ___
 
 • **parseDateTime**: *function*
 
-*Defined in [src/ConfigParams.ts:262](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L262)*
+*Defined in [src/ConfigParams.ts:262](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L262)*
 
 Sets a function that parses strings representing date-time into actual date-time values.
 
@@ -381,7 +381,7 @@ ___
 
 • **stringifyDateTime**: *function*
 
-*Defined in [src/ConfigParams.ts:302](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L302)*
+*Defined in [src/ConfigParams.ts:302](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L302)*
 
 Sets a function that converts date-time values into strings.
 
@@ -408,7 +408,7 @@ ___
 
 • **stringifyDuration**: *function*
 
-*Defined in [src/ConfigParams.ts:312](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L312)*
+*Defined in [src/ConfigParams.ts:312](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L312)*
 
 Sets a function that converts time duration values into strings.
 
@@ -435,7 +435,7 @@ ___
 
 • **timeFormats**: *string[]*
 
-*Defined in [src/ConfigParams.ts:382](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L382)*
+*Defined in [src/ConfigParams.ts:382](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L382)*
 
 Sets the time formats accepted by the time-parsing function.
 
@@ -475,7 +475,7 @@ ___
 
 • **currencySymbol**: *string[]*
 
-*Defined in [src/ConfigParams.ts:71](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L71)*
+*Defined in [src/ConfigParams.ts:71](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L71)*
 
 Sets symbols that denote currency numbers.
 
@@ -489,7 +489,7 @@ ___
 
 • **decimalSeparator**: *"." | ","*
 
-*Defined in [src/ConfigParams.ts:119](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L119)*
+*Defined in [src/ConfigParams.ts:119](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L119)*
 
 Sets a decimal separator used for parsing numerical literals.
 
@@ -509,7 +509,7 @@ ___
 
 • **precisionEpsilon**: *number*
 
-*Defined in [src/ConfigParams.ts:277](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L277)*
+*Defined in [src/ConfigParams.ts:277](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L277)*
 
 Sets how far two numerical values need to be from each other to be treated as non-equal.
 
@@ -530,7 +530,7 @@ ___
 
 • **precisionRounding**: *number*
 
-*Defined in [src/ConfigParams.ts:292](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L292)*
+*Defined in [src/ConfigParams.ts:292](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L292)*
 
 Sets the precision level of calculations' output.
 
@@ -551,7 +551,7 @@ ___
 
 • **smartRounding**: *boolean*
 
-*Defined in [src/ConfigParams.ts:336](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L336)*
+*Defined in [src/ConfigParams.ts:336](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L336)*
 
 When set to `false`, no rounding happens, and numbers are equal if and only if they are of truly identical value.
 
@@ -565,7 +565,7 @@ ___
 
 • **stringifyCurrency**: *function*
 
-*Defined in [src/ConfigParams.ts:328](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L328)*
+*Defined in [src/ConfigParams.ts:328](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L328)*
 
 Sets a function that converts numeric values into currency-formatted strings.
 
@@ -596,7 +596,7 @@ ___
 
 • **thousandSeparator**: *"" | "," | " " | "."*
 
-*Defined in [src/ConfigParams.ts:351](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L351)*
+*Defined in [src/ConfigParams.ts:351](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L351)*
 
 Sets the thousands' separator symbol for parsing numerical literals.
 
@@ -619,7 +619,7 @@ ___
 
 • **accentSensitive**: *boolean*
 
-*Defined in [src/ConfigParams.ts:20](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L20)*
+*Defined in [src/ConfigParams.ts:20](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L20)*
 
 When set to `true`, makes string comparison accent-sensitive.
 
@@ -635,7 +635,7 @@ ___
 
 • **caseFirst**: *"upper" | "lower" | "false"*
 
-*Defined in [src/ConfigParams.ts:42](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L42)*
+*Defined in [src/ConfigParams.ts:42](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L42)*
 
 When set to `upper`, upper case sorts first.
 
@@ -653,7 +653,7 @@ ___
 
 • **caseSensitive**: *boolean*
 
-*Defined in [src/ConfigParams.ts:30](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L30)*
+*Defined in [src/ConfigParams.ts:30](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L30)*
 
 When set to `true`, makes string comparison case-sensitive.
 
@@ -669,7 +669,7 @@ ___
 
 • **ignorePunctuation**: *boolean*
 
-*Defined in [src/ConfigParams.ts:142](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L142)*
+*Defined in [src/ConfigParams.ts:142](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L142)*
 
 When set to `true`, string comparison ignores punctuation.
 
@@ -683,7 +683,7 @@ ___
 
 • **localeLang**: *string*
 
-*Defined in [src/ConfigParams.ts:192](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L192)*
+*Defined in [src/ConfigParams.ts:192](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L192)*
 
 Sets the locale for language-sensitive string comparison.
 
@@ -699,7 +699,7 @@ ___
 
 • **matchWholeCell**: *boolean*
 
-*Defined in [src/ConfigParams.ts:200](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L200)*
+*Defined in [src/ConfigParams.ts:200](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L200)*
 
 When set to `true`, function criteria require whole cells to match the pattern.
 
@@ -713,7 +713,7 @@ ___
 
 • **useRegularExpressions**: *boolean*
 
-*Defined in [src/ConfigParams.ts:441](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L441)*
+*Defined in [src/ConfigParams.ts:441](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L441)*
 
 When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) are allowed to use regular expressions.
 
@@ -725,7 +725,7 @@ ___
 
 • **useWildcards**: *boolean*
 
-*Defined in [src/ConfigParams.ts:447](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ConfigParams.ts#L447)*
+*Defined in [src/ConfigParams.ts:447](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ConfigParams.ts#L447)*
 
 When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) can use the `*` and `?` wildcards.
 

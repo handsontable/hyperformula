@@ -6,7 +6,7 @@
 
 \+ **new Serialization**(`dependencyGraph`: DependencyGraph, `unparser`: Unparser, `exporter`: [Exporter](exporter.md)): *[Serialization](serialization.md)*
 
-*Defined in [src/Serialization.ts:23](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L23)*
+*Defined in [src/Serialization.ts:23](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L23)*
 
 **Parameters:**
 
@@ -24,7 +24,7 @@ Name | Type |
 
 ▸ **genericAllSheetsGetter**‹**T**›(`sheetGetter`: function): *Record‹string, T›*
 
-*Defined in [src/Serialization.ts:115](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L115)*
+*Defined in [src/Serialization.ts:115](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L115)*
 
 **Type parameters:**
 
@@ -50,7 +50,7 @@ ___
 
 ▸ **genericSheetGetter**‹**T**›(`sheet`: number, `getter`: function): *T[][]*
 
-*Defined in [src/Serialization.ts:84](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L84)*
+*Defined in [src/Serialization.ts:84](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L84)*
 
 **Type parameters:**
 
@@ -78,7 +78,7 @@ ___
 
 ▸ **getAllNamedExpressionsSerialized**(): *[SerializedNamedExpression](../interfaces/serializednamedexpression.md)[]*
 
-*Defined in [src/Serialization.ts:140](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L140)*
+*Defined in [src/Serialization.ts:140](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L140)*
 
 **Returns:** *[SerializedNamedExpression](../interfaces/serializednamedexpression.md)[]*
 
@@ -88,7 +88,7 @@ ___
 
 ▸ **getAllSheetsFormulas**(): *Record‹string, [Maybe](../globals.md#maybe)‹string›[][]›*
 
-*Defined in [src/Serialization.ts:132](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L132)*
+*Defined in [src/Serialization.ts:132](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L132)*
 
 **Returns:** *Record‹string, [Maybe](../globals.md#maybe)‹string›[][]›*
 
@@ -98,7 +98,7 @@ ___
 
 ▸ **getAllSheetsSerialized**(): *Record‹string, [RawCellContent](../globals.md#rawcellcontent)[][]›*
 
-*Defined in [src/Serialization.ts:136](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L136)*
+*Defined in [src/Serialization.ts:136](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L136)*
 
 **Returns:** *Record‹string, [RawCellContent](../globals.md#rawcellcontent)[][]›*
 
@@ -108,7 +108,7 @@ ___
 
 ▸ **getAllSheetsValues**(): *Record‹string, [CellValue](../globals.md#cellvalue)[][]›*
 
-*Defined in [src/Serialization.ts:128](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L128)*
+*Defined in [src/Serialization.ts:128](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L128)*
 
 **Returns:** *Record‹string, [CellValue](../globals.md#cellvalue)[][]›*
 
@@ -118,7 +118,7 @@ ___
 
 ▸ **getCellFormula**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `targetAddress?`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[Maybe](../globals.md#maybe)‹string›*
 
-*Defined in [src/Serialization.ts:42](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L42)*
+*Defined in [src/Serialization.ts:42](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L42)*
 
 **Parameters:**
 
@@ -135,7 +135,7 @@ ___
 
 ▸ **getCellHyperlink**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[Maybe](../globals.md#maybe)‹string›*
 
-*Defined in [src/Serialization.ts:31](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L31)*
+*Defined in [src/Serialization.ts:31](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L31)*
 
 **Parameters:**
 
@@ -151,7 +151,7 @@ ___
 
 ▸ **getCellSerialized**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `targetAddress?`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[RawCellContent](../globals.md#rawcellcontent)*
 
-*Defined in [src/Serialization.ts:64](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L64)*
+*Defined in [src/Serialization.ts:64](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L64)*
 
 **Parameters:**
 
@@ -168,7 +168,7 @@ ___
 
 ▸ **getCellValue**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[CellValue](../globals.md#cellvalue)*
 
-*Defined in [src/Serialization.ts:68](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L68)*
+*Defined in [src/Serialization.ts:68](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L68)*
 
 **Parameters:**
 
@@ -184,7 +184,7 @@ ___
 
 ▸ **getRawValue**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[RawCellContent](../globals.md#rawcellcontent)*
 
-*Defined in [src/Serialization.ts:72](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L72)*
+*Defined in [src/Serialization.ts:72](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L72)*
 
 **Parameters:**
 
@@ -200,7 +200,7 @@ ___
 
 ▸ **getSheetFormulas**(`sheet`: number): *[Maybe](../globals.md#maybe)‹string›[][]*
 
-*Defined in [src/Serialization.ts:80](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L80)*
+*Defined in [src/Serialization.ts:80](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L80)*
 
 **Parameters:**
 
@@ -216,7 +216,7 @@ ___
 
 ▸ **getSheetSerialized**(`sheet`: number): *[RawCellContent](../globals.md#rawcellcontent)[][]*
 
-*Defined in [src/Serialization.ts:124](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L124)*
+*Defined in [src/Serialization.ts:124](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L124)*
 
 **Parameters:**
 
@@ -232,7 +232,7 @@ ___
 
 ▸ **getSheetValues**(`sheet`: number): *[CellValue](../globals.md#cellvalue)[][]*
 
-*Defined in [src/Serialization.ts:76](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L76)*
+*Defined in [src/Serialization.ts:76](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L76)*
 
 **Parameters:**
 
@@ -248,7 +248,7 @@ ___
 
 ▸ **withNewConfig**(`newConfig`: [Config](config.md), `namedExpressions`: [NamedExpressions](namedexpressions.md)): *[Serialization](serialization.md)*
 
-*Defined in [src/Serialization.ts:158](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L158)*
+*Defined in [src/Serialization.ts:158](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L158)*
 
 **Parameters:**
 

@@ -37,7 +37,7 @@ their oldData keys remain. Three mechanisms prevent this:
 
 \+ **new UndoRedo**(`config`: [Config](config.md), `operations`: [Operations](operations.md)): *[UndoRedo](undoredo.md)*
 
-*Defined in [src/UndoRedo.ts:505](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L505)*
+*Defined in [src/UndoRedo.ts:505](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L505)*
 
 **Parameters:**
 
@@ -54,7 +54,7 @@ Name | Type |
 
 • **oldData**: *Map‹number, [[SimpleCellAddress](../interfaces/simplecelladdress.md), string][]›* = new Map()
 
-*Defined in [src/UndoRedo.ts:501](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L501)*
+*Defined in [src/UndoRedo.ts:501](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L501)*
 
 ## Methods
 
@@ -62,7 +62,7 @@ Name | Type |
 
 ▸ **beginBatchMode**(): *void*
 
-*Defined in [src/UndoRedo.ts:522](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L522)*
+*Defined in [src/UndoRedo.ts:522](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L522)*
 
 **Returns:** *void*
 
@@ -72,7 +72,7 @@ ___
 
 ▸ **cleanupOrphanedOldData**(): *void*
 
-*Defined in [src/UndoRedo.ts:880](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L880)*
+*Defined in [src/UndoRedo.ts:880](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L880)*
 
 Removes oldData entries whose version keys are not referenced by any
 entry on the undo stack, redo stack, or in-progress batch. Called after
@@ -87,7 +87,7 @@ ___
 
 ▸ **clearRedoStack**(): *void*
 
-*Defined in [src/UndoRedo.ts:550](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L550)*
+*Defined in [src/UndoRedo.ts:550](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L550)*
 
 Clears the redo stack and removes oldData entries no longer referenced by any remaining entry.
 
@@ -99,7 +99,7 @@ ___
 
 ▸ **clearUndoStack**(): *void*
 
-*Defined in [src/UndoRedo.ts:556](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L556)*
+*Defined in [src/UndoRedo.ts:556](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L556)*
 
 Clears the undo stack and removes oldData entries no longer referenced by any remaining entry.
 
@@ -111,7 +111,7 @@ ___
 
 ▸ **commitBatchMode**(): *void*
 
-*Defined in [src/UndoRedo.ts:526](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L526)*
+*Defined in [src/UndoRedo.ts:526](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L526)*
 
 **Returns:** *void*
 
@@ -121,7 +121,7 @@ ___
 
 ▸ **isRedoStackEmpty**(): *boolean*
 
-*Defined in [src/UndoRedo.ts:565](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L565)*
+*Defined in [src/UndoRedo.ts:565](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L565)*
 
 **Returns:** *boolean*
 
@@ -131,7 +131,7 @@ ___
 
 ▸ **isUndoStackEmpty**(): *boolean*
 
-*Defined in [src/UndoRedo.ts:561](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L561)*
+*Defined in [src/UndoRedo.ts:561](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L561)*
 
 **Returns:** *boolean*
 
@@ -141,7 +141,7 @@ ___
 
 ▸ **redo**(): *void*
 
-*Defined in [src/UndoRedo.ts:756](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L756)*
+*Defined in [src/UndoRedo.ts:756](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L756)*
 
 **Returns:** *void*
 
@@ -151,7 +151,7 @@ ___
 
 ▸ **redoAddColumns**(`operation`: [AddColumnsUndoEntry](addcolumnsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:808](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L808)*
+*Defined in [src/UndoRedo.ts:808](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L808)*
 
 **Parameters:**
 
@@ -167,7 +167,7 @@ ___
 
 ▸ **redoAddNamedExpression**(`operation`: [AddNamedExpressionUndoEntry](addnamedexpressionundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:841](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L841)*
+*Defined in [src/UndoRedo.ts:841](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L841)*
 
 **Parameters:**
 
@@ -183,7 +183,7 @@ ___
 
 ▸ **redoAddRows**(`operation`: [AddRowsUndoEntry](addrowsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:804](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L804)*
+*Defined in [src/UndoRedo.ts:804](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L804)*
 
 **Parameters:**
 
@@ -199,7 +199,7 @@ ___
 
 ▸ **redoAddSheet**(`operation`: [AddSheetUndoEntry](addsheetundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:816](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L816)*
+*Defined in [src/UndoRedo.ts:816](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L816)*
 
 **Parameters:**
 
@@ -215,7 +215,7 @@ ___
 
 ▸ **redoBatch**(`batchOperation`: [BatchUndoEntry](batchundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:768](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L768)*
+*Defined in [src/UndoRedo.ts:768](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L768)*
 
 **Parameters:**
 
@@ -231,7 +231,7 @@ ___
 
 ▸ **redoChangeNamedExpression**(`operation`: [ChangeNamedExpressionUndoEntry](changenamedexpressionundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:849](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L849)*
+*Defined in [src/UndoRedo.ts:849](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L849)*
 
 **Parameters:**
 
@@ -247,7 +247,7 @@ ___
 
 ▸ **redoClearSheet**(`operation`: [ClearSheetUndoEntry](clearsheetundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:832](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L832)*
+*Defined in [src/UndoRedo.ts:832](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L832)*
 
 **Parameters:**
 
@@ -263,7 +263,7 @@ ___
 
 ▸ **redoMoveCells**(`operation`: [MoveCellsUndoEntry](movecellsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:778](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L778)*
+*Defined in [src/UndoRedo.ts:778](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L778)*
 
 **Parameters:**
 
@@ -279,7 +279,7 @@ ___
 
 ▸ **redoMoveColumns**(`operation`: [MoveColumnsUndoEntry](movecolumnsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:828](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L828)*
+*Defined in [src/UndoRedo.ts:828](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L828)*
 
 **Parameters:**
 
@@ -295,7 +295,7 @@ ___
 
 ▸ **redoMoveRows**(`operation`: [MoveRowsUndoEntry](moverowsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:824](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L824)*
+*Defined in [src/UndoRedo.ts:824](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L824)*
 
 **Parameters:**
 
@@ -311,7 +311,7 @@ ___
 
 ▸ **redoPaste**(`operation`: [PasteUndoEntry](pasteundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:786](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L786)*
+*Defined in [src/UndoRedo.ts:786](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L786)*
 
 **Parameters:**
 
@@ -327,7 +327,7 @@ ___
 
 ▸ **redoRemoveColumns**(`operation`: [RemoveColumnsUndoEntry](removecolumnsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:782](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L782)*
+*Defined in [src/UndoRedo.ts:782](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L782)*
 
 **Parameters:**
 
@@ -343,7 +343,7 @@ ___
 
 ▸ **redoRemoveNamedExpression**(`operation`: [RemoveNamedExpressionUndoEntry](removenamedexpressionundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:845](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L845)*
+*Defined in [src/UndoRedo.ts:845](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L845)*
 
 **Parameters:**
 
@@ -359,7 +359,7 @@ ___
 
 ▸ **redoRemoveRows**(`operation`: [RemoveRowsUndoEntry](removerowsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:774](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L774)*
+*Defined in [src/UndoRedo.ts:774](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L774)*
 
 **Parameters:**
 
@@ -375,7 +375,7 @@ ___
 
 ▸ **redoRemoveSheet**(`operation`: [RemoveSheetUndoEntry](removesheetundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:812](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L812)*
+*Defined in [src/UndoRedo.ts:812](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L812)*
 
 **Parameters:**
 
@@ -391,7 +391,7 @@ ___
 
 ▸ **redoRenameSheet**(`operation`: [RenameSheetUndoEntry](renamesheetundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:820](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L820)*
+*Defined in [src/UndoRedo.ts:820](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L820)*
 
 **Parameters:**
 
@@ -407,7 +407,7 @@ ___
 
 ▸ **redoSetCellContents**(`operation`: [SetCellContentsUndoEntry](setcellcontentsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:798](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L798)*
+*Defined in [src/UndoRedo.ts:798](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L798)*
 
 **Parameters:**
 
@@ -423,7 +423,7 @@ ___
 
 ▸ **redoSetColumnOrder**(`operation`: [SetColumnOrderUndoEntry](setcolumnorderundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:857](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L857)*
+*Defined in [src/UndoRedo.ts:857](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L857)*
 
 **Parameters:**
 
@@ -439,7 +439,7 @@ ___
 
 ▸ **redoSetRowOrder**(`operation`: [SetRowOrderUndoEntry](setroworderundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:853](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L853)*
+*Defined in [src/UndoRedo.ts:853](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L853)*
 
 **Parameters:**
 
@@ -455,7 +455,7 @@ ___
 
 ▸ **redoSetSheetContent**(`operation`: [SetSheetContentUndoEntry](setsheetcontentundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:836](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L836)*
+*Defined in [src/UndoRedo.ts:836](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L836)*
 
 **Parameters:**
 
@@ -471,7 +471,7 @@ ___
 
 ▸ **saveOperation**(`operation`: [UndoEntry](../interfaces/undoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:514](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L514)*
+*Defined in [src/UndoRedo.ts:514](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L514)*
 
 **Parameters:**
 
@@ -487,7 +487,7 @@ ___
 
 ▸ **storeDataForVersion**(`version`: number, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `astHash`: string): *void*
 
-*Defined in [src/UndoRedo.ts:538](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L538)*
+*Defined in [src/UndoRedo.ts:538](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L538)*
 
 Stores a formula AST hash snapshot for the given LazilyTransformingAstService version.
 Skipped when `undoLimit` is 0 (undo disabled) to avoid storing data that would never be used.
@@ -508,7 +508,7 @@ ___
 
 ▸ **undo**(): *void*
 
-*Defined in [src/UndoRedo.ts:569](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L569)*
+*Defined in [src/UndoRedo.ts:569](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L569)*
 
 **Returns:** *void*
 
@@ -518,7 +518,7 @@ ___
 
 ▸ **undoAddColumns**(`operation`: [AddColumnsUndoEntry](addcolumnsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:626](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L626)*
+*Defined in [src/UndoRedo.ts:626](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L626)*
 
 **Parameters:**
 
@@ -534,7 +534,7 @@ ___
 
 ▸ **undoAddNamedExpression**(`operation`: [AddNamedExpressionUndoEntry](addnamedexpressionundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:736](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L736)*
+*Defined in [src/UndoRedo.ts:736](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L736)*
 
 **Parameters:**
 
@@ -550,7 +550,7 @@ ___
 
 ▸ **undoAddRows**(`operation`: [AddRowsUndoEntry](addrowsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:618](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L618)*
+*Defined in [src/UndoRedo.ts:618](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L618)*
 
 **Parameters:**
 
@@ -566,7 +566,7 @@ ___
 
 ▸ **undoAddSheet**(`operation`: [AddSheetUndoEntry](addsheetundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:678](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L678)*
+*Defined in [src/UndoRedo.ts:678](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L678)*
 
 **Parameters:**
 
@@ -582,7 +582,7 @@ ___
 
 ▸ **undoBatch**(`batchOperation`: [BatchUndoEntry](batchundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:580](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L580)*
+*Defined in [src/UndoRedo.ts:580](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L580)*
 
 **Parameters:**
 
@@ -598,7 +598,7 @@ ___
 
 ▸ **undoChangeNamedExpression**(`operation`: [ChangeNamedExpressionUndoEntry](changenamedexpressionundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:744](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L744)*
+*Defined in [src/UndoRedo.ts:744](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L744)*
 
 **Parameters:**
 
@@ -614,7 +614,7 @@ ___
 
 ▸ **undoClearSheet**(`operation`: [ClearSheetUndoEntry](clearsheetundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:711](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L711)*
+*Defined in [src/UndoRedo.ts:711](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L711)*
 
 **Parameters:**
 
@@ -630,7 +630,7 @@ ___
 
 ▸ **undoMoveCells**(`operation`: [MoveCellsUndoEntry](movecellsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:666](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L666)*
+*Defined in [src/UndoRedo.ts:666](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L666)*
 
 **Parameters:**
 
@@ -646,7 +646,7 @@ ___
 
 ▸ **undoMoveColumns**(`operation`: [MoveColumnsUndoEntry](movecolumnsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:659](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L659)*
+*Defined in [src/UndoRedo.ts:659](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L659)*
 
 **Parameters:**
 
@@ -662,7 +662,7 @@ ___
 
 ▸ **undoMoveRows**(`operation`: [MoveRowsUndoEntry](moverowsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:652](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L652)*
+*Defined in [src/UndoRedo.ts:652](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L652)*
 
 **Parameters:**
 
@@ -678,7 +678,7 @@ ___
 
 ▸ **undoPaste**(`operation`: [PasteUndoEntry](pasteundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:645](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L645)*
+*Defined in [src/UndoRedo.ts:645](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L645)*
 
 **Parameters:**
 
@@ -694,7 +694,7 @@ ___
 
 ▸ **undoRemoveColumns**(`operation`: [RemoveColumnsUndoEntry](removecolumnsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:602](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L602)*
+*Defined in [src/UndoRedo.ts:602](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L602)*
 
 **Parameters:**
 
@@ -710,7 +710,7 @@ ___
 
 ▸ **undoRemoveNamedExpression**(`operation`: [RemoveNamedExpressionUndoEntry](removenamedexpressionundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:740](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L740)*
+*Defined in [src/UndoRedo.ts:740](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L740)*
 
 **Parameters:**
 
@@ -726,7 +726,7 @@ ___
 
 ▸ **undoRemoveRows**(`operation`: [RemoveRowsUndoEntry](removerowsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:586](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L586)*
+*Defined in [src/UndoRedo.ts:586](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L586)*
 
 **Parameters:**
 
@@ -742,7 +742,7 @@ ___
 
 ▸ **undoRemoveSheet**(`operation`: [RemoveSheetUndoEntry](removesheetundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:683](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L683)*
+*Defined in [src/UndoRedo.ts:683](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L683)*
 
 **Parameters:**
 
@@ -758,7 +758,7 @@ ___
 
 ▸ **undoRenameSheet**(`operation`: [RenameSheetUndoEntry](renamesheetundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:701](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L701)*
+*Defined in [src/UndoRedo.ts:701](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L701)*
 
 **Parameters:**
 
@@ -774,7 +774,7 @@ ___
 
 ▸ **undoSetCellContents**(`operation`: [SetCellContentsUndoEntry](setcellcontentsundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:634](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L634)*
+*Defined in [src/UndoRedo.ts:634](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L634)*
 
 **Parameters:**
 
@@ -790,7 +790,7 @@ ___
 
 ▸ **undoSetColumnOrder**(`operation`: [SetColumnOrderUndoEntry](setcolumnorderundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:752](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L752)*
+*Defined in [src/UndoRedo.ts:752](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L752)*
 
 **Parameters:**
 
@@ -806,7 +806,7 @@ ___
 
 ▸ **undoSetRowOrder**(`operation`: [SetRowOrderUndoEntry](setroworderundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:748](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L748)*
+*Defined in [src/UndoRedo.ts:748](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L748)*
 
 **Parameters:**
 
@@ -822,7 +822,7 @@ ___
 
 ▸ **undoSetSheetContent**(`operation`: [SetSheetContentUndoEntry](setsheetcontentundoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:723](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L723)*
+*Defined in [src/UndoRedo.ts:723](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L723)*
 
 **Parameters:**
 

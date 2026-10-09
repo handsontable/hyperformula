@@ -6,7 +6,7 @@
 
 • **tokens**: *[FormatToken](formattoken.md)[]*
 
-*Defined in [src/format/parser.ts:36](https://github.com/handsontable/hyperformula/blob/af2d59d/src/format/parser.ts#L36)*
+*Defined in [src/format/parser.ts:36](https://github.com/handsontable/hyperformula/blob/99a45ea/src/format/parser.ts#L36)*
 
 ___
 
@@ -14,4 +14,4 @@ ___
 
 • **type**: *[FormatExpressionType](../enums/formatexpressiontype.md)*
 
-*Defined in [src/format/parser.ts:35](https://github.com/handsontable/hyperformula/blob/af2d59d/src/format/parser.ts#L35)*
+*Defined in [src/format/parser.ts:35](https://github.com/handsontable/hyperformula/blob/99a45ea/src/format/parser.ts#L35)*

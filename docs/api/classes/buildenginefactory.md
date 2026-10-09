@@ -6,7 +6,7 @@
 
 ▸ **buildEmpty**(`configInput`: Partial‹[ConfigParams](../interfaces/configparams.md)›, `namedExpressions`: [SerializedNamedExpression](../interfaces/serializednamedexpression.md)[]): *[EngineState](../globals.md#enginestate)*
 
-*Defined in [src/BuildEngineFactory.ts:62](https://github.com/handsontable/hyperformula/blob/af2d59d/src/BuildEngineFactory.ts#L62)*
+*Defined in [src/BuildEngineFactory.ts:66](https://github.com/handsontable/hyperformula/blob/99a45ea/src/BuildEngineFactory.ts#L66)*
 
 **Parameters:**
 
@@ -23,7 +23,7 @@ ___
 
 ▸ **buildFromSheet**(`sheet`: [Sheet](../globals.md#sheet), `configInput`: Partial‹[ConfigParams](../interfaces/configparams.md)›, `namedExpressions`: [SerializedNamedExpression](../interfaces/serializednamedexpression.md)[]): *[EngineState](../globals.md#enginestate)*
 
-*Defined in [src/BuildEngineFactory.ts:56](https://github.com/handsontable/hyperformula/blob/af2d59d/src/BuildEngineFactory.ts#L56)*
+*Defined in [src/BuildEngineFactory.ts:59](https://github.com/handsontable/hyperformula/blob/99a45ea/src/BuildEngineFactory.ts#L59)*
 
 **Parameters:**
 
@@ -41,7 +41,7 @@ ___
 
 ▸ **buildFromSheets**(`sheets`: [Sheets](../globals.md#sheets), `configInput`: Partial‹[ConfigParams](../interfaces/configparams.md)›, `namedExpressions`: [SerializedNamedExpression](../interfaces/serializednamedexpression.md)[]): *[EngineState](../globals.md#enginestate)*
 
-*Defined in [src/BuildEngineFactory.ts:51](https://github.com/handsontable/hyperformula/blob/af2d59d/src/BuildEngineFactory.ts#L51)*
+*Defined in [src/BuildEngineFactory.ts:53](https://github.com/handsontable/hyperformula/blob/99a45ea/src/BuildEngineFactory.ts#L53)*
 
 **Parameters:**
 
@@ -59,7 +59,7 @@ ___
 
 ▸ **rebuildWithConfig**(`config`: [Config](config.md), `sheets`: [Sheets](../globals.md#sheets), `namedExpressions`: [SerializedNamedExpression](../interfaces/serializednamedexpression.md)[], `stats`: [Statistics](statistics.md)): *[EngineState](../globals.md#enginestate)*
 
-*Defined in [src/BuildEngineFactory.ts:66](https://github.com/handsontable/hyperformula/blob/af2d59d/src/BuildEngineFactory.ts#L66)*
+*Defined in [src/BuildEngineFactory.ts:72](https://github.com/handsontable/hyperformula/blob/99a45ea/src/BuildEngineFactory.ts#L72)*
 
 **Parameters:**
 

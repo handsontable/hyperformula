@@ -6,7 +6,7 @@
 
 \+ **new String**(`value`: string): *[String](cellcontent.string.md)*
 
-*Defined in [src/CellContentParser.ts:34](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellContentParser.ts#L34)*
+*Defined in [src/CellContentParser.ts:34](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellContentParser.ts#L34)*
 
 **Parameters:**
 
@@ -22,4 +22,4 @@ Name | Type |
 
 • **value**: *string*
 
-*Defined in [src/CellContentParser.ts:35](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellContentParser.ts#L35)*
+*Defined in [src/CellContentParser.ts:35](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellContentParser.ts#L35)*

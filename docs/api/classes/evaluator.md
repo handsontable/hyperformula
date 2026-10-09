@@ -6,7 +6,7 @@
 
 \+ **new Evaluator**(`config`: [Config](config.md), `stats`: [Statistics](statistics.md), `interpreter`: Interpreter, `lazilyTransformingAstService`: [LazilyTransformingAstService](lazilytransformingastservice.md), `dependencyGraph`: DependencyGraph, `columnSearch`: [ColumnSearchStrategy](../interfaces/columnsearchstrategy.md)): *[Evaluator](evaluator.md)*
 
-*Defined in [src/Evaluator.ts:22](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Evaluator.ts#L22)*
+*Defined in [src/Evaluator.ts:22](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Evaluator.ts#L22)*
 
 **Parameters:**
 
@@ -27,7 +27,7 @@ Name | Type |
 
 • **interpreter**: *Interpreter*
 
-*Defined in [src/Evaluator.ts:27](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Evaluator.ts#L27)*
+*Defined in [src/Evaluator.ts:27](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Evaluator.ts#L27)*
 
 ## Methods
 
@@ -35,7 +35,7 @@ Name | Type |
 
 ▸ **partialRun**(`vertices`: Vertex[]): *[ContentChanges](contentchanges.md)*
 
-*Defined in [src/Evaluator.ts:44](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Evaluator.ts#L44)*
+*Defined in [src/Evaluator.ts:44](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Evaluator.ts#L44)*
 
 **Parameters:**
 
@@ -51,7 +51,7 @@ ___
 
 ▸ **run**(): *void*
 
-*Defined in [src/Evaluator.ts:34](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Evaluator.ts#L34)*
+*Defined in [src/Evaluator.ts:34](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Evaluator.ts#L34)*
 
 **Returns:** *void*
 
@@ -61,7 +61,7 @@ ___
 
 ▸ **runAndForget**(`ast`: Ast, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `dependencies`: RelativeDependency[]): *InterpreterValue*
 
-*Defined in [src/Evaluator.ts:56](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Evaluator.ts#L56)*
+*Defined in [src/Evaluator.ts:56](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Evaluator.ts#L56)*
 
 **Parameters:**
 

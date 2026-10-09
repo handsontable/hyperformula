@@ -8,7 +8,7 @@ A class that represents a range of data.
 
 \+ **new SimpleRangeValue**(`_data?`: InternalScalarValue[][], `range?`: [AbsoluteCellRange](absolutecellrange.md), `dependencyGraph?`: DependencyGraph, `_hasOnlyNumbers?`: undefined | false | true): *[SimpleRangeValue](simplerangevalue.md)*
 
-*Defined in [src/SimpleRangeValue.ts:21](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L21)*
+*Defined in [src/SimpleRangeValue.ts:21](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L21)*
 
 In most cases, it's more convenient to create a `SimpleRangeValue` object
 by calling one of the [static factory methods](#fromrange).
@@ -30,7 +30,7 @@ Name | Type |
 
 • **range**? : *[AbsoluteCellRange](absolutecellrange.md)*
 
-*Defined in [src/SimpleRangeValue.ts:33](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L33)*
+*Defined in [src/SimpleRangeValue.ts:33](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L33)*
 
 A property that represents the address of the range.
 
@@ -40,7 +40,7 @@ ___
 
 • **size**: *[ArraySize](arraysize.md)*
 
-*Defined in [src/SimpleRangeValue.ts:21](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L21)*
+*Defined in [src/SimpleRangeValue.ts:21](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L21)*
 
 A property that represents the size of the range.
 
@@ -50,7 +50,7 @@ A property that represents the size of the range.
 
 • **get data**(): *InternalScalarValue[][]*
 
-*Defined in [src/SimpleRangeValue.ts:45](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L45)*
+*Defined in [src/SimpleRangeValue.ts:45](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L45)*
 
 Returns the range data as a 2D array.
 
@@ -62,7 +62,7 @@ Returns the range data as a 2D array.
 
 ▸ **effectiveAddressesFromData**(`leftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *IterableIterator‹[SimpleCellAddress](../interfaces/simplecelladdress.md)›*
 
-*Defined in [src/SimpleRangeValue.ts:125](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L125)*
+*Defined in [src/SimpleRangeValue.ts:125](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L125)*
 
 Generates the addresses of the cells contained in the range assuming the provided address is the left corner of the range.
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **entriesFromTopLeftCorner**(`leftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *IterableIterator‹[InternalScalarValue, [SimpleCellAddress](../interfaces/simplecelladdress.md)]›*
 
-*Defined in [src/SimpleRangeValue.ts:139](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L139)*
+*Defined in [src/SimpleRangeValue.ts:139](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L139)*
 
 Generates values and addresses of the cells contained in the range assuming the provided address is the left corner of the range.
 
@@ -100,7 +100,7 @@ ___
 
 ▸ **hasOnlyNumbers**(): *boolean*
 
-*Defined in [src/SimpleRangeValue.ts:165](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L165)*
+*Defined in [src/SimpleRangeValue.ts:165](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L165)*
 
 Returns `true` if and only if the range contains only numeric values.
 
@@ -112,7 +112,7 @@ ___
 
 ▸ **height**(): *number*
 
-*Defined in [src/SimpleRangeValue.ts:102](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L102)*
+*Defined in [src/SimpleRangeValue.ts:102](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L102)*
 
 Returns the number of rows contained in the range.
 
@@ -124,7 +124,7 @@ ___
 
 ▸ **isAdHoc**(): *boolean*
 
-*Defined in [src/SimpleRangeValue.ts:88](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L88)*
+*Defined in [src/SimpleRangeValue.ts:88](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L88)*
 
 Returns `true` if and only if the `SimpleRangeValue` has no address set.
 
@@ -136,7 +136,7 @@ ___
 
 ▸ **iterateValuesFromTopLeftCorner**(): *IterableIterator‹InternalScalarValue›*
 
-*Defined in [src/SimpleRangeValue.ts:151](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L151)*
+*Defined in [src/SimpleRangeValue.ts:151](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L151)*
 
 Generates the values of the cells contained in the range assuming the provided address is the left corner of the range.
 
@@ -148,7 +148,7 @@ ___
 
 ▸ **numberOfElements**(): *number*
 
-*Defined in [src/SimpleRangeValue.ts:158](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L158)*
+*Defined in [src/SimpleRangeValue.ts:158](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L158)*
 
 Returns the number of cells contained in the range.
 
@@ -160,7 +160,7 @@ ___
 
 ▸ **rawData**(): *InternalScalarValue[][]*
 
-*Defined in [src/SimpleRangeValue.ts:196](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L196)*
+*Defined in [src/SimpleRangeValue.ts:196](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L196)*
 
 Returns the range data as a 2D array.
 
@@ -174,7 +174,7 @@ ___
 
 ▸ **rawNumbers**(): *number[][]*
 
-*Defined in [src/SimpleRangeValue.ts:186](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L186)*
+*Defined in [src/SimpleRangeValue.ts:186](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L186)*
 
 Returns the range data as a 2D array of numbers.
 
@@ -188,7 +188,7 @@ ___
 
 ▸ **sameDimensionsAs**(`other`: [SimpleRangeValue](simplerangevalue.md)): *boolean*
 
-*Defined in [src/SimpleRangeValue.ts:204](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L204)*
+*Defined in [src/SimpleRangeValue.ts:204](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L204)*
 
 Returns `true` if and only if the range has the same width and height as the `other` range object.
 
@@ -206,7 +206,7 @@ ___
 
 ▸ **valuesFromTopLeftCorner**(): *InternalScalarValue[]*
 
-*Defined in [src/SimpleRangeValue.ts:109](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L109)*
+*Defined in [src/SimpleRangeValue.ts:109](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L109)*
 
 Returns the range data as a 1D array.
 
@@ -218,7 +218,7 @@ ___
 
 ▸ **width**(): *number*
 
-*Defined in [src/SimpleRangeValue.ts:95](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L95)*
+*Defined in [src/SimpleRangeValue.ts:95](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L95)*
 
 Returns the number of columns contained in the range.
 
@@ -230,7 +230,7 @@ ___
 
 ▸ **fromRange**(`data`: InternalScalarValue[][], `range`: [AbsoluteCellRange](absolutecellrange.md), `dependencyGraph`: DependencyGraph): *[SimpleRangeValue](simplerangevalue.md)*
 
-*Defined in [src/SimpleRangeValue.ts:53](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L53)*
+*Defined in [src/SimpleRangeValue.ts:53](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L53)*
 
 A factory method. Returns a `SimpleRangeValue` object with the provided range address and the provided data.
 
@@ -250,7 +250,7 @@ ___
 
 ▸ **fromScalar**(`scalar`: InternalScalarValue): *[SimpleRangeValue](simplerangevalue.md)*
 
-*Defined in [src/SimpleRangeValue.ts:81](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L81)*
+*Defined in [src/SimpleRangeValue.ts:81](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L81)*
 
 A factory method. Returns a `SimpleRangeValue` object that contains a single value.
 
@@ -268,7 +268,7 @@ ___
 
 ▸ **onlyNumbers**(`data`: number[][]): *[SimpleRangeValue](simplerangevalue.md)*
 
-*Defined in [src/SimpleRangeValue.ts:60](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L60)*
+*Defined in [src/SimpleRangeValue.ts:60](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L60)*
 
 A factory method. Returns a `SimpleRangeValue` object with the provided numeric data.
 
@@ -286,7 +286,7 @@ ___
 
 ▸ **onlyRange**(`range`: [AbsoluteCellRange](absolutecellrange.md), `dependencyGraph`: DependencyGraph): *[SimpleRangeValue](simplerangevalue.md)*
 
-*Defined in [src/SimpleRangeValue.ts:74](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L74)*
+*Defined in [src/SimpleRangeValue.ts:74](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L74)*
 
 A factory method. Returns a `SimpleRangeValue` object with the provided range address.
 
@@ -305,7 +305,7 @@ ___
 
 ▸ **onlyValues**(`data`: InternalScalarValue[][]): *[SimpleRangeValue](simplerangevalue.md)*
 
-*Defined in [src/SimpleRangeValue.ts:67](https://github.com/handsontable/hyperformula/blob/af2d59d/src/SimpleRangeValue.ts#L67)*
+*Defined in [src/SimpleRangeValue.ts:67](https://github.com/handsontable/hyperformula/blob/99a45ea/src/SimpleRangeValue.ts#L67)*
 
 A factory method. Returns a `SimpleRangeValue` object with the provided data.
 

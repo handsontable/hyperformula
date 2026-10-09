@@ -8,7 +8,7 @@ This is a class for detailed error messages across HyperFormula.
 
 ▪ **ArrayDimensions**: *string* = "Array dimensions are not compatible."
 
-*Defined in [src/error-message.ts:14](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L14)*
+*Defined in [src/error-message.ts:14](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L14)*
 
 ___
 
@@ -16,7 +16,7 @@ ___
 
 ▪ **BadCriterion**: *string* = "Incorrect criterion."
 
-*Defined in [src/error-message.ts:18](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L18)*
+*Defined in [src/error-message.ts:19](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L19)*
 
 ___
 
@@ -24,7 +24,7 @@ ___
 
 ▪ **BadMode**: *string* = "Mode not recognized."
 
-*Defined in [src/error-message.ts:26](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L26)*
+*Defined in [src/error-message.ts:27](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L27)*
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 ▪ **BadRef**: *string* = "Address is not correct."
 
-*Defined in [src/error-message.ts:39](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L39)*
+*Defined in [src/error-message.ts:40](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L40)*
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 ▪ **BitshiftLong**: *string* = "Result of bitshift is too long."
 
-*Defined in [src/error-message.ts:58](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L58)*
+*Defined in [src/error-message.ts:60](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L60)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 ▪ **CellRangeExpected**: *string* = "Cell range expected."
 
-*Defined in [src/error-message.ts:20](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L20)*
+*Defined in [src/error-message.ts:21](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L21)*
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 ▪ **CellRefExpected**: *string* = "Cell reference expected."
 
-*Defined in [src/error-message.ts:37](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L37)*
+*Defined in [src/error-message.ts:38](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L38)*
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 ▪ **CharacterCodeBounds**: *string* = "Character code out of bounds."
 
-*Defined in [src/error-message.ts:67](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L67)*
+*Defined in [src/error-message.ts:69](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L69)*
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 ▪ **ComplexNumberExpected**: *string* = "Complex number expected."
 
-*Defined in [src/error-message.ts:73](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L73)*
+*Defined in [src/error-message.ts:75](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L75)*
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 ▪ **DateBounds**: *string* = "Date outside of bounds."
 
-*Defined in [src/error-message.ts:27](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L27)*
+*Defined in [src/error-message.ts:28](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L28)*
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 ▪ **DistinctSigns**: *string* = "Distinct signs."
 
-*Defined in [src/error-message.ts:10](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L10)*
+*Defined in [src/error-message.ts:10](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L10)*
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 ▪ **EmptyArg**: *string* = "Empty function argument."
 
-*Defined in [src/error-message.ts:12](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L12)*
+*Defined in [src/error-message.ts:12](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L12)*
 
 ___
 
@@ -104,7 +104,7 @@ ___
 
 ▪ **EmptyArray**: *string* = "Empty array not allowed."
 
-*Defined in [src/error-message.ts:13](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L13)*
+*Defined in [src/error-message.ts:13](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L13)*
 
 ___
 
@@ -112,7 +112,7 @@ ___
 
 ▪ **EmptyRange**: *string* = "Empty range not allowed."
 
-*Defined in [src/error-message.ts:38](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L38)*
+*Defined in [src/error-message.ts:39](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L39)*
 
 ___
 
@@ -120,7 +120,7 @@ ___
 
 ▪ **EmptyString**: *string* = "Empty-string argument not allowed."
 
-*Defined in [src/error-message.ts:59](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L59)*
+*Defined in [src/error-message.ts:61](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L61)*
 
 ___
 
@@ -128,7 +128,7 @@ ___
 
 ▪ **EndStartPeriod**: *string* = "End period needs to be at least start period."
 
-*Defined in [src/error-message.ts:36](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L36)*
+*Defined in [src/error-message.ts:37](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L37)*
 
 ___
 
@@ -136,7 +136,15 @@ ___
 
 ▪ **EqualLength**: *string* = "Ranges need to be of equal length."
 
-*Defined in [src/error-message.ts:31](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L31)*
+*Defined in [src/error-message.ts:32](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L32)*
+
+___
+
+### EqualXValues
+
+▪ **EqualXValues**: *string* = "All x values are equal."
+
+*Defined in [src/error-message.ts:51](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L51)*
 
 ___
 
@@ -144,7 +152,7 @@ ___
 
 ▪ **Formula**: *string* = "Expected formula."
 
-*Defined in [src/error-message.ts:52](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L52)*
+*Defined in [src/error-message.ts:54](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L54)*
 
 ___
 
@@ -152,7 +160,7 @@ ___
 
 ▪ **IncorrectDateTime**: *string* = "String does not represent correct DateTime."
 
-*Defined in [src/error-message.ts:66](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L66)*
+*Defined in [src/error-message.ts:68](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L68)*
 
 ___
 
@@ -160,7 +168,7 @@ ___
 
 ▪ **IndexBounds**: *string* = "Index out of bounds."
 
-*Defined in [src/error-message.ts:50](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L50)*
+*Defined in [src/error-message.ts:52](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L52)*
 
 ___
 
@@ -168,7 +176,7 @@ ___
 
 ▪ **IndexLarge**: *string* = "Index too large."
 
-*Defined in [src/error-message.ts:51](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L51)*
+*Defined in [src/error-message.ts:53](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L53)*
 
 ___
 
@@ -176,7 +184,7 @@ ___
 
 ▪ **IntegerExpected**: *string* = "Value needs to be an integer."
 
-*Defined in [src/error-message.ts:25](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L25)*
+*Defined in [src/error-message.ts:26](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L26)*
 
 ___
 
@@ -184,7 +192,7 @@ ___
 
 ▪ **InvalidDate**: *string* = "Invalid date."
 
-*Defined in [src/error-message.ts:57](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L57)*
+*Defined in [src/error-message.ts:59](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L59)*
 
 ___
 
@@ -192,7 +200,7 @@ ___
 
 ▪ **InvalidRoman**: *string* = "Invalid roman numeral."
 
-*Defined in [src/error-message.ts:71](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L71)*
+*Defined in [src/error-message.ts:73](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L73)*
 
 ___
 
@@ -200,7 +208,7 @@ ___
 
 ▪ **LengthBounds**: *string* = "Length out of bounds."
 
-*Defined in [src/error-message.ts:60](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L60)*
+*Defined in [src/error-message.ts:62](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L62)*
 
 ___
 
@@ -208,7 +216,7 @@ ___
 
 ▪ **LessThanOne**: *string* = "Argument cannot be less than 1."
 
-*Defined in [src/error-message.ts:69](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L69)*
+*Defined in [src/error-message.ts:71](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L71)*
 
 ___
 
@@ -216,7 +224,7 @@ ___
 
 ▪ **NaN**: *string* = "NaN or infinite value encountered."
 
-*Defined in [src/error-message.ts:30](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L30)*
+*Defined in [src/error-message.ts:31](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L31)*
 
 ___
 
@@ -224,7 +232,7 @@ ___
 
 ▪ **Negative**: *string* = "Value cannot be negative."
 
-*Defined in [src/error-message.ts:32](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L32)*
+*Defined in [src/error-message.ts:33](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L33)*
 
 ___
 
@@ -232,7 +240,7 @@ ___
 
 ▪ **NegativeCount**: *string* = "Count cannot be negative."
 
-*Defined in [src/error-message.ts:53](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L53)*
+*Defined in [src/error-message.ts:55](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L55)*
 
 ___
 
@@ -240,7 +248,7 @@ ___
 
 ▪ **NegativeLength**: *string* = "Length cannot be negative."
 
-*Defined in [src/error-message.ts:45](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L45)*
+*Defined in [src/error-message.ts:46](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L46)*
 
 ___
 
@@ -248,7 +256,7 @@ ___
 
 ▪ **NegativeTime**: *string* = "Time cannot be negative."
 
-*Defined in [src/error-message.ts:61](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L61)*
+*Defined in [src/error-message.ts:63](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L63)*
 
 ___
 
@@ -256,7 +264,7 @@ ___
 
 ▪ **NoConditionMet**: *string* = "None of the conditions were met."
 
-*Defined in [src/error-message.ts:63](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L63)*
+*Defined in [src/error-message.ts:65](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L65)*
 
 ___
 
@@ -264,7 +272,7 @@ ___
 
 ▪ **NoDefault**: *string* = "No default option."
 
-*Defined in [src/error-message.ts:62](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L62)*
+*Defined in [src/error-message.ts:64](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L64)*
 
 ___
 
@@ -272,7 +280,7 @@ ___
 
 ▪ **NoSpaceForArrayResult**: *string* = "No space for array result."
 
-*Defined in [src/error-message.ts:15](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L15)*
+*Defined in [src/error-message.ts:16](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L16)*
 
 ___
 
@@ -280,7 +288,7 @@ ___
 
 ▪ **NonZero**: *string* = "Argument cannot be 0."
 
-*Defined in [src/error-message.ts:68](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L68)*
+*Defined in [src/error-message.ts:70](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L70)*
 
 ___
 
@@ -288,7 +296,7 @@ ___
 
 ▪ **NotBinary**: *string* = "String does not represent a binary number."
 
-*Defined in [src/error-message.ts:33](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L33)*
+*Defined in [src/error-message.ts:34](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L34)*
 
 ___
 
@@ -296,7 +304,7 @@ ___
 
 ▪ **NotHex**: *string* = "String does not represent a hexadecimal number."
 
-*Defined in [src/error-message.ts:35](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L35)*
+*Defined in [src/error-message.ts:36](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L36)*
 
 ___
 
@@ -304,7 +312,7 @@ ___
 
 ▪ **NotOctal**: *string* = "String does not represent an octal number."
 
-*Defined in [src/error-message.ts:34](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L34)*
+*Defined in [src/error-message.ts:35](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L35)*
 
 ___
 
@@ -312,7 +320,7 @@ ___
 
 ▪ **NumberCoercion**: *string* = "Value cannot be coerced to number."
 
-*Defined in [src/error-message.ts:23](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L23)*
+*Defined in [src/error-message.ts:24](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L24)*
 
 ___
 
@@ -320,7 +328,7 @@ ___
 
 ▪ **NumberExpected**: *string* = "Number argument expected."
 
-*Defined in [src/error-message.ts:24](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L24)*
+*Defined in [src/error-message.ts:25](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L25)*
 
 ___
 
@@ -328,7 +336,7 @@ ___
 
 ▪ **NumberRange**: *string* = "Number-only range expected."
 
-*Defined in [src/error-message.ts:40](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L40)*
+*Defined in [src/error-message.ts:41](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L41)*
 
 ___
 
@@ -336,7 +344,7 @@ ___
 
 ▪ **OneValue**: *string* = "Needs at least one value."
 
-*Defined in [src/error-message.ts:47](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L47)*
+*Defined in [src/error-message.ts:48](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L48)*
 
 ___
 
@@ -344,7 +352,7 @@ ___
 
 ▪ **OutOfSheet**: *string* = "Resulting reference is out of the sheet."
 
-*Defined in [src/error-message.ts:28](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L28)*
+*Defined in [src/error-message.ts:29](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L29)*
 
 ___
 
@@ -352,7 +360,7 @@ ___
 
 ▪ **ParseError**: *string* = "Parsing error."
 
-*Defined in [src/error-message.ts:54](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L54)*
+*Defined in [src/error-message.ts:56](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L56)*
 
 ___
 
@@ -360,7 +368,7 @@ ___
 
 ▪ **PatternNotFound**: *string* = "Pattern not found."
 
-*Defined in [src/error-message.ts:46](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L46)*
+*Defined in [src/error-message.ts:47](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L47)*
 
 ___
 
@@ -368,7 +376,15 @@ ___
 
 ▪ **PeriodLong**: *string* = "Period number cannot exceed life length."
 
-*Defined in [src/error-message.ts:56](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L56)*
+*Defined in [src/error-message.ts:58](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L58)*
+
+___
+
+### PoolDimensions
+
+▪ **PoolDimensions**: *string* = "Range dimensions are not compatible with the window size and the stride."
+
+*Defined in [src/error-message.ts:15](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L15)*
 
 ___
 
@@ -376,7 +392,7 @@ ___
 
 ▪ **RangeManySheets**: *string* = "Range spans more than one sheet."
 
-*Defined in [src/error-message.ts:19](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L19)*
+*Defined in [src/error-message.ts:20](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L20)*
 
 ___
 
@@ -384,7 +400,7 @@ ___
 
 ▪ **ResultTooLong**: *string* = "Result exceeds the maximum allowed length."
 
-*Defined in [src/error-message.ts:76](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L76)*
+*Defined in [src/error-message.ts:78](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L78)*
 
 ___
 
@@ -392,7 +408,7 @@ ___
 
 ▪ **ScalarExpected**: *string* = "Cell range not allowed."
 
-*Defined in [src/error-message.ts:22](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L22)*
+*Defined in [src/error-message.ts:23](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L23)*
 
 ___
 
@@ -400,7 +416,7 @@ ___
 
 ▪ **Selector**: *string* = "Selector cannot exceed the number of arguments."
 
-*Defined in [src/error-message.ts:64](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L64)*
+*Defined in [src/error-message.ts:66](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L66)*
 
 ___
 
@@ -408,7 +424,7 @@ ___
 
 ▪ **SheetRef**: *string* = "Sheet does not exist."
 
-*Defined in [src/error-message.ts:55](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L55)*
+*Defined in [src/error-message.ts:57](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L57)*
 
 ___
 
@@ -416,7 +432,7 @@ ___
 
 ▪ **ShouldBeIorJ**: *string* = "Should be 'i' or 'j'."
 
-*Defined in [src/error-message.ts:74](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L74)*
+*Defined in [src/error-message.ts:76](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L76)*
 
 ___
 
@@ -424,7 +440,7 @@ ___
 
 ▪ **SizeMismatch**: *string* = "Array dimensions mismatched."
 
-*Defined in [src/error-message.ts:75](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L75)*
+*Defined in [src/error-message.ts:77](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L77)*
 
 ___
 
@@ -432,7 +448,7 @@ ___
 
 ▪ **StartEndDate**: *string* = "Start date needs to be earlier than end date."
 
-*Defined in [src/error-message.ts:65](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L65)*
+*Defined in [src/error-message.ts:67](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L67)*
 
 ___
 
@@ -440,7 +456,7 @@ ___
 
 ▪ **ThreeValues**: *string* = "Range needs to contain at least three elements."
 
-*Defined in [src/error-message.ts:49](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L49)*
+*Defined in [src/error-message.ts:50](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L50)*
 
 ___
 
@@ -448,7 +464,7 @@ ___
 
 ▪ **TwoValues**: *string* = "Range needs to contain at least two elements."
 
-*Defined in [src/error-message.ts:48](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L48)*
+*Defined in [src/error-message.ts:49](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L49)*
 
 ___
 
@@ -456,7 +472,7 @@ ___
 
 ▪ **ValueBaseLarge**: *string* = "Value in base too large."
 
-*Defined in [src/error-message.ts:42](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L42)*
+*Defined in [src/error-message.ts:43](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L43)*
 
 ___
 
@@ -464,7 +480,7 @@ ___
 
 ▪ **ValueBaseLong**: *string* = "Value in base too long."
 
-*Defined in [src/error-message.ts:44](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L44)*
+*Defined in [src/error-message.ts:45](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L45)*
 
 ___
 
@@ -472,7 +488,7 @@ ___
 
 ▪ **ValueBaseSmall**: *string* = "Value in base too small."
 
-*Defined in [src/error-message.ts:43](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L43)*
+*Defined in [src/error-message.ts:44](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L44)*
 
 ___
 
@@ -480,7 +496,7 @@ ___
 
 ▪ **ValueLarge**: *string* = "Value too large."
 
-*Defined in [src/error-message.ts:17](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L17)*
+*Defined in [src/error-message.ts:18](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L18)*
 
 ___
 
@@ -488,7 +504,7 @@ ___
 
 ▪ **ValueNotFound**: *string* = "Value not found."
 
-*Defined in [src/error-message.ts:41](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L41)*
+*Defined in [src/error-message.ts:42](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L42)*
 
 ___
 
@@ -496,7 +512,7 @@ ___
 
 ▪ **ValueSmall**: *string* = "Value too small."
 
-*Defined in [src/error-message.ts:16](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L16)*
+*Defined in [src/error-message.ts:17](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L17)*
 
 ___
 
@@ -504,7 +520,7 @@ ___
 
 ▪ **WeekendString**: *string* = "Incorrect weekend bitmask string."
 
-*Defined in [src/error-message.ts:70](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L70)*
+*Defined in [src/error-message.ts:72](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L72)*
 
 ___
 
@@ -512,7 +528,7 @@ ___
 
 ▪ **WrongArgNumber**: *string* = "Wrong number of arguments."
 
-*Defined in [src/error-message.ts:11](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L11)*
+*Defined in [src/error-message.ts:11](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L11)*
 
 ___
 
@@ -520,7 +536,7 @@ ___
 
 ▪ **WrongDimension**: *string* = "Wrong range dimension."
 
-*Defined in [src/error-message.ts:21](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L21)*
+*Defined in [src/error-message.ts:22](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L22)*
 
 ___
 
@@ -528,7 +544,7 @@ ___
 
 ▪ **WrongOrder**: *string* = "Wrong order of values."
 
-*Defined in [src/error-message.ts:72](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L72)*
+*Defined in [src/error-message.ts:74](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L74)*
 
 ___
 
@@ -536,7 +552,7 @@ ___
 
 ▪ **WrongType**: *string* = "Wrong type of argument."
 
-*Defined in [src/error-message.ts:29](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L29)*
+*Defined in [src/error-message.ts:30](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L30)*
 
 ## Methods
 
@@ -544,7 +560,7 @@ ___
 
 ▸ **FunctionName**(`arg`: string): *string*
 
-*Defined in [src/error-message.ts:77](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L77)*
+*Defined in [src/error-message.ts:79](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L79)*
 
 **Parameters:**
 
@@ -556,11 +572,27 @@ Name | Type |
 
 ___
 
+### LicenseCapability
+
+▸ **LicenseCapability**(`functionName`: string): *string*
+
+*Defined in [src/error-message.ts:82](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L82)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`functionName` | string |
+
+**Returns:** *string*
+
+___
+
 ### LicenseKey
 
 ▸ **LicenseKey**(`arg`: string): *string*
 
-*Defined in [src/error-message.ts:79](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L79)*
+*Defined in [src/error-message.ts:81](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L81)*
 
 **Parameters:**
 
@@ -576,7 +608,7 @@ ___
 
 ▸ **NamedExpressionName**(`arg`: string): *string*
 
-*Defined in [src/error-message.ts:78](https://github.com/handsontable/hyperformula/blob/af2d59d/src/error-message.ts#L78)*
+*Defined in [src/error-message.ts:80](https://github.com/handsontable/hyperformula/blob/99a45ea/src/error-message.ts#L80)*
 
 **Parameters:**
 

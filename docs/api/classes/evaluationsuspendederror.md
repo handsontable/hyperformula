@@ -16,7 +16,7 @@ Relates to:
 
 \+ **new EvaluationSuspendedError**(): *[EvaluationSuspendedError](evaluationsuspendederror.md)*
 
-*Defined in [src/errors.ts:257](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L257)*
+*Defined in [src/errors.ts:259](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L259)*
 
 **Returns:** *[EvaluationSuspendedError](evaluationsuspendederror.md)*
 

@@ -8,7 +8,7 @@ Represents size and fill ratio of a sheet
 
 • **fill**: *number*
 
-*Defined in [src/Sheet.ts:30](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Sheet.ts#L30)*
+*Defined in [src/Sheet.ts:30](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Sheet.ts#L30)*
 
 ___
 
@@ -16,7 +16,7 @@ ___
 
 • **height**: *number*
 
-*Defined in [src/Sheet.ts:29](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Sheet.ts#L29)*
+*Defined in [src/Sheet.ts:29](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Sheet.ts#L29)*
 
 ___
 
@@ -24,4 +24,4 @@ ___
 
 • **width**: *number*
 
-*Defined in [src/Sheet.ts:28](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Sheet.ts#L28)*
+*Defined in [src/Sheet.ts:28](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Sheet.ts#L28)*

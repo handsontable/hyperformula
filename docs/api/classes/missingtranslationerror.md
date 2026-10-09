@@ -8,7 +8,7 @@ Error thrown when translation is missing in translation package.
 
 \+ **new MissingTranslationError**(`key`: string): *[MissingTranslationError](missingtranslationerror.md)*
 
-*Defined in [src/errors.ts:266](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L266)*
+*Defined in [src/errors.ts:268](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L268)*
 
 **Parameters:**
 

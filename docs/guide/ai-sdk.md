@@ -13,7 +13,7 @@ A [Vercel AI SDK](https://sdk.vercel.ai/docs) tool that gives your agents determ
 - **Evaluate formulas deterministically** — your agent runs any Excel-compatible formula through HyperFormula instead of asking the LLM to do math. Results are exact, reproducible, and auditable.
 - **Read and write cells and ranges** — the agent inspects, populates, or modifies sheet data through typed tool calls.
 - **Trace dependencies** — precedents and dependents are surfaced so the agent can explain how every value was derived.
-- **400+ built-in functions out of the box** — the agent has access to the full Excel-compatible function set (`SUM`, `VLOOKUP`, `IRR`, `INDEX/MATCH`, and the rest), no implementation work required.
+- **423 built-in functions out of the box** — the agent has access to the full Excel-compatible function set (`SUM`, `VLOOKUP`, `IRR`, `INDEX/MATCH`, and the rest), no implementation work required.
 
 ## Example
 
@@ -30,7 +30,7 @@ const hf = HyperFormula.buildFromArray([
   ['Revenue', 100],
   ['Cost',     60],
   ['Profit', '=B1-B2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // Pass the spreadsheet tools straight into generateText.
 const result = await generateText({

@@ -6,7 +6,7 @@
 
 ▸ **add**(`value`: RawInterpreterValue, `address`: [SimpleCellAddress](simplecelladdress.md)): *void*
 
-*Defined in [src/Lookup/SearchStrategy.ts:37](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L37)*
+*Defined in [src/Lookup/SearchStrategy.ts:37](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L37)*
 
 **Parameters:**
 
@@ -23,7 +23,7 @@ ___
 
 ▸ **addColumns**(`columnsSpan`: [ColumnsSpan](../classes/columnsspan.md)): *void*
 
-*Defined in [src/Lookup/SearchStrategy.ts:45](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L45)*
+*Defined in [src/Lookup/SearchStrategy.ts:45](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L45)*
 
 **Parameters:**
 
@@ -39,7 +39,7 @@ ___
 
 ▸ **advancedFind**(`keyMatcher`: function, `range`: [SimpleRangeValue](../classes/simplerangevalue.md), `options`: [AdvancedFindOptions](advancedfindoptions.md)): *number*
 
-*Defined in [src/Lookup/SearchStrategy.ts:33](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L33)*
+*Defined in [src/Lookup/SearchStrategy.ts:33](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L33)*
 
 **Parameters:**
 
@@ -65,7 +65,7 @@ ___
 
 ▸ **applyChanges**(`contentChanges`: [CellValueChange](cellvaluechange.md)[]): *void*
 
-*Defined in [src/Lookup/SearchStrategy.ts:43](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L43)*
+*Defined in [src/Lookup/SearchStrategy.ts:43](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L43)*
 
 **Parameters:**
 
@@ -81,7 +81,7 @@ ___
 
 ▸ **change**(`oldValue`: RawInterpreterValue | undefined, `newValue`: RawInterpreterValue, `address`: [SimpleCellAddress](simplecelladdress.md)): *void*
 
-*Defined in [src/Lookup/SearchStrategy.ts:41](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L41)*
+*Defined in [src/Lookup/SearchStrategy.ts:41](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L41)*
 
 **Parameters:**
 
@@ -99,7 +99,7 @@ ___
 
 ▸ **find**(`searchKey`: RawNoErrorScalarValue, `range`: [SimpleRangeValue](../classes/simplerangevalue.md), `options`: [SearchOptions](searchoptions.md)): *number*
 
-*Defined in [src/Lookup/SearchStrategy.ts:31](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L31)*
+*Defined in [src/Lookup/SearchStrategy.ts:31](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L31)*
 
 **Parameters:**
 
@@ -117,7 +117,7 @@ ___
 
 ▸ **forceApplyPostponedTransformations**(): *void*
 
-*Defined in [src/Lookup/SearchStrategy.ts:60](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L60)*
+*Defined in [src/Lookup/SearchStrategy.ts:60](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L60)*
 
 Forces all lazily-tracked ValueIndex entries to apply any pending transformations,
 bringing every entry's version up to the current LazilyTransformingAstService version.
@@ -131,7 +131,7 @@ ___
 
 ▸ **moveValues**(`range`: IterableIterator‹[RawScalarValue, [SimpleCellAddress](simplecelladdress.md)]›, `toRight`: number, `toBottom`: number, `toSheet`: number): *void*
 
-*Defined in [src/Lookup/SearchStrategy.ts:51](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L51)*
+*Defined in [src/Lookup/SearchStrategy.ts:51](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L51)*
 
 **Parameters:**
 
@@ -150,7 +150,7 @@ ___
 
 ▸ **remove**(`value`: RawInterpreterValue | undefined, `address`: [SimpleCellAddress](simplecelladdress.md)): *void*
 
-*Defined in [src/Lookup/SearchStrategy.ts:39](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L39)*
+*Defined in [src/Lookup/SearchStrategy.ts:39](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L39)*
 
 **Parameters:**
 
@@ -167,7 +167,7 @@ ___
 
 ▸ **removeColumns**(`columnsSpan`: [ColumnsSpan](../classes/columnsspan.md)): *void*
 
-*Defined in [src/Lookup/SearchStrategy.ts:47](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L47)*
+*Defined in [src/Lookup/SearchStrategy.ts:47](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L47)*
 
 **Parameters:**
 
@@ -183,7 +183,7 @@ ___
 
 ▸ **removeSheet**(`sheetId`: number): *void*
 
-*Defined in [src/Lookup/SearchStrategy.ts:49](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L49)*
+*Defined in [src/Lookup/SearchStrategy.ts:49](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L49)*
 
 **Parameters:**
 
@@ -199,7 +199,7 @@ ___
 
 ▸ **removeValues**(`range`: IterableIterator‹[RawScalarValue, [SimpleCellAddress](simplecelladdress.md)]›): *void*
 
-*Defined in [src/Lookup/SearchStrategy.ts:53](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/SearchStrategy.ts#L53)*
+*Defined in [src/Lookup/SearchStrategy.ts:53](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/SearchStrategy.ts#L53)*
 
 **Parameters:**
 

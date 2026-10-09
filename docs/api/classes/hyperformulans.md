@@ -8,7 +8,7 @@ Aggregate class for default export
 
 ▪ **ArraySize**: *[ArraySize](arraysize.md)* = ArraySize
 
-*Defined in [src/index.ts:79](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L79)*
+*Defined in [src/index.ts:82](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L82)*
 
 ___
 
@@ -16,7 +16,7 @@ ___
 
 ▪ **CellError**: *[CellError](cellerror.md)* = CellError
 
-*Defined in [src/index.ts:67](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L67)*
+*Defined in [src/index.ts:70](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L70)*
 
 ___
 
@@ -24,7 +24,7 @@ ___
 
 ▪ **CellType**: *[CellType](../enums/celltype.md)* = CellType
 
-*Defined in [src/index.ts:68](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L68)*
+*Defined in [src/index.ts:71](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L71)*
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 ▪ **CellValueDetailedType**: *object* = CellValueDetailedType
 
-*Defined in [src/index.ts:70](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L70)*
+*Defined in [src/index.ts:73](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L73)*
 
 #### Type declaration:
 
@@ -42,7 +42,7 @@ ___
 
 ▪ **CellValueType**: *object* = CellValueType
 
-*Defined in [src/index.ts:69](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L69)*
+*Defined in [src/index.ts:72](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L72)*
 
 #### Type declaration:
 
@@ -52,7 +52,7 @@ ___
 
 ▪ **ConfigValueTooBigError**: *[ConfigValueTooBigError](configvaluetoobigerror.md)* = ConfigValueTooBigError
 
-*Defined in [src/index.ts:74](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L74)*
+*Defined in [src/index.ts:77](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L77)*
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 ▪ **ConfigValueTooSmallError**: *[ConfigValueTooSmallError](configvaluetoosmallerror.md)* = ConfigValueTooSmallError
 
-*Defined in [src/index.ts:75](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L75)*
+*Defined in [src/index.ts:78](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L78)*
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 ▪ **DetailedCellError**: *[DetailedCellError](detailedcellerror.md)* = DetailedCellError
 
-*Defined in [src/index.ts:71](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L71)*
+*Defined in [src/index.ts:74](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L74)*
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 ▪ **EmptyValue**: *symbol* = EmptyValue
 
-*Defined in [src/index.ts:81](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L81)*
+*Defined in [src/index.ts:84](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L84)*
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 ▪ **ErrorType**: *[ErrorType](../enums/errortype.md)* = ErrorType
 
-*Defined in [src/index.ts:66](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L66)*
+*Defined in [src/index.ts:68](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L68)*
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 ▪ **EvaluationSuspendedError**: *[EvaluationSuspendedError](evaluationsuspendederror.md)* = EvaluationSuspendedError
 
-*Defined in [src/index.ts:76](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L76)*
+*Defined in [src/index.ts:79](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L79)*
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 ▪ **ExpectedOneOfValuesError**: *[ExpectedOneOfValuesError](expectedoneofvalueserror.md)* = ExpectedOneOfValuesError
 
-*Defined in [src/index.ts:77](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L77)*
+*Defined in [src/index.ts:80](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L80)*
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 ▪ **ExpectedValueOfTypeError**: *[ExpectedValueOfTypeError](expectedvalueoftypeerror.md)* = ExpectedValueOfTypeError
 
-*Defined in [src/index.ts:78](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L78)*
+*Defined in [src/index.ts:81](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L81)*
 
 ___
 
@@ -116,7 +116,7 @@ ___
 
 ▪ **ExportedCellChange**: *[ExportedCellChange](exportedcellchange.md)* = ExportedCellChange
 
-*Defined in [src/index.ts:72](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L72)*
+*Defined in [src/index.ts:75](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L75)*
 
 ___
 
@@ -124,7 +124,15 @@ ___
 
 ▪ **ExportedNamedExpressionChange**: *[ExportedNamedExpressionChange](exportednamedexpressionchange.md)* = ExportedNamedExpressionChange
 
-*Defined in [src/index.ts:73](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L73)*
+*Defined in [src/index.ts:76](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L76)*
+
+___
+
+### FeatureId
+
+▪ **FeatureId**: *[FeatureId](../enums/featureid.md)* = FeatureId
+
+*Defined in [src/index.ts:69](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L69)*
 
 ___
 
@@ -132,7 +140,7 @@ ___
 
 ▪ **FunctionArgumentType**: *FunctionArgumentType* = FunctionArgumentType
 
-*Defined in [src/index.ts:83](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L83)*
+*Defined in [src/index.ts:86](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L86)*
 
 ___
 
@@ -140,7 +148,7 @@ ___
 
 ▪ **FunctionPlugin**: *FunctionPlugin* = FunctionPlugin
 
-*Defined in [src/index.ts:82](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L82)*
+*Defined in [src/index.ts:85](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L85)*
 
 ___
 
@@ -148,7 +156,7 @@ ___
 
 ▪ **FunctionPluginValidationError**: *[FunctionPluginValidationError](functionpluginvalidationerror.md)* = FunctionPluginValidationError
 
-*Defined in [src/index.ts:84](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L84)*
+*Defined in [src/index.ts:87](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L87)*
 
 ___
 
@@ -156,7 +164,7 @@ ___
 
 ▪ **HyperFormula**: *[HyperFormula](hyperformula.md)* = HyperFormula
 
-*Defined in [src/index.ts:65](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L65)*
+*Defined in [src/index.ts:67](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L67)*
 
 ___
 
@@ -164,7 +172,7 @@ ___
 
 ▪ **InvalidAddressError**: *[InvalidAddressError](invalidaddresserror.md)* = InvalidAddressError
 
-*Defined in [src/index.ts:85](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L85)*
+*Defined in [src/index.ts:88](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L88)*
 
 ___
 
@@ -172,7 +180,7 @@ ___
 
 ▪ **InvalidArgumentsError**: *[InvalidArgumentsError](invalidargumentserror.md)* = InvalidArgumentsError
 
-*Defined in [src/index.ts:86](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L86)*
+*Defined in [src/index.ts:89](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L89)*
 
 ___
 
@@ -180,7 +188,7 @@ ___
 
 ▪ **LanguageAlreadyRegisteredError**: *[LanguageAlreadyRegisteredError](languagealreadyregisterederror.md)* = LanguageAlreadyRegisteredError
 
-*Defined in [src/index.ts:88](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L88)*
+*Defined in [src/index.ts:91](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L91)*
 
 ___
 
@@ -188,7 +196,15 @@ ___
 
 ▪ **LanguageNotRegisteredError**: *[LanguageNotRegisteredError](languagenotregisterederror.md)* = LanguageNotRegisteredError
 
-*Defined in [src/index.ts:87](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L87)*
+*Defined in [src/index.ts:90](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L90)*
+
+___
+
+### LicenseCapabilityMissingError
+
+▪ **LicenseCapabilityMissingError**: *[LicenseCapabilityMissingError](licensecapabilitymissingerror.md)* = LicenseCapabilityMissingError
+
+*Defined in [src/index.ts:92](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L92)*
 
 ___
 
@@ -196,7 +212,7 @@ ___
 
 ▪ **MissingTranslationError**: *[MissingTranslationError](missingtranslationerror.md)* = MissingTranslationError
 
-*Defined in [src/index.ts:89](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L89)*
+*Defined in [src/index.ts:93](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L93)*
 
 ___
 
@@ -204,7 +220,7 @@ ___
 
 ▪ **NamedExpressionDoesNotExistError**: *[NamedExpressionDoesNotExistError](namedexpressiondoesnotexisterror.md)* = NamedExpressionDoesNotExistError
 
-*Defined in [src/index.ts:90](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L90)*
+*Defined in [src/index.ts:94](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L94)*
 
 ___
 
@@ -212,7 +228,7 @@ ___
 
 ▪ **NamedExpressionNameIsAlreadyTakenError**: *[NamedExpressionNameIsAlreadyTakenError](namedexpressionnameisalreadytakenerror.md)* = NamedExpressionNameIsAlreadyTakenError
 
-*Defined in [src/index.ts:91](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L91)*
+*Defined in [src/index.ts:95](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L95)*
 
 ___
 
@@ -220,7 +236,7 @@ ___
 
 ▪ **NamedExpressionNameIsInvalidError**: *[NamedExpressionNameIsInvalidError](namedexpressionnameisinvaliderror.md)* = NamedExpressionNameIsInvalidError
 
-*Defined in [src/index.ts:92](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L92)*
+*Defined in [src/index.ts:96](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L96)*
 
 ___
 
@@ -228,7 +244,7 @@ ___
 
 ▪ **NoOperationToRedoError**: *[NoOperationToRedoError](nooperationtoredoerror.md)* = NoOperationToRedoError
 
-*Defined in [src/index.ts:93](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L93)*
+*Defined in [src/index.ts:97](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L97)*
 
 ___
 
@@ -236,7 +252,7 @@ ___
 
 ▪ **NoOperationToUndoError**: *[NoOperationToUndoError](nooperationtoundoerror.md)* = NoOperationToUndoError
 
-*Defined in [src/index.ts:94](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L94)*
+*Defined in [src/index.ts:98](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L98)*
 
 ___
 
@@ -244,7 +260,7 @@ ___
 
 ▪ **NoRelativeAddressesAllowedError**: *[NoRelativeAddressesAllowedError](norelativeaddressesallowederror.md)* = NoRelativeAddressesAllowedError
 
-*Defined in [src/index.ts:95](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L95)*
+*Defined in [src/index.ts:99](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L99)*
 
 ___
 
@@ -252,7 +268,7 @@ ___
 
 ▪ **NoSheetWithIdError**: *[NoSheetWithIdError](nosheetwithiderror.md)* = NoSheetWithIdError
 
-*Defined in [src/index.ts:96](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L96)*
+*Defined in [src/index.ts:100](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L100)*
 
 ___
 
@@ -260,7 +276,7 @@ ___
 
 ▪ **NoSheetWithNameError**: *[NoSheetWithNameError](nosheetwithnameerror.md)* = NoSheetWithNameError
 
-*Defined in [src/index.ts:97](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L97)*
+*Defined in [src/index.ts:101](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L101)*
 
 ___
 
@@ -268,7 +284,7 @@ ___
 
 ▪ **NotAFormulaError**: *[NotAFormulaError](notaformulaerror.md)* = NotAFormulaError
 
-*Defined in [src/index.ts:98](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L98)*
+*Defined in [src/index.ts:102](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L102)*
 
 ___
 
@@ -276,7 +292,7 @@ ___
 
 ▪ **NothingToPasteError**: *[NothingToPasteError](nothingtopasteerror.md)* = NothingToPasteError
 
-*Defined in [src/index.ts:99](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L99)*
+*Defined in [src/index.ts:103](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L103)*
 
 ___
 
@@ -284,7 +300,7 @@ ___
 
 ▪ **ProtectedFunctionTranslationError**: *[ProtectedFunctionTranslationError](protectedfunctiontranslationerror.md)* = ProtectedFunctionTranslationError
 
-*Defined in [src/index.ts:100](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L100)*
+*Defined in [src/index.ts:104](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L104)*
 
 ___
 
@@ -292,7 +308,7 @@ ___
 
 ▪ **SheetNameAlreadyTakenError**: *[SheetNameAlreadyTakenError](sheetnamealreadytakenerror.md)* = SheetNameAlreadyTakenError
 
-*Defined in [src/index.ts:101](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L101)*
+*Defined in [src/index.ts:105](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L105)*
 
 ___
 
@@ -300,7 +316,7 @@ ___
 
 ▪ **SheetSizeLimitExceededError**: *[SheetSizeLimitExceededError](sheetsizelimitexceedederror.md)* = SheetSizeLimitExceededError
 
-*Defined in [src/index.ts:102](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L102)*
+*Defined in [src/index.ts:106](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L106)*
 
 ___
 
@@ -308,7 +324,7 @@ ___
 
 ▪ **SimpleRangeValue**: *[SimpleRangeValue](simplerangevalue.md)* = SimpleRangeValue
 
-*Defined in [src/index.ts:80](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L80)*
+*Defined in [src/index.ts:83](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L83)*
 
 ___
 
@@ -316,7 +332,7 @@ ___
 
 ▪ **SourceLocationHasArrayError**: *[SourceLocationHasArrayError](sourcelocationhasarrayerror.md)* = SourceLocationHasArrayError
 
-*Defined in [src/index.ts:103](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L103)*
+*Defined in [src/index.ts:107](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L107)*
 
 ___
 
@@ -324,7 +340,7 @@ ___
 
 ▪ **TargetLocationHasArrayError**: *[TargetLocationHasArrayError](targetlocationhasarrayerror.md)* = TargetLocationHasArrayError
 
-*Defined in [src/index.ts:104](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L104)*
+*Defined in [src/index.ts:108](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L108)*
 
 ___
 
@@ -332,7 +348,7 @@ ___
 
 ▪ **UnableToParseError**: *[UnableToParseError](unabletoparseerror.md)* = UnableToParseError
 
-*Defined in [src/index.ts:105](https://github.com/handsontable/hyperformula/blob/af2d59d/src/index.ts#L105)*
+*Defined in [src/index.ts:109](https://github.com/handsontable/hyperformula/blob/99a45ea/src/index.ts#L109)*
 
 ___
 
@@ -342,7 +358,7 @@ ___
 
 ▪ **buildDate**: *string* = process.env.HT_BUILD_DATE as string
 
-*Defined in [src/HyperFormula.ts:105](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L105)*
+*Defined in [src/HyperFormula.ts:108](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L108)*
 
 Latest build date.
 
@@ -352,7 +368,7 @@ ___
 
 ▪ **languages**: *Record‹string, RawTranslationPackage›*
 
-*Defined in [src/HyperFormula.ts:121](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L121)*
+*Defined in [src/HyperFormula.ts:124](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L124)*
 
 When using the UMD build, this property contains all available languages to use with the [registerLanguage](#registerlanguage) method.
 
@@ -364,7 +380,7 @@ ___
 
 ▪ **releaseDate**: *string* = process.env.HT_RELEASE_DATE as string
 
-*Defined in [src/HyperFormula.ts:112](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L112)*
+*Defined in [src/HyperFormula.ts:115](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L115)*
 
 A release date.
 
@@ -374,7 +390,7 @@ ___
 
 ▪ **version**: *string* = process.env.HT_VERSION as string
 
-*Defined in [src/HyperFormula.ts:98](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L98)*
+*Defined in [src/HyperFormula.ts:101](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L101)*
 
 Version of the HyperFormula.
 
@@ -384,7 +400,7 @@ Version of the HyperFormula.
 
 • **get defaultConfig**(): *[ConfigParams](../interfaces/configparams.md)*
 
-*Defined in [src/HyperFormula.ts:160](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L160)*
+*Defined in [src/HyperFormula.ts:163](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L163)*
 
 Returns all of HyperFormula's default [configuration options](/docs/guide/configuration-options.md).
 
@@ -404,11 +420,13 @@ const defaultConfig = HyperFormula.defaultConfig;
 
 ▸ **buildEmpty**(`configInput`: Partial‹[ConfigParams](../interfaces/configparams.md)›, `namedExpressions`: [SerializedNamedExpression](../interfaces/serializednamedexpression.md)[]): *[HyperFormula](hyperformula.md)*
 
-*Defined in [src/HyperFormula.ts:353](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L353)*
+*Defined in [src/HyperFormula.ts:360](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L360)*
 
 Builds an empty engine instance.
 Can be configured with the optional parameter that represents a [ConfigParams](../interfaces/configparams.md).
 If not specified the engine will be built with the default configuration.
+
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if namedExpressions is non-empty and the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
 
 **`example`** 
 ```js
@@ -420,7 +438,7 @@ const namedExpressions = [
 ];
 
 // build with no initial data and with optional config parameter maxColumns
-const hfInstance = HyperFormula.buildEmpty({ maxColumns: 1000 }, namedExpressions);
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3', maxColumns: 1000 }, namedExpressions);
 ```
 
 **Parameters:**
@@ -438,7 +456,7 @@ ___
 
 ▸ **buildFromArray**(`sheet`: [Sheet](../globals.md#sheet), `configInput`: Partial‹[ConfigParams](../interfaces/configparams.md)›, `namedExpressions`: [SerializedNamedExpression](../interfaces/serializednamedexpression.md)[]): *[HyperFormula](hyperformula.md)*
 
-*Defined in [src/HyperFormula.ts:279](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L279)*
+*Defined in [src/HyperFormula.ts:283](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L283)*
 
 Builds the engine for a sheet from a two-dimensional array representation.
 The engine is created with a single sheet.
@@ -450,6 +468,8 @@ If not specified, the engine will be built with the default configuration.
 **`throws`** [InvalidArgumentsError](hyperformulans.md#static-invalidargumentserror) when sheet is not an array of arrays
 
 **`throws`** [FunctionPluginValidationError](hyperformulans.md#static-functionpluginvalidationerror) when plugin class definition is not consistent with metadata
+
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if namedExpressions is non-empty and the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
 
 **`example`** 
 ```js
@@ -468,7 +488,7 @@ const namedExpressions = [
 ];
 
 // method with optional config parameter maxColumns
-const hfInstance = HyperFormula.buildFromArray(sheetData, { maxColumns: 1000 }, namedExpressions);
+const hfInstance = HyperFormula.buildFromArray(sheetData, { licenseKey: 'gpl-v3', maxColumns: 1000 }, namedExpressions);
 ```
 
 **Parameters:**
@@ -487,7 +507,7 @@ ___
 
 ▸ **buildFromSheets**(`sheets`: [Sheets](../globals.md#sheets), `configInput`: Partial‹[ConfigParams](../interfaces/configparams.md)›, `namedExpressions`: [SerializedNamedExpression](../interfaces/serializednamedexpression.md)[]): *[HyperFormula](hyperformula.md)*
 
-*Defined in [src/HyperFormula.ts:326](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L326)*
+*Defined in [src/HyperFormula.ts:331](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L331)*
 
 Builds the engine from an object containing multiple sheets with names.
 The engine is created with one or more sheets.
@@ -499,6 +519,8 @@ If not specified the engine will be built with the default configuration.
 **`throws`** [InvalidArgumentsError](hyperformulans.md#static-invalidargumentserror) when any sheet is not an array of arrays
 
 **`throws`** [FunctionPluginValidationError](hyperformulans.md#static-functionpluginvalidationerror) when plugin class definition is not consistent with metadata
+
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if namedExpressions is non-empty and the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
 
 **`example`** 
 ```js
@@ -524,7 +546,7 @@ const namedExpressions = [
 ];
 
 // method with optional config parameter useColumnIndex
-const hfInstance = HyperFormula.buildFromSheets(sheetData, { useColumnIndex: true }, namedExpressions);
+const hfInstance = HyperFormula.buildFromSheets(sheetData, { licenseKey: 'gpl-v3', useColumnIndex: true }, namedExpressions);
 ```
 
 **Parameters:**
@@ -545,7 +567,7 @@ ___
 
 ▸ **destroy**(): *void*
 
-*Defined in [src/HyperFormula.ts:4755](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4755)*
+*Defined in [src/HyperFormula.ts:4987](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4987)*
 
 Destroys instance of HyperFormula.
 
@@ -563,7 +585,7 @@ ___
 
 ▸ **getConfig**(): *[ConfigParams](../interfaces/configparams.md)*
 
-*Defined in [src/HyperFormula.ts:1180](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1180)*
+*Defined in [src/HyperFormula.ts:1234](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1234)*
 
 Returns current configuration of the engine instance.
 
@@ -583,7 +605,7 @@ ___
 
 ▸ **rebuildAndRecalculate**(): *void*
 
-*Defined in [src/HyperFormula.ts:1194](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1194)*
+*Defined in [src/HyperFormula.ts:1248](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1248)*
 
 Rebuilds the HyperFormula instance preserving the current sheets data.
 
@@ -600,7 +622,7 @@ ___
 
 ▸ **updateConfig**(`newParams`: Partial‹[ConfigParams](../interfaces/configparams.md)›): *void*
 
-*Defined in [src/HyperFormula.ts:1157](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1157)*
+*Defined in [src/HyperFormula.ts:1211](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1211)*
 
 Updates the config with given new metadata. It is an expensive operation, as it might trigger rebuilding the engine and recalculation of all formulas.
 
@@ -614,7 +636,7 @@ For more information, see the [Configuration options guide](/docs/guide/configur
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // add a config param, for example maxColumns,
 // you can check the configuration with getConfig method
@@ -637,7 +659,7 @@ ___
 
 ▸ **addSheet**(`sheetName?`: undefined | string): *string*
 
-*Defined in [src/HyperFormula.ts:2771](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2771)*
+*Defined in [src/HyperFormula.ts:2924](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2924)*
 
 Adds a new sheet to the HyperFormula instance. Returns given or autogenerated name of a new sheet.
 
@@ -649,12 +671,14 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [SheetNameAlreadyTakenError](hyperformulans.md#static-sheetnamealreadytakenerror) when sheet with a given name already exists
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['1'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return 'MySheet3'
 const nameProvided = hfInstance.addSheet('MySheet3');
@@ -678,7 +702,7 @@ ___
 
 ▸ **clearSheet**(`sheetId`: number): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:2919](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2919)*
+*Defined in [src/HyperFormula.ts:3084](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3084)*
 
 Clears the sheet content. Double-checks if the sheet exists.
 
@@ -692,12 +716,14 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [NoSheetWithIdError](hyperformulans.md#static-nosheetwithiderror) when the given sheet ID does not exist
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return a list of cells which values changed after the operation,
 // their absolute addresses and new values, in this example it will return:
@@ -722,7 +748,7 @@ ___
 
 ▸ **countSheets**(): *number*
 
-*Defined in [src/HyperFormula.ts:3608](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3608)*
+*Defined in [src/HyperFormula.ts:3780](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3780)*
 
 Returns the number of existing sheets.
 
@@ -730,7 +756,7 @@ Returns the number of existing sheets.
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return the number of sheets which is '1'
 const sheetsCount = hfInstance.countSheets();
@@ -744,7 +770,7 @@ ___
 
 ▸ **doesSheetExist**(`sheetName`: string): *boolean*
 
-*Defined in [src/HyperFormula.ts:3327](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3327)*
+*Defined in [src/HyperFormula.ts:3499](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3499)*
 
 Returns `true` whether sheet with a given name exists. The method accepts sheet name to be checked.
 
@@ -755,7 +781,7 @@ Returns `true` whether sheet with a given name exists. The method accepts sheet 
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return 'true' since 'MySheet1' exists
 const sheetExist = hfInstance.doesSheetExist('MySheet1');
@@ -775,7 +801,7 @@ ___
 
 ▸ **getAllSheetsDimensions**(): *Record‹string, [SheetDimensions](../globals.md#sheetdimensions)›*
 
-*Defined in [src/HyperFormula.ts:1033](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1033)*
+*Defined in [src/HyperFormula.ts:1087](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1087)*
 
 Returns a map containing dimensions of all sheets for the engine instance represented as a key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
 
@@ -791,7 +817,7 @@ const hfInstance = HyperFormula.buildFromSheets({
    ['3'],
    ['4'],
   ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return the dimensions of all sheets:
 // { Sheet1: { width: 3, height: 1 }, Sheet2: { width: 1, height: 2 } }
@@ -806,7 +832,7 @@ ___
 
 ▸ **getAllSheetsFormulas**(): *Record‹string, (string | undefined)[][]›*
 
-*Defined in [src/HyperFormula.ts:1104](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1104)*
+*Defined in [src/HyperFormula.ts:1158](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1158)*
 
 Returns formulas of all sheets in a form of an object which property keys are strings and values are 2D arrays of strings or possibly `undefined` when the call does not contain a formula.
 
@@ -814,7 +840,7 @@ Returns formulas of all sheets in a form of an object which property keys are st
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2', '=A1+10'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return only formulas: { Sheet1: [ [ undefined, undefined, '=A1+10' ] ] }
 const allSheetsFormulas = hfInstance.getAllSheetsFormulas();
@@ -828,7 +854,7 @@ ___
 
 ▸ **getAllSheetsSerialized**(): *Record‹string, [RawCellContent](../globals.md#rawcellcontent)[][]›*
 
-*Defined in [src/HyperFormula.ts:1129](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1129)*
+*Defined in [src/HyperFormula.ts:1183](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1183)*
 
 Returns formulas or values of all sheets in a form of an object which property keys are strings and values are 2D arrays of [RawCellContent](../globals.md#rawcellcontent).
 
@@ -841,7 +867,7 @@ For example, a cell set with the string `'1'` is serialized as the string `'1'`,
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', 2, '=A1+10'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return all sheets serialized content: { Sheet1: [ [ '1', 2, '=A1+10' ] ] }
 // note: the string '1' stays a string and the number 2 stays a number
@@ -856,7 +882,7 @@ ___
 
 ▸ **getAllSheetsValues**(): *Record‹string, [CellValue](../globals.md#cellvalue)[][]›*
 
-*Defined in [src/HyperFormula.ts:1085](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1085)*
+*Defined in [src/HyperFormula.ts:1139](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1139)*
 
 Returns values of all sheets in a form of an object which property keys are strings and values are 2D arrays of [CellValue](../globals.md#cellvalue).
 
@@ -866,7 +892,7 @@ Returns values of all sheets in a form of an object which property keys are stri
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '=A1+10', '3'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return all sheets values: { Sheet1: [ [ 1, 11, 3 ] ] }
 const allSheetsValues = hfInstance.getAllSheetsValues();
@@ -880,7 +906,7 @@ ___
 
 ▸ **getSheetDimensions**(`sheetId`: number): *[SheetDimensions](../globals.md#sheetdimensions)*
 
-*Defined in [src/HyperFormula.ts:1060](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1060)*
+*Defined in [src/HyperFormula.ts:1114](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1114)*
 
 Returns dimensions of a specified sheet.
 The sheet dimensions is represented with numbers: width and height.
@@ -895,7 +921,7 @@ Note: Due to the memory optimizations, some of the empty bottom rows and rightmo
 ```js
 const hfInstance = HyperFormula.buildFromArray([
    ['1', '2', '=Sheet2!$A1'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return provided sheet's dimensions: { width: 3, height: 1 }
 const sheetDimensions = hfInstance.getSheetDimensions(0);
@@ -915,7 +941,7 @@ ___
 
 ▸ **getSheetFormulas**(`sheetId`: number): *(string | undefined)[][]*
 
-*Defined in [src/HyperFormula.ts:970](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L970)*
+*Defined in [src/HyperFormula.ts:1024](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1024)*
 
 Returns an array with normalized formula strings from [Sheet](../globals.md#sheet) or `undefined` for a cells that have no value.
 
@@ -929,7 +955,7 @@ const hfInstance = HyperFormula.buildFromArray([
  ['0', '=SUM(1, 2, 3)', '=A1'],
  ['1', '=TEXT(A2, "0.0%")', '=C1'],
  ['2', '=SUM(A1:C1)', '=C1'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return all formulas of a sheet:
 // [
@@ -954,7 +980,7 @@ ___
 
 ▸ **getSheetId**(`sheetName`: string): *number | undefined*
 
-*Defined in [src/HyperFormula.ts:3302](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3302)*
+*Defined in [src/HyperFormula.ts:3474](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3474)*
 
 Returns a unique sheet ID assigned to the sheet with a given name or `undefined` if the sheet does not exist.
 
@@ -965,7 +991,7 @@ Returns a unique sheet ID assigned to the sheet with a given name or `undefined`
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return '0' because 'MySheet1' is of ID '0'
 const sheetID = hfInstance.getSheetId('MySheet1');
@@ -985,7 +1011,7 @@ ___
 
 ▸ **getSheetName**(`sheetId`: number): *string | undefined*
 
-*Defined in [src/HyperFormula.ts:3256](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3256)*
+*Defined in [src/HyperFormula.ts:3428](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3428)*
 
 Returns a unique sheet name assigned to the sheet of a given ID or `undefined` if the there is no sheet with a given ID.
 
@@ -996,7 +1022,7 @@ Returns a unique sheet name assigned to the sheet of a given ID or `undefined` i
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['1'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return 'MySheet2' as this sheet is the second one
 const sheetName = hfInstance.getSheetName(1);
@@ -1016,7 +1042,7 @@ ___
 
 ▸ **getSheetNames**(): *string[]*
 
-*Defined in [src/HyperFormula.ts:3278](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3278)*
+*Defined in [src/HyperFormula.ts:3450](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3450)*
 
 List all sheet names.
 Returns an array of sheet names as strings.
@@ -1026,7 +1052,7 @@ Returns an array of sheet names as strings.
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['1'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return all sheets names: ['MySheet1', 'MySheet2']
 const sheetNames = hfInstance.getSheetNames();
@@ -1040,7 +1066,7 @@ ___
 
 ▸ **getSheetSerialized**(`sheetId`: number): *[RawCellContent](../globals.md#rawcellcontent)[][]*
 
-*Defined in [src/HyperFormula.ts:1003](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1003)*
+*Defined in [src/HyperFormula.ts:1057](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1057)*
 
 Returns an array of arrays of [RawCellContent](../globals.md#rawcellcontent) with serialized content of cells from [Sheet](../globals.md#sheet), either a cell formula or an explicit value.
 
@@ -1056,7 +1082,7 @@ const hfInstance = HyperFormula.buildFromArray([
  ['0', '=SUM(1, 2, 3)', '=A1'],
  ['1', '=TEXT(A2, "0.0%")', '=C1'],
  ['2', '=SUM(A1:C1)', '=C1'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return:
 // [
@@ -1081,7 +1107,7 @@ ___
 
 ▸ **getSheetValues**(`sheetId`: number): *[CellValue](../globals.md#cellvalue)[][]*
 
-*Defined in [src/HyperFormula.ts:937](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L937)*
+*Defined in [src/HyperFormula.ts:991](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L991)*
 
 Returns an array of arrays of [CellValue](../globals.md#cellvalue) with values of all cells from [Sheet](../globals.md#sheet).
 Applies rounding and post-processing.
@@ -1098,7 +1124,7 @@ const hfInstance = HyperFormula.buildFromArray([
  ['0', '=SUM(1, 2, 3)', '=A1'],
  ['1', '=TEXT(A2, "0.0%")', '=C1'],
  ['2', '=SUM(A1:C1)', '=C1'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return all values of a sheet: [[0, 6, 0], [1, '1.0%', 0], [2, 6, 0]]
 const sheetValues = hfInstance.getSheetValues(0);
@@ -1118,12 +1144,13 @@ ___
 
 ▸ **isItPossibleToAddSheet**(`sheetName`: string): *boolean*
 
-*Defined in [src/HyperFormula.ts:2732](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2732)*
+*Defined in [src/HyperFormula.ts:2881](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2881)*
 
 Returns information whether it is possible to add a sheet to the engine.
 Checks against particular rules to ascertain that addSheet can be called.
 If returns `true`, doing [addSheet](hyperformulans.md#addsheet) operation won't throw any errors, and it is possible to add sheet with provided name.
 Returns `false` if the chosen name is already used.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -1132,7 +1159,7 @@ Returns `false` if the chosen name is already used.
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return 'false' because 'MySheet2' already exists
 const isAddable = hfInstance.isItPossibleToAddSheet('MySheet2');
@@ -1152,11 +1179,12 @@ ___
 
 ▸ **isItPossibleToClearSheet**(`sheetId`: number): *boolean*
 
-*Defined in [src/HyperFormula.ts:2877](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2877)*
+*Defined in [src/HyperFormula.ts:3038](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3038)*
 
 Returns information whether it is possible to clear a specified sheet.
 If returns `true`, doing [clearSheet](hyperformulans.md#clearsheet) operation won't throw any errors, provided sheet exists and its content can be cleared.
 Returns `false` otherwise
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -1165,7 +1193,7 @@ Returns `false` otherwise
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['1'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return 'true' because 'MySheet2' exists and can be cleared
 const isClearable = hfInstance.isItPossibleToClearSheet(1);
@@ -1185,11 +1213,12 @@ ___
 
 ▸ **isItPossibleToRemoveSheet**(`sheetId`: number): *boolean*
 
-*Defined in [src/HyperFormula.ts:2803](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2803)*
+*Defined in [src/HyperFormula.ts:2958](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2958)*
 
 Returns information whether it is possible to remove sheet for the engine.
 Returns `true` if the provided sheet exists, and therefore it can be removed, doing [removeSheet](hyperformulans.md#removesheet) operation won't throw any errors.
 Returns `false` otherwise
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -1198,7 +1227,7 @@ Returns `false` otherwise
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['1'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return 'true' because sheet with ID 1 exists and is removable
 const isRemovable = hfInstance.isItPossibleToRemoveSheet(1);
@@ -1218,11 +1247,12 @@ ___
 
 ▸ **isItPossibleToRenameSheet**(`sheetId`: number, `newName`: string): *boolean*
 
-*Defined in [src/HyperFormula.ts:3635](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3635)*
+*Defined in [src/HyperFormula.ts:3808](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3808)*
 
 Returns information whether it is possible to rename sheet.
 Returns `true` if the sheet with provided id exists and new name is available
 Returns `false` if sheet cannot be renamed
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -1231,7 +1261,7 @@ Returns `false` if sheet cannot be renamed
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // returns true
 hfInstance.isItPossibleToRenameSheet(0, 'MySheet0');
@@ -1252,11 +1282,12 @@ ___
 
 ▸ **isItPossibleToReplaceSheetContent**(`sheetId`: number, `values`: [RawCellContent](../globals.md#rawcellcontent)[][]): *boolean*
 
-*Defined in [src/HyperFormula.ts:2949](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2949)*
+*Defined in [src/HyperFormula.ts:3116](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3116)*
 
 Returns information whether it is possible to replace the sheet content.
 If returns `true`, doing [setSheetContent](hyperformulans.md#setsheetcontent) operation won't throw any errors, the provided sheet exists and then its content can be replaced.
 Returns `false` otherwise
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -1265,7 +1296,7 @@ Returns `false` otherwise
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['1'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return 'true' because sheet of ID 0 exists
 // and the provided content can be placed in this sheet
@@ -1287,7 +1318,7 @@ ___
 
 ▸ **removeSheet**(`sheetId`: number): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:2846](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2846)*
+*Defined in [src/HyperFormula.ts:3005](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3005)*
 
 Removes a sheet
 
@@ -1303,12 +1334,14 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [NoSheetWithIdError](hyperformulans.md#static-nosheetwithiderror) when the given sheet ID does not exist
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return a list of cells which values changed after the operation,
 // their absolute addresses and new values, in this example it will return:
@@ -1333,7 +1366,7 @@ ___
 
 ▸ **renameSheet**(`sheetId`: number, `newName`: string): *void*
 
-*Defined in [src/HyperFormula.ts:3673](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3673)*
+*Defined in [src/HyperFormula.ts:3850](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3850)*
 
 Renames a specified sheet.
 
@@ -1347,12 +1380,14 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [SheetNameAlreadyTakenError](hyperformulans.md#static-sheetnamealreadytakenerror) when the provided sheet name already exists
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // renames the sheet 'MySheet1'
 hfInstance.renameSheet(0, 'MySheet0');
@@ -1373,7 +1408,7 @@ ___
 
 ▸ **setSheetContent**(`sheetId`: number, `values`: [RawCellContent](../globals.md#rawcellcontent)[][]): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:2986](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2986)*
+*Defined in [src/HyperFormula.ts:3157](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3157)*
 
 Replaces the sheet content with new values.
 
@@ -1385,12 +1420,14 @@ Returns [an array of cells whose values changed as a result of this operation](/
 
 **`throws`** [InvalidArgumentsError](hyperformulans.md#static-invalidargumentserror) when values argument is not an array of arrays
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['1'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // should return a list of cells which values changed after the operation,
 // their absolute addresses and new values
@@ -1414,7 +1451,7 @@ ___
 
 ▸ **getFillRangeData**(`source`: [SimpleCellRange](../interfaces/simplecellrange.md), `target`: [SimpleCellRange](../interfaces/simplecellrange.md), `offsetsFromTarget`: boolean): *[RawCellContent](../globals.md#rawcellcontent)[][]*
 
-*Defined in [src/HyperFormula.ts:2688](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2688)*
+*Defined in [src/HyperFormula.ts:2836](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2836)*
 
 Returns values to fill target range using source range, with properly extending the range using wrap-around heuristic.
 
@@ -1426,7 +1463,7 @@ Returns values to fill target range using source range, with properly extending 
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildFromArray([[1, '=A1'], ['=$A$1', '2']]);
+const hfInstance = HyperFormula.buildFromArray([[1, '=A1'], ['=$A$1', '2']], { licenseKey: 'gpl-v3' });
 
 // should return [['2', '=$A$1', '2'], ['=A3', 1, '=C3'], ['2', '=$A$1', '2']]
 hfInstance.getFillRangeData( {start: {sheet: 0, row: 0, col: 0}, end: {sheet: 0, row: 1, col: 1}},
@@ -1449,7 +1486,7 @@ ___
 
 ▸ **getRangeFormulas**(`source`: [SimpleCellRange](../interfaces/simplecellrange.md)): *(string | undefined)[][]*
 
-*Defined in [src/HyperFormula.ts:2615](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2615)*
+*Defined in [src/HyperFormula.ts:2763](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2763)*
 
 Returns cell formulas in given range.
 
@@ -1465,7 +1502,7 @@ const hfInstance = HyperFormula.buildFromArray([
  ['=SUM(1, 2)', '2', '10'],
  ['5', '6', '7'],
  ['40', '30', '20'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // returns cell formulas of a given range only:
 // [ [ '=SUM(1, 2)', undefined ], [ undefined, undefined ] ]
@@ -1486,7 +1523,7 @@ ___
 
 ▸ **getRangeSerialized**(`source`: [SimpleCellRange](../interfaces/simplecellrange.md)): *[RawCellContent](../globals.md#rawcellcontent)[][]*
 
-*Defined in [src/HyperFormula.ts:2654](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2654)*
+*Defined in [src/HyperFormula.ts:2802](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2802)*
 
 Returns serialized cells in given range.
 
@@ -1505,7 +1542,7 @@ const hfInstance = HyperFormula.buildFromArray([
  ['=SUM(1, 2)', 2, 10],
  [5, 6, 7],
  [40, 30, 20],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return serialized cell content for the given range:
 // [ [ '=SUM(1, 2)', 2 ], [ 5, 6 ] ]
@@ -1526,7 +1563,7 @@ ___
 
 ▸ **getRangeValues**(`source`: [SimpleCellRange](../interfaces/simplecellrange.md)): *[CellValue](../globals.md#cellvalue)[][]*
 
-*Defined in [src/HyperFormula.ts:2579](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2579)*
+*Defined in [src/HyperFormula.ts:2727](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2727)*
 
 Returns the cell content of a given range in a [CellValue](../globals.md#cellvalue)[][] format.
 
@@ -1542,7 +1579,7 @@ const hfInstance = HyperFormula.buildFromArray([
  ['=SUM(1, 2)', '2', '10'],
  ['5', '6', '7'],
  ['40', '30', '20'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // returns calculated cells content: [ [ 3, 2 ], [ 5, 6 ] ]
 const rangeValues = hfInstance.getRangeValues({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 } });
@@ -1564,7 +1601,7 @@ ___
 
 ▸ **addRows**(`sheetId`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:1826](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1826)*
+*Defined in [src/HyperFormula.ts:1927](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1927)*
 
 Adds multiple rows into a specified position in a given sheet.
 Does nothing if rows are outside effective sheet size.
@@ -1581,12 +1618,14 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [SheetSizeLimitExceededError](hyperformulans.md#static-sheetsizelimitexceedederror) when performing this operation would result in sheet size limits exceeding
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1'],
  ['2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return a list of cells which values changed after the operation,
 // their absolute addresses and new values
@@ -1608,12 +1647,13 @@ ___
 
 ▸ **isItPossibleToAddRows**(`sheetId`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *boolean*
 
-*Defined in [src/HyperFormula.ts:1784](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1784)*
+*Defined in [src/HyperFormula.ts:1881](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1881)*
 
 Returns information whether it is possible to add rows into a specified position in a given sheet.
 Checks against particular rules to ascertain that addRows can be called.
 If returns `true`, doing [addRows](hyperformulans.md#addrows) operation won't throw any errors.
 Returns `false` if adding rows would exceed the sheet size limit or given arguments are invalid.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -1621,7 +1661,7 @@ Returns `false` if adding rows would exceed the sheet size limit or given argume
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2', '3'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'true' for this example,
 // it is possible to add one row in the second row of sheet 0
@@ -1643,12 +1683,13 @@ ___
 
 ▸ **isItPossibleToMoveRows**(`sheetId`: number, `startRow`: number, `numberOfRows`: number, `targetRow`: number): *boolean*
 
-*Defined in [src/HyperFormula.ts:2181](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2181)*
+*Defined in [src/HyperFormula.ts:2308](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2308)*
 
 Returns information whether it is possible to move a particular number of rows to a specified position in a given sheet.
 Checks against particular rules to ascertain that moveRows can be called.
 If returns `true`, doing [moveRows](hyperformulans.md#moverows) operation won't throw any errors.
 Returns `false` if the operation might be disrupted and causes side effects by the fact that there is an array inside the selected rows, the target location includes an array or the provided address is invalid.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -1657,7 +1698,7 @@ Returns `false` if the operation might be disrupted and causes side effects by t
 const hfInstance = HyperFormula.buildFromArray([
  ['1'],
  ['2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'true' for this example
 // it is possible to move one row from row 0 into row 2
@@ -1681,12 +1722,13 @@ ___
 
 ▸ **isItPossibleToRemoveRows**(`sheetId`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *boolean*
 
-*Defined in [src/HyperFormula.ts:1857](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1857)*
+*Defined in [src/HyperFormula.ts:1960](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1960)*
 
 Returns information whether it is possible to remove rows from a specified position in a given sheet.
 Checks against particular rules to ascertain that removeRows can be called.
 If returns `true`, doing [removeRows](hyperformulans.md#removerows) operation won't throw any errors.
 Returns `false` if given arguments are invalid.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -1695,7 +1737,7 @@ Returns `false` if given arguments are invalid.
 const hfInstance = HyperFormula.buildFromArray([
  ['1'],
  ['2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'true' for this example
 // it is possible to remove one row from row 1 of sheet 0
@@ -1717,9 +1759,10 @@ ___
 
 ▸ **isItPossibleToSetRowOrder**(`sheetId`: number, `newRowOrder`: number[]): *boolean*
 
-*Defined in [src/HyperFormula.ts:1579](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1579)*
+*Defined in [src/HyperFormula.ts:1660](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1660)*
 
 Checks if it is possible to reorder rows of a sheet according to a permutation.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 Parameter `newRowOrder` should have the form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`,
 i.e. the value at index `i` is the new position for the row that is currently at index `i`.
@@ -1733,7 +1776,7 @@ const hfInstance = HyperFormula.buildFromArray([
  ['A'],
  ['B'],
  ['C']
-]);
+], { licenseKey: 'gpl-v3' });
 
 // returns true
 hfInstance.isItPossibleToSetRowOrder(0, [1, 2, 0]);
@@ -1757,9 +1800,10 @@ ___
 
 ▸ **isItPossibleToSwapRowIndexes**(`sheetId`: number, `rowMapping`: [number, number][]): *boolean*
 
-*Defined in [src/HyperFormula.ts:1492](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1492)*
+*Defined in [src/HyperFormula.ts:1567](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1567)*
 
 Checks if it is possible to reorder rows of a sheet according to a source-target mapping.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -1769,7 +1813,7 @@ const hfInstance = HyperFormula.buildFromArray([
  [1],
  [2],
  [4, 5],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // returns true
 const isSwappable = hfInstance.isItPossibleToSwapRowIndexes(0, [[0, 2], [2, 0]]);
@@ -1793,7 +1837,7 @@ ___
 
 ▸ **moveRows**(`sheetId`: number, `startRow`: number, `numberOfRows`: number, `targetRow`: number): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:2228](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2228)*
+*Defined in [src/HyperFormula.ts:2359](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2359)*
 
 Moves a particular number of rows to a specified position in a given sheet.
 
@@ -1813,12 +1857,14 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [TargetLocationHasArrayError](hyperformulans.md#static-targetlocationhasarrayerror) when the target location has array inside - cells cannot be replaced by the array
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1'],
  ['2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return a list of cells which values changed after the operation,
 // their absolute addresses and new values
@@ -1842,7 +1888,7 @@ ___
 
 ▸ **removeRows**(`sheetId`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:1898](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1898)*
+*Defined in [src/HyperFormula.ts:2005](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2005)*
 
 Removes multiple rows from a specified position in a given sheet.
 Does nothing if rows are outside the effective sheet size.
@@ -1859,12 +1905,14 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [NoSheetWithIdError](hyperformulans.md#static-nosheetwithiderror) when the given sheet ID does not exist
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1'],
  ['2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return: [{ sheet: 0, col: 1, row: 2, value: null }] for this example
 const changes = hfInstance.removeRows(0, [1, 1]);
@@ -1885,7 +1933,7 @@ ___
 
 ▸ **setRowOrder**(`sheetId`: number, `newRowOrder`: number[]): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:1544](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1544)*
+*Defined in [src/HyperFormula.ts:1623](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1623)*
 
 Reorders rows of a sheet according to a permutation of 0-based indexes.
 
@@ -1909,13 +1957,15 @@ Note: This method may trigger dependency graph recalculation.
 
 **`throws`** [SourceLocationHasArrayError](hyperformulans.md#static-sourcelocationhasarrayerror) when the selected position has array inside
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['A'],
  ['B'],
  ['C']
-]);
+], { licenseKey: 'gpl-v3' });
 
 // Move 'A' to index 1, 'B' to index 2, and 'C' to index 0.
 const newRowOrder = [1, 2, 0]; // [ newPosForA, newPosForB, newPosForC ]
@@ -1940,7 +1990,7 @@ ___
 
 ▸ **swapRowIndexes**(`sheetId`: number, `rowMapping`: [number, number][]): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:1461](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1461)*
+*Defined in [src/HyperFormula.ts:1534](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1534)*
 
 Reorders rows of a sheet according to a source-target mapping.
 
@@ -1958,13 +2008,15 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [SourceLocationHasArrayError](hyperformulans.md#static-sourcelocationhasarrayerror) when the selected position has array inside
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  [1],
  [2],
  [4, 5],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should set swap rows 0 and 2 in place, returns:
 // [{
@@ -2003,7 +2055,7 @@ ___
 
 ▸ **addColumns**(`sheetId`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:1974](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1974)*
+*Defined in [src/HyperFormula.ts:2087](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2087)*
 
 Adds multiple columns into a specified position in a given sheet.
 Does nothing if the columns are outside the effective sheet size.
@@ -2022,11 +2074,13 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [SheetSizeLimitExceededError](hyperformulans.md#static-sheetsizelimitexceedederror) when performing this operation would result in sheet size limits exceeding
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['=RAND()', '42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return a list of cells which values changed after the operation,
 // their absolute addresses and new values, for this example:
@@ -2052,12 +2106,13 @@ ___
 
 ▸ **isItPossibleToAddColumns**(`sheetId`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *boolean*
 
-*Defined in [src/HyperFormula.ts:1928](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1928)*
+*Defined in [src/HyperFormula.ts:2037](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2037)*
 
 Returns information whether it is possible to add columns into a specified position in a given sheet.
 Checks against particular rules to ascertain that addColumns can be called.
 If returns `true`, doing [addColumns](hyperformulans.md#addcolumns) operation won't throw any errors.
 Returns `false` if adding columns would exceed the sheet size limit or given arguments are invalid.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -2065,7 +2120,7 @@ Returns `false` if adding columns would exceed the sheet size limit or given arg
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'true' for this example,
 // it is possible to add 1 column in sheet 0, at column 1
@@ -2087,12 +2142,13 @@ ___
 
 ▸ **isItPossibleToMoveColumns**(`sheetId`: number, `startColumn`: number, `numberOfColumns`: number, `targetColumn`: number): *boolean*
 
-*Defined in [src/HyperFormula.ts:2263](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2263)*
+*Defined in [src/HyperFormula.ts:2396](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2396)*
 
 Returns information whether it is possible to move a particular number of columns to a specified position in a given sheet.
 Checks against particular rules to ascertain that moveColumns can be called.
 If returns `true`, doing [moveColumns](hyperformulans.md#movecolumns) operation won't throw any errors.
 Returns `false` if the operation might be disrupted and causes side effects by the fact that there is an array inside the selected columns, the target location includes an array or the provided address is invalid.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -2100,7 +2156,7 @@ Returns `false` if the operation might be disrupted and causes side effects by t
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'true' for this example
 // it is possible to move one column from column 1 into column 2 of sheet 0
@@ -2124,12 +2180,13 @@ ___
 
 ▸ **isItPossibleToRemoveColumns**(`sheetId`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *boolean*
 
-*Defined in [src/HyperFormula.ts:2004](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2004)*
+*Defined in [src/HyperFormula.ts:2119](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2119)*
 
 Returns information whether it is possible to remove columns from a specified position in a given sheet.
 Checks against particular rules to ascertain that removeColumns can be called.
 If returns `true`, doing [removeColumns](hyperformulans.md#removecolumns) operation won't throw any errors.
 Returns `false` if given arguments are invalid.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -2137,7 +2194,7 @@ Returns `false` if given arguments are invalid.
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'true' for this example
 // it is possible to remove one column, in place of the second column of sheet 0
@@ -2159,9 +2216,10 @@ ___
 
 ▸ **isItPossibleToSetColumnOrder**(`sheetId`: number, `newColumnOrder`: number[]): *boolean*
 
-*Defined in [src/HyperFormula.ts:1748](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1748)*
+*Defined in [src/HyperFormula.ts:1841](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1841)*
 
 Checks if it is possible to reorder columns of a sheet according to a permutation.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 Parameter `newColumnOrder` should have the form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`,
 i.e. the value at index `i` is the new position for the column that is currently at index `i`.
@@ -2173,7 +2231,7 @@ See [setColumnOrder](hyperformulans.md#setcolumnorder) for details.
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['A', 'B', 'C']
-]);
+], { licenseKey: 'gpl-v3' });
 
 // returns true
 hfInstance.isItPossibleToSetColumnOrder(0, [1, 2, 0]);
@@ -2197,9 +2255,10 @@ ___
 
 ▸ **isItPossibleToSwapColumnIndexes**(`sheetId`: number, `columnMapping`: [number, number][]): *boolean*
 
-*Defined in [src/HyperFormula.ts:1665](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1665)*
+*Defined in [src/HyperFormula.ts:1752](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1752)*
 
 Checks if it is possible to reorder columns of a sheet according to a source-target mapping.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`fires`** [valuesUpdated](../interfaces/listeners.md#valuesupdated) if recalculation was triggered by this change
 
@@ -2210,7 +2269,7 @@ Checks if it is possible to reorder columns of a sheet according to a source-tar
 const hfInstance = HyperFormula.buildFromArray([
  [1, 2, 4],
  [5]
-]);
+], { licenseKey: 'gpl-v3' });
 
 // returns true
 hfInstance.isItPossibleToSwapColumnIndexes(0, [[0, 2], [2, 0]]);
@@ -2234,7 +2293,7 @@ ___
 
 ▸ **moveColumns**(`sheetId`: number, `startColumn`: number, `numberOfColumns`: number, `targetColumn`: number): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:2316](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2316)*
+*Defined in [src/HyperFormula.ts:2454](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2454)*
 
 Moves a particular number of columns to a specified position in a given sheet.
 
@@ -2254,22 +2313,25 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [TargetLocationHasArrayError](hyperformulans.md#static-targetlocationhasarrayerror) when the target location has array inside - cells cannot be replaced by the array
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2', '3', '=RAND()', '=SUM(A1:C1)'],
-]);
+], { licenseKey: 'gpl-v3' });
 
+// move column B before column D; the SUM range follows its cells and becomes A1:B1
 // should return a list of cells which values changed after the operation,
 // their absolute addresses and new values, for this example:
 // [{
-//   address: { sheet: 0, col: 1, row: 0 },
-//   newValue: 0.16210054671639,
-//  }, {
 //   address: { sheet: 0, col: 4, row: 0 },
-//   newValue: 6.16210054671639,
+//   newValue: 4,
+//  }, {
+//   address: { sheet: 0, col: 3, row: 0 },
+//   newValue: 0.16210054671639,
 // }]
-const changes = hfInstance.moveColumns(0, 1, 1, 2);
+const changes = hfInstance.moveColumns(0, 1, 1, 3);
 ```
 
 **Parameters:**
@@ -2289,7 +2351,7 @@ ___
 
 ▸ **removeColumns**(`sheetId`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:2049](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2049)*
+*Defined in [src/HyperFormula.ts:2168](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2168)*
 
 Removes multiple columns from a specified position in a given sheet.
 Does nothing if columns are outside the effective sheet size.
@@ -2306,11 +2368,13 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [InvalidArgumentsError](hyperformulans.md#static-invalidargumentserror) when the given arguments are invalid
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['0', '=SUM(1, 2, 3)', '=A1'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return a list of cells which values changed after the operation,
 // their absolute addresses and new values, in this example it will return:
@@ -2336,7 +2400,7 @@ ___
 
 ▸ **setColumnOrder**(`sheetId`: number, `newColumnOrder`: number[]): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:1715](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1715)*
+*Defined in [src/HyperFormula.ts:1806](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1806)*
 
 Reorders columns of a sheet according to a permutation of 0-based indexes.
 
@@ -2360,11 +2424,13 @@ Note: This method may trigger dependency graph recalculation.
 
 **`throws`** [SourceLocationHasArrayError](hyperformulans.md#static-sourcelocationhasarrayerror) when the selected position has array inside
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
   ['A', 'B', 'C']
-]);
+], { licenseKey: 'gpl-v3' });
 
 // Move 'A' to index 1, 'B' to index 2, and 'C' to index 0.
 const newColumnOrder = [1, 2, 0]; // [ newPosForA, newPosForB, newPosForC ]
@@ -2389,7 +2455,7 @@ ___
 
 ▸ **swapColumnIndexes**(`sheetId`: number, `columnMapping`: [number, number][]): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:1637](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1637)*
+*Defined in [src/HyperFormula.ts:1722](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1722)*
 
 Reorders columns of a sheet according to a source-target mapping.
 
@@ -2407,12 +2473,14 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [SourceLocationHasArrayError](hyperformulans.md#static-sourcelocationhasarrayerror) when the selected position has array inside
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  [1, 2, 4],
  [5]
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should set swap columns 0 and 2 in place, returns:
 // [{
@@ -2451,7 +2519,7 @@ ___
 
 ▸ **doesCellHaveFormula**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *boolean*
 
-*Defined in [src/HyperFormula.ts:3419](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3419)*
+*Defined in [src/HyperFormula.ts:3591](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3591)*
 
 Returns `true` if the specified cell contains a formula.
 The method accepts cell coordinates as object with column, row and sheet numbers.
@@ -2464,7 +2532,7 @@ The method accepts cell coordinates as object with column, row and sheet numbers
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['=SUM(A2:A3)', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'true' since the A1 cell contains a formula
 const A1Formula = hfInstance.doesCellHaveFormula({ sheet: 0, col: 0, row: 0 });
@@ -2487,7 +2555,7 @@ ___
 
 ▸ **doesCellHaveSimpleValue**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *boolean*
 
-*Defined in [src/HyperFormula.ts:3388](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3388)*
+*Defined in [src/HyperFormula.ts:3560](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3560)*
 
 Returns `true` if the specified cell contains a simple value.
 The method accepts cell coordinates as object with column, row and sheet numbers.
@@ -2500,7 +2568,7 @@ The method accepts cell coordinates as object with column, row and sheet numbers
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['=SUM(A2:A3)', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'true' since the selected cell contains a simple value
 const isA1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 0, row: 0 });
@@ -2523,7 +2591,7 @@ ___
 
 ▸ **getCellFormula**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *string | undefined*
 
-*Defined in [src/HyperFormula.ts:843](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L843)*
+*Defined in [src/HyperFormula.ts:897](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L897)*
 
 Returns a normalized formula string from the cell of a given address or `undefined` for an address that does not exist and empty values.
 
@@ -2535,7 +2603,7 @@ Returns a normalized formula string from the cell of a given address or `undefin
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['=SUM(1, 2, 3)', '0'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return a normalized A1 cell formula: '=SUM(1, 2, 3)'
 const A1Formula = hfInstance.getCellFormula({ sheet: 0, col: 0, row: 0 });
@@ -2558,7 +2626,7 @@ ___
 
 ▸ **getCellHyperlink**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *string | undefined*
 
-*Defined in [src/HyperFormula.ts:873](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L873)*
+*Defined in [src/HyperFormula.ts:927](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L927)*
 
 Returns the `HYPERLINK` url for a cell of a given address or `undefined` for an address that does not exist or a cell that is not `HYPERLINK`
 
@@ -2570,7 +2638,7 @@ Returns the `HYPERLINK` url for a cell of a given address or `undefined` for an 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['=HYPERLINK("https://hyperformula.handsontable.com/", "HyperFormula")', '0'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return url of 'HYPERLINK': https://hyperformula.handsontable.com/
 const A1Hyperlink = hfInstance.getCellHyperlink({ sheet: 0, col: 0, row: 0 });
@@ -2593,7 +2661,7 @@ ___
 
 ▸ **getCellSerialized**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[RawCellContent](../globals.md#rawcellcontent)*
 
-*Defined in [src/HyperFormula.ts:905](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L905)*
+*Defined in [src/HyperFormula.ts:959](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L959)*
 
 Returns [RawCellContent](../globals.md#rawcellcontent) with a serialized content of the cell of a given address: either a cell formula, an explicit value, or an error.
 
@@ -2607,7 +2675,7 @@ Returns [RawCellContent](../globals.md#rawcellcontent) with a serialized content
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['=SUM(1, 2, 3)', '0'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return serialized content of A1 cell: '=SUM(1, 2, 3)'
 const cellA1Serialized = hfInstance.getCellSerialized({ sheet: 0, col: 0, row: 0 });
@@ -2630,7 +2698,7 @@ ___
 
 ▸ **getCellType**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[CellType](hyperformulans.md#static-celltype)*
 
-*Defined in [src/HyperFormula.ts:3356](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3356)*
+*Defined in [src/HyperFormula.ts:3528](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3528)*
 
 Returns the type of a cell at a given address.
 The method accepts cell coordinates as object with column, row and sheet numbers.
@@ -2643,7 +2711,7 @@ The method accepts cell coordinates as object with column, row and sheet numbers
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['=SUM(A2:A3)', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'FORMULA', the cell of given coordinates is of this type
 const cellA1Type = hfInstance.getCellType({ sheet: 0, col: 0, row: 0 });
@@ -2666,7 +2734,7 @@ ___
 
 ▸ **getCellValue**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[CellValue](../globals.md#cellvalue)*
 
-*Defined in [src/HyperFormula.ts:812](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L812)*
+*Defined in [src/HyperFormula.ts:866](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L866)*
 
 Returns the cell value of a given address.
 Applies rounding and post-processing.
@@ -2681,7 +2749,7 @@ Applies rounding and post-processing.
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['=SUM(1, 2, 3)', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // get value of A1 cell, should be '6'
 const A1Value = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
@@ -2704,7 +2772,7 @@ ___
 
 ▸ **getCellValueDetailedType**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[CellValueDetailedType](hyperformulans.md#static-cellvaluedetailedtype)*
 
-*Defined in [src/HyperFormula.ts:3550](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3550)*
+*Defined in [src/HyperFormula.ts:3722](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3722)*
 
 Returns detailed type of the cell value of a given address.
 The method accepts cell coordinates as object with column, row and sheet numbers.
@@ -2721,7 +2789,7 @@ For more information, see the [Types of values guide](/docs/guide/types-of-value
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1%', '1$'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'NUMBER_PERCENT', cell value type of provided coordinates is a number with a format inference percent.
 const cellType = hfInstance.getCellValueDetailedType({ sheet: 0, col: 0, row: 0 });
@@ -2744,7 +2812,7 @@ ___
 
 ▸ **getCellValueFormat**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *FormatInfo*
 
-*Defined in [src/HyperFormula.ts:3584](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3584)*
+*Defined in [src/HyperFormula.ts:3756](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3756)*
 
 Returns auxiliary format information of the cell value of a given address.
 The method accepts cell coordinates as object with column, row and sheet numbers.
@@ -2759,7 +2827,7 @@ The method accepts cell coordinates as object with column, row and sheet numbers
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1$', '1'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return '$', cell value type of provided coordinates is a number with a format inference currency, parsed as using '$' as currency.
 const cellFormat = hfInstance.getCellValueFormat({ sheet: 0, col: 0, row: 0 });
@@ -2782,7 +2850,7 @@ ___
 
 ▸ **getCellValueType**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[CellValueType](hyperformulans.md#static-cellvaluetype)*
 
-*Defined in [src/HyperFormula.ts:3514](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3514)*
+*Defined in [src/HyperFormula.ts:3686](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3686)*
 
 Returns type of the cell value of a given address.
 The method accepts cell coordinates as object with column, row and sheet numbers.
@@ -2799,7 +2867,7 @@ For more information, see the [Types of values guide](/docs/guide/types-of-value
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['=SUM(1, 2, 3)', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'NUMBER', cell value type of provided coordinates is a number
 const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
@@ -2822,7 +2890,7 @@ ___
 
 ▸ **isCellEmpty**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *boolean*
 
-*Defined in [src/HyperFormula.ts:3451](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3451)*
+*Defined in [src/HyperFormula.ts:3623](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3623)*
 
 Returns`true` if the specified cell is empty.
 The method accepts cell coordinates as object with column, row and sheet numbers.
@@ -2835,7 +2903,7 @@ The method accepts cell coordinates as object with column, row and sheet numbers
 ```js
 const hfInstance = HyperFormula.buildFromArray([
   [null, '1'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'true', cell of provided coordinates is empty
 const isEmpty = hfInstance.isCellEmpty({ sheet: 0, col: 0, row: 0 });
@@ -2858,7 +2926,7 @@ ___
 
 ▸ **isCellPartOfArray**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *boolean*
 
-*Defined in [src/HyperFormula.ts:3479](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3479)*
+*Defined in [src/HyperFormula.ts:3651](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3651)*
 
 Returns `true` if a given cell is a part of an array.
 The method accepts cell coordinates as object with column, row and sheet numbers.
@@ -2871,7 +2939,7 @@ The method accepts cell coordinates as object with column, row and sheet numbers
 ```js
 const hfInstance = HyperFormula.buildFromArray([
    ['{=TRANSPOSE(B1:B1)}'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'true', cell of provided coordinates is a part of an array
 const isPartOfArray = hfInstance.isCellPartOfArray({ sheet: 0, col: 0, row: 0 });
@@ -2891,12 +2959,13 @@ ___
 
 ▸ **isItPossibleToMoveCells**(`source`: [SimpleCellRange](../interfaces/simplecellrange.md), `destinationLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *boolean*
 
-*Defined in [src/HyperFormula.ts:2085](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2085)*
+*Defined in [src/HyperFormula.ts:2206](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2206)*
 
 Returns information whether it is possible to move cells to a specified position in a given sheet.
 Checks against particular rules to ascertain that moveCells can be called.
 If returns `true`, doing [moveCells](hyperformulans.md#movecells) operation won't throw any errors.
 Returns `false` if the operation might be disrupted and causes side effects by the fact that there is an array inside the selected columns, the target location includes an array or the provided address is invalid.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if destinationLeftCorner, source, or any of basic type arguments are of wrong type
 
@@ -2906,7 +2975,7 @@ Returns `false` if the operation might be disrupted and causes side effects by t
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // choose the coordinates and assign them to variables
 const source = { sheet: 0, col: 1, row: 0 };
@@ -2934,11 +3003,12 @@ ___
 
 ▸ **isItPossibleToSetCellContents**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md) | [SimpleCellRange](../interfaces/simplecellrange.md)): *boolean*
 
-*Defined in [src/HyperFormula.ts:1356](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1356)*
+*Defined in [src/HyperFormula.ts:1423](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1423)*
 
 Returns information whether it is possible to change the content in a rectangular area bounded by the box.
 If returns `true`, doing [setCellContents](hyperformulans.md#setcellcontents) operation won't throw any errors.
 Returns `false` if the address is invalid or the sheet does not exist.
+Returns `false` also when the license key does not allow the Crud feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -2948,7 +3018,7 @@ Returns `false` if the address is invalid or the sheet does not exist.
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // top left corner
 const address1 = { col: 0, row: 0, sheet: 0 };
@@ -2974,7 +3044,7 @@ ___
 
 ▸ **moveCells**(`source`: [SimpleCellRange](../interfaces/simplecellrange.md), `destinationLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:2142](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2142)*
+*Defined in [src/HyperFormula.ts:2267](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2267)*
 
 Moves the content of a cell block from source to the target location.
 
@@ -2998,11 +3068,13 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [SheetsNotEqual](sheetsnotequal.md) if range provided has distinct sheet numbers for start and end
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['=RAND()', '42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // choose the coordinates and assign them to variables
 const source = { sheet: 0, col: 1, row: 0 };
@@ -3032,7 +3104,7 @@ ___
 
 ▸ **setCellContents**(`topLeftCornerAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `cellContents`: [RawCellContent](../globals.md#rawcellcontent)[][] | [RawCellContent](../globals.md#rawcellcontent)): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:1409](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1409)*
+*Defined in [src/HyperFormula.ts:1480](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1480)*
 
 Sets the content for a block of cells of a given coordinates.
 
@@ -3050,11 +3122,13 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if topLeftCornerAddress argument is of wrong type
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2', '=A1'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should set the content, returns:
 // [{
@@ -3081,7 +3155,7 @@ ___
 
 ▸ **addNamedExpression**(`expressionName`: string, `expression`: [RawCellContent](../globals.md#rawcellcontent), `scope?`: undefined | number, `options?`: [NamedExpressionOptions](../globals.md#namedexpressionoptions)): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:3904](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3904)*
+*Defined in [src/HyperFormula.ts:4102](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4102)*
 
 Adds a specified named expression.
 
@@ -3103,11 +3177,13 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [NoSheetWithIdError](hyperformulans.md#static-nosheetwithiderror) if no sheet with given sheetId exists
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // add own expression, scope limited to 'Sheet1' (sheetId=0), the method should return a list of cells which values
 // changed after the operation, their absolute addresses and new values
@@ -3136,7 +3212,7 @@ ___
 
 ▸ **changeNamedExpression**(`expressionName`: string, `newExpression`: [RawCellContent](../globals.md#rawcellcontent), `scope?`: undefined | number, `options?`: [NamedExpressionOptions](../globals.md#namedexpressionoptions)): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:4126](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4126)*
+*Defined in [src/HyperFormula.ts:4330](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4330)*
 
 Changes a given named expression to a specified formula.
 
@@ -3156,17 +3232,19 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [NoRelativeAddressesAllowedError](hyperformulans.md#static-norelativeaddressesallowederror) when the named expression formula contains relative references
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // add a named expression, scope limited to 'Sheet1' (sheetId=0)
 hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
 
-// change the named expression
-const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!$A$1+200');
+// change the named expression in the same scope
+const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!$A$1+200', 0);
 ```
 
 **Parameters:**
@@ -3186,7 +3264,7 @@ ___
 
 ▸ **getAllNamedExpressionsSerialized**(): *[SerializedNamedExpression](../interfaces/serializednamedexpression.md)[]*
 
-*Defined in [src/HyperFormula.ts:4294](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4294)*
+*Defined in [src/HyperFormula.ts:4505](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4505)*
 
 Returns all named expressions serialized.
 
@@ -3198,12 +3276,12 @@ const hfInstance = HyperFormula.buildFromArray([
  ['42'],
  ['50'],
  ['60'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // add two named expressions and one scoped
 hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
 hfInstance.addNamedExpression('anotherPrettyName', '=Sheet1!$A$2+100');
-hfInstance.addNamedExpression('prettyName3', '=Sheet1!$A$3+100', 0);
+hfInstance.addNamedExpression('alsoPrettyName', '=Sheet1!$A$3+100', 0);
 
 // get all expressions serialized
 // should return:
@@ -3223,7 +3301,7 @@ ___
 
 ▸ **getNamedExpression**(`expressionName`: string, `scope?`: undefined | number): *[NamedExpression](../interfaces/namedexpression.md) | undefined*
 
-*Defined in [src/HyperFormula.ts:4029](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4029)*
+*Defined in [src/HyperFormula.ts:4228](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4228)*
 
 Returns a named expression, or `undefined` for a named expression that does not exist or does not hold a formula.
 
@@ -3237,7 +3315,7 @@ For more information, see the [Named expressions guide](/docs/guide/named-expres
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // add a named expression in 'Sheet1' (sheetId=0)
 hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
@@ -3266,7 +3344,7 @@ ___
 
 ▸ **getNamedExpressionFormula**(`expressionName`: string, `scope?`: undefined | number): *string | undefined*
 
-*Defined in [src/HyperFormula.ts:3984](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3984)*
+*Defined in [src/HyperFormula.ts:4183](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4183)*
 
 Returns a normalized formula string for given named expression, or `undefined` for a named expression that does not exist or does not hold a formula.
 
@@ -3280,7 +3358,7 @@ For more information, see the [Named expressions guide](/docs/guide/named-expres
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // add a named expression in 'Sheet1' (sheetId=0)
 hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
@@ -3305,7 +3383,7 @@ ___
 
 ▸ **getNamedExpressionValue**(`expressionName`: string, `scope?`: undefined | number): *[CellValue](../globals.md#cellvalue) | undefined*
 
-*Defined in [src/HyperFormula.ts:3942](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3942)*
+*Defined in [src/HyperFormula.ts:4141](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4141)*
 
 Gets specified named expression value.
 Returns a [CellValue](../globals.md#cellvalue) or undefined if the given named expression does not exist.
@@ -3320,13 +3398,13 @@ For more information, see the [Named expressions guide](/docs/guide/named-expres
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // add a named expression, only 'Sheet1' (sheetId=0) considered as it is the scope
-hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 'Sheet1');
+hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
 
-// returns the calculated value of a passed named expression, '142' for this example
-const myFormula = hfInstance.getNamedExpressionValue('prettyName', 'Sheet1');
+// returns the calculated value of a passed named expression, 142 for this example
+const myFormula = hfInstance.getNamedExpressionValue('prettyName', 0);
 ```
 
 **Parameters:**
@@ -3344,12 +3422,13 @@ ___
 
 ▸ **isItPossibleToAddNamedExpression**(`expressionName`: string, `expression`: [RawCellContent](../globals.md#rawcellcontent), `scope?`: undefined | number): *boolean*
 
-*Defined in [src/HyperFormula.ts:3852](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3852)*
+*Defined in [src/HyperFormula.ts:4046](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4046)*
 
 Returns information whether it is possible to add named expression into a specific scope.
 Checks against particular rules to ascertain that addNamedExpression can be called.
 If returns `true`, doing [addNamedExpression](hyperformulans.md#addnamedexpression) operation won't throw any errors.
 Returns `false` if the operation might be disrupted.
+Returns `false` also when the license key does not allow the NamedExpressions feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -3357,7 +3436,7 @@ Returns `false` if the operation might be disrupted.
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // should return 'true' for this example,
 // it is possible to add named expression to global scope
@@ -3380,12 +3459,13 @@ ___
 
 ▸ **isItPossibleToChangeNamedExpression**(`expressionName`: string, `newExpression`: [RawCellContent](../globals.md#rawcellcontent), `scope?`: undefined | number): *boolean*
 
-*Defined in [src/HyperFormula.ts:4078](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4078)*
+*Defined in [src/HyperFormula.ts:4278](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4278)*
 
 Returns information whether it is possible to change named expression in a specific scope.
 Checks against particular rules to ascertain that changeNamedExpression can be called.
 If returns `true`, doing [changeNamedExpression](hyperformulans.md#changenamedexpression) operation won't throw any errors.
 Returns `false` if the operation might be disrupted.
+Returns `false` also when the license key does not allow the NamedExpressions feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -3393,7 +3473,7 @@ Returns `false` if the operation might be disrupted.
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // add a named expression
 hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
@@ -3419,12 +3499,13 @@ ___
 
 ▸ **isItPossibleToRemoveNamedExpression**(`expressionName`: string, `scope?`: undefined | number): *boolean*
 
-*Defined in [src/HyperFormula.ts:4162](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4162)*
+*Defined in [src/HyperFormula.ts:4368](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4368)*
 
 Returns information whether it is possible to remove named expression from a specific scope.
 Checks against particular rules to ascertain that removeNamedExpression can be called.
 If returns `true`, doing [removeNamedExpression](hyperformulans.md#removenamedexpression) operation won't throw any errors.
 Returns `false` if the operation might be disrupted.
+Returns `false` also when the license key does not allow the NamedExpressions feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -3432,7 +3513,7 @@ Returns `false` if the operation might be disrupted.
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // add a named expression
 hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
@@ -3457,7 +3538,7 @@ ___
 
 ▸ **listNamedExpressions**(`scope?`: undefined | number): *string[]*
 
-*Defined in [src/HyperFormula.ts:4256](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4256)*
+*Defined in [src/HyperFormula.ts:4467](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4467)*
 
 Lists named expressions.
 - If scope parameter is provided, returns an array of expression names defined for this scope.
@@ -3475,7 +3556,7 @@ const hfInstance = HyperFormula.buildFromArray([
  ['42'],
  ['50'],
  ['60'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // add two named expressions and one scoped
 hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
@@ -3503,7 +3584,7 @@ ___
 
 ▸ **removeNamedExpression**(`expressionName`: string, `scope?`: undefined | number): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:4207](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4207)*
+*Defined in [src/HyperFormula.ts:4417](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4417)*
 
 Removes a named expression.
 
@@ -3521,11 +3602,13 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [NoSheetWithIdError](hyperformulans.md#static-nosheetwithiderror) if no sheet with given sheetId exists
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // add a named expression
 hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
@@ -3551,7 +3634,7 @@ ___
 
 ▸ **calculateFormula**(`formulaString`: string, `sheetId`: number): *[CellValue](../globals.md#cellvalue) | [CellValue](../globals.md#cellvalue)[][]*
 
-*Defined in [src/HyperFormula.ts:4359](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4359)*
+*Defined in [src/HyperFormula.ts:4570](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4570)*
 
 Calculates fire-and-forget formula, returns the calculated value.
 
@@ -3566,7 +3649,7 @@ Calculates fire-and-forget formula, returns the calculated value.
 const hfInstance = HyperFormula.buildFromSheets({
  Sheet1: [['58']],
  Sheet2: [['1', '2', '3'], ['4', '5', '6']]
-});
+}, { licenseKey: 'gpl-v3' });
 
 // returns the calculated formula's value
 // for this example, returns `68`
@@ -3591,7 +3674,7 @@ ___
 
 ▸ **getAvailableFunctions**(): *FunctionListEntry[]*
 
-*Defined in [src/HyperFormula.ts:4530](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4530)*
+*Defined in [src/HyperFormula.ts:4761](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4761)*
 
 Returns metadata of all functions available in this instance for a function picker, with names translated
 according to the language set in this instance's configuration. Each entry contains the translated name, the
@@ -3615,9 +3698,24 @@ an untranslated id, so listing it would advertise a function that cannot be call
 plugin registered without translations for that language. A translation set to an empty string is not a missing
 entry: it falls back to the canonical id, so the function stays listed under its canonical name.
 
+A function the instance's license key does not include is omitted for the same reason: it would evaluate to a
+`#LIC!` error. The list therefore answers "what can this engine compute", not "what does this package contain".
+Two consequences worth knowing:
+- A key that blocks evaluation (a missing or invalid key, an expired classic key, or a trial past its grace
+  period) does **not** shorten the list. Such a key restricts nothing by entitlement — it is reported on the
+  console, and every license-gated function call evaluates to `#LIC!` — so the full catalog is still described.
+  `VERSION()` and `OFFSET()` are protected built-ins outside the license system, so they keep evaluating. Use it to
+  build a function picker before a key is configured. An expired key that keeps evaluating (a subscription past
+  its grace period, or a perpetual key whose maintenance doesn't cover this build) keeps its own grants, so the
+  list stays exactly what it was while the key was current.
+- A custom (user-registered) function is omitted only if it took a built-in id the key excludes. The rule is
+  "not covered by the capability table", not "not user-registered", so a plugin registered under an id the
+  built-in catalog already uses is treated as that built-in. Registered under an id of its own, a custom
+  function is never omitted. See [getFunctionDetails](hyperformulans.md#getfunctiondetails), which states the same exception.
+
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // get the list of available functions, translated for the configured language
 const functions = hfInstance.getAvailableFunctions();
@@ -3631,7 +3729,7 @@ ___
 
 ▸ **getCellDependents**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md) | [SimpleCellRange](../interfaces/simplecellrange.md)): *([SimpleCellRange](../interfaces/simplecellrange.md) | [SimpleCellAddress](../interfaces/simplecelladdress.md))[]*
 
-*Defined in [src/HyperFormula.ts:3183](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3183)*
+*Defined in [src/HyperFormula.ts:3355](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3355)*
 
 Returns all the out-neighbors in the [dependency graph](../../guide/dependency-graph.md) for a given cell address or range. Including:
 - All cells with formulas that contain the given cell address or range
@@ -3649,7 +3747,7 @@ The returned array includes also named expression dependents. They are represent
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
+const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] , { licenseKey: 'gpl-v3' });
 
 hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0});
 // returns [{ sheet: 0, col: 1, row: 0}, { sheet: 0, col: 2, row: 0}]
@@ -3669,7 +3767,7 @@ ___
 
 ▸ **getCellPrecedents**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md) | [SimpleCellRange](../interfaces/simplecellrange.md)): *([SimpleCellRange](../interfaces/simplecellrange.md) | [SimpleCellAddress](../interfaces/simplecelladdress.md))[]*
 
-*Defined in [src/HyperFormula.ts:3221](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3221)*
+*Defined in [src/HyperFormula.ts:3393](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3393)*
 
 Returns all the in-neighbors in the [dependency graph](../../guide/dependency-graph.md) for a given cell address or range. In particular:
 - If the argument is a single cell, `getCellPrecedents()` returns all cells and ranges contained in that cell's formula.
@@ -3683,7 +3781,7 @@ The returned array includes also named expression precedents. They are represent
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
+const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] , { licenseKey: 'gpl-v3' });
 
 hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0});
 // returns [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
@@ -3703,7 +3801,7 @@ ___
 
 ▸ **getFunctionDetails**(`canonicalName`: string): *FunctionDetails | undefined*
 
-*Defined in [src/HyperFormula.ts:4575](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4575)*
+*Defined in [src/HyperFormula.ts:4807](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4807)*
 
 Returns the full metadata of a single function registered in this instance, with names translated according to
 the language set in this instance's configuration: the parameter list (with per-parameter optionality), the
@@ -3711,9 +3809,10 @@ number of trailing parameters that repeat (`repeatLastArgs`), the category, a sh
 documentation link (`documentationUrl`) and usage examples (`examples`) — every built-in authors both.
 Resolves both built-in and custom (user-registered) functions, as well as aliases. An alias reports its
 target's metadata (including examples, which spell the target's name) under the alias id, with the target id
-exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, or
-has no translation entry for the configured language (an untranslated id cannot be evaluated, so it is not
-described either, which keeps this method consistent with [getAvailableFunctions](hyperformulans.md#getavailablefunctions)).
+exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, has
+no translation entry for the configured language, or is not included in this instance's license key (neither an
+untranslated nor an unlicensed id can be evaluated, so neither is described — which keeps this method consistent
+with [getAvailableFunctions](hyperformulans.md#getavailablefunctions), including its behavior for a key that blocks evaluation).
 For a custom function, `category` is `'Custom'`, there is no `shortDescription`, `documentationUrl` or
 `examples`, and parameters are reported positionally (`Arg1`, `Arg2`, ...). A custom plugin registered over a
 built-in id is the exception: the catalogue is keyed by function id, so it reports that built-in's authored
@@ -3730,7 +3829,7 @@ metadata alongside the parameter list of the implementation actually registered.
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // get the details of the SUMIF function, translated for the configured language
 const details = hfInstance.getFunctionDetails('SUMIF');
@@ -3750,7 +3849,7 @@ ___
 
 ▸ **getNamedExpressionsFromFormula**(`formulaString`: string): *string[]*
 
-*Defined in [src/HyperFormula.ts:4390](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4390)*
+*Defined in [src/HyperFormula.ts:4601](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4601)*
 
 Return a list of named expressions used by a formula.
 
@@ -3760,7 +3859,7 @@ Return a list of named expressions used by a formula.
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // returns a list of named expressions used by a formula
 // for this example, returns ['foo', 'bar']
@@ -3781,7 +3880,7 @@ ___
 
 ▸ **normalizeFormula**(`formulaString`: string): *string*
 
-*Defined in [src/HyperFormula.ts:4323](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4323)*
+*Defined in [src/HyperFormula.ts:4534](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4534)*
 
 Parses and then unparses a formula.
 Returns a normalized formula (e.g., restores the original capitalization of sheet names, function names, cell addresses, and named expressions).
@@ -3795,7 +3894,7 @@ Returns a normalized formula (e.g., restores the original capitalization of shee
 const hfInstance = HyperFormula.buildFromArray([
  ['42'],
  ['50'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // returns '=Sheet1!$A$1+10'
 const normalizedFormula = hfInstance.normalizeFormula('=SHEET1!$A$1+10');
@@ -3818,7 +3917,7 @@ ___
 
 ▸ **numberToDate**(`inputNumber`: number): *[DateTime](../globals.md#datetime)*
 
-*Defined in [src/HyperFormula.ts:4629](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4629)*
+*Defined in [src/HyperFormula.ts:4861](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4861)*
 
 Interprets number as a date.
 
@@ -3828,7 +3927,7 @@ For more information, see the [Date and time handling guide](/docs/guide/date-an
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // pass the number of days since nullDate
 // the method should return formatted date, for this example:
@@ -3850,7 +3949,7 @@ ___
 
 ▸ **numberToDateTime**(`inputNumber`: number): *[DateTime](../globals.md#datetime)*
 
-*Defined in [src/HyperFormula.ts:4603](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4603)*
+*Defined in [src/HyperFormula.ts:4835](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4835)*
 
 Interprets number as a date + time.
 
@@ -3860,7 +3959,7 @@ For more information, see the [Date and time handling guide](/docs/guide/date-an
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // pass the number of days since nullDate
 // the method should return formatted date and time, for this example:
@@ -3883,7 +3982,7 @@ ___
 
 ▸ **numberToTime**(`inputNumber`: number): *[DateTime](../globals.md#datetime)*
 
-*Defined in [src/HyperFormula.ts:4654](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4654)*
+*Defined in [src/HyperFormula.ts:4886](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4886)*
 
 Interprets number as a time (hours/minutes/seconds).
 
@@ -3893,7 +3992,7 @@ For more information, see the [Date and time handling guide](/docs/guide/date-an
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // pass a number to be interpreted as a time
 // should return {hours: 26, minutes: 24} for this example
@@ -3914,7 +4013,7 @@ ___
 
 ▸ **simpleCellAddressFromString**(`cellAddress`: string, `contextSheetId`: number): *[SimpleCellAddress](../interfaces/simplecelladdress.md) | undefined*
 
-*Defined in [src/HyperFormula.ts:3024](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3024)*
+*Defined in [src/HyperFormula.ts:3196](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3196)*
 
 Computes the simple (absolute) address of a cell address, based on its string representation.
 - If a sheet name is present in the string representation but is not present in the engine, returns `undefined`.
@@ -3926,7 +4025,7 @@ For more information, see the [Cell references guide](/docs/guide/cell-reference
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 hfInstance.addSheet('Sheet0'); //sheetId = 0
 
 // returns { sheet: 42, col: 0, row: 0 }
@@ -3957,7 +4056,7 @@ ___
 
 ▸ **simpleCellAddressToString**(`cellAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `optionsOrContextSheetId`: object | number): *undefined | string*
 
-*Defined in [src/HyperFormula.ts:3093](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3093)*
+*Defined in [src/HyperFormula.ts:3265](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3265)*
 
 Computes string representation of an absolute address in A1 notation. If `cellAddress.sheet` is not present in the engine, returns `undefined`.
 
@@ -3967,7 +4066,7 @@ For more information, see the [Cell references guide](/docs/guide/cell-reference
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 hfInstance.addSheet('Sheet0'); //sheetId = 0
 const addr = { sheet: 0, col: 1, row: 1 };
 
@@ -4002,7 +4101,7 @@ ___
 
 ▸ **simpleCellRangeFromString**(`cellRange`: string, `contextSheetId`: number): *[SimpleCellRange](../interfaces/simplecellrange.md) | undefined*
 
-*Defined in [src/HyperFormula.ts:3053](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3053)*
+*Defined in [src/HyperFormula.ts:3225](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3225)*
 
 Computes simple (absolute) address of a cell range based on its string representation.
 If sheet name is present in string representation but not present in the engine, returns `undefined`.
@@ -4015,7 +4114,7 @@ For more information, see the [Cell references guide](/docs/guide/cell-reference
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 hfInstance.addSheet('Sheet0'); //sheetId = 0
 
 // should return { start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 0 } }
@@ -4037,7 +4136,7 @@ ___
 
 ▸ **simpleCellRangeToString**(`cellRange`: [SimpleCellRange](../interfaces/simplecellrange.md), `optionsOrContextSheetId`: object | number): *string | undefined*
 
-*Defined in [src/HyperFormula.ts:3146](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3146)*
+*Defined in [src/HyperFormula.ts:3318](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3318)*
 
 Computes string representation of an absolute range in A1 notation.
 Returns `undefined` if:
@@ -4054,7 +4153,7 @@ For more information, see the [Cell references guide](/docs/guide/cell-reference
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 hfInstance.addSheet('Sheet0'); //sheetId = 0
 const range = { start: { sheet: 0, col: 1, row: 1 }, end: { sheet: 0, col: 2, row: 1 } };
 
@@ -4089,7 +4188,7 @@ ___
 
 ▸ **validateFormula**(`formulaString`: string): *boolean*
 
-*Defined in [src/HyperFormula.ts:4424](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4424)*
+*Defined in [src/HyperFormula.ts:4635](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4635)*
 
 Validates the formula.
 If the provided string starts with "=" and is a parsable formula, the method returns `true`.
@@ -4119,7 +4218,7 @@ ___
 
 ▸ **clearClipboard**(): *void*
 
-*Defined in [src/HyperFormula.ts:2494](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2494)*
+*Defined in [src/HyperFormula.ts:2642](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2642)*
 
 Clears the clipboard content.
 
@@ -4139,7 +4238,7 @@ ___
 
 ▸ **copy**(`source`: [SimpleCellRange](../interfaces/simplecellrange.md)): *[CellValue](../globals.md#cellvalue)[][]*
 
-*Defined in [src/HyperFormula.ts:2354](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2354)*
+*Defined in [src/HyperFormula.ts:2494](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2494)*
 
 Stores a copy of the cell block in internal clipboard for the further paste.
 Returns the copied values for use in external clipboard.
@@ -4152,11 +4251,13 @@ For more information, see the [Clipboard Operations guide](/docs/guide/clipboard
 
 **`throws`** [SheetsNotEqual](sheetsnotequal.md) if range provided has distinct sheet numbers for start and end
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Clipboard feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
   ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // it copies [ [ 2 ] ]
 const clipboardContent = hfInstance.copy({
@@ -4181,7 +4282,7 @@ ___
 
 ▸ **cut**(`source`: [SimpleCellRange](../interfaces/simplecellrange.md)): *[CellValue](../globals.md#cellvalue)[][]*
 
-*Defined in [src/HyperFormula.ts:2394](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2394)*
+*Defined in [src/HyperFormula.ts:2536](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2536)*
 
 Stores information of the cell block in internal clipboard for further paste.
 Calling [paste](hyperformulans.md#paste) right after this method is equivalent to call [moveCells](hyperformulans.md#movecells).
@@ -4196,11 +4297,13 @@ For more information, see the [Clipboard Operations guide](/docs/guide/clipboard
 
 **`throws`** [NoSheetWithIdError](hyperformulans.md#static-nosheetwithiderror) when the given sheet ID does not exist
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Clipboard feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
   ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // returns the values that were cut: [ [ 1 ] ]
 const clipboardContent = hfInstance.cut({
@@ -4225,7 +4328,7 @@ ___
 
 ▸ **isClipboardEmpty**(): *boolean*
 
-*Defined in [src/HyperFormula.ts:2477](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2477)*
+*Defined in [src/HyperFormula.ts:2625](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2625)*
 
 Returns information whether there is something in the clipboard.
 
@@ -4233,7 +4336,7 @@ Returns information whether there is something in the clipboard.
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // copy desired content
 const clipboardContent = hfInstance.copy({
@@ -4255,7 +4358,7 @@ ___
 
 ▸ **paste**(`targetLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:2445](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2445)*
+*Defined in [src/HyperFormula.ts:2589](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2589)*
 
 When called after [copy](hyperformulans.md#copy) it pastes copied values and formulas into a cell block.
 When called after [cut](hyperformulans.md#cut) it performs [moveCells](hyperformulans.md#movecells) operation into the cell block.
@@ -4281,11 +4384,13 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if targetLeftCorner is of wrong type
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Clipboard feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
   ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // [ [ 2 ] ] was copied
 const clipboardContent = hfInstance.copy({
@@ -4315,7 +4420,7 @@ ___
 
 ▸ **clearRedoStack**(): *void*
 
-*Defined in [src/HyperFormula.ts:2524](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2524)*
+*Defined in [src/HyperFormula.ts:2672](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2672)*
 
 Clears the redo stack in undoRedo history.
 
@@ -4325,7 +4430,7 @@ For more information, see the [Undo-Redo guide](/docs/guide/undo-redo.md).
 ```js
 const hfInstance = HyperFormula.buildFromArray([
   ['1', '2', '3'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // do an operation, for example remove columns
 hfInstance.removeColumns(0, [0, 1]);
@@ -4348,7 +4453,7 @@ ___
 
 ▸ **clearUndoStack**(): *void*
 
-*Defined in [src/HyperFormula.ts:2551](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L2551)*
+*Defined in [src/HyperFormula.ts:2699](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L2699)*
 
 Clears the undo stack in undoRedo history.
 
@@ -4358,7 +4463,7 @@ For more information, see the [Undo-Redo guide](/docs/guide/undo-redo.md).
 ```js
 const hfInstance = HyperFormula.buildFromArray([
   ['1', '2', '3'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // do an operation, for example remove columns
 hfInstance.removeColumns(0, [0, 1]);
@@ -4378,9 +4483,10 @@ ___
 
 ▸ **isThereSomethingToRedo**(): *boolean*
 
-*Defined in [src/HyperFormula.ts:1324](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1324)*
+*Defined in [src/HyperFormula.ts:1387](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1387)*
 
 Checks if there is at least one operation that can be re-done.
+Returns `false` also when the license key does not allow the UndoRedo feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 For more information, see the [Undo-Redo guide](/docs/guide/undo-redo.md).
 
@@ -4400,9 +4506,10 @@ ___
 
 ▸ **isThereSomethingToUndo**(): *boolean*
 
-*Defined in [src/HyperFormula.ts:1305](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1305)*
+*Defined in [src/HyperFormula.ts:1364](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1364)*
 
 Checks if there is at least one operation that can be undone.
+Returns `false` also when the license key does not allow the UndoRedo feature (see [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror)).
 
 For more information, see the [Undo-Redo guide](/docs/guide/undo-redo.md).
 
@@ -4412,7 +4519,7 @@ const hfInstance = HyperFormula.buildFromArray([
  ['1'],
  ['2'],
  ['3'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // perform CRUD operation, for example remove the second row
 hfInstance.removeRows(0, [1, 1]);
@@ -4430,7 +4537,7 @@ ___
 
 ▸ **redo**(): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:1277](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1277)*
+*Defined in [src/HyperFormula.ts:1334](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1334)*
 
 Re-do recently undone operation.
 
@@ -4444,13 +4551,15 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [NoOperationToRedoError](hyperformulans.md#static-nooperationtoredoerror) when there is no operation running that can be re-done
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the UndoRedo feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1'],
  ['2'],
  ['3'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // perform CRUD operation, for example remove the second row
 hfInstance.removeRows(0, [1, 1]);
@@ -4470,7 +4579,7 @@ ___
 
 ▸ **undo**(): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:1239](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L1239)*
+*Defined in [src/HyperFormula.ts:1294](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L1294)*
 
 Undo the previous operation.
 
@@ -4484,12 +4593,14 @@ Note that this method may trigger dependency graph recalculation.
 
 **`throws`** [NoOperationToUndoError](hyperformulans.md#static-nooperationtoundoerror) when there is no operation running that can be undone
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the UndoRedo feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
  ['3', ''],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // perform CRUD operation, for example remove the second row
 hfInstance.removeRows(0, [1, 1]);
@@ -4508,7 +4619,7 @@ ___
 
 ▸ **batch**(`batchOperations`: function): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:3714](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3714)*
+*Defined in [src/HyperFormula.ts:3894](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3894)*
 
 Runs the provided callback as a single [batch operation](../../guide/batch-operations.md) and returns the changed cells.
 
@@ -4522,12 +4633,14 @@ Note that this method may trigger dependency graph recalculation.
 
 **`fires`** [evaluationResumed](../interfaces/listeners.md#evaluationresumed) after the recomputation of necessary values
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Batching feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['1'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // multiple operations in a single callback will trigger evaluation only once
 // and only one set of changes is returned as a combined result of all
@@ -4554,13 +4667,13 @@ ___
 
 ▸ **isEvaluationSuspended**(): *boolean*
 
-*Defined in [src/HyperFormula.ts:3823](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3823)*
+*Defined in [src/HyperFormula.ts:4016](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4016)*
 
 Checks if the dependency graph recalculation process is [suspended](../../guide/batch-operations.md) or not.
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // suspend the evaluation
 hfInstance.suspendEvaluation();
@@ -4580,7 +4693,7 @@ ___
 
 ▸ **resumeEvaluation**(): *[ExportedChange](../globals.md#exportedchange)[]*
 
-*Defined in [src/HyperFormula.ts:3797](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3797)*
+*Defined in [src/HyperFormula.ts:3981](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3981)*
 
 Resumes the dependency graph recalculation that was [suspended](../../guide/batch-operations.md) with [suspendEvaluation](hyperformulans.md#suspendevaluation).
 It also triggers the recalculation and returns [an array of cells whose values changed as a result of all batched operations](/docs/guide/basic-operations.md#changes-array).
@@ -4594,7 +4707,7 @@ It also triggers the recalculation and returns [an array of cells whose values c
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['1'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // similar to batch() but operations are not within a callback,
 // one method suspends the recalculation
@@ -4619,7 +4732,7 @@ ___
 
 ▸ **suspendEvaluation**(): *void*
 
-*Defined in [src/HyperFormula.ts:3761](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L3761)*
+*Defined in [src/HyperFormula.ts:3944](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L3944)*
 
 Suspends the dependency graph recalculation to start a [batch operation](../../guide/batch-operations.md).
 It allows optimizing the performance.
@@ -4629,12 +4742,14 @@ To resume the evaluation use [resumeEvaluation](hyperformulans.md#resumeevaluati
 
 **`fires`** [evaluationSuspended](../interfaces/listeners.md#evaluationsuspended) always
 
+**`throws`** [LicenseCapabilityMissingError](hyperformulans.md#static-licensecapabilitymissingerror) if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Batching feature
+
 **`example`** 
 ```js
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['1'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // similar to batch() but operations are not within a callback,
 // one method suspends the recalculation
@@ -4661,14 +4776,14 @@ ___
 
 ▸ **off**‹**Event**›(`event`: Event, `listener`: Listeners[Event]): *void*
 
-*Defined in [src/HyperFormula.ts:4740](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4740)*
+*Defined in [src/HyperFormula.ts:4972](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4972)*
 
 Unsubscribes from an event or from all events.
 For the list of all available events, see [Listeners](../interfaces/listeners.md).
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // define a simple function to be called upon emitting an event
 const handler = ( ) => { console.log('baz') }
@@ -4706,14 +4821,14 @@ ___
 
 ▸ **on**‹**Event**›(`event`: Event, `listener`: Listeners[Event]): *void*
 
-*Defined in [src/HyperFormula.ts:4680](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4680)*
+*Defined in [src/HyperFormula.ts:4912](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4912)*
 
 Subscribes to an event.
 For the list of all available events, see [Listeners](../interfaces/listeners.md).
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // subscribe to a 'sheetAdded', pass a simple handler
 hfInstance.on('sheetAdded', ( ) => { console.log('foo') });
@@ -4742,14 +4857,14 @@ ___
 
 ▸ **once**‹**Event**›(`event`: Event, `listener`: Listeners[Event]): *void*
 
-*Defined in [src/HyperFormula.ts:4706](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4706)*
+*Defined in [src/HyperFormula.ts:4938](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4938)*
 
 Subscribes to an event once.
 For the list of all available events, see [Listeners](../interfaces/listeners.md).
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // subscribe to a 'sheetAdded', pass a simple handler
 hfInstance.once('sheetAdded', ( ) => { console.log('foo') });
@@ -4781,13 +4896,13 @@ ___
 
 ▸ **getAllFunctionPlugins**(): *FunctionPluginDefinition[]*
 
-*Defined in [src/HyperFormula.ts:4493](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4493)*
+*Defined in [src/HyperFormula.ts:4709](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4709)*
 
 Returns classes of all plugins registered in this instance of HyperFormula
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // return classes of all plugins registered, assign to a variable
 const allNames = hfInstance.getAllFunctionPlugins();
@@ -4801,7 +4916,7 @@ ___
 
 ▸ **getFunctionPlugin**(`functionId`: string): *FunctionPluginDefinition | undefined*
 
-*Defined in [src/HyperFormula.ts:4475](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4475)*
+*Defined in [src/HyperFormula.ts:4691](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4691)*
 
 Returns class of a plugin used by function with given id
 
@@ -4814,7 +4929,7 @@ For more information, see the [Custom functions guide](/docs/guide/custom-functi
 // import your own plugin
 import { MyExamplePlugin } from './file_with_your_plugin';
 
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // register a plugin
 HyperFormula.registerFunctionPlugin(MyExamplePlugin);
@@ -4837,14 +4952,19 @@ ___
 
 ▸ **getRegisteredFunctionNames**(): *string[]*
 
-*Defined in [src/HyperFormula.ts:4445](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L4445)*
+*Defined in [src/HyperFormula.ts:4661](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L4661)*
 
 Returns translated names of all functions registered in this instance of HyperFormula
 according to the language set in the configuration
 
+Answers for the instance's function REGISTRY — what is registered, not what the license key
+lets it evaluate — so it lists every registered function whatever the key grants. To build a
+function picker that never offers a function evaluating to `#LIC!`, use
+[getAvailableFunctions](hyperformulans.md#getavailablefunctions), which answers about availability.
+
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // return translated names of all functions, assign to a variable
 const allNames = hfInstance.getRegisteredFunctionNames();
@@ -4860,7 +4980,7 @@ ___
 
 ▸ **getAllFunctionPlugins**(): *FunctionPluginDefinition[]*
 
-*Defined in [src/HyperFormula.ts:652](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L652)*
+*Defined in [src/HyperFormula.ts:669](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L669)*
 
 Returns classes of all plugins registered in HyperFormula.
 
@@ -4878,7 +4998,7 @@ ___
 
 ▸ **getFunctionPlugin**(`functionId`: string): *FunctionPluginDefinition | undefined*
 
-*Defined in [src/HyperFormula.ts:636](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L636)*
+*Defined in [src/HyperFormula.ts:653](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L653)*
 
 Returns class of a plugin used by function with given id
 
@@ -4912,7 +5032,7 @@ ___
 
 ▸ **getLanguage**(`languageCode`: string): *TranslationPackage*
 
-*Defined in [src/HyperFormula.ts:375](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L375)*
+*Defined in [src/HyperFormula.ts:382](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L382)*
 
 Returns registered language from its code string.
 
@@ -4942,9 +5062,19 @@ ___
 
 ▸ **getRegisteredFunctionNames**(`code`: string): *string[]*
 
-*Defined in [src/HyperFormula.ts:606](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L606)*
+*Defined in [src/HyperFormula.ts:623](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L623)*
 
-Returns translated names of all registered functions for a given language
+Returns translated names of all registered functions for a given language.
+
+Answers for the GLOBAL function registry, because a static method has no engine, and therefore
+no configuration, in scope. An engine configured with its own `functionPlugins` registers only
+those, so this method can list functions that engine cannot evaluate at all.
+
+The two forms answer different questions and neither replaces the other: this one translates
+into any registered language without building an engine, while the instance method of the same
+name answers for the engine you actually hold, in that instance's own language. Neither form
+looks at the license key: to list only the functions an instance can evaluate, use
+[getAvailableFunctions](hyperformulans.md#getavailablefunctions).
 
 **`throws`** [ExpectedValueOfTypeError](hyperformulans.md#static-expectedvalueoftypeerror) if any of its basic type argument is of wrong type
 
@@ -4968,7 +5098,7 @@ ___
 
 ▸ **getRegisteredLanguagesCodes**(): *string[]*
 
-*Defined in [src/HyperFormula.ts:456](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L456)*
+*Defined in [src/HyperFormula.ts:463](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L463)*
 
 Returns all registered languages codes.
 
@@ -4986,7 +5116,7 @@ ___
 
 ▸ **registerFunction**(`functionId`: string, `plugin`: FunctionPluginDefinition, `translations?`: FunctionTranslationsPackage): *void*
 
-*Defined in [src/HyperFormula.ts:540](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L540)*
+*Defined in [src/HyperFormula.ts:547](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L547)*
 
 Registers a function with a given id if such exists in a plugin.
 
@@ -5025,7 +5155,7 @@ ___
 
 ▸ **registerFunctionPlugin**(`plugin`: FunctionPluginDefinition, `translations?`: FunctionTranslationsPackage): *void*
 
-*Defined in [src/HyperFormula.ts:486](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L486)*
+*Defined in [src/HyperFormula.ts:493](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L493)*
 
 Registers all functions in a given plugin with optional translations.
 
@@ -5063,7 +5193,7 @@ ___
 
 ▸ **registerLanguage**(`languageCode`: string, `languagePackage`: RawTranslationPackage): *void*
 
-*Defined in [src/HyperFormula.ts:406](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L406)*
+*Defined in [src/HyperFormula.ts:413](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L413)*
 
 Registers language under given code string.
 
@@ -5079,7 +5209,7 @@ For more information, see the [Localizing functions guide](/docs/guide/localizin
 ```js
 // return registered language
 HyperFormula.registerLanguage('enUS', enUS);
-const engine = HyperFormula.buildEmpty({language: 'enUS'});
+const engine = HyperFormula.buildEmpty({licenseKey: 'gpl-v3', language: 'enUS'});
 ```
 
 **Parameters:**
@@ -5097,7 +5227,7 @@ ___
 
 ▸ **unregisterAllFunctions**(): *void*
 
-*Defined in [src/HyperFormula.ts:587](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L587)*
+*Defined in [src/HyperFormula.ts:594](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L594)*
 
 Clears function registry.
 
@@ -5116,7 +5246,7 @@ ___
 
 ▸ **unregisterFunction**(`functionId`: string): *void*
 
-*Defined in [src/HyperFormula.ts:570](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L570)*
+*Defined in [src/HyperFormula.ts:577](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L577)*
 
 Unregisters a function with a given id.
 
@@ -5152,7 +5282,7 @@ ___
 
 ▸ **unregisterFunctionPlugin**(`plugin`: FunctionPluginDefinition): *void*
 
-*Defined in [src/HyperFormula.ts:510](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L510)*
+*Defined in [src/HyperFormula.ts:517](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L517)*
 
 Unregisters all functions defined in given plugin.
 
@@ -5183,7 +5313,7 @@ ___
 
 ▸ **unregisterLanguage**(`languageCode`: string): *void*
 
-*Defined in [src/HyperFormula.ts:436](https://github.com/handsontable/hyperformula/blob/af2d59d/src/HyperFormula.ts#L436)*
+*Defined in [src/HyperFormula.ts:443](https://github.com/handsontable/hyperformula/blob/99a45ea/src/HyperFormula.ts#L443)*
 
 Unregisters language that is registered under given code string.
 

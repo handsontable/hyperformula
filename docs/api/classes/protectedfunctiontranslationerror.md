@@ -14,7 +14,7 @@ Error thrown when trying to override protected translation.
 
 \+ **new ProtectedFunctionTranslationError**(`key`: string): *[ProtectedFunctionTranslationError](protectedfunctiontranslationerror.md)*
 
-*Defined in [src/errors.ts:279](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L279)*
+*Defined in [src/errors.ts:281](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L281)*
 
 **Parameters:**
 

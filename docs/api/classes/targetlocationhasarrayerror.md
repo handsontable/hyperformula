@@ -20,7 +20,7 @@ Error thrown when selected target location has an array.
 
 \+ **new TargetLocationHasArrayError**(): *[TargetLocationHasArrayError](targetlocationhasarrayerror.md)*
 
-*Defined in [src/errors.ts:366](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L366)*
+*Defined in [src/errors.ts:368](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L368)*
 
 **Returns:** *[TargetLocationHasArrayError](targetlocationhasarrayerror.md)*
 

@@ -6,7 +6,7 @@
 
 ▸ **doRedo**(`undoRedo`: [UndoRedo](../classes/undoredo.md)): *void*
 
-*Defined in [src/UndoRedo.ts:24](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L24)*
+*Defined in [src/UndoRedo.ts:24](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L24)*
 
 **Parameters:**
 
@@ -22,7 +22,7 @@ ___
 
 ▸ **doUndo**(`undoRedo`: [UndoRedo](../classes/undoredo.md)): *void*
 
-*Defined in [src/UndoRedo.ts:22](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L22)*
+*Defined in [src/UndoRedo.ts:22](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L22)*
 
 **Parameters:**
 
@@ -38,7 +38,7 @@ ___
 
 ▸ **getReferencedOldDataVersions**(): *number[]*
 
-*Defined in [src/UndoRedo.ts:30](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L30)*
+*Defined in [src/UndoRedo.ts:30](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L30)*
 
 Returns the LazilyTransformingAstService version keys referenced by this entry's oldData storage.
 Used to clean up oldData when the entry is permanently evicted from the undo/redo stack.

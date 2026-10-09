@@ -12,7 +12,7 @@ Error thrown when named expression contains relative addresses.
 
 \+ **new NoRelativeAddressesAllowedError**(): *[NoRelativeAddressesAllowedError](norelativeaddressesallowederror.md)*
 
-*Defined in [src/errors.ts:378](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L378)*
+*Defined in [src/errors.ts:380](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L380)*
 
 **Returns:** *[NoRelativeAddressesAllowedError](norelativeaddressesallowederror.md)*
 

@@ -6,7 +6,7 @@
 
 \+ **new AbsoluteRowRange**(`sheet`: number, `rowStart`: number, `rowEnd`: number): *[AbsoluteRowRange](absoluterowrange.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:495](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L495)*
+*Defined in [src/AbsoluteCellRange.ts:495](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L495)*
 
 **Parameters:**
 
@@ -24,7 +24,7 @@ Name | Type |
 
 • **end**: *[SimpleCellAddress](../interfaces/simplecelladdress.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:47](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L47)*
+*Defined in [src/AbsoluteCellRange.ts:47](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L47)*
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 • **start**: *[SimpleCellAddress](../interfaces/simplecelladdress.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:46](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L46)*
+*Defined in [src/AbsoluteCellRange.ts:46](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L46)*
 
 ## Accessors
 
@@ -40,7 +40,7 @@ ___
 
 • **get sheet**(): *number*
 
-*Defined in [src/AbsoluteCellRange.ts:60](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L60)*
+*Defined in [src/AbsoluteCellRange.ts:60](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L60)*
 
 **Returns:** *number*
 
@@ -50,7 +50,7 @@ ___
 
 ▸ **addressInRange**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *boolean*
 
-*Defined in [src/AbsoluteCellRange.ts:157](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L157)*
+*Defined in [src/AbsoluteCellRange.ts:157](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L157)*
 
 **Parameters:**
 
@@ -66,7 +66,7 @@ ___
 
 ▸ **addresses**(`dependencyGraph`: DependencyGraph): *[SimpleCellAddress](../interfaces/simplecelladdress.md)[]*
 
-*Defined in [src/AbsoluteCellRange.ts:315](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L315)*
+*Defined in [src/AbsoluteCellRange.ts:315](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L315)*
 
 **Parameters:**
 
@@ -82,7 +82,7 @@ ___
 
 ▸ **addressesArrayMap**‹**T**›(`dependencyGraph`: DependencyGraph, `op`: function): *T[][]*
 
-*Defined in [src/AbsoluteCellRange.ts:299](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L299)*
+*Defined in [src/AbsoluteCellRange.ts:299](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L299)*
 
 **Type parameters:**
 
@@ -110,7 +110,7 @@ ___
 
 ▸ **addressesWithDirection**(`right`: number, `bottom`: number, `dependencyGraph`: DependencyGraph): *IterableIterator‹[SimpleCellAddress](../interfaces/simplecelladdress.md)›*
 
-*Defined in [src/AbsoluteCellRange.ts:331](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L331)*
+*Defined in [src/AbsoluteCellRange.ts:331](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L331)*
 
 **Parameters:**
 
@@ -128,7 +128,7 @@ ___
 
 ▸ **arrayOfAddressesInRange**(): *[SimpleCellAddress](../interfaces/simplecelladdress.md)[][]*
 
-*Defined in [src/AbsoluteCellRange.ts:275](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L275)*
+*Defined in [src/AbsoluteCellRange.ts:275](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L275)*
 
 **Returns:** *[SimpleCellAddress](../interfaces/simplecelladdress.md)[][]*
 
@@ -138,7 +138,7 @@ ___
 
 ▸ **columnInRange**(`address`: [SimpleColumnAddress](../interfaces/simplecolumnaddress.md)): *boolean*
 
-*Defined in [src/AbsoluteCellRange.ts:168](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L168)*
+*Defined in [src/AbsoluteCellRange.ts:168](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L168)*
 
 **Parameters:**
 
@@ -154,7 +154,7 @@ ___
 
 ▸ **containsRange**(`range`: [AbsoluteCellRange](absolutecellrange.md)): *boolean*
 
-*Defined in [src/AbsoluteCellRange.ts:182](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L182)*
+*Defined in [src/AbsoluteCellRange.ts:182](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L182)*
 
 **Parameters:**
 
@@ -170,7 +170,7 @@ ___
 
 ▸ **doesOverlap**(`other`: [AbsoluteCellRange](absolutecellrange.md)): *boolean*
 
-*Defined in [src/AbsoluteCellRange.ts:144](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L144)*
+*Defined in [src/AbsoluteCellRange.ts:144](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L144)*
 
 **Parameters:**
 
@@ -186,7 +186,7 @@ ___
 
 ▸ **effectiveEndColumn**(`dependencyGraph`: DependencyGraph): *number*
 
-*Defined in [src/AbsoluteCellRange.ts:536](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L536)*
+*Defined in [src/AbsoluteCellRange.ts:536](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L536)*
 
 **Parameters:**
 
@@ -202,7 +202,7 @@ ___
 
 ▸ **effectiveEndRow**(`_dependencyGraph`: DependencyGraph): *number*
 
-*Defined in [src/AbsoluteCellRange.ts:394](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L394)*
+*Defined in [src/AbsoluteCellRange.ts:394](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L394)*
 
 **Parameters:**
 
@@ -218,7 +218,7 @@ ___
 
 ▸ **effectiveHeight**(`_dependencyGraph`: DependencyGraph): *number*
 
-*Defined in [src/AbsoluteCellRange.ts:402](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L402)*
+*Defined in [src/AbsoluteCellRange.ts:402](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L402)*
 
 **Parameters:**
 
@@ -234,7 +234,7 @@ ___
 
 ▸ **effectiveWidth**(`dependencyGraph`: DependencyGraph): *number*
 
-*Defined in [src/AbsoluteCellRange.ts:540](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L540)*
+*Defined in [src/AbsoluteCellRange.ts:540](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L540)*
 
 **Parameters:**
 
@@ -250,7 +250,7 @@ ___
 
 ▸ **exceedsSheetSizeLimits**(`_maxColumns`: number, `maxRows`: number): *boolean*
 
-*Defined in [src/AbsoluteCellRange.ts:532](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L532)*
+*Defined in [src/AbsoluteCellRange.ts:532](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L532)*
 
 **Parameters:**
 
@@ -267,7 +267,7 @@ ___
 
 ▸ **expandByColumns**(`_numberOfColumns`: number): *void*
 
-*Defined in [src/AbsoluteCellRange.ts:520](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L520)*
+*Defined in [src/AbsoluteCellRange.ts:520](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L520)*
 
 **Parameters:**
 
@@ -283,7 +283,7 @@ ___
 
 ▸ **expandByRows**(`numberOfRows`: number): *void*
 
-*Defined in [src/AbsoluteCellRange.ts:217](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L217)*
+*Defined in [src/AbsoluteCellRange.ts:217](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L217)*
 
 **Parameters:**
 
@@ -299,7 +299,7 @@ ___
 
 ▸ **getAddress**(`col`: number, `row`: number): *[SimpleCellAddress](../interfaces/simplecelladdress.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:379](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L379)*
+*Defined in [src/AbsoluteCellRange.ts:379](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L379)*
 
 **Parameters:**
 
@@ -316,7 +316,7 @@ ___
 
 ▸ **height**(): *number*
 
-*Defined in [src/AbsoluteCellRange.ts:267](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L267)*
+*Defined in [src/AbsoluteCellRange.ts:267](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L267)*
 
 **Returns:** *number*
 
@@ -326,7 +326,7 @@ ___
 
 ▸ **includesColumn**(`column`: number): *boolean*
 
-*Defined in [src/AbsoluteCellRange.ts:208](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L208)*
+*Defined in [src/AbsoluteCellRange.ts:208](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L208)*
 
 **Parameters:**
 
@@ -342,7 +342,7 @@ ___
 
 ▸ **includesRow**(`row`: number): *boolean*
 
-*Defined in [src/AbsoluteCellRange.ts:204](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L204)*
+*Defined in [src/AbsoluteCellRange.ts:204](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L204)*
 
 **Parameters:**
 
@@ -358,7 +358,7 @@ ___
 
 ▸ **intersectionWith**(`other`: [AbsoluteCellRange](absolutecellrange.md)): *[Maybe](../globals.md#maybe)‹[AbsoluteCellRange](absolutecellrange.md)›*
 
-*Defined in [src/AbsoluteCellRange.ts:186](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L186)*
+*Defined in [src/AbsoluteCellRange.ts:186](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L186)*
 
 **Parameters:**
 
@@ -374,7 +374,7 @@ ___
 
 ▸ **isFinite**(): *boolean*
 
-*Defined in [src/AbsoluteCellRange.ts:140](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L140)*
+*Defined in [src/AbsoluteCellRange.ts:140](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L140)*
 
 **Returns:** *boolean*
 
@@ -384,7 +384,7 @@ ___
 
 ▸ **moveToSheet**(`toSheet`: number): *void*
 
-*Defined in [src/AbsoluteCellRange.ts:234](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L234)*
+*Defined in [src/AbsoluteCellRange.ts:234](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L234)*
 
 **Parameters:**
 
@@ -400,7 +400,7 @@ ___
 
 ▸ **rangeWithSameHeight**(`startColumn`: number, `numberOfColumns`: number): *[AbsoluteCellRange](absolutecellrange.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:255](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L255)*
+*Defined in [src/AbsoluteCellRange.ts:255](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L255)*
 
 **Parameters:**
 
@@ -417,7 +417,7 @@ ___
 
 ▸ **rangeWithSameWidth**(`startRow`: number, `numberOfRows`: number): *[AbsoluteCellRange](absolutecellrange.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:528](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L528)*
+*Defined in [src/AbsoluteCellRange.ts:528](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L528)*
 
 **Parameters:**
 
@@ -434,7 +434,7 @@ ___
 
 ▸ **removeSpan**(`span`: [Span](../globals.md#span)): *void*
 
-*Defined in [src/AbsoluteCellRange.ts:239](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L239)*
+*Defined in [src/AbsoluteCellRange.ts:239](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L239)*
 
 **Parameters:**
 
@@ -450,7 +450,7 @@ ___
 
 ▸ **rowInRange**(`address`: [SimpleRowAddress](../interfaces/simplerowaddress.md)): *boolean*
 
-*Defined in [src/AbsoluteCellRange.ts:175](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L175)*
+*Defined in [src/AbsoluteCellRange.ts:175](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L175)*
 
 **Parameters:**
 
@@ -466,7 +466,7 @@ ___
 
 ▸ **sameAs**(`other`: [AbsoluteCellRange](absolutecellrange.md)): *boolean*
 
-*Defined in [src/AbsoluteCellRange.ts:295](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L295)*
+*Defined in [src/AbsoluteCellRange.ts:295](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L295)*
 
 **Parameters:**
 
@@ -482,7 +482,7 @@ ___
 
 ▸ **sameDimensionsAs**(`other`: [AbsoluteCellRange](absolutecellrange.md)): *boolean*
 
-*Defined in [src/AbsoluteCellRange.ts:291](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L291)*
+*Defined in [src/AbsoluteCellRange.ts:291](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L291)*
 
 **Parameters:**
 
@@ -498,7 +498,7 @@ ___
 
 ▸ **shiftByColumns**(`_numberOfColumns`: number): *void*
 
-*Defined in [src/AbsoluteCellRange.ts:516](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L516)*
+*Defined in [src/AbsoluteCellRange.ts:516](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L516)*
 
 **Parameters:**
 
@@ -514,7 +514,7 @@ ___
 
 ▸ **shiftByRows**(`numberOfRows`: number): *void*
 
-*Defined in [src/AbsoluteCellRange.ts:212](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L212)*
+*Defined in [src/AbsoluteCellRange.ts:212](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L212)*
 
 **Parameters:**
 
@@ -530,7 +530,7 @@ ___
 
 ▸ **shifted**(`byCols`: number, `byRows`: number): *[AbsoluteCellRange](absolutecellrange.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:524](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L524)*
+*Defined in [src/AbsoluteCellRange.ts:524](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L524)*
 
 **Parameters:**
 
@@ -547,7 +547,7 @@ ___
 
 ▸ **shouldBeRemoved**(): *boolean*
 
-*Defined in [src/AbsoluteCellRange.ts:512](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L512)*
+*Defined in [src/AbsoluteCellRange.ts:512](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L512)*
 
 **Returns:** *boolean*
 
@@ -557,7 +557,7 @@ ___
 
 ▸ **size**(): *number*
 
-*Defined in [src/AbsoluteCellRange.ts:271](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L271)*
+*Defined in [src/AbsoluteCellRange.ts:271](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L271)*
 
 **Returns:** *number*
 
@@ -567,7 +567,7 @@ ___
 
 ▸ **toString**(): *string*
 
-*Defined in [src/AbsoluteCellRange.ts:259](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L259)*
+*Defined in [src/AbsoluteCellRange.ts:259](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L259)*
 
 **Returns:** *string*
 
@@ -577,7 +577,7 @@ ___
 
 ▸ **width**(): *number*
 
-*Defined in [src/AbsoluteCellRange.ts:263](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L263)*
+*Defined in [src/AbsoluteCellRange.ts:263](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L263)*
 
 **Returns:** *number*
 
@@ -587,7 +587,7 @@ ___
 
 ▸ **withStart**(`newStart`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[AbsoluteCellRange](absolutecellrange.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:287](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L287)*
+*Defined in [src/AbsoluteCellRange.ts:287](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L287)*
 
 **Parameters:**
 
@@ -603,7 +603,7 @@ ___
 
 ▸ **fromAst**(`ast`: CellRangeAst | ColumnRangeAst | RowRangeAst, `baseAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[AbsoluteCellRange](absolutecellrange.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:83](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L83)*
+*Defined in [src/AbsoluteCellRange.ts:83](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L83)*
 
 **Parameters:**
 
@@ -620,7 +620,7 @@ ___
 
 ▸ **fromAstOrUndef**(`ast`: CellRangeAst | ColumnRangeAst | RowRangeAst, `baseAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[Maybe](../globals.md#maybe)‹[AbsoluteCellRange](absolutecellrange.md)›*
 
-*Defined in [src/AbsoluteCellRange.ts:93](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L93)*
+*Defined in [src/AbsoluteCellRange.ts:93](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L93)*
 
 **Parameters:**
 
@@ -637,7 +637,7 @@ ___
 
 ▸ **fromCellRange**(`x`: [CellRange](../interfaces/cellrange.md), `baseAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[AbsoluteCellRange](absolutecellrange.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:101](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L101)*
+*Defined in [src/AbsoluteCellRange.ts:101](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L101)*
 
 **Parameters:**
 
@@ -654,7 +654,7 @@ ___
 
 ▸ **fromCoordinates**(`sheet`: number, `x1`: number, `y1`: number, `x2`: number, `y2`: number): *[AbsoluteCellRange](absolutecellrange.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:136](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L136)*
+*Defined in [src/AbsoluteCellRange.ts:136](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L136)*
 
 **Parameters:**
 
@@ -674,7 +674,7 @@ ___
 
 ▸ **fromRowRangeAst**(`x`: RowRangeAst, `baseAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[AbsoluteRowRange](absoluterowrange.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:503](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L503)*
+*Defined in [src/AbsoluteCellRange.ts:503](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L503)*
 
 **Parameters:**
 
@@ -691,7 +691,7 @@ ___
 
 ▸ **fromSimpleCellAddresses**(`start`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `end`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[AbsoluteCellRange](absolutecellrange.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:64](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L64)*
+*Defined in [src/AbsoluteCellRange.ts:64](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L64)*
 
 **Parameters:**
 
@@ -708,7 +708,7 @@ ___
 
 ▸ **spanFrom**(`topLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `width`: number, `height`: number): *[AbsoluteCellRange](absolutecellrange.md)*
 
-*Defined in [src/AbsoluteCellRange.ts:108](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L108)*
+*Defined in [src/AbsoluteCellRange.ts:108](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L108)*
 
 **Parameters:**
 
@@ -726,7 +726,7 @@ ___
 
 ▸ **spanFromOrUndef**(`topLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `width`: number, `height`: number): *[Maybe](../globals.md#maybe)‹[AbsoluteCellRange](absolutecellrange.md)›*
 
-*Defined in [src/AbsoluteCellRange.ts:116](https://github.com/handsontable/hyperformula/blob/af2d59d/src/AbsoluteCellRange.ts#L116)*
+*Defined in [src/AbsoluteCellRange.ts:116](https://github.com/handsontable/hyperformula/blob/99a45ea/src/AbsoluteCellRange.ts#L116)*
 
 **Parameters:**
 

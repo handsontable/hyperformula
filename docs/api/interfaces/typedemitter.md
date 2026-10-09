@@ -6,7 +6,7 @@
 
 ▸ **off**‹**Event**›(`s`: Event, `listener`: Listeners[Event]): *void*
 
-*Defined in [src/Emitter.ts:322](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L322)*
+*Defined in [src/Emitter.ts:322](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L322)*
 
 **Type parameters:**
 
@@ -27,7 +27,7 @@ ___
 
 ▸ **on**‹**Event**›(`s`: Event, `listener`: Listeners[Event]): *void*
 
-*Defined in [src/Emitter.ts:320](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L320)*
+*Defined in [src/Emitter.ts:320](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L320)*
 
 **Type parameters:**
 
@@ -48,7 +48,7 @@ ___
 
 ▸ **once**‹**Event**›(`s`: Event, `listener`: Listeners[Event]): *void*
 
-*Defined in [src/Emitter.ts:324](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L324)*
+*Defined in [src/Emitter.ts:324](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L324)*
 
 **Type parameters:**
 

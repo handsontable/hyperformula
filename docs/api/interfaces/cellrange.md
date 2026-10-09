@@ -6,7 +6,7 @@
 
 • **end**: *CellAddress*
 
-*Defined in [src/Cell.ts:237](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L237)*
+*Defined in [src/Cell.ts:237](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L237)*
 
 ___
 
@@ -14,4 +14,4 @@ ___
 
 • **start**: *CellAddress*
 
-*Defined in [src/Cell.ts:236](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L236)*
+*Defined in [src/Cell.ts:236](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L236)*

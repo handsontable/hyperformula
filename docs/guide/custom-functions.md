@@ -144,7 +144,7 @@ Now, you're ready to use your GREET function in a formula.
 
 ```js
 // build a HyperFormula instance where you can use your function directly
-const hfInstance = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']]);
+const hfInstance = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']], { licenseKey: 'gpl-v3' });
 
 // read the value of cell B1
 const result = hfInstance.getCellValue({ sheet: 0, col: 1, row: 0 });
@@ -350,7 +350,7 @@ it('returns a VALUE error if the range argument contains a string', () => {
 
 ## Working demo
 
-Explore the full working example on [Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.4.x/custom-functions?v=).
+Explore the full working example on [Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/custom-functions?v=).
 
 This demo contains the implementation of both the
 [`GREET`](#add-a-simple-custom-function) and

@@ -6,7 +6,7 @@
 
 • **parsedValue**: *ValueCellVertexValue*
 
-*Defined in [src/ClipboardOperations.ts:32](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L32)*
+*Defined in [src/ClipboardOperations.ts:32](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L32)*
 
 ___
 
@@ -14,7 +14,7 @@ ___
 
 • **rawValue**: *[RawCellContent](../globals.md#rawcellcontent)*
 
-*Defined in [src/ClipboardOperations.ts:33](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L33)*
+*Defined in [src/ClipboardOperations.ts:33](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L33)*
 
 ___
 
@@ -22,4 +22,4 @@ ___
 
 • **type**: *[VALUE](../enums/clipboardcelltype.md#value)*
 
-*Defined in [src/ClipboardOperations.ts:31](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L31)*
+*Defined in [src/ClipboardOperations.ts:31](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L31)*

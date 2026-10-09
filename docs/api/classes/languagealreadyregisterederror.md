@@ -10,7 +10,7 @@ Error thrown when trying to register already registered language
 
 \+ **new LanguageAlreadyRegisteredError**(): *[LanguageAlreadyRegisteredError](languagealreadyregisterederror.md)*
 
-*Defined in [src/errors.ts:302](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L302)*
+*Defined in [src/errors.ts:304](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L304)*
 
 **Returns:** *[LanguageAlreadyRegisteredError](languagealreadyregisterederror.md)*
 

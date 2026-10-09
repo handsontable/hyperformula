@@ -6,7 +6,7 @@
 
 \+ **new CellError**(`type`: [ErrorType](hyperformulans.md#static-errortype), `message?`: undefined | string, `root?`: FormulaVertex): *[CellError](cellerror.md)*
 
-*Defined in [src/Cell.ts:149](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L149)*
+*Defined in [src/Cell.ts:149](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L149)*
 
 **Parameters:**
 
@@ -24,7 +24,7 @@ Name | Type |
 
 • **message**? : *undefined | string*
 
-*Defined in [src/Cell.ts:152](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L152)*
+*Defined in [src/Cell.ts:152](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L152)*
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 • **root**? : *FormulaVertex*
 
-*Defined in [src/Cell.ts:153](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L153)*
+*Defined in [src/Cell.ts:153](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L153)*
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • **type**: *[ErrorType](hyperformulans.md#static-errortype)*
 
-*Defined in [src/Cell.ts:151](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L151)*
+*Defined in [src/Cell.ts:151](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L151)*
 
 ## Methods
 
@@ -48,7 +48,7 @@ ___
 
 ▸ **attachRootVertex**(`vertex`: FormulaVertex): *[CellError](cellerror.md)*
 
-*Defined in [src/Cell.ts:165](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L165)*
+*Defined in [src/Cell.ts:165](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L165)*
 
 **Parameters:**
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **parsingError**(`detailedMessage?`: undefined | string): *[CellError](cellerror.md)*
 
-*Defined in [src/Cell.ts:161](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L161)*
+*Defined in [src/Cell.ts:161](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L161)*
 
 Returns a CellError with a given message.
 

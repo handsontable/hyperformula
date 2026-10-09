@@ -6,7 +6,7 @@
 
 \+ **new CrudOperations**(`config`: [Config](config.md), `operations`: [Operations](operations.md), `undoRedo`: [UndoRedo](undoredo.md), `clipboardOperations`: [ClipboardOperations](clipboardoperations.md), `dependencyGraph`: DependencyGraph, `columnSearch`: [ColumnSearchStrategy](../interfaces/columnsearchstrategy.md), `parser`: ParserWithCaching, `cellContentParser`: [CellContentParser](cellcontentparser.md), `lazilyTransformingAstService`: [LazilyTransformingAstService](lazilytransformingastservice.md), `namedExpressions`: [NamedExpressions](namedexpressions.md)): *[CrudOperations](crudoperations.md)*
 
-*Defined in [src/CrudOperations.ts:70](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L70)*
+*Defined in [src/CrudOperations.ts:70](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L70)*
 
 **Parameters:**
 
@@ -31,7 +31,7 @@ Name | Type |
 
 • **operations**: *[Operations](operations.md)*
 
-*Defined in [src/CrudOperations.ts:74](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L74)*
+*Defined in [src/CrudOperations.ts:74](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L74)*
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 • **undoRedo**: *[UndoRedo](undoredo.md)*
 
-*Defined in [src/CrudOperations.ts:75](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L75)*
+*Defined in [src/CrudOperations.ts:75](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L75)*
 
 ## Methods
 
@@ -47,7 +47,7 @@ ___
 
 ▸ **addColumns**(`sheet`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *void*
 
-*Defined in [src/CrudOperations.ts:110](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L110)*
+*Defined in [src/CrudOperations.ts:110](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L110)*
 
 **Parameters:**
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **addNamedExpression**(`expressionName`: string, `expression`: [RawCellContent](../globals.md#rawcellcontent), `sheetId?`: undefined | number, `options?`: [NamedExpressionOptions](../globals.md#namedexpressionoptions)): *void*
 
-*Defined in [src/CrudOperations.ts:382](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L382)*
+*Defined in [src/CrudOperations.ts:382](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L382)*
 
 **Parameters:**
 
@@ -83,7 +83,7 @@ ___
 
 ▸ **addRows**(`sheet`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *void*
 
-*Defined in [src/CrudOperations.ts:92](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L92)*
+*Defined in [src/CrudOperations.ts:92](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L92)*
 
 **Parameters:**
 
@@ -100,7 +100,7 @@ ___
 
 ▸ **addSheet**(`name?`: undefined | string): *string*
 
-*Defined in [src/CrudOperations.ts:204](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L204)*
+*Defined in [src/CrudOperations.ts:204](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L204)*
 
 **Parameters:**
 
@@ -116,7 +116,7 @@ ___
 
 ▸ **beginUndoRedoBatchMode**(): *void*
 
-*Defined in [src/CrudOperations.ts:188](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L188)*
+*Defined in [src/CrudOperations.ts:188](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L188)*
 
 **Returns:** *void*
 
@@ -126,7 +126,7 @@ ___
 
 ▸ **changeNamedExpressionExpression**(`expressionName`: string, `sheetId`: number | undefined, `newExpression`: [RawCellContent](../globals.md#rawcellcontent), `options?`: [NamedExpressionOptions](../globals.md#namedexpressionoptions)): *void*
 
-*Defined in [src/CrudOperations.ts:390](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L390)*
+*Defined in [src/CrudOperations.ts:390](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L390)*
 
 **Parameters:**
 
@@ -145,7 +145,7 @@ ___
 
 ▸ **clearClipboard**(): *void*
 
-*Defined in [src/CrudOperations.ts:200](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L200)*
+*Defined in [src/CrudOperations.ts:200](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L200)*
 
 **Returns:** *void*
 
@@ -155,7 +155,7 @@ ___
 
 ▸ **clearSheet**(`sheetId`: number): *void*
 
-*Defined in [src/CrudOperations.ts:240](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L240)*
+*Defined in [src/CrudOperations.ts:240](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L240)*
 
 **Parameters:**
 
@@ -171,7 +171,7 @@ ___
 
 ▸ **commitUndoRedoBatchMode**(): *void*
 
-*Defined in [src/CrudOperations.ts:192](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L192)*
+*Defined in [src/CrudOperations.ts:192](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L192)*
 
 **Returns:** *void*
 
@@ -181,7 +181,7 @@ ___
 
 ▸ **copy**(`sourceLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `width`: number, `height`: number): *void*
 
-*Defined in [src/CrudOperations.ts:167](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L167)*
+*Defined in [src/CrudOperations.ts:167](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L167)*
 
 **Parameters:**
 
@@ -199,7 +199,7 @@ ___
 
 ▸ **cut**(`sourceLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `width`: number, `height`: number): *void*
 
-*Defined in [src/CrudOperations.ts:154](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L154)*
+*Defined in [src/CrudOperations.ts:154](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L154)*
 
 **Parameters:**
 
@@ -217,7 +217,7 @@ ___
 
 ▸ **ensureItIsPossibleToAddColumns**(`sheet`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *void*
 
-*Defined in [src/CrudOperations.ts:462](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L462)*
+*Defined in [src/CrudOperations.ts:462](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L462)*
 
 **Parameters:**
 
@@ -234,7 +234,7 @@ ___
 
 ▸ **ensureItIsPossibleToAddNamedExpression**(`expressionName`: string, `expression`: [RawCellContent](../globals.md#rawcellcontent), `sheetId?`: undefined | number): *void*
 
-*Defined in [src/CrudOperations.ts:408](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L408)*
+*Defined in [src/CrudOperations.ts:408](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L408)*
 
 **Parameters:**
 
@@ -252,7 +252,7 @@ ___
 
 ▸ **ensureItIsPossibleToAddRows**(`sheet`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *void*
 
-*Defined in [src/CrudOperations.ts:429](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L429)*
+*Defined in [src/CrudOperations.ts:429](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L429)*
 
 **Parameters:**
 
@@ -269,7 +269,7 @@ ___
 
 ▸ **ensureItIsPossibleToAddSheet**(`name`: string): *void*
 
-*Defined in [src/CrudOperations.ts:550](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L550)*
+*Defined in [src/CrudOperations.ts:550](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L550)*
 
 **Parameters:**
 
@@ -285,7 +285,7 @@ ___
 
 ▸ **ensureItIsPossibleToChangeCellContents**(`inputAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `content`: [RawCellContent](../globals.md#rawcellcontent)[][]): *void*
 
-*Defined in [src/CrudOperations.ts:576](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L576)*
+*Defined in [src/CrudOperations.ts:576](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L576)*
 
 **Parameters:**
 
@@ -302,7 +302,7 @@ ___
 
 ▸ **ensureItIsPossibleToChangeContent**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/CrudOperations.ts:567](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L567)*
+*Defined in [src/CrudOperations.ts:567](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L567)*
 
 **Parameters:**
 
@@ -318,7 +318,7 @@ ___
 
 ▸ **ensureItIsPossibleToChangeNamedExpression**(`expressionName`: string, `expression`: [RawCellContent](../globals.md#rawcellcontent), `sheetId?`: undefined | number): *void*
 
-*Defined in [src/CrudOperations.ts:414](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L414)*
+*Defined in [src/CrudOperations.ts:414](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L414)*
 
 **Parameters:**
 
@@ -336,7 +336,7 @@ ___
 
 ▸ **ensureItIsPossibleToChangeSheetContents**(`sheetId`: number, `content`: [RawCellContent](../globals.md#rawcellcontent)[][]): *void*
 
-*Defined in [src/CrudOperations.ts:585](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L585)*
+*Defined in [src/CrudOperations.ts:585](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L585)*
 
 **Parameters:**
 
@@ -353,7 +353,7 @@ ___
 
 ▸ **ensureItIsPossibleToCopy**(`sourceLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `width`: number, `height`: number): *void*
 
-*Defined in [src/CrudOperations.ts:158](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L158)*
+*Defined in [src/CrudOperations.ts:158](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L158)*
 
 **Parameters:**
 
@@ -371,7 +371,7 @@ ___
 
 ▸ **ensureItIsPossibleToMoveColumns**(`sheet`: number, `startColumn`: number, `numberOfColumns`: number, `targetColumn`: number): *void*
 
-*Defined in [src/CrudOperations.ts:523](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L523)*
+*Defined in [src/CrudOperations.ts:523](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L523)*
 
 **Parameters:**
 
@@ -390,7 +390,7 @@ ___
 
 ▸ **ensureItIsPossibleToMoveRows**(`sheet`: number, `startRow`: number, `numberOfRows`: number, `targetRow`: number): *void*
 
-*Defined in [src/CrudOperations.ts:496](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L496)*
+*Defined in [src/CrudOperations.ts:496](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L496)*
 
 **Parameters:**
 
@@ -409,7 +409,7 @@ ___
 
 ▸ **ensureItIsPossibleToRemoveColumns**(`sheet`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *void*
 
-*Defined in [src/CrudOperations.ts:480](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L480)*
+*Defined in [src/CrudOperations.ts:480](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L480)*
 
 **Parameters:**
 
@@ -426,7 +426,7 @@ ___
 
 ▸ **ensureItIsPossibleToRemoveRows**(`sheet`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *void*
 
-*Defined in [src/CrudOperations.ts:447](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L447)*
+*Defined in [src/CrudOperations.ts:447](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L447)*
 
 **Parameters:**
 
@@ -443,7 +443,7 @@ ___
 
 ▸ **ensureItIsPossibleToRenameSheet**(`sheetId`: number, `name`: string): *void*
 
-*Defined in [src/CrudOperations.ts:556](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L556)*
+*Defined in [src/CrudOperations.ts:556](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L556)*
 
 **Parameters:**
 
@@ -460,7 +460,7 @@ ___
 
 ▸ **ensureRangeInSizeLimits**(`range`: [AbsoluteCellRange](absolutecellrange.md)): *void*
 
-*Defined in [src/CrudOperations.ts:591](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L591)*
+*Defined in [src/CrudOperations.ts:591](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L591)*
 
 **Parameters:**
 
@@ -476,7 +476,7 @@ ___
 
 ▸ **ensureScopeIdIsValid**(`scopeId?`: undefined | number): *void*
 
-*Defined in [src/CrudOperations.ts:609](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L609)*
+*Defined in [src/CrudOperations.ts:609](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L609)*
 
 **Parameters:**
 
@@ -492,7 +492,7 @@ ___
 
 ▸ **getAndClearContentChanges**(): *[ContentChanges](contentchanges.md)*
 
-*Defined in [src/CrudOperations.ts:605](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L605)*
+*Defined in [src/CrudOperations.ts:605](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L605)*
 
 **Returns:** *[ContentChanges](contentchanges.md)*
 
@@ -502,7 +502,7 @@ ___
 
 ▸ **isClipboardEmpty**(): *boolean*
 
-*Defined in [src/CrudOperations.ts:196](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L196)*
+*Defined in [src/CrudOperations.ts:196](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L196)*
 
 **Returns:** *boolean*
 
@@ -512,7 +512,7 @@ ___
 
 ▸ **isItPossibleToRemoveNamedExpression**(`expressionName`: string, `sheetId?`: undefined | number): *void*
 
-*Defined in [src/CrudOperations.ts:422](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L422)*
+*Defined in [src/CrudOperations.ts:422](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L422)*
 
 **Parameters:**
 
@@ -529,7 +529,7 @@ ___
 
 ▸ **isThereSomethingToRedo**(): *boolean*
 
-*Defined in [src/CrudOperations.ts:601](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L601)*
+*Defined in [src/CrudOperations.ts:601](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L601)*
 
 **Returns:** *boolean*
 
@@ -539,7 +539,7 @@ ___
 
 ▸ **isThereSomethingToUndo**(): *boolean*
 
-*Defined in [src/CrudOperations.ts:597](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L597)*
+*Defined in [src/CrudOperations.ts:597](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L597)*
 
 **Returns:** *boolean*
 
@@ -549,7 +549,7 @@ ___
 
 ▸ **mappingFromOrder**(`sheetId`: number, `newOrder`: number[], `rowOrColumn`: "row" | "column"): *[number, number][]*
 
-*Defined in [src/CrudOperations.ts:349](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L349)*
+*Defined in [src/CrudOperations.ts:349](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L349)*
 
 **Parameters:**
 
@@ -567,7 +567,7 @@ ___
 
 ▸ **moveCells**(`sourceLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `width`: number, `height`: number, `destinationLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/CrudOperations.ts:128](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L128)*
+*Defined in [src/CrudOperations.ts:128](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L128)*
 
 **Parameters:**
 
@@ -586,7 +586,7 @@ ___
 
 ▸ **moveColumns**(`sheet`: number, `startColumn`: number, `numberOfColumns`: number, `targetColumn`: number): *void*
 
-*Defined in [src/CrudOperations.ts:147](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L147)*
+*Defined in [src/CrudOperations.ts:147](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L147)*
 
 **Parameters:**
 
@@ -605,7 +605,7 @@ ___
 
 ▸ **moveRows**(`sheet`: number, `startRow`: number, `numberOfRows`: number, `targetRow`: number): *void*
 
-*Defined in [src/CrudOperations.ts:139](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L139)*
+*Defined in [src/CrudOperations.ts:139](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L139)*
 
 **Parameters:**
 
@@ -624,7 +624,7 @@ ___
 
 ▸ **paste**(`targetLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/CrudOperations.ts:172](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L172)*
+*Defined in [src/CrudOperations.ts:172](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L172)*
 
 **Parameters:**
 
@@ -640,7 +640,7 @@ ___
 
 ▸ **redo**(): *void*
 
-*Defined in [src/CrudOperations.ts:374](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L374)*
+*Defined in [src/CrudOperations.ts:374](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L374)*
 
 **Returns:** *void*
 
@@ -650,7 +650,7 @@ ___
 
 ▸ **removeColumns**(`sheet`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *void*
 
-*Defined in [src/CrudOperations.ts:119](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L119)*
+*Defined in [src/CrudOperations.ts:119](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L119)*
 
 **Parameters:**
 
@@ -667,7 +667,7 @@ ___
 
 ▸ **removeNamedExpression**(`expressionName`: string, `sheetId?`: undefined | number): *[InternalNamedExpression](internalnamedexpression.md)*
 
-*Defined in [src/CrudOperations.ts:398](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L398)*
+*Defined in [src/CrudOperations.ts:398](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L398)*
 
 **Parameters:**
 
@@ -684,7 +684,7 @@ ___
 
 ▸ **removeRows**(`sheet`: number, ...`indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *void*
 
-*Defined in [src/CrudOperations.ts:101](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L101)*
+*Defined in [src/CrudOperations.ts:101](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L101)*
 
 **Parameters:**
 
@@ -701,7 +701,7 @@ ___
 
 ▸ **removeSheet**(`sheetId`: number): *void*
 
-*Defined in [src/CrudOperations.ts:214](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L214)*
+*Defined in [src/CrudOperations.ts:214](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L214)*
 
 **Parameters:**
 
@@ -717,7 +717,7 @@ ___
 
 ▸ **renameSheet**(`sheetId`: number, `newName`: string): *[Maybe](../globals.md#maybe)‹string›*
 
-*Defined in [src/CrudOperations.ts:224](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L224)*
+*Defined in [src/CrudOperations.ts:224](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L224)*
 
 **Parameters:**
 
@@ -734,7 +734,7 @@ ___
 
 ▸ **setCellContents**(`topLeftCornerAddress`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `cellContents`: [RawCellContent](../globals.md#rawcellcontent)[][] | [RawCellContent](../globals.md#rawcellcontent)): *void*
 
-*Defined in [src/CrudOperations.ts:249](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L249)*
+*Defined in [src/CrudOperations.ts:249](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L249)*
 
 **Parameters:**
 
@@ -751,7 +751,7 @@ ___
 
 ▸ **setColumnOrder**(`sheetId`: number, `columnMapping`: [number, number][]): *void*
 
-*Defined in [src/CrudOperations.ts:322](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L322)*
+*Defined in [src/CrudOperations.ts:322](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L322)*
 
 **Parameters:**
 
@@ -768,7 +768,7 @@ ___
 
 ▸ **setRowOrder**(`sheetId`: number, `rowMapping`: [number, number][]): *void*
 
-*Defined in [src/CrudOperations.ts:295](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L295)*
+*Defined in [src/CrudOperations.ts:295](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L295)*
 
 **Parameters:**
 
@@ -785,7 +785,7 @@ ___
 
 ▸ **setSheetContent**(`sheetId`: number, `values`: [RawCellContent](../globals.md#rawcellcontent)[][]): *void*
 
-*Defined in [src/CrudOperations.ts:283](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L283)*
+*Defined in [src/CrudOperations.ts:283](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L283)*
 
 **Parameters:**
 
@@ -802,7 +802,7 @@ ___
 
 ▸ **testColumnOrderForArrays**(`sheetId`: number, `columnMapping`: [number, number][]): *void*
 
-*Defined in [src/CrudOperations.ts:311](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L311)*
+*Defined in [src/CrudOperations.ts:311](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L311)*
 
 **Parameters:**
 
@@ -819,7 +819,7 @@ ___
 
 ▸ **testRowOrderForArrays**(`sheetId`: number, `rowMapping`: [number, number][]): *void*
 
-*Defined in [src/CrudOperations.ts:338](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L338)*
+*Defined in [src/CrudOperations.ts:338](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L338)*
 
 **Parameters:**
 
@@ -836,7 +836,7 @@ ___
 
 ▸ **undo**(): *void*
 
-*Defined in [src/CrudOperations.ts:366](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L366)*
+*Defined in [src/CrudOperations.ts:366](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L366)*
 
 **Returns:** *void*
 
@@ -846,7 +846,7 @@ ___
 
 ▸ **validateSwapColumnIndexes**(`sheetId`: number, `columnMapping`: [number, number][]): *void*
 
-*Defined in [src/CrudOperations.ts:331](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L331)*
+*Defined in [src/CrudOperations.ts:331](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L331)*
 
 **Parameters:**
 
@@ -863,7 +863,7 @@ ___
 
 ▸ **validateSwapRowIndexes**(`sheetId`: number, `rowMapping`: [number, number][]): *void*
 
-*Defined in [src/CrudOperations.ts:304](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CrudOperations.ts#L304)*
+*Defined in [src/CrudOperations.ts:304](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CrudOperations.ts#L304)*
 
 **Parameters:**
 

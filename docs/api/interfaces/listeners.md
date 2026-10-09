@@ -6,7 +6,7 @@
 
 • **evaluationResumed**: *function*
 
-*Defined in [src/Emitter.ts:316](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L316)*
+*Defined in [src/Emitter.ts:316](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L316)*
 
 Occurs when evaluation is resumed.
 
@@ -17,7 +17,7 @@ Occurs when evaluation is resumed.
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ]
-});
+}, { licenseKey: 'gpl-v3' });
 
 // define a function to be called when the event occurs
 const handler = (changes) => { console.log('baz') }
@@ -59,7 +59,7 @@ ___
 
 • **evaluationSuspended**: *function*
 
-*Defined in [src/Emitter.ts:274](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L274)*
+*Defined in [src/Emitter.ts:274](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L274)*
 
 Occurs when evaluation is suspended.
 
@@ -68,7 +68,7 @@ Occurs when evaluation is suspended.
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ]
-});
+}, { licenseKey: 'gpl-v3' });
 
 // define a function to be called when the event occurs
 const handler = ( ) => { console.log('baz') }
@@ -103,7 +103,7 @@ ___
 
 • **namedExpressionAdded**: *function*
 
-*Defined in [src/Emitter.ts:162](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L162)*
+*Defined in [src/Emitter.ts:162](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L162)*
 
 Occurs when a named expression with specified values and location is added.
 
@@ -115,7 +115,7 @@ Occurs when a named expression with specified values and location is added.
 ```js
 const hfInstance = HyperFormula.buildFromArray([
   ['42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // define a function to be called when the event occurs
 const handler = (namedExpressionName, changes) => { console.log('baz') }
@@ -152,7 +152,7 @@ ___
 
 • **namedExpressionRemoved**: *function*
 
-*Defined in [src/Emitter.ts:202](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L202)*
+*Defined in [src/Emitter.ts:202](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L202)*
 
 Occurs when a named expression with specified values is removed and from an indicated location.
 
@@ -164,7 +164,7 @@ Occurs when a named expression with specified values is removed and from an indi
 ```js
 const hfInstance = HyperFormula.buildFromArray([
   ['42'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // define a function to be called when the event occurs
 const handler = (namedExpressionName, changes) => { console.log('baz') }
@@ -207,7 +207,7 @@ ___
 
 • **sheetAdded**: *function*
 
-*Defined in [src/Emitter.ts:52](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L52)*
+*Defined in [src/Emitter.ts:52](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L52)*
 
 Occurs when a sheet is added anywhere inside the workbook.
 
@@ -215,7 +215,7 @@ Occurs when a sheet is added anywhere inside the workbook.
 
 **`example`** 
 ```js
-const hfInstance = HyperFormula.buildEmpty();
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
 // define a function to be called when the event occurs
 const handler = (addedSheetDisplayName) => { console.log('baz') }
@@ -251,7 +251,7 @@ ___
 
 • **sheetRemoved**: *function*
 
-*Defined in [src/Emitter.ts:89](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L89)*
+*Defined in [src/Emitter.ts:89](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L89)*
 
 Occurs when a sheet is removed from anywhere inside the workbook.
 
@@ -264,7 +264,7 @@ Occurs when a sheet is removed from anywhere inside the workbook.
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
   MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // define a function to be called when the event occurs
 const handler = (removedSheetDisplayName, changes) => { console.log('baz') }
@@ -301,7 +301,7 @@ ___
 
 • **sheetRenamed**: *function*
 
-*Defined in [src/Emitter.ts:126](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L126)*
+*Defined in [src/Emitter.ts:126](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L126)*
 
 Occurs when a sheet is renamed anywhere inside the workbook.
 
@@ -314,7 +314,7 @@ Occurs when a sheet is renamed anywhere inside the workbook.
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
   MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // define a function to be called when the event occurs
 const handler = (oldName, newName) => { console.log(`Sheet ${oldName} was renamed to ${newName}`) }
@@ -353,7 +353,7 @@ ___
 
 • **valuesUpdated**: *function*
 
-*Defined in [src/Emitter.ts:237](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L237)*
+*Defined in [src/Emitter.ts:237](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L237)*
 
 Occurs when values in a specified location are changed and cause recalculation.
 
@@ -363,7 +363,7 @@ Occurs when values in a specified location are changed and cause recalculation.
 ```js
 const hfInstance = HyperFormula.buildFromArray([
   ['1', '2', '=A1'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // define a function to be called when the event occurs
 const handler = (changes) => { console.log('baz') }

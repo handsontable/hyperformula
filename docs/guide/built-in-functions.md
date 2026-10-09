@@ -15,7 +15,7 @@ spreadsheet software. That is because a spreadsheet is probably the most
 universal software ever created. We wanted the same flexibility for HyperFormula
 but without the constraints of the spreadsheet UI.
 
-Each of HyperFormula's built-in function names is available in [17 languages](localizing-functions.md#list-of-supported-languages) and [custom language packs](localizing-functions.md) can be added.
+Each of HyperFormula's built-in function names is available in [18 languages](localizing-functions.md#list-of-supported-languages) and [custom language packs](localizing-functions.md) can be added.
 
 The latest version of HyperFormula has an extensive collection of
 **423** functions grouped into categories:
@@ -215,7 +215,7 @@ Total number of functions: **423**
 | <a id="NA"></a>NA | Returns #N/A! error value. | NA() |
 | <a id="SHEET"></a>SHEET | Returns sheet number of a given value or a formula sheet number if no argument is provided. | SHEET([value]) |
 | <a id="SHEETS"></a>SHEETS | Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided. | SHEETS([value]) |
-| <a id="VERSION"></a>VERSION | Returns the HyperFormula version and the license key status as a single text value, e.g. "HyperFormula v3.0.0, 1" (a status code, or the last five characters of the license key). | VERSION() |
+| <a id="VERSION"></a>VERSION | Returns the HyperFormula version as a text value, e.g. "HyperFormula v3.0.0". | VERSION() |
 
 ### Logical
 
@@ -301,7 +301,7 @@ Total number of functions: **423**
 | <a id="LN"></a>LN | Returns the natural logarithm based on the constant e of a number. | LN(number) |
 | <a id="LOG"></a>LOG | Returns the logarithm of a number to the specified base. | LOG(number, [base]) |
 | <a id="LOG10"></a>LOG10 | Returns the base-10 logarithm of a number. | LOG10(number) |
-| <a id="MOD"></a>MOD | Returns the remainder when one number is divided by another. | MOD(dividend, divisor) |
+| <a id="MOD"></a>MOD | Returns the remainder when one number is divided by another. The result has the same sign as divisor. | MOD(dividend, divisor) |
 | <a id="MROUND"></a>MROUND | Rounds a number to the nearest multiple. | MROUND(number, base) |
 | <a id="MULTINOMIAL"></a>MULTINOMIAL | Returns number of multiset combinations. | MULTINOMIAL(number1, ...) |
 | <a id="ODD"></a>ODD | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(number) |
@@ -342,8 +342,8 @@ Total number of functions: **423**
 
 | Function ID | Description | Syntax |
 |:---|:---|:---|
-| <a id="MAXPOOL"></a>MAXPOOL | Calculates a smaller range which is a maximum of a window_size, in a given range, for every stride element. | MAXPOOL(range, window_size, [stride]) |
-| <a id="MEDIANPOOL"></a>MEDIANPOOL | Calculates a smaller range which is a median of a window_size, in a given range, for every stride element. | MEDIANPOOL(range, window_size, [stride]) |
+| <a id="MAXPOOL"></a>MAXPOOL | Calculates a smaller range which is a maximum of a window_size, in a given range, for every stride element.<br>The windows must fit range exactly: window_size cannot exceed either dimension of range, and both dimensions of range, reduced by window_size, must be whole multiples of stride. Otherwise the function returns the #VALUE! error. A window_size or stride that is not a positive integer returns the #NUM! error. | MAXPOOL(range, window_size, [stride]) |
+| <a id="MEDIANPOOL"></a>MEDIANPOOL | Calculates a smaller range which is a median of a window_size, in a given range, for every stride element.<br>The windows must fit range exactly: window_size cannot exceed either dimension of range, and both dimensions of range, reduced by window_size, must be whole multiples of stride. Otherwise the function returns the #VALUE! error. A window_size or stride that is not a positive integer returns the #NUM! error. | MEDIANPOOL(range, window_size, [stride]) |
 | <a id="MMULT"></a>MMULT | Calculates the array product of two arrays. | MMULT(array1, array2) |
 
 ### Operator
@@ -482,7 +482,7 @@ Total number of functions: **423**
 | <a id="STDEVP"></a>STDEVP | Returns standard deviation of a population. | STDEVP(value1, ...) |
 | <a id="STDEVPA"></a>STDEVPA | Returns standard deviation of a population, counting text and logical values found in ranges. | STDEVPA(value1, ...) |
 | <a id="STDEVS"></a>STDEVS | Returns standard deviation of a sample. | STDEVS(value1, ...) |
-| <a id="STEYX"></a>STEYX | Returns standard error for predicted of the predicted y value for each x value. | STEYX(array1, array2) |
+| <a id="STEYX"></a>STEYX | Returns the standard error of the predicted y value for each x value in the linear regression of array1 on array2. | STEYX(array1, array2) |
 | <a id="T.DIST"></a>T.DIST | Returns density of Student-t distribution. | T.DIST(x, degrees, cumulative) |
 | <a id="T.DIST.2T"></a>T.DIST.2T | Returns density of Student-t distribution, both-sided. | T.DIST.2T(x, degrees) |
 | <a id="T.DIST.RT"></a>T.DIST.RT | Returns density of Student-t distribution, right-tailed. | T.DIST.RT(x, degrees) |

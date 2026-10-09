@@ -6,7 +6,7 @@
 
 ▸ **emit**‹**Event**›(`event`: Event, ...`args`: Parameters‹Listeners[Event]›): *this*
 
-*Defined in [src/Emitter.ts:328](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L328)*
+*Defined in [src/Emitter.ts:328](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L328)*
 
 **Type parameters:**
 

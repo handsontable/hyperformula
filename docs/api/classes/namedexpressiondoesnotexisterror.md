@@ -8,7 +8,7 @@ Error thrown when the given named expression does not exist.
 
 \+ **new NamedExpressionDoesNotExistError**(`expressionName`: string): *[NamedExpressionDoesNotExistError](namedexpressiondoesnotexisterror.md)*
 
-*Defined in [src/errors.ts:101](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L101)*
+*Defined in [src/errors.ts:103](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L103)*
 
 **Parameters:**
 

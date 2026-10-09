@@ -19,7 +19,7 @@ The following methods accept [ConfigParams](../interfaces/configparams.md) as a 
 
 \+ **new ExpectedValueOfTypeError**(`expectedType`: string, `paramName`: string): *[ExpectedValueOfTypeError](expectedvalueoftypeerror.md)*
 
-*Defined in [src/errors.ts:177](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L177)*
+*Defined in [src/errors.ts:179](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L179)*
 
 **Parameters:**
 

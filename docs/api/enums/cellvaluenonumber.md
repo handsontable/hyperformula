@@ -6,7 +6,7 @@
 
 • **BOOLEAN**: = "BOOLEAN"
 
-*Defined in [src/Cell.ts:83](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L83)*
+*Defined in [src/Cell.ts:83](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L83)*
 
 ___
 
@@ -14,7 +14,7 @@ ___
 
 • **EMPTY**: = "EMPTY"
 
-*Defined in [src/Cell.ts:80](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L80)*
+*Defined in [src/Cell.ts:80](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L80)*
 
 ___
 
@@ -22,7 +22,7 @@ ___
 
 • **ERROR**: = "ERROR"
 
-*Defined in [src/Cell.ts:84](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L84)*
+*Defined in [src/Cell.ts:84](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L84)*
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **NUMBER**: = "NUMBER"
 
-*Defined in [src/Cell.ts:81](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L81)*
+*Defined in [src/Cell.ts:81](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L81)*
 
 ___
 
@@ -38,4 +38,4 @@ ___
 
 • **STRING**: = "STRING"
 
-*Defined in [src/Cell.ts:82](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L82)*
+*Defined in [src/Cell.ts:82](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L82)*

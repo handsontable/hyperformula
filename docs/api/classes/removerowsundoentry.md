@@ -6,7 +6,7 @@
 
 \+ **new RemoveRowsUndoEntry**(`command`: [RemoveRowsCommand](removerowscommand.md), `rowsRemovals`: [RowsRemoval](../interfaces/rowsremoval.md)[]): *[RemoveRowsUndoEntry](removerowsundoentry.md)*
 
-*Defined in [src/UndoRedo.ts:47](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L47)*
+*Defined in [src/UndoRedo.ts:47](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L47)*
 
 **Parameters:**
 
@@ -23,7 +23,7 @@ Name | Type |
 
 • **command**: *[RemoveRowsCommand](removerowscommand.md)*
 
-*Defined in [src/UndoRedo.ts:49](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L49)*
+*Defined in [src/UndoRedo.ts:49](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L49)*
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **rowsRemovals**: *[RowsRemoval](../interfaces/rowsremoval.md)[]*
 
-*Defined in [src/UndoRedo.ts:50](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L50)*
+*Defined in [src/UndoRedo.ts:50](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L50)*
 
 ## Methods
 
@@ -39,7 +39,7 @@ ___
 
 ▸ **doRedo**(`undoRedo`: [UndoRedo](undoredo.md)): *void*
 
-*Defined in [src/UndoRedo.ts:59](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L59)*
+*Defined in [src/UndoRedo.ts:59](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L59)*
 
 **Parameters:**
 
@@ -55,7 +55,7 @@ ___
 
 ▸ **doUndo**(`undoRedo`: [UndoRedo](undoredo.md)): *void*
 
-*Defined in [src/UndoRedo.ts:55](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L55)*
+*Defined in [src/UndoRedo.ts:55](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L55)*
 
 **Parameters:**
 
@@ -71,6 +71,6 @@ ___
 
 ▸ **getReferencedOldDataVersions**(): *number[]*
 
-*Defined in [src/UndoRedo.ts:63](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L63)*
+*Defined in [src/UndoRedo.ts:63](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L63)*
 
 **Returns:** *number[]*

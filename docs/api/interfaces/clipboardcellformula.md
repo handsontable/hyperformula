@@ -6,7 +6,7 @@
 
 • **hash**: *string*
 
-*Defined in [src/ClipboardOperations.ts:42](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L42)*
+*Defined in [src/ClipboardOperations.ts:42](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L42)*
 
 ___
 
@@ -14,4 +14,4 @@ ___
 
 • **type**: *[FORMULA](../enums/clipboardcelltype.md#formula)*
 
-*Defined in [src/ClipboardOperations.ts:41](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L41)*
+*Defined in [src/ClipboardOperations.ts:41](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L41)*

@@ -6,7 +6,7 @@
 
 \+ **new Operations**(`config`: [Config](config.md), `dependencyGraph`: DependencyGraph, `columnSearch`: [ColumnSearchStrategy](../interfaces/columnsearchstrategy.md), `cellContentParser`: [CellContentParser](cellcontentparser.md), `parser`: ParserWithCaching, `stats`: [Statistics](statistics.md), `lazilyTransformingAstService`: [LazilyTransformingAstService](lazilytransformingastservice.md), `namedExpressions`: [NamedExpressions](namedexpressions.md), `arraySizePredictor`: [ArraySizePredictor](arraysizepredictor.md)): *[Operations](operations.md)*
 
-*Defined in [src/Operations.ts:160](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L160)*
+*Defined in [src/Operations.ts:160](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L160)*
 
 **Parameters:**
 
@@ -30,7 +30,7 @@ Name | Type |
 
 ▸ **addColumns**(`cmd`: [AddColumnsCommand](addcolumnscommand.md)): *void*
 
-*Defined in [src/Operations.ts:203](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L203)*
+*Defined in [src/Operations.ts:203](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L203)*
 
 **Parameters:**
 
@@ -46,7 +46,7 @@ ___
 
 ▸ **addNamedExpression**(`expressionName`: string, `expression`: [RawCellContent](../globals.md#rawcellcontent), `sheetId?`: undefined | number, `options?`: [NamedExpressionOptions](../globals.md#namedexpressionoptions)): *void*
 
-*Defined in [src/Operations.ts:420](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L420)*
+*Defined in [src/Operations.ts:420](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L420)*
 
 **Parameters:**
 
@@ -65,7 +65,7 @@ ___
 
 ▸ **addPlaceholderSheetWithId**(`sheetId`: number, `name`: string): *void*
 
-*Defined in [src/Operations.ts:253](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L253)*
+*Defined in [src/Operations.ts:253](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L253)*
 
 Adds a placeholder sheet with a specific ID for undo operations.
 Used to restore previously merged placeholder sheets.
@@ -89,7 +89,7 @@ ___
 
 ▸ **addRows**(`cmd`: [AddRowsCommand](addrowscommand.md)): *void*
 
-*Defined in [src/Operations.ts:197](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L197)*
+*Defined in [src/Operations.ts:197](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L197)*
 
 **Parameters:**
 
@@ -105,7 +105,7 @@ ___
 
 ▸ **addSheet**(`name?`: undefined | string): *object*
 
-*Defined in [src/Operations.ts:231](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L231)*
+*Defined in [src/Operations.ts:231](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L231)*
 
 Adds a new sheet to the workbook.
 
@@ -127,7 +127,7 @@ ___
 
 ▸ **addSheetWithId**(`sheetId`: number, `name`: string): *void*
 
-*Defined in [src/Operations.ts:240](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L240)*
+*Defined in [src/Operations.ts:240](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L240)*
 
 Adds a sheet with a specific ID for redo operations.
 
@@ -146,7 +146,7 @@ ___
 
 ▸ **changeNamedExpressionExpression**(`expressionName`: string, `newExpression`: [RawCellContent](../globals.md#rawcellcontent), `sheetId?`: undefined | number, `options?`: [NamedExpressionOptions](../globals.md#namedexpressionoptions)): *[[InternalNamedExpression](internalnamedexpression.md), [ClipboardCell](../globals.md#clipboardcell)]*
 
-*Defined in [src/Operations.ts:433](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L433)*
+*Defined in [src/Operations.ts:433](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L433)*
 
 **Parameters:**
 
@@ -165,7 +165,7 @@ ___
 
 ▸ **clearSheet**(`sheetId`: number): *void*
 
-*Defined in [src/Operations.ts:223](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L223)*
+*Defined in [src/Operations.ts:223](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L223)*
 
 Clears the sheet content.
 
@@ -183,7 +183,7 @@ ___
 
 ▸ **ensureItIsPossibleToMoveCells**(`sourceLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `width`: number, `height`: number, `destinationLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/Operations.ts:466](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L466)*
+*Defined in [src/Operations.ts:466](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L466)*
 
 **Parameters:**
 
@@ -202,7 +202,7 @@ ___
 
 ▸ **forceApplyPostponedTransformations**(): *void*
 
-*Defined in [src/Operations.ts:745](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L745)*
+*Defined in [src/Operations.ts:745](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L745)*
 
 Forces all formula vertices and column index entries to apply pending lazy
 transformations, bringing them up to the current LazilyTransformingAstService version.
@@ -216,7 +216,7 @@ ___
 
 ▸ **getAndClearContentChanges**(): *[ContentChanges](contentchanges.md)*
 
-*Defined in [src/Operations.ts:734](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L734)*
+*Defined in [src/Operations.ts:734](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L734)*
 
 **Returns:** *[ContentChanges](contentchanges.md)*
 
@@ -226,7 +226,7 @@ ___
 
 ▸ **getClipboardCell**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[ClipboardCell](../globals.md#clipboardcell)*
 
-*Defined in [src/Operations.ts:549](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L549)*
+*Defined in [src/Operations.ts:549](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L549)*
 
 **Parameters:**
 
@@ -242,7 +242,7 @@ ___
 
 ▸ **getOldContent**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[[SimpleCellAddress](../interfaces/simplecelladdress.md), [ClipboardCell](../globals.md#clipboardcell)]*
 
-*Defined in [src/Operations.ts:530](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L530)*
+*Defined in [src/Operations.ts:530](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L530)*
 
 **Parameters:**
 
@@ -258,7 +258,7 @@ ___
 
 ▸ **getRangeClipboardCells**(`range`: [AbsoluteCellRange](absolutecellrange.md)): *[[SimpleCellAddress](../interfaces/simplecelladdress.md), [ClipboardCell](../globals.md#clipboardcell)][]*
 
-*Defined in [src/Operations.ts:590](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L590)*
+*Defined in [src/Operations.ts:590](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L590)*
 
 **Parameters:**
 
@@ -274,7 +274,7 @@ ___
 
 ▸ **getSheetClipboardCells**(`sheet`: number): *[ClipboardCell](../globals.md#clipboardcell)[][]*
 
-*Defined in [src/Operations.ts:574](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L574)*
+*Defined in [src/Operations.ts:574](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L574)*
 
 **Parameters:**
 
@@ -290,7 +290,7 @@ ___
 
 ▸ **moveCells**(`sourceLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `width`: number, `height`: number, `destinationLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *[MoveCellsResult](../interfaces/movecellsresult.md)*
 
-*Defined in [src/Operations.ts:343](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L343)*
+*Defined in [src/Operations.ts:343](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L343)*
 
 **Parameters:**
 
@@ -309,7 +309,7 @@ ___
 
 ▸ **moveColumns**(`sheet`: number, `startColumn`: number, `numberOfColumns`: number, `targetColumn`: number): *number*
 
-*Defined in [src/Operations.ts:324](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L324)*
+*Defined in [src/Operations.ts:324](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L324)*
 
 **Parameters:**
 
@@ -328,7 +328,7 @@ ___
 
 ▸ **moveRows**(`sheet`: number, `startRow`: number, `numberOfRows`: number, `targetRow`: number): *number*
 
-*Defined in [src/Operations.ts:305](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L305)*
+*Defined in [src/Operations.ts:305](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L305)*
 
 **Parameters:**
 
@@ -347,7 +347,7 @@ ___
 
 ▸ **removeColumns**(`cmd`: [RemoveColumnsCommand](removecolumnscommand.md)): *[ColumnsRemoval](../interfaces/columnsremoval.md)[]*
 
-*Defined in [src/Operations.ts:209](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L209)*
+*Defined in [src/Operations.ts:209](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L209)*
 
 **Parameters:**
 
@@ -363,7 +363,7 @@ ___
 
 ▸ **removeNamedExpression**(`expressionName`: string, `sheetId?`: undefined | number): *[[InternalNamedExpression](internalnamedexpression.md), [ClipboardCell](../globals.md#clipboardcell)]*
 
-*Defined in [src/Operations.ts:447](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L447)*
+*Defined in [src/Operations.ts:447](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L447)*
 
 **Parameters:**
 
@@ -380,7 +380,7 @@ ___
 
 ▸ **removeRows**(`cmd`: [RemoveRowsCommand](removerowscommand.md)): *[RowsRemoval](../interfaces/rowsremoval.md)[]*
 
-*Defined in [src/Operations.ts:186](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L186)*
+*Defined in [src/Operations.ts:186](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L186)*
 
 **Parameters:**
 
@@ -396,7 +396,7 @@ ___
 
 ▸ **removeSheet**(`sheetId`: number): *[[InternalNamedExpression](internalnamedexpression.md), [ClipboardCell](../globals.md#clipboardcell)][]*
 
-*Defined in [src/Operations.ts:261](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L261)*
+*Defined in [src/Operations.ts:261](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L261)*
 
 Removes a sheet from the workbook.
 
@@ -414,7 +414,7 @@ ___
 
 ▸ **removeSheetByName**(`sheetName`: string): *[[InternalNamedExpression](internalnamedexpression.md)‹›, [ClipboardCell](../globals.md#clipboardcell)][]*
 
-*Defined in [src/Operations.ts:273](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L273)*
+*Defined in [src/Operations.ts:273](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L273)*
 
 Removes a sheet from the workbook by name.
 
@@ -432,7 +432,7 @@ ___
 
 ▸ **renameSheet**(`sheetId`: number, `newName`: string): *object*
 
-*Defined in [src/Operations.ts:281](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L281)*
+*Defined in [src/Operations.ts:281](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L281)*
 
 Renames a sheet in the workbook.
 
@@ -457,7 +457,7 @@ ___
 
 ▸ **restoreCell**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `clipboardCell`: [ClipboardCell](../globals.md#clipboardcell)): *void*
 
-*Defined in [src/Operations.ts:509](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L509)*
+*Defined in [src/Operations.ts:509](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L509)*
 
 Restores a single cell.
 
@@ -476,7 +476,7 @@ ___
 
 ▸ **restoreClipboardCells**(`sourceSheetId`: number, `cells`: IterableIterator‹[[SimpleCellAddress](../interfaces/simplecelladdress.md), [ClipboardCell](../globals.md#clipboardcell)]›): *string[]*
 
-*Defined in [src/Operations.ts:493](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L493)*
+*Defined in [src/Operations.ts:493](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L493)*
 
 **Parameters:**
 
@@ -493,7 +493,7 @@ ___
 
 ▸ **restoreNamedExpression**(`namedExpression`: [InternalNamedExpression](internalnamedexpression.md), `content`: [ClipboardCell](../globals.md#clipboardcell), `sheetId?`: undefined | number): *void*
 
-*Defined in [src/Operations.ts:426](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L426)*
+*Defined in [src/Operations.ts:426](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L426)*
 
 **Parameters:**
 
@@ -511,7 +511,7 @@ ___
 
 ▸ **rowEffectivelyNotInSheet**(`row`: number, `sheet`: number): *boolean*
 
-*Defined in [src/Operations.ts:729](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L729)*
+*Defined in [src/Operations.ts:729](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L729)*
 
 Returns true if row number is outside of given sheet.
 
@@ -530,7 +530,7 @@ ___
 
 ▸ **setCellContent**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `newCellContent`: [RawCellContent](../globals.md#rawcellcontent)): *[[SimpleCellAddress](../interfaces/simplecelladdress.md), [ClipboardCell](../globals.md#clipboardcell)]*
 
-*Defined in [src/Operations.ts:598](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L598)*
+*Defined in [src/Operations.ts:598](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L598)*
 
 **Parameters:**
 
@@ -547,7 +547,7 @@ ___
 
 ▸ **setCellEmpty**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/Operations.ts:695](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L695)*
+*Defined in [src/Operations.ts:695](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L695)*
 
 Sets cell content to an empty value.
 Creates an EmptyCellVertex and updates the dependency graph and column search index.
@@ -566,7 +566,7 @@ ___
 
 ▸ **setColumnOrder**(`sheetId`: number, `columnMapping`: [number, number][]): *[[SimpleCellAddress](../interfaces/simplecelladdress.md), [ClipboardCell](../globals.md#clipboardcell)][]*
 
-*Defined in [src/Operations.ts:399](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L399)*
+*Defined in [src/Operations.ts:399](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L399)*
 
 **Parameters:**
 
@@ -583,7 +583,7 @@ ___
 
 ▸ **setFormulaToCell**(`address`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `size`: [ArraySize](arraysize.md), `__namedParameters`: object): *void*
 
-*Defined in [src/Operations.ts:663](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L663)*
+*Defined in [src/Operations.ts:663](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L663)*
 
 Sets cell content to a formula.
 Creates a ScalarFormulaVertex and updates the dependency graph and column search index.
@@ -611,7 +611,7 @@ ___
 
 ▸ **setFormulaToCellFromCache**(`formulaHash`: string, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/Operations.ts:709](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L709)*
+*Defined in [src/Operations.ts:709](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L709)*
 
 **Parameters:**
 
@@ -628,7 +628,7 @@ ___
 
 ▸ **setParsingErrorToCell**(`rawInput`: string, `errors`: ParsingError[], `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/Operations.ts:648](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L648)*
+*Defined in [src/Operations.ts:648](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L648)*
 
 Sets cell content to an instance of parsing error.
 Creates a ParsingErrorVertex and updates the dependency graph and column search index.
@@ -649,7 +649,7 @@ ___
 
 ▸ **setRowOrder**(`sheetId`: number, `rowMapping`: [number, number][]): *[[SimpleCellAddress](../interfaces/simplecelladdress.md), [ClipboardCell](../globals.md#clipboardcell)][]*
 
-*Defined in [src/Operations.ts:378](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L378)*
+*Defined in [src/Operations.ts:378](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L378)*
 
 **Parameters:**
 
@@ -666,7 +666,7 @@ ___
 
 ▸ **setSheetContent**(`sheetId`: number, `newSheetContent`: [RawCellContent](../globals.md#rawcellcontent)[][]): *void*
 
-*Defined in [src/Operations.ts:634](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L634)*
+*Defined in [src/Operations.ts:634](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L634)*
 
 **Parameters:**
 
@@ -683,7 +683,7 @@ ___
 
 ▸ **setValueToCell**(`value`: RawAndParsedValue, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/Operations.ts:681](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L681)*
+*Defined in [src/Operations.ts:681](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L681)*
 
 Sets cell content to a value.
 Creates a ValueCellVertex and updates the dependency graph and column search index.

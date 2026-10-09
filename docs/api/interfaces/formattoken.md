@@ -6,7 +6,7 @@
 
 • **type**: *[TokenType](../enums/tokentype.md)*
 
-*Defined in [src/format/parser.ts:17](https://github.com/handsontable/hyperformula/blob/af2d59d/src/format/parser.ts#L17)*
+*Defined in [src/format/parser.ts:17](https://github.com/handsontable/hyperformula/blob/99a45ea/src/format/parser.ts#L17)*
 
 ___
 
@@ -14,4 +14,4 @@ ___
 
 • **value**: *string*
 
-*Defined in [src/format/parser.ts:18](https://github.com/handsontable/hyperformula/blob/af2d59d/src/format/parser.ts#L18)*
+*Defined in [src/format/parser.ts:18](https://github.com/handsontable/hyperformula/blob/99a45ea/src/format/parser.ts#L18)*

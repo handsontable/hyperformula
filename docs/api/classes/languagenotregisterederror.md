@@ -12,7 +12,7 @@ Error thrown when trying to retrieve not registered language
 
 \+ **new LanguageNotRegisteredError**(): *[LanguageNotRegisteredError](languagenotregisterederror.md)*
 
-*Defined in [src/errors.ts:291](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L291)*
+*Defined in [src/errors.ts:293](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L293)*
 
 **Returns:** *[LanguageNotRegisteredError](languagenotregisterederror.md)*
 

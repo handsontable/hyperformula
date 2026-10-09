@@ -8,7 +8,7 @@ Error thrown when the sheet of a given ID does not exist.
 
 \+ **new NoSheetWithIdError**(`sheetId`: number): *[NoSheetWithIdError](nosheetwithiderror.md)*
 
-*Defined in [src/errors.ts:11](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L11)*
+*Defined in [src/errors.ts:13](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L13)*
 
 **Parameters:**
 

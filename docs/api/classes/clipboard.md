@@ -6,7 +6,7 @@
 
 \+ **new Clipboard**(`sourceLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `width`: number, `height`: number, `type`: [ClipboardOperationType](../enums/clipboardoperationtype.md), `content?`: [ClipboardCell](../globals.md#clipboardcell)[][]): *[Clipboard](clipboard.md)*
 
-*Defined in [src/ClipboardOperations.ts:51](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L51)*
+*Defined in [src/ClipboardOperations.ts:51](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L51)*
 
 **Parameters:**
 
@@ -26,7 +26,7 @@ Name | Type |
 
 • **content**? : *[ClipboardCell](../globals.md#clipboardcell)[][]*
 
-*Defined in [src/ClipboardOperations.ts:57](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L57)*
+*Defined in [src/ClipboardOperations.ts:57](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L57)*
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 • **height**: *number*
 
-*Defined in [src/ClipboardOperations.ts:55](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L55)*
+*Defined in [src/ClipboardOperations.ts:55](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L55)*
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 • **sourceLeftCorner**: *[SimpleCellAddress](../interfaces/simplecelladdress.md)*
 
-*Defined in [src/ClipboardOperations.ts:53](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L53)*
+*Defined in [src/ClipboardOperations.ts:53](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L53)*
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 • **type**: *[ClipboardOperationType](../enums/clipboardoperationtype.md)*
 
-*Defined in [src/ClipboardOperations.ts:56](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L56)*
+*Defined in [src/ClipboardOperations.ts:56](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L56)*
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 • **width**: *number*
 
-*Defined in [src/ClipboardOperations.ts:54](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L54)*
+*Defined in [src/ClipboardOperations.ts:54](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L54)*
 
 ## Methods
 
@@ -66,7 +66,7 @@ ___
 
 ▸ **getContent**(`leftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *IterableIterator‹[[SimpleCellAddress](../interfaces/simplecelladdress.md), [ClipboardCell](../globals.md#clipboardcell)]›*
 
-*Defined in [src/ClipboardOperations.ts:61](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L61)*
+*Defined in [src/ClipboardOperations.ts:61](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L61)*
 
 **Parameters:**
 

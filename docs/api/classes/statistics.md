@@ -8,7 +8,7 @@ Provides tracking performance statistics to the engine
 
 ▸ **end**(`name`: [StatType](../enums/stattype.md)): *void*
 
-*Defined in [src/statistics/Statistics.ts:59](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/Statistics.ts#L59)*
+*Defined in [src/statistics/Statistics.ts:59](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/Statistics.ts#L59)*
 
 Stops tracking particular statistic.
 Raise error if tracking statistic wasn't started.
@@ -27,7 +27,7 @@ ___
 
 ▸ **incrementCriterionFunctionFullCacheUsed**(): *void*
 
-*Defined in [src/statistics/Statistics.ts:18](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/Statistics.ts#L18)*
+*Defined in [src/statistics/Statistics.ts:18](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/Statistics.ts#L18)*
 
 **Returns:** *void*
 
@@ -37,7 +37,7 @@ ___
 
 ▸ **incrementCriterionFunctionPartialCacheUsed**(): *void*
 
-*Defined in [src/statistics/Statistics.ts:24](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/Statistics.ts#L24)*
+*Defined in [src/statistics/Statistics.ts:24](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/Statistics.ts#L24)*
 
 **Returns:** *void*
 
@@ -47,7 +47,7 @@ ___
 
 ▸ **measure**‹**T**›(`name`: [StatType](../enums/stattype.md), `func`: function): *T*
 
-*Defined in [src/statistics/Statistics.ts:80](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/Statistics.ts#L80)*
+*Defined in [src/statistics/Statistics.ts:80](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/Statistics.ts#L80)*
 
 Measure given statistic as execution of given function.
 
@@ -77,7 +77,7 @@ ___
 
 ▸ **reset**(): *void*
 
-*Defined in [src/statistics/Statistics.ts:33](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/Statistics.ts#L33)*
+*Defined in [src/statistics/Statistics.ts:33](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/Statistics.ts#L33)*
 
 Resets statistics
 
@@ -89,7 +89,7 @@ ___
 
 ▸ **snapshot**(): *Map‹[StatType](../enums/stattype.md), number›*
 
-*Defined in [src/statistics/Statistics.ts:90](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/Statistics.ts#L90)*
+*Defined in [src/statistics/Statistics.ts:90](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/Statistics.ts#L90)*
 
 Returns the snapshot of current results
 
@@ -101,7 +101,7 @@ ___
 
 ▸ **start**(`name`: [StatType](../enums/stattype.md)): *void*
 
-*Defined in [src/statistics/Statistics.ts:45](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/Statistics.ts#L45)*
+*Defined in [src/statistics/Statistics.ts:45](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/Statistics.ts#L45)*
 
 Starts tracking particular statistic.
 

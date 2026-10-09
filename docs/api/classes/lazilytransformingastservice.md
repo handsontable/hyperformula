@@ -38,7 +38,7 @@ after compaction: `version() = versionOffset + transformations.length`.
 
 \+ **new LazilyTransformingAstService**(`stats`: [Statistics](statistics.md), `maxPendingLazyTransformations`: number): *[LazilyTransformingAstService](lazilytransformingastservice.md)*
 
-*Defined in [src/LazilyTransformingAstService.ts:54](https://github.com/handsontable/hyperformula/blob/af2d59d/src/LazilyTransformingAstService.ts#L54)*
+*Defined in [src/LazilyTransformingAstService.ts:54](https://github.com/handsontable/hyperformula/blob/99a45ea/src/LazilyTransformingAstService.ts#L54)*
 
 **Parameters:**
 
@@ -55,15 +55,15 @@ Name | Type |
 
 • **parser**? : *ParserWithCaching*
 
-*Defined in [src/LazilyTransformingAstService.ts:49](https://github.com/handsontable/hyperformula/blob/af2d59d/src/LazilyTransformingAstService.ts#L49)*
+*Defined in [src/LazilyTransformingAstService.ts:49](https://github.com/handsontable/hyperformula/blob/99a45ea/src/LazilyTransformingAstService.ts#L49)*
 
 ___
 
 ### undoRedo
 
-• **undoRedo**? : *[UndoRedo](undoredo.md)*
+• **undoRedo**? : *[UndoRedo](../enums/featureid.md#undoredo)*
 
-*Defined in [src/LazilyTransformingAstService.ts:50](https://github.com/handsontable/hyperformula/blob/af2d59d/src/LazilyTransformingAstService.ts#L50)*
+*Defined in [src/LazilyTransformingAstService.ts:50](https://github.com/handsontable/hyperformula/blob/99a45ea/src/LazilyTransformingAstService.ts#L50)*
 
 ## Methods
 
@@ -71,7 +71,7 @@ ___
 
 ▸ **addTransformation**(`transformation`: FormulaTransformer): *number*
 
-*Defined in [src/LazilyTransformingAstService.ts:66](https://github.com/handsontable/hyperformula/blob/af2d59d/src/LazilyTransformingAstService.ts#L66)*
+*Defined in [src/LazilyTransformingAstService.ts:66](https://github.com/handsontable/hyperformula/blob/99a45ea/src/LazilyTransformingAstService.ts#L66)*
 
 **Parameters:**
 
@@ -87,7 +87,7 @@ ___
 
 ▸ **applyTransformations**(`ast`: Ast, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `version`: number): *[Ast, [SimpleCellAddress](../interfaces/simplecelladdress.md), number]*
 
-*Defined in [src/LazilyTransformingAstService.ts:88](https://github.com/handsontable/hyperformula/blob/af2d59d/src/LazilyTransformingAstService.ts#L88)*
+*Defined in [src/LazilyTransformingAstService.ts:88](https://github.com/handsontable/hyperformula/blob/99a45ea/src/LazilyTransformingAstService.ts#L88)*
 
 **Parameters:**
 
@@ -105,7 +105,7 @@ ___
 
 ▸ **beginCombinedMode**(`sheet`: number): *void*
 
-*Defined in [src/LazilyTransformingAstService.ts:75](https://github.com/handsontable/hyperformula/blob/af2d59d/src/LazilyTransformingAstService.ts#L75)*
+*Defined in [src/LazilyTransformingAstService.ts:75](https://github.com/handsontable/hyperformula/blob/99a45ea/src/LazilyTransformingAstService.ts#L75)*
 
 **Parameters:**
 
@@ -121,7 +121,7 @@ ___
 
 ▸ **commitCombinedMode**(): *number*
 
-*Defined in [src/LazilyTransformingAstService.ts:79](https://github.com/handsontable/hyperformula/blob/af2d59d/src/LazilyTransformingAstService.ts#L79)*
+*Defined in [src/LazilyTransformingAstService.ts:79](https://github.com/handsontable/hyperformula/blob/99a45ea/src/LazilyTransformingAstService.ts#L79)*
 
 **Returns:** *number*
 
@@ -131,7 +131,7 @@ ___
 
 ▸ **compact**(): *void*
 
-*Defined in [src/LazilyTransformingAstService.ts:135](https://github.com/handsontable/hyperformula/blob/af2d59d/src/LazilyTransformingAstService.ts#L135)*
+*Defined in [src/LazilyTransformingAstService.ts:135](https://github.com/handsontable/hyperformula/blob/99a45ea/src/LazilyTransformingAstService.ts#L135)*
 
 Compacts the transformations array by discarding all entries that have already
 been applied by every consumer. Safe to call only after all FormulaVertex and
@@ -148,7 +148,7 @@ ___
 
 ▸ **getTransformationsFrom**(`version`: number, `filter?`: undefined | function): *IterableIterator‹FormulaTransformer›*
 
-*Defined in [src/LazilyTransformingAstService.ts:109](https://github.com/handsontable/hyperformula/blob/af2d59d/src/LazilyTransformingAstService.ts#L109)*
+*Defined in [src/LazilyTransformingAstService.ts:109](https://github.com/handsontable/hyperformula/blob/99a45ea/src/LazilyTransformingAstService.ts#L109)*
 
 **Parameters:**
 
@@ -165,7 +165,7 @@ ___
 
 ▸ **needsCompaction**(): *boolean*
 
-*Defined in [src/LazilyTransformingAstService.ts:123](https://github.com/handsontable/hyperformula/blob/af2d59d/src/LazilyTransformingAstService.ts#L123)*
+*Defined in [src/LazilyTransformingAstService.ts:123](https://github.com/handsontable/hyperformula/blob/99a45ea/src/LazilyTransformingAstService.ts#L123)*
 
 Returns true when enough transformations have accumulated to justify the cost
 of forcing all consumers (FormulaVertex, ColumnIndex) to apply pending changes.
@@ -178,6 +178,6 @@ ___
 
 ▸ **version**(): *number*
 
-*Defined in [src/LazilyTransformingAstService.ts:62](https://github.com/handsontable/hyperformula/blob/af2d59d/src/LazilyTransformingAstService.ts#L62)*
+*Defined in [src/LazilyTransformingAstService.ts:62](https://github.com/handsontable/hyperformula/blob/99a45ea/src/LazilyTransformingAstService.ts#L62)*
 
 **Returns:** *number*

@@ -8,7 +8,7 @@ Do not store stats in the memory. Stats are not needed on daily basis
 
 ▸ **end**(`_name`: [StatType](../enums/stattype.md)): *void*
 
-*Defined in [src/statistics/EmptyStatistics.ts:27](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/EmptyStatistics.ts#L27)*
+*Defined in [src/statistics/EmptyStatistics.ts:27](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/EmptyStatistics.ts#L27)*
 
 **`inheritdoc`** 
 
@@ -26,7 +26,7 @@ ___
 
 ▸ **incrementCriterionFunctionFullCacheUsed**(): *void*
 
-*Defined in [src/statistics/EmptyStatistics.ts:12](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/EmptyStatistics.ts#L12)*
+*Defined in [src/statistics/EmptyStatistics.ts:12](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/EmptyStatistics.ts#L12)*
 
 **`inheritdoc`** 
 
@@ -38,7 +38,7 @@ ___
 
 ▸ **incrementCriterionFunctionPartialCacheUsed**(): *void*
 
-*Defined in [src/statistics/EmptyStatistics.ts:17](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/EmptyStatistics.ts#L17)*
+*Defined in [src/statistics/EmptyStatistics.ts:17](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/EmptyStatistics.ts#L17)*
 
 **`inheritdoc`** 
 
@@ -50,7 +50,7 @@ ___
 
 ▸ **measure**‹**T**›(`name`: [StatType](../enums/stattype.md), `func`: function): *T*
 
-*Defined in [src/statistics/Statistics.ts:80](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/Statistics.ts#L80)*
+*Defined in [src/statistics/Statistics.ts:80](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/Statistics.ts#L80)*
 
 Measure given statistic as execution of given function.
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **reset**(): *void*
 
-*Defined in [src/statistics/Statistics.ts:33](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/Statistics.ts#L33)*
+*Defined in [src/statistics/Statistics.ts:33](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/Statistics.ts#L33)*
 
 Resets statistics
 
@@ -92,7 +92,7 @@ ___
 
 ▸ **snapshot**(): *Map‹[StatType](../enums/stattype.md), number›*
 
-*Defined in [src/statistics/Statistics.ts:90](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/Statistics.ts#L90)*
+*Defined in [src/statistics/Statistics.ts:90](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/Statistics.ts#L90)*
 
 Returns the snapshot of current results
 
@@ -104,7 +104,7 @@ ___
 
 ▸ **start**(`_name`: [StatType](../enums/stattype.md)): *void*
 
-*Defined in [src/statistics/EmptyStatistics.ts:22](https://github.com/handsontable/hyperformula/blob/af2d59d/src/statistics/EmptyStatistics.ts#L22)*
+*Defined in [src/statistics/EmptyStatistics.ts:22](https://github.com/handsontable/hyperformula/blob/99a45ea/src/statistics/EmptyStatistics.ts#L22)*
 
 **`inheritdoc`** 
 

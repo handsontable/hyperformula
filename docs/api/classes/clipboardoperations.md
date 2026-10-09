@@ -6,7 +6,7 @@
 
 \+ **new ClipboardOperations**(`config`: [Config](config.md), `dependencyGraph`: DependencyGraph, `operations`: [Operations](operations.md)): *[ClipboardOperations](clipboardoperations.md)*
 
-*Defined in [src/ClipboardOperations.ts:77](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L77)*
+*Defined in [src/ClipboardOperations.ts:77](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L77)*
 
 **Parameters:**
 
@@ -22,9 +22,9 @@ Name | Type |
 
 ### clipboard
 
-• **clipboard**? : *[Clipboard](clipboard.md)*
+• **clipboard**? : *[Clipboard](../enums/featureid.md#clipboard)*
 
-*Defined in [src/ClipboardOperations.ts:75](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L75)*
+*Defined in [src/ClipboardOperations.ts:75](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L75)*
 
 ## Methods
 
@@ -32,7 +32,7 @@ Name | Type |
 
 ▸ **abortCut**(): *void*
 
-*Defined in [src/ClipboardOperations.ts:107](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L107)*
+*Defined in [src/ClipboardOperations.ts:107](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L107)*
 
 **Returns:** *void*
 
@@ -42,7 +42,7 @@ ___
 
 ▸ **clear**(): *void*
 
-*Defined in [src/ClipboardOperations.ts:113](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L113)*
+*Defined in [src/ClipboardOperations.ts:113](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L113)*
 
 **Returns:** *void*
 
@@ -52,7 +52,7 @@ ___
 
 ▸ **copy**(`leftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `width`: number, `height`: number): *void*
 
-*Defined in [src/ClipboardOperations.ts:92](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L92)*
+*Defined in [src/ClipboardOperations.ts:92](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L92)*
 
 **Parameters:**
 
@@ -70,7 +70,7 @@ ___
 
 ▸ **cut**(`leftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `width`: number, `height`: number): *void*
 
-*Defined in [src/ClipboardOperations.ts:88](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L88)*
+*Defined in [src/ClipboardOperations.ts:88](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L88)*
 
 **Parameters:**
 
@@ -88,7 +88,7 @@ ___
 
 ▸ **ensureItIsPossibleToCopyPaste**(`destinationLeftCorner`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/ClipboardOperations.ts:117](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L117)*
+*Defined in [src/ClipboardOperations.ts:117](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L117)*
 
 **Parameters:**
 
@@ -104,7 +104,7 @@ ___
 
 ▸ **isCopyClipboard**(): *boolean*
 
-*Defined in [src/ClipboardOperations.ts:141](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L141)*
+*Defined in [src/ClipboardOperations.ts:141](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L141)*
 
 **Returns:** *boolean*
 
@@ -114,6 +114,6 @@ ___
 
 ▸ **isCutClipboard**(): *boolean*
 
-*Defined in [src/ClipboardOperations.ts:137](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L137)*
+*Defined in [src/ClipboardOperations.ts:137](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L137)*
 
 **Returns:** *boolean*

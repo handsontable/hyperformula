@@ -6,7 +6,7 @@
 
 \+ **new Number**(`value`: ExtendedNumber): *[Number](cellcontent.number.md)*
 
-*Defined in [src/CellContentParser.ts:28](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellContentParser.ts#L28)*
+*Defined in [src/CellContentParser.ts:28](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellContentParser.ts#L28)*
 
 **Parameters:**
 
@@ -22,4 +22,4 @@ Name | Type |
 
 • **value**: *ExtendedNumber*
 
-*Defined in [src/CellContentParser.ts:29](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellContentParser.ts#L29)*
+*Defined in [src/CellContentParser.ts:29](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellContentParser.ts#L29)*

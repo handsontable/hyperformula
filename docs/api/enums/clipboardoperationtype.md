@@ -6,7 +6,7 @@
 
 • **COPY**:
 
-*Defined in [src/ClipboardOperations.ts:19](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L19)*
+*Defined in [src/ClipboardOperations.ts:19](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L19)*
 
 ___
 
@@ -14,4 +14,4 @@ ___
 
 • **CUT**:
 
-*Defined in [src/ClipboardOperations.ts:20](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L20)*
+*Defined in [src/ClipboardOperations.ts:20](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L20)*

@@ -6,7 +6,7 @@
 
 \+ **new RowSearchStrategy**(`dependencyGraph`: DependencyGraph): *[RowSearchStrategy](rowsearchstrategy.md)*
 
-*Defined in [src/Lookup/RowSearchStrategy.ts:12](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/RowSearchStrategy.ts#L12)*
+*Defined in [src/Lookup/RowSearchStrategy.ts:12](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/RowSearchStrategy.ts#L12)*
 
 **Parameters:**
 
@@ -22,7 +22,7 @@ Name | Type |
 
 ▸ **advancedFind**(`keyMatcher`: function, `rangeValue`: [SimpleRangeValue](simplerangevalue.md), `__namedParameters`: object): *number*
 
-*Defined in [src/Lookup/AdvancedFind.ts:27](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/AdvancedFind.ts#L27)*
+*Defined in [src/Lookup/AdvancedFind.ts:27](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/AdvancedFind.ts#L27)*
 
 **Parameters:**
 
@@ -52,7 +52,7 @@ ___
 
 ▸ **find**(`searchKey`: RawNoErrorScalarValue, `rangeValue`: [SimpleRangeValue](simplerangevalue.md), `searchOptions`: [SearchOptions](../interfaces/searchoptions.md)): *number*
 
-*Defined in [src/Lookup/RowSearchStrategy.ts:20](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/RowSearchStrategy.ts#L20)*
+*Defined in [src/Lookup/RowSearchStrategy.ts:20](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/RowSearchStrategy.ts#L20)*
 
 **Parameters:**
 

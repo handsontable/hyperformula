@@ -6,7 +6,7 @@
 
 • **index**: *number[]*
 
-*Defined in [src/Lookup/ColumnIndex.ts:34](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L34)*
+*Defined in [src/Lookup/ColumnIndex.ts:34](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L34)*
 
 ___
 
@@ -14,4 +14,4 @@ ___
 
 • **version**: *number*
 
-*Defined in [src/Lookup/ColumnIndex.ts:33](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnIndex.ts#L33)*
+*Defined in [src/Lookup/ColumnIndex.ts:33](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnIndex.ts#L33)*

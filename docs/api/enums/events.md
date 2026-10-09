@@ -6,7 +6,7 @@
 
 • **EvaluationResumed**: = "evaluationResumed"
 
-*Defined in [src/Emitter.ts:17](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L17)*
+*Defined in [src/Emitter.ts:17](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L17)*
 
 ___
 
@@ -14,7 +14,7 @@ ___
 
 • **EvaluationSuspended**: = "evaluationSuspended"
 
-*Defined in [src/Emitter.ts:16](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L16)*
+*Defined in [src/Emitter.ts:16](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L16)*
 
 ___
 
@@ -22,7 +22,7 @@ ___
 
 • **NamedExpressionAdded**: = "namedExpressionAdded"
 
-*Defined in [src/Emitter.ts:13](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L13)*
+*Defined in [src/Emitter.ts:13](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L13)*
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **NamedExpressionRemoved**: = "namedExpressionRemoved"
 
-*Defined in [src/Emitter.ts:14](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L14)*
+*Defined in [src/Emitter.ts:14](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L14)*
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **SheetAdded**: = "sheetAdded"
 
-*Defined in [src/Emitter.ts:10](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L10)*
+*Defined in [src/Emitter.ts:10](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L10)*
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 • **SheetRemoved**: = "sheetRemoved"
 
-*Defined in [src/Emitter.ts:11](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L11)*
+*Defined in [src/Emitter.ts:11](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L11)*
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 • **SheetRenamed**: = "sheetRenamed"
 
-*Defined in [src/Emitter.ts:12](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L12)*
+*Defined in [src/Emitter.ts:12](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L12)*
 
 ___
 
@@ -62,4 +62,4 @@ ___
 
 • **ValuesUpdated**: = "valuesUpdated"
 
-*Defined in [src/Emitter.ts:15](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Emitter.ts#L15)*
+*Defined in [src/Emitter.ts:15](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Emitter.ts#L15)*

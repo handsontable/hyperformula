@@ -6,7 +6,7 @@
 
 \+ **new RemoveRowsCommand**(`sheet`: number, `indexes`: [ColumnRowIndex](../globals.md#columnrowindex)[]): *[RemoveRowsCommand](removerowscommand.md)*
 
-*Defined in [src/Operations.ts:60](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L60)*
+*Defined in [src/Operations.ts:60](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L60)*
 
 **Parameters:**
 
@@ -23,7 +23,7 @@ Name | Type |
 
 • **indexes**: *[ColumnRowIndex](../globals.md#columnrowindex)[]*
 
-*Defined in [src/Operations.ts:63](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L63)*
+*Defined in [src/Operations.ts:63](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L63)*
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **sheet**: *number*
 
-*Defined in [src/Operations.ts:62](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L62)*
+*Defined in [src/Operations.ts:62](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L62)*
 
 ## Methods
 
@@ -39,7 +39,7 @@ ___
 
 ▸ **normalizedIndexes**(): *[ColumnRowIndex](../globals.md#columnrowindex)[]*
 
-*Defined in [src/Operations.ts:67](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L67)*
+*Defined in [src/Operations.ts:67](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L67)*
 
 **Returns:** *[ColumnRowIndex](../globals.md#columnrowindex)[]*
 
@@ -49,6 +49,6 @@ ___
 
 ▸ **rowsSpans**(): *[RowsSpan](rowsspan.md)[]*
 
-*Defined in [src/Operations.ts:71](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L71)*
+*Defined in [src/Operations.ts:71](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L71)*
 
 **Returns:** *[RowsSpan](rowsspan.md)[]*

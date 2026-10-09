@@ -25,7 +25,7 @@ const hfInstance = HyperFormula.buildFromArray([
  ['A'],
  ['B'],
  ['C'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // we'll set the row order to [1, 2, 0] in the next steps
 // the resulting sheet will be: [['C'], ['A'], ['B']]
@@ -50,7 +50,7 @@ const hfInstance = HyperFormula.buildFromArray([
  ['A'],
  ['B'],
  ['C'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // a variable to carry the user message
 let messageUsedInUI;
@@ -73,7 +73,7 @@ const hfInstance = HyperFormula.buildFromArray([
  ['A'],
  ['B'],
  ['C'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 let messageUsedInUI;
 
@@ -117,7 +117,7 @@ For example, if you want to move the last column to the front of a 3-column shee
 // a HyperFormula instance with example data
 const hfInstance = HyperFormula.buildFromArray([
  ['A', 'B', 'C']
-]);
+], { licenseKey: 'gpl-v3' });
 
 // we'll set the column order to [1, 2, 0] in the next steps
 // the resulting sheet will be: [['C', 'A', 'B']]
@@ -138,7 +138,7 @@ Use the [`isItPossibleToSetColumnOrder`](../api/classes/hyperformula.md#isitposs
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['A', 'B', 'C']
-]);
+], { licenseKey: 'gpl-v3' });
 
 // a variable to carry the user message
 let messageUsedInUI;
@@ -159,7 +159,7 @@ If your specified column number permutation is valid, change the column order:
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['A', 'B', 'C']
-]);
+], { licenseKey: 'gpl-v3' });
 
 let messageUsedInUI;
 

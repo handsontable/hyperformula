@@ -6,7 +6,7 @@
 
 \+ **new InternalNamedExpression**(`displayName`: string, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md), `added`: boolean, `options?`: [NamedExpressionOptions](../globals.md#namedexpressionoptions)): *[InternalNamedExpression](internalnamedexpression.md)*
 
-*Defined in [src/NamedExpressions.ts:24](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L24)*
+*Defined in [src/NamedExpressions.ts:24](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L24)*
 
 **Parameters:**
 
@@ -25,7 +25,7 @@ Name | Type |
 
 • **added**: *boolean*
 
-*Defined in [src/NamedExpressions.ts:28](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L28)*
+*Defined in [src/NamedExpressions.ts:28](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L28)*
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 • **address**: *[SimpleCellAddress](../interfaces/simplecelladdress.md)*
 
-*Defined in [src/NamedExpressions.ts:27](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L27)*
+*Defined in [src/NamedExpressions.ts:27](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L27)*
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 • **displayName**: *string*
 
-*Defined in [src/NamedExpressions.ts:26](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L26)*
+*Defined in [src/NamedExpressions.ts:26](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L26)*
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 • **options**? : *[NamedExpressionOptions](../globals.md#namedexpressionoptions)*
 
-*Defined in [src/NamedExpressions.ts:29](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L29)*
+*Defined in [src/NamedExpressions.ts:29](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L29)*
 
 ## Methods
 
@@ -57,7 +57,7 @@ ___
 
 ▸ **copy**(): *[InternalNamedExpression](internalnamedexpression.md)*
 
-*Defined in [src/NamedExpressions.ts:37](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L37)*
+*Defined in [src/NamedExpressions.ts:37](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L37)*
 
 **Returns:** *[InternalNamedExpression](internalnamedexpression.md)*
 
@@ -67,6 +67,6 @@ ___
 
 ▸ **normalizeExpressionName**(): *string*
 
-*Defined in [src/NamedExpressions.ts:33](https://github.com/handsontable/hyperformula/blob/af2d59d/src/NamedExpressions.ts#L33)*
+*Defined in [src/NamedExpressions.ts:33](https://github.com/handsontable/hyperformula/blob/99a45ea/src/NamedExpressions.ts#L33)*
 
 **Returns:** *string*

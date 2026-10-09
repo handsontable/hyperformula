@@ -6,7 +6,7 @@
 
 • **removedCells**: *[ChangedCell](changedcell.md)[]*
 
-*Defined in [src/Operations.ts:141](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L141)*
+*Defined in [src/Operations.ts:141](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L141)*
 
 ___
 
@@ -14,7 +14,7 @@ ___
 
 • **rowCount**: *number*
 
-*Defined in [src/Operations.ts:139](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L139)*
+*Defined in [src/Operations.ts:139](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L139)*
 
 ___
 
@@ -22,7 +22,7 @@ ___
 
 • **rowFrom**: *number*
 
-*Defined in [src/Operations.ts:138](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L138)*
+*Defined in [src/Operations.ts:138](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L138)*
 
 ___
 
@@ -30,4 +30,4 @@ ___
 
 • **version**: *number*
 
-*Defined in [src/Operations.ts:140](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Operations.ts#L140)*
+*Defined in [src/Operations.ts:140](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Operations.ts#L140)*

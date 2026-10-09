@@ -90,6 +90,7 @@ HyperFormula 3.0.0 introduces a change in the default value of the `precisionRou
 
 ```javascript
 const hf = HyperFormula.buildEmpty({
+  licenseKey: 'gpl-v3',
   precisionRounding: 14
 });
 ```

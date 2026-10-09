@@ -8,7 +8,7 @@ Error thrown when there are no operations to be undone by the [undo](crudoperati
 
 \+ **new NoOperationToUndoError**(): *[NoOperationToUndoError](nooperationtoundoerror.md)*
 
-*Defined in [src/errors.ts:110](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L110)*
+*Defined in [src/errors.ts:112](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L112)*
 
 **Returns:** *[NoOperationToUndoError](nooperationtoundoerror.md)*
 

@@ -6,7 +6,7 @@
 
 \+ **new DateTimeHelper**(`config`: [Config](config.md)): *[DateTimeHelper](datetimehelper.md)*
 
-*Defined in [src/DateTimeHelper.ts:58](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L58)*
+*Defined in [src/DateTimeHelper.ts:58](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L58)*
 
 **Parameters:**
 
@@ -22,7 +22,7 @@ Name | Type |
 
 ▸ **dateStringToDateNumber**(`dateTimeString`: string): *[Maybe](../globals.md#maybe)‹ExtendedNumber›*
 
-*Defined in [src/DateTimeHelper.ts:81](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L81)*
+*Defined in [src/DateTimeHelper.ts:81](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L81)*
 
 **Parameters:**
 
@@ -38,7 +38,7 @@ ___
 
 ▸ **dateToNumber**(`date`: [SimpleDate](../interfaces/simpledate.md)): *number*
 
-*Defined in [src/DateTimeHelper.ts:131](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L131)*
+*Defined in [src/DateTimeHelper.ts:131](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L131)*
 
 **Parameters:**
 
@@ -54,7 +54,7 @@ ___
 
 ▸ **daysInMonth**(`year`: number, `month`: number): *number*
 
-*Defined in [src/DateTimeHelper.ts:167](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L167)*
+*Defined in [src/DateTimeHelper.ts:167](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L167)*
 
 **Parameters:**
 
@@ -71,7 +71,7 @@ ___
 
 ▸ **endOfMonth**(`date`: [SimpleDate](../interfaces/simpledate.md)): *[SimpleDate](../interfaces/simpledate.md)*
 
-*Defined in [src/DateTimeHelper.ts:175](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L175)*
+*Defined in [src/DateTimeHelper.ts:175](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L175)*
 
 **Parameters:**
 
@@ -87,7 +87,7 @@ ___
 
 ▸ **getEpochYearZero**(): *number*
 
-*Defined in [src/DateTimeHelper.ts:109](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L109)*
+*Defined in [src/DateTimeHelper.ts:109](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L109)*
 
 **Returns:** *number*
 
@@ -97,7 +97,7 @@ ___
 
 ▸ **getNullYear**(): *number*
 
-*Defined in [src/DateTimeHelper.ts:105](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L105)*
+*Defined in [src/DateTimeHelper.ts:105](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L105)*
 
 **Returns:** *number*
 
@@ -107,7 +107,7 @@ ___
 
 ▸ **getWithinBounds**(`dayNumber`: number): *[Maybe](../globals.md#maybe)‹number›*
 
-*Defined in [src/DateTimeHelper.ts:77](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L77)*
+*Defined in [src/DateTimeHelper.ts:77](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L77)*
 
 **Parameters:**
 
@@ -123,7 +123,7 @@ ___
 
 ▸ **isValidDate**(`date`: [SimpleDate](../interfaces/simpledate.md)): *boolean*
 
-*Defined in [src/DateTimeHelper.ts:113](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L113)*
+*Defined in [src/DateTimeHelper.ts:113](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L113)*
 
 **Parameters:**
 
@@ -139,7 +139,7 @@ ___
 
 ▸ **leapYearsCount**(`year`: number): *number*
 
-*Defined in [src/DateTimeHelper.ts:163](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L163)*
+*Defined in [src/DateTimeHelper.ts:163](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L163)*
 
 **Parameters:**
 
@@ -155,7 +155,7 @@ ___
 
 ▸ **numberToSimpleDate**(`arg`: number): *[SimpleDate](../interfaces/simpledate.md)*
 
-*Defined in [src/DateTimeHelper.ts:139](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L139)*
+*Defined in [src/DateTimeHelper.ts:139](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L139)*
 
 **Parameters:**
 
@@ -171,7 +171,7 @@ ___
 
 ▸ **numberToSimpleDateTime**(`arg`: number): *[SimpleDateTime](../globals.md#simpledatetime)*
 
-*Defined in [src/DateTimeHelper.ts:154](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L154)*
+*Defined in [src/DateTimeHelper.ts:154](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L154)*
 
 **Parameters:**
 
@@ -187,7 +187,7 @@ ___
 
 ▸ **parseDateTimeFromConfigFormats**(`dateTimeString`: string): *Partial‹object›*
 
-*Defined in [src/DateTimeHelper.ts:101](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L101)*
+*Defined in [src/DateTimeHelper.ts:101](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L101)*
 
 **Parameters:**
 
@@ -203,7 +203,7 @@ ___
 
 ▸ **relativeNumberToAbsoluteNumber**(`arg`: number): *number*
 
-*Defined in [src/DateTimeHelper.ts:135](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L135)*
+*Defined in [src/DateTimeHelper.ts:135](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L135)*
 
 **Parameters:**
 
@@ -219,7 +219,7 @@ ___
 
 ▸ **toBasisUS**(`start`: [SimpleDate](../interfaces/simpledate.md), `end`: [SimpleDate](../interfaces/simpledate.md)): *[[SimpleDate](../interfaces/simpledate.md), [SimpleDate](../interfaces/simpledate.md)]*
 
-*Defined in [src/DateTimeHelper.ts:179](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L179)*
+*Defined in [src/DateTimeHelper.ts:179](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L179)*
 
 **Parameters:**
 
@@ -236,7 +236,7 @@ ___
 
 ▸ **yearLengthForBasis**(`start`: [SimpleDate](../interfaces/simpledate.md), `end`: [SimpleDate](../interfaces/simpledate.md)): *number*
 
-*Defined in [src/DateTimeHelper.ts:195](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L195)*
+*Defined in [src/DateTimeHelper.ts:195](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L195)*
 
 **Parameters:**
 

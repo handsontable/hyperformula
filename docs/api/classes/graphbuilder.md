@@ -8,7 +8,7 @@ Service building the graph and mappings.
 
 \+ **new GraphBuilder**(`dependencyGraph`: DependencyGraph, `columnSearch`: [ColumnSearchStrategy](../interfaces/columnsearchstrategy.md), `parser`: ParserWithCaching, `cellContentParser`: [CellContentParser](cellcontentparser.md), `stats`: [Statistics](statistics.md), `arraySizePredictor`: [ArraySizePredictor](arraysizepredictor.md)): *[GraphBuilder](graphbuilder.md)*
 
-*Defined in [src/GraphBuilder.ts:31](https://github.com/handsontable/hyperformula/blob/af2d59d/src/GraphBuilder.ts#L31)*
+*Defined in [src/GraphBuilder.ts:31](https://github.com/handsontable/hyperformula/blob/99a45ea/src/GraphBuilder.ts#L31)*
 
 Configures the building service.
 
@@ -31,7 +31,7 @@ Name | Type |
 
 ▸ **buildGraph**(`sheets`: [Sheets](../globals.md#sheets), `stats`: [Statistics](statistics.md)): *void*
 
-*Defined in [src/GraphBuilder.ts:50](https://github.com/handsontable/hyperformula/blob/af2d59d/src/GraphBuilder.ts#L50)*
+*Defined in [src/GraphBuilder.ts:50](https://github.com/handsontable/hyperformula/blob/99a45ea/src/GraphBuilder.ts#L50)*
 
 Builds graph.
 

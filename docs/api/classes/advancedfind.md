@@ -6,7 +6,7 @@
 
 ▸ **advancedFind**(`keyMatcher`: function, `rangeValue`: [SimpleRangeValue](simplerangevalue.md), `__namedParameters`: object): *number*
 
-*Defined in [src/Lookup/AdvancedFind.ts:27](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/AdvancedFind.ts#L27)*
+*Defined in [src/Lookup/AdvancedFind.ts:27](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/AdvancedFind.ts#L27)*
 
 **Parameters:**
 

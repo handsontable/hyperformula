@@ -8,7 +8,7 @@ Error thrown when the given arguments are invalid
 
 \+ **new InvalidArgumentsError**(`expectedArguments`: string): *[InvalidArgumentsError](invalidargumentserror.md)*
 
-*Defined in [src/errors.ts:65](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L65)*
+*Defined in [src/errors.ts:67](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L67)*
 
 **Parameters:**
 

@@ -6,7 +6,7 @@
 
 \+ **new DetailedCellError**(`error`: [CellError](cellerror.md), `value`: string, `address?`: undefined | string): *[DetailedCellError](detailedcellerror.md)*
 
-*Defined in [src/CellValue.ts:13](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellValue.ts#L13)*
+*Defined in [src/CellValue.ts:13](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellValue.ts#L13)*
 
 **Parameters:**
 
@@ -24,7 +24,7 @@ Name | Type |
 
 • **address**? : *undefined | string*
 
-*Defined in [src/CellValue.ts:18](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellValue.ts#L18)*
+*Defined in [src/CellValue.ts:18](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellValue.ts#L18)*
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 • **message**: *string*
 
-*Defined in [src/CellValue.ts:13](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellValue.ts#L13)*
+*Defined in [src/CellValue.ts:13](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellValue.ts#L13)*
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • **type**: *[ErrorType](hyperformulans.md#static-errortype)*
 
-*Defined in [src/CellValue.ts:12](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellValue.ts#L12)*
+*Defined in [src/CellValue.ts:12](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellValue.ts#L12)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **value**: *string*
 
-*Defined in [src/CellValue.ts:17](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellValue.ts#L17)*
+*Defined in [src/CellValue.ts:17](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellValue.ts#L17)*
 
 ## Methods
 
@@ -56,7 +56,7 @@ ___
 
 ▸ **toString**(): *string*
 
-*Defined in [src/CellValue.ts:24](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellValue.ts#L24)*
+*Defined in [src/CellValue.ts:24](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellValue.ts#L24)*
 
 **Returns:** *string*
 
@@ -66,6 +66,6 @@ ___
 
 ▸ **valueOf**(): *string*
 
-*Defined in [src/CellValue.ts:28](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellValue.ts#L28)*
+*Defined in [src/CellValue.ts:28](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellValue.ts#L28)*
 
 **Returns:** *string*

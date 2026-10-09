@@ -16,7 +16,7 @@ Checks against the validity in:
 
 \+ **new UnableToParseError**(`value`: any): *[UnableToParseError](unabletoparseerror.md)*
 
-*Defined in [src/errors.ts:160](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L160)*
+*Defined in [src/errors.ts:162](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L162)*
 
 **Parameters:**
 

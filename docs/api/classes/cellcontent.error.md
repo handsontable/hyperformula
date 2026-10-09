@@ -6,7 +6,7 @@
 
 \+ **new Error**(`errorType`: [ErrorType](hyperformulans.md#static-errortype), `message?`: undefined | string): *[Error](cellcontent.error.md)*
 
-*Defined in [src/CellContentParser.ts:62](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellContentParser.ts#L62)*
+*Defined in [src/CellContentParser.ts:62](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellContentParser.ts#L62)*
 
 **Parameters:**
 
@@ -23,4 +23,4 @@ Name | Type |
 
 • **value**: *[CellError](cellerror.md)*
 
-*Defined in [src/CellContentParser.ts:62](https://github.com/handsontable/hyperformula/blob/af2d59d/src/CellContentParser.ts#L62)*
+*Defined in [src/CellContentParser.ts:62](https://github.com/handsontable/hyperformula/blob/99a45ea/src/CellContentParser.ts#L62)*

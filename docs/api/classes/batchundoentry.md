@@ -6,7 +6,7 @@
 
 • **operations**: *[UndoEntry](../interfaces/undoentry.md)[]* = []
 
-*Defined in [src/UndoRedo.ts:443](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L443)*
+*Defined in [src/UndoRedo.ts:443](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L443)*
 
 ## Methods
 
@@ -14,7 +14,7 @@
 
 ▸ **add**(`operation`: [UndoEntry](../interfaces/undoentry.md)): *void*
 
-*Defined in [src/UndoRedo.ts:445](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L445)*
+*Defined in [src/UndoRedo.ts:445](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L445)*
 
 **Parameters:**
 
@@ -30,7 +30,7 @@ ___
 
 ▸ **doRedo**(`undoRedo`: [UndoRedo](undoredo.md)): *void*
 
-*Defined in [src/UndoRedo.ts:459](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L459)*
+*Defined in [src/UndoRedo.ts:459](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L459)*
 
 **Parameters:**
 
@@ -46,7 +46,7 @@ ___
 
 ▸ **doUndo**(`undoRedo`: [UndoRedo](undoredo.md)): *void*
 
-*Defined in [src/UndoRedo.ts:455](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L455)*
+*Defined in [src/UndoRedo.ts:455](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L455)*
 
 **Parameters:**
 
@@ -62,7 +62,7 @@ ___
 
 ▸ **getReferencedOldDataVersions**(): *number[]*
 
-*Defined in [src/UndoRedo.ts:463](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L463)*
+*Defined in [src/UndoRedo.ts:463](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L463)*
 
 **Returns:** *number[]*
 
@@ -72,6 +72,6 @@ ___
 
 ▸ **reversedOperations**(): *Generator‹[UndoEntry](../interfaces/undoentry.md), void, unknown›*
 
-*Defined in [src/UndoRedo.ts:449](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L449)*
+*Defined in [src/UndoRedo.ts:449](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L449)*
 
 **Returns:** *Generator‹[UndoEntry](../interfaces/undoentry.md), void, unknown›*

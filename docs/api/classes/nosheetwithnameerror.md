@@ -8,7 +8,7 @@ Error thrown when the sheet of a given name does not exist.
 
 \+ **new NoSheetWithNameError**(`sheetName`: string): *[NoSheetWithNameError](nosheetwithnameerror.md)*
 
-*Defined in [src/errors.ts:20](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L20)*
+*Defined in [src/errors.ts:22](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L22)*
 
 **Parameters:**
 

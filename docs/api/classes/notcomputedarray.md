@@ -6,7 +6,7 @@
 
 \+ **new NotComputedArray**(`size`: [ArraySize](arraysize.md)): *[NotComputedArray](notcomputedarray.md)*
 
-*Defined in [src/ArrayValue.ts:23](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L23)*
+*Defined in [src/ArrayValue.ts:23](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L23)*
 
 **Parameters:**
 
@@ -22,7 +22,7 @@ Name | Type |
 
 • **size**: *[ArraySize](arraysize.md)*
 
-*Defined in [src/ArrayValue.ts:24](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L24)*
+*Defined in [src/ArrayValue.ts:24](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L24)*
 
 ## Methods
 
@@ -30,7 +30,7 @@ Name | Type |
 
 ▸ **get**(`col`: number, `row`: number): *number*
 
-*Defined in [src/ArrayValue.ts:36](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L36)*
+*Defined in [src/ArrayValue.ts:36](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L36)*
 
 **Parameters:**
 
@@ -47,7 +47,7 @@ ___
 
 ▸ **height**(): *number*
 
-*Defined in [src/ArrayValue.ts:31](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L31)*
+*Defined in [src/ArrayValue.ts:31](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L31)*
 
 **Returns:** *number*
 
@@ -57,7 +57,7 @@ ___
 
 ▸ **simpleRangeValue**(): *[SimpleRangeValue](simplerangevalue.md)*
 
-*Defined in [src/ArrayValue.ts:40](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L40)*
+*Defined in [src/ArrayValue.ts:40](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L40)*
 
 **Returns:** *[SimpleRangeValue](simplerangevalue.md)*
 
@@ -67,6 +67,6 @@ ___
 
 ▸ **width**(): *number*
 
-*Defined in [src/ArrayValue.ts:27](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L27)*
+*Defined in [src/ArrayValue.ts:27](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L27)*
 
 **Returns:** *number*

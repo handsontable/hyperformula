@@ -6,7 +6,7 @@
 
 • **expression**: *[RawCellContent](../globals.md#rawcellcontent)*
 
-*Defined in [src/Serialization.ts:18](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L18)*
+*Defined in [src/Serialization.ts:18](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L18)*
 
 ___
 
@@ -14,7 +14,7 @@ ___
 
 • **name**: *string*
 
-*Defined in [src/Serialization.ts:17](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L17)*
+*Defined in [src/Serialization.ts:17](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L17)*
 
 ___
 
@@ -22,7 +22,7 @@ ___
 
 • **options**? : *[NamedExpressionOptions](../globals.md#namedexpressionoptions)*
 
-*Defined in [src/Serialization.ts:20](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L20)*
+*Defined in [src/Serialization.ts:20](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L20)*
 
 ___
 
@@ -30,4 +30,4 @@ ___
 
 • **scope**? : *undefined | number*
 
-*Defined in [src/Serialization.ts:19](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Serialization.ts#L19)*
+*Defined in [src/Serialization.ts:19](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Serialization.ts#L19)*

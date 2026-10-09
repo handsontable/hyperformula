@@ -6,7 +6,7 @@
 
 • **EMPTY**:
 
-*Defined in [src/ClipboardOperations.ts:25](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L25)*
+*Defined in [src/ClipboardOperations.ts:25](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L25)*
 
 ___
 
@@ -14,7 +14,7 @@ ___
 
 • **FORMULA**:
 
-*Defined in [src/ClipboardOperations.ts:26](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L26)*
+*Defined in [src/ClipboardOperations.ts:26](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L26)*
 
 ___
 
@@ -22,7 +22,7 @@ ___
 
 • **PARSING_ERROR**:
 
-*Defined in [src/ClipboardOperations.ts:27](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L27)*
+*Defined in [src/ClipboardOperations.ts:27](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L27)*
 
 ___
 
@@ -30,4 +30,4 @@ ___
 
 • **VALUE**:
 
-*Defined in [src/ClipboardOperations.ts:24](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ClipboardOperations.ts#L24)*
+*Defined in [src/ClipboardOperations.ts:24](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ClipboardOperations.ts#L24)*

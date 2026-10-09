@@ -8,7 +8,7 @@ Error thrown when the given sheets are not equal.
 
 \+ **new SheetsNotEqual**(`sheet1`: number, `sheet2`: number): *[SheetsNotEqual](sheetsnotequal.md)*
 
-*Defined in [src/errors.ts:74](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L74)*
+*Defined in [src/errors.ts:76](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L76)*
 
 **Parameters:**
 

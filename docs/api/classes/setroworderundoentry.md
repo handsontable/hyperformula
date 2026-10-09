@@ -6,7 +6,7 @@
 
 \+ **new SetRowOrderUndoEntry**(`sheetId`: number, `rowMapping`: [number, number][], `oldContent`: [[SimpleCellAddress](../interfaces/simplecelladdress.md), [ClipboardCell](../globals.md#clipboardcell)][]): *[SetRowOrderUndoEntry](setroworderundoentry.md)*
 
-*Defined in [src/UndoRedo.ts:110](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L110)*
+*Defined in [src/UndoRedo.ts:110](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L110)*
 
 **Parameters:**
 
@@ -24,7 +24,7 @@ Name | Type |
 
 • **oldContent**: *[[SimpleCellAddress](../interfaces/simplecelladdress.md), [ClipboardCell](../globals.md#clipboardcell)][]*
 
-*Defined in [src/UndoRedo.ts:114](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L114)*
+*Defined in [src/UndoRedo.ts:114](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L114)*
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 • **rowMapping**: *[number, number][]*
 
-*Defined in [src/UndoRedo.ts:113](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L113)*
+*Defined in [src/UndoRedo.ts:113](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L113)*
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • **sheetId**: *number*
 
-*Defined in [src/UndoRedo.ts:112](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L112)*
+*Defined in [src/UndoRedo.ts:112](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L112)*
 
 ## Methods
 
@@ -48,7 +48,7 @@ ___
 
 ▸ **doRedo**(`undoRedo`: [UndoRedo](undoredo.md)): *void*
 
-*Defined in [src/UndoRedo.ts:123](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L123)*
+*Defined in [src/UndoRedo.ts:123](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L123)*
 
 **Parameters:**
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **doUndo**(`undoRedo`: [UndoRedo](undoredo.md)): *void*
 
-*Defined in [src/UndoRedo.ts:119](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L119)*
+*Defined in [src/UndoRedo.ts:119](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L119)*
 
 **Parameters:**
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **getReferencedOldDataVersions**(): *number[]*
 
-*Defined in [src/UndoRedo.ts:42](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L42)*
+*Defined in [src/UndoRedo.ts:42](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L42)*
 
 Returns LazilyTransformingAstService version keys referenced by this entry's oldData.
 Default implementation returns empty — override in entries that store oldData.

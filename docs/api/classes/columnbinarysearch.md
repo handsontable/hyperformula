@@ -6,7 +6,7 @@
 
 \+ **new ColumnBinarySearch**(`dependencyGraph`: DependencyGraph): *[ColumnBinarySearch](columnbinarysearch.md)*
 
-*Defined in [src/Lookup/ColumnBinarySearch.ts:15](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnBinarySearch.ts#L15)*
+*Defined in [src/Lookup/ColumnBinarySearch.ts:15](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnBinarySearch.ts#L15)*
 
 **Parameters:**
 
@@ -22,7 +22,7 @@ Name | Type |
 
 ▸ **add**(`value`: RawScalarValue, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/Lookup/ColumnBinarySearch.ts:21](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnBinarySearch.ts#L21)*
+*Defined in [src/Lookup/ColumnBinarySearch.ts:21](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnBinarySearch.ts#L21)*
 
 **Parameters:**
 
@@ -39,7 +39,7 @@ ___
 
 ▸ **addColumns**(`columnsSpan`: [ColumnsSpan](columnsspan.md)): *void*
 
-*Defined in [src/Lookup/ColumnBinarySearch.ts:37](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnBinarySearch.ts#L37)*
+*Defined in [src/Lookup/ColumnBinarySearch.ts:37](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnBinarySearch.ts#L37)*
 
 **Parameters:**
 
@@ -55,7 +55,7 @@ ___
 
 ▸ **advancedFind**(`keyMatcher`: function, `rangeValue`: [SimpleRangeValue](simplerangevalue.md), `__namedParameters`: object): *number*
 
-*Defined in [src/Lookup/AdvancedFind.ts:27](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/AdvancedFind.ts#L27)*
+*Defined in [src/Lookup/AdvancedFind.ts:27](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/AdvancedFind.ts#L27)*
 
 **Parameters:**
 
@@ -85,7 +85,7 @@ ___
 
 ▸ **applyChanges**(`contentChanges`: [CellValueChange](../interfaces/cellvaluechange.md)[]): *void*
 
-*Defined in [src/Lookup/ColumnBinarySearch.ts:33](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnBinarySearch.ts#L33)*
+*Defined in [src/Lookup/ColumnBinarySearch.ts:33](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnBinarySearch.ts#L33)*
 
 **Parameters:**
 
@@ -101,7 +101,7 @@ ___
 
 ▸ **change**(`oldValue`: RawScalarValue | undefined, `newValue`: RawScalarValue, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/Lookup/ColumnBinarySearch.ts:29](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnBinarySearch.ts#L29)*
+*Defined in [src/Lookup/ColumnBinarySearch.ts:29](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnBinarySearch.ts#L29)*
 
 **Parameters:**
 
@@ -119,7 +119,7 @@ ___
 
 ▸ **find**(`searchKey`: RawNoErrorScalarValue, `rangeValue`: [SimpleRangeValue](simplerangevalue.md), `searchOptions`: [SearchOptions](../interfaces/searchoptions.md)): *number*
 
-*Defined in [src/Lookup/ColumnBinarySearch.ts:69](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnBinarySearch.ts#L69)*
+*Defined in [src/Lookup/ColumnBinarySearch.ts:69](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnBinarySearch.ts#L69)*
 
 **Parameters:**
 
@@ -137,7 +137,7 @@ ___
 
 ▸ **forceApplyPostponedTransformations**(): *void*
 
-*Defined in [src/Lookup/ColumnBinarySearch.ts:63](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnBinarySearch.ts#L63)*
+*Defined in [src/Lookup/ColumnBinarySearch.ts:63](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnBinarySearch.ts#L63)*
 
 No-op: ColumnBinarySearch reads cell values directly from the dependency graph
 on every lookup, so it has no cached data that could become stale.
@@ -153,7 +153,7 @@ ___
 
 ▸ **moveValues**(`sourceRange`: IterableIterator‹[RawScalarValue, [SimpleCellAddress](../interfaces/simplecelladdress.md)]›, `toRight`: number, `toBottom`: number, `toSheet`: number): *void*
 
-*Defined in [src/Lookup/ColumnBinarySearch.ts:49](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnBinarySearch.ts#L49)*
+*Defined in [src/Lookup/ColumnBinarySearch.ts:49](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnBinarySearch.ts#L49)*
 
 **Parameters:**
 
@@ -172,7 +172,7 @@ ___
 
 ▸ **remove**(`value`: RawScalarValue | undefined, `address`: [SimpleCellAddress](../interfaces/simplecelladdress.md)): *void*
 
-*Defined in [src/Lookup/ColumnBinarySearch.ts:25](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnBinarySearch.ts#L25)*
+*Defined in [src/Lookup/ColumnBinarySearch.ts:25](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnBinarySearch.ts#L25)*
 
 **Parameters:**
 
@@ -189,7 +189,7 @@ ___
 
 ▸ **removeColumns**(`columnsSpan`: [ColumnsSpan](columnsspan.md)): *void*
 
-*Defined in [src/Lookup/ColumnBinarySearch.ts:41](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnBinarySearch.ts#L41)*
+*Defined in [src/Lookup/ColumnBinarySearch.ts:41](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnBinarySearch.ts#L41)*
 
 **Parameters:**
 
@@ -205,7 +205,7 @@ ___
 
 ▸ **removeSheet**(`sheetId`: number): *void*
 
-*Defined in [src/Lookup/ColumnBinarySearch.ts:45](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnBinarySearch.ts#L45)*
+*Defined in [src/Lookup/ColumnBinarySearch.ts:45](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnBinarySearch.ts#L45)*
 
 **Parameters:**
 
@@ -221,7 +221,7 @@ ___
 
 ▸ **removeValues**(`range`: IterableIterator‹[RawScalarValue, [SimpleCellAddress](../interfaces/simplecelladdress.md)]›): *void*
 
-*Defined in [src/Lookup/ColumnBinarySearch.ts:53](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Lookup/ColumnBinarySearch.ts#L53)*
+*Defined in [src/Lookup/ColumnBinarySearch.ts:53](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Lookup/ColumnBinarySearch.ts#L53)*
 
 **Parameters:**
 

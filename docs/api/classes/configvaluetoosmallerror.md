@@ -18,7 +18,7 @@ The following methods accept [ConfigParams](../interfaces/configparams.md) as a 
 
 \+ **new ConfigValueTooSmallError**(`paramName`: string, `minimum`: number): *[ConfigValueTooSmallError](configvaluetoosmallerror.md)*
 
-*Defined in [src/errors.ts:209](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L209)*
+*Defined in [src/errors.ts:211](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L211)*
 
 **Parameters:**
 

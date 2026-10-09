@@ -1,8 +1,8 @@
-Welcome to the HyperFormula `v3.4.0` API!
+Welcome to the HyperFormula `v3.5.0` API!
 
 The API reference documentation provides detailed information for methods, error types, event types, and all the configuration options available in HyperFormula.
 
-Current build: 10/08/2026 16:10:51
+Current build: 09/10/2026 10:07:20
 
 ### API reference index
 
@@ -43,7 +43,7 @@ For example, subscribing to `sheetAdded` event:
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 const handler = ( ) => { console.log('baz') }
 

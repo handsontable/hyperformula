@@ -14,7 +14,7 @@ By default, HyperFormula recognizes `$` as a currency symbol in cell input. To a
 ```javascript
 const hf = HyperFormula.buildFromArray(
   [['100 zł', '=A1 * 1.23']],
-  { currencySymbol: ['$', 'zł'] }
+  { licenseKey: 'gpl-v3', currencySymbol: ['$', 'zł'] }
 );
 
 console.log(hf.getCellValue({ sheet: 0, col: 0, row: 0 }));            // 100
@@ -42,7 +42,7 @@ With no `stringifyCurrency` configured, the built-in formatter handles simple `$
 const hf = HyperFormula.buildFromArray([
   [1234.5, '=TEXT(A1, "$0.00")'],
   [1234.5, '=TEXT(A2, "$#.00")'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })); // "$1234.50"
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 1 })); // "$1234.50"
@@ -51,7 +51,7 @@ console.log(hf.getCellValue({ sheet: 0, col: 1, row: 1 })); // "$1234.50"
 A non-`$` symbol used purely as a suffix (no thousands grouping, no decimal-comma) also passes through unchanged:
 
 ```javascript
-const hf = HyperFormula.buildFromArray([[1234.5, '=TEXT(A1, "0.00 zł")']]);
+const hf = HyperFormula.buildFromArray([[1234.5, '=TEXT(A1, "0.00 zł")']], { licenseKey: 'gpl-v3' });
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })); // "1234.50 zł"
 ```
 
@@ -81,7 +81,7 @@ const stringifyCurrency = (value, fmt) =>
 
 const hf = HyperFormula.buildFromArray([
   [1234.5, '=TEXT(A1, "$#,##0.00")'],
-], { stringifyCurrency });
+], { licenseKey: 'gpl-v3', stringifyCurrency });
 
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })); // "$1234.50"
 ```

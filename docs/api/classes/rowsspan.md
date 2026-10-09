@@ -6,7 +6,7 @@
 
 \+ **new RowsSpan**(`sheet`: number, `rowStart`: number, `rowEnd`: number): *[RowsSpan](rowsspan.md)*
 
-*Defined in [src/Span.ts:11](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Span.ts#L11)*
+*Defined in [src/Span.ts:11](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Span.ts#L11)*
 
 **Parameters:**
 
@@ -24,7 +24,7 @@ Name | Type |
 
 • **rowEnd**: *number*
 
-*Defined in [src/Span.ts:16](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Span.ts#L16)*
+*Defined in [src/Span.ts:16](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Span.ts#L16)*
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 • **rowStart**: *number*
 
-*Defined in [src/Span.ts:15](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Span.ts#L15)*
+*Defined in [src/Span.ts:15](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Span.ts#L15)*
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • **sheet**: *number*
 
-*Defined in [src/Span.ts:14](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Span.ts#L14)*
+*Defined in [src/Span.ts:14](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Span.ts#L14)*
 
 ## Accessors
 
@@ -48,7 +48,7 @@ ___
 
 • **get end**(): *number*
 
-*Defined in [src/Span.ts:34](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Span.ts#L34)*
+*Defined in [src/Span.ts:34](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Span.ts#L34)*
 
 **Returns:** *number*
 
@@ -58,7 +58,7 @@ ___
 
 • **get numberOfRows**(): *number*
 
-*Defined in [src/Span.ts:26](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Span.ts#L26)*
+*Defined in [src/Span.ts:26](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Span.ts#L26)*
 
 **Returns:** *number*
 
@@ -68,7 +68,7 @@ ___
 
 • **get start**(): *number*
 
-*Defined in [src/Span.ts:30](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Span.ts#L30)*
+*Defined in [src/Span.ts:30](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Span.ts#L30)*
 
 **Returns:** *number*
 
@@ -78,7 +78,7 @@ ___
 
 ▸ **firstRow**(): *[RowsSpan](rowsspan.md)*
 
-*Defined in [src/Span.ts:64](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Span.ts#L64)*
+*Defined in [src/Span.ts:64](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Span.ts#L64)*
 
 **Returns:** *[RowsSpan](rowsspan.md)*
 
@@ -88,7 +88,7 @@ ___
 
 ▸ **intersect**(`otherSpan`: [RowsSpan](rowsspan.md)): *[RowsSpan](rowsspan.md) | null*
 
-*Defined in [src/Span.ts:52](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Span.ts#L52)*
+*Defined in [src/Span.ts:52](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Span.ts#L52)*
 
 **Parameters:**
 
@@ -104,7 +104,7 @@ ___
 
 ▸ **rows**(): *IterableIterator‹number›*
 
-*Defined in [src/Span.ts:46](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Span.ts#L46)*
+*Defined in [src/Span.ts:46](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Span.ts#L46)*
 
 **Returns:** *IterableIterator‹number›*
 
@@ -114,7 +114,7 @@ ___
 
 ▸ **fromNumberOfRows**(`sheet`: number, `rowStart`: number, `numberOfRows`: number): *[RowsSpan](rowsspan.md)‹›*
 
-*Defined in [src/Span.ts:38](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Span.ts#L38)*
+*Defined in [src/Span.ts:38](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Span.ts#L38)*
 
 **Parameters:**
 
@@ -132,7 +132,7 @@ ___
 
 ▸ **fromRowStartAndEnd**(`sheet`: number, `rowStart`: number, `rowEnd`: number): *[RowsSpan](rowsspan.md)‹›*
 
-*Defined in [src/Span.ts:42](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Span.ts#L42)*
+*Defined in [src/Span.ts:42](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Span.ts#L42)*
 
 **Parameters:**
 

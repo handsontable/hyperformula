@@ -6,7 +6,7 @@
 
 \+ **new ClearSheetUndoEntry**(`sheetId`: number, `oldSheetContent`: [ClipboardCell](../globals.md#clipboardcell)[][]): *[ClearSheetUndoEntry](clearsheetundoentry.md)*
 
-*Defined in [src/UndoRedo.ts:329](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L329)*
+*Defined in [src/UndoRedo.ts:329](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L329)*
 
 **Parameters:**
 
@@ -23,7 +23,7 @@ Name | Type |
 
 • **oldSheetContent**: *[ClipboardCell](../globals.md#clipboardcell)[][]*
 
-*Defined in [src/UndoRedo.ts:332](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L332)*
+*Defined in [src/UndoRedo.ts:332](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L332)*
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **sheetId**: *number*
 
-*Defined in [src/UndoRedo.ts:331](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L331)*
+*Defined in [src/UndoRedo.ts:331](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L331)*
 
 ## Methods
 
@@ -39,7 +39,7 @@ ___
 
 ▸ **doRedo**(`undoRedo`: [UndoRedo](undoredo.md)): *void*
 
-*Defined in [src/UndoRedo.ts:341](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L341)*
+*Defined in [src/UndoRedo.ts:341](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L341)*
 
 **Parameters:**
 
@@ -55,7 +55,7 @@ ___
 
 ▸ **doUndo**(`undoRedo`: [UndoRedo](undoredo.md)): *void*
 
-*Defined in [src/UndoRedo.ts:337](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L337)*
+*Defined in [src/UndoRedo.ts:337](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L337)*
 
 **Parameters:**
 
@@ -71,7 +71,7 @@ ___
 
 ▸ **getReferencedOldDataVersions**(): *number[]*
 
-*Defined in [src/UndoRedo.ts:42](https://github.com/handsontable/hyperformula/blob/af2d59d/src/UndoRedo.ts#L42)*
+*Defined in [src/UndoRedo.ts:42](https://github.com/handsontable/hyperformula/blob/99a45ea/src/UndoRedo.ts#L42)*
 
 Returns LazilyTransformingAstService version keys referenced by this entry's oldData.
 Default implementation returns empty — override in entries that store oldData.

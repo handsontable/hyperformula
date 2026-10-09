@@ -8,7 +8,7 @@ Error thrown when there is nothing to paste by the [paste](crudoperations.md#pas
 
 \+ **new NothingToPasteError**(): *[NothingToPasteError](nothingtopasteerror.md)*
 
-*Defined in [src/errors.ts:128](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L128)*
+*Defined in [src/errors.ts:130](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L130)*
 
 **Returns:** *[NothingToPasteError](nothingtopasteerror.md)*
 

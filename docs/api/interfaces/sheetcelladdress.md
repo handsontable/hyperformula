@@ -6,7 +6,7 @@
 
 • **col**: *number*
 
-*Defined in [src/Cell.ts:231](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L231)*
+*Defined in [src/Cell.ts:231](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L231)*
 
 ___
 
@@ -14,4 +14,4 @@ ___
 
 • **row**: *number*
 
-*Defined in [src/Cell.ts:232](https://github.com/handsontable/hyperformula/blob/af2d59d/src/Cell.ts#L232)*
+*Defined in [src/Cell.ts:232](https://github.com/handsontable/hyperformula/blob/99a45ea/src/Cell.ts#L232)*

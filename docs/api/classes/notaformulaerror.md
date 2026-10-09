@@ -8,7 +8,7 @@ Error thrown when the the provided string is not a valid formula, i.e does not s
 
 \+ **new NotAFormulaError**(): *[NotAFormulaError](notaformulaerror.md)*
 
-*Defined in [src/errors.ts:47](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L47)*
+*Defined in [src/errors.ts:49](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L49)*
 
 **Returns:** *[NotAFormulaError](notaformulaerror.md)*
 

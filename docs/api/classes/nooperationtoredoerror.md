@@ -8,7 +8,7 @@ Error thrown when there are no operations to redo by the [redo](crudoperations.m
 
 \+ **new NoOperationToRedoError**(): *[NoOperationToRedoError](nooperationtoredoerror.md)*
 
-*Defined in [src/errors.ts:119](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L119)*
+*Defined in [src/errors.ts:121](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L121)*
 
 **Returns:** *[NoOperationToRedoError](nooperationtoredoerror.md)*
 

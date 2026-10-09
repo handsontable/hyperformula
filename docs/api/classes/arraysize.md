@@ -6,7 +6,7 @@
 
 \+ **new ArraySize**(`width`: number, `height`: number, `isRef`: boolean): *[ArraySize](arraysize.md)*
 
-*Defined in [src/ArraySize.ts:14](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArraySize.ts#L14)*
+*Defined in [src/ArraySize.ts:15](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArraySize.ts#L15)*
 
 **Parameters:**
 
@@ -24,7 +24,7 @@ Name | Type | Default |
 
 • **height**: *number*
 
-*Defined in [src/ArraySize.ts:17](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArraySize.ts#L17)*
+*Defined in [src/ArraySize.ts:18](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArraySize.ts#L18)*
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 • **isRef**: *boolean*
 
-*Defined in [src/ArraySize.ts:18](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArraySize.ts#L18)*
+*Defined in [src/ArraySize.ts:19](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArraySize.ts#L19)*
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • **width**: *number*
 
-*Defined in [src/ArraySize.ts:16](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArraySize.ts#L16)*
+*Defined in [src/ArraySize.ts:17](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArraySize.ts#L17)*
 
 ## Methods
 
@@ -48,7 +48,7 @@ ___
 
 ▸ **isScalar**(): *boolean*
 
-*Defined in [src/ArraySize.ts:29](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArraySize.ts#L29)*
+*Defined in [src/ArraySize.ts:30](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArraySize.ts#L30)*
 
 **Returns:** *boolean*
 
@@ -58,7 +58,7 @@ ___
 
 ▸ **error**(): *[ArraySize](arraysize.md)‹›*
 
-*Defined in [src/ArraySize.ts:21](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArraySize.ts#L21)*
+*Defined in [src/ArraySize.ts:22](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArraySize.ts#L22)*
 
 **Returns:** *[ArraySize](arraysize.md)‹›*
 
@@ -68,6 +68,6 @@ ___
 
 ▸ **scalar**(): *[ArraySize](arraysize.md)‹›*
 
-*Defined in [src/ArraySize.ts:25](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArraySize.ts#L25)*
+*Defined in [src/ArraySize.ts:26](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArraySize.ts#L26)*
 
 **Returns:** *[ArraySize](arraysize.md)‹›*

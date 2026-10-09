@@ -6,7 +6,7 @@
 
 \+ **new ArrayValue**(`array`: InternalScalarValue[][]): *[ArrayValue](arrayvalue.md)*
 
-*Defined in [src/ArrayValue.ts:47](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L47)*
+*Defined in [src/ArrayValue.ts:47](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L47)*
 
 **Parameters:**
 
@@ -22,7 +22,7 @@ Name | Type |
 
 • **size**: *[ArraySize](arraysize.md)*
 
-*Defined in [src/ArrayValue.ts:46](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L46)*
+*Defined in [src/ArrayValue.ts:46](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L46)*
 
 ## Methods
 
@@ -30,7 +30,7 @@ Name | Type |
 
 ▸ **addColumns**(`aboveColumn`: number, `numberOfColumns`: number): *void*
 
-*Defined in [src/ArrayValue.ts:75](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L75)*
+*Defined in [src/ArrayValue.ts:75](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L75)*
 
 **Parameters:**
 
@@ -47,7 +47,7 @@ ___
 
 ▸ **addRows**(`aboveRow`: number, `numberOfRows`: number): *void*
 
-*Defined in [src/ArrayValue.ts:70](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L70)*
+*Defined in [src/ArrayValue.ts:70](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L70)*
 
 **Parameters:**
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **get**(`col`: number, `row`: number): *InternalScalarValue*
 
-*Defined in [src/ArrayValue.ts:110](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L110)*
+*Defined in [src/ArrayValue.ts:110](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L110)*
 
 **Parameters:**
 
@@ -81,7 +81,7 @@ ___
 
 ▸ **height**(): *number*
 
-*Defined in [src/ArrayValue.ts:128](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L128)*
+*Defined in [src/ArrayValue.ts:128](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L128)*
 
 **Returns:** *number*
 
@@ -91,7 +91,7 @@ ___
 
 ▸ **nullArrays**(`count`: number, `size`: number): *any[][]*
 
-*Defined in [src/ArrayValue.ts:102](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L102)*
+*Defined in [src/ArrayValue.ts:102](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L102)*
 
 **Parameters:**
 
@@ -108,7 +108,7 @@ ___
 
 ▸ **raw**(): *InternalScalarValue[][]*
 
-*Defined in [src/ArrayValue.ts:132](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L132)*
+*Defined in [src/ArrayValue.ts:132](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L132)*
 
 **Returns:** *InternalScalarValue[][]*
 
@@ -118,7 +118,7 @@ ___
 
 ▸ **removeColumns**(`leftmostColumn`: number, `rightmostColumn`: number): *void*
 
-*Defined in [src/ArrayValue.ts:91](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L91)*
+*Defined in [src/ArrayValue.ts:91](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L91)*
 
 **Parameters:**
 
@@ -135,7 +135,7 @@ ___
 
 ▸ **removeRows**(`startRow`: number, `endRow`: number): *void*
 
-*Defined in [src/ArrayValue.ts:82](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L82)*
+*Defined in [src/ArrayValue.ts:82](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L82)*
 
 **Parameters:**
 
@@ -152,7 +152,7 @@ ___
 
 ▸ **resize**(`newSize`: [ArraySize](arraysize.md)): *void*
 
-*Defined in [src/ArrayValue.ts:136](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L136)*
+*Defined in [src/ArrayValue.ts:136](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L136)*
 
 **Parameters:**
 
@@ -168,7 +168,7 @@ ___
 
 ▸ **set**(`col`: number, `row`: number, `value`: number): *void*
 
-*Defined in [src/ArrayValue.ts:117](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L117)*
+*Defined in [src/ArrayValue.ts:117](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L117)*
 
 **Parameters:**
 
@@ -186,7 +186,7 @@ ___
 
 ▸ **simpleRangeValue**(): *[SimpleRangeValue](simplerangevalue.md)*
 
-*Defined in [src/ArrayValue.ts:66](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L66)*
+*Defined in [src/ArrayValue.ts:66](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L66)*
 
 **Returns:** *[SimpleRangeValue](simplerangevalue.md)*
 
@@ -196,7 +196,7 @@ ___
 
 ▸ **width**(): *number*
 
-*Defined in [src/ArrayValue.ts:124](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L124)*
+*Defined in [src/ArrayValue.ts:124](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L124)*
 
 **Returns:** *number*
 
@@ -206,7 +206,7 @@ ___
 
 ▸ **fromInterpreterValue**(`value`: InterpreterValue): *[ArrayValue](arrayvalue.md)‹›*
 
-*Defined in [src/ArrayValue.ts:58](https://github.com/handsontable/hyperformula/blob/af2d59d/src/ArrayValue.ts#L58)*
+*Defined in [src/ArrayValue.ts:58](https://github.com/handsontable/hyperformula/blob/99a45ea/src/ArrayValue.ts#L58)*
 
 **Parameters:**
 

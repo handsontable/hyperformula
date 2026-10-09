@@ -6,7 +6,7 @@
 
 • **day**: *number*
 
-*Defined in [src/DateTimeHelper.ts:20](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L20)*
+*Defined in [src/DateTimeHelper.ts:20](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L20)*
 
 ___
 
@@ -14,7 +14,7 @@ ___
 
 • **month**: *number*
 
-*Defined in [src/DateTimeHelper.ts:19](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L19)*
+*Defined in [src/DateTimeHelper.ts:19](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L19)*
 
 ___
 
@@ -22,4 +22,4 @@ ___
 
 • **year**: *number*
 
-*Defined in [src/DateTimeHelper.ts:18](https://github.com/handsontable/hyperformula/blob/af2d59d/src/DateTimeHelper.ts#L18)*
+*Defined in [src/DateTimeHelper.ts:18](https://github.com/handsontable/hyperformula/blob/99a45ea/src/DateTimeHelper.ts#L18)*

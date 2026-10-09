@@ -8,7 +8,7 @@ Error thrown when loaded sheet size exceeds configured limits.
 
 \+ **new SheetSizeLimitExceededError**(): *[SheetSizeLimitExceededError](sheetsizelimitexceedederror.md)*
 
-*Defined in [src/errors.ts:38](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L38)*
+*Defined in [src/errors.ts:40](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L40)*
 
 **Returns:** *[SheetSizeLimitExceededError](sheetsizelimitexceedederror.md)*
 

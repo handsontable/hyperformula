@@ -40,7 +40,7 @@ ___
 
 ▸ **functionMethodNotFound**(`functionName`: string, `pluginName`: string): *[FunctionPluginValidationError](functionpluginvalidationerror.md)*
 
-*Defined in [src/errors.ts:321](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L321)*
+*Defined in [src/errors.ts:323](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L323)*
 
 **Parameters:**
 
@@ -57,7 +57,7 @@ ___
 
 ▸ **functionNotDeclaredInPlugin**(`functionId`: string, `pluginName`: string): *[FunctionPluginValidationError](functionpluginvalidationerror.md)*
 
-*Defined in [src/errors.ts:317](https://github.com/handsontable/hyperformula/blob/af2d59d/src/errors.ts#L317)*
+*Defined in [src/errors.ts:319](https://github.com/handsontable/hyperformula/blob/99a45ea/src/errors.ts#L319)*
 
 **Parameters:**
 
