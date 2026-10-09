@@ -399,6 +399,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'ДОВЕРИТ.СТЬЮДЕНТ',
     DEVSQ: 'КВАДРОТКЛ',
     GEOMEAN: 'СРГЕОМ',
+    GESTEP: 'GESTEP',
     HARMEAN: 'СРГАРМ',
     CRITBINOM: 'КРИТБИНОМ',
     PEARSON: 'PEARSON',
