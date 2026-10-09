@@ -4,8 +4,9 @@
  */
 
 import {CellError, ErrorType} from '../../Cell'
+import {offsetMonth, SimpleDate} from '../../DateTimeHelper'
 import {ErrorMessage} from '../../error-message'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {
   EmptyValue,
@@ -18,6 +19,26 @@ import {
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+
+/**
+ * The coupon schedule of a coupon function call, built once from its validated arguments.
+ */
+interface CouponSchedule {
+  /** The settlement date serial, truncated. */
+  settlement: number,
+  /** The maturity date. */
+  maturity: SimpleDate,
+  /** The number of coupons per year: 1, 2 or 4. */
+  frequency: number,
+  /** The day-count basis: 0 to 4. */
+  basis: number,
+  /** The number of coupon dates after settlement, up to and including maturity. */
+  count: number,
+  /** The last coupon date on or before settlement. */
+  previous: SimpleDate,
+  /** The first coupon date after settlement. */
+  next: SimpleDate,
+}
 
 export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FinancialPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
@@ -297,6 +318,33 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: 1000, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPPCD': {
+      method: 'couppcd',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPNCD': {
+      method: 'coupncd',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPNUM': {
+      method: 'coupnum',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
       ],
     },
@@ -831,6 +879,48 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  /**
+   * Corresponds to COUPPCD(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the last coupon date on or before the settlement date, as a date serial number.
+   *
+   * @param ast
+   * @param state
+   */
+  public couppcd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPPCD',
+      (schedule: CouponSchedule) => this.dateTimeHelper.dateToNumber(schedule.previous)
+    )
+  }
+
+  /**
+   * Corresponds to COUPNCD(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the first coupon date after the settlement date, as a date serial number.
+   *
+   * @param ast
+   * @param state
+   */
+  public coupncd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPNCD',
+      (schedule: CouponSchedule) => this.dateTimeHelper.dateToNumber(schedule.next)
+    )
+  }
+
+  /**
+   * Corresponds to COUPNUM(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the number of coupons payable after the settlement date, up to and including the maturity date.
+   *
+   * @param ast
+   * @param state
+   */
+  public coupnum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPNUM',
+      (schedule: CouponSchedule) => schedule.count
+    )
+  }
+
   public fvschedule(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FVSCHEDULE'),
       (value: number, ratios: SimpleRangeValue) => {
@@ -1078,6 +1168,65 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   }
 
   /**
+   * Runs COUPPCD, COUPNCD and COUPNUM, which share the arguments
+   * (settlement, maturity, frequency, [basis]).
+   *
+   * Validates in Excel's order: settlement, maturity, settlement before maturity, then an empty settlement, maturity
+   * or frequency argument (#N/A), then frequency and basis. An empty date is not compared with the other date. Builds
+   * the coupon schedule and passes it to `calculate`. A previous coupon date before the earliest supported date is
+   * #NUM!.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   * @param {string} functionName - the function's id, used to look up its metadata
+   * @param {Function} calculate - computes the result from the coupon schedule
+   */
+  private couponFunction(
+    ast: ProcedureAst,
+    state: InterpreterState,
+    functionName: string,
+    calculate: (schedule: CouponSchedule) => number,
+  ): InterpreterValue {
+    const isArgumentEmpty = (index: number) => ast.args[index]?.type === AstNodeType.EMPTY
+    const isDateEmpty = isArgumentEmpty(0) || isArgumentEmpty(1)
+    const isFrequencyEmpty = isArgumentEmpty(2)
+    return this.runFunction(ast.args, state, this.metadata(functionName),
+      (settlementArg: InternalScalarValue, maturityArg: InternalScalarValue, frequencyArg: InternalScalarValue, basisArg: InternalScalarValue) => {
+        const settlement = this.coerceToSecurityDate(settlementArg)
+        if (settlement instanceof CellError) {
+          return settlement
+        }
+        const maturity = this.coerceToSecurityDate(maturityArg)
+        if (maturity instanceof CellError) {
+          return maturity
+        }
+        if (!isDateEmpty && settlement >= maturity) {
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
+        }
+        if (isDateEmpty || isFrequencyEmpty) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const frequency = this.coerceToCouponFrequency(frequencyArg)
+        if (frequency instanceof CellError) {
+          return frequency
+        }
+        const basis = this.coerceToDayCountBasis(basisArg)
+        if (basis instanceof CellError) {
+          return basis
+        }
+        const maturityDate = this.dateTimeHelper.numberToSimpleDate(maturity)
+        const count = this.couponsAfter(settlement, maturityDate, frequency)
+        const previous = this.couponDate(maturityDate, -count, frequency)
+        if (this.dateTimeHelper.dateToNumber(previous) < 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+        }
+        const next = this.couponDate(maturityDate, 1 - count, frequency)
+        return calculate({settlement, maturity: maturityDate, frequency, basis, count, previous, next})
+      }
+    )
+  }
+
+  /**
    * Converts a date argument of a securities function: a number as `strictNumber` accepts it, truncated to an integer.
    * A date outside the supported range is #NUM!, and so is a negative value even when it truncates to 0, as in Excel.
    */
@@ -1115,6 +1264,22 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   }
 
   /**
+   * Converts the `frequency` argument of a coupon function: a number as `strictNumber` accepts it, truncated to an
+   * integer, that must be 1 (annual), 2 (semiannual) or 4 (quarterly).
+   */
+  private coerceToCouponFrequency(value: InternalScalarValue): number | CellError {
+    const frequency = this.strictNumber(value)
+    if (frequency instanceof CellError) {
+      return frequency
+    }
+    const truncated = Math.trunc(frequency)
+    if (truncated !== 1 && truncated !== 2 && truncated !== 4) {
+      return new CellError(ErrorType.NUM, ErrorMessage.CouponFrequency)
+    }
+    return truncated
+  }
+
+  /**
    * Converts an argument the way Excel does for these functions: numbers, dates, numeric text and empty cells are
    * accepted, while a boolean or the empty text is #VALUE!. Errors are passed on.
    */
@@ -1127,6 +1292,36 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     }
     const coerced = this.coerceScalarToNumberOrError(value)
     return coerced instanceof CellError ? coerced : getRawValue(coerced)
+  }
+
+  /**
+   * Returns the coupon date `periods` coupon periods after `anchor` (before it when negative). The date is computed
+   * from the anchor directly, so the day of the month never drifts: if the anchor is the last day of its month, so is
+   * the result; otherwise the result keeps the anchor's day, clamped to the length of its month (leap years included).
+   */
+  private couponDate(anchor: SimpleDate, periods: number, frequency: number): SimpleDate {
+    const shifted = offsetMonth(anchor, periods * 12 / frequency)
+    const lastDay = this.dateTimeHelper.daysInMonth(shifted.year, shifted.month)
+    const isAnchorMonthEnd = anchor.day === this.dateTimeHelper.daysInMonth(anchor.year, anchor.month)
+    return {...shifted, day: isAnchorMonthEnd ? lastDay : Math.min(anchor.day, lastDay)}
+  }
+
+  /**
+   * Returns the number of coupon dates after `settlement`, up to and including `maturity`: the smallest k >= 1 for
+   * which the coupon date k periods before maturity is on or before settlement.
+   *
+   * Runs in constant time instead of stepping through the periods (a quarterly schedule over the whole supported date
+   * range has 32,400 of them): the whole periods in the months between settlement and maturity give a coupon date in
+   * settlement's month or later, and one period more gives a date before settlement's month.
+   */
+  private couponsAfter(settlement: number, maturity: SimpleDate, frequency: number): number {
+    const settlementDate = this.dateTimeHelper.numberToSimpleDate(settlement)
+    const months = 12 * (maturity.year - settlementDate.year) + maturity.month - settlementDate.month
+    const periods = Math.floor(months * frequency / 12)
+    if (periods > 0 && this.dateTimeHelper.dateToNumber(this.couponDate(maturity, -periods, frequency)) <= settlement) {
+      return periods
+    }
+    return periods + 1
   }
 }
 
