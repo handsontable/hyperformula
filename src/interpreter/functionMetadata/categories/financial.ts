@@ -17,6 +17,27 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=ACCRINTM(DATE(2008,4,1), DATE(2008,6,15), 0.1, 1000, 3)', '=ACCRINTM(A1, B1, 0.05)'],
   },
+  COUPDAYBS: {
+    category: 'Financial',
+    shortDescription: 'Returns the number of days from the beginning of the coupon period to `settlement`.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'frequency', description: 'The number of coupon payments per year, truncated to an integer: 1 (annual), 2 (semiannual) or 4 (quarterly).'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=COUPDAYBS(DATE(2011,1,25), DATE(2011,11,15), 2, 1)', '=COUPDAYBS(A1, B1, 4)'],
+  },
+  COUPDAYS: {
+    category: 'Financial',
+    shortDescription: 'Returns the number of days in the coupon period that contains `settlement`.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'frequency', description: 'The number of coupon payments per year, truncated to an integer: 1 (annual), 2 (semiannual) or 4 (quarterly).'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=COUPDAYS(DATE(2011,1,25), DATE(2011,11,15), 2, 1)', '=COUPDAYS(A1, B1, 4)'],
+  },
+  COUPDAYSNC: {
+    category: 'Financial',
+    shortDescription: 'Returns the number of days from `settlement` to the next coupon date.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'frequency', description: 'The number of coupon payments per year, truncated to an integer: 1 (annual), 2 (semiannual) or 4 (quarterly).'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=COUPDAYSNC(DATE(2011,1,25), DATE(2011,11,15), 2, 1)', '=COUPDAYSNC(A1, B1, 4)'],
+  },
   COUPNCD: {
     category: 'Financial',
     shortDescription: 'Returns the first coupon date after `settlement`, as a date serial number.',
