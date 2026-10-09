@@ -211,6 +211,43 @@ export class DateTimeHelper {
     }
   }
 
+  /**
+   * Counts the days between two dates under a day-count basis, and returns the number of days in a year under the
+   * same basis. YEARFRAC and the securities functions (DISC, INTRATE, PRICEDISC, RECEIVED, YIELDDISC, ACCRINTM)
+   * compute their year fraction as `dayCount / yearDays`.
+   *
+   * | `basis` | `dayCount`                                   | `yearDays`                  |
+   * |---------|----------------------------------------------|-----------------------------|
+   * | 0       | US (NASD) 30/360, as adjusted by `toBasisUS` | 360                         |
+   * | 1       | actual days                                  | `yearLengthForBasis`        |
+   * | 2       | actual days                                  | 360                         |
+   * | 3       | actual days                                  | 365                         |
+   * | 4       | European 30/360, as adjusted by `toBasisEU`  | 360                         |
+   *
+   * @param {number} startDate - date serial number, an integer not greater than `endDate`
+   * @param {number} endDate - date serial number, an integer
+   * @param {number} basis - day-count basis, an integer from 0 to 4
+   */
+  public dayCountByBasis(startDate: number, endDate: number, basis: number): { dayCount: number, yearDays: number } {
+    const start = this.numberToSimpleDate(startDate)
+    const end = this.numberToSimpleDate(endDate)
+    switch (basis) {
+      case 0: {
+        const [adjustedStart, adjustedEnd] = this.toBasisUS({...start}, {...end})
+        return {dayCount: daysIn30DayMonths(adjustedStart, adjustedEnd), yearDays: 360}
+      }
+      case 1:
+        return {dayCount: endDate - startDate, yearDays: this.yearLengthForBasis(start, end)}
+      case 2:
+        return {dayCount: endDate - startDate, yearDays: 360}
+      case 3:
+        return {dayCount: endDate - startDate, yearDays: 365}
+      case 4:
+        return {dayCount: daysIn30DayMonths(toBasisEU(start), toBasisEU(end)), yearDays: 360}
+    }
+    throw new Error('Should not be reachable.')
+  }
+
   private parseSingleFormat(dateString: string, dateFormat?: string, timeFormat?: string): Maybe<DateTime> {
     const dateTime = this.parseDateTime(dateString, dateFormat, timeFormat)
     if (instanceOfSimpleDate(dateTime)) {
@@ -318,4 +355,12 @@ export function timeToNumber(time: SimpleTime): number {
 
 export function toBasisEU(date: SimpleDate): SimpleDate {
   return {year: date.year, month: date.month, day: Math.min(30, date.day)}
+}
+
+/**
+ * Counts the days between two dates as if every month had 30 days. The dates must already be adjusted to a 30/360
+ * basis (`toBasisUS` or `toBasisEU`).
+ */
+function daysIn30DayMonths(start: SimpleDate, end: SimpleDate): number {
+  return 360 * (end.year - start.year) + 30 * (end.month - start.month) + end.day - start.day
 }

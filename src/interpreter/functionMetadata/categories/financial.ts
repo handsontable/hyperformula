@@ -10,6 +10,13 @@ import {FunctionDoc} from '../FunctionDescription'
  * truth for the function metadata API, and `docs/guide/built-in-functions.md` is generated from it.
  */
 export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
+  ACCRINTM: {
+    category: 'Financial',
+    shortDescription: 'Returns the accrued interest of a security that pays interest at maturity.',
+    parameters: [{name: 'issue', description: 'The issue date, as a date serial number, truncated to an integer.'}, {name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer; must not be earlier than `issue` (equal dates give 0).'}, {name: 'rate', description: 'The annual coupon rate; must be greater than 0.'}, {name: 'par', description: 'The par value; must be greater than 0. If the argument is omitted or empty, 1000 is used.'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=ACCRINTM(DATE(2008,4,1), DATE(2008,6,15), 0.1, 1000, 3)', '=ACCRINTM(A1, B1, 0.05)'],
+  },
   CUMIPMT: {
     category: 'Financial',
     shortDescription: 'Returns the cumulative interest paid on a loan between a start period and an end period.',
@@ -37,6 +44,13 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'cost', description: 'The initial cost of the asset.'}, {name: 'salvage', description: 'The value of the asset at the end of its depreciation.'}, {name: 'life', description: 'The number of periods over which the asset is depreciated.'}, {name: 'period', description: 'The period, in the same units as life, for which depreciation is calculated.'}, {name: 'factor', description: 'The rate at which the balance declines; defaults to 2 (double-declining).'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=DDB(10000, 1000, 6, 2)', '=DDB(10000, 1000, 6, 1, 1.5)'],
+  },
+  DISC: {
+    category: 'Financial',
+    shortDescription: 'Returns the discount rate of a security.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'pr', description: 'The price per $100 face value; must be greater than 0.'}, {name: 'redemption', description: 'The redemption value per $100 face value; must be greater than 0.'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=DISC(DATE(2018,7,1), DATE(2048,1,1), 97.975, 100, 1)', '=DISC(A1, B1, 99, 100)'],
   },
   DOLLARDE: {
     category: 'Financial',
@@ -72,6 +86,13 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'pv', description: 'The initial present value of the investment.'}, {name: 'schedule', description: 'A range of interest rates applied successively over each period.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=FVSCHEDULE(1000, A1:A3)', '=FVSCHEDULE(5000, B2:B5)'],
+  },
+  INTRATE: {
+    category: 'Financial',
+    shortDescription: 'Returns the interest rate of a fully invested security.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'investment', description: 'The amount invested; must be greater than 0.'}, {name: 'redemption', description: 'The amount received at `maturity`; must be greater than 0.'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=INTRATE(DATE(2008,2,15), DATE(2008,5,15), 1000000, 1014420, 2)', '=INTRATE(A1, B1, 1000, 1050)'],
   },
   IPMT: {
     category: 'Financial',
@@ -143,6 +164,13 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=PPMT(0.05/12, 1, 60, 20000)', '=PPMT(0.04/12, 12, 360, 200000, 0, 1)'],
   },
+  PRICEDISC: {
+    category: 'Financial',
+    shortDescription: 'Returns the price per $100 face value of a discounted security.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'discount', description: 'The discount rate; must be greater than 0. A large `discount` gives a zero or negative price.'}, {name: 'redemption', description: 'The redemption value per $100 face value; must be greater than 0.'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=PRICEDISC(DATE(2008,2,16), DATE(2008,3,1), 0.0525, 100, 2)', '=PRICEDISC(A1, B1, 0.05, 100)'],
+  },
   PV: {
     category: 'Financial',
     shortDescription: 'Returns the present value of an investment.',
@@ -156,6 +184,13 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'nper', description: 'The total number of payment periods.'}, {name: 'pmt', description: 'The payment made each period; paid-out amounts are negative.'}, {name: 'pv', description: 'The present value, i.e. the loan principal or initial investment.'}, {name: 'fv', description: 'The future value, i.e. the desired cash balance after the last payment; defaults to 0.'}, {name: 'type', description: 'When payments are due: 0 for the end of each period, 1 for the beginning; defaults to 0.'}, {name: 'guess', description: 'An estimated rate used as the starting point for the iterative calculation; defaults to 0.1 (10%).'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=RATE(60, -100, 5000)', '=RATE(360, -1000, 200000, 0, 0, 0.05)'],
+  },
+  RECEIVED: {
+    category: 'Financial',
+    shortDescription: 'Returns the amount received at maturity for a fully invested security.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'investment', description: 'The amount invested; must be greater than 0.'}, {name: 'discount', description: 'The discount rate; must be greater than 0. If `discount` multiplied by the year fraction from `settlement` to `maturity` is 1 or more, the result is #NUM!.'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=RECEIVED(DATE(2008,2,15), DATE(2008,5,15), 1000000, 0.0575, 2)', '=RECEIVED(A1, B1, 1000, 0.05)'],
   },
   RRI: {
     category: 'Financial',
@@ -212,5 +247,12 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'values', description: 'A range of cash flow values; must contain at least one negative and one positive value.'}, {name: 'dates', description: 'A range of payment dates, one per value in values and the same length; the first date is the reference point and every other date must fall on or after it.'}, {name: 'guess', description: 'An estimated rate used as the starting point for the iterative calculation; defaults to 0.1 (10%).'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=XIRR(A1:A4, B1:B4)', '=XIRR(A1:A5, B1:B5, 0.1)'],
+  },
+  YIELDDISC: {
+    category: 'Financial',
+    shortDescription: 'Returns the annual yield of a discounted security.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'pr', description: 'The price per $100 face value; must be greater than 0.'}, {name: 'redemption', description: 'The redemption value per $100 face value; must be greater than 0.'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=YIELDDISC(DATE(2008,2,16), DATE(2008,3,1), 99.795, 100, 2)', '=YIELDDISC(A1, B1, 99, 100)'],
   },
 }
