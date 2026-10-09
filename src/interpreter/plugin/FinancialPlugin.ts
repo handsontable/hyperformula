@@ -1079,12 +1079,15 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   /**
    * Converts a date argument of a securities function: a number as `strictNumber` accepts it, truncated to an integer.
-   * A date outside the supported range is #NUM!.
+   * A date outside the supported range is #NUM!, and so is a negative value even when it truncates to 0, as in Excel.
    */
   private coerceToSecurityDate(value: InternalScalarValue): number | CellError {
     const dateNumber = this.strictNumber(value)
     if (dateNumber instanceof CellError) {
       return dateNumber
+    }
+    if (dateNumber < 0) {
+      return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
     }
     const date = Math.trunc(dateNumber)
     if (this.dateTimeHelper.getWithinBounds(date) === undefined) {
