@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- Added `LINEST` for simple and multiple linear regression, with optional intercept and regression statistics. The `stats` argument must be constant because result dimensions are determined before evaluation. [#1769](https://github.com/handsontable/hyperformula/pull/1769)
 - Added support for the new license key format. A proprietary key can now grant a subset of the library: a function your key does not include evaluates to a `#LIC!` error, and the matching parts of the API throw a `LicenseCapabilityMissingError`. `getAvailableFunctions()` and `getFunctionDetails()` describe only the functions your key includes. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
 
 ### Changed

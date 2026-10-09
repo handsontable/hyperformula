@@ -143,6 +143,7 @@ export const dictionary: RawTranslationPackage = {
     ISTEXT: 'ESTEXTO',
     LEFT: 'IZQUIERDA',
     LEN: 'LARGO',
+    LINEST: 'ESTIMACION.LINEAL',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',

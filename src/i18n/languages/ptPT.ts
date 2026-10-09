@@ -143,6 +143,7 @@ const dictionary: RawTranslationPackage = {
     ISTEXT: 'ÉTEXTO',
     LEFT: 'ESQUERDA',
     LEN: 'NÚM.CARACT',
+    LINEST: 'PROJ.LIN',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',

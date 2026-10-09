@@ -304,6 +304,18 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=LARGE(A1:A10, 1)', '=LARGE(A1:A10, 3)'],
   },
+  LINEST: {
+    category: 'Statistical',
+    shortDescription: 'Returns linear regression coefficients and optional statistics.',
+    parameters: [
+      {name: 'known_y', description: 'A numeric range of observed dependent values.'},
+      {name: 'known_x', description: 'Optional numeric predictors. If omitted, uses sequential values starting at 1 with the shape of known_y.'},
+      {name: 'const', description: 'Whether to fit an intercept. Defaults to TRUE; FALSE fits through zero.'},
+      {name: 'stats', description: 'Whether to return five rows including regression statistics. Defaults to FALSE. Must be a constant; cell references and computed expressions are unsupported.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=LINEST(A1:A10, B1:C10)', '=LINEST(A1:A10, B1:C10, TRUE(), TRUE())'],
+  },
   'LOGNORM.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of lognormal distribution.',
