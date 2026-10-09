@@ -81,6 +81,14 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
         {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, lessThan: 1},
       ],
     },
+    'PERCENTRANK.EXC': {
+      method: 'percentrankExc',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1, defaultValue: 3},
+      ],
+    },
     'QUARTILE.INC': {
       method: 'quartile',
       parameters: [
@@ -140,6 +148,41 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
           return vals
         }
         return percentileExclusive(vals, k)
+      }
+    )
+  }
+
+  /**
+   * Corresponds to PERCENTRANK.EXC(array, x, [significance]).
+   *
+   * Returns the exclusive rank of x in the array, i.e. the inverse of PERCENTILE.EXC, truncated (not rounded)
+   * to the given number of significant digits. Values between two array elements are linearly interpolated.
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   * @returns rank in (0, 1), #N/A if x is outside of the array, or CellError on invalid input
+   */
+  public percentrankExc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('PERCENTRANK.EXC'),
+      (range: SimpleRangeValue, x: number, significance: number) => {
+        const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if (vals instanceof CellError) {
+          return vals
+        }
+        vals.sort((a, b) => a - b)
+        const n = vals.length
+        if (n === 0 || x < vals[0] || x > vals[n - 1]) {
+          return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+        }
+        if (n === 1) {
+          return 1
+        }
+        const upperIndex = vals.findIndex(val => val >= x)
+        const rank = vals[upperIndex] === x
+          ? upperIndex + 1
+          : upperIndex + (x - vals[upperIndex - 1]) / (vals[upperIndex] - vals[upperIndex - 1])
+        const scale = Math.pow(10, Math.trunc(significance))
+        return Math.floor(rank / (n + 1) * scale + 1e-9) / scale
       }
     )
   }
