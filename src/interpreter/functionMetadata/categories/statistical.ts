@@ -59,6 +59,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=BINOM.DIST(3, 10, 0.5, FALSE())', '=BINOM.DIST(3, 10, 0.5, TRUE())'],
   },
+  'BINOM.DIST.RANGE': {
+    category: 'Statistical',
+    shortDescription: 'Returns the probability of a trial result using a binomial distribution over a range of successes.',
+    parameters: [{name: 'trials', description: 'The total number of independent trials; truncated to an integer.'}, {name: 'probability_s', description: 'The probability of success on a single trial, between 0 and 1.'}, {name: 'number_s', description: 'The lower bound of the number of successes; truncated to an integer.'}, {name: 'number_s2', description: 'The upper bound of the number of successes; truncated to an integer. Defaults to number_s when omitted.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=BINOM.DIST.RANGE(10, 0.5, 5)', '=BINOM.DIST.RANGE(10, 0.5, 3, 7)'],
+  },
   'BINOM.INV': {
     category: 'Statistical',
     shortDescription: 'Returns inverse binomial distribution value.',

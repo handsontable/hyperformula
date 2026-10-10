@@ -132,6 +132,15 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
         {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
+    'BINOM.DIST.RANGE': {
+      method: 'binomialdistrange',
+      parameters: [
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, minValue: 0},
+      ]
+    },
     'BINOM.INV': {
       method: 'binomialinv',
       parameters: [
@@ -541,6 +550,23 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
     )
   }
 
+  public binomialdistrange(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BINOM.DIST.RANGE'),
+      (trials: number, prob: number, succ: number, succUpper?: number) => {
+        trials = Math.trunc(trials)
+        succ = Math.trunc(succ)
+        succUpper = succUpper === undefined ? succ : Math.trunc(succUpper)
+        if (succ > succUpper || succUpper > trials) {
+          return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
+        }
+        if (trials > MAX_BINOMIAL_TRIALS) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
+        return binomialRangeProbability(trials, prob, succ, succUpper)
+      }
+    )
+  }
+
   public binomialinv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BINOM.INV'),
       (trials: number, prob: number, alpha: number) => {
@@ -841,3 +867,143 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
   }
 }
 
+/**
+ * The largest number of trials BINOM.DIST.RANGE accepts. Excel answers #NUM! from 2147483647 trials upwards
+ * (measured: 2147483646 works, 2147483647 does not).
+ */
+const MAX_BINOMIAL_TRIALS = 2147483646
+
+/** Terms of the Stirling series for the error of the Stirling approximation of the factorial. */
+const STIRLING_S0 = 1 / 12
+const STIRLING_S1 = 1 / 360
+const STIRLING_S2 = 1 / 1260
+const STIRLING_S3 = 1 / 1680
+const STIRLING_S4 = 1 / 1188
+
+/**
+ * The error of Stirling's approximation, log(n!) - ((n + 1/2) log(n) - n + log(sqrt(2 pi))), for n >= 15.
+ * With bd0 it gives binomial probabilities without the cancellation of the textbook formula (Loader, 2000).
+ */
+function stirlingError(n: number): number {
+  const nn = n * n
+  if (n > 500) {
+    return (STIRLING_S0 - STIRLING_S1 / nn) / n
+  }
+  if (n > 80) {
+    return (STIRLING_S0 - (STIRLING_S1 - STIRLING_S2 / nn) / nn) / n
+  }
+  if (n > 35) {
+    return (STIRLING_S0 - (STIRLING_S1 - (STIRLING_S2 - STIRLING_S3 / nn) / nn) / nn) / n
+  }
+  return (STIRLING_S0 - (STIRLING_S1 - (STIRLING_S2 - (STIRLING_S3 - STIRLING_S4 / nn) / nn) / nn) / nn) / n
+}
+
+/**
+ * The deviance term x log(x / np) + np - x, evaluated without losing digits when x is close to np.
+ */
+function deviance(x: number, np: number): number {
+  if (Math.abs(x - np) < 0.1 * (x + np)) {
+    let v = (x - np) / (x + np)
+    let sum = (x - np) * v
+    let term = 2 * x * v
+    v *= v
+    for (let j = 1; j < 1000; j++) {
+      term *= v
+      const next = sum + term / (2 * j + 1)
+      if (next === sum) {
+        return next
+      }
+      sum = next
+    }
+    return sum
+  }
+  return x * Math.log(x / np) + np - x
+}
+
+/**
+ * The probability of exactly k successes in n trials with success probability p (and q = 1 - p).
+ */
+function binomialPmf(k: number, n: number, p: number, q: number): number {
+  if (k === 0) {
+    return Math.exp(n * Math.log1p(-p))
+  }
+  if (k === n) {
+    return Math.exp(n * Math.log(p))
+  }
+  if (k >= 15 && n - k >= 15) {
+    const logPmf = stirlingError(n) - stirlingError(k) - stirlingError(n - k) - deviance(k, n * p) - deviance(n - k, n * q)
+    return Math.exp(logPmf) / Math.sqrt(2 * Math.PI * k * (n - k) / n)
+  }
+  // Few successes or few failures: the binomial coefficient has at most 14 factors.
+  const m = Math.min(k, n - k)
+  let logCoefficient = 0
+  for (let j = 1; j <= m; j++) {
+    logCoefficient += Math.log((n - m + j) / j)
+  }
+  return Math.exp(logCoefficient + k * Math.log(p) + (n - k) * Math.log1p(-p))
+}
+
+/**
+ * The probability of between lo and hi successes (inclusive) in n trials.
+ *
+ * Starts at the term closest to the mode, where the probabilities are largest, and walks outwards with the ratio of
+ * neighbouring terms until the terms no longer change the sum. Binomial terms fall off like a Gaussian, so only about
+ * ten standard deviations are visited however large n is: the cost grows with the square root of n, not with n.
+ */
+function binomialRangeProbability(n: number, p: number, lo: number, hi: number): number {
+  if (p === 0) {
+    return lo === 0 ? 1 : 0
+  }
+  if (p === 1) {
+    return hi === n ? 1 : 0
+  }
+  const q = 1 - p
+  const mode = Math.min(n, Math.floor((n + 1) * p))
+  const start = Math.min(Math.max(mode, lo), hi)
+  const first = binomialPmf(start, n, p, q)
+  if (first === 0) {
+    return 0
+  }
+  const sum = new CompensatedSum()
+  sum.add(first)
+
+  let term = first
+  for (let i = start; i < hi; i++) {
+    term *= (n - i) / (i + 1) * (p / q)
+    sum.add(term)
+    if (term === 0 || term < sum.value() * NEGLIGIBLE_TERM) {
+      break
+    }
+  }
+  term = first
+  for (let i = start; i > lo; i--) {
+    term *= i / (n - i + 1) * (q / p)
+    sum.add(term)
+    if (term === 0 || term < sum.value() * NEGLIGIBLE_TERM) {
+      break
+    }
+  }
+  return Math.min(sum.value(), 1)
+}
+
+/** A term this much smaller than the running sum no longer changes it in double precision. */
+const NEGLIGIBLE_TERM = 1e-18
+
+/**
+ * Neumaier's compensated summation: keeps the rounding error of each addition in a separate term, so the error of a
+ * sum of n terms stays near one rounding instead of growing with n.
+ */
+class CompensatedSum {
+  private sum = 0
+  private compensation = 0
+
+  public add(term: number): void {
+    const total = this.sum + term
+    this.compensation += Math.abs(this.sum) >= Math.abs(term) ? (this.sum - total) + term : (term - total) + this.sum
+    this.sum = total
+  }
+
+  public value(): number {
+    return this.sum + this.compensation
+  }
+}

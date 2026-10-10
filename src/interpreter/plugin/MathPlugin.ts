@@ -39,6 +39,20 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
         {argumentType: FunctionArgumentType.NUMBER, minValue: 0}
       ]
     },
+    'PERMUT': {
+      method: 'permut',
+      parameters: [
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0}
+      ]
+    },
+    'PERMUTATIONA': {
+      method: 'permutationa',
+      parameters: [
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0}
+      ]
+    },
     'GCD': {
       method: 'gcd',
       parameters: [
@@ -163,6 +177,32 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
           return 1
         }
         return combin(n + m - 1, m)
+      }
+    )
+  }
+
+  public permut(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('PERMUT'),
+      (n: number, k: number) => {
+        n = Math.trunc(n)
+        k = Math.trunc(k)
+        if (k > n) {
+          return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
+        }
+        let ret = 1
+        for (let i = 0; i < k && Number.isFinite(ret); i++) {
+          ret *= n - i
+        }
+        return Number.isFinite(ret) ? ret : new CellError(ErrorType.NUM, ErrorMessage.NaN)
+      }
+    )
+  }
+
+  public permutationa(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('PERMUTATIONA'),
+      (n: number, k: number) => {
+        const ret = Math.pow(Math.trunc(n), Math.trunc(k))
+        return Number.isFinite(ret) ? ret : new CellError(ErrorType.NUM, ErrorMessage.NaN)
       }
     )
   }
