@@ -1,0 +1,204 @@
+#!/usr/bin/env bash
+# Self-test for the audit-harness marker scan used in .github/workflows/build.yml.
+#
+# Why this exists:
+#   The CI step in build.yml invokes
+#   `scripts/marker-scan.sh dist commonjs es typings languages` to grep the build
+#   output for `[V<n>]`/`[vrf_n]` citation markers and the `§AuditSources` footer — internal
+#   spec-drafting tokens that must never ship in compiled JS. Empirically
+#   (probed 2026-05-25 by planting `// [V99] test marker` in src/index.ts and
+#   running `npm run bundle-all`), markers leak through THREE distinct surfaces:
+#     1) babel-transpiled commonjs/*.js and es/*.mjs preserve source comments
+#     2) webpack-bundled dist/hyperformula.js and dist/hyperformula.full.js
+#        preserve source comments (development build, no comment-stripping)
+#     3) dist/*.js.map source-maps embed full original source in
+#        `sourcesContent`, so comments survive into the map even when stripped
+#        from the .js itself (not applicable here, but defends future configs)
+#   This script exercises the SAME scripts/marker-scan.sh that CI runs, against
+#   synthetic fixtures covering all three surfaces — so the workflow step and
+#   the self-test cannot drift independently.
+#
+# Exit code: 0 on all assertions pass, non-zero on any failure.
+
+set -uo pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly MARKER_SCAN="$SCRIPT_DIR/marker-scan.sh"
+readonly TMP_ROOT="$(mktemp -d -t hf-marker-scan-XXXXXX)"
+trap 'rm -rf "$TMP_ROOT"' EXIT
+
+# ---- Adapter: drives the shared scan against a synthetic fixture root ------
+# Invokes scripts/marker-scan.sh — the same script CI runs — passing the
+# fixture's dist/commonjs/es subdirectories. This is the only place where the
+# self-test couples to the scan; the scan logic itself lives in marker-scan.sh.
+run_marker_scan() {
+  local root="$1"
+  local paths=()
+  local dir
+  # Mirror the build.yml invocation exactly so the self-test and CI cannot drift.
+  for dir in dist commonjs es typings languages docs/api docs/guide; do
+    if [ -d "$root/$dir" ]; then
+      paths+=("$root/$dir")
+    fi
+  done
+  if [ ${#paths[@]} -eq 0 ]; then
+    # Mirror the script's "no dirs" branch so the assertion harness treats this
+    # as a clean (rc=0) outcome.
+    bash "$MARKER_SCAN" "$root/__missing__"
+    return $?
+  fi
+  local rc=0
+  bash "$MARKER_SCAN" "${paths[@]}" || rc=$?
+  case "$rc" in
+    0) return 0 ;;  # no markers    -> CI would pass
+    1) return 1 ;;  # markers found -> CI would fail
+    *) return "$rc" ;;
+  esac
+}
+
+# ---- Fixture builders -------------------------------------------------------
+make_clean_fixture() {
+  local root="$1"
+  mkdir -p "$root/dist" "$root/commonjs" "$root/es"
+  cat >"$root/dist/hyperformula.js" <<'EOF'
+// HyperFormula bundle (synthetic, clean)
+const HyperFormula = function() { return 42; };
+module.exports = HyperFormula;
+EOF
+  cat >"$root/dist/hyperformula.js.map" <<'EOF'
+{"version":3,"sources":["webpack:///./src/index.ts"],"sourcesContent":["const HyperFormula = function() { return 42; };\nmodule.exports = HyperFormula;\n"],"mappings":"AAAA"}
+EOF
+  cat >"$root/commonjs/index.js" <<'EOF'
+"use strict";
+exports.foo = 1;
+EOF
+  cat >"$root/es/index.mjs" <<'EOF'
+export const foo = 1;
+EOF
+}
+
+# Variant: marker in dist .js file (e.g. preserved source comment).
+make_marker_in_dist_js() {
+  local root="$1"
+  make_clean_fixture "$root"
+  cat >>"$root/dist/hyperformula.js" <<'EOF'
+// [V12] internal citation marker — must not ship
+EOF
+}
+
+# Variant: marker in source-map sourcesContent only (stripped from .js).
+make_marker_in_sourcemap() {
+  local root="$1"
+  make_clean_fixture "$root"
+  cat >"$root/dist/hyperformula.js.map" <<'EOF'
+{"version":3,"sources":["webpack:///./src/index.ts"],"sourcesContent":["// [V7] citation that survived into sourcesContent\nconst HyperFormula = function() { return 42; };\n"],"mappings":"AAAA"}
+EOF
+}
+
+# Variant: §AuditSources footer leaked into commonjs output.
+make_marker_in_commonjs() {
+  local root="$1"
+  make_clean_fixture "$root"
+  cat >>"$root/commonjs/index.js" <<'EOF'
+// §AuditSources: internal/spec.md
+EOF
+}
+
+# Variant: marker in es/*.mjs.
+make_marker_in_es() {
+  local root="$1"
+  make_clean_fixture "$root"
+  cat >>"$root/es/index.mjs" <<'EOF'
+// [V42] another internal token
+EOF
+}
+
+# Variant: CURRENT lowercase prefixed marker (e.g. [vrf_3]) in commonjs output.
+# The pre-2026-05-21 [V<n>] form is legacy; real specs emit [vrf_/dec_/con_/
+# que_/wrg_/crf_]_<digits>. Isolates the scan-PATTERN coverage.
+make_marker_in_commonjs_current() {
+  local root="$1"
+  make_clean_fixture "$root"
+  cat >>"$root/commonjs/index.js" <<'EOF'
+// [vrf_3] current-grammar citation marker — must not ship
+EOF
+}
+
+# Variant: marker leaked into typings/*.d.ts. `bundle:typings` (tsc -d) and
+# `bundle:languages` are build outputs that preserve source comments, so they
+# are leak surfaces too. Uses a legacy [V<n>] marker to isolate the DIRECTORY-
+# coverage defect from the pattern defect.
+make_marker_in_typings() {
+  local root="$1"
+  make_clean_fixture "$root"
+  mkdir -p "$root/typings"
+  cat >"$root/typings/index.d.ts" <<'EOF'
+/** Public API surface. [V12] citation leaked into declarations. */
+export declare const foo: number;
+EOF
+}
+
+# Variant: marker leaked into a published docs page. build.yml also scans
+# docs/api (generated) and docs/guide (hand-written) so citation markers never
+# reach the online docs; this fixture isolates that DIRECTORY-coverage surface.
+make_marker_in_docs_guide() {
+  local root="$1"
+  make_clean_fixture "$root"
+  mkdir -p "$root/docs/guide"
+  cat >"$root/docs/guide/some-page.md" <<'EOF'
+# Some guide page
+
+Content with an internal [vrf_3] citation that must never ship to the docs site.
+EOF
+}
+
+# ---- Assertion harness ------------------------------------------------------
+PASS_COUNT=0
+FAIL_COUNT=0
+
+assert_scan() {
+  local name="$1"
+  local expected="$2"   # "clean" -> expect rc 0 ; "dirty" -> expect rc 1
+  local root="$3"
+
+  local rc=0
+  run_marker_scan "$root" >"$TMP_ROOT/scan-out" 2>&1 || rc=$?
+
+  local got
+  case "$rc" in
+    0) got="clean" ;;
+    1) got="dirty" ;;
+    *) got="error($rc)" ;;
+  esac
+
+  if [ "$got" = "$expected" ]; then
+    echo "PASS  $name  (expected=$expected, got=$got)"
+    PASS_COUNT=$((PASS_COUNT + 1))
+  else
+    echo "FAIL  $name  (expected=$expected, got=$got)"
+    echo "  scan output:"
+    sed 's/^/    /' "$TMP_ROOT/scan-out"
+    FAIL_COUNT=$((FAIL_COUNT + 1))
+  fi
+}
+
+# ---- Test cases -------------------------------------------------------------
+echo "=== audit-marker scan self-test ==="
+echo "Fixture root: $TMP_ROOT"
+echo ""
+
+f="$TMP_ROOT/case-clean";          make_clean_fixture          "$f"; assert_scan "clean build (no markers)"          "clean" "$f"
+f="$TMP_ROOT/case-dist-js";        make_marker_in_dist_js      "$f"; assert_scan "marker in dist/*.js comment"        "dirty" "$f"
+f="$TMP_ROOT/case-dist-map";       make_marker_in_sourcemap    "$f"; assert_scan "marker in dist/*.js.map (sourcesContent)" "dirty" "$f"
+f="$TMP_ROOT/case-commonjs";       make_marker_in_commonjs     "$f"; assert_scan "§AuditSources in commonjs/*.js"          "dirty" "$f"
+f="$TMP_ROOT/case-es";             make_marker_in_es           "$f"; assert_scan "marker in es/*.mjs"                 "dirty" "$f"
+f="$TMP_ROOT/case-commonjs-current"; make_marker_in_commonjs_current "$f"; assert_scan "current [vrf_n] marker in commonjs/*.js" "dirty" "$f"
+f="$TMP_ROOT/case-typings";        make_marker_in_typings      "$f"; assert_scan "marker in typings/*.d.ts"          "dirty" "$f"
+f="$TMP_ROOT/case-docs-guide";     make_marker_in_docs_guide   "$f"; assert_scan "marker in docs/guide/*.md"         "dirty" "$f"
+
+echo ""
+echo "=== summary: $PASS_COUNT passed, $FAIL_COUNT failed ==="
+
+if [ "$FAIL_COUNT" -gt 0 ]; then
+  exit 1
+fi
