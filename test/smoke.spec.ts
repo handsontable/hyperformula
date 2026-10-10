@@ -103,4 +103,17 @@ describe('HyperFormula', () => {
 
     hf.destroy()
   })
+
+  it('rejects a zero depreciation period', () => {
+    const hf = HyperFormula.buildFromArray([
+      ['=DB(1000000,100000,6,0)', '=DB(1000000,100000,6,1)', '=DDB(1000000,100000,6,0)', '=DDB(1000000,100000,6,1)'],
+    ], {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('A1'))).toMatchObject({type: 'NUM', value: '#NUM!'})
+    expect(hf.getCellValue(adr('B1'))).toBe(319000)
+    expect(hf.getCellValue(adr('C1'))).toMatchObject({type: 'NUM', value: '#NUM!'})
+    expect(hf.getCellValue(adr('D1'))).toBeCloseTo(333333.3333333333, 4)
+
+    hf.destroy()
+  })
 })
