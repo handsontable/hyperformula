@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - Fixed the validation of classic (25-character) license keys depending on the time zone: east of UTC, a key that expired the day before the build was released was still accepted, and west of UTC, the console message printed an expiry date one day too early. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+- Fixed the `ERF` and `ERFC` functions losing precision for arguments close to zero and for large arguments, for example `ERF(1E-10)` and `ERFC(5)`; the results now agree with Excel. [#1795](https://github.com/handsontable/hyperformula/pull/1795)
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
 - Fixed the `MAXPOOL` and `MEDIANPOOL` functions throwing an uncaught `TypeError` or `RangeError`. They now return the `#VALUE!` error when the window is larger than the range or the range dimensions, reduced by the window size, are not whole multiples of the stride, and the `#NUM!` error when the window size or the stride is not a positive integer. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
