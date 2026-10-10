@@ -31,3 +31,13 @@ docs/guide/built-in-functions.md
 # Wrangler (Cloudflare Workers) local state
 .wrangler
 .dev.vars*
+
+# Infisical local project link — contains workspaceId (infra inventory, HOT/SZBI:
+# stays in personal private repos only, never in a public repo)
+.infisical.json
+
+# Claude Code project-local state (personal, not shared) — .claude/settings.json
+# itself IS meant to be committed (repo-wide guardrails), so only ignore the rest.
+.claude/settings.local.json
+.claude/worktrees/
+.claude/scheduled_tasks.lock
