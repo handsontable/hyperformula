@@ -614,8 +614,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    *
    * The size depends on the text and the delimiters, so it can be predicted only when the text,
    * the delimiters, ignore_empty and match_mode are literals. Otherwise, the function is treated
-   * as returning a scalar, and a result larger than one cell is reported as #VALUE!
-   * (the same limitation as SEQUENCE with non-literal dimensions).
+   * as returning a scalar, and a result larger than one cell is reported as #VALUE!.
    *
    * @param {ProcedureAst} ast - The procedure AST node
    * @param {InterpreterState} _state - The interpreter state (unused)
