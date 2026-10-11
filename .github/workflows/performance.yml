@@ -75,17 +75,6 @@ jobs:
         run: |
           cd head && npm run benchmark:compare-benchmarks "$GITHUB_WORKSPACE/base-1.json,$GITHUB_WORKSPACE/base-2.json" "$GITHUB_WORKSPACE/head-1.json,$GITHUB_WORKSPACE/head-2.json" "$GITHUB_WORKSPACE/performance-report.md"
 
-      - name: Keep the raw samples
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # https://github.com/actions/upload-artifact/releases/tag/v4.6.2
-        with:
-          name: performance-results
-          path: |
-            base-*.json
-            head-*.json
-            performance-report.md
-          if-no-files-found: ignore
-
       - name: Publish a comment - header
         uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
         with:
