@@ -82,6 +82,17 @@ jobs:
         run: |
           cd head && npm run benchmark:compare-benchmarks "$GITHUB_WORKSPACE/base-1.json,$GITHUB_WORKSPACE/base-2.json" "$GITHUB_WORKSPACE/head-1.json,$GITHUB_WORKSPACE/head-2.json" "$GITHUB_WORKSPACE/performance-report.md"
 
+      # The runner is gone after the job; the raw samples in the log are what a later analysis can use.
+      - name: Print the raw samples
+        if: always()
+        run: |
+          for f in base-1 head-1 head-2 base-2; do
+            echo "::group::$f.json"
+            cat "$GITHUB_WORKSPACE/$f.json" 2>/dev/null || echo "(missing)"
+            echo
+            echo "::endgroup::"
+          done
+
       - name: Publish a comment - header
         uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
         with:
