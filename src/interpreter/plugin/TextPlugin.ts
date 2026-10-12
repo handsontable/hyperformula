@@ -603,6 +603,9 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
           ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
           : padWith
         const width = rows.reduce((max, row) => Math.max(max, row.length), 0)
+        if (rows.length > this.config.maxRows || width > this.config.maxColumns) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
+        }
 
         return SimpleRangeValue.onlyValues(rows.map(row => [...row, ...Array<InternalScalarValue>(width - row.length).fill(padValue)]))
       }
@@ -644,7 +647,12 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       return ArraySize.scalar()
     }
 
-    return new ArraySize(rows.reduce((max, row) => Math.max(max, row.length), 0), rows.length)
+    const width = rows.reduce((max, row) => Math.max(max, row.length), 0)
+    if (rows.length > this.config.maxRows || width > this.config.maxColumns) {
+      return ArraySize.error()
+    }
+
+    return new ArraySize(width, rows.length)
   }
 
   /**
@@ -688,8 +696,8 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       return new CellError(ErrorType.VALUE, ErrorMessage.IndexBounds)
     }
 
-    // An empty delimiter matches at once: at the start of the text for a positive instance_num and at its end for a negative one.
-    if (delimiters.length > 0 && delimiters.every(delimiter => delimiter === '')) {
+    // An empty delimiter, alone or in a list, matches at once: at the start of the text for a positive instance_num and at its end for a negative one.
+    if (delimiters.some(delimiter => delimiter === '')) {
       const position = instance > 0 ? 0 : text.length
       return extractText({start: position, end: position})
     }
@@ -896,7 +904,8 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * @param {Ast} node - The AST node
    * @returns {Maybe<string>} - The text, or undefined if the node is not such a literal
    */
-  private static literalText(node: Ast): Maybe<string> {
+  private static literalText(argNode: Ast): Maybe<string> {
+    const node = TextPlugin.withoutParentheses(argNode)
     if (node.type === AstNodeType.STRING) {
       return node.value
     }
@@ -908,6 +917,16 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       return signed.toString()
     }
     return undefined
+  }
+
+  /**
+   * Strips the parentheses around an expression: `(-1.5)` is read like `-1.5`.
+   *
+   * @param {Ast} node - The AST node
+   * @returns {Ast} - The innermost node that is not a parenthesis
+   */
+  private static withoutParentheses(node: Ast): Ast {
+    return node.type === AstNodeType.PARENTHESIS ? TextPlugin.withoutParentheses(node.expression) : node
   }
 
   /**
@@ -930,7 +949,8 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * @param {Maybe<Ast>} node - The AST node, or undefined if the argument is omitted
    * @returns {Maybe<string[]>} - The delimiters, or undefined if the node is not a literal
    */
-  private static literalDelimiters(node: Maybe<Ast>): Maybe<string[]> {
+  private static literalDelimiters(argNode: Maybe<Ast>): Maybe<string[]> {
+    const node = argNode === undefined ? undefined : TextPlugin.withoutParentheses(argNode)
     if (node === undefined || node.type === AstNodeType.EMPTY) {
       return []
     }
@@ -950,7 +970,8 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * @param {number} defaultValue - The value of an omitted or empty argument
    * @returns {Maybe<number>} - The number, or undefined if the node is not such a literal
    */
-  private static literalNumber(node: Maybe<Ast>, defaultValue: number): Maybe<number> {
+  private static literalNumber(argNode: Maybe<Ast>, defaultValue: number): Maybe<number> {
+    const node = argNode === undefined ? undefined : TextPlugin.withoutParentheses(argNode)
     if (node === undefined || node.type === AstNodeType.EMPTY) {
       return defaultValue
     }
