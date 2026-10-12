@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added the `PERMUT`, `PERMUTATIONA` and `BINOM.DIST.RANGE` functions. [#1790](https://github.com/handsontable/hyperformula/pull/1790)
+
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
@@ -16,7 +20,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Added support for the new license key format. A proprietary key can now grant a subset of the library: a function your key does not include evaluates to a `#LIC!` error, and the matching parts of the API throw a `LicenseCapabilityMissingError`. `getAvailableFunctions()` and `getFunctionDetails()` describe only the functions your key includes. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
-- Added the `PERMUT`, `PERMUTATIONA` and `BINOM.DIST.RANGE` functions. [#1790](https://github.com/handsontable/hyperformula/pull/1790)
 
 ### Changed
 
