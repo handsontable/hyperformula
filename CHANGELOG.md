@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added the `SORTBY`, `XMATCH` and `LOOKUP` functions.
+- Added the `SORTBY`, `XMATCH` and `LOOKUP` functions. [#1806](https://github.com/handsontable/hyperformula/pull/1806)
 
 ### Fixed
 
