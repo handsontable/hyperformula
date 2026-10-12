@@ -576,7 +576,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         }
         const avg = mean(coerced)
         const s = stdev(coerced, true)
-        if (s === 0) {
+        if (s === 0 || !Number.isFinite(s)) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
         const fourthMoment = coerced.reduce((a, b) => a + Math.pow((b - avg) / s, 4), 0)
