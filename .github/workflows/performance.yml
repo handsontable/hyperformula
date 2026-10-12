@@ -72,9 +72,11 @@ jobs:
         env:
           PERF_SAMPLE_SCALE: '0.5'
         run: |
-          run() { (cd "$1" && npm run benchmark:write-to-file "$GITHUB_WORKSPACE/$1-$2.json"); }
-          run base 1; run head 1
-          run head 2; run base 2
+          run() { (cd "$1" && PERF_INJECT="$3" npm run benchmark:write-to-file "$GITHUB_WORKSPACE/$1-$2.json"); }
+          BASE_INJECT='Column ranges - add column=10'
+          HEAD_INJECT='Sheet B: change value, add/remove row/column=10;Recalculation fan-out - one edit, 10k dependents=10'
+          run base 1 "$BASE_INJECT"; run head 1 "$HEAD_INJECT"
+          run head 2 "$HEAD_INJECT"; run base 2 "$BASE_INJECT"
 
       # Exits non-zero when a results file is unreadable or nothing is comparable, so a broken comparison is a
       # red check instead of a stale report. A regression is reported in the comment but does not fail this step.
