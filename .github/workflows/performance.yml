@@ -18,6 +18,7 @@ jobs:
         os: [ 'ubuntu-latest' ]
     name: Test performance
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
     steps:
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
@@ -51,6 +52,12 @@ jobs:
       # Both sides run the same (head) copy of the suite; only the engine under test differs.
       - name: Share the tests between base and head
         run: cp -r head/test/hyperformula-tests base/test/hyperformula-tests
+
+      - name: Record the revisions under test
+        run: |
+          echo "base:  $(git -C base rev-parse HEAD)"
+          echo "head:  $(git -C head rev-parse HEAD)"
+          echo "tests: $(git -C head/test/hyperformula-tests rev-parse HEAD)"
 
       - name: (base) Install dependencies
         run: cd base && npm ci
