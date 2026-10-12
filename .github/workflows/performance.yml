@@ -54,10 +54,12 @@ jobs:
         run: cp -r head/test/hyperformula-tests base/test/hyperformula-tests
 
       - name: Record the revisions under test
+        id: revisions
         run: |
           echo "base:  $(git -C base rev-parse HEAD)"
           echo "head:  $(git -C head rev-parse HEAD)"
           echo "tests: $(git -C head/test/hyperformula-tests rev-parse HEAD)"
+          echo "tests=$(git -C head/test/hyperformula-tests rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: (base) Install dependencies
         run: cd base && npm ci
@@ -66,8 +68,8 @@ jobs:
         run: cd head && npm ci
 
       # Two rounds, each with half of the samples; the comparison merges the rounds of a side. The order is
-      # reversed in the second round (base, head, head, base): the first process on a fresh runner is slow
-      #, and with a fixed order that penalty would always land on the same side.
+      # reversed in the second round (base, head, head, base) so that any effect of running first or second
+      # is shared by both sides.
       - name: Run performance tests (alternating base and head)
         env:
           PERF_SAMPLE_SCALE: '0.5'
@@ -98,7 +100,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           message: |
-            ## Performance comparison of head (${{ github.event.pull_request.head.sha }}) vs base (${{ github.event.pull_request.base.sha }})
+            ## Performance comparison of head (${{ github.event.pull_request.head.sha }}) vs base (${{ github.event.pull_request.base.sha }}) with the tests at ${{ steps.revisions.outputs.tests }}
 
       - name: Publish a comment - performance comparison report
         uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
