@@ -181,7 +181,7 @@ export function findLastOccurrenceInOrderedRange(
   }
 
   // ifNoMatch === 'returnNotFound': on a range that is not actually sorted the descent above can miss a
-  // value that is present, so, as Excel does, look for an exact hit with a plain bisection
+  // value that is present, so look for an exact hit with a plain bisection
   let low = start
   let high = end
 
