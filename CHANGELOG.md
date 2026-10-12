@@ -7,16 +7,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added a new function: `ERF.PRECISE`. [#1789](https://github.com/handsontable/hyperformula/pull/1789)
+
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
+- Fixed the `ERF` and `ERFC` functions returning a number for a boolean or an empty text argument instead of `#VALUE!` as Excel does; numeric text, dates and empty cells are still accepted. [#1789](https://github.com/handsontable/hyperformula/pull/1789)
 
 ## [3.5.0] - 2026-10-09
 
 ### Added
 
 - Added support for the new license key format. A proprietary key can now grant a subset of the library: a function your key does not include evaluates to a `#LIC!` error, and the matching parts of the API throw a `LicenseCapabilityMissingError`. `getAvailableFunctions()` and `getFunctionDetails()` describe only the functions your key includes. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
-- Added a new function: `ERF.PRECISE`. [#1789](https://github.com/handsontable/hyperformula/pull/1789)
 
 ### Changed
 
@@ -27,7 +31,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - Fixed the validation of classic (25-character) license keys depending on the time zone: east of UTC, a key that expired the day before the build was released was still accepted, and west of UTC, the console message printed an expiry date one day too early. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
-- Fixed the `ERF` and `ERFC` functions returning a number for a boolean or an empty text argument instead of `#VALUE!` as Excel does; numeric text, dates and empty cells are still accepted. [#1789](https://github.com/handsontable/hyperformula/pull/1789)
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
 - Fixed the `MAXPOOL` and `MEDIANPOOL` functions throwing an uncaught `TypeError` or `RangeError`. They now return the `#VALUE!` error when the window is larger than the range or the range dimensions, reduced by the window size, are not whole multiples of the stride, and the `#NUM!` error when the window size or the stride is not a positive integer. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
