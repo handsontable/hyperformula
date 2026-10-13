@@ -96,8 +96,6 @@
     "benchmark:cruds": "npm run tsnode test/hyperformula-tests/performance/run-cruds-benchmark.ts",
     "benchmark:write-to-file": "npm run tsnode test/hyperformula-tests/performance/write-to-file.ts",
     "benchmark:compare-benchmarks": "npm run tsnode test/hyperformula-tests/performance/compare-benchmarks.ts",
-    "benchmark:instructions": "npm run tsnode test/hyperformula-tests/performance/run-instructions.ts",
-    "benchmark:compare-instructions": "npm run tsnode test/hyperformula-tests/performance/compare-instructions.ts",
     "lint": "eslint . --ext .js,.ts",
     "lint:fix": "eslint . --ext .js,.ts --fix",
     "audit": "npm audit --omit=dev",

@@ -69,17 +69,17 @@ jobs:
       - name: (head) Install dependencies
         run: cd head && npm ci
 
-      # The base package.json may predate the benchmark:instructions entry, so the base run starts the shared runner
-      # through the generic tsnode script. Each run compiles and measures the engine of its own tree.
+      # The runner comes with the shared tests and is started through the generic tsnode script, which every revision of
+      # package.json has. Each run compiles and measures the engine of its own tree.
       - name: (base) Count instructions
         run: cd base && npm run tsnode test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json"
 
       - name: (head) Count instructions
-        run: cd head && npm run benchmark:instructions "$GITHUB_WORKSPACE/head-instructions.json"
+        run: cd head && npm run tsnode test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/head-instructions.json"
 
       - name: Compare the counts
         run: |
-          cd head && npm run benchmark:compare-instructions "$GITHUB_WORKSPACE/base-instructions.json" "$GITHUB_WORKSPACE/head-instructions.json" "$GITHUB_WORKSPACE/instructions-report.md"
+          cd head && npm run tsnode test/hyperformula-tests/performance/compare-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json" "$GITHUB_WORKSPACE/head-instructions.json" "$GITHUB_WORKSPACE/instructions-report.md"
           cat "$GITHUB_WORKSPACE/instructions-report.md" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Print the raw counts
