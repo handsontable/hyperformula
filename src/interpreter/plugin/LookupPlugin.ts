@@ -209,8 +209,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    * Only the items of the `lookup_value` type take part in the search, so numbers, text and booleans of mixed
    * data are never compared with each other. A `lookup_vector` that is wider than it is tall is searched along
    * its first row, any other along its first column. Without `result_vector` the result is read from the last
-   * row (or column) of `lookup_vector`; a `result_vector` given as a range is read from its first cell onwards,
-   * whatever its size.
+   * row (or column) of `lookup_vector`; a `result_vector` is read from its first cell onwards and a position past
+   * its end is #N/A, so that the result depends only on the cells the formula refers to.
    *
    * @param ast
    * @param state
@@ -218,9 +218,6 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   public lookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LOOKUP'), (key: RawNoErrorScalarValue, lookupVector: SimpleRangeValue, resultVector?: SimpleRangeValue) => {
       const isSearchedAlongRow = lookupVector.width() > lookupVector.height()
-      const resultArg = ast.args[2]
-      // a single-cell reference reaches the callback as an array without a range, so the cell address is taken from the AST
-      const resultCell = resultArg?.type === AstNodeType.CELL_REFERENCE ? resultArg.reference.toSimpleCellAddress(state.formulaAddress) : undefined
       const position = this.findLastNotGreaterOfSameType(key, this.lineOf(lookupVector, isSearchedAlongRow, 0))
 
       if (position === -1) {
@@ -229,7 +226,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
       const value = resultVector === undefined
         ? (isSearchedAlongRow ? this.cellAt(lookupVector, lookupVector.height() - 1, position) : this.cellAt(lookupVector, position, lookupVector.width() - 1))
-        : (this.isColumnVector(resultVector, isSearchedAlongRow) ? this.cellAt(resultVector, position, 0, resultCell) : this.cellAt(resultVector, 0, position, resultCell))
+        : (this.isColumnVector(resultVector, isSearchedAlongRow) ? this.cellAt(resultVector, position, 0) : this.cellAt(resultVector, 0, position))
 
       if (value === undefined) {
         return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
@@ -347,15 +344,15 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    * Returns the value at the given offset from the top-left corner of the range value. For a range it is read
    * from the sheet even beyond the range's size; for an array, `undefined` is returned outside of it.
    */
-  private cellAt(rangeValue: SimpleRangeValue, row: number, col: number, singleCell?: SimpleCellAddress): InterpreterValue | undefined {
+  private cellAt(rangeValue: SimpleRangeValue, row: number, col: number): InterpreterValue | undefined {
     const range = rangeValue.range
-
-    if (range === undefined && singleCell !== undefined) {
-      return this.dependencyGraph.getCellValue(simpleCellAddress(singleCell.sheet, singleCell.col + col, singleCell.row + row))
-    }
 
     if (range === undefined) {
       return rangeValue.data[row]?.[col]
+    }
+
+    if (row >= range.height() || col >= range.width()) {
+      return undefined
     }
 
     return this.dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col + col, range.start.row + row))
