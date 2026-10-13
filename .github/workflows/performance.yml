@@ -80,8 +80,12 @@ jobs:
 
       # Exits non-zero when a results file is unreadable or nothing is comparable, so a broken comparison is a
       # red check instead of a stale report. A regression is reported in the comment but does not fail this step.
+      # When the tests carry a noise history, each scenario is judged against the band of changes measured
+      # earlier on identical code.
       - name: Compare the results
         run: |
+          HISTORY=test/hyperformula-tests/performance/noise-history.json
+          if [ -f "head/$HISTORY" ]; then export PERF_HISTORY_FILE="$HISTORY"; fi
           cd head && npm run benchmark:compare-benchmarks "$GITHUB_WORKSPACE/base-1.json,$GITHUB_WORKSPACE/base-2.json" "$GITHUB_WORKSPACE/head-1.json,$GITHUB_WORKSPACE/head-2.json" "$GITHUB_WORKSPACE/performance-report.md"
 
       # The runner is gone after the job; the raw samples in the log are what a later analysis can use.
