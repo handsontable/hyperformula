@@ -1,0 +1,93 @@
+name: Performance (instruction count)
+permissions:
+  contents: read
+
+# Advisory companion of performance.yml. Instead of wall-clock time it counts the CPU instructions of each scenario's
+# measured region with valgrind/callgrind, which does not depend on the load of the shared runner. The report goes to
+# the job summary; nothing is posted to the pull request and the job never fails the pull request.
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  instruction-count:
+    name: Count instructions
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 60
+    steps:
+      # Counts depend on the exact Node.js build; base and head run in this job on the same one.
+      - name: Setup Node.js
+        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
+        with:
+          node-version: '22'
+
+      - name: Install valgrind
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends valgrind
+          valgrind --version
+
+      - name: (base) Checkout main repository
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # https://github.com/actions/checkout/releases/tag/v2.3.4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+
+      - name: (head) Checkout main repository
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # https://github.com/actions/checkout/releases/tag/v2.3.4
+        with:
+          path: head
+
+      - name: Checkout hyperformula-tests repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ssh-key: ${{ secrets.DEPLOY_TOKEN }}
+          repository: handsontable/hyperformula-tests
+          path: head/test/hyperformula-tests
+
+      - name: Fetch hyperformula-tests and sync branches
+        run: cd head/test && ./fetch-tests.sh
+
+      # Both sides run the same (head) copy of the suite; only the engine under test differs.
+      - name: Share the tests between base and head
+        run: cp -r head/test/hyperformula-tests base/test/hyperformula-tests
+
+      - name: Record the revisions under test
+        run: |
+          echo "base:  $(git -C base rev-parse HEAD)"
+          echo "head:  $(git -C head rev-parse HEAD)"
+          echo "tests: $(git -C head/test/hyperformula-tests rev-parse HEAD)"
+          node --version
+
+      - name: (base) Install dependencies
+        run: cd base && npm ci
+
+      - name: (head) Install dependencies
+        run: cd head && npm ci
+
+      # The base package.json may predate the benchmark:instructions entry, so the base run starts the shared runner
+      # through the generic tsnode script. Each run compiles and measures the engine of its own tree.
+      - name: (base) Count instructions
+        run: cd base && npm run tsnode test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json"
+
+      - name: (head) Count instructions
+        run: cd head && npm run benchmark:instructions "$GITHUB_WORKSPACE/head-instructions.json"
+
+      - name: Compare the counts
+        run: |
+          cd head && npm run benchmark:compare-instructions "$GITHUB_WORKSPACE/base-instructions.json" "$GITHUB_WORKSPACE/head-instructions.json" "$GITHUB_WORKSPACE/instructions-report.md"
+          cat "$GITHUB_WORKSPACE/instructions-report.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Print the raw counts
+        if: always()
+        run: |
+          for f in base-instructions head-instructions; do
+            echo "::group::$f.json"
+            cat "$GITHUB_WORKSPACE/$f.json" 2>/dev/null || echo "(missing)"
+            echo
+            echo "::endgroup::"
+          done
