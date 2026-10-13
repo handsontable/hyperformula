@@ -70,7 +70,8 @@ jobs:
         run: cd head && npm ci
 
       # The runner comes with the shared tests and is started through the generic tsnode script, which every revision of
-      # package.json has. Each run compiles and measures the engine of its own tree.
+      # package.json has. Each run compiles the engine of its own tree into the same build directory and measures it
+      # there, so the two runs must stay sequential: the count depends on the paths a process sees.
       - name: (base) Count instructions
         run: cd base && npm run tsnode test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json"
 
