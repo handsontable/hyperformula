@@ -80,6 +80,20 @@ describe('HyperFormula', () => {
     hf.destroy()
   })
 
+  it('should preserve dollar sequences in SUBSTITUTE replacement text', () => {
+    const hf = HyperFormula.buildFromArray([[
+      '=SUBSTITUTE("a-b-c","-","$&")',
+      '=SUBSTITUTE("a-b-c","-","$$")',
+      '=SUBSTITUTE("a-b-c","-","$&",1)',
+      '=SUBSTITUTE("a-b-c","-","$`")',
+      '=SUBSTITUTE("a-b-c","-","$\'")',
+    ]], {licenseKey: 'gpl-v3'})
+
+    expect(hf.getSheetValues(0)[0]).toEqual(['a$&b$&c', 'a$$b$$c', 'a$&b-c', 'a$`b$`c', 'a$\'b$\'c'])
+
+    hf.destroy()
+  })
+
   it('should add and remove rows with formula updates', () => {
     const data = [
       [1],
