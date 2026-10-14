@@ -193,6 +193,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * it fits only when the formula starts no further from the first row or
    * column than the number of rows or columns dropped; otherwise the dimension
    * stays unbounded, which makes array-space validation report a spill error.
+   * An unresolved count drops nothing for this rule too, so its result fits
+   * only in the first row or column.
    *
    * @param {number} sourceDimension - The predicted source height or width, possibly unbounded.
    * @param {LiteralCount} count - The classified count; must not be invalid.
@@ -204,7 +206,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   private predictDropDimension(sourceDimension: number, count: LiteralCount, anchor: number, effectiveDimension: number): number {
     const requestedDrop = count.kind === 'value' ? Math.abs(Math.trunc(count.value)) : 0
 
-    if (!Number.isFinite(sourceDimension) && count.kind === 'value' && anchor > requestedDrop) {
+    if (!Number.isFinite(sourceDimension) && anchor > requestedDrop) {
       return Number.POSITIVE_INFINITY
     }
 

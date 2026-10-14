@@ -120,6 +120,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | TAKE          | =TAKE(Data!A:A, , 1)                                           | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | No such function. | Spills all 1,048,576 rows from row 1, with blank source cells as 0; returns SPILL below row 1. |
 | DROP          | =DROP(A1:A3, 3)                                                |          N/A | No such function. |           CALC  |
 | DROP          | =DROP(Data!A:A, 1)                                             | Spills to the source sheet's current height minus one row; returns SPILL below row 2. | No such function. | Spills all 1,048,575 remaining rows, with blank source cells as 0; returns SPILL below row 2. |
+| DROP          | =DROP(Data!A:A, B1)                                            | Spills from row 1 only; returns SPILL below row 1, because the count is read after the result size is set. | No such function. | Spills 1,048,576 minus B1 rows when entered in row B1+1 or above; returns SPILL below. |
 | DROP          | =DROP(A1:C3, {1,2})                                            | Uses the first count and drops one row. | No such function. | Returns a 1x2 array of VALUE errors. |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
