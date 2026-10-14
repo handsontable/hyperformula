@@ -103,7 +103,7 @@ const normalizeBase = (b) => {
 
 const DOCS_BASE = normalizeBase(process.env.DOCS_BASE || buildConfigOverrides.base || '/');
 const DOCS_DEST = process.env.DOCS_DEST || buildConfigOverrides.dest || 'docs/.vuepress/dist';
-const DOCS_HOSTNAME = process.env.DOCS_HOSTNAME || buildConfigOverrides.hostname || 'https://hyperformula.handsontable.com';
+const DOCS_HOSTNAME = process.env.DOCS_HOSTNAME || buildConfigOverrides.hostname || 'https://handsontable.com';
 
 module.exports = {
   // Default page globs, minus the built-in-functions template: it is the INPUT of docs:generate-function-docs,

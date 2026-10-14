@@ -33,7 +33,7 @@ To start a local HyperFormula docs server:
 
 From the `hyperformula` directory, you can run the following npm scripts:
 
-* `npm run docs:dev` - Starts a local docs server at http://localhost:8080/hyperformula/.
+* `npm run docs:dev` - Starts a local docs server at http://localhost:8080/docs/hyperformula/.
 * `npm run docs:build` - Builds the docs output into `/docs/.vuepress/dist`.
 * `npm run docs:generate-function-docs` - Regenerates the built-in functions guide page from the function metadata API. Runs automatically as the first step of `docs:dev` and `docs:build`.
 
@@ -53,9 +53,11 @@ Configuration in the repository:
 - `docs/.vuepress/cf/_headers`, `docs/.vuepress/cf/_redirects` &mdash; asset headers and redirects, copied into the root of the build output by `script/prepare-cf-assets.js`.
 - `.nvmrc` &mdash; Node.js version used by the build.
 
-The asset directory is `docs/.vuepress/dist`, while VuePress writes to `docs/.vuepress/dist/docs` (see `docs/.vuepress/build.config.js`). This keeps the `/docs/` prefix that every document is built with, so the site is served under `https://hyperformula.handsontable.com/docs/`.
+The asset directory is `docs/.vuepress/dist`, while VuePress writes to `docs/.vuepress/dist/docs/hyperformula` (see `docs/.vuepress/build.config.js`). This keeps the `/docs/hyperformula/` prefix that every document is built with, so the site is served under `https://handsontable.com/docs/hyperformula/`.
 
-Production traffic reaches this Worker through the `hyperformula-website` Worker, which proxies `/docs*` to `https://hyperformula-docs.handsoncode.workers.dev` (the `DOCS_ORIGIN` constant in that project).
+Production traffic reaches this Worker through the handsontable.com Worker (`handsontable-com-v3-production`, repository `handsontable/handsontable.com-v3`), which proxies `/docs/hyperformula/*` to `https://hyperformula-docs.handsoncode.workers.dev` without changing the path, and rewrites this Worker's own redirects back onto handsontable.com. The rest of `/docs/*` there is the Handsontable documentation, a separate app. Its staging Worker does the same for https://dev.handsontable.com/docs/hyperformula/ from the `develop` branch preview.
+
+The documentation's former addresses, `https://hyperformula.handsontable.com/docs/*`, still reach this Worker (through the `hyperformula-website` Worker), which answers them with a permanent redirect to the same path under `https://handsontable.com/docs/hyperformula/` (`worker/index.js`).
 
 Build settings in the Cloudflare dashboard, under **Workers & Pages > hyperformula-docs > Settings > Build**: build command `npm run docs:build:cf`, deploy command `npx wrangler deploy`, non-production branch deploy command `npx wrangler versions upload`, production branch `master`, non-production branch builds enabled.
 
