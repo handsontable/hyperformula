@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {
   EmptyValue,
@@ -791,7 +791,8 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
    * Corresponds to ACCRINTM(issue, settlement, rate, [par], [basis]).
    *
    * Returns the accrued interest of a security that pays interest at maturity. An empty or omitted `par` is 1000.
-   * Arguments are validated from left to right, as in Excel. `issue` equal to `settlement` gives 0.
+   * Arguments are validated from left to right, as in Excel; an empty `issue`, `settlement` or `rate` is #N/A.
+   * `issue` equal to `settlement` gives 0.
    *
    * @param ast
    * @param state
@@ -799,13 +800,22 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   public accrintm(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ACCRINTM'),
       (issueArg: InternalScalarValue, settlementArg: InternalScalarValue, rateArg: InternalScalarValue, parArg: InternalScalarValue, basisArg: InternalScalarValue) => {
+        if (this.isArgumentEmpty(ast, 0)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
         const issue = this.coerceToSecurityDate(issueArg)
         if (issue instanceof CellError) {
           return issue
         }
+        if (this.isArgumentEmpty(ast, 1)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
         const settlement = this.coerceToSecurityDate(settlementArg)
         if (settlement instanceof CellError) {
           return settlement
+        }
+        if (this.isArgumentEmpty(ast, 2)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
         }
         const rate = this.strictNumber(rateArg)
         if (rate instanceof CellError) {
@@ -1029,8 +1039,9 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
    * (settlement, maturity, first amount, second amount, [basis]).
    *
    * Validates in Excel's order: settlement and maturity, then basis, then the two amounts (errors and #VALUE!),
-   * then settlement before maturity and both amounts positive (#NUM!). Passes the day count and the days in the year
-   * between settlement and maturity to `calculate`.
+   * then settlement before maturity and both amounts positive (#NUM!). An empty settlement, maturity or amount is #N/A
+   * in its own place of that order. Passes the day count and the days in the year between settlement and maturity to
+   * `calculate`.
    *
    * @param {ProcedureAst} ast - the function's AST
    * @param {InterpreterState} state - the interpreter state
@@ -1045,9 +1056,15 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   ): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata(functionName),
       (settlementArg: InternalScalarValue, maturityArg: InternalScalarValue, firstAmountArg: InternalScalarValue, secondAmountArg: InternalScalarValue, basisArg: InternalScalarValue) => {
+        if (this.isArgumentEmpty(ast, 0)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
         const settlement = this.coerceToSecurityDate(settlementArg)
         if (settlement instanceof CellError) {
           return settlement
+        }
+        if (this.isArgumentEmpty(ast, 1)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
         }
         const maturity = this.coerceToSecurityDate(maturityArg)
         if (maturity instanceof CellError) {
@@ -1057,9 +1074,15 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         if (basis instanceof CellError) {
           return basis
         }
+        if (this.isArgumentEmpty(ast, 2)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
         const firstAmount = this.strictNumber(firstAmountArg)
         if (firstAmount instanceof CellError) {
           return firstAmount
+        }
+        if (this.isArgumentEmpty(ast, 3)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
         }
         const secondAmount = this.strictNumber(secondAmountArg)
         if (secondAmount instanceof CellError) {
@@ -1075,6 +1098,17 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         return calculate(dayCount, yearDays, firstAmount, secondAmount)
       }
     )
+  }
+
+  /**
+   * Returns true when the argument at `index` is syntactically empty, as the first argument of `DISC(,A3,A4,A5)`.
+   * An omitted trailing argument is not empty.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {number} index - the argument's position, from 0
+   */
+  private isArgumentEmpty(ast: ProcedureAst, index: number): boolean {
+    return ast.args[index]?.type === AstNodeType.EMPTY
   }
 
   /**
