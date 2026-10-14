@@ -4,7 +4,7 @@
  *
  * These files must live at the root of the asset directory declared in
  * `wrangler.jsonc` (`docs/.vuepress/dist`), while VuePress writes its output to
- * `docs/.vuepress/dist/docs`. They therefore cannot be kept in
+ * `docs/.vuepress/dist/docs/hyperformula`. They therefore cannot be kept in
  * `docs/.vuepress/public` and are copied here instead.
  */
 const fs = require('fs');
