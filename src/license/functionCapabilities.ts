@@ -75,8 +75,8 @@ const FUNCTION_GROUPS: ReadonlyMap<string, readonly string[]> = new Map([
  * gated at all, which is exactly the treatment a custom function should get.
  */
 const UNGROUPED_FUNCTIONS = [
-  'ACCRINTM', 'ACOSH', 'ACOT', 'ACOTH', 'ARABIC', 'ASINH', 'ATANH', 'AVEDEV', 'BASE', 'BESSELI', 'BESSELJ',
-  'BESSELK',
+  'ACCRINT', 'ACCRINTM', 'ACOSH', 'ACOT', 'ACOTH', 'ARABIC', 'ASINH', 'ATANH', 'AVEDEV', 'BASE', 'BESSELI',
+  'BESSELJ', 'BESSELK',
   'BESSELY', 'BETA.DIST', 'BETA.INV', 'BIN2DEC', 'BIN2HEX', 'BIN2OCT', 'BINOM.DIST', 'BINOM.INV', 'BITAND',
   'BITLSHIFT', 'BITOR', 'BITRSHIFT', 'BITXOR', 'CEILING.MATH', 'CEILING.PRECISE', 'CHISQ.DIST',
   'CHISQ.DIST.RT', 'CHISQ.INV', 'CHISQ.INV.RT', 'CHISQ.TEST', 'COMBIN', 'COMBINA', 'COMPLEX',

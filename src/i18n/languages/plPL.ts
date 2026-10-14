@@ -25,6 +25,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'WART.BEZWGL',
+    ACCRINT: 'NAL.ODS',
     ACCRINTM: 'NAL.ODS.WYKUP',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',

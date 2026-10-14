@@ -361,6 +361,6 @@ export function toBasisEU(date: SimpleDate): SimpleDate {
  * Counts the days between two dates as if every month had 30 days. The dates must already be adjusted to a 30/360
  * basis (`toBasisUS` or `toBasisEU`).
  */
-function daysIn30DayMonths(start: SimpleDate, end: SimpleDate): number {
+export function daysIn30DayMonths(start: SimpleDate, end: SimpleDate): number {
   return 360 * (end.year - start.year) + 30 * (end.month - start.month) + end.day - start.day
 }

@@ -25,6 +25,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'BATASAN.MATRIKS',
     ARRAYFORMULA: 'RUMUS.MATRIKS',
     ABS: 'ABS',
+    ACCRINT: 'ACCRINT',
     ACCRINTM: 'ACCRINTM',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',

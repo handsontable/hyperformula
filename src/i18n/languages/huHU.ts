@@ -25,6 +25,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINT: 'IDŐSZAKI.KAMAT',
     ACCRINTM: 'LEJÁRATI.KAMAT',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSH',

@@ -25,6 +25,7 @@ export const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINT: 'INT.ACUM',
     ACCRINTM: 'INT.ACUM.V',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',

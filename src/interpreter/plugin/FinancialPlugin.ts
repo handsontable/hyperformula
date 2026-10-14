@@ -4,9 +4,10 @@
  */
 
 import {CellError, ErrorType} from '../../Cell'
-import {offsetMonth, SimpleDate} from '../../DateTimeHelper'
+import {daysIn30DayMonths, offsetMonth, SimpleDate, toBasisEU} from '../../DateTimeHelper'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
+import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {
   EmptyValue,
@@ -39,6 +40,24 @@ interface CouponSchedule {
   /** The first coupon date after settlement. */
   next: SimpleDate,
 }
+
+/**
+ * The quasi-coupon schedule of an ACCRINT call: coupon dates anchored at `first_interest`. Period k runs from the
+ * coupon date k periods after `first_interest` (before it when k is negative) to the next coupon date.
+ */
+interface QuasiCouponSchedule {
+  /** The first interest date, the anchor of the schedule. */
+  firstInterest: SimpleDate,
+  /** The number of coupons per year: 1, 2 or 4. */
+  frequency: number,
+  /** The day-count basis: 0 to 4. */
+  basis: number,
+}
+
+/**
+ * The index of the quasi-coupon period that ends on `first_interest`.
+ */
+const FIRST_INTEREST_PERIOD = -1
 
 export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FinancialPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
@@ -373,6 +392,19 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'ACCRINT': {
+      method: 'accrint',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 1000, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: true, emptyAsDefault: true},
       ],
     },
     'FVSCHEDULE': {
@@ -1017,6 +1049,87 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  /**
+   * Corresponds to ACCRINT(issue, first_interest, settlement, rate, [par], frequency, [basis], [calc_method]).
+   *
+   * Returns the accrued interest of a security that pays periodic interest: `par` * `rate` / `frequency` times the
+   * accrued time in coupon periods, as `accruedCouponPeriods` computes it. An empty `par` is 1000, and an empty or
+   * omitted `calc_method` is TRUE.
+   *
+   * Validates in Excel's order: `calc_method` first, then the other arguments from left to right (an empty required
+   * argument is #N/A), then `rate` and `par` greater than 0, then `issue` before `settlement`. `first_interest` may be
+   * on or before `issue`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public accrint(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ACCRINT'),
+      (issueArg: InternalScalarValue, firstInterestArg: InternalScalarValue, settlementArg: InternalScalarValue, rateArg: InternalScalarValue,
+        parArg: InternalScalarValue, frequencyArg: InternalScalarValue, basisArg: InternalScalarValue, calcMethodArg: InternalScalarValue) => {
+        const calcMethod = this.coerceToCalcMethod(calcMethodArg)
+        if (calcMethod instanceof CellError) {
+          return calcMethod
+        }
+        if (this.isArgumentEmpty(ast, 0)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const issue = this.coerceToSecurityDate(issueArg)
+        if (issue instanceof CellError) {
+          return issue
+        }
+        if (this.isArgumentEmpty(ast, 1)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const firstInterest = this.coerceToSecurityDate(firstInterestArg)
+        if (firstInterest instanceof CellError) {
+          return firstInterest
+        }
+        if (this.isArgumentEmpty(ast, 2)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const settlement = this.coerceToSecurityDate(settlementArg)
+        if (settlement instanceof CellError) {
+          return settlement
+        }
+        if (this.isArgumentEmpty(ast, 3)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const rate = this.strictNumber(rateArg)
+        if (rate instanceof CellError) {
+          return rate
+        }
+        const par = this.strictNumber(parArg)
+        if (par instanceof CellError) {
+          return par
+        }
+        if (this.isArgumentEmpty(ast, 5)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const frequency = this.coerceToCouponFrequency(frequencyArg)
+        if (frequency instanceof CellError) {
+          return frequency
+        }
+        const basis = this.coerceToDayCountBasis(basisArg)
+        if (basis instanceof CellError) {
+          return basis
+        }
+        if (rate <= 0 || par <= 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+        if (issue >= settlement) {
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
+        }
+        const schedule = {firstInterest: this.dateTimeHelper.numberToSimpleDate(firstInterest), frequency, basis}
+        const periods = this.accruedCouponPeriods(schedule, issue, settlement, calcMethod)
+        if (periods instanceof CellError) {
+          return periods
+        }
+        return par * rate / frequency * periods
+      }
+    )
+  }
+
   public fvschedule(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FVSCHEDULE'),
       (value: number, ratios: SimpleRangeValue) => {
@@ -1335,7 +1448,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
           return basis
         }
         const maturityDate = this.dateTimeHelper.numberToSimpleDate(maturity)
-        const count = this.couponsAfter(settlement, maturityDate, frequency)
+        const count = -this.couponPeriodIndex(settlement, maturityDate, frequency)
         const previous = this.couponDate(maturityDate, -count, frequency)
         if (this.dateTimeHelper.dateToNumber(previous) < 0) {
           return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
@@ -1420,28 +1533,30 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
    * the result; otherwise the result keeps the anchor's day, clamped to the length of its month (leap years included).
    */
   private couponDate(anchor: SimpleDate, periods: number, frequency: number): SimpleDate {
-    const shifted = offsetMonth(anchor, periods * 12 / frequency)
-    const lastDay = this.dateTimeHelper.daysInMonth(shifted.year, shifted.month)
+    const {year, month} = offsetMonth(anchor, periods * 12 / frequency)
+    const lastDay = this.dateTimeHelper.daysInMonth(year, month)
     const isAnchorMonthEnd = anchor.day === this.dateTimeHelper.daysInMonth(anchor.year, anchor.month)
-    return {...shifted, day: isAnchorMonthEnd ? lastDay : Math.min(anchor.day, lastDay)}
+    return {year, month, day: isAnchorMonthEnd ? lastDay : Math.min(anchor.day, lastDay)}
   }
 
   /**
-   * Returns the number of coupon dates after `settlement`, up to and including `maturity`: the smallest k >= 1 for
-   * which the coupon date k periods before maturity is on or before settlement.
+   * Returns the index k of the coupon period that contains `date` in the schedule anchored at `anchor`: the coupon
+   * date k periods after the anchor is on or before `date` and the next coupon date is after it. k is negative for a
+   * date before the anchor, and 0 for the anchor itself. The coupon functions count the coupons after settlement as
+   * minus the index of settlement in maturity's schedule.
    *
    * Runs in constant time instead of stepping through the periods (a quarterly schedule over the whole supported date
-   * range has 32,400 of them): the whole periods in the months between settlement and maturity give a coupon date in
-   * settlement's month or later, and one period more gives a date before settlement's month.
+   * range has 32,400 of them): the whole periods in the months from the anchor to `date` give a coupon date in
+   * `date`'s month or earlier, and the next coupon date is in a later month, so k is that number of periods or one
+   * less.
    */
-  private couponsAfter(settlement: number, maturity: SimpleDate, frequency: number): number {
-    const settlementDate = this.dateTimeHelper.numberToSimpleDate(settlement)
-    const months = 12 * (maturity.year - settlementDate.year) + maturity.month - settlementDate.month
-    const periods = Math.floor(months * frequency / 12)
-    if (periods > 0 && this.dateTimeHelper.dateToNumber(this.couponDate(maturity, -periods, frequency)) <= settlement) {
+  private couponPeriodIndex(date: number, anchor: SimpleDate, frequency: number): number {
+    const {year, month} = this.dateTimeHelper.numberToSimpleDate(date)
+    const periods = Math.floor((12 * (year - anchor.year) + month - anchor.month) * frequency / 12)
+    if (this.dateTimeHelper.dateToNumber(this.couponDate(anchor, periods, frequency)) <= date) {
       return periods
     }
-    return periods + 1
+    return periods - 1
   }
 
   /**
@@ -1516,6 +1631,292 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     }
     const target = offsetMonth(maturity, -periods * monthsPerPeriod)
     return {...target, day: Math.min(day, this.dateTimeHelper.daysInMonth(target.year, target.month))}
+  }
+
+  /**
+   * Converts the `calc_method` argument of ACCRINT: an error is passed on, text (even "TRUE" or "1") is #VALUE!, a
+   * number is TRUE when it is not 0, and a blank cell is FALSE.
+   */
+  private coerceToCalcMethod(value: InternalScalarValue): boolean | CellError {
+    const calcMethod = typeof value === 'string' ? undefined : coerceScalarToBoolean(value)
+    return calcMethod ?? new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+  }
+
+  /**
+   * Returns the interest that ACCRINT accrues from `issue` to `settlement` in coupon periods (the result divided by
+   * `par` * `rate` / `frequency`), as Excel computes it. "The issue's period" and "the settlement's period" are the
+   * periods of `schedule` that contain them.
+   *
+   * - Settlement after `first_interest`: `accrualFromIssue` up to the settlement's period, or with `calcMethod` FALSE
+   *   up to `first_interest`'s period, so that the time from the start of that period to settlement counts as one span.
+   * - Settlement on or before `first_interest`, with `calcMethod` FALSE and issue in an earlier period than
+   *   settlement: `partialPeriodsBeforeFirstInterest`.
+   * - Otherwise, settlement in a period before `first_interest`'s: `accrualBeforeFirstInterestPeriod`.
+   * - Otherwise: `accrualFromIssue` up to `first_interest`'s period.
+   *
+   * The coupon date on or before issue must not be before the earliest supported date and, for a settlement after
+   * `first_interest`, the coupon date after settlement must not be after the latest one (#NUM! otherwise).
+   *
+   * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
+   * @param {number} issue - the issue date serial
+   * @param {number} settlement - the settlement date serial, after `issue`
+   * @param {boolean} calcMethod - the `calc_method` argument
+   */
+  private accruedCouponPeriods(schedule: QuasiCouponSchedule, issue: number, settlement: number, calcMethod: boolean): number | CellError {
+    const issuePeriod = this.couponPeriodIndex(issue, schedule.firstInterest, schedule.frequency)
+    if (this.quasiCouponDate(schedule, issuePeriod) < 0) {
+      return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+    }
+    const firstInterest = this.quasiCouponDate(schedule, 0)
+    if (settlement > firstInterest) {
+      const settlementPeriod = this.periodEndingOnOrAfter(schedule, settlement)
+      if (this.dateTimeHelper.getWithinBounds(this.quasiCouponDate(schedule, settlementPeriod + 1)) === undefined) {
+        return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+      }
+      return this.accrualFromIssue(schedule, issue, issuePeriod, settlement, calcMethod ? settlementPeriod : FIRST_INTEREST_PERIOD)
+    }
+    const settlementPeriod = settlement === firstInterest
+      ? FIRST_INTEREST_PERIOD
+      : this.couponPeriodIndex(settlement, schedule.firstInterest, schedule.frequency)
+    if (!calcMethod && issuePeriod !== settlementPeriod) {
+      return this.partialPeriodsBeforeFirstInterest(schedule, issue, issuePeriod, settlement, settlementPeriod)
+    }
+    if (settlementPeriod < FIRST_INTEREST_PERIOD) {
+      return this.accrualBeforeFirstInterestPeriod(schedule, issue, issuePeriod, settlement, settlementPeriod)
+    }
+    return this.accrualFromIssue(schedule, issue, issuePeriod, settlement, FIRST_INTEREST_PERIOD)
+  }
+
+  /**
+   * Returns the index of the period that contains `settlement`, or of the period before it when settlement is on a
+   * coupon date: a settlement on a coupon date ends the period before.
+   */
+  private periodEndingOnOrAfter(schedule: QuasiCouponSchedule, settlement: number): number {
+    const period = this.couponPeriodIndex(settlement, schedule.firstInterest, schedule.frequency)
+    return this.quasiCouponDate(schedule, period) === settlement ? period - 1 : period
+  }
+
+  /**
+   * Returns the accrued coupon periods from `issue` to `settlement` when settlement is in `lastPeriod`: the issue's
+   * partial period (`issuePeriodPart`), plus the days from the start of `lastPeriod` to settlement over the length of
+   * `first_interest`'s period, plus each whole period in between. When `lastPeriod` is not after the issue's period,
+   * the days from issue to settlement over the length of `first_interest`'s period.
+   *
+   * The whole periods are added one at a time, in Excel's order of additions: O(n) in their number. A period after
+   * `first_interest` counts as 1, except under basis 1, where its actual length can differ from its length as
+   * `couponPeriodLength` gives it.
+   *
+   * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
+   * @param {number} issue - the issue date serial
+   * @param {number} issuePeriod - the index of the issue's period
+   * @param {number} settlement - the settlement date serial
+   * @param {number} lastPeriod - the index of the period in which the accrual ends at settlement
+   */
+  private accrualFromIssue(schedule: QuasiCouponSchedule, issue: number, issuePeriod: number, settlement: number, lastPeriod: number): number {
+    const firstInterestPeriodLength = this.couponPeriodLength(schedule, FIRST_INTEREST_PERIOD)
+    if (issuePeriod >= lastPeriod) {
+      return this.accruedDays(schedule, issue, settlement) / firstInterestPeriodLength
+    }
+    let periods = this.issuePeriodPart(schedule, issue, issuePeriod)
+      + this.accruedDays(schedule, this.quasiCouponDate(schedule, lastPeriod), settlement) / firstInterestPeriodLength
+    for (let period = issuePeriod + 1; period < lastPeriod; period++) {
+      periods += this.wholePeriod(schedule, period)
+    }
+    return periods
+  }
+
+  /**
+   * Returns the accrued coupon periods for a settlement in a period before `first_interest`'s: the time from issue to
+   * `first_interest` minus the time from settlement to `first_interest`, both in periods of `first_interest`'s
+   * length, grouped as Excel adds them. The days from settlement to `first_interest` are the rest of the settlement's
+   * period (of the length `settlementPeriodLength` gives) plus the later periods: 360 / `frequency` days each under
+   * bases 0 and 4, their actual days under the other bases. The lengths of the periods in between cancel out, so this
+   * takes constant time.
+   *
+   * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
+   * @param {number} issue - the issue date serial
+   * @param {number} issuePeriod - the index of the issue's period
+   * @param {number} settlement - the settlement date serial
+   * @param {number} settlementPeriod - the index of the settlement's period, before `first_interest`'s
+   */
+  private accrualBeforeFirstInterestPeriod(schedule: QuasiCouponSchedule, issue: number, issuePeriod: number, settlement: number, settlementPeriod: number): number {
+    const {basis, frequency} = schedule
+    const daysAfterSettlementPeriod = basis === 0 || basis === 4
+      ? (FIRST_INTEREST_PERIOD - settlementPeriod) * 360 / frequency
+      : this.quasiCouponDate(schedule, 0) - this.quasiCouponDate(schedule, settlementPeriod + 1)
+    const daysToFirstInterest = this.settlementPeriodLength(schedule, issuePeriod, settlementPeriod)
+      - this.accruedDays(schedule, this.quasiCouponDate(schedule, settlementPeriod), settlement) + daysAfterSettlementPeriod
+    return this.issuePeriodPart(schedule, issue, issuePeriod)
+      + ((FIRST_INTEREST_PERIOD - issuePeriod) - daysToFirstInterest / this.couponPeriodLength(schedule, FIRST_INTEREST_PERIOD))
+  }
+
+  /**
+   * Returns the accrued coupon periods with `calc_method` FALSE when issue and settlement are in different periods
+   * and settlement is on or before `first_interest`: the issue's partial period (none when issue is on a coupon date),
+   * plus the settlement's partial period over its length, minus the whole periods from the settlement's period to
+   * `first_interest`. The result can be negative.
+   *
+   * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
+   * @param {number} issue - the issue date serial
+   * @param {number} issuePeriod - the index of the issue's period
+   * @param {number} settlement - the settlement date serial
+   * @param {number} settlementPeriod - the index of the settlement's period, not after `first_interest`'s
+   */
+  private partialPeriodsBeforeFirstInterest(schedule: QuasiCouponSchedule, issue: number, issuePeriod: number, settlement: number, settlementPeriod: number): number {
+    const issuePart = this.quasiCouponDate(schedule, issuePeriod) === issue ? 0 : this.issuePeriodPart(schedule, issue, issuePeriod)
+    const settlementPart = this.accruedDays(schedule, this.quasiCouponDate(schedule, settlementPeriod), settlement)
+      / this.couponPeriodLength(schedule, settlementPeriod)
+    return issuePart + settlementPart - (FIRST_INTEREST_PERIOD - settlementPeriod)
+  }
+
+  /**
+   * Returns the part of the issue's period from issue to the next coupon date, over the period's length:
+   * `issuePeriodLength` when the period is before `first_interest`'s, `couponPeriodLength` otherwise. An issue on a
+   * coupon date gives a whole period (`wholePeriod`).
+   *
+   * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
+   * @param {number} issue - the issue date serial
+   * @param {number} issuePeriod - the index of the issue's period
+   */
+  private issuePeriodPart(schedule: QuasiCouponSchedule, issue: number, issuePeriod: number): number {
+    if (this.quasiCouponDate(schedule, issuePeriod) === issue) {
+      return this.wholePeriod(schedule, issuePeriod)
+    }
+    const length = issuePeriod < FIRST_INTEREST_PERIOD
+      ? this.issuePeriodLength(schedule, issuePeriod)
+      : this.couponPeriodLength(schedule, issuePeriod)
+    return this.accruedDays(schedule, issue, this.quasiCouponDate(schedule, issuePeriod + 1)) / length
+  }
+
+  /**
+   * Returns a whole period in coupon periods: 1, except for a period after `first_interest` under basis 1, which is
+   * its actual length over its length as `couponPeriodLength` gives it. The two lengths differ only when the period's
+   * end rolls over (`periodEndRollsOver`), so the date arithmetic is skipped for every other period.
+   */
+  private wholePeriod(schedule: QuasiCouponSchedule, period: number): number {
+    if (period < 0 || schedule.basis !== 1 || !this.periodEndRollsOver(schedule, period)) {
+      return 1
+    }
+    const actualLength = this.quasiCouponDate(schedule, period + 1) - this.quasiCouponDate(schedule, period)
+    return actualLength / this.couponPeriodLength(schedule, period)
+  }
+
+  /**
+   * Returns true when `rolledOverPeriodEnd` is after the coupon date that ends `period`: `first_interest` is not the
+   * last day of its month and its day does not exist in the month of that coupon date.
+   */
+  private periodEndRollsOver(schedule: QuasiCouponSchedule, period: number): boolean {
+    const {firstInterest, frequency} = schedule
+    const end = offsetMonth(firstInterest, (period + 1) * 12 / frequency)
+    return !this.isMonthEnd(firstInterest) && firstInterest.day > this.dateTimeHelper.daysInMonth(end.year, end.month)
+  }
+
+  /**
+   * Returns the length in days of a period that is not the issue's period before `first_interest`'s: 360 /
+   * `frequency` under bases 0, 2 and 4, 365 / `frequency` under basis 3, and under basis 1 the days from the period
+   * start to `rolledOverPeriodEnd`.
+   */
+  private couponPeriodLength(schedule: QuasiCouponSchedule, period: number): number {
+    switch (schedule.basis) {
+      case 1:
+        return this.rolledOverPeriodEnd(schedule, period) - this.quasiCouponDate(schedule, period)
+      case 3:
+        return 365 / schedule.frequency
+      default:
+        return 360 / schedule.frequency
+    }
+  }
+
+  /**
+   * Returns the length in days of the issue's period when it is before `first_interest`'s. Under bases 0 and 2, the
+   * US 30/360 days (`days360`) from the period start to `rolledOverPeriodEnd`; under basis 4, the European 30/360
+   * days to the date with `first_interest`'s day in the month of the next coupon date, even when that day does not
+   * exist (30 February counts as day 30); under bases 1 and 3, `couponPeriodLength`.
+   */
+  private issuePeriodLength(schedule: QuasiCouponSchedule, period: number): number {
+    const {firstInterest, frequency} = schedule
+    const start = this.couponDate(firstInterest, period, frequency)
+    switch (schedule.basis) {
+      case 0:
+      case 2:
+        return this.days360(start, this.dateTimeHelper.numberToSimpleDate(this.rolledOverPeriodEnd(schedule, period)))
+      case 4: {
+        const next = this.couponDate(firstInterest, period + 1, frequency)
+        const end = {...next, day: this.isMonthEnd(firstInterest) ? next.day : firstInterest.day}
+        return daysIn30DayMonths(toBasisEU(start), toBasisEU(end))
+      }
+      default:
+        return this.couponPeriodLength(schedule, period)
+    }
+  }
+
+  /**
+   * Returns the length in days that Excel uses for the settlement's period when settlement is in a period before
+   * `first_interest`'s: the days to the next coupon date when issue is in the same period (US 30/360 under bases 0
+   * and 2, European 30/360 under basis 4, actual under basis 1, 365 / `frequency` under basis 3), and
+   * `issuePeriodLength` otherwise.
+   */
+  private settlementPeriodLength(schedule: QuasiCouponSchedule, issuePeriod: number, settlementPeriod: number): number {
+    if (issuePeriod !== settlementPeriod) {
+      return this.issuePeriodLength(schedule, settlementPeriod)
+    }
+    const {firstInterest, frequency} = schedule
+    switch (schedule.basis) {
+      case 0:
+      case 2:
+        return this.days360(this.couponDate(firstInterest, settlementPeriod, frequency), this.couponDate(firstInterest, settlementPeriod + 1, frequency))
+      case 3:
+        return 365 / frequency
+      default:
+        return this.accruedDays(schedule, this.quasiCouponDate(schedule, settlementPeriod), this.quasiCouponDate(schedule, settlementPeriod + 1))
+    }
+  }
+
+  /**
+   * Returns the date serial of the day with `first_interest`'s day of the month in the month of the coupon date that
+   * ends `period`, rolled over into the next month when that month is shorter (for `first_interest` on 30 August,
+   * "30 February 2008" is 1 March 2008). A month-end `first_interest` gives the coupon date itself.
+   */
+  private rolledOverPeriodEnd(schedule: QuasiCouponSchedule, period: number): number {
+    const {firstInterest, frequency} = schedule
+    const next = this.couponDate(firstInterest, period + 1, frequency)
+    const day = this.isMonthEnd(firstInterest) ? next.day : firstInterest.day
+    return this.dateTimeHelper.dateToNumber(next) + day - next.day
+  }
+
+  /**
+   * Counts the days from `start` to `end` with the US (NASD) 30/360 method as Microsoft documents it for Excel's
+   * DAYS360: a start date on the last day of its month counts as day 30; an end date on the last day of its month
+   * counts as the 1st of the next month when the start day is below 30, and as day 30 otherwise.
+   */
+  private days360(start: SimpleDate, end: SimpleDate): number {
+    const adjustedStart = {...start, day: this.isMonthEnd(start) ? 30 : start.day}
+    if (!this.isMonthEnd(end)) {
+      return daysIn30DayMonths(adjustedStart, end)
+    }
+    const adjustedEnd = adjustedStart.day < 30 ? {...offsetMonth(end, 1), day: 1} : {...end, day: 30}
+    return daysIn30DayMonths(adjustedStart, adjustedEnd)
+  }
+
+  /**
+   * Returns the days from `start` to `end` counted by the schedule's basis.
+   */
+  private accruedDays(schedule: QuasiCouponSchedule, start: number, end: number): number {
+    return this.dateTimeHelper.dayCountByBasis(start, end, schedule.basis).dayCount
+  }
+
+  /**
+   * Returns the date serial of the coupon date `period` periods after `first_interest` (before it when negative).
+   */
+  private quasiCouponDate(schedule: QuasiCouponSchedule, period: number): number {
+    return this.dateTimeHelper.dateToNumber(this.couponDate(schedule.firstInterest, period, schedule.frequency))
+  }
+
+  /**
+   * Returns true when `date` is the last day of its month.
+   */
+  private isMonthEnd(date: SimpleDate): boolean {
+    return date.day === this.dateTimeHelper.daysInMonth(date.year, date.month)
   }
 }
 
