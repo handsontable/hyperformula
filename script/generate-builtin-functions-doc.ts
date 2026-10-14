@@ -45,9 +45,17 @@ function buildUpdatedFile(): string {
   return spliceBuiltinFunctionsMarkdown(template, generated)
 }
 
+/**
+ * The catalogue's descriptions link API pages by absolute URL on the docs' former home. Those are library strings,
+ * also returned by `getFunctionDetails`, so they change with a release. On this page, one level below the docs root
+ * (`guide/`), they become relative links instead, which follow the docs wherever the build serves them (`base` in
+ * `docs/.vuepress/build.config.js`) and open as in-site navigation.
+ */
+const FORMER_DOCS_ROOT = /https:\/\/hyperformula\.handsontable\.com\/docs\//g
+
 /** Generates the guide page from the template + current catalogue. */
 function main(): void {
-  fs.writeFileSync(DOC_PATH, buildUpdatedFile(), 'utf8')
+  fs.writeFileSync(DOC_PATH, buildUpdatedFile().replace(FORMER_DOCS_ROOT, '../'), 'utf8')
   process.stdout.write('built-in-functions.md generated from template.\n')
 }
 
