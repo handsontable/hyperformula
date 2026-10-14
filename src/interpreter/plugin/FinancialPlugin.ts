@@ -300,6 +300,28 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
       ],
     },
+    'PRICEMAT': {
+      method: 'pricemat',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'YIELDMAT': {
+      method: 'yieldmat',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
     'FVSCHEDULE': {
       method: 'fvschedule',
       parameters: [
@@ -841,6 +863,55 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  /**
+   * Corresponds to PRICEMAT(settlement, maturity, issue, rate, yld, [basis]).
+   *
+   * Returns the price per $100 face value of a security that pays interest at maturity:
+   * `(100 + DIM/B × rate × 100) / (1 + DSM/B × yld) − A/B × rate × 100`, with the day counts of `interestAtMaturity`.
+   * A negative `yld` is #NUM!.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public pricemat(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.interestAtMaturity(ast, state, 'PRICEMAT',
+      (accruedDays: number, issueToMaturityDays: number, settlementToMaturityDays: number, yearDays: number, rate: number, yld: number) => {
+        if (yld < 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+        return (100 + issueToMaturityDays / yearDays * rate * 100) / (1 + settlementToMaturityDays / yearDays * yld)
+          - accruedDays / yearDays * rate * 100
+      }
+    )
+  }
+
+  /**
+   * Corresponds to YIELDMAT(settlement, maturity, issue, rate, pr, [basis]).
+   *
+   * Returns the annual yield of a security that pays interest at maturity: with `T1 = 1 + DIM/B × rate` and
+   * `T2 = pr/100 + A/B × rate`, `(T1 − T2) / T2 × (B / DSM)`, with the day counts of `interestAtMaturity`.
+   * A `pr` of 0 or less is #NUM!. Settlement and maturity 0 days apart under the basis (possible with bases 0 and 4)
+   * is #DIV/0!.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public yieldmat(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.interestAtMaturity(ast, state, 'YIELDMAT',
+      (accruedDays: number, issueToMaturityDays: number, settlementToMaturityDays: number, yearDays: number, rate: number, price: number) => {
+        if (price <= 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+        if (settlementToMaturityDays === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        const valueAtMaturity = 1 + issueToMaturityDays / yearDays * rate
+        const valueAtSettlement = price / 100 + accruedDays / yearDays * rate
+        return (valueAtMaturity - valueAtSettlement) / valueAtSettlement * (yearDays / settlementToMaturityDays)
+      }
+    )
+  }
+
   public fvschedule(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FVSCHEDULE'),
       (value: number, ratios: SimpleRangeValue) => {
@@ -1096,6 +1167,82 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         }
         const {dayCount, yearDays} = this.dateTimeHelper.dayCountByBasis(settlement, maturity, basis)
         return calculate(dayCount, yearDays, firstAmount, secondAmount)
+      }
+    )
+  }
+
+  /**
+   * Runs PRICEMAT and YIELDMAT, which share the arguments (settlement, maturity, issue, rate, amount, [basis]); the
+   * amount is the yield for PRICEMAT and the price for YIELDMAT.
+   *
+   * Validates in Excel's order: basis first, then settlement, maturity, issue, rate and the amount (each: an error is
+   * passed on, an empty argument is #N/A, text or a boolean is #VALUE!, a date out of range is #NUM!), then issue
+   * before settlement before maturity and rate not negative (#NUM!). Passes to `calculate` the days from issue to
+   * settlement (A), from issue to maturity (DIM) and from settlement to maturity (DSM), and the days in the year (B),
+   * all counted under the basis. DSM is `DIM − A`, which under the US 30/360 basis can differ from a count started at
+   * settlement, as in Excel; under the actual/actual basis, B is the year length of the issue-to-settlement span.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   * @param {string} functionName - the function's id, used to look up its metadata
+   * @param {Function} calculate - computes the result from A, DIM, DSM, B, the rate and the amount
+   */
+  private interestAtMaturity(
+    ast: ProcedureAst,
+    state: InterpreterState,
+    functionName: string,
+    calculate: (accruedDays: number, issueToMaturityDays: number, settlementToMaturityDays: number, yearDays: number, rate: number, amount: number) => number | CellError,
+  ): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata(functionName),
+      (settlementArg: InternalScalarValue, maturityArg: InternalScalarValue, issueArg: InternalScalarValue, rateArg: InternalScalarValue, amountArg: InternalScalarValue, basisArg: InternalScalarValue) => {
+        const basis = this.coerceToDayCountBasis(basisArg)
+        if (basis instanceof CellError) {
+          return basis
+        }
+        if (this.isArgumentEmpty(ast, 0)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const settlement = this.coerceToSecurityDate(settlementArg)
+        if (settlement instanceof CellError) {
+          return settlement
+        }
+        if (this.isArgumentEmpty(ast, 1)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const maturity = this.coerceToSecurityDate(maturityArg)
+        if (maturity instanceof CellError) {
+          return maturity
+        }
+        if (this.isArgumentEmpty(ast, 2)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const issue = this.coerceToSecurityDate(issueArg)
+        if (issue instanceof CellError) {
+          return issue
+        }
+        if (this.isArgumentEmpty(ast, 3)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const rate = this.strictNumber(rateArg)
+        if (rate instanceof CellError) {
+          return rate
+        }
+        if (this.isArgumentEmpty(ast, 4)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const amount = this.strictNumber(amountArg)
+        if (amount instanceof CellError) {
+          return amount
+        }
+        if (settlement >= maturity || issue >= settlement) {
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
+        }
+        if (rate < 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+        const {dayCount: accruedDays, yearDays} = this.dateTimeHelper.dayCountByBasis(issue, settlement, basis)
+        const issueToMaturityDays = this.dateTimeHelper.dayCountByBasis(issue, maturity, basis).dayCount
+        return calculate(accruedDays, issueToMaturityDays, issueToMaturityDays - accruedDays, yearDays, rate, amount)
       }
     )
   }

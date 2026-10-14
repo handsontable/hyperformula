@@ -171,6 +171,13 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=PRICEDISC(DATE(2008,2,16), DATE(2008,3,1), 0.0525, 100, 2)', '=PRICEDISC(A1, B1, 0.05, 100)'],
   },
+  PRICEMAT: {
+    category: 'Financial',
+    shortDescription: 'Returns the price per $100 face value of a security that pays interest at maturity.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer; must be later than `issue` and earlier than `maturity`.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer.'}, {name: 'issue', description: 'The issue date, as a date serial number, truncated to an integer.'}, {name: 'rate', description: 'The interest rate at the issue date; must not be negative.'}, {name: 'yld', description: 'The annual yield; must not be negative.'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=PRICEMAT(DATE(2008,2,15), DATE(2008,4,13), DATE(2007,11,11), 0.061, 0.061, 0)', '=PRICEMAT(A1, B1, C1, 0.05, 0.06)'],
+  },
   PV: {
     category: 'Financial',
     shortDescription: 'Returns the present value of an investment.',
@@ -254,5 +261,12 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'pr', description: 'The price per $100 face value; must be greater than 0.'}, {name: 'redemption', description: 'The redemption value per $100 face value; must be greater than 0.'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=YIELDDISC(DATE(2008,2,16), DATE(2008,3,1), 99.795, 100, 2)', '=YIELDDISC(A1, B1, 99, 100)'],
+  },
+  YIELDMAT: {
+    category: 'Financial',
+    shortDescription: 'Returns the annual yield of a security that pays interest at maturity.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer; must be later than `issue` and earlier than `maturity`.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer. If `settlement` and `maturity` are 0 days apart under `basis` (possible with bases 0 and 4), the result is #DIV/0!.'}, {name: 'issue', description: 'The issue date, as a date serial number, truncated to an integer.'}, {name: 'rate', description: 'The interest rate at the issue date; must not be negative.'}, {name: 'pr', description: 'The price per $100 face value; must be greater than 0.'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=YIELDMAT(DATE(2008,3,15), DATE(2008,11,3), DATE(2007,11,8), 0.0625, 100.0123, 0)', '=YIELDMAT(A1, B1, C1, 0.05, 99.5)'],
   },
 }
