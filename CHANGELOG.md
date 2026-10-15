@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added the `TAKE` dynamic-array function. [#1722](https://github.com/handsontable/hyperformula/pull/1722)
 - Added the `DROP` dynamic-array function. [#1796](https://github.com/handsontable/hyperformula/pull/1796)
-- Added the `TOROW` and `TOCOL` dynamic-array functions.
+- Added the `TOROW` and `TOCOL` dynamic-array functions. [#1828](https://github.com/handsontable/hyperformula/pull/1828)
 
 ### Fixed
 
