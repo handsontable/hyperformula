@@ -297,7 +297,7 @@ refreshes the refs.
    `develop`, whose commits from during the freeze are not part of this release.
    Then, unless `hyperformula@<version>` is already on npm, prints the registry
    and the `npm whoami` user and asks you to type the version back (anything
-   else aborts), then publishes and waits up to 60s for the new version to
+   else aborts), then publishes and waits up to 10 minutes for the new version to
    become visible on the registry. A plain `x.y.z` publishes under npm's
    `latest` tag; a version carrying a prerelease suffix (an rc, e.g.
    `3.5.0-rc.1`) publishes under `next` instead, so `npm install hyperformula`

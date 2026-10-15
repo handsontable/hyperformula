@@ -342,9 +342,9 @@ wait_for_npm() { # wait_for_npm <version>
   until on_npm "$version"; do
     # Say that the publish itself succeeded: by this point it has, and a bare
     # "not visible" reads like the publish failed, which would invite a retry.
-    [[ $waited -ge 60 ]] && die "npm publish reported success, but hyperformula@$version is still not visible on npm after ${waited}s - check the registry before retrying."
+    [[ $waited -ge 600 ]] && die "npm publish reported success, but hyperformula@$version is still not visible on npm after ${waited}s - check the registry before retrying."
     sleep 5; waited=$((waited + 5))
-    printf '    waiting for hyperformula@%s on npm (%ss)\n' "$version" "$waited"
+    (( waited % 15 == 0 )) && printf '    waiting for hyperformula@%s on npm (%ss)\n' "$version" "$waited"
   done
 }
 
