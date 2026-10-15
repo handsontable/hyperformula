@@ -1,6 +1,5 @@
 {
   "name": "hyperformula-docs",
-  "version": "3.4.0",
   "private": true,
   "description": "The HyperFormula documentation portal.",
   "license": "GPL-3.0-only",
