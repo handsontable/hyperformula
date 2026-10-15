@@ -111,14 +111,17 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 
 ## What the move still owes
 
-1. **Import `hyperformula-ui`, nested.** The directory is a placeholder. The UI is imported from the formula-builder repository in a separate change, as a whole: its repository moves under `hyperformula-ui/` with its own layout intact (`git filter-repo --to-subdirectory-filter hyperformula-ui`), so its history survives and the relative paths in its shared configuration keep working. Its packages keep the names they have today. The same change has to:
-   - add `hyperformula-ui/packages/*`, `hyperformula-ui/demo/*` and `hyperformula-ui/e2e` to the root `workspaces` array — not before: npm silently ignores an entry with no `package.json`, so listing them early buys nothing, and the lockfile is regenerated when the packages land either way;
-   - convert it from pnpm to npm. The UI adjusts to this repository, not the other way round:
+1. **Import `hyperformula-ui`, nested.** The directory is a placeholder. The UI is imported from the formula-builder repository in a separate change, as a whole: its repository moves under `hyperformula-ui/` with its own layout intact (`git filter-repo --to-subdirectory-filter hyperformula-ui`), so its history survives and the relative paths in its shared configuration keep working. Its packages keep the names they have today.
+
+   **Before the import**, in the formula-builder repository itself, convert it from pnpm to npm. The UI adjusts to this repository, not the other way round, and it arrives already working under npm:
      - `catalog:` specifications become plain version ranges, and `pnpm-workspace.yaml` goes;
      - `workspace:*` specifications, between its own packages and in their `peerDependencies`, become the shared version range, which the release script bumps — npm rejects the `workspace:` protocol outright;
      - `pnpm -r`, `pnpm --filter` and `pnpm exec` in its scripts, its CI workflow and its Playwright `webServer` commands become `npm run --workspace=…`, `--workspaces --if-present` and `npm exec`;
-     - `pnpm-lock.yaml` and the `packageManager` field go; the root `package-lock.json` covers it;
-     - every package that runs `tsc` declares its own `typescript`: npm hoists one version to the root, which is the engine's 4.x, so a package needing 5.x must declare it to get its own copy;
+     - `pnpm-lock.yaml` and the `packageManager` field go, replaced by a `package-lock.json` there. The import drops that lockfile: the root `package-lock.json` covers the UI from then on;
+     - every package that runs `tsc` declares its own `typescript`: npm hoists one version to the root, which is the engine's 4.x, so a package needing 5.x must declare it to get its own copy.
+
+   **The import change itself** then has to:
+   - add `hyperformula-ui/packages/*`, `hyperformula-ui/demo/*` and `hyperformula-ui/e2e` to the root `workspaces` array — not before: npm silently ignores an entry with no `package.json`, so listing them early buys nothing, and the lockfile is regenerated when the packages land either way;
    - give the root ESLint run a boundary at `hyperformula-ui/`, by excluding it or with an override, because the UI brings its own linter and a newer TypeScript;
    - point the root fan-out scripts, which today target `--workspace=hyperformula` only, at the UI's packages too;
    - add an `.nvmrc` saying `22`, an `AGENTS.md` with a `CLAUDE.md` symlink, and `hyperformula-ui/dev-docs/` — but no changelog of its own. Every published UI package versions in step with the engine, so the release script bumps each of their manifests as well as the engine's.
@@ -126,7 +129,7 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 
 ## What the move decided
 
-- **npm workspaces, not pnpm.** A package-manager migration is a risk the move did not need to carry at the same time.
+- **npm workspaces, not pnpm.** A package-manager migration is a risk the move did not need to carry at the same time. The same holds for the UI, which uses pnpm today: it converts to npm in its own repository before it is imported, so this repository runs one package manager.
 - **`docs/` is not a workspace member.** VuePress 1.x and its `--openssl-legacy-provider` dependency tree must never reach an engine install. It installs on its own with `npm run docs:install`, and CI installs it before building the portal.
 - **`hyperformula-ui/` is nested, not flat.** The UI keeps its own layout under one directory, rather than each of its packages getting a top-level directory of its own. The import is then one move with the history intact, the UI's toolchain stays separable from the engine's, and each package's internals still travel with it. The cost: `hyperformula-ui/` is a folder rather than a package, and the root lists its members by glob.
 - **`dev-docs/` at two levels, not one at the root.** One directory at the root was the original plan; it was dropped in favour of splitting by ownership, so that each package's internals travel with the package and `hyperformula-ui` gets its own when it lands. Repository-wide standards stay here, and a fact lives in exactly one level — see [`dev-docs/` at two levels](#dev-docs-at-two-levels).
