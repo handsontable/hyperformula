@@ -113,7 +113,12 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 
 1. **Import `hyperformula-ui`, nested.** The directory is a placeholder. The UI is imported from the formula-builder repository in a separate change, as a whole: its repository moves under `hyperformula-ui/` with its own layout intact (`git filter-repo --to-subdirectory-filter hyperformula-ui`), so its history survives and the relative paths in its shared configuration keep working. Its packages keep the names they have today. The same change has to:
    - add `hyperformula-ui/packages/*`, `hyperformula-ui/demo/*` and `hyperformula-ui/e2e` to the root `workspaces` array — not before: npm silently ignores an entry with no `package.json`, so listing them early buys nothing, and the lockfile is regenerated when the packages land either way;
-   - rewrite its dependency specifications as plain version ranges: it uses pnpm catalogs, and this repository uses npm;
+   - convert it from pnpm to npm. The UI adjusts to this repository, not the other way round:
+     - `catalog:` specifications become plain version ranges, and `pnpm-workspace.yaml` goes;
+     - `workspace:*` specifications, between its own packages and in their `peerDependencies`, become the shared version range, which the release script bumps — npm rejects the `workspace:` protocol outright;
+     - `pnpm -r`, `pnpm --filter` and `pnpm exec` in its scripts, its CI workflow and its Playwright `webServer` commands become `npm run --workspace=…`, `--workspaces --if-present` and `npm exec`;
+     - `pnpm-lock.yaml` and the `packageManager` field go; the root `package-lock.json` covers it;
+     - every package that runs `tsc` declares its own `typescript`: npm hoists one version to the root, which is the engine's 4.x, so a package needing 5.x must declare it to get its own copy;
    - give the root ESLint run a boundary at `hyperformula-ui/`, by excluding it or with an override, because the UI brings its own linter and a newer TypeScript;
    - point the root fan-out scripts, which today target `--workspace=hyperformula` only, at the UI's packages too;
    - add an `.nvmrc` saying `22`, an `AGENTS.md` with a `CLAUDE.md` symlink, and `hyperformula-ui/dev-docs/` — but no changelog of its own. Every published UI package versions in step with the engine, so the release script bumps each of their manifests as well as the engine's.
