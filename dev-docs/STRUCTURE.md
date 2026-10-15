@@ -28,7 +28,12 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 │   ├── package.json  .nvmrc  README.md
 │   └── AGENTS.md  CLAUDE.md
 │
-├── hyperformula-ui/                  # ── package: UI components (not imported yet)
+├── hyperformula-ui/                  # ── a group of packages: UI components (not imported yet; planned layout below)
+│   ├── packages/*/                   # one directory per published package
+│   ├── demo/*/                       # demo applications (private)
+│   ├── e2e/                          # end-to-end suite (private)
+│   ├── dev-docs/                     # the UI's own internals reference
+│   └── AGENTS.md  CLAUDE.md  README.md, and its shared toolchain configuration
 │
 ├── docs/                             # ── the documentation portal (NOT a workspace member)
 │   ├── guide/                        # Markdown guides
@@ -58,6 +63,8 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 
 `workspaces` in the root `package.json` lists `hyperformula`. `npm ci` at the root installs it into a shared `node_modules`. `hyperformula-ui/` is a placeholder and is deliberately not listed yet — see [What the move still owes](#what-the-move-still-owes).
 
+`hyperformula-ui/` will be a folder, not a package. npm does not support a workspace that declares workspaces of its own, so the root lists the UI's members directly: `hyperformula-ui/packages/*`, `hyperformula-ui/demo/*` and `hyperformula-ui/e2e`.
+
 **`docs/` is deliberately outside the workspace.** The portal drags in a large, old dependency tree (VuePress 1.x, `--openssl-legacy-provider`) that must not reach an engine install. It has its own `package.json` and installs separately with `npm run docs:install`.
 
 ## Where a command runs
@@ -84,7 +91,7 @@ This directory holds what applies to the whole repository: the definition of don
 
 [`hyperformula/dev-docs/`](../hyperformula/dev-docs/README.md) holds the engine's internals: architecture, the parser, the interpreter, the dependency graph, the function catalogue, translations, performance, its test suites, and its own build steps.
 
-The split is by ownership. A fact lives in exactly one of them, and `hyperformula-ui` gets its own when it lands.
+The split is by ownership. A fact lives in exactly one of them, and `hyperformula-ui` gets its own, `hyperformula-ui/dev-docs/`, when it lands.
 
 ## Scripts at three levels
 
@@ -104,18 +111,24 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 
 ## What the move still owes
 
-1. **Import `hyperformula-ui`.** The directory is a placeholder; the package is imported from the formula-builder repository in a separate change, preserving its history, and it keeps the scope it publishes under today. Add `hyperformula-ui` to the root `workspaces` array in that same change, not before: npm silently ignores an entry with no `package.json`, so listing it early buys nothing and the lockfile has to be regenerated when the package lands either way. When it arrives it also needs an `.nvmrc` saying `22` and an `AGENTS.md` with a `CLAUDE.md` symlink — but no changelog of its own, and its version moves in step with the engine's. The release script bumps one manifest today; give it the second one in the same change.
+1. **Import `hyperformula-ui`, nested.** The directory is a placeholder. The UI is imported from the formula-builder repository in a separate change, as a whole: its repository moves under `hyperformula-ui/` with its own layout intact (`git filter-repo --to-subdirectory-filter hyperformula-ui`), so its history survives and the relative paths in its shared configuration keep working. Its packages keep the names they have today. The same change has to:
+   - add `hyperformula-ui/packages/*`, `hyperformula-ui/demo/*` and `hyperformula-ui/e2e` to the root `workspaces` array — not before: npm silently ignores an entry with no `package.json`, so listing them early buys nothing, and the lockfile is regenerated when the packages land either way;
+   - rewrite its dependency specifications as plain version ranges: it uses pnpm catalogs, and this repository uses npm;
+   - give the root ESLint run a boundary at `hyperformula-ui/`, by excluding it or with an override, because the UI brings its own linter and a newer TypeScript;
+   - point the root fan-out scripts, which today target `--workspace=hyperformula` only, at the UI's packages too;
+   - add an `.nvmrc` saying `22`, an `AGENTS.md` with a `CLAUDE.md` symlink, and `hyperformula-ui/dev-docs/` — but no changelog of its own. Every published UI package versions in step with the engine, so the release script bumps each of their manifests as well as the engine's.
 2. **Path-filter CI.** Each package's jobs should run only when its own paths change, with full runs on `develop`, `master`, and release branches. Not done here on purpose: a naive `paths:` filter on a workflow that branch protection lists as a required check leaves the check permanently pending, and pull requests become unmergeable. Doing it safely needs the required-checks list, which lives in repository settings rather than in the tree, and the `dorny/paths-filter`-plus-single-gate shape that the Handsontable monorepo uses.
 
 ## What the move decided
 
 - **npm workspaces, not pnpm.** A package-manager migration is a risk the move did not need to carry at the same time.
 - **`docs/` is not a workspace member.** VuePress 1.x and its `--openssl-legacy-provider` dependency tree must never reach an engine install. It installs on its own with `npm run docs:install`, and CI installs it before building the portal.
+- **`hyperformula-ui/` is nested, not flat.** The UI keeps its own layout under one directory, rather than each of its packages getting a top-level directory of its own. The import is then one move with the history intact, the UI's toolchain stays separable from the engine's, and each package's internals still travel with it. The cost: `hyperformula-ui/` is a folder rather than a package, and the root lists its members by glob.
 - **`dev-docs/` at two levels, not one at the root.** One directory at the root was the original plan; it was dropped in favour of splitting by ownership, so that each package's internals travel with the package and `hyperformula-ui` gets its own when it lands. Repository-wide standards stay here, and a fact lives in exactly one level — see [`dev-docs/` at two levels](#dev-docs-at-two-levels).
 - **The packages release together, on one version, from one changelog.** A release cuts every published package at the same version, whether or not each one changed, and `CHANGELOG.md` at the repository root is the single history for all of them. That keeps one number to reason about — the version a user reports a bug against identifies the state of the whole repository — at the cost of publishing a package whose code did not move. Entries name the package they concern where it is not obvious.
 - **The published tarball still carries a changelog and a licence.** `hyperformula`'s `prepack` copies the root `CHANGELOG.md` and `LICENSE.txt` into the package and `postpack` removes them again, so each is one file under version control and npm consumers still get both. The webpack banner reads the root `LICENSE.txt` directly.
 - **Every `.nvmrc` says `22`.**
-- **Linting stays at the root**, run once over the whole repository, so nothing between packages falls through the gap.
+- **Linting stays at the root**, run once over the whole repository, so nothing between packages falls through the gap. The UI, which brings its own linter, is the exception to settle when it is imported — see [What the move still owes](#what-the-move-still-owes).
 - **The private test suite stays branch-matched.** Only its checkout path moved, to `hyperformula/test/hyperformula-tests/`. Its specs needed no change: they import the engine relatively, and the depth from a spec to the package root is unchanged.
 
 ## Two things the move uncovered
