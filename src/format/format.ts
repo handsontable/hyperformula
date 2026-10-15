@@ -318,7 +318,7 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
  * Returning `undefined` instructs the formatter to fall through to the
  * built-in number formatter, preserving HyperFormula's zero-dependency
  * default behavior. Replace this default by setting the
- * [`stringifyCurrency`](../../api/interfaces/configparams.md#stringifycurrency)
+ * [`stringifyCurrency`](/api/interfaces/configparams.md#stringifycurrency)
  * config option.
  *
  * @param _value - the numeric value to format (unused in default).
