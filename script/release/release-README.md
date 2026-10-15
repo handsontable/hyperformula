@@ -316,7 +316,8 @@ they are hard to miss in the output:
 ```
   [ ] Create the GitHub release for <version> (body = the <version> section of CHANGELOG.md):
         https://github.com/handsontable/hyperformula/releases/new?tag=<version>&title=<version>
-  [ ] Check that the docs workflow deployed the documentation to gh-pages
+  [ ] Check that Workers Builds deployed the docs from master (the "Workers Builds:
+      hyperformula-docs" check on the master commit) to https://handsontable.com/docs/hyperformula/
   [ ] Announce the release in #hyperformula and #release
   [ ] Close the GitHub and ClickUp tasks in this release, announcing <version>,
       notify everyone involved in the discussions, and check linked issues
