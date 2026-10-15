@@ -20,12 +20,12 @@ function resolvePageVars(md, page) {
 
 /**
  * Rewrite root-relative Markdown links (`](/guide/…)`, `](/api/…)`) to include
- * the configured `base` (`/docs/`). VuePress rebases these for the HTML site,
- * but the raw `.md` companions do not — so without this an agent resolving them
- * from the site origin lands outside `/docs/` and 404s. Protocol-relative
+ * the configured `base` (`/docs/hyperformula/`). VuePress rebases these for the
+ * HTML site, but the raw `.md` companions do not — so without this an agent
+ * resolving them from the site origin lands outside `/docs/hyperformula/` and 404s. Protocol-relative
  * (`//…`), absolute (`http…`), anchor (`#…`) and relative links are untouched.
  * @param {string} md stripped markdown
- * @param {string} base configured base, e.g. '/docs/'
+ * @param {string} base configured base, e.g. '/docs/hyperformula/'
  * @returns {string}
  */
 function rebaseRootLinks(md, base) {
