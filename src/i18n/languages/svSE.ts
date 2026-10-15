@@ -399,7 +399,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'KONFIDENS.T',
     DEVSQ: 'KVADAVV',
     GEOMEAN: 'GEOMEDEL',
-    GESTEP: 'GESTEP',
+    GESTEP: 'SLSTEG',
     HARMEAN: 'HARMMEDEL',
     CRITBINOM: 'KRITBINOM',
     PEARSON: 'PEARSON',
