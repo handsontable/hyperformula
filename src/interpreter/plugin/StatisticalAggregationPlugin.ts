@@ -3,6 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
@@ -35,8 +36,43 @@ import {
 } from '../doubleDouble'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ * How far the probabilities of PROB may be from summing up to exactly 1; absorbs the rounding of the
+ * binary floating-point sum (0.4 + 0.3 + 0.2 + 0.1 is 0.9999999999999999).
+ */
+const PROBABILITY_SUM_TOLERANCE = 1e-9
+
 export class StatisticalAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<StatisticalAggregationPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
+    'MODE.MULT': {
+      method: 'modemult',
+      sizeOfResultArrayMethod: 'modemultArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.ANY},
+      ],
+      repeatLastArgs: 1,
+      vectorizationForbidden: true,
+    },
+    'FREQUENCY': {
+      method: 'frequency',
+      sizeOfResultArrayMethod: 'frequencyArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+      vectorizationForbidden: true,
+    },
+    'PROB': {
+      method: 'prob',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
+      ],
+    },
     'AVEDEV': {
       method: 'avedev',
       parameters: [
@@ -163,6 +199,157 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
     COVARIANCEP: 'COVARIANCE.P',
     COVARIANCES: 'COVARIANCE.S',
     SKEWP: 'SKEW.P',
+  }
+
+  /**
+   * Corresponds to MODE.MULT(number1, [number2, ...]).
+   *
+   * Returns a column of the most frequent numbers, in order of first occurrence. Only numbers are counted:
+   * text, booleans and empty cells are skipped, an error is propagated. Returns #N/A when no number repeats.
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   */
+  public modemult(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('MODE.MULT'),
+      (...args: RawInterpreterValue[]) => {
+        const values = this.numbersOfArguments(args)
+        if (values instanceof CellError) {
+          return values
+        }
+        const occurrences = new Map<number, number>()
+        values.forEach(value => occurrences.set(value, (occurrences.get(value) ?? 0) + 1))
+        const highestCount = Math.max(...occurrences.values())
+        if (highestCount < 2) {
+          return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+        }
+        const modes = Array.from(occurrences.keys()).filter(value => occurrences.get(value) === highestCount)
+        return SimpleRangeValue.onlyNumbers(modes.map(mode => [mode]))
+      })
+  }
+
+  /**
+   * Predicts the output size of MODE.MULT at parse time. The number of modes depends on the data, so the
+   * upper bound is used: every mode needs at least two occurrences. The actual result is smaller or equal.
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   */
+  public modemultArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 1) {
+      return ArraySize.error()
+    }
+    const argumentState = new InterpreterState(state.formulaAddress, true)
+    const numberOfValues = ast.args
+      .map(arg => this.arraySizeForAst(arg, argumentState))
+      .reduce((sum, size) => sum + size.width * size.height, 0)
+    return new ArraySize(1, Math.max(1, Math.floor(numberOfValues / 2)))
+  }
+
+  /**
+   * Corresponds to FREQUENCY(data_array, bins_array).
+   *
+   * Returns a column with one row per bin plus one. The row of a bin counts the numbers above the next smaller
+   * bin and up to and including that bin, so the intervals follow the ascending order of the bins while each
+   * row stays at the position of its bin in `bins_array`; of equal bins only the first gets the count, the
+   * others 0. The last row counts the numbers above the largest bin. Text, booleans and empty cells are skipped
+   * in both arguments. When `bins_array` holds no number, the result is a single bin below all the data:
+   * 0, then the count of the numbers.
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   */
+  public frequency(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('FREQUENCY'),
+      (dataArray: SimpleRangeValue, binsArray: SimpleRangeValue) => {
+        const data = this.arithmeticHelper.manyToExactNumbers(dataArray.valuesFromTopLeftCorner())
+        if (data instanceof CellError) {
+          return data
+        }
+        const numericBins = this.arithmeticHelper.manyToExactNumbers(binsArray.valuesFromTopLeftCorner())
+        if (numericBins instanceof CellError) {
+          return numericBins
+        }
+        const bins = numericBins.length === 0 ? [-Infinity] : numericBins
+        const binsAscending = bins.map((_, index) => index).sort((a, b) => bins[a] - bins[b] || a - b)
+        const sortedBins = binsAscending.map(index => bins[index])
+        const sortedCounts: number[] = new Array(bins.length + 1).fill(0)
+        data.forEach(value => {
+          const binIndex = sortedBins.findIndex(bin => value <= bin)
+          sortedCounts[binIndex === -1 ? bins.length : binIndex]++
+        })
+        const counts: number[] = new Array(bins.length + 1)
+        binsAscending.forEach((originalIndex, sortedIndex) => {
+          counts[originalIndex] = sortedCounts[sortedIndex]
+        })
+        counts[bins.length] = sortedCounts[bins.length]
+        return SimpleRangeValue.onlyNumbers(counts.map(count => [count]))
+      })
+  }
+
+  /**
+   * Predicts the output size of FREQUENCY at parse time: one row per cell of `bins_array` plus one. The cells
+   * that are not numbers are skipped at runtime, so the actual result may be shorter.
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   */
+  public frequencyArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length !== 2) {
+      return ArraySize.error()
+    }
+    const binsSize = this.arraySizeForAst(ast.args[1], new InterpreterState(state.formulaAddress, true))
+    return new ArraySize(1, binsSize.width * binsSize.height + 1)
+  }
+
+  /**
+   * Corresponds to PROB(x_range, prob_range, lower_limit, [upper_limit]).
+   *
+   * Returns the probability that a value of `x_range` equals `lower_limit`, or lies between `lower_limit`
+   * and `upper_limit` inclusive. Returns #N/A when the ranges differ in size, and #NUM! when a probability
+   * is not in (0, 1] or the probabilities do not sum up to 1. Pairs in which either cell is not a number are skipped.
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   */
+  public prob(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('PROB'),
+      (values: SimpleRangeValue, probabilities: SimpleRangeValue, lowerLimit: number, upperLimit?: number) => {
+        if (values.numberOfElements() !== probabilities.numberOfElements()) {
+          return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
+        }
+        const pairs = parseTwoArrays(values, probabilities)
+        if (pairs instanceof CellError) {
+          return pairs
+        }
+        const [xs, ps] = pairs
+        const probabilitySum = ps.reduce((sum, p) => sum + p, 0)
+        if (ps.some(p => p <= 0 || p > 1) || Math.abs(probabilitySum - 1) > PROBABILITY_SUM_TOLERANCE) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ProbabilityBounds)
+        }
+        const upper = upperLimit ?? lowerLimit
+        return ps.reduce((sum, p, i) => xs[i] >= lowerLimit && xs[i] <= upper ? sum + p : sum, 0)
+      })
+  }
+
+  /**
+   * Collects the numbers of function arguments, each being a scalar or a range: errors are propagated,
+   * everything that is not a number (text, booleans, empty cells) is skipped.
+   *
+   * @param args - evaluated arguments of a function
+   */
+  private numbersOfArguments(args: RawInterpreterValue[]): number[] | CellError {
+    const numbers: number[] = []
+    for (const arg of args) {
+      const found = this.arithmeticHelper.manyToExactNumbers(
+        arg instanceof SimpleRangeValue ? arg.valuesFromTopLeftCorner() : [arg]
+      )
+      if (found instanceof CellError) {
+        return found
+      }
+      numbers.push(...found)
+    }
+    return numbers
   }
 
   public avedev(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
