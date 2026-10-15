@@ -901,7 +901,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
   /**
    * Reads a literal text from an AST node at parse time: a string, or a number converted to text.
    *
-   * @param {Ast} node - The AST node
+   * @param {Ast} argNode - The AST node
    * @returns {Maybe<string>} - The text, or undefined if the node is not such a literal
    */
   private static literalText(argNode: Ast): Maybe<string> {
@@ -946,7 +946,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * Reads literal TEXTSPLIT delimiters from an AST node at parse time.
    * An omitted or empty argument yields no delimiters; an array literal yields all its elements.
    *
-   * @param {Maybe<Ast>} node - The AST node, or undefined if the argument is omitted
+   * @param {Maybe<Ast>} argNode - The AST node, or undefined if the argument is omitted
    * @returns {Maybe<string[]>} - The delimiters, or undefined if the node is not a literal
    */
   private static literalDelimiters(argNode: Maybe<Ast>): Maybe<string[]> {
@@ -966,7 +966,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
   /**
    * Reads a literal number from an AST node at parse time: a number, or TRUE()/FALSE() as 1/0.
    *
-   * @param {Maybe<Ast>} node - The AST node, or undefined if the argument is omitted
+   * @param {Maybe<Ast>} argNode - The AST node, or undefined if the argument is omitted
    * @param {number} defaultValue - The value of an omitted or empty argument
    * @returns {Maybe<number>} - The number, or undefined if the node is not such a literal
    */
