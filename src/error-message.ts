@@ -13,6 +13,7 @@ export class ErrorMessage {
   public static EmptyArray = 'Empty array not allowed.'
   public static ArrayDimensions = 'Array dimensions are not compatible.'
   public static PoolDimensions = 'Range dimensions are not compatible with the window size and the stride.'
+  public static SingularMatrix = 'Matrix is singular.'
   public static NoSpaceForArrayResult = 'No space for array result.'
   public static ValueSmall = 'Value too small.'
   public static ValueLarge = 'Value too large.'

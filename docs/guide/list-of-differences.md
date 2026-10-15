@@ -127,4 +127,5 @@ A few of the rows above share a root cause worth stating once:
 
 - **Rounding toward zero, not down.** `INT` discards the fractional part rather than rounding toward negative infinity, so it differs from Excel and Google Sheets for negative input only. `ROUNDDOWN`/`ROUNDUP` are unaffected — they are defined in terms of zero in all three.
 - **`ISEVEN`/`ISODD` do not truncate.** They test the remainder of the value as given, so a value with a fractional part returns `FALSE` from *both*. Excel and Google Sheets truncate to an integer first, so exactly one of the two is always `TRUE`.
+- **`MDETERM`/`MINVERSE` eliminate exactly.** The determinant is computed without division by pivots, so a singular matrix of integers gives exactly `0` and `MINVERSE` returns `#NUM!`. Excel returns rounding noise for such a matrix (`MDETERM({1,2,3;4,5,6;7,8,9})` is `6.66E-16` there).
 - **`CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1.** Excel and Google Sheets switch the negative-number rounding direction for any non-zero `mode`.
