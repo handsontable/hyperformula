@@ -50,7 +50,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
       method: 'permutationa',
       parameters: [
         {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
-        {argumentType: FunctionArgumentType.NUMBER, minValue: 0}
+        {argumentType: FunctionArgumentType.NUMBER}
       ]
     },
     'GCD': {
@@ -201,6 +201,9 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
   public permutationa(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PERMUTATIONA'),
       (n: number, k: number) => {
+        if (k <= -1) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
         const ret = Math.pow(Math.trunc(n), Math.trunc(k))
         return Number.isFinite(ret) ? ret : new CellError(ErrorType.NUM, ErrorMessage.NaN)
       }
