@@ -118,7 +118,9 @@ module.exports = (options, ctx) => ({
         await fs.promises.mkdir(path.dirname(outFile), { recursive: true });
         await fs.promises.writeFile(outFile, clean, 'utf8');
 
-        const url = hostname + base.replace(/\/$/, '') + page.path.replace(/\.html$/, '');
+        // Keep `.html`: the Worker treats a last segment containing a dot as a file name, so the
+        // extensionless URL of a page such as `guide/migration-from-2.x-to-3.0` would answer 404.
+        const url = hostname + base.replace(/\/$/, '') + page.path;
         // The per-page `.md` keeps relative links (resolve within the companion
         // tree); the aggregated corpus needs absolute links (single-file URL).
         corpus.push('---', '', `## ${page.title || page.path}`, '', `URL: ${url}`, '', absolutizeLinks(clean, url), '');
