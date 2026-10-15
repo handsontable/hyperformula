@@ -602,7 +602,9 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
           if (numbers instanceof CellError) {
             return numbers
           }
-          values.push(...numbers)
+          for (const number of numbers) {
+            values.push(number)
+          }
         }
         const occurrences = new Map<number, number>()
         values.forEach(value => occurrences.set(value, (occurrences.get(value) ?? 0) + 1))
