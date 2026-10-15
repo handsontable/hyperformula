@@ -9,7 +9,7 @@ The engine's own build — the intermediate `lib/`, the bundles, and packaging �
 Node version is pinned in [`.nvmrc`](../.nvmrc) — 22, the same in every package. The repository uses npm workspaces with a committed `package-lock.json`, so install with `npm ci`, not `npm install`.
 
 ```bash
-npm ci              # the workspace: hyperformula, hyperformula-ui
+npm ci              # the workspace: hyperformula
 npm run docs:install # the portal, which is not a workspace member
 ```
 

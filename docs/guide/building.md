@@ -13,7 +13,7 @@ tags:
 
 The build process uses Webpack and Babel, as well as npm tasks
 listed in package.json. During this process, the source located in
-the `src/*` directory is transformed into the output files.
+the `hyperformula/src/*` directory is transformed into the output files.
 
 The library is developed in TypeScript and the exact configuration options can
 be found in `hyperformula/tsconfig.json`.
@@ -26,11 +26,14 @@ npm ci               # the engine and its toolchain
 npm run docs:install # the documentation portal, only if you are building the docs
 ```
 
-The commands below are the engine's own scripts. Run them from the repository
-root, where each is forwarded to the package, or from `hyperformula/` directly.
-Only `bundle-all` and the `test:*`, `verify:*` and `docs:*` entry points are
-forwarded from the root; for anything else, add `--workspace=hyperformula` or
-work inside `hyperformula/`.
+The commands below are the engine's own scripts. Run them inside `hyperformula/`,
+or from the repository root with `--workspace=hyperformula`. The root also
+forwards the common ones under the same name, so these work there directly:
+`build`, `bundle-all`, `compile`, `clean`, the `test:*` scripts except
+`test:logMemory` and `test:browser.debug`, `verify-bundles`,
+`verify:publish-package`, `verify:typings` and `typedoc:build-api`. The
+individual `bundle:*` and `verify:*` steps and the benchmarks are not forwarded.
+`lint` is a root script: it runs once over the whole repository.
 
 ## Output formats
 
@@ -74,9 +77,9 @@ We use the Node 22 LTS in the build-chain and recommend this version for buildin
 
 ## Verify the build
 
-`npm run verify-bundles` is forwarded from the repository root; the individual
-checks are package scripts, so run them with `--workspace=hyperformula` or from
-inside `hyperformula/`:
+`verify-bundles`, `verify:publish-package` and `verify:typings` are forwarded
+from the repository root. The individual bundle checks are package scripts, so
+run them with `--workspace=hyperformula` or from inside `hyperformula/`:
 
 * `verify-bundles` - runs all verify commands
 * `verify:umd` - verifies UMD version

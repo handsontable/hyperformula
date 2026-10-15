@@ -11,11 +11,13 @@ hyperformula/src/interpreter/plugin/3rdparty
 *.config.js
 hyperformula/.config/
 hyperformula/karma.*
-doc
 hyperformula/test/_setupFiles/*.js
 
-# Scripts, not linted
-script
+# Scripts, not linted. Anchored, like every other entry: a bare `script` would
+# match a directory of that name at any depth, the trap described below.
+/script
+hyperformula/script
+docs/script
 
 # The source language packs, deliberately, and only for now.
 #
@@ -40,6 +42,6 @@ hyperformula/test-jasmine
 hyperformula/test-jest
 hyperformula/typings
 docs/.vuepress/dist
-doc
-typedoc
+hyperformula/doc
+hyperformula/typedoc
 

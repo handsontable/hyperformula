@@ -4,11 +4,11 @@
 
 This repository holds the engine and everything built around it.
 
-| Directory | What it is | Published |
+| Directory | What it is | Published as |
 |---|---|---|
-| [`hyperformula/`](hyperformula/) | The calculation engine. **Start here** — its [README](hyperformula/README.md) is the product documentation. | yes |
-| [`hyperformula-ui/`](hyperformula-ui/) | UI components for working with HyperFormula. Not imported yet. | yes |
-| [`docs/`](docs/) | The documentation portal. Installed separately; not a workspace member. | no |
+| [`hyperformula/`](hyperformula/) | The calculation engine. **Start here** — its [README](hyperformula/README.md) is the product documentation. | The [`hyperformula`](https://www.npmjs.com/package/hyperformula) package on npm: ES modules, CommonJS, UMD bundles for the browser (also served by the jsDelivr and unpkg CDNs), and TypeScript typings |
+| [`hyperformula-ui/`](hyperformula-ui/) | UI components for working with HyperFormula. Not imported yet. | Not yet — nothing is published from this directory until the package is imported |
+| [`docs/`](docs/) | The documentation portal. Installed separately; not a workspace member. | Not a package. Built and deployed as the documentation site at [hyperformula.handsontable.com/docs](https://hyperformula.handsontable.com/docs/) |
 
 The published packages release together, on one version, and share the single [`CHANGELOG.md`](CHANGELOG.md) at the root.
 

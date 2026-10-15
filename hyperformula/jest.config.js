@@ -4,6 +4,8 @@
 module.exports = {
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   collectCoverageFrom: [
+    // `*.ts`, not `**`: src/ also holds AGENTS.md files and their CLAUDE.md symlinks
+    // for coding agents, and the babel coverage provider would try to instrument them.
     'src/**/*.ts',
     '!**/node_modules/**',
   ],
