@@ -24,6 +24,7 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 │   ├── .config/                      # webpack, karma, and babel config factories
 │   ├── tsconfig.json  jest.config.js  karma.conf.js  webpack.config.js
 │   ├── babel.config.js  ht.config.js  jasmine.json  .npmignore
+│   ├── .eslintrc.js  .eslintignore   # its own lint configuration
 │   ├── .typedoc.ts  .typedoc.md.ts   # API reference generation, output into docs/api
 │   ├── package.json  .nvmrc  README.md
 │   └── AGENTS.md  CLAUDE.md
@@ -44,6 +45,7 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 │   ├── worker/index.js               # Cloudflare Worker serving the built portal
 │   ├── wrangler.jsonc                # Its deploy configuration
 │   ├── package.json  .nvmrc
+│   ├── .eslintrc.js  .eslintignore   # its own lint configuration
 │   └── AGENTS.md  CLAUDE.md  README.md
 │
 ├── script/                           # Repository-wide only: the release procedure and the licence gate
@@ -51,7 +53,6 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 ├── .ai/                              # One sentence pointing at dev-docs/, for agents that look here
 ├── .claude/                          # Claude Code settings and skills
 ├── .github/                          # CI workflows, issue and PR templates
-├── .eslintrc.js  .eslintignore       # Linting, run once from the root over everything
 ├── package.json                      # Private workspace root: fan-out scripts only
 ├── package-lock.json  .nvmrc  .worktreeinclude
 ├── AGENTS.md  CLAUDE.md  README.md  CONTRIBUTING.md  LICENSE.txt
@@ -71,7 +72,8 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 
 | Command | Runs in |
 |---|---|
-| `npm run lint` | The root, over the whole repository |
+| `npm run lint` | Fanned out to every workspace that defines `lint`; each lints itself with its own configuration |
+| `npm run docs:lint` | The portal, with its own configuration — separate, because the portal installs separately |
 | `npm run test:jest`, `bundle-all`, `compile` | Fanned out to `hyperformula` |
 | `npm run docs:*` | Orchestrated from the root across both `hyperformula` and `docs` |
 
@@ -122,7 +124,7 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 
    **The import change itself** then has to:
    - add `hyperformula-ui/packages/*`, `hyperformula-ui/demo/*` and `hyperformula-ui/e2e` to the root `workspaces` array — not before: npm silently ignores an entry with no `package.json`, so listing them early buys nothing, and the lockfile is regenerated when the packages land either way;
-   - give the root ESLint run a boundary at `hyperformula-ui/`, by excluding it or with an override, because the UI brings its own linter and a newer TypeScript;
+   - give each UI package a `lint` script running its own linter, so the root `npm run lint` picks it up;
    - point the root fan-out scripts, which today target `--workspace=hyperformula` only, at the UI's packages too;
    - add an `.nvmrc` saying `22`, an `AGENTS.md` with a `CLAUDE.md` symlink, and `hyperformula-ui/dev-docs/` — but no changelog of its own. Every published UI package versions in step with the engine, so the release script bumps each of their manifests as well as the engine's.
 2. **Path-filter CI.** Each package's jobs should run only when its own paths change, with full runs on `develop`, `master`, and release branches. Not done here on purpose: a naive `paths:` filter on a workflow that branch protection lists as a required check leaves the check permanently pending, and pull requests become unmergeable. Doing it safely needs the required-checks list, which lives in repository settings rather than in the tree, and the `dorny/paths-filter`-plus-single-gate shape that the Handsontable monorepo uses.
@@ -136,12 +138,12 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 - **The packages release together, on one version, from one changelog.** A release cuts every published package at the same version, whether or not each one changed, and `CHANGELOG.md` at the repository root is the single history for all of them. That keeps one number to reason about — the version a user reports a bug against identifies the state of the whole repository — at the cost of publishing a package whose code did not move. Entries name the package they concern where it is not obvious.
 - **The published tarball still carries a changelog and a licence.** `hyperformula`'s `prepack` copies the root `CHANGELOG.md` and `LICENSE.txt` into the package and `postpack` removes them again, so each is one file under version control and npm consumers still get both. The webpack banner reads the root `LICENSE.txt` directly.
 - **Every `.nvmrc` says `22`.**
-- **Linting stays at the root**, run once over the whole repository, so nothing between packages falls through the gap. The UI, which brings its own linter, is the exception to settle when it is imported — see [What the move still owes](#what-the-move-still-owes).
+- **Each directory lints itself.** `hyperformula/` and `docs/` each carry their own `.eslintrc.js` and `.eslintignore`, and each package declares the lint tooling it uses. The root `npm run lint` only fans out with `--workspaces --if-present`, so a package with a different linter or TypeScript version — the UI — brings its own, and the engine's rules, licence header included, never reach it. `docs/` is not a workspace, so its lint is `npm run docs:lint`, run by the documentation CI job, which installs the portal anyway.
 - **The private test suite stays branch-matched.** Only its checkout path moved, to `hyperformula/test/hyperformula-tests/`. Its specs needed no change: they import the engine relatively, and the depth from a spec to the package root is unchanged.
 
 ## Two things the move uncovered
 
 Both were pre-existing, and both are recorded here because the next person will otherwise rediscover them the hard way.
 
-- **The source language packs were never linted.** The old ignore list carried a bare `languages` entry meant for the build output. An unanchored pattern matches a directory of that name at any depth, so it also excluded `src/i18n/languages/`, and the `sort-keys` override targeting those files never ran. Anchoring the build-output entry exposed 881 violations. They are excluded again, deliberately and with a comment, in [`.eslintignore`](../.eslintignore); sorting 19 translation files is a change of its own.
+- **The source language packs were never linted.** The old ignore list carried a bare `languages` entry meant for the build output. An unanchored pattern matches a directory of that name at any depth, so it also excluded `src/i18n/languages/`, and the `sort-keys` override targeting those files never ran. Anchoring the build-output entry exposed 881 violations. They are excluded again, deliberately and with a comment, in [`hyperformula/.eslintignore`](../hyperformula/.eslintignore); sorting 19 translation files is a change of its own.
 - **`@vuepress/shared-utils` only works inside a full VuePress dependency tree.** It requires `markdown-it-emoji` and a `lru-cache` major it does not declare, and relied on `vuepress` hoisting them. That is why the built-in-functions generator moved into `docs/script/`, where that tree exists, rather than staying beside the engine build scripts.

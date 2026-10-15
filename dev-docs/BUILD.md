@@ -13,7 +13,7 @@ npm ci              # the workspace: hyperformula
 npm run docs:install # the portal, which is not a workspace member
 ```
 
-Root scripts fan out to the packages. `npm run lint` is the exception: it runs once, from the root, over the whole repository. To run a package's own scripts, work from its directory or pass `--workspace=hyperformula`.
+Root scripts fan out to the packages. `npm run lint` fans out to every workspace that defines it, each with its own configuration; the portal, which installs separately, is linted with `npm run docs:lint`. To run a package's own scripts, work from its directory or pass `--workspace=hyperformula`.
 
 ## Generated documentation
 

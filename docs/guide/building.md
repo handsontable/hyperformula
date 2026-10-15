@@ -33,7 +33,7 @@ forwards the common ones under the same name, so these work there directly:
 `test:logMemory` and `test:browser.debug`, `verify-bundles`,
 `verify:publish-package`, `verify:typings` and `typedoc:build-api`. The
 individual `bundle:*` and `verify:*` steps and the benchmarks are not forwarded.
-`lint` is a root script: it runs once over the whole repository.
+`lint` and `lint:fix` run in every package, each with its own configuration.
 
 ## Output formats
 

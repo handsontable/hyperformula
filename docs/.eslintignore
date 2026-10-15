@@ -1,0 +1,7 @@
+# Anchored to this directory: an unanchored pattern matches a directory of that
+# name at any depth.
+node_modules
+# Formatted by code-examples-generator.sh with examples/eslintrc.examples.js.
+/examples/
+# Build scripts, not linted.
+/script/
