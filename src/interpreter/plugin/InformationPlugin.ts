@@ -238,7 +238,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     }
     const value = this.evaluateAst(ast.args[0], state)
     if (value instanceof SimpleRangeValue) {
-      return value.numberOfElements() === 1 ? valueTypeCode(value.data[0][0]) : TYPE_CODE_ARRAY
+      return TYPE_CODE_ARRAY
     }
     return valueTypeCode(value)
   }
@@ -268,11 +268,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       return true
     }
     if (arg.type === AstNodeType.CELL_RANGE) {
-      try {
-        return AbsoluteCellRange.fromAst(arg, state.formulaAddress).size() > 1
-      } catch (e) {
-        return false
-      }
+      return AbsoluteCellRange.fromAst(arg, state.formulaAddress).size() > 1
     }
     return false
   }
