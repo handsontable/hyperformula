@@ -10,13 +10,14 @@ import {ErrorMessage} from '../../error-message'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {BooleanPlugin} from './BooleanPlugin'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
- * Classifies a TAKE or DROP count expression whose value may be known before evaluation.
+ * Classifies a TAKE or DROP count, or a TOROW or TOCOL `ignore` value, whose
+ * value may be known before evaluation.
  *
  * @internal
  */
@@ -33,10 +34,27 @@ type LiteralCount =
  */
 type TakeLiteralDimension = LiteralCount | {kind: 'unbounded'}
 
+/**
+ * The functions that flatten an array into a single row or column.
+ *
+ * @internal
+ */
+type FlattenFunction = 'TOROW' | 'TOCOL'
+
+/** TOROW and TOCOL `ignore` value that keeps every element. */
+const IGNORE_NOTHING = 0
+/** TOROW and TOCOL `ignore` value that skips blank cells. */
+const IGNORE_BLANKS = 1
+/** TOROW and TOCOL `ignore` value that skips errors. */
+const IGNORE_ERRORS = 2
+/** TOROW and TOCOL `ignore` value that skips blank cells and errors. */
+const IGNORE_BLANKS_AND_ERRORS = 3
+
 export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ArrayPlugin> {
   /**
-   * Evaluates the dependency-free subset of TAKE and DROP count expressions
-   * used for static result-size prediction.
+   * Evaluates the dependency-free subset of TAKE and DROP count expressions,
+   * and of TOROW and TOCOL `ignore` expressions, used for static result-size
+   * prediction.
    *
    * @param {Ast | undefined} argument - The count expression to inspect before evaluation.
    * @returns {LiteralCount} The constant value, an invalid-literal marker, or an unresolved marker.
@@ -150,9 +168,9 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 
   /**
-   * Resolves a direct TAKE or DROP source reference without evaluating its values.
-   * The range supplies materialized dimensions only; spill placement never
-   * depends on its sheet.
+   * Resolves a direct TAKE, DROP, TOROW or TOCOL source reference without
+   * evaluating its values. The range supplies materialized dimensions, and for
+   * TOROW and TOCOL also its sheet.
    *
    * @param {Ast} argument - The source expression to inspect.
    * @param {InterpreterState} state - The formula state used to resolve relative addresses.
@@ -215,9 +233,9 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 
   /**
-   * Measures a TAKE or DROP source whose predicted size is unbounded. A direct
-   * whole-column or whole-row reference is measured by its effective size; a
-   * computed array falls back to the configured sheet limits.
+   * Measures a TAKE, DROP, TOROW or TOCOL source whose predicted size is
+   * unbounded. A direct whole-column or whole-row reference is measured by its
+   * effective size; a computed array falls back to the configured sheet limits.
    *
    * @param {Ast} argument - The source expression to measure.
    * @param {InterpreterState} state - The formula state used to resolve relative addresses.
@@ -309,6 +327,28 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
         {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
+      ],
+      vectorizationForbidden: true,
+    },
+    'TOROW': {
+      method: 'torow',
+      sizeOfResultArrayMethod: 'torowArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: IGNORE_NOTHING, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: false, emptyAsDefault: true},
+      ],
+      vectorizationForbidden: true,
+    },
+    'TOCOL': {
+      method: 'tocol',
+      sizeOfResultArrayMethod: 'tocolArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: IGNORE_NOTHING, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: false, emptyAsDefault: true},
       ],
       vectorizationForbidden: true,
     },
@@ -606,6 +646,265 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     }
 
     return new ArraySize(effectiveWidth, effectiveHeight)
+  }
+
+  /**
+   * Corresponds to TOROW(array, [ignore], [scan_by_column]).
+   *
+   * Returns the elements of the source array in a single row. See `flatten`
+   * for the arguments and errors.
+   *
+   * @param {ProcedureAst} ast - The parsed TOROW call.
+   * @param {InterpreterState} state - The current formula evaluation state.
+   * @returns {InterpreterValue} A one-row array or a spreadsheet error.
+   */
+  public torow(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.flatten(ast, state, 'TOROW')
+  }
+
+  /**
+   * Corresponds to TOCOL(array, [ignore], [scan_by_column]).
+   *
+   * Returns the elements of the source array in a single column. See
+   * `flatten` for the arguments and errors.
+   *
+   * @param {ProcedureAst} ast - The parsed TOCOL call.
+   * @param {InterpreterState} state - The current formula evaluation state.
+   * @returns {InterpreterValue} A one-column array or a spreadsheet error.
+   */
+  public tocol(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.flatten(ast, state, 'TOCOL')
+  }
+
+  /**
+   * Calculates the spilled array size of TOROW. See `flattenArraySize`.
+   *
+   * @param {ProcedureAst} ast - The parsed TOROW call.
+   * @param {InterpreterState} state - The formula state whose address anchors the spill.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  public torowArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    return this.flattenArraySize(ast, state, 'TOROW')
+  }
+
+  /**
+   * Calculates the spilled array size of TOCOL. See `flattenArraySize`.
+   *
+   * @param {ProcedureAst} ast - The parsed TOCOL call.
+   * @param {InterpreterState} state - The formula state whose address anchors the spill.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  public tocolArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    return this.flattenArraySize(ast, state, 'TOCOL')
+  }
+
+  /**
+   * Flattens the source array into a single row (TOROW) or column (TOCOL).
+   *
+   * The source is read row by row, or column by column when `scan_by_column`
+   * is true. `ignore` selects the elements left out: 0 keeps every element,
+   * 1 skips blank cells, 2 skips errors, 3 skips both; it is truncated toward
+   * zero. Empty text is not blank and is kept. An empty `array` argument and
+   * an `ignore` value outside 0 to 3 return #VALUE!, and a result with no
+   * elements returns #N/A.
+   *
+   * `ignore` and `scan_by_column` are coerced here rather than by the
+   * argument metadata: both reject empty text with #VALUE!, and an error in
+   * `scan_by_column` must not take precedence over an invalid `ignore`.
+   *
+   * @param {ProcedureAst} ast - The parsed TOROW or TOCOL call.
+   * @param {InterpreterState} state - The current formula evaluation state.
+   * @param {FlattenFunction} functionName - The function whose metadata and orientation apply.
+   * @returns {InterpreterValue} The flattened elements or a spreadsheet error.
+   */
+  private flatten(ast: ProcedureAst, state: InterpreterState, functionName: FlattenFunction): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata(functionName),
+      (source: SimpleRangeValue, ignoreArgument: InternalScalarValue, scanByColumnArgument: InternalScalarValue) => {
+        if (ast.args[0].type === AstNodeType.EMPTY) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.EmptyArg)
+        }
+
+        const ignore = this.coerceFlattenIgnore(ignoreArgument)
+        if (ignore instanceof CellError) {
+          return ignore
+        }
+
+        const scanByColumn = this.coerceFlattenScanByColumn(scanByColumnArgument)
+        if (scanByColumn instanceof CellError) {
+          return scanByColumn
+        }
+
+        if (ignore < IGNORE_NOTHING) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.ValueSmall)
+        }
+        if (ignore > IGNORE_BLANKS_AND_ERRORS) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
+        }
+
+        const elements = this.collectFlattenElements(source, ignore, scanByColumn)
+        if (elements.length === 0) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArray)
+        }
+
+        return SimpleRangeValue.onlyValues(functionName === 'TOCOL' ? elements.map(element => [element]) : [elements])
+      }
+    )
+  }
+
+  /**
+   * Coerces the TOROW or TOCOL `ignore` argument to a number truncated
+   * toward zero. Numeric text, logical values and blank cells convert as for
+   * any number; empty text returns #VALUE!.
+   *
+   * @param {InternalScalarValue} value - The `ignore` argument.
+   * @returns {number | CellError} The truncated number or an error.
+   */
+  private coerceFlattenIgnore(value: InternalScalarValue): number | CellError {
+    if (value === '') {
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+    }
+
+    const coerced = this.arithmeticHelper.coerceScalarToNumberOrError(value)
+    return coerced instanceof CellError ? coerced : Math.trunc(getRawValue(coerced))
+  }
+
+  /**
+   * Coerces the TOROW or TOCOL `scan_by_column` argument to a logical value.
+   * Numbers, blank cells and the texts "TRUE" and "FALSE" convert as for any
+   * logical value; empty and other text return #VALUE!.
+   *
+   * @param {InternalScalarValue} value - The `scan_by_column` argument.
+   * @returns {boolean | CellError} The logical value or an error.
+   */
+  private coerceFlattenScanByColumn(value: InternalScalarValue): boolean | CellError {
+    const coerced = value === '' ? undefined : coerceScalarToBoolean(value)
+    return coerced ?? new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+  }
+
+  /**
+   * Reads the source elements in scan order, leaving out the blank cells and
+   * errors that `ignore` selects. Runs in time proportional to the number of
+   * source elements.
+   *
+   * @param {SimpleRangeValue} source - The evaluated source array.
+   * @param {number} ignore - The `ignore` value, from 0 to 3.
+   * @param {boolean} scanByColumn - Whether to read column by column instead of row by row.
+   * @returns {InternalScalarValue[]} The kept elements in scan order.
+   */
+  private collectFlattenElements(source: SimpleRangeValue, ignore: number, scanByColumn: boolean): InternalScalarValue[] {
+    const ignoreBlanks = ignore === IGNORE_BLANKS || ignore === IGNORE_BLANKS_AND_ERRORS
+    const ignoreErrors = ignore === IGNORE_ERRORS || ignore === IGNORE_BLANKS_AND_ERRORS
+    const data = source.data
+    const lineCount = scanByColumn ? source.width() : source.height()
+    const lineLength = scanByColumn ? source.height() : source.width()
+    const elements: InternalScalarValue[] = []
+
+    for (let line = 0; line < lineCount; line++) {
+      for (let position = 0; position < lineLength; position++) {
+        const value = scanByColumn ? data[position][line] : data[line][position]
+        const isIgnored = (ignoreBlanks && value === EmptyValue) || (ignoreErrors && value instanceof CellError)
+        if (!isIgnored) {
+          elements.push(value)
+        }
+      }
+    }
+
+    return elements
+  }
+
+  /**
+   * Classifies a TOROW or TOCOL `ignore` expression for result-size
+   * prediction. An omitted or empty `ignore` keeps every element; a literal
+   * outside 0 to 3 after truncation is invalid.
+   *
+   * @param {Ast | undefined} argument - The `ignore` expression.
+   * @returns {LiteralCount} The truncated value, an invalid-literal marker, or an unresolved marker.
+   * @internal
+   */
+  private parseFlattenLiteralIgnore(argument: Ast | undefined): LiteralCount {
+    if (argument === undefined || argument.type === AstNodeType.EMPTY) {
+      return {kind: 'value', value: IGNORE_NOTHING}
+    }
+
+    const literal = this.parseLiteralCount(argument)
+    if (literal.kind !== 'value') {
+      return literal
+    }
+
+    const value = Math.trunc(literal.value)
+    return value < IGNORE_NOTHING || value > IGNORE_BLANKS_AND_ERRORS ? {kind: 'invalid'} : {kind: 'value', value}
+  }
+
+  /**
+   * Calculates the spilled array size of TOROW or TOCOL: one row or column
+   * holding every source element. That is exact when `ignore` is 0 and the
+   * upper bound otherwise, because `ignore` can only remove elements; the
+   * cells a shorter result leaves unused stay blank. An invalid literal
+   * `ignore` is reported as an invalid size, so the formula evaluates to its
+   * #VALUE! error instead of reserving space. So is a source with no
+   * elements, such as a whole column of an empty sheet, because an array
+   * result cannot be reserved with no cells.
+   *
+   * A whole-column source of TOCOL (a whole-row source of TOROW) runs along
+   * the result and is measured by its effective size. While blank cells may
+   * be kept, such a result reaches the sheet edge, so it fits only in the
+   * first row (column) and only from a single source column (row). Elsewhere
+   * the dimension stays unbounded, which makes array-space validation report a
+   * spill error. A formula below the first row would otherwise make its own
+   * source taller when it spills, and a wider source would not fit the result.
+   * The same rule applies whatever `ignore` is when the source is on the
+   * formula's own sheet: a reservation longer than that sheet makes it grow,
+   * and every new prediction would then reserve more. A computed source, such
+   * as `A:A+0`, has no sheet to check and is measured by the configured sheet
+   * limits, so it follows the same rule.
+   *
+   * @param {ProcedureAst} ast - The parsed TOROW or TOCOL call.
+   * @param {InterpreterState} state - The formula state whose address anchors the spill.
+   * @param {FlattenFunction} functionName - The function whose metadata and orientation apply.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  private flattenArraySize(ast: ProcedureAst, state: InterpreterState, functionName: FlattenFunction): ArraySize {
+    if (ast.args.length < 1 || ast.args.length > 3) {
+      return ArraySize.error()
+    }
+
+    const ignore = this.parseFlattenLiteralIgnore(ast.args[1])
+    if (ignore.kind === 'invalid') {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata(functionName)
+    const sourceSize = this.arraySizeForAst(
+      ast.args[0],
+      new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
+    )
+    const effectiveSourceSize = this.effectiveSourceSize(ast.args[0], state)
+    const height = Number.isFinite(sourceSize.height) ? sourceSize.height : effectiveSourceSize.height
+    const width = Number.isFinite(sourceSize.width) ? sourceSize.width : effectiveSourceSize.width
+    const toColumn = functionName === 'TOCOL'
+
+    const mayKeepBlanks = ignore.kind === 'unresolved' || ignore.value === IGNORE_NOTHING || ignore.value === IGNORE_ERRORS
+    const sourceRange = this.directSourceRange(ast.args[0], state)
+    const isComputedOrOnFormulaSheet = sourceRange === undefined || sourceRange.sheet === state.formulaAddress.sheet
+    const isUnboundedAlongResult = !Number.isFinite(toColumn ? sourceSize.height : sourceSize.width)
+    if ((mayKeepBlanks || isComputedOrOnFormulaSheet) && isUnboundedAlongResult) {
+      const sourceLinesAcross = toColumn ? width : height
+      const anchor = toColumn ? state.formulaAddress.row : state.formulaAddress.col
+
+      if (sourceLinesAcross > 1) {
+        return new ArraySize(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY)
+      }
+      if (anchor !== 0) {
+        return toColumn ? new ArraySize(1, Number.POSITIVE_INFINITY) : new ArraySize(Number.POSITIVE_INFINITY, 1)
+      }
+    }
+
+    const length = height * width
+    if (length < 1) {
+      return ArraySize.error()
+    }
+
+    return toColumn ? new ArraySize(1, length) : new ArraySize(length, 1)
   }
 
   /**

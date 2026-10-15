@@ -135,6 +135,20 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=TAKE(A1:C5, 2)', '=TAKE(A1:C5, -2, -1)', '=TAKE(A1:C5, , 2)'],
   },
+  TOCOL: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns the elements of an array in a single column.',
+    parameters: [{name: 'array', description: 'The array or range to return as a column.'}, {name: 'ignore', description: 'Which elements to leave out: 0 (default) keeps every element, 1 skips blank cells, 2 skips errors, 3 skips blank cells and errors. Truncated to an integer; any other value returns #VALUE!. When elements are skipped, the result still takes one cell per element of array, and the unused cells at its end stay blank.'}, {name: 'scan_by_column', description: 'FALSE (default) reads array row by row, TRUE reads it column by column.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TOCOL(A1:C3)', '=TOCOL(A1:C3, 1)', '=TOCOL(A1:C3, 0, TRUE())'],
+  },
+  TOROW: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns the elements of an array in a single row.',
+    parameters: [{name: 'array', description: 'The array or range to return as a row.'}, {name: 'ignore', description: 'Which elements to leave out: 0 (default) keeps every element, 1 skips blank cells, 2 skips errors, 3 skips blank cells and errors. Truncated to an integer; any other value returns #VALUE!. When elements are skipped, the result still takes one cell per element of array, and the unused cells at its end stay blank.'}, {name: 'scan_by_column', description: 'FALSE (default) reads array row by row, TRUE reads it column by column.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TOROW(A1:C3)', '=TOROW(A1:C3, 1)', '=TOROW(A1:C3, 0, TRUE())'],
+  },
   TRANSPOSE: {
     category: 'Lookup and reference',
     shortDescription: 'Transposes the rows and columns of an array.',
