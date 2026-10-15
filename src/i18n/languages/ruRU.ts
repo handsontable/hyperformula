@@ -284,7 +284,7 @@ const dictionary: RawTranslationPackage = {
     FACTDOUBLE: 'ДВФАКТР',
     COMBIN: 'ЧИСЛКОМБ',
     COMBINA: 'ЧИСЛКОМБА',
-    PERMUT: 'PERMUT',
+    PERMUT: 'ПЕРЕСТ',
     PERMUTATIONA: 'PERMUTATIONA',
     GCD: 'НОД',
     LCM: 'НОК',

@@ -316,7 +316,7 @@ const dictionary: RawTranslationPackage = {
     BETAINV: 'BETAINV',
     'BINOM.DIST': 'BINOM.FÖRD',
     BINOMDIST: 'BINOMFÖRD',
-    'BINOM.DIST.RANGE': 'BINOM.DIST.RANGE',
+    'BINOM.DIST.RANGE': 'BINOM.FÖRD.INTERVALL',
     'BINOM.INV': 'BINOM.INV',
     BESSELI: 'BESSELI',
     BESSELJ: 'BESSELJ',
