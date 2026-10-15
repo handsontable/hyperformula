@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added the `PERCENTRANK.INC` (with its `PERCENTRANK` alias), `MODE.MULT`, `FREQUENCY` and `PROB` statistical functions.
+- Added the `PERCENTRANK.INC` (with its `PERCENTRANK` alias), `MODE.MULT`, `FREQUENCY` and `PROB` statistical functions. [#1818](https://github.com/handsontable/hyperformula/pull/1818)
 
 ### Fixed
 
