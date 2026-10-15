@@ -390,7 +390,7 @@ const dictionary: RawTranslationPackage = {
     PERCENTILE: 'PERCENTIL',
     'PERCENTILE.INC': 'PERCENTIL.INK',
     'PERCENTILE.EXC': 'PERCENTIL.EXK',
-    'RANK.AVG': 'RANK.AVG',
+    'RANK.AVG': 'RANG.MED',
     QUARTILE: 'KVARTIL',
     'QUARTILE.INC': 'KVARTIL.INK',
     'QUARTILE.EXC': 'KVARTIL.EXK',
