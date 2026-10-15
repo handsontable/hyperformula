@@ -63,11 +63,75 @@ function collect(node, found = new Set()) {
   return found
 }
 
+/**
+ * Decides whether a licence expression lets the package ship under the allowlist.
+ *
+ * Evaluated as SPDX: `OR` is satisfied by either side, `AND` only by both, `AND`
+ * binds tighter than `OR`, and parentheses group. `X WITH exception` counts as
+ * `X`. A trailing `*` marks a licence license-checker guessed from a file, and is
+ * ignored. license-checker reports a package that lists several licences in the
+ * legacy `licenses` field as an array, which that field means as alternatives,
+ * so an array reads as `OR`. Anything malformed or empty is not permitted.
+ *
+ * @param {string|string[]|undefined} licenses The `licenses` value of a report entry.
+ * @returns {boolean} Whether the package may ship.
+ */
+function isPermitted(licenses) {
+  const expression = Array.isArray(licenses) ? licenses.join(' OR ') : String(licenses ?? '')
+  const tokens = expression.match(/[()]|[^\s()]+/g) ?? []
+  let position = 0
+
+  const term = () => {
+    const token = tokens[position++]
+
+    if (token === '(') {
+      const value = either()
+
+      if (tokens[position++] !== ')') {
+        throw new Error('unbalanced parentheses')
+      }
+      return value
+    }
+    if (token === undefined || token === ')' || token === 'AND' || token === 'OR') {
+      throw new Error('licence expected')
+    }
+    if (tokens[position] === 'WITH') {
+      position += 2
+    }
+    return ALLOWED.has(token.replace(/\*$/, ''))
+  }
+  const both = () => {
+    let value = term()
+
+    while (tokens[position] === 'AND') {
+      position++
+      value = term() && value
+    }
+    return value
+  }
+  const either = () => {
+    let value = both()
+
+    while (tokens[position] === 'OR') {
+      position++
+      value = both() || value
+    }
+    return value
+  }
+
+  try {
+    const value = either()
+
+    return position === tokens.length && value
+  } catch {
+    return false
+  }
+}
+
 const production = new Set()
 
 for (const workspace of WORKSPACES) {
   collect(json('npm', ['ls', `--workspace=${workspace}`, '--omit=dev', '--all', '--json']), production)
-  production.delete(`${workspace}@${json('npm', ['pkg', 'get', 'version', `--workspace=${workspace}`, '--json'])[workspace]}`)
 }
 
 // The workspace packages themselves are GPL and are not their own dependencies.
@@ -83,7 +147,7 @@ if (production.size === 0) {
   console.error('Licence check: no production dependencies resolved. Refusing to pass vacuously.')
   process.exitCode = 1
 } else {
-  const licences = json('npx', ['license-checker', '--json'])
+  const licences = json('npx', ['--no-install', 'license-checker', '--json'])
   const offenders = []
 
   for (const id of production) {
@@ -94,11 +158,8 @@ if (production.size === 0) {
       continue
     }
 
-    const declared = String(entry.licenses ?? '')
-    const parts = declared.replace(/[()]/g, '').split(/\s+OR\s+|\s+AND\s+/).map(s => s.replace(/\*$/, '').trim())
-
-    if (!parts.some(part => ALLOWED.has(part))) {
-      offenders.push(`${id} — ${declared || 'no licence declared'}`)
+    if (!isPermitted(entry.licenses)) {
+      offenders.push(`${id} — ${[].concat(entry.licenses ?? []).join(', ') || 'no licence declared'}`)
     }
   }
 
