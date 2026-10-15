@@ -387,7 +387,7 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'SANTAN',
     LARGE: 'BÜYÜK',
     SMALL: 'KÜÇÜK',
-    'RANK.EQ': 'RANK.EQ',
+    'RANK.EQ': 'RANK.EŞİT',
     RANK: 'RANK',
     PERCENTILE: 'YÜZDEBİRLİK',
     'PERCENTILE.INC': 'YÜZDEBİRLİK.DHL',
