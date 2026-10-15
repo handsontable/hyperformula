@@ -47,15 +47,22 @@ function buildUpdatedFile(): string {
 
 /**
  * The catalogue's descriptions link API pages by absolute URL on the docs' former home. Those are library strings,
- * also returned by `getFunctionDetails`, so they change with a release. On this page, one level below the docs root
- * (`guide/`), they become relative links instead, which follow the docs wherever the build serves them (`base` in
+ * also returned by `getFunctionDetails` and pinned by the tests, so they change with a release. On this page they
+ * become links relative to the docs root instead, which follow the docs wherever the build serves them (`base` in
  * `docs/.vuepress/build.config.js`) and open as in-site navigation.
  */
 const FORMER_DOCS_ROOT = /https:\/\/hyperformula\.handsontable\.com\/docs\//g
 
+/** From the generated page to the docs root, as a relative URL prefix: `../` while the page sits in `guide/`. */
+const PAGE_TO_DOCS_ROOT = (() => {
+  const relative = path.relative(path.dirname(DOC_PATH), path.join(REPO_ROOT, 'docs')).split(path.sep).join('/')
+
+  return relative ? `${relative}/` : './'
+})()
+
 /** Generates the guide page from the template + current catalogue. */
 function main(): void {
-  fs.writeFileSync(DOC_PATH, buildUpdatedFile().replace(FORMER_DOCS_ROOT, '../'), 'utf8')
+  fs.writeFileSync(DOC_PATH, buildUpdatedFile().replace(FORMER_DOCS_ROOT, PAGE_TO_DOCS_ROOT), 'utf8')
   process.stdout.write('built-in-functions.md generated from template.\n')
 }
 

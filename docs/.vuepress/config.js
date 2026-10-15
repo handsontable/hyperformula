@@ -190,6 +190,13 @@ module.exports = {
         if (searchPattern.test($page.path) || generatedPagePattern.test($page.path)) {
           $page.frontmatter.editLink = false
         }
+
+        // name the page's address on handsontable.com as canonical (<link rel="canonical">, rendered by
+        // templates/ssr.html), so a copy served under another host (a workers.dev preview, or the old
+        // hyperformula.handsontable.com until it redirects) is never indexed in its place
+        if ($page.path !== '/404.html' && !$page.frontmatter.canonicalUrl) {
+          $page.frontmatter.canonicalUrl = `${DOCS_HOSTNAME}${DOCS_BASE.replace(/\/$/, '')}${$page.path}`
+        }
       },
       chainMarkdown (config) {
         // inject custom markdown highlight with our aliases to formula syntax

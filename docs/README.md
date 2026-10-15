@@ -27,14 +27,14 @@ To start a local HyperFormula docs server:
    ```bash
    npm run docs:dev
    ```
-5. In your browser, go to: http://localhost:8080/hyperformula/.
+5. In your browser, go to: http://localhost:8080/docs/hyperformula/.
 
 ## HyperFormula documentation npm scripts
 
 From the `hyperformula` directory, you can run the following npm scripts:
 
 * `npm run docs:dev` - Starts a local docs server at http://localhost:8080/docs/hyperformula/.
-* `npm run docs:build` - Builds the docs output into `/docs/.vuepress/dist`.
+* `npm run docs:build` - Builds the docs into `docs/.vuepress/dist/docs/hyperformula` (the base path, `/docs/hyperformula/`, and the output directory are set in `docs/.vuepress/build.config.js`).
 * `npm run docs:generate-function-docs` - Regenerates the built-in functions guide page from the function metadata API. Runs automatically as the first step of `docs:dev` and `docs:build`.
 
 ## Deployment
@@ -115,6 +115,6 @@ docs                            # All documentation files
 `npm run docs:build` produces docs meant to be read by both people and AI coding agents:
 
 * **HTML + Markdown per page** &mdash; every guide page is built as both an `.html` page and a companion `.md` file with the same content, via the `md-companions` VuePress plugin (`.vuepress/plugins/md-companions`). The companion lives next to its HTML page, e.g. `guide/basic-usage.html` and `guide/basic-usage.md`.
-* **`llms-full.txt`** &mdash; all guide pages concatenated into one Markdown file at the docs root (`/docs/llms-full.txt`), so an agent can fetch the whole corpus in a single request instead of crawling page by page.
+* **`llms-full.txt`** &mdash; all guide pages concatenated into one Markdown file at the docs root (`/docs/hyperformula/llms-full.txt`, served at https://handsontable.com/docs/hyperformula/llms-full.txt), so an agent can fetch the whole corpus in a single request instead of crawling page by page.
 * **"View as Markdown" link** &mdash; every guide page shows a small link near the top of its content that navigates to that page's `.md` companion (rendered via the local theme in `.vuepress/theme`, which overrides the default theme's `Layout.vue`).
 * **"Set up your coding agent" page** &mdash; [`guide/setup-coding-agent.md`](guide/setup-coding-agent.md) explains how to point Claude Code, Cursor, Copilot, and other agents at these machine-readable docs, and embeds the `CodingAgentWizard` component: an interactive picker that shows the right setup instructions for the agent you choose.

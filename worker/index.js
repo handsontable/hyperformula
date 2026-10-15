@@ -24,15 +24,19 @@
  * bypasses this script and turns every directory and extensionless URL into a 404.
  */
 
+import buildConfig from '../docs/.vuepress/build.config.js'
+
 /**
- * The documentation's base path (`base` in `docs/.vuepress/build.config.js`).
+ * The documentation's base path, read from `docs/.vuepress/build.config.js` (the file the build takes it from), so
+ * the Worker cannot drift from the paths the build writes. `script/prepare-cf-assets.js` stops a deploy build whose
+ * base differs from it.
  */
-const BASE = '/docs/hyperformula/'
+const BASE = buildConfig.base
 
 /**
  * Where the documentation is served: handsontable.com proxies `BASE` to this Worker unchanged.
  */
-const HOME = 'https://handsontable.com/docs/hyperformula/'
+const HOME = `${buildConfig.hostname}${BASE}`
 
 /**
  * The base the documentation was built with before it moved to handsontable.com. Its addresses still arrive here:
