@@ -66,7 +66,9 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 
 `hyperformula-ui/` will be a folder, not a package. npm does not support a workspace that declares workspaces of its own, so the root lists the UI's members directly: `hyperformula-ui/packages/*`, `hyperformula-ui/demo/*` and `hyperformula-ui/e2e`.
 
-**`docs/` is deliberately outside the workspace.** The portal drags in a large, old dependency tree (VuePress 1.x, `--openssl-legacy-provider`) that must not reach an engine install. It has its own `package.json` and installs separately with `npm run docs:install`.
+**`docs/` is deliberately outside the workspace.** The criterion is age, not size. The portal runs on VuePress 1.x, which is end-of-life, builds with webpack 4, and only runs on current Node with `--openssl-legacy-provider`. In a shared install its old packages are hoisted to the root, where anything else can start resolving them by accident — the engine's language build required `fs-extra` without declaring it, and resolved the copy that only the portal's tree supplied. So it has its own `package.json` and installs separately with `npm run docs:install`.
+
+Size alone does not keep a package out. The UI's dependencies, its frameworks, grid libraries and browser test runner, are larger than the portal's but current, and the UI joins the workspace when it is imported. A root `npm ci` installs them too, so the contributor and CI install grows. What the published `hyperformula` package depends on does not change: those are the UI's own dependencies, not the engine's.
 
 ## Where a command runs
 
@@ -132,7 +134,7 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 ## What the move decided
 
 - **npm workspaces, not pnpm.** A package-manager migration is a risk the move did not need to carry at the same time. The same holds for the UI, which uses pnpm today: it converts to npm in its own repository before it is imported, so this repository runs one package manager.
-- **`docs/` is not a workspace member.** VuePress 1.x and its `--openssl-legacy-provider` dependency tree must never reach an engine install. It installs on its own with `npm run docs:install`, and CI installs it before building the portal.
+- **`docs/` is not a workspace member, because its toolchain is legacy, not because it is large.** VuePress 1.x, webpack 4 and `--openssl-legacy-provider` must never be hoisted into the shared install. The UI, larger but current, does join the workspace — see [Workspaces](#workspaces). It installs on its own with `npm run docs:install`, and CI installs it before building the portal.
 - **`hyperformula-ui/` is nested, not flat.** The UI keeps its own layout under one directory, rather than each of its packages getting a top-level directory of its own. The import is then one move with the history intact, the UI's toolchain stays separable from the engine's, and each package's internals still travel with it. The cost: `hyperformula-ui/` is a folder rather than a package, and the root lists its members by glob.
 - **`dev-docs/` at two levels, not one at the root.** One directory at the root was the original plan; it was dropped in favour of splitting by ownership, so that each package's internals travel with the package and `hyperformula-ui` gets its own when it lands. Repository-wide standards stay here, and a fact lives in exactly one level — see [`dev-docs/` at two levels](#dev-docs-at-two-levels).
 - **The packages release together, on one version, from one changelog.** A release cuts every published package at the same version, whether or not each one changed, and `CHANGELOG.md` at the repository root is the single history for all of them. That keeps one number to reason about — the version a user reports a bug against identifies the state of the whole repository — at the cost of publishing a package whose code did not move. Entries name the package they concern where it is not obvious.
