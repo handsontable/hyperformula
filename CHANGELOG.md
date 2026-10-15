@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Added the `CHOOSECOLS` dynamic-array function. [#1734](https://github.com/handsontable/hyperformula/pull/1734)
-- Added the `CHOOSEROWS` dynamic-array function.
+- Added the `CHOOSEROWS` dynamic-array function. [#1827](https://github.com/handsontable/hyperformula/pull/1827)
 
 ### Fixed
 
