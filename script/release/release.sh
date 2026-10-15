@@ -1152,10 +1152,12 @@ elif $DRY_RUN; then
   echo "    (would ask for confirmation, then run: npm publish --tag $NPM_TAG)"
 else
   confirm_publish "$VERSION" "$NPM_USER"
-  # The changelog lives at the repository root and npm cannot pack outside the
-  # package, so copy it in first. And publish the workspace, not the root, whose
-  # manifest is private.
-  run npm run copy-changelog --workspace=hyperformula
+  # Publish the workspace, not the root, whose manifest is private. The changelog
+  # and licence live at the repository root and npm cannot pack outside the
+  # package. The package's prepack copies them in, but npm skips lifecycle
+  # scripts entirely when ignore-scripts is set in the maintainer's npmrc - and
+  # then the tarball ships without both. So copy them explicitly as well.
+  run npm run copy-root-files --workspace=hyperformula
   run npm publish --workspace=hyperformula --tag "$NPM_TAG"
   wait_for_npm "$VERSION"
 fi

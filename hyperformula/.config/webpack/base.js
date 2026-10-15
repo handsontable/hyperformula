@@ -3,7 +3,7 @@ const fs = require('fs');
 const { BannerPlugin } = require('webpack');
 
 const licenseComment = fs.readFileSync(path.resolve(__dirname, '../source-license-header.js'), 'utf8').trim();
-let licensePreamble = fs.readFileSync(path.resolve(__dirname, '../../LICENSE.txt'), 'utf8');
+let licensePreamble = fs.readFileSync(path.resolve(__dirname, '../../../LICENSE.txt'), 'utf8');
 
 licensePreamble += '\n\nVersion: ' + process.env.HT_VERSION;
 licensePreamble += '\nRelease date: ' + process.env.HT_RELEASE_DATE + ' (built at ' + process.env.HT_BUILD_DATE + ')';

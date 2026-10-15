@@ -25,7 +25,7 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 │   ├── tsconfig.json  jest.config.js  karma.conf.js  webpack.config.js
 │   ├── babel.config.js  ht.config.js  jasmine.json  .npmignore
 │   ├── .typedoc.ts  .typedoc.md.ts   # API reference generation, output into docs/api
-│   ├── package.json  .nvmrc  README.md  LICENSE.txt
+│   ├── package.json  .nvmrc  README.md
 │   └── AGENTS.md  CLAUDE.md
 │
 ├── hyperformula-ui/                  # ── package: UI components (not imported yet)
@@ -113,7 +113,7 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 - **`docs/` is not a workspace member.** VuePress 1.x and its `--openssl-legacy-provider` dependency tree must never reach an engine install. It installs on its own with `npm run docs:install`, and CI installs it before building the portal.
 - **`dev-docs/` at two levels, not one at the root.** One directory at the root was the original plan; it was dropped in favour of splitting by ownership, so that each package's internals travel with the package and `hyperformula-ui` gets its own when it lands. Repository-wide standards stay here, and a fact lives in exactly one level — see [`dev-docs/` at two levels](#dev-docs-at-two-levels).
 - **The packages release together, on one version, from one changelog.** A release cuts every published package at the same version, whether or not each one changed, and `CHANGELOG.md` at the repository root is the single history for all of them. That keeps one number to reason about — the version a user reports a bug against identifies the state of the whole repository — at the cost of publishing a package whose code did not move. Entries name the package they concern where it is not obvious.
-- **The published tarball still carries a changelog.** `hyperformula`'s `prepack` copies the root `CHANGELOG.md` into the package and `postpack` removes it again, so there is one file under version control and npm consumers still get one.
+- **The published tarball still carries a changelog and a licence.** `hyperformula`'s `prepack` copies the root `CHANGELOG.md` and `LICENSE.txt` into the package and `postpack` removes them again, so each is one file under version control and npm consumers still get both. The webpack banner reads the root `LICENSE.txt` directly.
 - **Every `.nvmrc` says `22`.**
 - **Linting stays at the root**, run once over the whole repository, so nothing between packages falls through the gap.
 - **The private test suite stays branch-matched.** Only its checkout path moved, to `hyperformula/test/hyperformula-tests/`. Its specs needed no change: they import the engine relatively, and the depth from a spec to the package root is unchanged.
