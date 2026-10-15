@@ -47,8 +47,9 @@ function buildUpdatedFile(): string {
 
 /**
  * The catalogue's descriptions link API pages by absolute URL on the docs' former home. Those are library strings,
- * also returned by `getFunctionDetails` and pinned by the tests, so they change with a release. On this page they
- * become links relative to the docs root instead, which follow the docs wherever the build serves them (`base` in
+ * also returned by `getFunctionDetails` and pinned by the hyperformula-tests suite
+ * (`unit/function-metadata-api.spec.ts`), so they change with a release. On this page they become links relative to
+ * the docs root instead, which follow the docs wherever the build serves them (`base` in
  * `docs/.vuepress/build.config.js`) and open as in-site navigation.
  */
 const FORMER_DOCS_ROOT = /https:\/\/hyperformula\.handsontable\.com\/docs\//g

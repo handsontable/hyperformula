@@ -27,8 +27,16 @@ if (!fs.existsSync(TARGET_DIR)) {
 
 const withSlashes = (base) => `/${base.replace(/^\/+|\/+$/g, '')}/`.replace(/^\/\/$/, '/');
 
+if (BASE !== withSlashes(BASE)) {
+  throw Error(`The base in docs/.vuepress/build.config.js (${BASE}) must start and end with "/": worker/index.js uses it as written.`);
+}
+
 if (process.env.DOCS_BASE && withSlashes(process.env.DOCS_BASE) !== BASE) {
   throw Error(`DOCS_BASE (${process.env.DOCS_BASE}) differs from the base in docs/.vuepress/build.config.js (${BASE}), which worker/index.js serves. Change it there instead.`);
+}
+
+if (process.env.DOCS_HOSTNAME && process.env.DOCS_HOSTNAME !== buildConfig.hostname) {
+  throw Error(`DOCS_HOSTNAME (${process.env.DOCS_HOSTNAME}) differs from the hostname in docs/.vuepress/build.config.js (${buildConfig.hostname}), which worker/index.js redirects to. Change it there instead.`);
 }
 
 if (!fs.existsSync(join(TARGET_DIR, BASE, 'index.html'))) {
@@ -39,8 +47,10 @@ CONFIG_FILES.forEach((fileName) => {
   const source = join(SOURCE_DIR, fileName);
   const target = join(TARGET_DIR, fileName);
 
-  if (!fs.readFileSync(source, 'utf8').includes(BASE)) {
-    throw Error(`${source} does not name the docs base ${BASE} (docs/.vuepress/build.config.js). Update it with the base.`);
+  const rules = fs.readFileSync(source, 'utf8').split('\n').filter((line) => line.trim() && !line.trim().startsWith('#'));
+
+  if (!rules.some((line) => line.includes(BASE))) {
+    throw Error(`${source} has no rule naming the docs base ${BASE} (docs/.vuepress/build.config.js). Update its rules with the base.`);
   }
 
   fs.copyFileSync(source, target);
