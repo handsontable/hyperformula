@@ -146,7 +146,7 @@ const dictionary: RawTranslationPackage = {
     LN: 'LN',
     LOG10: 'LOG',
     LOG: 'LOGZ',
-    LOOKUP: 'LOOKUP',
+    LOOKUP: 'VYHLEDAT',
     LOWER: 'MALÁ',
     MATCH: 'POZVYHLEDAT',
     MAX: 'MAX',
