@@ -54,7 +54,7 @@ const dictionary: RawTranslationPackage = {
     CODE: 'CODE',
     COLUMN: 'KOLOM',
     COLUMNS: 'KOLOMMEN',
-    CONCAT: 'CONCAT',
+    CONCAT: 'TEKST.SAMENV',
     CONCATENATE: 'TEKST.SAMENVOEGEN',
     CORREL: 'CORRELATIE',
     COS: 'COS',

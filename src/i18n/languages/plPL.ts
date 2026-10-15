@@ -245,7 +245,7 @@ const dictionary: RawTranslationPackage = {
     UNIQUE: 'UNIKATOWE',
     UPPER: 'LITERY.WIELKIE',
     VALUE: 'WARTOŚĆ',
-    VALUETOTEXT: 'VALUETOTEXT',
+    VALUETOTEXT: 'WARTOŚĆ.NA.TEKST',
     VARA: 'WARIANCJA.A',
     'VAR.P': 'WARIANCJA.POP',
     VARPA: 'WARIANCJA.POPUL.A',

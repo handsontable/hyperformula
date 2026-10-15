@@ -245,7 +245,7 @@ const dictionary: RawTranslationPackage = {
     UNIQUE: 'ENTYDIGE',
     UPPER: 'STORE.BOGSTAVER',
     VALUE: 'VÆRDI',
-    VALUETOTEXT: 'VALUETOTEXT',
+    VALUETOTEXT: 'VÆRDITILTEKST',
     VARA: 'VARIANSV',
     'VAR.P': 'VARIANS.P',
     VARPA: 'VARIANSPV',
