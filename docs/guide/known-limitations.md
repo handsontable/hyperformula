@@ -69,6 +69,16 @@ a circular reference.
 
 * HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal column-index expression can therefore be reported as `#SPILL!`. Errors in literal column indexes are detected before spill allocation.
 
+### CHOOSEROWS function
+
+* Row indexes must be supplied as separate scalar arguments. Passing multiple indexes through an array or range argument is not supported.
+
+* A whole-row source can spill when the formula is in the first column, regardless of whether the source is on the same sheet. A formula outside the first column returns `#SPILL!` because its result would extend beyond the worksheet edge. An empty source returns `#N/A` because its effective range is empty. Finite-width sources are supported.
+
+* HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal row-index expression can therefore be reported as `#SPILL!`. Errors in literal row indexes are detected before spill allocation.
+
+* A named expression, or a function whose result size depends on cell values, passed directly as the source returns `#VALUE!` when the result has more than one cell, because its size cannot be predicted before evaluation.
+
 ### OFFSET function
 
 HyperFormula resolves the OFFSET function at parse time rather than during evaluation. The parser inspects the arguments and rewrites the expression into a plain cell reference or range. This keeps the dependency graph accurate but imposes several restrictions.

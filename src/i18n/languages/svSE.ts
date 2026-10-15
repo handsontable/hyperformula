@@ -19,6 +19,7 @@ const dictionary: RawTranslationPackage = {
   },
   functions: {
     CHOOSECOLS: 'VÄLJKOL',
+    CHOOSEROWS: 'VÄLJRADER',
     FILTER: 'FILTER',
     VSTACK: 'VSTACK',
     HSTACK: 'HSTACK',

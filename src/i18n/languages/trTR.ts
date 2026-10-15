@@ -19,6 +19,7 @@ const dictionary: RawTranslationPackage = {
   },
   functions: {
     CHOOSECOLS: 'SÜTUNSEÇ',
+    CHOOSEROWS: 'SATIRSEÇ',
     FILTER: 'FILTER',
     VSTACK: 'DÜŞEYYIĞ',
     HSTACK: 'YATAYYIĞ',

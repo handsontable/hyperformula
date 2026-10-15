@@ -19,6 +19,7 @@ const dictionary: RawTranslationPackage = {
   },
   functions: {
     CHOOSECOLS: 'OSZLOPVÁLASZTÁS',
+    CHOOSEROWS: 'SORVÁLASZTÁS',
     FILTER: 'FILTER',
     VSTACK: 'FÜGG.HALMOZÁS',
     HSTACK: 'VÍZSZ.HALMOZÁS',

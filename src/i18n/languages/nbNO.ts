@@ -19,6 +19,7 @@ const dictionary: RawTranslationPackage = {
   },
   functions: {
     CHOOSECOLS: 'VELGKOL',
+    CHOOSEROWS: 'VELGRADER',
     FILTER: 'FILTER',
     VSTACK: 'VSTAKK',
     HSTACK: 'HSTAKK',
