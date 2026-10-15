@@ -1207,7 +1207,8 @@ if $DRY_RUN; then echo "  (dry run - nothing changed; re-run with --real-run to 
 manual_checklist <<NEXT
   [ ] Create the GitHub release for $VERSION (body = the $VERSION section of CHANGELOG.md):
         https://github.com/handsontable/hyperformula/releases/new?tag=$VERSION&title=$VERSION$($IS_PRERELEASE && printf '&prerelease=1\n      (prerelease - leave the "Set as the latest release" box unchecked)')
-  [ ] Check that the docs workflow deployed the documentation to gh-pages
+  [ ] Check that Workers Builds deployed the docs from master (the "Workers Builds:
+      hyperformula-docs" check on the master commit) to https://handsontable.com/docs/hyperformula/
   [ ] Review the deployed docs and test the demos
   [ ] Announce the release in #hyperformula and #release
   [ ] Close the GitHub and ClickUp tasks in this release, announcing $VERSION,
