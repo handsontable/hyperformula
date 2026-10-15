@@ -245,8 +245,8 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         return formatArg
       }
 
-      const format = this.coerceScalarToNumberOrError(formatArg)
-      if (!isExtendedNumber(format)) {
+      const format = formatArg === '' ? undefined : this.coerceScalarToNumberOrError(formatArg)
+      if (format === undefined || !isExtendedNumber(format)) {
         return new CellError(ErrorType.VALUE)
       }
 
