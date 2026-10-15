@@ -18,6 +18,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#NILAI!',
   },
   functions: {
+    CHOOSECOLS: 'CHOOSECOLS',
+    CHOOSEROWS: 'CHOOSEROWS',
     FILTER: 'FILTER',
     VSTACK: 'VSTACK',
     HSTACK: 'HSTACK',

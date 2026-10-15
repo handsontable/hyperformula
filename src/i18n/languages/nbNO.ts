@@ -18,6 +18,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#VERDI!',
   },
   functions: {
+    CHOOSECOLS: 'VELGKOL',
+    CHOOSEROWS: 'VELGRADER',
     FILTER: 'FILTER',
     VSTACK: 'VSTAKK',
     HSTACK: 'HSTAKK',

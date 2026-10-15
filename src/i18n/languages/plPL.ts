@@ -18,6 +18,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#ARG!',
   },
   functions: {
+    CHOOSECOLS: 'WYBIERZ.KOLUMNY',
+    CHOOSEROWS: 'WYBIERZ.WIERSZE',
     FILTER: 'FILTER',
     VSTACK: 'STOS.PION',
     HSTACK: 'STOS.POZ',

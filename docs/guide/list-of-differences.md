@@ -117,6 +117,9 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | NORMSDIST     | =NORMSDIST(0, TRUE())                                          |          0.5 |  Wrong number |    Wrong number |
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
+| CHOOSECOLS    | =CHOOSECOLS(Data!A:A, 1)                                      | Spills the whole column from row 1; returns SPILL below row 1. | Spills the whole column when space is available. | Spills the whole column from row 1; returns SPILL below row 1. |
+| CHOOSEROWS    | =CHOOSEROWS(Data!1:1, 1)                                      | Spills the source sheet's used columns from column A; returns SPILL outside column A. | Returns every column of the source sheet's row. | Returns all 16,384 columns of the row. |
+| CHOOSEROWS    | =CHOOSEROWS(Data!A:A, -1)                                     | Returns the source sheet's last used row. | Returns the source sheet's last row. | Returns row 1,048,576. |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
