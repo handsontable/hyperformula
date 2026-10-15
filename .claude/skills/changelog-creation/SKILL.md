@@ -20,7 +20,7 @@ Documentation-only, test-only, and CI or tooling changes take none, and neither 
 
 ## 4. Write the bullet
 
-Under `## [Unreleased]` in `CHANGELOG.md` at the repository root — one changelog for every package, because they release together on one version. Put it in the section that matches the change, creating the `### ` heading if it is absent. Name the package the entry concerns when the text does not make it obvious. End it with the link from step 3.
+Under `## [Unreleased]` in the changelog of the package the change belongs to: `CHANGELOG.md` at the repository root for the engine, `hyperformula-ui/CHANGELOG.md` for the UI packages until their version joins the engine's. Which one, and why: [`DOC-STANDARDS.md`](../../../dev-docs/DOC-STANDARDS.md#the-changelog). Put it in the section that matches the change, creating the `### ` heading if it is absent. Name the package the entry concerns when the text does not make it obvious. End it with the link from step 3.
 
 ## 5. Re-read it as a user would
 

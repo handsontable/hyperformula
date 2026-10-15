@@ -10,7 +10,7 @@ This repository holds the engine and everything built around it.
 | [`hyperformula-ui/`](hyperformula-ui/) | UI components for working with HyperFormula: a group of packages, with their demos and end-to-end tests. Not imported yet. | Not yet — nothing is published from this directory until the packages are imported |
 | [`docs/`](docs/) | The documentation portal. Installed separately; not a workspace member. | Not a package. Built and deployed as the documentation site at [hyperformula.handsontable.com/docs](https://hyperformula.handsontable.com/docs/) |
 
-The published packages release together, on one version, and share the single [`CHANGELOG.md`](CHANGELOG.md) at the root.
+The engine's history is [`CHANGELOG.md`](CHANGELOG.md) at the root. The UI packages version and release on their own until they are mature, then join the engine's version — see [`dev-docs/STRUCTURE.md`](dev-docs/STRUCTURE.md#what-the-move-decided).
 
 ## Getting started
 
