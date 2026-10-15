@@ -61,6 +61,10 @@ a circular reference.
 
 * Ordering (including mixed types, empty cells, and text collation) follows HyperFormula's own comparison rules, which honor the `caseSensitive` and `accentSensitive` configuration options. Numbers sort before text, and text before logical values.
 
+### TOROW and TOCOL functions
+
+* When formulas on two sheets flatten each other's whole columns below the first row and skip blank cells, for example `=TOCOL(Sheet2!A:A, 1)` in cell B5 of Sheet1 and `=TOCOL(Sheet1!A:A, 1)` in cell B5 of Sheet2, the space reserved for each result counts toward the size of the other sheet. Both sheets get taller than their data, and taller again each time one of these formulas is entered again. The results stay correct. TOROW behaves the same way with whole rows right of the first column.
+
 ### OFFSET function
 
 HyperFormula resolves the OFFSET function at parse time rather than during evaluation. The parser inspects the arguments and rewrites the expression into a plain cell reference or range. This keeps the dependency graph accurate but imposes several restrictions.
