@@ -590,8 +590,9 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
   }
 
   /**
-   * Converts a scalar to its text, writing numbers to 15 significant digits with an upper-case,
-   * two-digit exponent (e.g. `1E+21`, `1E-07`). Other values are converted like in `coerceScalarToString`.
+   * Converts a scalar to its text. A number is written to 15 significant digits, in plain decimal notation as long as
+   * that takes at most 20 digits, and in scientific notation with a two-digit exponent otherwise (`1E+20`, `1.5E-20`).
+   * Other values are converted like in `coerceScalarToString`.
    *
    * @param {InternalScalarValue} value - The scalar to convert
    * @returns {string | CellError} - The text, or the value itself if it is an error
@@ -601,10 +602,28 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       return coerceScalarToString(value)
     }
 
-    return Number(getRawValue(value).toPrecision(15))
-      .toString()
-      .replace(/e([+-])(\d)$/, (_, sign, digit) => `E${sign}0${digit}`)
-      .replace('e', 'E')
+    const number = getRawValue(value)
+    if (number === 0) {
+      return '0'
+    }
+
+    const [mantissa, exponentText] = Math.abs(number).toExponential(14).split('e')
+    const digits = mantissa.replace('.', '').replace(/0+$/, '')
+    const exponent = Number(exponentText)
+    const sign = number < 0 ? '-' : ''
+    const decimalDigitCount = exponent >= 0 ? Math.max(exponent + 1, digits.length) : -exponent + digits.length
+
+    if (decimalDigitCount > 20) {
+      const fraction = digits.length > 1 ? `.${digits.slice(1)}` : ''
+      return `${sign}${digits[0]}${fraction}E${exponent < 0 ? '-' : '+'}${String(Math.abs(exponent)).padStart(2, '0')}`
+    }
+    if (exponent < 0) {
+      return `${sign}0.${'0'.repeat(-exponent - 1)}${digits}`
+    }
+    if (exponent + 1 >= digits.length) {
+      return `${sign}${digits}${'0'.repeat(exponent + 1 - digits.length)}`
+    }
+    return `${sign}${digits.slice(0, exponent + 1)}.${digits.slice(exponent + 1)}`
   }
 
   /**
