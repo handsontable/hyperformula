@@ -232,7 +232,7 @@ const dictionary: RawTranslationPackage = {
     TBILLYIELD: 'RENT.BS',
     TEXT: 'TEKST',
     TEXTAFTER: 'TEXTAFTER',
-    TEXTBEFORE: 'TEXTBEFORE',
+    TEXTBEFORE: 'TEKST.PRZED',
     TEXTJOIN: 'POŁĄCZ.TEKSTY',
     TEXTSPLIT: 'TEXTSPLIT',
     TIME: 'CZAS',
