@@ -341,8 +341,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   /**
-   * Returns the value at the given offset from the top-left corner of the range value. For a range it is read
-   * from the sheet even beyond the range's size; for an array, `undefined` is returned outside of it.
+   * Returns the value at the given offset from the top-left corner of the range value, or `undefined` when the
+   * offset lies outside of it, so that only cells the formula refers to are read.
    */
   private cellAt(rangeValue: SimpleRangeValue, row: number, col: number): InterpreterValue | undefined {
     const range = rangeValue.range
