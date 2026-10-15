@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added the `MUNIT`, `MDETERM` and `MINVERSE` matrix functions: the identity matrix, the determinant and the inverse of a square matrix.
+- Added the `MUNIT`, `MDETERM` and `MINVERSE` matrix functions: the identity matrix, the determinant and the inverse of a square matrix. [#1817](https://github.com/handsontable/hyperformula/pull/1817)
 
 ### Fixed
 
