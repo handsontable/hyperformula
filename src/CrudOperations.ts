@@ -262,6 +262,7 @@ export class CrudOperations {
     this.undoRedo.clearRedoStack()
 
     const oldContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: [SimpleCellAddress, ClipboardCell] }[] = []
+    const overwrittenCells: [SimpleCellAddress, ClipboardCell][] = []
 
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
@@ -272,12 +273,13 @@ export class CrudOperations {
         }
         const newContent = cellContents[i][j]
         this.clipboardOperations.abortCut()
-        const oldContent = this.operations.setCellContent(address, newContent)
+        const {oldContent, overwrittenCells: overwritten} = this.operations.setCellContent(address, newContent)
         oldContents.push({address, newContent, oldContent})
+        overwrittenCells.push(...overwritten)
       }
     }
 
-    this.undoRedo.saveOperation(new SetCellContentsUndoEntry(oldContents))
+    this.undoRedo.saveOperation(new SetCellContentsUndoEntry(oldContents, overwrittenCells))
   }
 
   public setSheetContent(sheetId: number, values: RawCellContent[][]): void {
