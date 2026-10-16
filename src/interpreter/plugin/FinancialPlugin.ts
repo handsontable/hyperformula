@@ -96,8 +96,8 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
       parameters: [
         {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
         {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
-        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
-        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
         {argumentType: FunctionArgumentType.INTEGER, minValue: 1, maxValue: 12, defaultValue: 12},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
@@ -107,8 +107,8 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
       parameters: [
         {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
         {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
-        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
-        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
         {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, defaultValue: 2},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
@@ -350,6 +350,9 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   public db(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DB'),
       (cost: number, salvage: number, life: number, period: number, month: number) => {
+        if (life < 1 || period < 1) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
         if ((month === 12 && period > life) || (period > life + 1)) {
           return new CellError(ErrorType.NUM, ErrorMessage.PeriodLong)
         }
@@ -382,6 +385,9 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   public ddb(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DDB'),
       (cost: number, salvage: number, life: number, period: number, factor: number) => {
+        if (life < 1 || period < 1) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
         if (period > life) {
           return new CellError(ErrorType.NUM)
         }
