@@ -1,6 +1,6 @@
 <br>
 <p align="center">
-  <a href="https://hyperformula.handsontable.com/">
+  <a href="https://handsontable.com/hyperformula/">
     <img src="https://raw.githubusercontent.com/handsontable/hyperformula/master/github-hf-logo-blue.svg" width="350" height="71" alt="HyperFormula - A headless spreadsheet, a parser and evaluator of Excel formulas"/>
   </a>
 </p>
