@@ -390,6 +390,7 @@ const dictionary: RawTranslationPackage = {
     PERCENTILE: 'YÜZDEBİRLİK',
     'PERCENTILE.INC': 'YÜZDEBİRLİK.DHL',
     'PERCENTILE.EXC': 'YÜZDEBİRLİK.HRC',
+    'RANK.AVG': 'RANK.ORT',
     QUARTILE: 'DÖRTTEBİRLİK',
     'QUARTILE.INC': 'DÖRTTEBİRLİK.DHL',
     'QUARTILE.EXC': 'DÖRTTEBİRLİK.HRC',
