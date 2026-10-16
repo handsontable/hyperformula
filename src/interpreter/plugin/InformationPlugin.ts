@@ -3,14 +3,52 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../../error-message'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+
+const TYPE_CODE_NUMBER = 1
+const TYPE_CODE_TEXT = 2
+const TYPE_CODE_BOOLEAN = 4
+const TYPE_CODE_ERROR = 16
+const TYPE_CODE_ARRAY = 64
+
+/**
+ * Codes returned by ERROR.TYPE. #NULL! (code 1) has no counterpart in HyperFormula, and neither has a code for #CYCLE!.
+ */
+const ERROR_TYPE_CODES: Partial<Record<ErrorType, number>> = {
+  [ErrorType.DIV_BY_ZERO]: 2,
+  [ErrorType.VALUE]: 3,
+  [ErrorType.REF]: 4,
+  [ErrorType.NAME]: 5,
+  [ErrorType.NUM]: 6,
+  [ErrorType.NA]: 7,
+  [ErrorType.SPILL]: 9,
+}
+
+/**
+ * Returns the TYPE code of a single (non-array) value.
+ *
+ * @param value
+ */
+function valueTypeCode(value: InterpreterValue): number {
+  if (value instanceof CellError) {
+    return TYPE_CODE_ERROR
+  }
+  if (typeof value === 'string') {
+    return TYPE_CODE_TEXT
+  }
+  if (typeof value === 'boolean') {
+    return TYPE_CODE_BOOLEAN
+  }
+  return TYPE_CODE_NUMBER
+}
 
 /**
  * Interpreter plugin containing information functions
@@ -34,6 +72,12 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
+    },
+    'ERROR.TYPE': {
+      method: 'errortype',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR}
+      ]
     },
     'ISBINARY': {
       method: 'isbinary',
@@ -149,7 +193,84 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       ],
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
+    },
+    'TYPE': {
+      method: 'type',
+      parameters: [
+        {argumentType: FunctionArgumentType.ANY}
+      ],
+      vectorizationForbidden: true,
     }
+  }
+
+  /**
+   * Corresponds to ERROR.TYPE(value)
+   *
+   * Returns the number of an error type (2-7 and 9), or #N/A when the value is not an error or the error has no code
+   *
+   * @param ast
+   * @param state
+   */
+  public errortype(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ERROR.TYPE'), (arg: InternalScalarValue) => {
+      if (!(arg instanceof CellError)) {
+        return new CellError(ErrorType.NA)
+      }
+      return ERROR_TYPE_CODES[arg.type] ?? new CellError(ErrorType.NA)
+    })
+  }
+
+  /**
+   * Corresponds to TYPE(value)
+   *
+   * Returns the type of a value: 1 for numbers and empty cells, 2 for text, 4 for booleans, 16 for errors
+   * and 64 for arrays and multi-cell ranges. Errors are classified, not propagated.
+   *
+   * @param ast
+   * @param state
+   */
+  public type(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+    }
+    if (this.isRowOrColumnOfMultiCellRange(ast.args[0], state)) {
+      return TYPE_CODE_ARRAY
+    }
+    const value = this.evaluateAst(ast.args[0], state)
+    if (value instanceof SimpleRangeValue) {
+      return TYPE_CODE_ARRAY
+    }
+    return valueTypeCode(value)
+  }
+
+  /**
+   * ROW and COLUMN evaluate to a scalar here, while Excel returns an array when they are given a multi-cell range.
+   * TYPE reports the Excel classification.
+   *
+   * @param ast
+   * @param state
+   */
+  private isRowOrColumnOfMultiCellRange(ast: Ast, state: InterpreterState): boolean {
+    while (ast.type === AstNodeType.PARENTHESIS) {
+      ast = ast.expression
+    }
+    if (ast.type !== AstNodeType.FUNCTION_CALL || (ast.procedureName !== 'ROW' && ast.procedureName !== 'COLUMN')) {
+      return false
+    }
+    let arg = ast.args[0]
+    while (arg !== undefined && arg.type === AstNodeType.PARENTHESIS) {
+      arg = arg.expression
+    }
+    if (arg === undefined) {
+      return false
+    }
+    if (arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
+      return true
+    }
+    if (arg.type === AstNodeType.CELL_RANGE) {
+      return AbsoluteCellRange.fromAst(arg, state.formulaAddress).size() > 1
+    }
+    return false
   }
 
   /**
