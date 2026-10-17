@@ -593,9 +593,9 @@ step "2. Create release/$VERSION in hyperformula-tests, then sync the suite"
 run npm run test:setup-private
 
 # 3. Bump version + release date (each half skipped when already correct, so a
-CURRENT_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
 #    re-run after a later failure does not rewrite files it already wrote)
 step "3. Bump version + HT_RELEASE_DATE"
+CURRENT_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
 if [[ "$CURRENT_VERSION" == "$VERSION" ]]; then
   skip "package.json already at $VERSION"
 elif $DRY_RUN; then
@@ -603,6 +603,23 @@ elif $DRY_RUN; then
 else
   CF_V="$VERSION" node -e 'const f="package.json",j=require("./"+f);j.version=process.env.CF_V;require("fs").writeFileSync(f,JSON.stringify(j,null,2)+"\n")'
   echo "    package.json version -> $VERSION"
+fi
+
+# The check:licenses script excludes this package from its own license check
+# (GPL-3.0-only is not on its allow list), and license-checker matches that
+# exclusion by exact name@version only - so it has to follow the version, or the
+# check fails for every release after the one it names. Read on its own rather
+# than inside the version bump above, so that a re-run still fixes a stale one.
+LICENSE_EXCLUDED_VERSION="$(node -e 'const s=(require("./package.json").scripts||{})["check:licenses"]||"";const m=/hyperformula@([^";\s]+)/.exec(s);process.stdout.write(m?m[1]:"")' 2>/dev/null || true)"
+if [[ -z "$LICENSE_EXCLUDED_VERSION" ]]; then
+  warn "package.json has no check:licenses script excluding hyperformula@<version>, so its exclusion was not updated - if the script changed, make sure it still excludes hyperformula@$VERSION and commit it on release/$VERSION."
+elif [[ "$LICENSE_EXCLUDED_VERSION" == "$VERSION" ]]; then
+  skip "check:licenses already excludes hyperformula@$VERSION"
+elif $DRY_RUN; then
+  echo "    (set check:licenses to exclude hyperformula@$VERSION instead of hyperformula@$LICENSE_EXCLUDED_VERSION)"
+else
+  CF_V="$VERSION" node -e 'const f="package.json",j=require("./"+f);j.scripts["check:licenses"]=j.scripts["check:licenses"].replace(/hyperformula@[^";\s]+/,"hyperformula@"+process.env.CF_V);require("fs").writeFileSync(f,JSON.stringify(j,null,2)+"\n")'
+  echo "    check:licenses exclusion -> hyperformula@$VERSION"
 fi
 
 # Read the current date only once the file is known to exist and carry the key:
@@ -776,14 +793,16 @@ else
     merge_develop_into_version_branch "$VERSION_BRANCH" )
   # CodeSandbox / StackBlitz demo URLs in this repo's docs: point every one at
   # the new branch, whatever branch it names now (old releases left several
-  # behind). Scans docs/guide and docs/index.md only - the tracked files that
-  # carry these URLs. Walking all of docs/ would also descend into the gitignored
-  # generated trees (docs/api, docs/functions, docs/.vuepress/dist), whose built
-  # HTML repeats the same URLs but is never committed - it would bury the dry-run
-  # preview under hundreds of lines and inflate the reported file count.
+  # behind). Scans docs/guide, docs/index.md and README.md only - the tracked
+  # files that carry these URLs. Walking all of docs/ would also descend into the
+  # gitignored generated trees (docs/api, docs/functions, docs/.vuepress/dist),
+  # whose built HTML repeats the same URLs but is never committed - it would bury
+  # the dry-run preview under hundreds of lines and inflate the reported file
+  # count. If you add one here, add it to step 9's ADD_PATHS too.
   DOC_URL_PATHS=()
   [[ -d docs/guide ]] && DOC_URL_PATHS+=(docs/guide)
   [[ -f docs/index.md ]] && DOC_URL_PATHS+=(docs/index.md)
+  [[ -f README.md ]] && DOC_URL_PATHS+=(README.md)
   if [[ ${#DOC_URL_PATHS[@]} -gt 0 ]]; then
     CF_NEW="$VERSION_BRANCH" CF_FENCE="$PREVIEW_FENCE" \
     CF_DRY="$($DRY_RUN && echo 1 || echo '')" perl - "${DOC_URL_PATHS[@]}" <<'PERL'
@@ -854,7 +873,7 @@ if (!$count) {
 }
 PERL
   else
-    skip "no docs/guide or docs/index.md here - no demo URLs to rewrite"
+    skip "no docs/guide, docs/index.md or README.md here - no demo URLs to rewrite"
   fi
 fi
 
@@ -866,17 +885,18 @@ step "9. Commit + push release/$VERSION"
 # though, not a list of files this run wrote, so they cannot tell the freeze's
 # edits from the operator's inside the same path - which is why the preflight
 # refuses to start a fresh freeze on a dirty tree.
-# package-lock.json, ht.config.js and docs/ are each conditional on existing:
-# step 4 deletes and regenerates the lock file, so between an 'npm i' and its
-# write it is briefly gone, and both files can be legitimately absent altogether
-# (see step 3) - a bare pathspec for any of them would die under 'set -e' when
-# it is not there.
+# package-lock.json, ht.config.js, docs/ and README.md are each conditional on
+# existing: step 4 deletes and regenerates the lock file, so between an 'npm i'
+# and its write it is briefly gone, and the others can be legitimately absent
+# altogether (see steps 3 and 8) - a bare pathspec for any of them would die
+# under 'set -e' when it is not there.
 # Anything a future step writes outside these paths will not be committed, so
 # add its path here too.
 ADD_PATHS=(package.json CHANGELOG.md)
 [[ -f package-lock.json ]] && ADD_PATHS+=(package-lock.json)
 [[ -f ht.config.js ]] && ADD_PATHS+=(ht.config.js)
 [[ -d docs ]] && ADD_PATHS+=(docs)
+[[ -f README.md ]] && ADD_PATHS+=(README.md)
 run git add "${ADD_PATHS[@]}"
 if $DRY_RUN || [[ -n "$(git status --porcelain -- "${ADD_PATHS[@]}")" ]]; then
   run git commit -m "$VERSION"
@@ -1033,9 +1053,10 @@ fi
 # but as a warning, not an error: by the time step 8 runs the release is out,
 # so refusing there would leave a published package and a dead script. A branch
 # that is missing at publish time usually means the freeze's demos step never
-# completed, which also means the CodeSandbox URLs in docs/ were never rewritten.
+# completed, which also means the CodeSandbox URLs in docs/ and README.md were
+# never rewritten.
 if ! branch_exists "$VERSION_BRANCH" "$DEMOS_DIR" && ! remote_branch_exists "$VERSION_BRANCH" "$DEMOS_DIR"; then
-  note "hyperformula-demos has no $VERSION_BRANCH branch, so step 8 will create it from develop. For a major or minor release the freeze's demos step should already have created it, so check that the CodeSandbox URLs in docs/ name tree/$VERSION_BRANCH as well. For the first patch on a new minor line there may simply be nothing there yet."
+  note "hyperformula-demos has no $VERSION_BRANCH branch, so step 8 will create it from develop. For a major or minor release the freeze's demos step should already have created it, so check that the CodeSandbox URLs in docs/ and README.md name tree/$VERSION_BRANCH as well. For the first patch on a new minor line there may simply be nothing there yet."
 fi
 
 step "Plan"
@@ -1187,10 +1208,10 @@ manual_checklist <<NEXT
   [ ] Create the GitHub release for $VERSION (body = the $VERSION section of CHANGELOG.md):
         https://github.com/handsontable/hyperformula/releases/new?tag=$VERSION&title=$VERSION$($IS_PRERELEASE && printf '&prerelease=1\n      (prerelease - leave the "Set as the latest release" box unchecked)')
   [ ] Check that the docs workflow deployed the documentation to gh-pages
+  [ ] Review the deployed docs and test the demos
   [ ] Announce the release in #hyperformula and #release
   [ ] Close the GitHub and ClickUp tasks in this release, announcing $VERSION,
       notify everyone involved in the discussions, and check linked issues
-  [ ] Review the deployed docs and test the demos
 NEXT
 exit 0
 }

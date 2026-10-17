@@ -8,10 +8,14 @@
  *
  *   - `.html` URLs are served as they are, without redirecting to an extensionless
  *     URL (guaranteed by `"html_handling": "none"`),
- *   - directory URLs (`/docs/`, `/docs/api/`) serve the directory `index.html`,
- *   - extensionless URLs (`/docs/guide/basic-usage`) serve the matching `.html` file,
- *   - a directory URL without the trailing slash (`/docs`) redirects to the
- *     canonical URL with the trailing slash,
+ *   - directory URLs (`/docs/hyperformula/`, `/docs/hyperformula/api/`) serve the
+ *     directory `index.html`,
+ *   - extensionless URLs (`/docs/hyperformula/guide/basic-usage`) serve the matching
+ *     `.html` file,
+ *   - a directory URL without the trailing slash (`/docs/hyperformula`) redirects to
+ *     the canonical URL with the trailing slash,
+ *   - the documentation's former addresses (see `isFormerAddress`) redirect
+ *     permanently to their new home on handsontable.com,
  *   - anything else is answered with the nearest `404.html`.
  *
  * The 404 page is served here rather than through the `not_found_handling` asset
@@ -19,6 +23,37 @@
  * browser navigations (requests with `Sec-Fetch-Mode: navigate`) on its own, which
  * bypasses this script and turns every directory and extensionless URL into a 404.
  */
+
+import buildConfig from '../docs/.vuepress/build.config.js'
+
+/**
+ * The documentation's base path, read from `docs/.vuepress/build.config.js` (the file the build takes it from), so
+ * the Worker cannot drift from the paths the build writes. `script/prepare-cf-assets.js` stops a deploy build whose
+ * base differs from it.
+ */
+const BASE = buildConfig.base
+
+/**
+ * Where the documentation is served: handsontable.com proxies `BASE` to this Worker unchanged.
+ */
+const HOME = `${buildConfig.hostname}${BASE}`
+
+/**
+ * The base the documentation was built with before it moved to handsontable.com. Its addresses still arrive here:
+ * hyperformula.handsontable.com keeps sending `/docs/*` to this Worker (through the hyperformula-website Worker).
+ */
+const FORMER_BASE = '/docs/'
+
+/**
+ * Tells whether the pathname is one of the documentation's former addresses: `/docs`, or anything under `/docs/`
+ * outside the current base. None of them names an asset any more, so all of them reach this script.
+ *
+ * @param {string} pathname Pathname to check.
+ * @returns {boolean} `true` when the pathname belongs to the former base.
+ */
+const isFormerAddress = (pathname) => (pathname === '/docs' || pathname.startsWith(FORMER_BASE))
+  && pathname !== BASE.slice(0, -1)
+  && !pathname.startsWith(BASE)
 
 /**
  * Builds a request for the given pathname, preserving the original request otherwise.
@@ -90,6 +125,10 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url)
     const { pathname } = url
+
+    if (isFormerAddress(pathname)) {
+      return Response.redirect(`${HOME}${pathname.slice(FORMER_BASE.length)}${url.search}`, 301)
+    }
 
     if (pathname.endsWith('/')) {
       const indexResponse = await env.ASSETS.fetch(requestForPathname(request, url, `${pathname}index.html`))

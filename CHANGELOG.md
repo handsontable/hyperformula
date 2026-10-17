@@ -7,6 +7,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.5.0] - 2026-10-09
+
+### Added
+
+- Added support for the new license key format. A proprietary key can now grant a subset of the library: a function your key does not include evaluates to a `#LIC!` error, and the matching parts of the API throw a `LicenseCapabilityMissingError`. `getAvailableFunctions()` and `getFunctionDetails()` describe only the functions your key includes. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+
+### Changed
+
+- Changed the `VERSION` function to return only the HyperFormula version (e.g. `HyperFormula v3.4.0`), without the license key status. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+- Changed the API methods gated by the license key to throw a `LicenseCapabilityMissingError` when the key is missing or invalid, when a classic key has expired, or when a trial key is past its grace period. The gated methods are the ones that edit cells, rows, columns, and sheets, `copy()`, `cut()`, `paste()`, `undo()`, `redo()`, `batch()`, `suspendEvaluation()`, and the methods that add, change, or remove named expressions. Building an engine with named expressions throws the same error, and the matching `isItPossibleTo*()` methods, `isThereSomethingToUndo()`, and `isThereSomethingToRedo()` return `false`. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+- Changed the `MAXPOOL` and `MEDIANPOOL` functions to accept a stride greater than the window size in a cell, where they returned the `#VALUE!` error before. The windows then skip the rows and columns between them, as `calculateFormula()` already did. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
+
+### Fixed
+
+- Fixed the validation of classic (25-character) license keys depending on the time zone: east of UTC, a key that expired the day before the build was released was still accepted, and west of UTC, the console message printed an expiry date one day too early. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+- Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
+- Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
+- Fixed the `MAXPOOL` and `MEDIANPOOL` functions throwing an uncaught `TypeError` or `RangeError`. They now return the `#VALUE!` error when the window is larger than the range or the range dimensions, reduced by the window size, are not whole multiples of the stride, and the `#NUM!` error when the window size or the stride is not a positive integer. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
+- Fixed the `VAR`, `STDEV`, `DEVSQ`, `COVARIANCE.P`, `COVARIANCE.S`, `SLOPE`, `STEYX`, `DVAR` and `DSTDEV` functions, their variants, and the matching `SUBTOTAL` modes losing precision on data with a large mean and a small spread. [#1784](https://github.com/handsontable/hyperformula/pull/1784)
+- Fixed a bug where `SLOPE` and `STEYX` returned `#NUM!` or an arbitrary number instead of `#DIV/0!` when all the x values are equal. [#1784](https://github.com/handsontable/hyperformula/pull/1784)
+- Fixed a bug where `STEYX` returned `#NUM!` or `0` instead of the standard error for points that lie almost on a line. [#1784](https://github.com/handsontable/hyperformula/pull/1784)
+- Fixed a bug where `VAR`, `STDEV`, `DVAR`, `DSTDEV`, `COVARIANCE.P`, `COVARIANCE.S`, `SLOPE`, `STEYX`, their variants, and the matching `SUBTOTAL` modes returned an error or `0` for very large or very small values although the result was within the range of numbers, and `DEVSQ` returned `0` for very small values. [#1784](https://github.com/handsontable/hyperformula/pull/1784)
+- Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
+- Fixed a bug where moving or pasting a formula with an undefined name to another sheet incorrectly added an empty global named expression. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
@@ -242,7 +267,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Removed
 
 - Removed all polyfills from the CommonJS build and the ES modules build. In the UMD build, kept only the polyfills
-  required by the [supported browsers](https://hyperformula.handsontable.com/guide/supported-browsers.html).
+  required by the [supported browsers](https://hyperformula.handsontable.com/docs/guide/supported-browsers.html).
   [#1011](https://github.com/handsontable/hyperformula/issues/1011)
 
 ## [2.0.1] - 2022-06-14
@@ -261,9 +286,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 For more information on this release, see:
 
-- [Release notes](https://hyperformula.handsontable.com/guide/release-notes.html)
+- [Release notes](https://hyperformula.handsontable.com/docs/guide/release-notes.html)
 - [Blog post](https://handsontable.com/blog/articles/2022/04/whats-new-in-hyperformula-2.0.0)
-- [Migration guide](https://hyperformula.handsontable.com/guide/migration-from-1.0-to-2.0.html)
+- [Migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-1.x-to-2.0.html)
 
 ### Added
 

@@ -43,6 +43,9 @@ import {
 import {Evaluator} from './Evaluator'
 import {ExportedChange, Exporter} from './Exporter'
 import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {licenseAllowsFunction} from './license/CapabilityRegistry'
+import {ensureFeatureAllowed, isFeatureAllowed} from './license/ensureFeatureAllowed'
+import {FeatureId} from './license/LicenseEntitlement'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
 import {FUNCTION_DOCS} from './interpreter/functionMetadata'
@@ -253,6 +256,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when sheet is not an array of arrays
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -271,7 +275,7 @@ export class HyperFormula implements TypedEmitter {
    * ];
    *
    * // method with optional config parameter maxColumns
-   * const hfInstance = HyperFormula.buildFromArray(sheetData, { maxColumns: 1000 }, namedExpressions);
+   * const hfInstance = HyperFormula.buildFromArray(sheetData, { licenseKey: 'gpl-v3', maxColumns: 1000 }, namedExpressions);
    * ```
    *
    * @category Factories
@@ -293,6 +297,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when any sheet is not an array of arrays
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -318,7 +323,7 @@ export class HyperFormula implements TypedEmitter {
    * ];
    *
    * // method with optional config parameter useColumnIndex
-   * const hfInstance = HyperFormula.buildFromSheets(sheetData, { useColumnIndex: true }, namedExpressions);
+   * const hfInstance = HyperFormula.buildFromSheets(sheetData, { licenseKey: 'gpl-v3', useColumnIndex: true }, namedExpressions);
    * ```
    *
    * @category Factories
@@ -335,6 +340,8 @@ export class HyperFormula implements TypedEmitter {
    * @param {Partial<ConfigParams>} configInput - engine configuration
    * @param {SerializedNamedExpression[]} namedExpressions - starting named expressions
    *
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
+   *
    * @example
    * ```js
    * const namedExpressions = [
@@ -345,7 +352,7 @@ export class HyperFormula implements TypedEmitter {
    * ];
    *
    * // build with no initial data and with optional config parameter maxColumns
-   * const hfInstance = HyperFormula.buildEmpty({ maxColumns: 1000 }, namedExpressions);
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3', maxColumns: 1000 }, namedExpressions);
    * ```
    *
    * @category Factories
@@ -398,7 +405,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * // return registered language
    * HyperFormula.registerLanguage('enUS', enUS);
-   * const engine = HyperFormula.buildEmpty({language: 'enUS'});
+   * const engine = HyperFormula.buildEmpty({licenseKey: 'gpl-v3', language: 'enUS'});
    * ```
    *
    * @category Static Methods
@@ -589,7 +596,17 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns translated names of all registered functions for a given language
+   * Returns translated names of all registered functions for a given language.
+   *
+   * Answers for the GLOBAL function registry, because a static method has no engine, and therefore
+   * no configuration, in scope. An engine configured with its own `functionPlugins` registers only
+   * those, so this method can list functions that engine cannot evaluate at all.
+   *
+   * The two forms answer different questions and neither replaces the other: this one translates
+   * into any registered language without building an engine, while the instance method of the same
+   * name answers for the engine you actually hold, in that instance's own language. Neither form
+   * looks at the license key: to list only the functions an instance can evaluate, use
+   * [[getAvailableFunctions]].
    *
    * @param {string} code - language code
    *
@@ -700,25 +717,57 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Whether an instance's license lets it evaluate the given function id, and therefore whether the
+   * metadata API may describe it. Mirrors the gate-B branch the interpreter runs per function call
+   * (`Interpreter.evaluateAstWithoutPostprocessing`, the `FUNCTION_CALL` case), through the same
+   * [[licenseAllowsFunction]] rule and the same alias canonicalization, so a listed function is
+   * always one that actually evaluates.
+   *
+   * Gate B only, deliberately — never the license key's validity state. A key that blocks
+   * evaluation (a missing or invalid key, an expired classic key, or a trial past its grace period)
+   * resolves to an unrestricted entitlement (the invariant `resolveLicense` documents), so it
+   * reaches this method with both `licenseCapabilities` axes set to `'all'` and every function
+   * stays listed.
+   * That is the intended answer: a key problem is reported on the console and by `#LIC!` in cells,
+   * and narrowing the catalog to the two protected built-ins would leave an integrator who has not
+   * wired up their key yet with an empty function picker and no clue why. The list narrows only for
+   * a key that evaluates (a valid one, or an expired one that keeps working with its own grants) and
+   * genuinely does not include a function — the case where the answer is useful.
+   *
+   * @param {string} functionId - the id as registered, which may be an alias
+   * @param {FunctionRegistry} functionRegistry - the engine's registry, which resolves the alias map
+   * @param {Config} config - the instance's config, holding its resolved entitlement
+   */
+  private static licenseListsFunction(functionId: string, functionRegistry: FunctionRegistry, config: Config): boolean {
+    if (FunctionRegistry.functionIsProtected(functionId)) {
+      return true
+    }
+    return licenseAllowsFunction(config.capabilityRegistry, config.licenseCapabilities, functionRegistry.getCanonicalFunctionId(functionId))
+  }
+
+  /**
    * Builds the function list for every id registered in an engine's own registry. Documented functions use their
    * catalogue entry; custom functions are listed with their name only. Sorted by localized name with
    * `localeCompare`, so the order follows the host's collation rules, with the language-independent canonical name
    * as a stable tiebreaker for entries that share a localized name.
    *
-   * Takes the [[TranslationPackage]] rather than deriving it from a language code: an instance must describe its
-   * functions under the package its own evaluator uses (`Config.translationPackage`), which is a snapshot taken
+   * Takes the instance's whole [[Config]] rather than a language code: an instance must describe its functions
+   * under the translation package its own evaluator uses (`Config.translationPackage`), which is a snapshot taken
    * when the instance was built and can differ from whatever is registered globally for the same code today.
-   * Deriving it here instead would let this method report a localized name the instance refuses to evaluate.
+   * Deriving it here instead would let this method report a localized name the instance refuses to evaluate. The
+   * config also carries the resolved entitlement, for the same reason — see [[licenseListsFunction]].
    *
    * @param {FunctionRegistry} functionRegistry - the engine's registry, the source of both the ids and their plugins
-   * @param {TranslationPackage} language - the translation package to translate the names under
+   * @param {Config} config - the instance's config: the translation package and the resolved license entitlement
    */
-  private static buildAvailableFunctions(functionRegistry: FunctionRegistry, language: TranslationPackage): FunctionListEntry[] {
+  private static buildAvailableFunctions(functionRegistry: FunctionRegistry, config: Config): FunctionListEntry[] {
+    const language = config.translationPackage
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
     return functionRegistry.getListableFunctionIds()
       // The interpreter refuses to evaluate ids the active language has no translation entry for
       // (FunctionRegistry.getFunction), so an untranslated function would be advertised but uncallable.
       .filter(id => language.isFunctionTranslated(id))
+      .filter(id => HyperFormula.licenseListsFunction(id, functionRegistry, config))
       .map(id => {
         const resolved = HyperFormula.resolveFunctionMetadata(id, functionRegistry.getFunctionPlugin(id))
         if (resolved === undefined) {
@@ -742,12 +791,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - the language-independent function id (canonical id or alias)
    * @param {FunctionRegistry} functionRegistry - the engine's registry, which resolves the id to its plugin
-   * @param {TranslationPackage} language - the translation package to translate the names under
+   * @param {Config} config - the instance's config: the translation package and the resolved license entitlement
    */
-  private static buildFunctionDetailsFor(functionId: string, functionRegistry: FunctionRegistry, language: TranslationPackage): FunctionDetails | undefined {
-    // Mirrors the filter in buildAvailableFunctions: an id the active language cannot evaluate
-    // (no translation entry) gets no details either, so the list and the details always agree.
+  private static buildFunctionDetailsFor(functionId: string, functionRegistry: FunctionRegistry, config: Config): FunctionDetails | undefined {
+    const language = config.translationPackage
+    // Mirrors the filters in buildAvailableFunctions: an id the active language cannot evaluate
+    // (no translation entry), or one this instance's license does not grant, gets no details
+    // either, so the list and the details always agree.
     if (!language.isFunctionTranslated(functionId)) {
+      return undefined
+    }
+    if (!HyperFormula.licenseListsFunction(functionId, functionRegistry, config)) {
       return undefined
     }
     const resolved = HyperFormula.resolveFunctionMetadata(functionId, functionRegistry.getFunctionPlugin(functionId))
@@ -798,7 +852,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1, 2, 3)', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // get value of A1 cell, should be '6'
    * const A1Value = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
@@ -829,7 +883,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1, 2, 3)', '0'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return a normalized A1 cell formula: '=SUM(1, 2, 3)'
    * const A1Formula = hfInstance.getCellFormula({ sheet: 0, col: 0, row: 0 });
@@ -859,7 +913,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=HYPERLINK("https://hyperformula.handsontable.com/", "HyperFormula")', '0'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return url of 'HYPERLINK': https://hyperformula.handsontable.com/
    * const A1Hyperlink = hfInstance.getCellHyperlink({ sheet: 0, col: 0, row: 0 });
@@ -891,7 +945,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1, 2, 3)', '0'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return serialized content of A1 cell: '=SUM(1, 2, 3)'
    * const cellA1Serialized = hfInstance.getCellSerialized({ sheet: 0, col: 0, row: 0 });
@@ -926,7 +980,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['0', '=SUM(1, 2, 3)', '=A1'],
    *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
    *  ['2', '=SUM(A1:C1)', '=C1'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return all values of a sheet: [[0, 6, 0], [1, '1.0%', 0], [2, 6, 0]]
    * const sheetValues = hfInstance.getSheetValues(0);
@@ -954,7 +1008,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['0', '=SUM(1, 2, 3)', '=A1'],
    *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
    *  ['2', '=SUM(A1:C1)', '=C1'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return all formulas of a sheet:
    * // [
@@ -987,7 +1041,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['0', '=SUM(1, 2, 3)', '=A1'],
    *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
    *  ['2', '=SUM(A1:C1)', '=C1'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return:
    * // [
@@ -1021,7 +1075,7 @@ export class HyperFormula implements TypedEmitter {
    *    ['3'],
    *    ['4'],
    *   ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return the dimensions of all sheets:
    * // { Sheet1: { width: 3, height: 1 }, Sheet2: { width: 1, height: 2 } }
@@ -1049,7 +1103,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *    ['1', '2', '=Sheet2!$A1'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return provided sheet's dimensions: { width: 3, height: 1 }
    * const sheetDimensions = hfInstance.getSheetDimensions(0);
@@ -1074,7 +1128,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '=A1+10', '3'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return all sheets values: { Sheet1: [ [ 1, 11, 3 ] ] }
    * const allSheetsValues = hfInstance.getAllSheetsValues();
@@ -1094,7 +1148,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '=A1+10'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return only formulas: { Sheet1: [ [ undefined, undefined, '=A1+10' ] ] }
    * const allSheetsFormulas = hfInstance.getAllSheetsFormulas();
@@ -1117,7 +1171,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', 2, '=A1+10'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return all sheets serialized content: { Sheet1: [ [ '1', 2, '=A1+10' ] ] }
    * // note: the string '1' stays a string and the number 2 stays a number
@@ -1145,7 +1199,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // add a config param, for example maxColumns,
    * // you can check the configuration with getConfig method
@@ -1219,13 +1273,14 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoOperationToUndoError]] when there is no operation running that can be undone
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the UndoRedo feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
    *  ['3', ''],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // perform CRUD operation, for example remove the second row
    * hfInstance.removeRows(0, [1, 1]);
@@ -1237,6 +1292,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Undo and Redo
    */
   public undo(): ExportedChange[] {
+    this.ensureCapability(FeatureId.UndoRedo)
     this._crudOperations.undo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1253,6 +1309,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoOperationToRedoError]] when there is no operation running that can be re-done
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the UndoRedo feature
    *
    * @example
    * ```js
@@ -1260,7 +1317,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['1'],
    *  ['2'],
    *  ['3'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // perform CRUD operation, for example remove the second row
    * hfInstance.removeRows(0, [1, 1]);
@@ -1275,12 +1332,14 @@ export class HyperFormula implements TypedEmitter {
    * @category Undo and Redo
    */
   public redo(): ExportedChange[] {
+    this.ensureCapability(FeatureId.UndoRedo)
     this._crudOperations.redo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
    * Checks if there is at least one operation that can be undone.
+   * Returns `false` also when the license key does not allow the UndoRedo feature (see [[LicenseCapabilityMissingError]]).
    *
    * For more information, see the [Undo-Redo guide](/guide/undo-redo.md).
    *
@@ -1290,7 +1349,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['1'],
    *  ['2'],
    *  ['3'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // perform CRUD operation, for example remove the second row
    * hfInstance.removeRows(0, [1, 1]);
@@ -1303,11 +1362,15 @@ export class HyperFormula implements TypedEmitter {
    * @category Undo and Redo
    */
   public isThereSomethingToUndo(): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.UndoRedo)) {
+      return false
+    }
     return this._crudOperations.isThereSomethingToUndo()
   }
 
   /**
    * Checks if there is at least one operation that can be re-done.
+   * Returns `false` also when the license key does not allow the UndoRedo feature (see [[LicenseCapabilityMissingError]]).
    *
    * For more information, see the [Undo-Redo guide](/guide/undo-redo.md).
    *
@@ -1322,6 +1385,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Undo and Redo
    */
   public isThereSomethingToRedo(): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.UndoRedo)) {
+      return false
+    }
     return this._crudOperations.isThereSomethingToRedo()
   }
 
@@ -1329,6 +1395,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to change the content in a rectangular area bounded by the box.
    * If returns `true`, doing [[setCellContents]] operation won't throw any errors.
    * Returns `false` if the address is invalid or the sheet does not exist.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - single cell or block of cells to check
    *
@@ -1339,7 +1406,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // top left corner
    * const address1 = { col: 0, row: 0, sheet: 0 };
@@ -1354,6 +1421,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public isItPossibleToSetCellContents(address: SimpleCellAddress | SimpleCellRange): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     let range
     if (isSimpleCellAddress(address)) {
       range = new AbsoluteCellRange(address, address)
@@ -1389,12 +1459,13 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a raw cell value
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[ExpectedValueOfTypeError]] if topLeftCornerAddress argument is of wrong type
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '=A1'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should set the content, returns:
    * // [{
@@ -1407,6 +1478,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     this._crudOperations.setCellContents(topLeftCornerAddress, cellContents)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1427,6 +1499,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1434,7 +1507,7 @@ export class HyperFormula implements TypedEmitter {
    *  [1],
    *  [2],
    *  [4, 5],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should set swap rows 0 and 2 in place, returns:
    * // [{
@@ -1459,6 +1532,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public swapRowIndexes(sheetId: number, rowMapping: [number, number][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setRowOrder(sheetId, rowMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1466,6 +1540,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Checks if it is possible to reorder rows of a sheet according to a source-target mapping.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {number} sheetId - ID of a sheet to operate on
    * @param {[number, number][]} rowMapping - array mapping original positions to final positions of rows
@@ -1478,7 +1553,7 @@ export class HyperFormula implements TypedEmitter {
    *  [1],
    *  [2],
    *  [4, 5],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // returns true
    * const isSwappable = hfInstance.isItPossibleToSwapRowIndexes(0, [[0, 2], [2, 0]]);
@@ -1490,6 +1565,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public isItPossibleToSwapRowIndexes(sheetId: number, rowMapping: [number, number][]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     try {
       this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
@@ -1522,6 +1600,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1529,7 +1608,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['A'],
    *  ['B'],
    *  ['C']
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // Move 'A' to index 1, 'B' to index 2, and 'C' to index 0.
    * const newRowOrder = [1, 2, 0]; // [ newPosForA, newPosForB, newPosForC ]
@@ -1542,6 +1621,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public setRowOrder(sheetId: number, newRowOrder: number[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     const mapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
     return this.swapRowIndexes(sheetId, mapping)
@@ -1549,6 +1629,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Checks if it is possible to reorder rows of a sheet according to a permutation.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * Parameter `newRowOrder` should have the form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`,
    * i.e. the value at index `i` is the new position for the row that is currently at index `i`.
@@ -1565,7 +1646,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['A'],
    *  ['B'],
    *  ['C']
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // returns true
    * hfInstance.isItPossibleToSetRowOrder(0, [1, 2, 0]);
@@ -1577,6 +1658,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public isItPossibleToSetRowOrder(sheetId: number, newRowOrder: number[]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     try {
       const rowMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
@@ -1604,13 +1688,14 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  [1, 2, 4],
    *  [5]
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should set swap columns 0 and 2 in place, returns:
    * // [{
@@ -1635,6 +1720,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public swapColumnIndexes(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setColumnOrder(sheetId, columnMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1642,6 +1728,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Checks if it is possible to reorder columns of a sheet according to a source-target mapping.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
@@ -1651,7 +1738,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  [1, 2, 4],
    *  [5]
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // returns true
    * hfInstance.isItPossibleToSwapColumnIndexes(0, [[0, 2], [2, 0]]);
@@ -1663,6 +1750,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public isItPossibleToSwapColumnIndexes(sheetId: number, columnMapping: [number, number][]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     try {
       this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
@@ -1695,12 +1785,13 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['A', 'B', 'C']
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // Move 'A' to index 1, 'B' to index 2, and 'C' to index 0.
    * const newColumnOrder = [1, 2, 0]; // [ newPosForA, newPosForB, newPosForC ]
@@ -1713,6 +1804,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public setColumnOrder(sheetId: number, newColumnOrder: number[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     const mapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
     return this.swapColumnIndexes(sheetId, mapping)
@@ -1720,6 +1812,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Checks if it is possible to reorder columns of a sheet according to a permutation.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * Parameter `newColumnOrder` should have the form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`,
    * i.e. the value at index `i` is the new position for the column that is currently at index `i`.
@@ -1734,7 +1827,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['A', 'B', 'C']
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // returns true
    * hfInstance.isItPossibleToSetColumnOrder(0, [1, 2, 0]);
@@ -1746,6 +1839,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public isItPossibleToSetColumnOrder(sheetId: number, newColumnOrder: number[]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     try {
       const columnMapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
@@ -1762,6 +1858,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks against particular rules to ascertain that addRows can be called.
    * If returns `true`, doing [[addRows]] operation won't throw any errors.
    * Returns `false` if adding rows would exceed the sheet size limit or given arguments are invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {number} sheetId - sheet ID in which rows will be added
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
@@ -1772,7 +1869,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '3'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' for this example,
    * // it is possible to add one row in the second row of sheet 0
@@ -1782,6 +1879,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public isItPossibleToAddRows(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     try {
@@ -1808,13 +1908,14 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values
@@ -1824,6 +1925,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public addRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.addRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1834,6 +1936,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks against particular rules to ascertain that removeRows can be called.
    * If returns `true`, doing [[removeRows]] operation won't throw any errors.
    * Returns `false` if given arguments are invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {number} sheetId - sheet ID from which rows will be removed
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [row, amount]
@@ -1845,7 +1948,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' for this example
    * // it is possible to remove one row from row 1 of sheet 0
@@ -1855,6 +1958,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public isItPossibleToRemoveRows(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     try {
@@ -1881,13 +1987,14 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return: [{ sheet: 0, col: 1, row: 2, value: null }] for this example
    * const changes = hfInstance.removeRows(0, [1, 1]);
@@ -1896,6 +2003,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public removeRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.removeRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1906,6 +2014,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks against particular rules to ascertain that addColumns can be called.
    * If returns `true`, doing [[addColumns]] operation won't throw any errors.
    * Returns `false` if adding columns would exceed the sheet size limit or given arguments are invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {number} sheetId - sheet ID in which columns will be added
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
@@ -1916,7 +2025,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' for this example,
    * // it is possible to add 1 column in sheet 0, at column 1
@@ -1926,6 +2035,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public isItPossibleToAddColumns(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     try {
@@ -1953,12 +2065,13 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=RAND()', '42'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, for this example:
@@ -1972,6 +2085,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public addColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.addColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1982,6 +2096,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks against particular rules to ascertain that removeColumns can be called.
    * If returns `true`, doing [[removeColumns]] operation won't throw any errors.
    * Returns `false` if given arguments are invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {number} sheetId - sheet ID from which columns will be removed
    * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [column, amount]
@@ -1992,7 +2107,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' for this example
    * // it is possible to remove one column, in place of the second column of sheet 0
@@ -2002,6 +2117,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public isItPossibleToRemoveColumns(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     try {
@@ -2028,12 +2146,13 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['0', '=SUM(1, 2, 3)', '=A1'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, in this example it will return:
@@ -2047,6 +2166,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public removeColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.removeColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2057,6 +2177,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks against particular rules to ascertain that moveCells can be called.
    * If returns `true`, doing [[moveCells]] operation won't throw any errors.
    * Returns `false` if the operation might be disrupted and causes side effects by the fact that there is an array inside the selected columns, the target location includes an array or the provided address is invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {SimpleCellRange} source - range for a moved block
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
@@ -2068,7 +2189,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // choose the coordinates and assign them to variables
    * const source = { sheet: 0, col: 1, row: 0 };
@@ -2083,6 +2204,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public isItPossibleToMoveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     if (!isSimpleCellAddress(destinationLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner')
     }
@@ -2117,12 +2241,13 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
    * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=RAND()', '42'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // choose the coordinates and assign them to variables
    * const source = { sheet: 0, col: 1, row: 0 };
@@ -2140,6 +2265,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public moveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     if (!isSimpleCellAddress(destinationLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner')
     }
@@ -2156,6 +2282,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks against particular rules to ascertain that moveRows can be called.
    * If returns `true`, doing [[moveRows]] operation won't throw any errors.
    * Returns `false` if the operation might be disrupted and causes side effects by the fact that there is an array inside the selected rows, the target location includes an array or the provided address is invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {number} sheetId - a sheet number in which the operation will be performed
    * @param {number} startRow - number of the first row to move
@@ -2169,7 +2296,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' for this example
    * // it is possible to move one row from row 0 into row 2
@@ -2179,6 +2306,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public isItPossibleToMoveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(startRow, 'number', 'startRow')
     validateArgToType(numberOfRows, 'number', 'numberOfRows')
@@ -2210,13 +2340,14 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
    * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values
@@ -2226,6 +2357,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public moveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(startRow, 'number', 'startRow')
     validateArgToType(numberOfRows, 'number', 'numberOfRows')
@@ -2239,6 +2371,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks against particular rules to ascertain that moveColumns can be called.
    * If returns `true`, doing [[moveColumns]] operation won't throw any errors.
    * Returns `false` if the operation might be disrupted and causes side effects by the fact that there is an array inside the selected columns, the target location includes an array or the provided address is invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {number} sheetId - a sheet number in which the operation will be performed
    * @param {number} startColumn - number of the first column to move
@@ -2251,7 +2384,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' for this example
    * // it is possible to move one column from column 1 into column 2 of sheet 0
@@ -2261,6 +2394,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public isItPossibleToMoveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(startColumn, 'number', 'startColumn')
     validateArgToType(numberOfColumns, 'number', 'numberOfColumns')
@@ -2292,28 +2428,31 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
    * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '3', '=RAND()', '=SUM(A1:C1)'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
+   * // move column B before column D; the SUM range follows its cells and becomes A1:B1
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, for this example:
    * // [{
-   * //   address: { sheet: 0, col: 1, row: 0 },
-   * //   newValue: 0.16210054671639,
-   * //  }, {
    * //   address: { sheet: 0, col: 4, row: 0 },
-   * //   newValue: 6.16210054671639,
+   * //   newValue: 4,
+   * //  }, {
+   * //   address: { sheet: 0, col: 3, row: 0 },
+   * //   newValue: 0.16210054671639,
    * // }]
-   * const changes = hfInstance.moveColumns(0, 1, 1, 2);
+   * const changes = hfInstance.moveColumns(0, 1, 1, 3);
    * ```
    *
    * @category Columns
    */
   public moveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(startColumn, 'number', 'startColumn')
     validateArgToType(numberOfColumns, 'number', 'numberOfColumns')
@@ -2333,12 +2472,13 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Clipboard feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['1', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // it copies [ [ 2 ] ]
    * const clipboardContent = hfInstance.copy({
@@ -2352,6 +2492,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public copy(source: SimpleCellRange): CellValue[][] {
+    this.ensureCapability(FeatureId.Clipboard)
     if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
@@ -2373,12 +2514,13 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Clipboard feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['1', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // returns the values that were cut: [ [ 1 ] ]
    * const clipboardContent = hfInstance.cut({
@@ -2392,6 +2534,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public cut(source: SimpleCellRange): CellValue[][] {
+    this.ensureCapability(FeatureId.Clipboard)
     if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
@@ -2421,12 +2564,13 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NothingToPasteError]] when clipboard is empty
    * @throws [[TargetLocationHasArrayError]] when the selected target area has array inside
    * @throws [[ExpectedValueOfTypeError]] if targetLeftCorner is of wrong type
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Clipboard feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['1', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // [ [ 2 ] ] was copied
    * const clipboardContent = hfInstance.copy({
@@ -2443,6 +2587,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
+    // Clipboard alone is enough, including for pasting a CUT - which relocates cells, the same
+    // mutation the public moveCells() requires Crud for. Granting the clipboard is taken to grant
+    // what the clipboard does, so this route is deliberately not gated on Crud as well.
+    this.ensureCapability(FeatureId.Clipboard)
     if (!isSimpleCellAddress(targetLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'targetLeftCorner')
     }
@@ -2458,7 +2606,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // copy desired content
    * const clipboardContent = hfInstance.copy({
@@ -2504,7 +2652,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['1', '2', '3'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // do an operation, for example remove columns
    * hfInstance.removeColumns(0, [0, 1]);
@@ -2534,7 +2682,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['1', '2', '3'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // do an operation, for example remove columns
    * hfInstance.removeColumns(0, [0, 1]);
@@ -2567,7 +2715,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['=SUM(1, 2)', '2', '10'],
    *  ['5', '6', '7'],
    *  ['40', '30', '20'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    *
    * // returns calculated cells content: [ [ 3, 2 ], [ 5, 6 ] ]
@@ -2603,7 +2751,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['=SUM(1, 2)', '2', '10'],
    *  ['5', '6', '7'],
    *  ['40', '30', '20'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // returns cell formulas of a given range only:
    * // [ [ '=SUM(1, 2)', undefined ], [ undefined, undefined ] ]
@@ -2642,7 +2790,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['=SUM(1, 2)', 2, 10],
    *  [5, 6, 7],
    *  [40, 30, 20],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return serialized cell content for the given range:
    * // [ [ '=SUM(1, 2)', 2 ], [ 5, 6 ] ]
@@ -2676,7 +2824,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildFromArray([[1, '=A1'], ['=$A$1', '2']]);
+   * const hfInstance = HyperFormula.buildFromArray([[1, '=A1'], ['=$A$1', '2']], { licenseKey: 'gpl-v3' });
    *
    * // should return [['2', '=$A$1', '2'], ['=A3', 1, '=C3'], ['2', '=$A$1', '2']]
    * hfInstance.getFillRangeData( {start: {sheet: 0, row: 0, col: 0}, end: {sheet: 0, row: 1, col: 1}},
@@ -2711,6 +2859,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks against particular rules to ascertain that addSheet can be called.
    * If returns `true`, doing [[addSheet]] operation won't throw any errors, and it is possible to add sheet with provided name.
    * Returns `false` if the chosen name is already used.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {string} sheetName - sheet name, case-insensitive
    *
@@ -2721,7 +2870,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['1'] ],
    *   MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return 'false' because 'MySheet2' already exists
    * const isAddable = hfInstance.isItPossibleToAddSheet('MySheet2');
@@ -2730,6 +2879,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public isItPossibleToAddSheet(sheetName: string): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetName, 'string', 'sheetName')
     try {
       this._crudOperations.ensureItIsPossibleToAddSheet(sheetName)
@@ -2750,13 +2902,14 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[SheetNameAlreadyTakenError]] when sheet with a given name already exists
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return 'MySheet3'
    * const nameProvided = hfInstance.addSheet('MySheet3');
@@ -2769,6 +2922,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public addSheet(sheetName?: string): string {
+    this.ensureCapability(FeatureId.Crud)
     if (sheetName !== undefined) {
       validateArgToType(sheetName, 'string', 'sheetName')
     }
@@ -2782,6 +2936,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to remove sheet for the engine.
    * Returns `true` if the provided sheet exists, and therefore it can be removed, doing [[removeSheet]] operation won't throw any errors.
    * Returns `false` otherwise
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {number} sheetId - sheet ID.
    *
@@ -2792,7 +2947,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' because sheet with ID 1 exists and is removable
    * const isRemovable = hfInstance.isItPossibleToRemoveSheet(1);
@@ -2801,6 +2956,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public isItPossibleToRemoveSheet(sheetId: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     try {
       this._crudOperations.ensureScopeIdIsValid(sheetId)
@@ -2824,13 +2982,14 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
    *  MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, in this example it will return:
@@ -2844,6 +3003,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public removeSheet(sheetId: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     const displayName = this.sheetMapping.getSheetName(sheetId) as string
     this._crudOperations.removeSheet(sheetId)
@@ -2856,6 +3016,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to clear a specified sheet.
    * If returns `true`, doing [[clearSheet]] operation won't throw any errors, provided sheet exists and its content can be cleared.
    * Returns `false` otherwise
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {number} sheetId - sheet ID.
    *
@@ -2866,7 +3027,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' because 'MySheet2' exists and can be cleared
    * const isClearable = hfInstance.isItPossibleToClearSheet(1);
@@ -2875,6 +3036,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public isItPossibleToClearSheet(sheetId: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     try {
       this._crudOperations.ensureScopeIdIsValid(sheetId)
@@ -2897,13 +3061,14 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
    *  MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, in this example it will return:
@@ -2917,6 +3082,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public clearSheet(sheetId: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.clearSheet(sheetId)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2926,6 +3092,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to replace the sheet content.
    * If returns `true`, doing [[setSheetContent]] operation won't throw any errors, the provided sheet exists and then its content can be replaced.
    * Returns `false` otherwise
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {number} sheetId - sheet ID.
    * @param {RawCellContent[][]} values - array of new values
@@ -2937,7 +3104,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' because sheet of ID 0 exists
    * // and the provided content can be placed in this sheet
@@ -2947,6 +3114,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public isItPossibleToReplaceSheetContent(sheetId: number, values: RawCellContent[][]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     try {
       this._crudOperations.ensureScopeIdIsValid(sheetId)
@@ -2968,13 +3138,14 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when values argument is not an array of arrays
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values
@@ -2984,6 +3155,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public setSheetContent(sheetId: number, values: RawCellContent[][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setSheetContent(sheetId, values)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -3003,7 +3175,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    * hfInstance.addSheet('Sheet0'); //sheetId = 0
    *
    * // returns { sheet: 42, col: 0, row: 0 }
@@ -3041,7 +3213,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    * hfInstance.addSheet('Sheet0'); //sheetId = 0
    *
    * // should return { start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 0 } }
@@ -3068,7 +3240,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    * hfInstance.addSheet('Sheet0'); //sheetId = 0
    * const addr = { sheet: 0, col: 1, row: 1 };
    *
@@ -3121,7 +3293,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    * hfInstance.addSheet('Sheet0'); //sheetId = 0
    * const range = { start: { sheet: 0, col: 1, row: 1 }, end: { sheet: 0, col: 2, row: 1 } };
    *
@@ -3172,7 +3344,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] , { licenseKey: 'gpl-v3' });
    *
    * hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0});
    * // returns [{ sheet: 0, col: 1, row: 0}, { sheet: 0, col: 2, row: 0}]
@@ -3210,7 +3382,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] , { licenseKey: 'gpl-v3' });
    *
    * hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0});
    * // returns [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
@@ -3245,7 +3417,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return 'MySheet2' as this sheet is the second one
    * const sheetName = hfInstance.getSheetName(1);
@@ -3267,7 +3439,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return all sheets names: ['MySheet1', 'MySheet2']
    * const sheetNames = hfInstance.getSheetNames();
@@ -3291,7 +3463,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['1'] ],
    *   MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return '0' because 'MySheet1' is of ID '0'
    * const sheetID = hfInstance.getSheetId('MySheet1');
@@ -3316,7 +3488,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['1'] ],
    *   MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' since 'MySheet1' exists
    * const sheetExist = hfInstance.doesSheetExist('MySheet1');
@@ -3342,7 +3514,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(A2:A3)', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'FORMULA', the cell of given coordinates is of this type
    * const cellA1Type = hfInstance.getCellType({ sheet: 0, col: 0, row: 0 });
@@ -3374,7 +3546,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(A2:A3)', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' since the selected cell contains a simple value
    * const isA1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 0, row: 0 });
@@ -3405,7 +3577,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(A2:A3)', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' since the A1 cell contains a formula
    * const A1Formula = hfInstance.doesCellHaveFormula({ sheet: 0, col: 0, row: 0 });
@@ -3437,7 +3609,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   [null, '1'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'true', cell of provided coordinates is empty
    * const isEmpty = hfInstance.isCellEmpty({ sheet: 0, col: 0, row: 0 });
@@ -3468,7 +3640,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *    ['{=TRANSPOSE(B1:B1)}'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'true', cell of provided coordinates is a part of an array
    * const isPartOfArray = hfInstance.isCellPartOfArray({ sheet: 0, col: 0, row: 0 });
@@ -3500,7 +3672,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1, 2, 3)', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'NUMBER', cell value type of provided coordinates is a number
    * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
@@ -3536,7 +3708,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1%', '1$'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'NUMBER_PERCENT', cell value type of provided coordinates is a number with a format inference percent.
    * const cellType = hfInstance.getCellValueDetailedType({ sheet: 0, col: 0, row: 0 });
@@ -3570,7 +3742,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1$', '1'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return '$', cell value type of provided coordinates is a number with a format inference currency, parsed as using '$' as currency.
    * const cellFormat = hfInstance.getCellValueFormat({ sheet: 0, col: 0, row: 0 });
@@ -3597,7 +3769,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return the number of sheets which is '1'
    * const sheetsCount = hfInstance.countSheets();
@@ -3613,6 +3785,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns information whether it is possible to rename sheet.
    * Returns `true` if the sheet with provided id exists and new name is available
    * Returns `false` if sheet cannot be renamed
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {number} sheetId - a sheet number
    * @param {string} newName - a name of the sheet to be given
@@ -3624,7 +3797,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['1'] ],
    *   MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // returns true
    * hfInstance.isItPossibleToRenameSheet(0, 'MySheet0');
@@ -3633,6 +3806,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public isItPossibleToRenameSheet(sheetId: number, newName: string): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(newName, 'string', 'newName')
     try {
@@ -3656,13 +3832,14 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SheetNameAlreadyTakenError]] when the provided sheet name already exists
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['1'] ],
    *   MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // renames the sheet 'MySheet1'
    * hfInstance.renameSheet(0, 'MySheet0');
@@ -3671,6 +3848,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public renameSheet(sheetId: number, newName: string): void {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(newName, 'string', 'newName')
     const oldName = this._crudOperations.renameSheet(sheetId, newName)
@@ -3693,12 +3871,14 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[evaluationSuspended]] always
    * @fires [[evaluationResumed]] after the recomputation of necessary values
    *
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Batching feature
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // multiple operations in a single callback will trigger evaluation only once
    * // and only one set of changes is returned as a combined result of all
@@ -3712,6 +3892,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public batch(batchOperations: () => void): ExportedChange[] {
+    this.ensureCapability(FeatureId.Batching)
     this.suspendEvaluation()
     this._crudOperations.beginUndoRedoBatchMode()
     try {
@@ -3734,12 +3915,14 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[evaluationSuspended]] always
    *
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Batching feature
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // similar to batch() but operations are not within a callback,
    * // one method suspends the recalculation
@@ -3759,6 +3942,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public suspendEvaluation(): void {
+    this.ensureCapability(FeatureId.Batching)
     this._evaluationSuspended = true
     this._emitter.emit(Events.EvaluationSuspended)
   }
@@ -3775,7 +3959,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // similar to batch() but operations are not within a callback,
    * // one method suspends the recalculation
@@ -3795,6 +3979,15 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public resumeEvaluation(): ExportedChange[] {
+    // Deliberately NOT gated, unlike suspendEvaluation and batch. This is the only exit from
+    // a suspended engine, and _evaluationSuspended survives rebuildWithConfig: an instance
+    // suspended while Batching was granted, whose entitlement then loses Batching via
+    // updateConfig, would be stuck suspended forever - every read throws
+    // EvaluationSuspendedError and the sole recovery path would throw
+    // LicenseCapabilityMissingError. Gating the two entry points is what makes the feature
+    // licensable; gating the release valve only strands the caller, which is the same reason
+    // teardown (clearClipboard, clearUndoStack, clearRedoStack) is ungated. See the note on
+    // ensureCapability.
     this._evaluationSuspended = false
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.EvaluationResumed, changes)
@@ -3806,7 +3999,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // suspend the evaluation
    * hfInstance.suspendEvaluation();
@@ -3829,6 +4022,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks against particular rules to ascertain that addNamedExpression can be called.
    * If returns `true`, doing [[addNamedExpression]] operation won't throw any errors.
    * Returns `false` if the operation might be disrupted.
+   * Returns `false` also when the license key does not allow the NamedExpressions feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {string} expressionName - a name of the expression to be added
    * @param {RawCellContent} expression - the expression
@@ -3840,7 +4034,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // should return 'true' for this example,
    * // it is possible to add named expression to global scope
@@ -3850,6 +4044,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public isItPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, scope?: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.NamedExpressions)) {
+      return false
+    }
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -3882,12 +4079,13 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NamedExpressionNameIsInvalidError]] when the named-expression name is not valid
    * @throws [[NoRelativeAddressesAllowedError]] when the named-expression formula contains relative references
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // add own expression, scope limited to 'Sheet1' (sheetId=0), the method should return a list of cells which values
    * // changed after the operation, their absolute addresses and new values
@@ -3902,6 +4100,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public addNamedExpression(expressionName: string, expression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -3928,13 +4127,13 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // add a named expression, only 'Sheet1' (sheetId=0) considered as it is the scope
-   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 'Sheet1');
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
    *
-   * // returns the calculated value of a passed named expression, '142' for this example
-   * const myFormula = hfInstance.getNamedExpressionValue('prettyName', 'Sheet1');
+   * // returns the calculated value of a passed named expression, 142 for this example
+   * const myFormula = hfInstance.getNamedExpressionValue('prettyName', 0);
    * ```
    *
    * @category Named Expressions
@@ -3969,7 +4168,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // add a named expression in 'Sheet1' (sheetId=0)
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
@@ -4010,7 +4209,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // add a named expression in 'Sheet1' (sheetId=0)
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
@@ -4052,6 +4251,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks against particular rules to ascertain that changeNamedExpression can be called.
    * If returns `true`, doing [[changeNamedExpression]] operation won't throw any errors.
    * Returns `false` if the operation might be disrupted.
+   * Returns `false` also when the license key does not allow the NamedExpressions feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {string} expressionName - an expression name, case-insensitive.
    * @param {RawCellContent} newExpression - a new expression
@@ -4063,7 +4263,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // add a named expression
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
@@ -4076,6 +4276,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public isItPossibleToChangeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.NamedExpressions)) {
+      return false
+    }
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4107,23 +4310,25 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
    * @throws [[ArrayFormulasNotSupportedError]] when the named expression formula is an array formula
    * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // add a named expression, scope limited to 'Sheet1' (sheetId=0)
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
    *
-   * // change the named expression
-   * const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!$A$1+200');
+   * // change the named expression in the same scope
+   * const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!$A$1+200', 0);
    * ```
    *
    * @category Named Expressions
    */
   public changeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4137,6 +4342,7 @@ export class HyperFormula implements TypedEmitter {
    * Checks against particular rules to ascertain that removeNamedExpression can be called.
    * If returns `true`, doing [[removeNamedExpression]] operation won't throw any errors.
    * Returns `false` if the operation might be disrupted.
+   * Returns `false` also when the license key does not allow the NamedExpressions feature (see [[LicenseCapabilityMissingError]]).
    *
    * @param {string} expressionName - an expression name, case-insensitive.
    * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
@@ -4147,7 +4353,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // add a named expression
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
@@ -4160,6 +4366,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public isItPossibleToRemoveNamedExpression(expressionName: string, scope?: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.NamedExpressions)) {
+      return false
+    }
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4188,12 +4397,13 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NamedExpressionDoesNotExistError]] when the given expression does not exist.
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // add a named expression
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
@@ -4205,6 +4415,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public removeNamedExpression(expressionName: string, scope?: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4237,7 +4448,7 @@ export class HyperFormula implements TypedEmitter {
    *  ['42'],
    *  ['50'],
    *  ['60'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // add two named expressions and one scoped
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
@@ -4272,12 +4483,12 @@ export class HyperFormula implements TypedEmitter {
    *  ['42'],
    *  ['50'],
    *  ['60'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // add two named expressions and one scoped
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
    * hfInstance.addNamedExpression('anotherPrettyName', '=Sheet1!$A$2+100');
-   * hfInstance.addNamedExpression('prettyName3', '=Sheet1!$A$3+100', 0);
+   * hfInstance.addNamedExpression('alsoPrettyName', '=Sheet1!$A$3+100', 0);
    *
    * // get all expressions serialized
    * // should return:
@@ -4309,7 +4520,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
    *  ['50'],
-   * ]);
+   * ], { licenseKey: 'gpl-v3' });
    *
    * // returns '=Sheet1!$A$1+10'
    * const normalizedFormula = hfInstance.normalizeFormula('=SHEET1!$A$1+10');
@@ -4344,7 +4555,7 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  Sheet1: [['58']],
    *  Sheet2: [['1', '2', '3'], ['4', '5', '6']]
-   * });
+   * }, { licenseKey: 'gpl-v3' });
    *
    * // returns the calculated formula's value
    * // for this example, returns `68`
@@ -4378,7 +4589,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // returns a list of named expressions used by a formula
    * // for this example, returns ['foo', 'bar']
@@ -4432,9 +4643,14 @@ export class HyperFormula implements TypedEmitter {
    * Returns translated names of all functions registered in this instance of HyperFormula
    * according to the language set in the configuration
    *
+   * Answers for the instance's function REGISTRY — what is registered, not what the license key
+   * lets it evaluate — so it lists every registered function whatever the key grants. To build a
+   * function picker that never offers a function evaluating to `#LIC!`, use
+   * [[getAvailableFunctions]], which answers about availability.
+   *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // return translated names of all functions, assign to a variable
    * const allNames = hfInstance.getRegisteredFunctionNames();
@@ -4461,7 +4677,7 @@ export class HyperFormula implements TypedEmitter {
    * // import your own plugin
    * import { MyExamplePlugin } from './file_with_your_plugin';
    *
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // register a plugin
    * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
@@ -4482,7 +4698,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // return classes of all plugins registered, assign to a variable
    * const allNames = hfInstance.getAllFunctionPlugins();
@@ -4517,9 +4733,24 @@ export class HyperFormula implements TypedEmitter {
    * plugin registered without translations for that language. A translation set to an empty string is not a missing
    * entry: it falls back to the canonical id, so the function stays listed under its canonical name.
    *
+   * A function the instance's license key does not include is omitted for the same reason: it would evaluate to a
+   * `#LIC!` error. The list therefore answers "what can this engine compute", not "what does this package contain".
+   * Two consequences worth knowing:
+   * - A key that blocks evaluation (a missing or invalid key, an expired classic key, or a trial past its grace
+   *   period) does **not** shorten the list. Such a key restricts nothing by entitlement — it is reported on the
+   *   console, and every license-gated function call evaluates to `#LIC!` — so the full catalog is still described.
+   *   `VERSION()` and `OFFSET()` are protected built-ins outside the license system, so they keep evaluating. Use it to
+   *   build a function picker before a key is configured. An expired key that keeps evaluating (a subscription past
+   *   its grace period, or a perpetual key whose maintenance doesn't cover this build) keeps its own grants, so the
+   *   list stays exactly what it was while the key was current.
+   * - A custom (user-registered) function is omitted only if it took a built-in id the key excludes. The rule is
+   *   "not covered by the capability table", not "not user-registered", so a plugin registered under an id the
+   *   built-in catalog already uses is treated as that built-in. Registered under an id of its own, a custom
+   *   function is never omitted. See {@link getFunctionDetails}, which states the same exception.
+   *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // get the list of available functions, translated for the configured language
    * const functions = hfInstance.getAvailableFunctions();
@@ -4530,9 +4761,9 @@ export class HyperFormula implements TypedEmitter {
   public getAvailableFunctions(): FunctionListEntry[] {
     return HyperFormula.buildAvailableFunctions(
       this._functionRegistry,
-      // The instance's own package, the one its evaluator uses — not a fresh global lookup, which could describe
-      // the functions under a package this instance never adopted.
-      this._config.translationPackage,
+      // The instance's own config: its translation package (not a fresh global lookup, which could describe the
+      // functions under a package this instance never adopted) and its resolved license entitlement.
+      this._config,
     )
   }
 
@@ -4543,9 +4774,10 @@ export class HyperFormula implements TypedEmitter {
    * documentation link (`documentationUrl`) and usage examples (`examples`) — every built-in authors both.
    * Resolves both built-in and custom (user-registered) functions, as well as aliases. An alias reports its
    * target's metadata (including examples, which spell the target's name) under the alias id, with the target id
-   * exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, or
-   * has no translation entry for the configured language (an untranslated id cannot be evaluated, so it is not
-   * described either, which keeps this method consistent with [[getAvailableFunctions]]).
+   * exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, has
+   * no translation entry for the configured language, or is not included in this instance's license key (neither an
+   * untranslated nor an unlicensed id can be evaluated, so neither is described — which keeps this method consistent
+   * with [[getAvailableFunctions]], including its behavior for a key that blocks evaluation).
    * For a custom function, `category` is `'Custom'`, there is no `shortDescription`, `documentationUrl` or
    * `examples`, and parameters are reported positionally (`Arg1`, `Arg2`, ...). A custom plugin registered over a
    * built-in id is the exception: the catalogue is keyed by function id, so it reports that built-in's authored
@@ -4564,7 +4796,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // get the details of the SUMIF function, translated for the configured language
    * const details = hfInstance.getFunctionDetails('SUMIF');
@@ -4574,8 +4806,8 @@ export class HyperFormula implements TypedEmitter {
    */
   public getFunctionDetails(canonicalName: string): FunctionDetails | undefined {
     validateArgToType(canonicalName, 'string', 'canonicalName')
-    // The instance's own package, the one its evaluator uses — see getAvailableFunctions.
-    return HyperFormula.buildFunctionDetailsFor(canonicalName, this._functionRegistry, this._config.translationPackage)
+    // The instance's own config, for the same reasons as getAvailableFunctions.
+    return HyperFormula.buildFunctionDetailsFor(canonicalName, this._functionRegistry, this._config)
   }
 
   /**
@@ -4589,7 +4821,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // pass the number of days since nullDate
    * // the method should return formatted date and time, for this example:
@@ -4616,7 +4848,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // pass the number of days since nullDate
    * // the method should return formatted date, for this example:
@@ -4642,7 +4874,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // pass a number to be interpreted as a time
    * // should return {hours: 26, minutes: 24} for this example
@@ -4665,7 +4897,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // subscribe to a 'sheetAdded', pass a simple handler
    * hfInstance.on('sheetAdded', ( ) => { console.log('foo') });
@@ -4690,7 +4922,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // subscribe to a 'sheetAdded', pass a simple handler
    * hfInstance.once('sheetAdded', ( ) => { console.log('foo') });
@@ -4716,7 +4948,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty();
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
    *
    * // define a simple function to be called upon emitting an event
    * const handler = ( ) => { console.log('baz') }
@@ -4768,6 +5000,48 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Throws an error if the current license does not allow the given feature: either the key's
+   * state blocks every gated feature (a missing or invalid key, an expired classic key, or a trial
+   * past its grace period), or the key does not grant it.
+   *
+   * Where the line is drawn, so a later change does not move it by accident:
+   * - **Gated:** methods that create value by mutating the sheet, the clipboard, the undo
+   *   history, or the named-expression set.
+   * - **Not gated:** reads (`getCellValue`, `listNamedExpressions`,
+   *   `getAllNamedExpressionsSerialized`, the `isItPossibleTo*` predicates and
+   *   `isThereSomethingToUndo`/`isThereSomethingToRedo`, which answer `false` instead of throwing
+   *   when the method they ask about is not allowed) and teardown or
+   *   cleanup that only ever removes state (`clearClipboard`, `clearUndoStack`,
+   *   `clearRedoStack`, `destroy`). Gating cleanup would let a restricted entitlement strand
+   *   an integration mid-teardown while giving a licensee nothing, and mirrors gate B, which
+   *   blocks *calling* a function rather than *reading* an already-computed value.
+   * - **Not gated, for the same reason:** `resumeEvaluation`, the sole exit from a suspended
+   *   engine. Gate the entry points (`suspendEvaluation`, `batch`) and the feature is
+   *   licensable; gate the release valve too and an entitlement change mid-suspension leaves
+   *   the instance permanently unusable. A capability check must never be reachable only on
+   *   the way out of a state it let the caller into.
+   *
+   * Must stay the first statement of every gated method, so a blocking key is reported before
+   * any argument validation.
+   *
+   * @internal
+   */
+  private ensureCapability(feature: FeatureId): void {
+    ensureFeatureAllowed(this._config, feature)
+  }
+
+  /**
+   * Whether the current license allows the given feature: the answer [[ensureCapability]] acts on,
+   * for the `isItPossibleTo*` predicates and `isThereSomethingToUndo`/`isThereSomethingToRedo`,
+   * which answer `false` instead of throwing.
+   *
+   * @internal
+   */
+  private isCapabilityAllowed(feature: FeatureId): boolean {
+    return isFeatureAllowed(this._config, feature)
+  }
+
+  /**
    * Parses a formula string and extracts its AST and dependencies.
    *
    * @internal
@@ -4793,7 +5067,10 @@ export class HyperFormula implements TypedEmitter {
    */
   private rebuildWithConfig(newParams: Partial<ConfigParams>): void {
     const newConfig = this._config.mergeConfig(newParams)
-    const configNewLanguage = this._config.mergeConfig({language: newParams.language})
+    // The second argument silences license console messages for this transient Config: it is
+    // built from the OUTGOING config purely to reserialize sheets, and must not print an expiry
+    // notice for the key the caller may be replacing in this very call.
+    const configNewLanguage = this._config.mergeConfig({language: newParams.language}, false)
     const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
     const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
 

@@ -1,3 +1,13 @@
+---
+tags:
+  - architecture
+  - internals
+  - parser
+  - Abstract Syntax Tree
+  - Chevrotain
+  - topological order
+---
+
 # Key concepts
 
 ## High-level design diagram

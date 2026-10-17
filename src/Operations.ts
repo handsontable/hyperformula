@@ -958,10 +958,17 @@ export class Operations {
       const expressionName = namedExpressionDependency.name
       const sourceVertex = this.dependencyGraph.fetchNamedExpressionVertex(expressionName, sourceSheet).vertex
       const namedExpressionInTargetScope = this.namedExpressions.isExpressionInScope(expressionName, targetAddress.sheet)
+      const namedExpressionInSourceScope = this.namedExpressions.isExpressionInScope(expressionName, sourceSheet)
 
+      // A name the source sheet does not define locally resolves to the same workbook-level vertex
+      // from either sheet: a global named expression, or the placeholder of a name defined nowhere.
+      // There is nothing to copy then, and copying would turn an undefined name into an empty
+      // global named expression, changing the formula's #NAME? into an empty value.
       const targetScopeExpressionVertex = namedExpressionInTargetScope
         ? this.dependencyGraph.fetchNamedExpressionVertex(expressionName, targetAddress.sheet).vertex
-        : this.copyOrFetchGlobalNamedExpressionVertex(expressionName, sourceVertex, addedGlobalNamedExpressions)
+        : namedExpressionInSourceScope
+          ? this.copyOrFetchGlobalNamedExpressionVertex(expressionName, sourceVertex, addedGlobalNamedExpressions)
+          : sourceVertex
 
       if (targetScopeExpressionVertex !== sourceVertex) {
         this.dependencyGraph.graph.removeEdgeIfExists(sourceVertex, vertex)

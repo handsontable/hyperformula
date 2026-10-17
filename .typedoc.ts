@@ -7,6 +7,7 @@ module.exports = {
     "./src/dependencyTransformers/**",
     "./src/DependencyGraph/**",
     "./src/ColumnSearch/**",
+    "./src/license/handsontable-license-key-parser/**",
   ],
   "mode": "file",
   "out": "./typedoc",

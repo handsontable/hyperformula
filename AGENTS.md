@@ -6,6 +6,19 @@ Instructions for AI coding agents (Cursor, Claude Code, Codex, Aider, and any ot
 
 Whatever you do, start by reading entire [DEV_DOCS.md](DEV_DOCS.md). Only then proceed to your task.
 
+## Never publish sensitive information
+
+Never write any of the following into a commit message, branch name, pull request title or description, GitHub issue or comment, code comment, changelog entry, or documentation page:
+
+- client, customer, and partner names, or details that identify them indirectly (their domains, deployments, or the wording of their reports)
+- personal data of any kind &mdash; names, e-mail addresses, phone numbers, user accounts, IP addresses
+- credentials and secrets &mdash; API keys, tokens, passwords, license keys, private URLs
+- internal-only material &mdash; contents of private repositories and internal tickets, unreleased plans, contract and pricing details
+
+Describe the change on its own technical terms instead: write "fix an off-by-one error in `SUMIFS` when the criteria range is empty", not "fix the bug reported by \<company\>". An internal ticket identifier such as `HF-123` is fine on its own; the contents of that ticket are not.
+
+If a change cannot be described without such information, stop and ask the user how to proceed.
+
 ## Other important resources
 
 - the repository [README.md](README.md) &mdash; high-level project description and quick install/usage

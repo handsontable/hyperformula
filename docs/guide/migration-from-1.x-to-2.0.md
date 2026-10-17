@@ -1,3 +1,14 @@
+---
+tags:
+  - migration
+  - migrate
+  - upgrade
+  - breaking changes
+  - gpu.js
+  - GPU acceleration
+  - v2.0
+---
+
 # Migrating from 1.x to 2.0
 
 To upgrade your HyperFormula version from 1.x.x to 2.0.0, follow this guide.
