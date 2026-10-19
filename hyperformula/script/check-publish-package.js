@@ -95,7 +95,7 @@ async function checkDirectoryTreeStructure() {
     const stats = await stat(`${UNPACKED_DIR_NAME}/${FILES_CHECKLIST[i]}`)
 
     if (!stats || !stats.isFile()) {
-      throw new Error(`No such file (${file}) in the checklist or it is not described as a regular file`);
+      throw new Error(`No such file (${FILES_CHECKLIST[i]}) in the checklist or it is not described as a regular file`);
     }
   }
 }
