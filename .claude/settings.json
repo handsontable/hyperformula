@@ -1,7 +1,7 @@
 {
-  "enabledPlugins": [
-    "typescript-lsp@claude-plugins-official"
-  ],
+  "enabledPlugins": {
+    "typescript-lsp@claude-plugins-official": true
+  },
   "permissions": {
     "deny": [
       "Read(/hyperformula/lib/**)",
