@@ -25,6 +25,7 @@ const FILES_CHECKLIST = [
   'CHANGELOG.md',
   'README.md',
   'package.json',
+  'script/postinstall-skills-message.js',
   'commonjs/index.js',
   'commonjs/HyperFormula.js',
   'dist/hyperformula.js',
