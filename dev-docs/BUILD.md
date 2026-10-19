@@ -32,7 +32,7 @@ The portal is served by a Cloudflare Worker, and **deployment is driven by Worke
 
 | Command | Does |
 |---|---|
-| `npm run docs:build:cf` | Full portal build, then composes the Worker asset tree through `docs/script/prepare-cf-assets.js` |
+| `npm run docs:build:cf` | `docs:install`, then the full portal build from an empty output directory. Like `docs:build`, it ends by composing the Worker asset tree through `docs/script/prepare-cf-assets.js` |
 | `npm run docs:deploy:cf` | `wrangler deploy` — production |
 | `npm run docs:preview:cf` | `wrangler versions upload` — a per-branch preview URL |
 

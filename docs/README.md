@@ -50,8 +50,8 @@ From the repository root:
 
 * `npm run docs:install` - Installs the portal's own dependencies (`npm ci` inside `docs/`). Needed once, and again whenever `docs/package.json` changes.
 * `npm run docs:dev` - Starts a local docs server at http://localhost:8080/docs/hyperformula/.
-* `npm run docs:build` - Builds the docs into `docs/.vuepress/dist/docs/hyperformula` (the base path, `/docs/hyperformula/`, and the output directory are set in `docs/.vuepress/build.config.js`).
-* `npm run docs:build:cf` - The build Cloudflare Workers Builds runs. Installs the portal first, then builds and composes the Worker assets.
+* `npm run docs:build` - Builds the docs into `docs/.vuepress/dist/docs/hyperformula` (the base path, `/docs/hyperformula/`, and the output directory are set in `docs/.vuepress/build.config.js`), then composes the Worker assets with `docs/script/prepare-cf-assets.js`, so CI catches a broken asset step before Workers Builds does.
+* `npm run docs:build:cf` - The build Cloudflare Workers Builds runs. Installs the portal and clears the previous output first, then runs the same build.
 * `npm run docs:generate-function-docs` - Regenerates the built-in functions guide page from the function metadata API. Runs automatically as the first step of `docs:dev` and `docs:build`.
 * `npm run docs:code-examples:generate-js docs/examples/<guide>/example1.ts` - Generates the JavaScript variant of one TypeScript example and formats it. The path is relative to where you run the command.
 * `npm run docs:code-examples:generate-all-js` - The same for every example in `docs/examples/`.
