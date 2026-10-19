@@ -55,7 +55,7 @@ HyperFormula is a headless spreadsheet calculation engine. No UI, no DOM, no ser
 `hyperformula/src/parser/` wraps the [Chevrotain](https://chevrotain.io/) parser generator.
 
 - `LexerConfig.ts` and `ParserConfig.ts` build the token set from the active language and config — the lexer is **language-dependent**, because function names are translated.
-- `ParserWithCaching.ts` is the entry point; identical formula strings resolve from `Cache.ts` rather than being reparsed.
+- `ParserWithCaching.ts` is the entry point; formulas that are the same once the relative parts of their references are taken as offsets from their own cell share one cached AST in `Cache.ts` rather than being reparsed — see [`PARSER.md`](PARSER.md).
 - `collectDependencies.ts` extracts the relative dependencies of an AST. Resolving them against a concrete address is `hyperformula/src/absolutizeDependencies.ts`, which sits at the source root rather than in `hyperformula/src/parser/`.
 - `Unparser.ts` is the inverse — AST back to text, in the target language. A change to parsing almost always needs a matching change here, or round-tripping breaks.
 
@@ -74,7 +74,7 @@ HyperFormula is a headless spreadsheet calculation engine. No UI, no DOM, no ser
 
 - `Graph.ts` holds the vertices and edges; `TopSort.ts` produces the evaluation order and detects cycles.
 - Vertex kinds: `ValueCellVertex`, `FormulaVertex`, `EmptyCellVertex`, `RangeVertex`, `ParsingErrorVertex`.
-- `AddressMapping/` maps a `SimpleCellAddress` to its vertex; `RangeMapping.ts` does the same for ranges, so a range is a single vertex rather than one edge per cell.
+- `AddressMapping/` maps a `SimpleCellAddress` to its vertex; `RangeMapping.ts` does the same for ranges, so every formula over a range shares one range vertex — see [`DEPENDENCY-GRAPH.md`](DEPENDENCY-GRAPH.md).
 - `hyperformula/src/LazilyTransformingAstService.ts` — at the source root, not in this directory — defers AST rewrites after structural changes until a formula is actually read. A change there affects both correctness and the CRUD hot path.
 
 ## Invariants
@@ -83,7 +83,7 @@ Everything in `hyperformula/src/` ships, runs in the browser and in Node, and si
 
 - **Headless.** No DOM, no network, no filesystem. A dependency that reaches for `window`, `document`, or `fs` does not belong in `hyperformula/src/`.
 - **Incremental.** A change recalculates the affected subgraph, never the whole sheet. Anything that forces a full recalculation is a performance regression, not an implementation detail.
-- **Language-dependent parsing.** Function names, argument separators, and error literals all vary by language. Never hard-code an English function name in the parser or the interpreter.
+- **Language-dependent parsing.** Function names and error literals vary by language. The argument, decimal and array separators do not: they are configuration (`ConfigParams`). Never hard-code an English function name in the parser or the interpreter.
 - **Errors are values.** Return a `CellError` with a message from `hyperformula/src/error-message.ts`. A throw reachable from evaluation escapes one cell and takes the whole recalculation with it.
 - **Coercion goes through `ArithmeticHelper`.** Spreadsheet coercion is not JavaScript coercion, and it is already implemented once.
 - **Public API stability.** `hyperformula/src/HyperFormula.ts` and the types re-exported from `hyperformula/src/index.ts` are the contract. The JSDoc on it **is** the published API reference — write it for the reader of the docs portal. See [`DEFINITION-OF-DONE.md`](../../dev-docs/DEFINITION-OF-DONE.md) for what a breaking change requires.
@@ -103,6 +103,6 @@ Everything in `hyperformula/src/` ships, runs in the browser and in Node, and si
 
 - `HyperFormula.ts` — the public API. Every method here is documented output.
 - `CrudOperations.ts` / `Operations.ts` / `UndoRedo.ts` — CRUD validates, `Operations` mutates, `UndoRedo` records. A new mutation needs all three, or undo silently diverges.
-- `Config.ts` / `ConfigParams.ts` — `ConfigParams.ts` declares the interface and carries the `@default` JSDoc tags; the values themselves live in `Config.defaultConfig`, which the constructor merges a partial config onto. A new option therefore needs four things: the field, a value in `defaultConfig`, validation, and a guide entry. An option added to `ConfigParams.ts` alone is `undefined` at run time.
+- `Config.ts` / `ConfigParams.ts` — `ConfigParams.ts` declares the interface and carries the `@default` JSDoc tags; the default values live in `Config.defaultConfig`. The constructor does not merge a partial config onto them: it reads each option by name and assigns most of them through `configValueFromParam` (`ArgumentSanitization.ts`), which checks the type or the allowed values and falls back to the default; array and object options use `configValueFromParamCheck`, and `chooseAddressMappingPolicy`, `functionPlugins` and `context` are assigned directly. Only `mergeConfig`, used by `updateConfig`, merges a partial onto the current config and builds a new `Config` from the result. A new option therefore needs the field in `ConfigParams.ts`, a value in `defaultConfig`, a field on `Config` with its constructor assignment and validation, and a guide entry. `Config` implements `ConfigParams`, so the compiler rejects an option added to `ConfigParams.ts` alone.
 - `dependencyTransformers/` — AST rewrites when rows, columns, or sheets move. Paired with `LazilyTransformingAstService.ts`, which defers them until a formula is read.
 - `format/`, `helpers/`, `Lookup/`, `statistics/` — number and date formats, shared utilities, lookup strategies, instrumentation counters.

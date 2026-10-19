@@ -44,7 +44,7 @@ export class AbsPlugin extends FunctionPlugin implements FunctionPluginTypecheck
 }
 ```
 
-`implementedFunctions` maps the **canonical English id** to its metadata — translated names never appear here. `method` names the class method that implements it, and `FunctionPluginTypecheck` makes a mismatch a compile error.
+`implementedFunctions` maps the **canonical English id** to its metadata — translated names never appear here. `method` names the class method that implements it. Nothing checks that name at compile time — `FunctionPluginTypecheck` constrains only the signatures of the plugin's public members — so a mismatch throws `FunctionPluginValidationError` when the plugin is registered: for a built-in exported from `plugin/index.ts`, on import of `hyperformula/src/index.ts`; for the protected `VersionPlugin`, when an engine is built.
 
 ### `runFunction` does the work
 
@@ -90,12 +90,12 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 
 This list is the authority; the skills link here rather than repeating it.
 
-1. the plugin implementation in `hyperformula/src/interpreter/plugin/`, plus its `implementedFunctions` metadata;
+1. the plugin implementation in `hyperformula/src/interpreter/plugin/`, plus its `implementedFunctions` metadata — and a new plugin class must be exported from `hyperformula/src/interpreter/plugin/index.ts`: `hyperformula/src/index.ts` registers the built-in plugins from that module's exports (only the protected `VersionPlugin` is loaded by `FunctionRegistry` itself), so an unexported one compiles but every function in it evaluates to `#NAME?`;
 2. the catalogue entry in `hyperformula/src/interpreter/functionMetadata/categories/` — see [`FUNCTION-CATALOGUE.md`](FUNCTION-CATALOGUE.md);
 3. **every** language file in `hyperformula/src/i18n/languages/` — see [`I18N.md`](I18N.md);
 4. tests — see [`TESTING.md`](TESTING.md);
 5. the changelog entry — see [`DEFINITION-OF-DONE.md`](../../dev-docs/DEFINITION-OF-DONE.md).
 
-They do not fail the same way. A missing catalogue entry **fails the docs build**; a parameter-count mismatch only warns on the console; a missing translation, a missing test, and a missing `optionalArg` fail silently.
+They do not fail the same way. A missing catalogue entry **fails the docs build**; a parameter-count mismatch warns on the console; a missing translation makes the function evaluate to `#NAME?` in that language and drop out of `getAvailableFunctions`. The private suite catches all three (a parameter-count mismatch only when the implementation declares at least one parameter), but only when it is attached. A missing test and a missing `optionalArg` fail silently.
 
 Skill: `hyperformula-function-dev`.
