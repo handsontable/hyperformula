@@ -10,6 +10,8 @@ HyperFormula is a headless spreadsheet calculation engine in TypeScript. No UI, 
 
 Read [`dev-docs/README.md`](dev-docs/README.md) first. It says which page covers what, and every directory's own `AGENTS.md` points at the page that covers that directory.
 
+Read the repository, not the web. The guides in `docs/guide/` and the generated API reference in `docs/api/` are the content the documentation portal serves: read the local files rather than fetching the rendered pages, and read `hyperformula/src/` rather than either when the question is what the code actually does.
+
 ## Never publish sensitive information
 
 Never write any of the following into a commit message, branch name, pull request title or description, GitHub issue or comment, code comment, changelog entry, or documentation page:

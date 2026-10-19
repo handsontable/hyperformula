@@ -13,7 +13,7 @@ Every field is required, `documentationUrl` included. Each entry authors its own
 
 An entry's `category` must be one of the categories in `FUNCTION_CATEGORIES` — the ones the generated guide page renders as `### ` sections.
 
-The separate `'Custom'` category is reserved for user-registered functions and must **never** appear in `FUNCTION_CATEGORIES` or in a catalogue file. It names no section, and the docs generator rejects an entry carrying it rather than silently dropping it from the page it is building. That rejection is also what turns a missing catalogue entry into a failed docs build.
+The separate `'Custom'` category is reserved for user-registered functions and must **never** appear in `FUNCTION_CATEGORIES` or in a catalogue file. It names no section, and the docs generator rejects an entry carrying it rather than silently dropping it from the page it is building. That rejection is also what turns a missing catalogue entry into a failed docs build. Arity drift (below) needs no such guard: the function still reaches the generator, which renders its degraded syntax line.
 
 ## Keyed by id, not by implementation
 

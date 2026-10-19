@@ -29,10 +29,6 @@ Committed, so every developer gets the same setup.
 
 Relative deny patterns anchor at the session's working directory, and project settings are not inherited from parent directories — these rules apply to sessions started at the repository root.
 
-## Read the repository, not the web
-
-The guides in `docs/guide/` and the generated API reference in `docs/api/` are the same content the documentation portal serves. Read the local files rather than fetching the rendered pages, and read `hyperformula/src/` rather than either when the question is what the code actually does.
-
 ## Skills
 
 All skills live in `.claude/skills/`, at the repository root — one directory to look in, one to keep consistent. No skill sets the `paths` frontmatter field: with it, Claude Code offers a skill only after a file matching the glob has been read, which hides the skill exactly when a task starts from a symptom rather than a file. Every skill is chosen from its description alone, so the description names both the files and the symptoms it covers.

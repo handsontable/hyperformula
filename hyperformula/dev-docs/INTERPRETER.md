@@ -27,6 +27,8 @@
 
 Every built-in function lives in a plugin class under `hyperformula/src/interpreter/plugin/` extending `FunctionPlugin`. One file per plugin; a plugin holds one function or a family of related ones.
 
+Adding a built-in function is close to adding a custom one, so the [custom functions guide](../../docs/guide/custom-functions.md) is a useful reference for the implementation patterns: argument metadata, return types, and array handling.
+
 ```ts
 export class AbsPlugin extends FunctionPlugin implements FunctionPluginTypecheck<AbsPlugin> {
   public static implementedFunctions: ImplementedFunctions = {

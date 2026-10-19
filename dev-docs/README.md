@@ -40,7 +40,7 @@ Inside the engine — architecture, the parser, the interpreter, the dependency 
 |---|---|
 | Anything in `hyperformula/src/` | [`hyperformula/dev-docs/README.md`](../hyperformula/dev-docs/README.md) |
 
-Outside both: [`docs/README.md`](../docs/README.md) for running the documentation portal, [`hyperformula/test/README.md`](../hyperformula/test/README.md) for attaching the private test suite, and [`CONTRIBUTING.md`](../CONTRIBUTING.md) for external contributors.
+Outside both: [`README.md`](../README.md) for what the repository holds, [`hyperformula/README.md`](../hyperformula/README.md) for what the engine is and how to install and use it, [`docs/README.md`](../docs/README.md) for running the documentation portal, [`hyperformula/test/README.md`](../hyperformula/test/README.md) for attaching the private test suite, and [`CONTRIBUTING.md`](../CONTRIBUTING.md) for external contributors.
 
 ## Conventions
 
