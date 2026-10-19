@@ -19,7 +19,7 @@ Never force-push to `master`, `develop`, or a branch that already has an open pu
 
 1. Commit the source change on a feature branch cut from `develop`.
 2. Run the pre-flight gate below.
-3. Push, and open the pull request against `develop` (`gh pr create --base develop`). The repository's default branch is `master`, so without `--base` the pull request targets `master`.
+3. Push, and open the pull request against `develop` (`gh pr create --base develop`). The repository's default branch is `master`, so without `--base` the pull request targets `master`. Fill in every section of [the template](#the-template).
 4. Add the changelog entry, linking that pull request or the public issue it fixes — see [`DOC-STANDARDS.md`](DOC-STANDARDS.md#the-changelog).
 5. Commit and push the entry to the same branch.
 
@@ -35,7 +35,7 @@ npm run test:jest
 
 Add `npm run test` (which includes the browser run) when the change touches bundling, module format, or anything browser-specific. Add `npm run docs:generate-function-docs` when it touches a function or its catalogue entry — from the repository root, after `npm run docs:install`, because the generator runs in the portal's own install.
 
-Read the output. Do not open a pull request on a red run and describe it as ready.
+Read the output. Do not open a pull request on a red run and describe it as ready. A green Jest run without `hyperformula/test/hyperformula-tests/` covers only the smoke tests, so confirm the private suite is attached before calling the run green.
 
 ## The template
 

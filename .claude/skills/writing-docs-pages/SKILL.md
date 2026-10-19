@@ -29,7 +29,7 @@ And [`docs/README.md`](../../../docs/README.md), for what the portal contains an
 ```bash
 npm run docs:install # once: the portal has its own install
 npm run bundle-all   # the portal embeds the built engine
-npm run docs:dev     # http://localhost:8080/docs/
+npm run docs:dev     # http://localhost:8080/docs/hyperformula/
 ```
 
 ## 4. Before you finish

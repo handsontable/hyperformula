@@ -7,36 +7,14 @@ description: Use before creating, pushing, opening, or updating a pull request i
 
 | File | Why |
 |---|---|
-| [`PULL-REQUESTS.md`](../../../dev-docs/PULL-REQUESTS.md) | Branch naming, the pre-flight gate, the template, and the one-change-per-pull-request rule |
+| [`PULL-REQUESTS.md`](../../../dev-docs/PULL-REQUESTS.md) | Branch naming, the order of operations, the pre-flight gate, the template, and scope and upkeep |
 | [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md) | Every item the change must contain before review |
 | [`DOC-STANDARDS.md`](../../../dev-docs/DOC-STANDARDS.md#the-changelog) | The changelog entry that follows the pull request |
 
-## 2. Commit on a correctly named branch
+## 2. Follow the order of operations
 
-`<type>/<ticket>-<slug>`, cut from `develop`. Nothing from a private ticket in the name — the identifier alone is fine.
+Work through [`PULL-REQUESTS.md`](../../../dev-docs/PULL-REQUESTS.md#order-of-operations) step by step, from the branch name to the pushed changelog entry. Write the entry with skill `changelog-creation`.
 
-## 3. Run the gate and read the output
+## 3. Check before asking for review
 
-```bash
-npm run test:setup-private
-npm run lint
-npm run test:jest
-```
-
-A green Jest run without `hyperformula/test/hyperformula-tests/` covers only the smoke tests. Confirm the suite is attached before calling it green. Do not open a pull request on a red run and describe it as ready.
-
-## 4. Push and open the pull request
-
-Target `develop` with `gh pr create --base develop` — the default branch is `master`. Fill in every section of the template. Tick the Types of changes boxes honestly, breaking change included.
-
-## 5. Add the changelog entry
-
-Read the number from the pull request URL, then skill `changelog-creation`. Push it to the same branch.
-
-## 6. Confirm the definition of done
-
-Then read your own diff end to end before asking anyone else to.
-
-## While the branch is open
-
-Update the description in the same push whenever the scope changes.
+Go through [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md), then [Scope and upkeep](../../../dev-docs/PULL-REQUESTS.md#scope-and-upkeep) — including keeping the description current while the branch is open.
