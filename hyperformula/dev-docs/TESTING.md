@@ -19,6 +19,8 @@ The full suite is kept in a separate private repository and is **git-ignored** h
 npm run test:setup-private
 ```
 
+**Without it, `npm run test:jest` runs only the smoke tests and reports a clean pass over almost nothing** — the most common false signal in this repository. Confirm `hyperformula/test/hyperformula-tests/` is present before calling a run green.
+
 **Run it after every branch switch.** The suite is branch-matched, so skipping it runs the previous branch's tests against the current source: the results are meaningless, and they look like ordinary passes and failures. How the fetch works, and the environment variables it honours, are in [`hyperformula/test/README.md`](../test/README.md). In a fresh git worktree the directory is absent entirely — see [`WORKTREES.md`](../../dev-docs/WORKTREES.md).
 
 **A clone fetched before the monorepo move is left behind at `test/hyperformula-tests/`, in the repository root.** Nothing ignores that path any more, so `git status` lists an untracked `test/`. The release script then refuses to start on a dirty tree, and `git add -A` would commit the clone as an embedded repository. Delete it once, from the repository root, after checking that `test/` holds nothing else:
@@ -34,6 +36,7 @@ npm run test:setup-private   # fetches the suite into hyperformula/test/hyperfor
 |---|---|
 | `npm run test` | Lint, Jest, and the Karma browser run — the full local gate |
 | `npm run test:jest` | Jest only; the fast loop |
+| `npm run test:jest -- <pattern>` | Jest on the files or `describe` names matching the pattern |
 | `npm run test:watch` | Jest in watch mode |
 | `npm run test:coverage` | Jest with coverage |
 | `npm run test:browser` | Karma, against the `dist` build, in headless Chrome and Firefox |

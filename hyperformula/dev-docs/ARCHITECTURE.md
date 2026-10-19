@@ -29,6 +29,21 @@ HyperFormula is a headless spreadsheet calculation engine. No UI, no DOM, no ser
         Serialization / Exporter   engine values  ──►  values the caller asked for
 ```
 
+## Where a symptom lives
+
+| Symptom | Stage |
+|---|---|
+| Does not parse, or parses wrongly | `hyperformula/src/parser/` |
+| `getCellFormula` returns something the user never typed | `hyperformula/src/parser/Unparser.ts` |
+| A function returns the wrong value or error | `hyperformula/src/interpreter/plugin/` |
+| Value right, but stale after an edit | `hyperformula/src/DependencyGraph/`, `hyperformula/src/Evaluator.ts` |
+| Wrong after adding or removing rows or columns | `hyperformula/src/dependencyTransformers/`, `LazilyTransformingAstService.ts` |
+| Wrong in one language only | `hyperformula/src/i18n/languages/` |
+| Coercion or comparison is wrong | `hyperformula/src/interpreter/ArithmeticHelper.ts` |
+| The public API disagrees with its docs | `hyperformula/src/HyperFormula.ts` |
+
+A bug that looks like an interpreter problem is often a parser or graph problem. Confirm which stage is wrong before editing. The smallest reproduction of a calculation bug is a two-line `buildFromArray` plus one `getCellValue`.
+
 ## Core modules
 
 | Module | Role |

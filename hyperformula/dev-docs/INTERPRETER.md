@@ -101,4 +101,13 @@ This list is the authority; the skills link here rather than repeating it.
 
 They do not fail the same way. A missing catalogue entry **fails the docs build**; a parameter-count mismatch warns on the console; a missing translation makes the function evaluate to `#NAME?` in that language and drop out of `getAvailableFunctions`. The private suite catches all three (a parameter-count mismatch only when the implementation declares at least one parameter), but only when it is attached. A function missing from the capability table escapes the license check, which only the private suite catches. A missing test and a missing `optionalArg` fail silently.
 
+### Verifying a function change
+
+```bash
+npm run test:jest -- <FunctionName>
+npm run docs:install                  # once: the generator runs in the portal's own install
+npm run docs:generate-function-docs   # fails loudly on a bad or missing catalogue entry
+npm run lint
+```
+
 Skill: `hyperformula-function-dev`.

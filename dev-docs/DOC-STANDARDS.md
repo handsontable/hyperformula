@@ -66,3 +66,5 @@ A breaking change says what breaks and what to do instead, and still needs a mig
 `docs/` is a VuePress site. How to run it, what is generated, and how to add a page are in [`docs/README.md`](../docs/README.md).
 
 Two rules from above bear repeating there, because they are the ones most often broken while writing a guide: do not restate the API reference, and describe HyperFormula rather than Excel.
+
+**A new page needs a sidebar entry** under `docs/.vuepress/`. A page without one builds successfully and is unreachable, so nothing in the build tells you it is missing.

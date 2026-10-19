@@ -8,33 +8,14 @@ description: Use when creating or editing a page in the HyperFormula documentati
 | File | Why |
 |---|---|
 | [`DOCS-CONTENT-GUIDE.md`](../../../dev-docs/DOCS-CONTENT-GUIDE.md) | How to write the page: structure, chunking, language, code examples, VuePress conventions, and the self-review checklist to run before finishing |
-| [`DOC-STANDARDS.md`](../../../dev-docs/DOC-STANDARDS.md) | When documentation is required, and describing HyperFormula rather than Excel |
+| [`DOC-STANDARDS.md`](../../../dev-docs/DOC-STANDARDS.md) | When documentation is required, which files are generated, describing HyperFormula rather than Excel, and the portal's rules |
 | [`FUNCTION-CATALOGUE.md`](../../../hyperformula/dev-docs/FUNCTION-CATALOGUE.md) | Only when the change concerns the built-in functions page, which is generated from the catalogue |
-| [`BUILD.md`](../../../dev-docs/BUILD.md) | Which documentation files are generated, by which command |
 
 And [`docs/README.md`](../../../docs/README.md), for what the portal contains and how to run it.
 
-## 2. Change the source, not the output
+## 2. Work through them in order
 
-| To change | Edit | Then run |
-|---|---|---|
-| What the functions page says about a function | its catalogue entry in `hyperformula/src/interpreter/functionMetadata/categories/` | `npm run docs:generate-function-docs` |
-| The API reference | the JSDoc in `hyperformula/src/` | `npm run typedoc:build-api` |
-| A guide | the file in `docs/guide/` | `npm run docs:dev` |
-
-`docs/guide/built-in-functions.md` and `docs/api/` are git-ignored build output. Editing them is always wrong, and the edit disappears on the next build.
-
-## 3. Run the portal
-
-```bash
-npm run docs:install # once: the portal has its own install
-npm run bundle-all   # the portal embeds the built engine
-npm run docs:dev     # http://localhost:8080/docs/hyperformula/
-```
-
-## 4. Before you finish
-
-- A new page needs a sidebar entry under `docs/.vuepress/`, or it builds and is unreachable.
-- Link to the API reference for detail rather than restating it.
-- Verify any behavioural claim against the implementation. Where HyperFormula deviates from Excel, record it in [`docs/guide/list-of-differences.md`](../../../docs/guide/list-of-differences.md).
-- Run the self-review checklist at the end of [`DOCS-CONTENT-GUIDE.md`](../../../dev-docs/DOCS-CONTENT-GUIDE.md#self-review-checklist-run-before-finishing-any-page).
+1. Change the source, not the output — [Generated files](../../../dev-docs/DOC-STANDARDS.md#generated-files).
+2. Write the page — [`DOCS-CONTENT-GUIDE.md`](../../../dev-docs/DOCS-CONTENT-GUIDE.md), [Describing behaviour](../../../dev-docs/DOC-STANDARDS.md#describing-behaviour), and [The documentation portal](../../../dev-docs/DOC-STANDARDS.md#the-documentation-portal), sidebar entry included.
+3. Run the portal and look at the page — [`docs/README.md`](../../../docs/README.md).
+4. Run the self-review checklist at the end of [`DOCS-CONTENT-GUIDE.md`](../../../dev-docs/DOCS-CONTENT-GUIDE.md#self-review-checklist-run-before-finishing-any-page).
