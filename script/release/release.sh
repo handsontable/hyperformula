@@ -646,7 +646,9 @@ fi
 #    while node_modules is missing - and skipping then would take a broken
 #    install straight into the build.
 step "4. Reinstall dependencies"
-LOCK_VERSION="$(node -e 'try{process.stdout.write(require("./package-lock.json").version||"")}catch(e){}' 2>/dev/null || true)"
+# The workspace lock file has no top-level version: the engine's sits in the
+# entry for its directory.
+LOCK_VERSION="$(PKG_DIR="$PKG_DIR" node -e 'try{process.stdout.write(require("./package-lock.json").packages[process.env.PKG_DIR].version||"")}catch(e){}' 2>/dev/null || true)"
 if [[ "$LOCK_VERSION" == "$VERSION" && -d node_modules ]]; then
   skip "package-lock.json already regenerated for $VERSION"
 else
