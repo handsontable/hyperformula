@@ -21,6 +21,13 @@ npm run test:setup-private
 
 **Run it after every branch switch.** The suite is branch-matched, so skipping it runs the previous branch's tests against the current source: the results are meaningless, and they look like ordinary passes and failures. How the fetch works, and the environment variables it honours, are in [`hyperformula/test/README.md`](../test/README.md). In a fresh git worktree the directory is absent entirely — see [`WORKTREES.md`](../../dev-docs/WORKTREES.md).
 
+**A clone fetched before the monorepo move is left behind at `test/hyperformula-tests/`, in the repository root.** Nothing ignores that path any more, so `git status` lists an untracked `test/`. The release script then refuses to start on a dirty tree, and `git add -A` would commit the clone as an embedded repository. Delete it once, from the repository root, after checking that `test/` holds nothing else:
+
+```bash
+rm -rf test/
+npm run test:setup-private   # fetches the suite into hyperformula/test/hyperformula-tests/
+```
+
 ## Running tests
 
 | Command | Runs |

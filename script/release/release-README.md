@@ -132,7 +132,9 @@ describe decisions made from stale refs. The script marks these fetches
    `hyperformula` workspace *and* `node_modules` exists.
    Both are required: an interrupted install can leave the lock file written and
    `node_modules` missing, and skipping then would carry a broken install
-   straight into the build.
+   straight into the build. A reinstall deletes `hyperformula/node_modules` as
+   well as the root one, because npm resolves a lock-free install from what is
+   already on disk.
 5. **Builds, then lints and runs the whole test suite** — the unit tests and the
    browser suite, which needs headless Chrome and Firefox on this machine.
    These always run, even when resuming a freeze that got this far before.

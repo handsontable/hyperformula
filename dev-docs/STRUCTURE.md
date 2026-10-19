@@ -145,7 +145,7 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 - **The published tarball still carries a changelog and a licence.** `hyperformula`'s `prepack` copies the root `CHANGELOG.md` and `LICENSE.txt` into the package and `postpack` removes them again, so each is one file under version control and npm consumers still get both. The webpack banner reads the root `LICENSE.txt` directly.
 - **Every `.nvmrc` says `22`.**
 - **Each directory lints itself.** `hyperformula/` and `docs/` each carry their own `.eslintrc.js` and `.eslintignore`, and each package declares the lint tooling it uses. The root `npm run lint` only fans out with `--workspaces --if-present`, so a package with a different linter or TypeScript version — the UI — brings its own, and the engine's rules, licence header included, never reach it. `docs/` is not a workspace, so its lint is `npm run docs:lint`, run by the documentation CI job, which installs the portal anyway.
-- **The private test suite stays branch-matched.** Only its checkout path moved, to `hyperformula/test/hyperformula-tests/`. Its specs needed no change: they import the engine relatively, and the depth from a spec to the package root is unchanged.
+- **The private test suite stays branch-matched.** Only its checkout path moved, to `hyperformula/test/hyperformula-tests/`. Its specs needed no change: they import the engine relatively, and the depth from a spec to the package root is unchanged. A clone fetched before the move stays behind at the root and has to be deleted once — see [`hyperformula/dev-docs/TESTING.md`](../hyperformula/dev-docs/TESTING.md#fetching-the-private-suite).
 
 ## Two things the move uncovered
 

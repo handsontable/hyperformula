@@ -653,7 +653,10 @@ LOCK_VERSION="$(PKG_DIR="$PKG_DIR" node -e 'try{process.stdout.write(require("./
 if [[ "$LOCK_VERSION" == "$VERSION" && -d node_modules ]]; then
   skip "package-lock.json already regenerated for $VERSION"
 else
-  run rm -rf ./node_modules
+  # The workspace's own node_modules too: npm keeps there whatever it could not
+  # hoist, and an install without a lock file starts from what is on disk, so a
+  # stale copy left there would be written into the new lock file.
+  run rm -rf ./node_modules "$PKG_DIR/node_modules"
   run rm -f package-lock.json
   run npm i
 fi
