@@ -6,7 +6,7 @@ The engine's own build — the intermediate `lib/`, the bundles, and packaging �
 
 ## Install
 
-Node version is pinned in [`.nvmrc`](../.nvmrc) — 22, the same in every package. The repository uses npm workspaces with a committed `package-lock.json`, so install with `npm ci`, not `npm install`.
+Node version is pinned in the root [`.nvmrc`](../.nvmrc) — 22. It is the only one: the whole repository runs on one Node version, and `nvm` finds it from any subdirectory. The repository uses npm workspaces with a committed `package-lock.json`, so install with `npm ci`, not `npm install`.
 
 ```bash
 npm ci              # the workspace: hyperformula

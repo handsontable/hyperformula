@@ -26,7 +26,7 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 │   ├── babel.config.js  ht.config.js  jasmine.json  .npmignore
 │   ├── .eslintrc.js  .eslintignore   # its own lint configuration
 │   ├── .typedoc.ts  .typedoc.md.ts   # API reference generation, output into docs/api
-│   ├── package.json  .nvmrc  README.md
+│   ├── package.json  README.md
 │   └── AGENTS.md  CLAUDE.md
 │
 ├── hyperformula-ui/                  # ── a group of packages: UI components (not imported yet; planned layout below)
@@ -44,7 +44,7 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 │   ├── script/                       # Generates guide/built-in-functions.md; composes the Worker assets
 │   ├── worker/index.js               # Cloudflare Worker serving the built portal
 │   ├── wrangler.jsonc                # Its deploy configuration
-│   ├── package.json  .nvmrc
+│   ├── package.json
 │   ├── .eslintrc.js  .eslintignore   # its own lint configuration
 │   └── AGENTS.md  CLAUDE.md  README.md
 │
@@ -129,7 +129,7 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
    - give each UI package a `lint` script running its own linter, so the root `npm run lint` picks it up;
    - license each published UI package like the engine: `"license": "GPL-3.0-only"` in its `package.json`, the root `LICENSE.txt` in its tarball through the same `prepack` copy the engine uses, and an entry, by package name, in `WORKSPACES` in `script/check-licenses.mjs`, so its production dependencies pass the same allowlist;
    - point the root fan-out scripts, which today target `--workspace=hyperformula` only, at the UI's packages too;
-   - add an `.nvmrc` saying `22`, an `AGENTS.md` with a `CLAUDE.md` symlink, and `hyperformula-ui/dev-docs/`;
+   - delete the UI's own `.nvmrc`, if it has one — the root `.nvmrc` covers the whole repository — and add an `AGENTS.md` with a `CLAUDE.md` symlink, and `hyperformula-ui/dev-docs/`;
    - keep the UI's own version and history: its packages stay on their `0.x` line, with `hyperformula-ui/CHANGELOG.md` and a release path of their own, tagged with a prefix such as `hyperformula-ui@0.3.0` so the tags cannot collide with the engine's bare `3.5.0`. `script/release/release.sh` keeps releasing the engine only. The UI's `peerDependencies` on `hyperformula` say which engine versions it works with.
 2. **Path-filter CI.** Each package's jobs should run only when its own paths change, with full runs on `develop`, `master`, and release branches. Not done here on purpose: a naive `paths:` filter on a workflow that branch protection lists as a required check leaves the check permanently pending, and pull requests become unmergeable. Doing it safely needs the required-checks list, which lives in repository settings rather than in the tree, and the `dorny/paths-filter`-plus-single-gate shape that the Handsontable monorepo uses.
 3. **Before this merges, switch the Workers Builds deploy commands.** The Cloudflare dashboard still runs `npx wrangler deploy` and `npx wrangler versions upload` at the repository root, which find no configuration and no `wrangler` there now that `wrangler.jsonc` lives in `docs/`. Set the deploy command to `npm run docs:deploy:cf` and the non-production branch deploy command to `npm run docs:preview:cf`, as [`docs/README.md`](../docs/README.md#deployment) describes. Do it first: every branch with the old layout already defines both scripts at its root, so the switch breaks nothing. Until it is made, every preview build fails, and production stops updating once the move reaches `master`.
@@ -143,7 +143,7 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 - **The UI packages are GPL-3.0-only, like the engine** — the working assumption until a licensing decision says otherwise. It sets what the import does with their manifests, their tarballs and the licence gate; see [What the move still owes](#what-the-move-still-owes).
 - **The UI versions on its own until it is mature, then joins the engine's version.** While its API is still moving, the UI releases on its own `0.x` line, where every minor release may break, with its own changelog — rather than starting at `3.x` and forcing an engine major, or a break smuggled into a minor, whenever the UI changes incompatibly. Once the team judges the UI ready, the versions join — there is no fixed trigger — and from then on the packages release together, on one version, from one changelog. A release then cuts every published package at the same version, whether or not each one changed, and `CHANGELOG.md` at the repository root is the single history for all of them; the UI's changelog is folded into it. That keeps one number to reason about — the version a user reports a bug against identifies the state of the whole repository — at the cost of publishing a package whose code did not move. This order is the safe one: joining separate versions only needs version numbers to go up, while splitting a shared version after users depend on it is hard.
 - **The published tarball still carries a changelog and a licence.** `hyperformula`'s `prepack` copies the root `CHANGELOG.md` and `LICENSE.txt` into the package and `postpack` removes them again, so each is one file under version control and npm consumers still get both. The webpack banner reads the root `LICENSE.txt` directly.
-- **Every `.nvmrc` says `22`.**
+- **One `.nvmrc`, at the root.** The whole repository runs on one Node version; `nvm` finds the root file from any subdirectory, and Workers Builds, which starts at the root, reads it too.
 - **Each directory lints itself.** `hyperformula/` and `docs/` each carry their own `.eslintrc.js` and `.eslintignore`, and each package declares the lint tooling it uses. The root `npm run lint` only fans out with `--workspaces --if-present`, so a package with a different linter or TypeScript version — the UI — brings its own, and the engine's rules, licence header included, never reach it. `docs/` is not a workspace, so its lint is `npm run docs:lint`, run by the documentation CI job, which installs the portal anyway.
 - **The private test suite stays branch-matched.** Only its checkout path moved, to `hyperformula/test/hyperformula-tests/`. Its specs needed no change: they import the engine relatively, and the depth from a spec to the package root is unchanged. A clone fetched before the move stays behind at the root and has to be deleted once — see [`hyperformula/dev-docs/TESTING.md`](../hyperformula/dev-docs/TESTING.md#fetching-the-private-suite).
 
