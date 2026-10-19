@@ -1,6 +1,9 @@
 # Anchored to this directory: an unanchored pattern matches a directory of that
 # name at any depth.
 node_modules
+# ESLint skips dot-folders by default; the portal's own code lives in this one.
+!/.vuepress/
+/.vuepress/dist/
 # Formatted by code-examples-generator.sh with examples/eslintrc.examples.js.
 /examples/
 # Build scripts, not linted.

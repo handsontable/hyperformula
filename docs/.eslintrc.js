@@ -13,4 +13,32 @@ module.exports = {
     sourceType: 'module',
   },
   extends: ['eslint:recommended'],
+  overrides: [
+    {
+      // The VuePress configuration, plugins and themes, loaded by Node.
+      files: ['.vuepress/**/*.js'],
+      env: {
+        worker: false,
+        node: true,
+      },
+      parserOptions: {
+        sourceType: 'script',
+      },
+    },
+    {
+      // Bundled into the client by webpack.
+      files: [
+        '.vuepress/enhanceApp.js',
+        '.vuepress/components/**/*.js',
+        '.vuepress/plugins/search-box/match-query.js',
+      ],
+      env: {
+        node: false,
+        browser: true,
+      },
+      parserOptions: {
+        sourceType: 'module',
+      },
+    },
+  ],
 };

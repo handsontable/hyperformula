@@ -76,7 +76,7 @@ Size alone does not keep a package out. The UI's dependencies, its frameworks, g
 | Command | Runs in |
 |---|---|
 | `npm run lint` | Fanned out to every workspace that defines `lint`; each lints itself with its own configuration |
-| `npm run docs:lint` | The portal, with its own configuration — separate, because the portal installs separately |
+| `npm run docs:lint` | The portal's code — `.vuepress/` and `worker/` — with its own configuration, separate because the portal installs separately. Not the Markdown content, and not `examples/`, which `code-examples-generator.sh` formats |
 | `npm run test:jest`, `bundle-all`, `compile` | Fanned out to `hyperformula` |
 | `npm run docs:*` | Orchestrated from the root across both `hyperformula` and `docs` |
 
