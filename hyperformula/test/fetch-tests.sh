@@ -2,9 +2,9 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# The directory that holds test/. That is the repository root today, and will be
-# the hyperformula package root once this repository becomes a monorepo. Either
-# way it sits inside the git working tree, which is all `git rev-parse` needs.
+# The directory that holds test/: the hyperformula package root, one level below
+# the repository root. It sits inside the git working tree, which is all
+# `git rev-parse` needs.
 PACKAGE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 HYPERFORMULA_TESTS_DIR="$SCRIPT_DIR/hyperformula-tests"
 
