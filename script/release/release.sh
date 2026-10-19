@@ -1151,7 +1151,7 @@ run git checkout master
 if on_npm "$VERSION"; then
   skip "hyperformula@$VERSION is already on npm - not publishing again"
 elif $DRY_RUN; then
-  echo "    (would ask for confirmation, then run: npm publish --tag $NPM_TAG)"
+  echo "    (would ask for confirmation, then run: npm run copy-root-files --workspace=hyperformula, then npm publish --workspace=hyperformula --tag $NPM_TAG)"
 else
   confirm_publish "$VERSION" "$NPM_USER"
   # Publish the workspace, not the root, whose manifest is private. The changelog

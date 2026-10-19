@@ -39,7 +39,8 @@ function json(bin, args) {
   // `npm ls` exits non-zero on any tree warning, so read stdout regardless.
   let out = ''
   try {
-    out = execFileSync(bin, args, { cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+    // npm and npx are .cmd shims on Windows, which Node launches only through a shell.
+    out = execFileSync(bin, args, { cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, shell: process.platform === 'win32' })
   } catch (error) {
     out = error.stdout ?? ''
   }
@@ -57,6 +58,9 @@ function collect(node, found = new Set()) {
   for (const [name, dep] of Object.entries(node.dependencies ?? {})) {
     if (dep.version) {
       found.add(`${name}@${dep.version}`)
+    } else if (dep.missing) {
+      // Declared but not installed: no licence can be read for it, so it must fail.
+      found.add(`${name}@(not installed)`)
     }
     collect(dep, found)
   }
