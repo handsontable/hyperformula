@@ -516,7 +516,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   STEYX: {
     category: 'Statistical',
-    shortDescription: 'Returns standard error for predicted of the predicted y value for each x value.',
+    shortDescription: 'Returns the standard error of the predicted y value for each x value in the linear regression of array1 on array2.',
     parameters: [{name: 'array1', description: 'The range of dependent (y) values.'}, {name: 'array2', description: 'The range of independent (x) values, matching the size of array1.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=STEYX(A1:A10, B1:B10)'],

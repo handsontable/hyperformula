@@ -1,6 +1,6 @@
 ---
 name: hyperformula-code-review
-description: Use when reviewing a diff, a branch, or a pull request in the HyperFormula repository. Covers correctness for a calculation engine, performance on the hot paths, the five places a function change must touch, API stability, and what the definition of done requires.
+description: Use when reviewing a diff, a branch, or a pull request in the HyperFormula repository. Covers correctness for a calculation engine, performance on the hot paths, the six places a function change must touch, API stability, and what the definition of done requires.
 ---
 
 ## 1. Read the relevant files from `dev-docs/`
@@ -29,7 +29,7 @@ Review in the order below, and stop to report the first serious finding rather t
 
 ## 3. Completeness of a function change
 
-Check every one of [the five places a function change must touch](../../../hyperformula/dev-docs/INTERPRETER.md#the-five-places-a-function-change-must-touch); most of them fail silently when missed. Plus `sizeOfResultArrayMethod` for anything array-returning, and an explicit `optionalArg` where arity does not express the valid call. Skill `hyperformula-function-dev`.
+Check every one of [the six places a function change must touch](../../../hyperformula/dev-docs/INTERPRETER.md#the-six-places-a-function-change-must-touch); most of them fail silently when missed. Plus `sizeOfResultArrayMethod` for anything array-returning, and an explicit `optionalArg` where arity does not express the valid call. Skill `hyperformula-function-dev`.
 
 ## 4. Performance
 

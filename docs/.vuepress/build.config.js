@@ -6,7 +6,11 @@
  *   DOCS_HOSTNAME  — absolute origin used for the sitemap
  */
 module.exports = {
-  base: '/docs/',
-  dest: '.vuepress/dist/docs',
-  hostname: 'https://hyperformula.handsontable.com',
+  // Served at https://handsontable.com/docs/hyperformula/: handsontable.com
+  // proxies that path to this Worker unchanged, so every URL the build writes
+  // (links, assets, sitemap, `.md` companions, llms-full.txt) carries the
+  // full prefix.
+  base: '/docs/hyperformula/',
+  dest: '.vuepress/dist/docs/hyperformula',
+  hostname: 'https://handsontable.com',
 };

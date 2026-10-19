@@ -13,11 +13,11 @@ description: Use when adding a new built-in spreadsheet function to HyperFormula
 | [`TESTING.md`](../../../hyperformula/dev-docs/TESTING.md#what-each-kind-of-change-needs) | The list of cases a function change must cover |
 | [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md) | What the change must contain before review |
 
-## 2. Touch all five places
+## 2. Touch all six places
 
-A function is not done until all five agree, and they do not fail the same way — a missing catalogue entry fails the docs build, a parameter-count mismatch only warns on the console, and the rest fail silently.
+A function is not done until all six agree, and they do not fail the same way — a missing catalogue entry fails the docs build, a parameter-count mismatch only warns on the console, and the rest fail silently.
 
-The list is in [`INTERPRETER.md`](../../../hyperformula/dev-docs/INTERPRETER.md#the-five-places-a-function-change-must-touch). Work through it there rather than from a copy; two of the five have their own page, linked from it.
+The list is in [`INTERPRETER.md`](../../../hyperformula/dev-docs/INTERPRETER.md#the-six-places-a-function-change-must-touch). Work through it there rather than from a copy; three of the six have their own page, linked from it.
 
 ## 3. Declare the two things nothing cross-checks
 

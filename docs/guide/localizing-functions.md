@@ -9,7 +9,7 @@ tags:
 # Localizing functions
 
 You can localize a function's ID and error
-messages. Currently, HyperFormula supports 18 languages, with British English
+messages. Currently, HyperFormula supports {{ $page.languagesCount }} languages, with British English
 as the default.
 
 To change the language all you need to do is import and
@@ -104,6 +104,7 @@ HyperFormula.registerLanguage('es', spanish);
 
 // Use it in your configuration
 const hf = HyperFormula.buildEmpty({
+  licenseKey: 'gpl-v3',
   language: 'es'
 });
 ```

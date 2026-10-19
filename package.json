@@ -10,7 +10,7 @@
   "bugs": {
     "url": "https://github.com/handsontable/hyperformula/issues"
   },
-  "homepage": "https://hyperformula.handsontable.com/",
+  "homepage": "https://handsontable.com/hyperformula/",
   "author": "Handsoncode <hello@handsontable.com>",
   "workspaces": [
     "hyperformula"

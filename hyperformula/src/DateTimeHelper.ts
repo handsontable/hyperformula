@@ -176,6 +176,14 @@ export class DateTimeHelper {
     return {year: date.year, month: date.month, day: this.daysInMonth(date.year, date.month)}
   }
 
+  /**
+   * Clamps the day of the month so that it does not exceed the number of days in that month.
+   * Leap years, including the configurable 1900 leap year, are taken into account.
+   */
+  public truncateDayInMonth(date: SimpleDate): SimpleDate {
+    return {year: date.year, month: date.month, day: Math.min(date.day, this.daysInMonth(date.year, date.month))}
+  }
+
   public toBasisUS(start: SimpleDate, end: SimpleDate): [SimpleDate, SimpleDate] {
     if (start.day === 31) {
       start.day = 30
@@ -286,10 +294,6 @@ function dayToMonth(dayOfYear: number): number {
 export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
   const totalM = 12 * date.year + date.month - 1 + offset
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
-}
-
-export function truncateDayInMonth(date: SimpleDate): SimpleDate {
-  return {year: date.year, month: date.month, day: Math.min(date.day, numDays[date.month - 1])}
 }
 
 export function roundToNearestSecond(arg: number): number {

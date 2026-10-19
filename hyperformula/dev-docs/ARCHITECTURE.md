@@ -47,6 +47,7 @@ HyperFormula is a headless spreadsheet calculation engine. No UI, no DOM, no ser
 | `hyperformula/src/NamedExpressions.ts` | Named expression storage and scoping. |
 | `hyperformula/src/Serialization.ts`, `hyperformula/src/Exporter.ts` | Read values, formulas, and serialized content back out. |
 | `hyperformula/src/i18n/` | Function-name translations, one file per language. |
+| `hyperformula/src/license/` | License key reading, capability tables, and license gating — see [`LICENSING.md`](LICENSING.md). Its `handsontable-license-key-parser/` is vendored; do not edit it. |
 | `hyperformula/src/format/` | Number and date format parsing. |
 | `hyperformula/src/statistics/` | Instrumentation counters used by the performance benchmarks. |
 

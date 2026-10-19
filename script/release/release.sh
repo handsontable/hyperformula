@@ -52,6 +52,7 @@ PKG_DIR="hyperformula"
 PKG_JSON="$PKG_DIR/package.json"
 PKG_CHANGELOG="CHANGELOG.md"   # one changelog for every package, at the repository root
 PKG_HT_CONFIG="$PKG_DIR/ht.config.js"
+PKG_README="$PKG_DIR/README.md"   # the package README, shown on npm; the root one describes the monorepo
 
 # Prints the body of a CHANGELOG.md section: every line between the given
 # heading and the next '## ' heading, without the surrounding blank lines.
@@ -349,9 +350,9 @@ wait_for_npm() { # wait_for_npm <version>
   until on_npm "$version"; do
     # Say that the publish itself succeeded: by this point it has, and a bare
     # "not visible" reads like the publish failed, which would invite a retry.
-    [[ $waited -ge 60 ]] && die "npm publish reported success, but hyperformula@$version is still not visible on npm after ${waited}s - check the registry before retrying."
+    [[ $waited -ge 600 ]] && die "npm publish reported success, but hyperformula@$version is still not visible on npm after ${waited}s - check the registry before retrying."
     sleep 5; waited=$((waited + 5))
-    printf '    waiting for hyperformula@%s on npm (%ss)\n' "$version" "$waited"
+    (( waited % 15 == 0 )) && printf '    waiting for hyperformula@%s on npm (%ss)\n' "$version" "$waited"
   done
 }
 
@@ -600,9 +601,9 @@ step "2. Create release/$VERSION in hyperformula-tests, then sync the suite"
 run npm run test:setup-private
 
 # 3. Bump version + release date (each half skipped when already correct, so a
-CURRENT_VERSION="$(PKG_JSON="$PKG_JSON" node -e 'process.stdout.write(require("./"+process.env.PKG_JSON).version||"")' 2>/dev/null || true)"
 #    re-run after a later failure does not rewrite files it already wrote)
 step "3. Bump version + HT_RELEASE_DATE"
+CURRENT_VERSION="$(PKG_JSON="$PKG_JSON" node -e 'process.stdout.write(require("./"+process.env.PKG_JSON).version||"")' 2>/dev/null || true)"
 if [[ "$CURRENT_VERSION" == "$VERSION" ]]; then
   skip "$PKG_JSON already at $VERSION"
 elif $DRY_RUN; then
@@ -785,14 +786,16 @@ else
     merge_develop_into_version_branch "$VERSION_BRANCH" )
   # CodeSandbox / StackBlitz demo URLs in this repo's docs: point every one at
   # the new branch, whatever branch it names now (old releases left several
-  # behind). Scans docs/guide and docs/index.md only - the tracked files that
-  # carry these URLs. Walking all of docs/ would also descend into the gitignored
-  # generated trees (docs/api, docs/functions, docs/.vuepress/dist), whose built
-  # HTML repeats the same URLs but is never committed - it would bury the dry-run
-  # preview under hundreds of lines and inflate the reported file count.
+  # behind). Scans docs/guide, docs/index.md and $PKG_README only - the tracked
+  # files that carry these URLs. Walking all of docs/ would also descend into the
+  # gitignored generated trees (docs/api, docs/functions, docs/.vuepress/dist),
+  # whose built HTML repeats the same URLs but is never committed - it would bury
+  # the dry-run preview under hundreds of lines and inflate the reported file
+  # count. If you add one here, add it to step 9's ADD_PATHS too.
   DOC_URL_PATHS=()
   [[ -d docs/guide ]] && DOC_URL_PATHS+=(docs/guide)
   [[ -f docs/index.md ]] && DOC_URL_PATHS+=(docs/index.md)
+  [[ -f "$PKG_README" ]] && DOC_URL_PATHS+=("$PKG_README")
   if [[ ${#DOC_URL_PATHS[@]} -gt 0 ]]; then
     CF_NEW="$VERSION_BRANCH" CF_FENCE="$PREVIEW_FENCE" \
     CF_DRY="$($DRY_RUN && echo 1 || echo '')" perl - "${DOC_URL_PATHS[@]}" <<'PERL'
@@ -863,7 +866,7 @@ if (!$count) {
 }
 PERL
   else
-    skip "no docs/guide or docs/index.md here - no demo URLs to rewrite"
+    skip "no docs/guide, docs/index.md or $PKG_README here - no demo URLs to rewrite"
   fi
 fi
 
@@ -875,17 +878,18 @@ step "9. Commit + push release/$VERSION"
 # though, not a list of files this run wrote, so they cannot tell the freeze's
 # edits from the operator's inside the same path - which is why the preflight
 # refuses to start a fresh freeze on a dirty tree.
-# package-lock.json, ht.config.js and docs/ are each conditional on existing:
-# step 4 deletes and regenerates the lock file, so between an 'npm i' and its
-# write it is briefly gone, and both files can be legitimately absent altogether
-# (see step 3) - a bare pathspec for any of them would die under 'set -e' when
-# it is not there.
+# package-lock.json, ht.config.js, docs/ and $PKG_README are each conditional on
+# existing: step 4 deletes and regenerates the lock file, so between an 'npm i'
+# and its write it is briefly gone, and the others can be legitimately absent
+# altogether (see steps 3 and 8) - a bare pathspec for any of them would die
+# under 'set -e' when it is not there.
 # Anything a future step writes outside these paths will not be committed, so
 # add its path here too.
 ADD_PATHS=("$PKG_JSON" "$PKG_CHANGELOG")
 [[ -f package-lock.json ]] && ADD_PATHS+=(package-lock.json)
 [[ -f "$PKG_HT_CONFIG" ]] && ADD_PATHS+=("$PKG_HT_CONFIG")
 [[ -d docs ]] && ADD_PATHS+=(docs)
+[[ -f "$PKG_README" ]] && ADD_PATHS+=("$PKG_README")
 run git add "${ADD_PATHS[@]}"
 if $DRY_RUN || [[ -n "$(git status --porcelain -- "${ADD_PATHS[@]}")" ]]; then
   run git commit -m "$VERSION"
@@ -1042,9 +1046,10 @@ fi
 # but as a warning, not an error: by the time step 8 runs the release is out,
 # so refusing there would leave a published package and a dead script. A branch
 # that is missing at publish time usually means the freeze's demos step never
-# completed, which also means the CodeSandbox URLs in docs/ were never rewritten.
+# completed, which also means the CodeSandbox URLs in docs/ and $PKG_README were
+# never rewritten.
 if ! branch_exists "$VERSION_BRANCH" "$DEMOS_DIR" && ! remote_branch_exists "$VERSION_BRANCH" "$DEMOS_DIR"; then
-  note "hyperformula-demos has no $VERSION_BRANCH branch, so step 8 will create it from develop. For a major or minor release the freeze's demos step should already have created it, so check that the CodeSandbox URLs in docs/ name tree/$VERSION_BRANCH as well. For the first patch on a new minor line there may simply be nothing there yet."
+  note "hyperformula-demos has no $VERSION_BRANCH branch, so step 8 will create it from develop. For a major or minor release the freeze's demos step should already have created it, so check that the CodeSandbox URLs in docs/ and $PKG_README name tree/$VERSION_BRANCH as well. For the first patch on a new minor line there may simply be nothing there yet."
 fi
 
 step "Plan"
@@ -1201,7 +1206,8 @@ if $DRY_RUN; then echo "  (dry run - nothing changed; re-run with --real-run to 
 manual_checklist <<NEXT
   [ ] Create the GitHub release for $VERSION (body = the $VERSION section of CHANGELOG.md):
         https://github.com/handsontable/hyperformula/releases/new?tag=$VERSION&title=$VERSION$($IS_PRERELEASE && printf '&prerelease=1\n      (prerelease - leave the "Set as the latest release" box unchecked)')
-  [ ] Check that the docs workflow deployed the documentation to gh-pages
+  [ ] Check that Workers Builds deployed the docs from master (the "Workers Builds:
+      hyperformula-docs" check on the master commit) to https://handsontable.com/docs/hyperformula/
   [ ] Review the deployed docs and test the demos
   [ ] Announce the release in #hyperformula and #release
   [ ] Close the GitHub and ClickUp tasks in this release, announcing $VERSION,

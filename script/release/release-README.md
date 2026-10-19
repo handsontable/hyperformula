@@ -148,18 +148,19 @@ describe decisions made from stale refs. The script marks these fetches
    `develop`, commits and pushes, then gets onto the `M.m.x` branch (creating it
    if needed, fast-forwarding it first if it already exists) and makes sure the
    version bump is on it. Then, in this repository, repoints every CodeSandbox
-   and StackBlitz demo URL in `docs/guide/` and `docs/index.md` — the tracked
-   files that carry them, so the rewrite never descends into generated output
-   like `docs/api/` — at `tree/<M.m.x>`, whatever branch it names today; old
-   releases left several behind. URLs for demos that no longer exist on the
-   current branch stay pinned to the last branch that has them (`vue-demo`, the
-   Vue 2 example replaced by `vue-3-demo` after 2.5.x); if you retire a demo, add
-   it to that list in the script. Skipped entirely for a patch release, where
-   `M.m.x` already names the right branch.
+   and StackBlitz demo URL in `docs/guide/`, `docs/index.md` and `hyperformula/README.md` —
+   the tracked files that carry them, so the rewrite never descends into
+   generated output like `docs/api/` — at `tree/<M.m.x>`, whatever branch it
+   names today; old releases left several behind. URLs for demos that no longer
+   exist on the current branch stay pinned to the last branch that has them
+   (`vue-demo`, the Vue 2 example replaced by `vue-3-demo` after 2.5.x); if you
+   retire a demo, add it to that list in the script. Skipped entirely for a patch
+   release, where `M.m.x` already names the right branch.
 9. **Commits and pushes the release branch.** Commits only if there is something
    to commit. Stages **named paths, not `git add .`** — `hyperformula/package.json`,
-   `CHANGELOG.md`, and whichever of `package-lock.json`, `hyperformula/ht.config.js` and
-   `docs/` exist — so unrelated work elsewhere in your tree cannot ride along.
+   `CHANGELOG.md`, and whichever of `package-lock.json`, `hyperformula/ht.config.js`,
+   `docs/` and `hyperformula/README.md` exist — so unrelated work elsewhere in your
+   tree cannot ride along.
    These are whole paths, though, not a list of files the run wrote, which is why
    the preflight refuses to start a fresh freeze on a dirty tree. If you add a
    step that writes somewhere new, add its path to that list too.
@@ -294,7 +295,7 @@ refreshes the refs.
    `develop`, whose commits from during the freeze are not part of this release.
    Then, unless `hyperformula@<version>` is already on npm, prints the registry
    and the `npm whoami` user and asks you to type the version back (anything
-   else aborts), then publishes and waits up to 60s for the new version to
+   else aborts), then publishes and waits up to 10 minutes for the new version to
    become visible on the registry. A plain `x.y.z` publishes under npm's
    `latest` tag; a version carrying a prerelease suffix (an rc, e.g.
    `3.5.0-rc.1`) publishes under `next` instead, so `npm install hyperformula`
@@ -313,7 +314,8 @@ they are hard to miss in the output:
 ```
   [ ] Create the GitHub release for <version> (body = the <version> section of CHANGELOG.md):
         https://github.com/handsontable/hyperformula/releases/new?tag=<version>&title=<version>
-  [ ] Check that the docs workflow deployed the documentation to gh-pages
+  [ ] Check that Workers Builds deployed the docs from master (the "Workers Builds:
+      hyperformula-docs" check on the master commit) to https://handsontable.com/docs/hyperformula/
   [ ] Announce the release in #hyperformula and #release
   [ ] Close the GitHub and ClickUp tasks in this release, announcing <version>,
       notify everyone involved in the discussions, and check linked issues

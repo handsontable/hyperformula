@@ -9,6 +9,7 @@ import {Config} from './Config'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {InterpreterState} from './interpreter/InterpreterState'
 import {FunctionArgumentType} from './interpreter'
+import {FunctionCallLicenseGate} from './license/FunctionCallLicenseGate'
 import {Ast, AstNodeType, ProcedureAst} from './parser'
 
 export class ArraySize {
@@ -40,10 +41,13 @@ function arraySizeForUnaryOp(arraySize: ArraySize): ArraySize {
 }
 
 export class ArraySizePredictor {
+  private readonly functionCallLicenseGate: FunctionCallLicenseGate
+
   constructor(
     private config: Config,
     private functionRegistry: FunctionRegistry,
   ) {
+    this.functionCallLicenseGate = new FunctionCallLicenseGate(config, functionRegistry)
   }
 
   public checkArraySize(ast: Ast, formulaAddress: SimpleCellAddress): ArraySize {
@@ -123,6 +127,12 @@ export class ArraySizePredictor {
   }
 
   private checkArraySizeForFunction(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    // A call the license stops evaluates to a single #LIC! error. Sized as one cell, it reserves
+    // no spill range, so a non-empty cell below it cannot turn that error into #SPILL!.
+    if (this.functionCallLicenseGate.stopsCall(ast.procedureName)) {
+      return ArraySize.scalar()
+    }
+
     const pluginArraySizeFunction = this.functionRegistry.getArraySizeFunction(ast.procedureName)
 
     if (pluginArraySizeFunction !== undefined) {

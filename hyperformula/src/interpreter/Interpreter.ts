@@ -12,7 +12,7 @@ import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
 import {FormulaVertex} from '../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../error-message'
-import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
+import {FunctionCallLicenseGate} from '../license/FunctionCallLicenseGate'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
@@ -45,6 +45,9 @@ import { AddressWithSheet } from '../parser/Address'
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
 
+  /** Decides which function calls the license stops; see {@link FunctionCallLicenseGate}. */
+  private readonly functionCallLicenseGate: FunctionCallLicenseGate
+
   constructor(
     public readonly config: Config,
     public readonly dependencyGraph: DependencyGraph,
@@ -59,6 +62,7 @@ export class Interpreter {
   ) {
     this.functionRegistry.initializePlugins(this)
     this.criterionBuilder = new CriterionBuilder(config)
+    this.functionCallLicenseGate = new FunctionCallLicenseGate(config, functionRegistry)
   }
 
   public evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
@@ -177,8 +181,9 @@ export class Interpreter {
         return this.unaryRangeWrapper(this.percentOp, result, state)
       }
       case AstNodeType.FUNCTION_CALL: {
-        if (this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
-          return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState))
+        const licenseError = this.functionCallLicenseGate.stoppedCallError(ast.procedureName)
+        if (licenseError !== undefined) {
+          return licenseError
         }
         const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
         if (pluginFunction !== undefined) {

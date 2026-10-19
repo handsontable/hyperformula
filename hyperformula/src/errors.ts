@@ -4,6 +4,8 @@
  */
 
 import {SimpleCellAddress} from './Cell'
+import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {FeatureId} from './license/LicenseEntitlement'
 
 /**
  * Error thrown when the sheet of a given ID does not exist.
@@ -390,5 +392,67 @@ export class NoRelativeAddressesAllowedError extends Error {
 export class AliasAlreadyExisting extends Error {
   constructor(name: string, pluginName: string) {
     super(`Alias id ${name} in plugin ${pluginName} already defined as a function or alias.`)
+  }
+}
+
+/**
+ * Error thrown when a public API method is called for a {@link FeatureId} that the current
+ * license entitlement does not grant, or when the license key itself blocks every gated feature
+ * (a missing or invalid key, an expired classic key, or a trial past its grace period); the
+ * message then names the key's state instead. Mirrors gate B's `ErrorMessage.LicenseCapability`, but
+ * this one guards the API surface itself rather than a formula evaluation, so it
+ * is thrown synchronously instead of surfacing as a cell error.
+ *
+ * This list names every method that can throw it - `resumeEvaluation` is deliberately NOT among
+ * them: it is the sole exit from a suspended engine, so gating it could strand an instance
+ * permanently if the entitlement changes mid-suspension (see the note on `HyperFormula.
+ * ensureCapability`).
+ *
+ * @see [[HyperFormula.buildFromArray]]
+ * @see [[HyperFormula.buildFromSheets]]
+ * @see [[HyperFormula.buildEmpty]]
+ * @see [[addNamedExpression]]
+ * @see [[changeNamedExpression]]
+ * @see [[removeNamedExpression]]
+ * @see [[copy]]
+ * @see [[cut]]
+ * @see [[paste]]
+ * @see [[setCellContents]]
+ * @see [[addRows]]
+ * @see [[removeRows]]
+ * @see [[addColumns]]
+ * @see [[removeColumns]]
+ * @see [[moveCells]]
+ * @see [[moveRows]]
+ * @see [[moveColumns]]
+ * @see [[swapRowIndexes]]
+ * @see [[setRowOrder]]
+ * @see [[swapColumnIndexes]]
+ * @see [[setColumnOrder]]
+ * @see [[addSheet]]
+ * @see [[removeSheet]]
+ * @see [[clearSheet]]
+ * @see [[setSheetContent]]
+ * @see [[renameSheet]]
+ * @see [[undo]]
+ * @see [[redo]]
+ * @see [[batch]]
+ * @see [[suspendEvaluation]]
+ */
+export class LicenseCapabilityMissingError extends Error {
+  /** The gated feature the call needed. */
+  public readonly feature: FeatureId
+
+  /**
+   * @param {FeatureId} feature - the gated feature that was called
+   * @param {LicenseKeyValidityState} [blockingState] - the key's state when the key itself blocks
+   * every gated feature (a missing or invalid key, an expired classic key, or a trial past its grace
+   * period); omit when the key evaluates but does not grant `feature`
+   */
+  constructor(feature: FeatureId, blockingState?: LicenseKeyValidityState) {
+    super(blockingState === undefined
+      ? `Feature ${feature} is not included in your license.`
+      : `License key is ${blockingState}. Feature ${feature} is not available.`)
+    this.feature = feature
   }
 }

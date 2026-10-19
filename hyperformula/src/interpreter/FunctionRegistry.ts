@@ -234,6 +234,18 @@ export class FunctionRegistry {
   }
 
   /**
+   * Returns the id a function is registered as an alias of (`plugin.aliases`), or the id itself
+   * when it is not an alias. The license capability table lists canonical names only, so both the
+   * interpreter and the function metadata API resolve an id through this before consulting it:
+   * calling a gated function through its alias must be gated exactly like calling it by name.
+   *
+   * @param {string} functionId - the id as registered, which may be an alias
+   */
+  public getCanonicalFunctionId(functionId: string): string {
+    return this.getFunctionPlugin(functionId)?.aliases?.[functionId] ?? functionId
+  }
+
+  /**
    * Returns the ids of all functions the function-metadata API (`getAvailableFunctions`/`getFunctionDetails`)
    * should describe: every function registered in this instance (aliases and any custom/user-registered functions
    * included), plus the protected ids (e.g. `VERSION`, `OFFSET`). `instancePlugins` already contains `VERSION`

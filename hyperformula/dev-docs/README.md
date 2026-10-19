@@ -14,6 +14,7 @@ Repository-wide standards — what a change must include, code style, testing st
 | Function descriptions in the API and the docs | [`FUNCTION-CATALOGUE.md`](FUNCTION-CATALOGUE.md) |
 | Dependency tracking and recalculation order | [`DEPENDENCY-GRAPH.md`](DEPENDENCY-GRAPH.md) |
 | Function-name translations | [`I18N.md`](I18N.md) |
+| License keys, and which functions and features a key grants | [`LICENSING.md`](LICENSING.md) |
 | Anything on a hot path | [`PERFORMANCE.md`](PERFORMANCE.md) |
 | The test suites, and the private one | [`TESTING.md`](TESTING.md) |
 | The intermediate build and packaging | [`BUILD.md`](BUILD.md) |

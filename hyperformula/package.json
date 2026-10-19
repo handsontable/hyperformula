@@ -1,7 +1,7 @@
 {
   "name": "hyperformula",
   "description": "HyperFormula is a JavaScript engine for efficient processing of spreadsheet-like data and formulas",
-  "homepage": "https://hyperformula.handsontable.com/",
+  "homepage": "https://handsontable.com/hyperformula/",
   "repository": {
     "type": "git",
     "url": "https://github.com/handsontable/hyperformula.git",
@@ -11,7 +11,7 @@
     "url": "https://github.com/handsontable/hyperformula/issues"
   },
   "author": "Handsoncode <hello@handsontable.com>",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "keywords": [
     "formula",
     "spreadsheet",
@@ -93,6 +93,7 @@
     "benchmark:write-to-file": "npm run tsnode test/hyperformula-tests/performance/write-to-file.ts",
     "benchmark:compare-benchmarks": "npm run tsnode test/hyperformula-tests/performance/compare-benchmarks.ts",
     "clean": "rimraf coverage/ commonjs/ dist/ es/ languages/ lib/ typings/ test-jasmine/",
+    "check:license-key-parser-drift": "node script/check-license-key-parser-drift.js",
     "compile": "tsc",
     "tsnode": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"}"
   },

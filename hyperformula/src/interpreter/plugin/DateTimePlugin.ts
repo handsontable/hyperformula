@@ -12,8 +12,7 @@ import {
   roundToNearestSecond,
   SimpleDate,
   timeToNumber,
-  toBasisEU,
-  truncateDayInMonth
+  toBasisEU
 } from '../../DateTimeHelper'
 import {ErrorMessage} from '../../error-message'
 import {format} from '../../format/format'
@@ -458,7 +457,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     return this.runFunction(ast.args, state, this.metadata('EDATE'),
       (dateNumber: number, delta: number) => {
         const date = this.dateTimeHelper.numberToSimpleDate(dateNumber)
-        const newDate = truncateDayInMonth(offsetMonth(date, delta))
+        const newDate = this.dateTimeHelper.truncateDayInMonth(offsetMonth(date, delta))
         let ret: Maybe<number> = this.dateTimeHelper.dateToNumber(newDate)
         ret = this.dateTimeHelper.getWithinBounds(ret)
         if (ret === undefined) {

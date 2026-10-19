@@ -18,32 +18,8 @@ import {
   RawScalarValue
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {AverageResult} from './AverageResult'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
-
-class AverageResult {
-  public static empty = new AverageResult(0, 0)
-
-  constructor(
-    public readonly sum: number,
-    public readonly count: number,
-  ) {}
-
-  public static single(arg: number): AverageResult {
-    return new AverageResult(arg, 1)
-  }
-
-  public compose(other: AverageResult) {
-    return new AverageResult(this.sum + other.sum, this.count + other.count)
-  }
-
-  public averageValue(): Maybe<number> {
-    if (this.count > 0) {
-      return this.sum / this.count
-    } else {
-      return undefined
-    }
-  }
-}
 
 /** Computes key for criterion function cache */
 function conditionalAggregationFunctionCacheKey(functionName: string): (conditions: Condition[]) => string {
@@ -200,7 +176,7 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
       if (averageResult instanceof CellError) {
         return averageResult
       } else {
-        return averageResult.averageValue() || new CellError(ErrorType.DIV_BY_ZERO)
+        return averageResult.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
       }
     }
 

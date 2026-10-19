@@ -86,16 +86,17 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 - **Never describe Excel's behaviour when HyperFormula deviates.** Implement what is specified, then record the deviation in [`docs/guide/list-of-differences.md`](../../docs/guide/list-of-differences.md).
 - **Never allocate inside a per-cell loop** when the value can be hoisted.
 
-### The five places a function change must touch
+### The six places a function change must touch
 
 This list is the authority; the skills link here rather than repeating it.
 
 1. the plugin implementation in `hyperformula/src/interpreter/plugin/`, plus its `implementedFunctions` metadata — and a new plugin class must be exported from `hyperformula/src/interpreter/plugin/index.ts`: `hyperformula/src/index.ts` registers the built-in plugins from that module's exports (only the protected `VersionPlugin` is loaded by `FunctionRegistry` itself), so an unexported one compiles but every function in it evaluates to `#NAME?`;
 2. the catalogue entry in `hyperformula/src/interpreter/functionMetadata/categories/` — see [`FUNCTION-CATALOGUE.md`](FUNCTION-CATALOGUE.md);
-3. **every** language file in `hyperformula/src/i18n/languages/` — see [`I18N.md`](I18N.md);
-4. tests — see [`TESTING.md`](TESTING.md);
-5. the changelog entry — see [`DEFINITION-OF-DONE.md`](../../dev-docs/DEFINITION-OF-DONE.md).
+3. the license capability table in `hyperformula/src/license/functionCapabilities.ts` — see [`LICENSING.md`](LICENSING.md#the-license-capability-table);
+4. **every** language file in `hyperformula/src/i18n/languages/` — see [`I18N.md`](I18N.md);
+5. tests — see [`TESTING.md`](TESTING.md);
+6. the changelog entry — see [`DEFINITION-OF-DONE.md`](../../dev-docs/DEFINITION-OF-DONE.md).
 
-They do not fail the same way. A missing catalogue entry **fails the docs build**; a parameter-count mismatch warns on the console; a missing translation makes the function evaluate to `#NAME?` in that language and drop out of `getAvailableFunctions`. The private suite catches all three (a parameter-count mismatch only when the implementation declares at least one parameter), but only when it is attached. A missing test and a missing `optionalArg` fail silently.
+They do not fail the same way. A missing catalogue entry **fails the docs build**; a parameter-count mismatch warns on the console; a missing translation makes the function evaluate to `#NAME?` in that language and drop out of `getAvailableFunctions`. The private suite catches all three (a parameter-count mismatch only when the implementation declares at least one parameter), but only when it is attached. A function missing from the capability table escapes the license check, which only the private suite catches. A missing test and a missing `optionalArg` fail silently.
 
 Skill: `hyperformula-function-dev`.

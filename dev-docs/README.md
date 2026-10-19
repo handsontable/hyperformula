@@ -2,7 +2,7 @@
 
 The canonical reference for everyone working on the HyperFormula source: maintainers, the internal team, and the AI agents they run. Written for humans first; agents read the same files.
 
-Everything a developer needs to know lives here or is linked from here. External contributors start with [`CONTRIBUTING.md`](../CONTRIBUTING.md); users start with the [documentation portal](https://hyperformula.handsontable.com/docs).
+Everything a developer needs to know lives here or is linked from here. External contributors start with [`CONTRIBUTING.md`](../CONTRIBUTING.md); users start with the [documentation portal](https://handsontable.com/docs/hyperformula/).
 
 ## How the documentation is organised
 

@@ -8,7 +8,7 @@ This repository holds the engine and everything built around it.
 |---|---|---|
 | [`hyperformula/`](hyperformula/) | The calculation engine. **Start here** — its [README](hyperformula/README.md) is the product documentation. | The [`hyperformula`](https://www.npmjs.com/package/hyperformula) package on npm: ES modules, CommonJS, UMD bundles for the browser (also served by the jsDelivr and unpkg CDNs), and TypeScript typings |
 | [`hyperformula-ui/`](hyperformula-ui/) | UI components for working with HyperFormula: a group of packages, with their demos and end-to-end tests. Not imported yet. | Not yet — nothing is published from this directory until the packages are imported |
-| [`docs/`](docs/) | The documentation portal. Installed separately; not a workspace member. | Not a package. Built and deployed as the documentation site at [hyperformula.handsontable.com/docs](https://hyperformula.handsontable.com/docs/) |
+| [`docs/`](docs/) | The documentation portal. Installed separately; not a workspace member. | Not a package. Built and deployed as the documentation site at [handsontable.com/docs/hyperformula](https://handsontable.com/docs/hyperformula/) |
 
 The engine's history is [`CHANGELOG.md`](CHANGELOG.md) at the root. The UI packages version and release on their own until they are mature, then join the engine's version — see [`dev-docs/STRUCTURE.md`](dev-docs/STRUCTURE.md#what-the-move-decided).
 

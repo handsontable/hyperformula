@@ -28,7 +28,7 @@ To start a local HyperFormula docs server:
    ```bash
    npm run docs:dev
    ```
-5. In your browser, go to: http://localhost:8080/hyperformula/.
+5. In your browser, go to: http://localhost:8080/docs/hyperformula/.
 
 ## What is generated
 
@@ -49,8 +49,8 @@ How to write the page — structure, chunking, language, code examples, and the 
 From the repository root:
 
 * `npm run docs:install` - Installs the portal's own dependencies (`npm ci` inside `docs/`). Needed once, and again whenever `docs/package.json` changes.
-* `npm run docs:dev` - Starts a local docs server at http://localhost:8080/hyperformula/.
-* `npm run docs:build` - Builds the docs output into `docs/.vuepress/dist/docs`.
+* `npm run docs:dev` - Starts a local docs server at http://localhost:8080/docs/hyperformula/.
+* `npm run docs:build` - Builds the docs into `docs/.vuepress/dist/docs/hyperformula` (the base path, `/docs/hyperformula/`, and the output directory are set in `docs/.vuepress/build.config.js`).
 * `npm run docs:build:cf` - The build Cloudflare Workers Builds runs. Installs the portal first, then builds and composes the Worker assets.
 * `npm run docs:generate-function-docs` - Regenerates the built-in functions guide page from the function metadata API. Runs automatically as the first step of `docs:dev` and `docs:build`.
 
@@ -72,9 +72,11 @@ Configuration in the repository:
 - `docs/.vuepress/cf/_headers`, `docs/.vuepress/cf/_redirects` &mdash; asset headers and redirects, copied into the root of the build output by `docs/script/prepare-cf-assets.js`.
 - `docs/.nvmrc` &mdash; Node.js version used by the build.
 
-The asset directory is `docs/.vuepress/dist` (written as `./.vuepress/dist` in `wrangler.jsonc`, which resolves against `docs/`), while VuePress writes to `docs/.vuepress/dist/docs` (see `docs/.vuepress/build.config.js`). This keeps the `/docs/` prefix that every document is built with, so the site is served under `https://hyperformula.handsontable.com/docs/`.
+The asset directory is `docs/.vuepress/dist` (written as `./.vuepress/dist` in `wrangler.jsonc`, which resolves against `docs/`), while VuePress writes to `docs/.vuepress/dist/docs/hyperformula` (see `docs/.vuepress/build.config.js`). This keeps the `/docs/hyperformula/` prefix that every document is built with, so the site is served under `https://handsontable.com/docs/hyperformula/`.
 
-Production traffic reaches this Worker through the `hyperformula-website` Worker, which proxies `/docs*` to `https://hyperformula-docs.handsoncode.workers.dev` (the `DOCS_ORIGIN` constant in that project).
+Production traffic reaches this Worker through the handsontable.com Worker (`handsontable-com-v3-production`, repository `handsontable/handsontable.com-v3`), which proxies `/docs/hyperformula/*` to `https://hyperformula-docs.handsoncode.workers.dev` without changing the path, and rewrites this Worker's own redirects back onto handsontable.com. The rest of `/docs/*` there is the Handsontable documentation, a separate app. Its staging Worker does the same for https://dev.handsontable.com/docs/hyperformula/ from the `develop` branch preview.
+
+The documentation's former addresses, `https://hyperformula.handsontable.com/docs/*`, still reach this Worker (through the `hyperformula-website` Worker), which answers them with a permanent redirect to the same path under `https://handsontable.com/docs/hyperformula/` (`worker/index.js`).
 
 Build settings in the Cloudflare dashboard, under **Workers & Pages > hyperformula-docs > Settings > Build**: root directory `/`, build command `npm run docs:build:cf`, deploy command `npm run docs:deploy:cf`, non-production branch deploy command `npm run docs:preview:cf`, production branch `master`, non-production branch builds enabled.
 
@@ -132,6 +134,6 @@ docs                            # All documentation files
 `npm run docs:build` produces docs meant to be read by both people and AI coding agents:
 
 * **HTML + Markdown per page** &mdash; every guide page is built as both an `.html` page and a companion `.md` file with the same content, via the `md-companions` VuePress plugin (`.vuepress/plugins/md-companions`). The companion lives next to its HTML page, e.g. `guide/basic-usage.html` and `guide/basic-usage.md`.
-* **`llms-full.txt`** &mdash; all guide pages concatenated into one Markdown file at the docs root (`/docs/llms-full.txt`), so an agent can fetch the whole corpus in a single request instead of crawling page by page.
+* **`llms-full.txt`** &mdash; all guide pages concatenated into one Markdown file at the docs root (`/docs/hyperformula/llms-full.txt`, served at https://handsontable.com/docs/hyperformula/llms-full.txt), so an agent can fetch the whole corpus in a single request instead of crawling page by page.
 * **"View as Markdown" link** &mdash; every guide page shows a small link near the top of its content that navigates to that page's `.md` companion (rendered via the local theme in `.vuepress/theme`, which overrides the default theme's `Layout.vue`).
 * **"Set up your coding agent" page** &mdash; [`guide/setup-coding-agent.md`](guide/setup-coding-agent.md) explains how to point Claude Code, Cursor, Copilot, and other agents at these machine-readable docs, and embeds the `CodingAgentWizard` component: an interactive picker that shows the right setup instructions for the agent you choose.
