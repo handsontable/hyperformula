@@ -37,8 +37,12 @@ const FILES_CHECKLIST = [
   'commonjs/i18n/languages/plPL.js',
 ]
 
+let received = false
+
 process.stdin.resume()
 process.stdin.on('data', function(data) {
+  received = true
+
   if (!data) {
     throw Error('Missing STDIN stream');
   }
@@ -69,6 +73,14 @@ process.stdin.on('data', function(data) {
   }).finally(() => {
     process.exit(errorCode)
   })
+})
+// A failed `npm pack` prints no package name (`--silent` also hides its error),
+// and the pipe ignores its exit code, so empty input must fail the check.
+process.stdin.on('end', function() {
+  if (!received) {
+    console.log(`Publish package check: \u001b[0;31mERROR\u001b[0m (no package name on STDIN - npm pack failed)`)
+    process.exit(1)
+  }
 })
 process.stdout.on('error', (err) => {
   if (err.code === 'EPIPE') {
