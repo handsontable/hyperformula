@@ -1,6 +1,5 @@
 ---
 name: hyperformula-dev
-paths: hyperformula/src/**
 description: >
   Use for ANY work touching the HyperFormula engine in `hyperformula/src/`: fixing bugs, adding features,
   changing the public API, working on the parser, the interpreter, the dependency graph,

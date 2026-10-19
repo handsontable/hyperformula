@@ -1,6 +1,5 @@
 ---
 name: hyperformula-function-dev
-paths: hyperformula/src/interpreter/**
 description: Use when adding a new built-in spreadsheet function to HyperFormula, changing an existing one's signature, arguments, return type, or error behaviour, or when a function returns the wrong value or the wrong error. Covers the FunctionPlugin contract, runFunction and argument metadata, the function metadata catalogue, translations, and the full end-to-end checklist.
 ---
 
@@ -29,6 +28,7 @@ The list is in [`INTERPRETER.md`](../../../hyperformula/dev-docs/INTERPRETER.md#
 
 ```bash
 npm run test:jest -- <FunctionName>
+npm run docs:install                  # once: the generator runs in the portal's own install
 npm run docs:generate-function-docs   # fails loudly on a bad or missing catalogue entry
 npm run lint
 ```

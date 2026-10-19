@@ -1,6 +1,5 @@
 ---
 name: writing-docs-pages
-paths: docs/**
 description: Use when creating or editing a page in the HyperFormula documentation portal, adding a guide, or updating the API reference. Covers what is generated versus hand-written, sidebar registration, running the portal, and the writing rules.
 ---
 
@@ -13,7 +12,7 @@ description: Use when creating or editing a page in the HyperFormula documentati
 | [`FUNCTION-CATALOGUE.md`](../../../hyperformula/dev-docs/FUNCTION-CATALOGUE.md) | Only when the change concerns the built-in functions page, which is generated from the catalogue |
 | [`BUILD.md`](../../../dev-docs/BUILD.md) | Which documentation files are generated, by which command |
 
-And [`docs/README.md`](../../../dev-docs/README.md), for what the portal contains and how to run it.
+And [`docs/README.md`](../../../docs/README.md), for what the portal contains and how to run it.
 
 ## 2. Change the source, not the output
 
@@ -28,8 +27,9 @@ And [`docs/README.md`](../../../dev-docs/README.md), for what the portal contain
 ## 3. Run the portal
 
 ```bash
+npm run docs:install # once: the portal has its own install
 npm run bundle-all   # the portal embeds the built engine
-npm run docs:dev     # http://localhost:8080/hyperformula/
+npm run docs:dev     # http://localhost:8080/docs/
 ```
 
 ## 4. Before you finish

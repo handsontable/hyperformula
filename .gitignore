@@ -32,6 +32,7 @@ dev*.html
 # Generated at docs:build from built-in-functions.tmpl.md (HF-249 single-source); do not commit.
 docs/guide/built-in-functions.md
 
-# Wrangler (Cloudflare Workers) local state
+# Wrangler (Cloudflare Workers) local state, and the .env file it reads an API token from
 .wrangler
 .dev.vars*
+.env*

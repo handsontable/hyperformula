@@ -1,6 +1,5 @@
 ---
 name: hyperformula-unit-testing
-paths: hyperformula/test/**
 description: Use when writing or modifying tests for HyperFormula, or when a change to `hyperformula/src/` needs test coverage. Covers the two suites, fetching the private suite, how to build an engine in a test, and what a function or CRUD change must cover.
 ---
 

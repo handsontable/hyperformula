@@ -10,7 +10,7 @@ Claude Code can run a session — or an isolated subagent — in a `git worktree
 | `hyperformula/test/hyperformula-tests/` | The private suite is git-ignored, so every `npm run test:jest` run covers only the smoke tests | `npm run test:setup-private` |
 | `hyperformula/{lib,dist,es,commonjs,typings,languages}/` | `npm run test:browser` and the bundle checks have nothing to run against | `npm run bundle-all` |
 | `docs/api/`, `docs/guide/built-in-functions.md` | The docs build fails, or serves nothing | `npm run docs:build` |
-| `.dev.vars*` | `wrangler` deploy and preview fail | Copy it yourself if you need it. Deploy credentials are deliberately **not** copied into worktrees — see [`.worktreeinclude`](../.worktreeinclude) |
+| `.dev.vars*` | Nothing: it holds secrets for local `wrangler dev`, and the docs Worker uses none | Copy it yourself if you need it. `wrangler` never reads deploy credentials from it — it deploys with `wrangler login` or `CLOUDFLARE_API_TOKEN` — and it is deliberately **not** copied into worktrees; see [`.worktreeinclude`](../.worktreeinclude) |
 
 ## The branch-matched test suite is the trap
 
@@ -29,4 +29,4 @@ Run `npm ci` in the worktree. The portal is a separate install either way — `n
 
 ## Sparse checkouts
 
-`worktree.sparsePaths` limits what git writes to disk. Worth setting once a task can be scoped to one package — `[".claude", "hyperformula"]` for engine work. It is not set by default, because a task that turns out to span packages then fails in a confusing way.
+`worktree.sparsePaths` limits what git writes to disk. Worth setting once a task can be scoped to one package — `[".claude", ".github", "dev-docs", "docs", "hyperformula"]` for engine work. Root-level files are always checked out, root-level directories only when listed: without `dev-docs/` every link into it breaks, and without `docs/` `npm run docs:generate-function-docs` fails. It is not set by default, because a task that turns out to span packages then fails in a confusing way.

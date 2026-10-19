@@ -35,7 +35,7 @@ The guides in `docs/guide/` and the generated API reference in `docs/api/` are t
 
 ## Skills
 
-All skills live in `.claude/skills/`, at the repository root — one directory to look in, one to keep consistent. A skill that belongs to part of the tree is scoped by the `paths` frontmatter field (one glob, or a comma-separated list) rather than by placement. A skill that applies anywhere — writing a changelog entry, opening a pull request, test discipline, reviewing a diff — carries no `paths` and is chosen from its description alone.
+All skills live in `.claude/skills/`, at the repository root — one directory to look in, one to keep consistent. No skill sets the `paths` frontmatter field: with it, Claude Code offers a skill only after a file matching the glob has been read, which hides the skill exactly when a task starts from a symptom rather than a file. Every skill is chosen from its description alone, so the description names both the files and the symptoms it covers.
 
 A skill holds the **steps**: what to do, in what order, and what to check. It does not restate the rules those steps enforce — it links to the `dev-docs/` page that owns them.
 

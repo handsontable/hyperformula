@@ -13,11 +13,11 @@
 # Deliberately NOT copied — listing these here would cause real bugs:
 #
 #   .dev.vars .dev.vars.*
-#                         Cloudflare Worker deploy credentials. Copying them
-#                         puts a deploy token on disk in every worktree,
-#                         including the isolated ones subagents get, for the
-#                         convenience of the one maintainer who actually runs
-#                         `wrangler`. They can copy the file themselves.
+#                         Secrets for local `wrangler dev` (the docs Worker
+#                         uses none). Copying them puts whatever a maintainer
+#                         keeps there on disk in every worktree, including the
+#                         isolated ones subagents get. They can copy the file
+#                         themselves.
 #
 #   node_modules          A copy is not an install: `.bin` shims and native
 #                         builds do not survive it. Run `npm ci` in the worktree.

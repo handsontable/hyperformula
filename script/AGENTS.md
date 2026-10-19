@@ -10,4 +10,4 @@ Repository-level scripts. Each package keeps its own in `hyperformula/script/` a
 - What the build produces, and where the licence gate fits: [`dev-docs/BUILD.md`](../dev-docs/BUILD.md)
 - Everything else: [`dev-docs/README.md`](../dev-docs/README.md)
 
-These run in CI as well as locally, so they must not assume an interactive terminal, a working directory, or a developer's environment variables. Nothing here is covered by tests; a change is verified by running it.
+No workflow runs these; they are run by hand from the repository root. `release/release.sh` needs an operator at a terminal on purpose — after `--real-run`, its typed confirmation is the last guard before `npm publish` — so never make it run without one. Nothing here is covered by tests; a change is verified by running it.

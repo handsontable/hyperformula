@@ -13,7 +13,7 @@ description: Use before creating, pushing, opening, or updating a pull request i
 
 ## 2. Commit on a correctly named branch
 
-`<type>/<ticket>-<slug>`. Nothing from a private ticket in the name — the identifier alone is fine.
+`<type>/<ticket>-<slug>`, cut from `develop`. Nothing from a private ticket in the name — the identifier alone is fine.
 
 ## 3. Run the gate and read the output
 
@@ -27,7 +27,7 @@ A green Jest run without `hyperformula/test/hyperformula-tests/` covers only the
 
 ## 4. Push and open the pull request
 
-Fill in every section of the template. Tick the Types of changes boxes honestly, breaking change included.
+Target `develop` with `gh pr create --base develop` — the default branch is `master`. Fill in every section of the template. Tick the Types of changes boxes honestly, breaking change included.
 
 ## 5. Add the changelog entry
 

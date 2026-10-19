@@ -11,7 +11,7 @@ The standards these run against — what a change must prove, how a case is writ
 | Smoke tests | [`hyperformula/test/smoke.spec.ts`](../test/smoke.spec.ts) | Everyone, in this repository |
 | Full suite | `hyperformula/test/hyperformula-tests/` | Internal team and anyone granted access |
 
-The full suite is kept in a separate private repository and is **git-ignored** here. It carries the unit tests, the browser and compatibility runs, and the performance benchmarks. External contributors put their tests in `hyperformula/test/`; the internal team moves them into the private repository through a separate pull request.
+The full suite is kept in a separate private repository and is **git-ignored** here. It carries the unit tests, the browser and compatibility runs, and the performance benchmarks. External contributors put their tests in `hyperformula/test/`; the internal team moves them into the private repository through a separate pull request, and writes its own tests there directly, on the branch with the same name as the engine branch.
 
 ## Fetching the private suite
 

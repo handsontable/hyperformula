@@ -6,7 +6,8 @@ Every change to production code — bug fix, feature, or improvement — must in
 2. **Automatic tests** in `hyperformula/test/`:
    - bug fix — at least one test that reproduces the bug;
    - new feature — a set of tests that precisely describe the feature;
-   - pull requests from external contributors put tests in `hyperformula/test/`; the internal team adds them to the private repository through a separate pull request.
+   - pull requests from external contributors put tests in `hyperformula/test/`, and the internal team moves them to the private repository;
+   - the internal team adds its own tests directly to the private repository, through a separate pull request on the branch of the same name.
    See [`TESTING.md`](TESTING.md).
 3. **Documentation updates** matching the change. A breaking change also needs a section in the migration guide. See [`DOC-STANDARDS.md`](DOC-STANDARDS.md).
 4. **JSDoc** on classes and functions, plus a high-level description of the concepts used in any complex fragment.
