@@ -10,7 +10,7 @@ The full test suite is available on request. To obtain it, contact us at hyperfo
 
 The private test suite is kept in the `hyperformula-tests` repository. Once you have access to it, you can use it following this instructions:
 
-Whenenever you switch branch in the main repository, you need to fetch the private test suite to the `test/hyperformula-tests` directory by running:
+Whenenever you switch branch in the main repository, you need to fetch the private test suite to the `hyperformula/test/hyperformula-tests` directory by running:
 ```
 npm run test:setup-private
 
@@ -29,11 +29,11 @@ npm run test:compatibility
 
 ## `fetch-tests.sh`
 
-This file is located in the `test` directory.
+This file is located in the `hyperformula/test` directory.
 
 ### What it does
 
-1. **Clone if missing** – If `test/hyperformula-tests` does not exist:
+1. **Clone if missing** – If `hyperformula/test/hyperformula-tests` does not exist:
    - With `DEPLOY_TOKEN` set: clones via HTTPS using the token
    - Otherwise: clones via SSH (`git@github.com:handsontable/hyperformula-tests.git`)
 
