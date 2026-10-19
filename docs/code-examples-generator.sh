@@ -106,6 +106,13 @@ elif [ "$1" == "--formatAllTsExamples" ]; then
   echo "Formatting all TS/TSX example files..."
   go_through_all_examples_concurrently "formatAllTsExamples"
 else
+  # A relative path is taken from where npm was invoked (INIT_CWD), not from
+  # docs/, where npm runs this script: the root's docs:code-examples:generate-js
+  # passes a path written from the repository root.
+  input_path="$1"
+  if [[ "$input_path" != /* ]]; then
+    input_path="${INIT_CWD:-$PWD}/$input_path"
+  fi
   echo "Generating single example..."
-  generate_single_example "$1"
+  generate_single_example "$input_path"
 fi
