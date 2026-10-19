@@ -7,16 +7,18 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
+import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {BooleanPlugin} from './BooleanPlugin'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
- * Classifies a TAKE or DROP count expression whose value may be known before evaluation.
+ * Classifies a TAKE or DROP count, a WRAPROWS or WRAPCOLS `wrap_count`, or an
+ * EXPAND `rows` or `columns` expression whose value may be known before evaluation.
  *
  * @internal
  */
@@ -33,10 +35,33 @@ type LiteralCount =
  */
 type TakeLiteralDimension = LiteralCount | {kind: 'unbounded'}
 
+/**
+ * Distinguishes an omitted or empty EXPAND `rows` or `columns`, which keeps the
+ * source dimension, from an expression whose value cannot be resolved during
+ * static result-size prediction.
+ *
+ * @internal
+ */
+type ExpandLiteralDimension = LiteralCount | {kind: 'kept'}
+
+/**
+ * The functions that share the WRAPROWS and WRAPCOLS implementation.
+ *
+ * @internal
+ */
+type WrapFunctionName = 'WRAPROWS' | 'WRAPCOLS'
+
+/**
+ * The largest number of rows EXPAND returns: the height of a Microsoft Excel
+ * sheet. EXPAND has no limit on the number of columns.
+ */
+const EXPAND_MAX_ROWS = 1048576
+
 export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ArrayPlugin> {
   /**
-   * Evaluates the dependency-free subset of TAKE and DROP count expressions
-   * used for static result-size prediction.
+   * Evaluates the dependency-free subset of TAKE and DROP count expressions,
+   * of WRAPROWS and WRAPCOLS `wrap_count` expressions, and of EXPAND `rows`
+   * and `columns` expressions, used for static result-size prediction.
    *
    * @param {Ast | undefined} argument - The count expression to inspect before evaluation.
    * @returns {LiteralCount} The constant value, an invalid-literal marker, or an unresolved marker.
@@ -309,6 +334,44 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
         {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
+      ],
+      vectorizationForbidden: true,
+    },
+    'WRAPROWS': {
+      method: 'wraprows',
+      sizeOfResultArrayMethod: 'wraprowsArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        // SCALAR: the count's error and coercion are checked in the method, after the vector's error and before its shape.
+        {argumentType: FunctionArgumentType.SCALAR},
+        // Any value pads as it is, errors included; omitted or empty pads with #N/A.
+        {argumentType: FunctionArgumentType.SCALAR, optionalArg: true},
+      ],
+      vectorizationForbidden: true,
+    },
+    'WRAPCOLS': {
+      method: 'wrapcols',
+      sizeOfResultArrayMethod: 'wrapcolsArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, optionalArg: true},
+      ],
+      vectorizationForbidden: true,
+    },
+    'EXPAND': {
+      method: 'expand',
+      sizeOfResultArrayMethod: 'expandArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        // Required, but an empty `rows` keeps the source height; coerced in the method, as `columns`.
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, optionalArg: true},
+        // Omitted pads with #N/A; empty pads with blank cells.
+        {argumentType: FunctionArgumentType.SCALAR, optionalArg: true},
       ],
       vectorizationForbidden: true,
     },
@@ -609,6 +672,380 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 
   /**
+   * Corresponds to WRAPROWS(vector, wrap_count, [pad_with]).
+   *
+   * Wraps a one-dimensional vector into rows of `wrap_count` values.
+   *
+   * @param {ProcedureAst} ast - The parsed WRAPROWS call.
+   * @param {InterpreterState} state - The current formula evaluation state.
+   * @returns {InterpreterValue} The wrapped values or a spreadsheet error.
+   */
+  public wraprows(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.wrap(ast, state, 'WRAPROWS')
+  }
+
+  /**
+   * Corresponds to WRAPCOLS(vector, wrap_count, [pad_with]).
+   *
+   * Wraps a one-dimensional vector into columns of `wrap_count` values.
+   *
+   * @param {ProcedureAst} ast - The parsed WRAPCOLS call.
+   * @param {InterpreterState} state - The current formula evaluation state.
+   * @returns {InterpreterValue} The wrapped values or a spreadsheet error.
+   */
+  public wrapcols(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.wrap(ast, state, 'WRAPCOLS')
+  }
+
+  /**
+   * Calculates the spilled array size of WRAPROWS (see `wrapArraySize`).
+   *
+   * @param {ProcedureAst} ast - The parsed WRAPROWS call.
+   * @param {InterpreterState} state - The formula state whose address anchors the spill.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  public wraprowsArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    return this.wrapArraySize(ast, state, 'WRAPROWS')
+  }
+
+  /**
+   * Calculates the spilled array size of WRAPCOLS (see `wrapArraySize`).
+   *
+   * @param {ProcedureAst} ast - The parsed WRAPCOLS call.
+   * @param {InterpreterState} state - The formula state whose address anchors the spill.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  public wrapcolsArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    return this.wrapArraySize(ast, state, 'WRAPCOLS')
+  }
+
+  /**
+   * Corresponds to EXPAND(array, rows, [columns], [pad_with]).
+   *
+   * Pads an array to `rows` rows and `columns` columns with `pad_with`, or
+   * with #N/A when `pad_with` is omitted (an empty `pad_with` pads with blank
+   * cells). An omitted or empty `rows` or `columns` keeps the array's size.
+   * Counts are truncated toward zero. A count smaller than the array returns
+   * #VALUE!, and more than 1,048,576 rows return #NUM!. A result larger than
+   * the configured sheet size (`maxRows`, `maxColumns`) returns #VALUE!,
+   * checked before the result is built, as for SEQUENCE. An array or a range
+   * as `pad_with` returns #VALUE!, and so does an empty result (a kept
+   * dimension of a whole column or row with no data).
+   *
+   * @param {ProcedureAst} ast - The parsed EXPAND call.
+   * @param {InterpreterState} state - The current formula evaluation state.
+   * @returns {InterpreterValue} The padded array or a spreadsheet error.
+   */
+  public expand(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('EXPAND'),
+      (array: SimpleRangeValue, rowsArgument: InternalScalarValue, columnsArgument: Maybe<InternalScalarValue>, padWith: Maybe<InternalScalarValue>) => {
+        if (this.isArrayArgument(ast.args[3], state)) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+        }
+
+        const rows = this.coerceExpandDimension(ast.args[1], rowsArgument, array.height())
+        if (rows instanceof CellError) {
+          return rows
+        }
+
+        const columns = this.coerceExpandDimension(ast.args[2], columnsArgument, array.width())
+        if (columns instanceof CellError) {
+          return columns
+        }
+
+        if (rows < array.height() || columns < array.width()) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.ValueSmall)
+        }
+
+        if (rows > EXPAND_MAX_ROWS) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
+
+        if (rows > this.config.maxRows || columns > this.config.maxColumns) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
+        }
+
+        if (rows === 0 || columns === 0) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.EmptyRange)
+        }
+
+        const result = array.data.map(row => this.padRowToWidth(row, columns, padWith))
+        while (result.length < rows) {
+          result.push(this.padRowToWidth([], columns, padWith))
+        }
+
+        return SimpleRangeValue.onlyValues(result)
+      }
+    )
+  }
+
+  /**
+   * Calculates the spilled array size of EXPAND. Statically known counts give
+   * the exact size, and an omitted or empty count keeps the source dimension.
+   * A count that depends on other cells cannot be known before evaluation, so
+   * the formula is a single cell, as for SEQUENCE: a larger result returns
+   * #VALUE!. So is a kept dimension of a source whose size cannot be predicted
+   * (such as a named expression), and every count that makes EXPAND return an
+   * error (including a result larger than the configured sheet size), so the
+   * formula evaluates to that error instead of reserving space.
+   *
+   * A kept dimension of a whole-column (whole-row) source spans the effective
+   * size of the source, and fits only when the formula starts in the first row
+   * (column); otherwise it stays unbounded, which makes array-space
+   * validation report a spill error.
+   *
+   * @param {ProcedureAst} ast - The parsed EXPAND call.
+   * @param {InterpreterState} state - The formula state whose address anchors the spill.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  public expandArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 2 || ast.args.length > 4 || this.isArrayArgument(ast.args[3], state)) {
+      return ArraySize.error()
+    }
+
+    const rows = this.parseExpandLiteralDimension(ast.args[1])
+    const columns = this.parseExpandLiteralDimension(ast.args[2])
+    if (rows.kind === 'invalid' || rows.kind === 'unresolved' || columns.kind === 'invalid' || columns.kind === 'unresolved') {
+      return ArraySize.error()
+    }
+
+    const sourceSize = this.predictSourceSize(ast.args[0], state, 'EXPAND')
+    if ((rows.kind === 'kept' || columns.kind === 'kept') && this.isUnpredictedSize(ast.args[0], sourceSize)) {
+      return ArraySize.error()
+    }
+
+    const effectiveSourceSize = this.effectiveSourceSize(ast.args[0], state)
+    const sourceHeight = Number.isFinite(sourceSize.height) ? sourceSize.height : effectiveSourceSize.height
+    const sourceWidth = Number.isFinite(sourceSize.width) ? sourceSize.width : effectiveSourceSize.width
+    const height = rows.kind === 'value' ? Math.trunc(rows.value) : sourceHeight
+    const width = columns.kind === 'value' ? Math.trunc(columns.value) : sourceWidth
+
+    if (
+      height < sourceHeight || width < sourceWidth || height > EXPAND_MAX_ROWS
+      || height > this.config.maxRows || width > this.config.maxColumns
+      || height < 1 || width < 1
+    ) {
+      return ArraySize.error()
+    }
+
+    const keepsUnboundedHeight = rows.kind === 'kept' && !Number.isFinite(sourceSize.height) && state.formulaAddress.row !== 0
+    const keepsUnboundedWidth = columns.kind === 'kept' && !Number.isFinite(sourceSize.width) && state.formulaAddress.col !== 0
+
+    return new ArraySize(
+      keepsUnboundedWidth ? Number.POSITIVE_INFINITY : width,
+      keepsUnboundedHeight ? Number.POSITIVE_INFINITY : height,
+    )
+  }
+
+  /**
+   * Shared implementation of WRAPROWS and WRAPCOLS.
+   *
+   * Cuts the vector into lines of `wrap_count` values, rows for WRAPROWS and
+   * columns for WRAPCOLS; a line is never longer than the vector. The last
+   * line is padded with `pad_with`, or with #N/A when `pad_with` is omitted or
+   * empty. `wrap_count` is truncated toward zero. A two-dimensional vector or
+   * an empty or blank one returns #VALUE!, and a `wrap_count` below 1 returns
+   * #NUM!. Runs in time proportional to the vector's length.
+   *
+   * @param {ProcedureAst} ast - The parsed WRAPROWS or WRAPCOLS call.
+   * @param {InterpreterState} state - The current formula evaluation state.
+   * @param {WrapFunctionName} functionName - Which of the two functions is evaluated.
+   * @returns {InterpreterValue} The wrapped values or a spreadsheet error.
+   */
+  private wrap(ast: ProcedureAst, state: InterpreterState, functionName: WrapFunctionName): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata(functionName),
+      (vector: SimpleRangeValue, wrapCountArgument: InternalScalarValue, padWithArgument: Maybe<InternalScalarValue>) => {
+        const wrapCount = this.coerceCount(wrapCountArgument)
+        if (wrapCount instanceof CellError) {
+          return wrapCount
+        }
+
+        if (vector.width() > 1 && vector.height() > 1) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.WrongDimension)
+        }
+
+        const elements = vector.height() === 1 ? vector.data[0] : vector.data.map(row => row[0])
+        if (elements.length === 0 || (elements.length === 1 && elements[0] === EmptyValue)) {
+          return new CellError(ErrorType.VALUE, this.isOmittedArgument(ast.args[0]) ? ErrorMessage.EmptyArg : ErrorMessage.EmptyRange)
+        }
+
+        if (wrapCount < 1) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+
+        const padWith = this.isOmittedArgument(ast.args[2]) ? undefined : padWithArgument
+        const lineLength = Math.min(wrapCount, elements.length)
+        const lines = Array.from({length: Math.ceil(elements.length / lineLength)}, (_, line) =>
+          this.padRowToWidth(elements.slice(line * lineLength, (line + 1) * lineLength), lineLength, padWith)
+        )
+
+        return SimpleRangeValue.onlyValues(functionName === 'WRAPROWS'
+          ? lines
+          : lines[0].map((_, position) => lines.map(line => line[position]))
+        )
+      }
+    )
+  }
+
+  /**
+   * Calculates the spilled array size of WRAPROWS and WRAPCOLS. A statically
+   * known `wrap_count` gives the exact size: lines of the smaller of
+   * `wrap_count` and the vector's length, as many as needed to hold the
+   * vector. A `wrap_count` that depends on other cells cannot be known before
+   * evaluation, so the formula is a single cell, as for SEQUENCE: a larger
+   * result returns #VALUE!. So is a two-dimensional source and every count
+   * that makes the function return an error, so the formula evaluates to that
+   * error instead of reserving space.
+   *
+   * A whole-column (whole-row) vector is measured by its effective size. The
+   * number of lines grows with it, so the result fits only when the formula
+   * starts in the first row (column); otherwise that dimension stays
+   * unbounded, which makes array-space validation report a spill error.
+   *
+   * @param {ProcedureAst} ast - The parsed WRAPROWS or WRAPCOLS call.
+   * @param {InterpreterState} state - The formula state whose address anchors the spill.
+   * @param {WrapFunctionName} functionName - Which of the two functions is predicted.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  private wrapArraySize(ast: ProcedureAst, state: InterpreterState, functionName: WrapFunctionName): ArraySize {
+    if (ast.args.length < 2 || ast.args.length > 3) {
+      return ArraySize.error()
+    }
+
+    const sourceSize = this.predictSourceSize(ast.args[0], state, functionName)
+    const wrapCount = this.parseLiteralCount(ast.args[1])
+    if (wrapCount.kind !== 'value' || Math.trunc(wrapCount.value) < 1 || (sourceSize.width > 1 && sourceSize.height > 1)) {
+      return ArraySize.error()
+    }
+
+    const effectiveSourceSize = this.effectiveSourceSize(ast.args[0], state)
+    const length = (Number.isFinite(sourceSize.height) ? sourceSize.height : effectiveSourceSize.height)
+      * (Number.isFinite(sourceSize.width) ? sourceSize.width : effectiveSourceSize.width)
+    if (length < 1) {
+      return ArraySize.error()
+    }
+
+    const lineLength = Math.min(Math.trunc(wrapCount.value), length)
+    const startsAwayFromSheetEdge = (!Number.isFinite(sourceSize.height) && state.formulaAddress.row !== 0)
+      || (!Number.isFinite(sourceSize.width) && state.formulaAddress.col !== 0)
+    const lineCount = startsAwayFromSheetEdge ? Number.POSITIVE_INFINITY : Math.ceil(length / lineLength)
+
+    return functionName === 'WRAPROWS'
+      ? new ArraySize(lineLength, lineCount)
+      : new ArraySize(lineCount, lineLength)
+  }
+
+  /**
+   * Predicts the size of a WRAPROWS, WRAPCOLS or EXPAND source, with array
+   * arithmetic enabled for it as the function's metadata requests.
+   *
+   * @param {Ast} source - The source expression.
+   * @param {InterpreterState} state - The formula state.
+   * @param {WrapFunctionName | 'EXPAND'} functionName - The function whose metadata drives the array-arithmetic flag.
+   * @returns {ArraySize} The predicted source size.
+   */
+  private predictSourceSize(source: Ast, state: InterpreterState, functionName: WrapFunctionName | 'EXPAND'): ArraySize {
+    const metadata = this.metadata(functionName)
+    return this.arraySizeForAst(
+      source,
+      new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata.enableArrayArithmeticForArguments ?? false)),
+    )
+  }
+
+  /**
+   * Classifies an EXPAND `rows` or `columns` expression before evaluation. An
+   * omitted or empty count keeps the source dimension.
+   *
+   * @param {Ast | undefined} argument - The count expression to classify.
+   * @returns {ExpandLiteralDimension} The constant count, or its kept, invalid, or unresolved classification.
+   */
+  private parseExpandLiteralDimension(argument: Ast | undefined): ExpandLiteralDimension {
+    return this.isOmittedArgument(argument) ? {kind: 'kept'} : this.parseLiteralCount(argument)
+  }
+
+  /**
+   * Coerces an EXPAND `rows` or `columns` value. An omitted or empty count
+   * keeps the source dimension; any other value is coerced as a count.
+   *
+   * @param {Ast | undefined} argument - The count expression, to tell an empty count from a blank cell.
+   * @param {Maybe<InternalScalarValue>} value - The evaluated count.
+   * @param {number} sourceDimension - The array's height or width.
+   * @returns {number | CellError} The dimension of the result or an error.
+   */
+  private coerceExpandDimension(argument: Ast | undefined, value: Maybe<InternalScalarValue>, sourceDimension: number): number | CellError {
+    return value === undefined || this.isOmittedArgument(argument) ? sourceDimension : this.coerceCount(value)
+  }
+
+  /**
+   * Coerces a WRAPROWS or WRAPCOLS `wrap_count`, or an EXPAND `rows` or
+   * `columns` value, to a number truncated toward zero. Errors are returned as
+   * they are; numeric text, logical values and blank cells convert as for any
+   * number; empty text returns #VALUE!.
+   *
+   * @param {InternalScalarValue} value - The count.
+   * @returns {number | CellError} The truncated number or an error.
+   */
+  private coerceCount(value: InternalScalarValue): number | CellError {
+    if (value === '') {
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+    }
+
+    const coerced = this.arithmeticHelper.coerceScalarToNumberOrError(value)
+    return coerced instanceof CellError ? coerced : Math.trunc(getRawValue(coerced))
+  }
+
+  /**
+   * Tells whether an optional argument is omitted or syntactically empty.
+   *
+   * @param {Ast | undefined} argument - The argument expression, if any.
+   * @returns {boolean} True when the argument is omitted or empty.
+   */
+  private isOmittedArgument(argument: Ast | undefined): boolean {
+    return argument === undefined || argument.type === AstNodeType.EMPTY
+  }
+
+  /**
+   * Tells whether an EXPAND `pad_with` is an array or a multi-cell range,
+   * judged by its size with array arithmetic enabled.
+   *
+   * @param {Ast | undefined} argument - The `pad_with` expression, if any.
+   * @param {InterpreterState} state - The formula state.
+   * @returns {boolean} True when `pad_with` holds more than one value.
+   */
+  private isArrayArgument(argument: Ast | undefined, state: InterpreterState): boolean {
+    if (argument === undefined || this.isOmittedArgument(argument)) {
+      return false
+    }
+
+    const size = this.arraySizeForAst(argument, new InterpreterState(state.formulaAddress, true))
+    return size.width !== 1 || size.height !== 1
+  }
+
+  /**
+   * Tells whether an EXPAND source has a size that cannot be predicted before
+   * evaluation, such as a named expression or a function whose result size
+   * depends on cell values. Size prediction reports such a source as one cell,
+   * which only a cell reference, a one-cell range or an empty argument really is.
+   *
+   * @param {Ast} source - The source argument.
+   * @param {ArraySize} sourceSize - The predicted size of the source.
+   * @returns {boolean} True when the source's real size is unknown.
+   */
+  private isUnpredictedSize(source: Ast, sourceSize: ArraySize): boolean {
+    let argument = source
+    while (argument.type === AstNodeType.PARENTHESIS) {
+      argument = argument.expression
+    }
+
+    return sourceSize.isRef
+      && sourceSize.width === 1
+      && sourceSize.height === 1
+      && argument.type !== AstNodeType.CELL_REFERENCE
+      && argument.type !== AstNodeType.CELL_RANGE
+      && argument.type !== AstNodeType.EMPTY
+  }
+
+  /**
    * Corresponds to VSTACK(array1, [array2], ...)
    *
    * Stacks the input arrays vertically, one on top of another, into a single array.
@@ -720,19 +1157,23 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
   /**
    * Returns a copy of the given row resized to exactly `width` cells: longer
-   * rows are truncated and shorter rows are padded on the right with #N/A. Used
-   * by VSTACK to align every stacked row to the widest input.
+   * rows are truncated and shorter rows are padded on the right with
+   * `padWith`, or with #N/A when it is omitted. Used by VSTACK to align every
+   * stacked row to the widest input, and by WRAPROWS, WRAPCOLS and EXPAND to
+   * pad their short lines.
    *
-   * @param row - the source row to resize
-   * @param width - the target number of cells
+   * @param {InternalScalarValue[]} row - the source row to resize
+   * @param {number} width - the target number of cells
+   * @param {InternalScalarValue} [padWith] - the value of each added cell; #N/A when omitted
+   * @returns {InternalScalarValue[]} the resized copy of the row
    */
-  private padRowToWidth(row: InternalScalarValue[], width: number): InternalScalarValue[] {
+  private padRowToWidth(row: InternalScalarValue[], width: number, padWith?: InternalScalarValue): InternalScalarValue[] {
     if (row.length >= width) {
       return row.slice(0, width)
     }
     const padded = row.slice()
     while (padded.length < width) {
-      padded.push(new CellError(ErrorType.NA, ErrorMessage.ValueNotFound))
+      padded.push(padWith ?? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound))
     }
     return padded
   }

@@ -46,6 +46,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=DROP(A1:C5, 2)', '=DROP(A1:C5, -1, -1)', '=DROP(A1:C5, , 1)'],
   },
+  EXPAND: {
+    category: 'Lookup and reference',
+    shortDescription: 'Expands an array to the given numbers of rows and columns, filling the added cells with a pad value.',
+    parameters: [{name: 'array', description: 'The array or range to expand.'}, {name: 'rows', description: 'The number of rows of the result, truncated to an integer. A value smaller than the number of rows of array returns #VALUE!, and more than 1,048,576 rows return #NUM!. An empty argument keeps the number of rows of array. The size must be resolvable at parse time, so use a literal (e.g. 3); a cell reference or formula yields a #VALUE! error whenever the result would span more than one cell.'}, {name: 'columns', description: 'The number of columns of the result, truncated to an integer; a value smaller than the number of columns of array returns #VALUE!. When omitted or empty, the number of columns of array is kept. Like rows, it must be resolvable at parse time.'}, {name: 'pad_with', description: 'The value of the added cells; #N/A when omitted, blank when empty. An array or a range returns #VALUE!.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=EXPAND(A1:B2, 3, 3)', '=EXPAND(A1:B2, 4, , 0)', '=EXPAND(A1, 2, 2, "-")'],
+  },
   FILTER: {
     category: 'Lookup and reference',
     shortDescription: 'Filters an array, based on multiple conditions (boolean arrays).',
@@ -162,6 +169,20 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'array1', description: 'A range or array to stack. Further ranges or arrays can be passed as additional arguments; they are stacked top to bottom into one array.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=VSTACK(A1:B2, A3:B4)', '=VSTACK(A1:C1, A2:C2)'],
+  },
+  WRAPCOLS: {
+    category: 'Lookup and reference',
+    shortDescription: 'Wraps a row or column of values into columns of a given length.',
+    parameters: [{name: 'vector', description: 'The row or column of values to wrap. A two-dimensional range or array returns #VALUE!.'}, {name: 'wrap_count', description: 'The number of values in each column, truncated to an integer; a value below 1 returns #NUM!. A value at least the length of vector returns vector in one column. It must be resolvable at parse time, so use a literal (e.g. 3); a cell reference or formula yields a #VALUE! error whenever the result would span more than one cell.'}, {name: 'pad_with', description: 'The value that fills the rest of the last column; #N/A when omitted or empty.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=WRAPCOLS(A1:G1, 3)', '=WRAPCOLS(A1:A7, 3, 0)'],
+  },
+  WRAPROWS: {
+    category: 'Lookup and reference',
+    shortDescription: 'Wraps a row or column of values into rows of a given length.',
+    parameters: [{name: 'vector', description: 'The row or column of values to wrap. A two-dimensional range or array returns #VALUE!.'}, {name: 'wrap_count', description: 'The number of values in each row, truncated to an integer; a value below 1 returns #NUM!. A value at least the length of vector returns vector in one row. It must be resolvable at parse time, so use a literal (e.g. 3); a cell reference or formula yields a #VALUE! error whenever the result would span more than one cell.'}, {name: 'pad_with', description: 'The value that fills the rest of the last row; #N/A when omitted or empty.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=WRAPROWS(A1:G1, 3)', '=WRAPROWS(A1:A7, 3, 0)'],
   },
   XLOOKUP: {
     category: 'Lookup and reference',
