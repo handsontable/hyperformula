@@ -9,3 +9,4 @@
 !typings/**/*
 !github-hf-logo-blue.svg
 !CHANGELOG.md
+!script/postinstall-skills-message.js

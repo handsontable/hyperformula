@@ -104,7 +104,8 @@
     "check:license-key-parser-drift": "node script/check-license-key-parser-drift.js",
     "check:licenses": "license-checker --production --excludePackages=\"hyperformula@3.5.0\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\"",
     "tsnode": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"}",
-    "release": "bash script/release/release.sh"
+    "release": "bash script/release/release.sh",
+    "postinstall": "node script/postinstall-skills-message.js"
   },
   "dependencies": {
     "chevrotain": "^6.5.0",
