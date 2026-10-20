@@ -27,6 +27,7 @@
   },
   "files": [
     "dist",
+    "!dist/.tsbuildinfo",
     "src",
     "DOCS.md"
   ],

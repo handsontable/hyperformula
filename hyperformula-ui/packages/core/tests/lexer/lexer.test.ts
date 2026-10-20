@@ -43,6 +43,10 @@ describe("Lexer", () => {
     expect(values('="x" & "y')).toEqual(["=", '"x"', "&", '"', "y"]);
   });
 
+  it("an unterminated string ending in a backslash before a line break leaves later quotes as errors", () => {
+    expect(values('="a\\\n"b"')).toEqual(["=", '"', "a", "\\", '"', "b", '"']);
+  });
+
   it("cell cellRefs absolute markers", () => {
     const tokens = lex.tokenize("A1 $A1 A$1 $A$1");
     const cellRefs = tokens.filter((token) => token.type === TokenType.CELL_REF);

@@ -10,7 +10,7 @@ It has no UI framework dependency. A grid connects to it through the `IGridAdapt
 npm install hyperformula-ui hyperformula
 ```
 
-`hyperformula` is a peer dependency: version 3.4.0 or later.
+`hyperformula` is an optional peer dependency: version 3.4.0 or later. Without it, the editor still edits and highlights formulas, but function autocomplete, function help and named-expression highlighting are off.
 
 ## Use
 

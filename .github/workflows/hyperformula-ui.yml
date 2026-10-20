@@ -40,6 +40,11 @@ jobs:
       - name: Check the generated stylesheet is committed
         run: git diff --exit-code -- 'hyperformula-ui/**/cssText.ts'
 
+      - name: Check the generated API docs are committed
+        run: |
+          npm run docs --workspace=hyperformula-ui/packages/core
+          git diff --exit-code -- hyperformula-ui/packages/core/DOCS.md
+
       - name: Lint
         run: npm run lint --workspace=hyperformula-ui/packages/core
 

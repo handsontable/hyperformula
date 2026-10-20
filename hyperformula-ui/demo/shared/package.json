@@ -9,11 +9,7 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "exports": {
-    ".": {
-      "hyperformula-ui-source": "./datasets.ts",
-      "default": "./datasets.ts"
-    },
-    "./shared.css": "./shared.css"
+    ".": "./datasets.ts"
   },
   "dependencies": {
     "hyperformula": "^3.4.0"
