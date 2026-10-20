@@ -27,8 +27,10 @@ Repository-wide standards and process live here. Each package documents its own 
 | What a test must prove, and how a case is written | [`TESTING.md`](TESTING.md) |
 | Documentation rules, and the changelog | [`DOC-STANDARDS.md`](DOC-STANDARDS.md) |
 | Writing a documentation page | [`DOCS-CONTENT-GUIDE.md`](DOCS-CONTENT-GUIDE.md) |
-| Installing the workspace, deploying the portal, cutting a release | [`BUILD.md`](BUILD.md) |
-| Opening a pull request | [`PULL-REQUESTS.md`](PULL-REQUESTS.md) |
+| Installing the workspace, deploying the portal, cutting a release, scripts and CI, dependencies | [`BUILD.md`](BUILD.md) |
+| Opening a pull request | [`DEFINITION-OF-DONE.md`](DEFINITION-OF-DONE.md#opening-the-pull-request) |
+| Reviewing a pull request | [`CODE-REVIEW.md`](CODE-REVIEW.md) |
+| What must never appear in code, commits, pull requests, or docs | [`SENSITIVE-INFORMATION.md`](SENSITIVE-INFORMATION.md) |
 | Which package holds what, and what the monorepo move still owes | [`STRUCTURE.md`](STRUCTURE.md) |
 | A linked git worktree | [`WORKTREES.md`](WORKTREES.md) |
 | How this repository is set up for agents | [`AGENT-TOOLING.md`](AGENT-TOOLING.md) |
@@ -46,6 +48,8 @@ Outside both: [`README.md`](../README.md) for what the repository holds, [`hyper
 
 - Markdown **link targets** are filesystem-relative — `../hyperformula/test/README.md` from here, `../../../dev-docs/TESTING.md` from a nested `AGENTS.md` — so they resolve on GitHub and in an editor.
 - A path **named in prose** rather than linked is spelled from the repository root: `dev-docs/TESTING.md`, `hyperformula/src/interpreter/plugin/`.
+- When a file moves, every link and path that names it is updated in the same change.
+- Pages describe the current state, not the history of decisions that led to it.
 - Diagrams live only in `dev-docs/`, never in the always-loaded `AGENTS.md` files.
 - Public, user-facing documentation belongs in [`docs/`](../docs/), not here. `dev-docs/` never ships.
 - **Nothing outside this directory restates what is in it.** `AGENTS.md`, `README.md`, and `SKILL.md` files carry only what is so specific to their own context that it would be useless anywhere else; everything else is a link. Two copies of a rule means one of them is wrong within a release, and the reader cannot tell which.
