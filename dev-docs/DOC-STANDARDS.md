@@ -13,9 +13,11 @@ These apply across the whole repository: guides, the API reference, JSDoc inside
 
 ## The API reference is the source of truth
 
-The API reference, generated from JSDoc, holds all the detail about each function and class. A guide gives the overview and links to the reference for the detail.
+The API reference, generated from JSDoc, holds all the detail about each function and class. A guide gives the overview and links to the reference for the detail. A big topic gets a guide of its own.
 
 This is not a licence to make a guide unreadable on its own. A guide page repeats the small essential context a reader needs to finish the task in front of them, and links out only for depth. [`DOCS-CONTENT-GUIDE.md`](DOCS-CONTENT-GUIDE.md#how-to-structure-a-page) owns that trade-off and states the rule of thumb: if removing a link would make the current task impossible to finish, that information belongs on the page.
+
+JSDoc is understandable without internal context, and carries an example where the concept is not obvious. A snippet in an `@example` block runs when pasted, `licenseKey` included, just like a guide snippet — see [`DOCS-CONTENT-GUIDE.md`](DOCS-CONTENT-GUIDE.md#code-examples).
 
 ## Generated files
 
@@ -28,7 +30,9 @@ Both are git-ignored. A missing `docs/api/` folder means it has not been built y
 
 ## Describing behaviour
 
-Describe **HyperFormula's** behaviour, not Excel's. HyperFormula deliberately deviates in places, and much of the existing prose was seeded from Excel documentation. Verify a claim against the implementation before writing it down, and record any deviation in [the list of differences](../docs/guide/list-of-differences.md).
+Describe **HyperFormula's** behaviour, not Excel's. HyperFormula deliberately deviates in places, and much of the existing prose was seeded from Excel documentation. Verify a claim against the implementation before writing it down.
+
+Record an intentional deviation from Excel in [the list of differences](../docs/guide/list-of-differences.md), and an engine limitation, such as "the result size must be known at parse time", in [the known limitations](../docs/guide/known-limitations.md). A function's limitations go on those two pages, not on the built-in functions page.
 
 ## The changelog
 
@@ -51,19 +55,23 @@ One bullet per change, ending with a link to the public issue where one exists, 
 
 Writing the entry:
 
-- **From the user's perspective.** What changed for someone using HyperFormula, not what changed in the code. No class names, no file paths.
+- **Short, and from the user's perspective.** What changed for someone using HyperFormula, not what changed in the code. No class names, no file paths.
 - **Past tense, verb first**: "Added…", "Fixed…", "Changed…", "Removed…".
-- **Specific.** Name the function, option, or operation, and say what it does now. Show the difference when a value changed.
-- **Nothing sensitive.** No client, customer, or partner names, and nothing that identifies them indirectly.
+- **In the right section.** A new feature is not a fix, and a bug fix is rarely a breaking change. What counts as breaking is decided by [`DEFINITION-OF-DONE.md`](DEFINITION-OF-DONE.md#breaking-changes).
+- **Specific.** Name the function, option, or operation, and say what it does now. Show the difference when a value changed. Format names as code and name each exact function: `COVARIANCE.P` and `COVARIANCE.S`, not `COVARIANCE`.
+- **No duplicates.** Consolidate related changes into one entry.
+- **Nothing sensitive** — see [`SENSITIVE-INFORMATION.md`](SENSITIVE-INFORMATION.md).
 - End with a period, then the link.
 
 A breaking change says what breaks and what to do instead, and still needs a migration-guide section — the entry is not a substitute.
+
+**Release notes are not edited in feature pull requests.** `docs/guide/release-notes.md` is generated from the changelog at release time and covers only HyperFormula — see [`release-README.md`](../script/release/release-README.md).
 
 **No entry is needed** for documentation-only, test-only, or CI and tooling changes, or for a bug that was introduced and never released.
 
 ## The documentation portal
 
-`docs/` is a VuePress site. How to run it, what is generated, and how to add a page are in [`docs/README.md`](../docs/README.md).
+`docs/` is a VuePress site. How to run it, what is generated, and how to add a page are in [`docs/README.md`](../docs/README.md). A change to the docs tooling — a generator, a VuePress plugin, the `.md` companions, `llms-full.txt` — updates that README in the same pull request.
 
 Two rules from above bear repeating there, because they are the ones most often broken while writing a guide: do not restate the API reference, and describe HyperFormula rather than Excel.
 

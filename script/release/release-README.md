@@ -405,3 +405,8 @@ the script, and a `usage_<name>` help function. To add, say, `post-release`: wri
 and list it in `usage_top`. (`cmd_code_freeze` and `cmd_publish` already follow
 this shape — use either as a reference.) Call `start_warning_register` first if
 the command has any step that can fail softly.
+
+Check a change to the script, or to a checklist it prints, with a dry run of
+every command it affects, and confirm in the preview that the version bumps, the
+rewritten demo URLs, the changelog section and the release notes still come out
+right.
