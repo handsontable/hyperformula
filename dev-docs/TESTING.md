@@ -8,9 +8,12 @@ Each package documents its own suites and commands: the engine's are in [`hyperf
 
 - Every change to `hyperformula/src/` needs tests in `hyperformula/test/`. This is part of the [definition of done](DEFINITION-OF-DONE.md), not a suggestion.
 - **Bug fix**: at least one test that reproduces the bug — it must fail against the unfixed code. Write it first and watch it fail.
-- **New feature**: a set of tests that describe the feature precisely enough to serve as its specification.
-- Cover more than the happy path: boundary values, empty and invalid input, error results, and interaction with related features.
-- `docs/` and the `script/` directories are not tested.
+- **New feature**: a set of tests that describe the feature precisely enough to serve as its specification. The suite's size is proportional to the spec: a few cases per spec row, not hundreds of near-duplicates.
+- Cover more than the happy path: boundary values, empty and invalid input, error results, and interaction with related features. Cover every variant: both axes, both directions, each match or search mode, a non-default configuration.
+- Test the positive paths, not only rejections; for example, granted features still work. Test the general paths, not only the fast ones; for example, composing cached aggregates.
+- Functions the task names but leaves unchanged get regression tests.
+- Pin silent-failure mechanisms with tests: warnings, call ordering, defensive copies.
+- **No tests for code that doesn't need them.** `docs/`, the `script/` directories and vendored upstream code, such as `hyperformula/src/license/handsontable-license-key-parser/`, are not tested.
 
 ## How to write a test case
 
@@ -27,6 +30,13 @@ it('returns the divisor sign for arguments with opposite signs', () => {
 - Name the case after the behaviour it pins, not after the function under test: "returns `#VALUE!` when the range is empty", not "test SUMIFS".
 - Build the smallest engine that exhibits the behaviour. A two-cell array beats a realistic sheet.
 - Assert through the public API — `getCellValue`, `getCellFormula`, `getSheetValues` — not through internals.
+- No duplicated tests or helpers across files; each file has one clear topic.
+- Tests are deterministic and isolated:
+  - no wall-clock bounds;
+  - global state restored, for example language packs;
+  - no output on the real console.
+- Use real inputs where they exist, for example real files, not synthetic ones. Build licence keys in the format real keys are issued in today, with the vendored key reader's own encoding and checksum, rather than writing key strings by hand. Never put a real customer's key in a test (see [`SENSITIVE-INFORMATION.md`](SENSITIVE-INFORMATION.md)).
+- Lower test-only constants so scenarios stay small, for example a configurable threshold.
 - A test must prove intended behaviour. Never relax an assertion, widen a matcher, or skip a case to turn a run green — if a test is red, the default assumption is that the **code** is wrong.
 
 Before requesting a review, ask which further tests would be valuable and add the ones that protect against realistic regressions.
@@ -49,6 +59,8 @@ Write the case from the requirement, not from the implementation. Reading the im
 - Mocking the unit under test, or mocking so deeply that only the mock is exercised.
 - Asserting that a call "does not throw" when the requirement is a specific returned value.
 - Changing the input until the current implementation happens to be right.
+
+An assertion that is weakened or deleted for a valid reason has that reason recorded in the commit that changes it.
 
 "This test fails and I do not yet know why" is a useful report. A green run that hides it is not.
 

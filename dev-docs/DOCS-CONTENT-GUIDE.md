@@ -78,7 +78,8 @@ Treat **every page as page one.**
    must carry a clear signal of what product/feature it belongs to, because the title
    and breadcrumb may be stripped away. Don't overdo it — once per section is enough.
 3. **Front-load the essential context**, then the details. A reader who sees only the
-  first chunk should still get the core answer.
+  first chunk should still get the core answer. The simplest working example comes
+   first; advanced options come later.
 4. **Self-containment beats DRY — resolve the tension deliberately.** RAG wants
   repetition; engineering instinct wants "don't repeat yourself." For docs content,
    **self-containment wins**:
@@ -144,6 +145,8 @@ Treat **every page as page one.**
   inside the procedure instead of assuming setup. If a step depends on an external
     tool or concept, give one line of context or a link. The AI cannot infer what you
     didn't write.
+7. **Use a positive tone.** Describe what HyperFormula does and how to reach the goal,
+  not what is missing.
 
 ---
 
@@ -169,6 +172,9 @@ and hallucinate the parts you omit.
 5. **Show the correct way; show a wrong way only when it prevents a frequent
   mistake.** If you include an anti-pattern, label it clearly ("Don't do this —
     it throws because…") so it can't be mistaken for a recommendation.
+6. **Framework guides quote the demo.** A snippet in an integration guide is an exact
+  fragment of the StackBlitz demo it links, written in idiomatic modern code for that
+    framework (Angular `@for`, React 18/19, Svelte 5 runes, Vue 3).
 
 ---
 
@@ -192,6 +198,8 @@ and hallucinate the parts you omit.
     edge cases, gotchas, and common mistakes with their resolution (e.g. why
     `buildEmpty` needs a `licenseKey`, when to use named expressions vs. cell
     references, precision/rounding caveats).
+6. **Describe a known limitation by its effect.** Say what the behaviour is and what
+  it means for the reader, not the internal cause.
 
 ---
 

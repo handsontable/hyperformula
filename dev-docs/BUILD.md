@@ -1,6 +1,6 @@
 # Building and releasing
 
-How the workspace installs, and the repository-level steps: generating the documentation, deploying the portal, and cutting a release.
+How the workspace installs, the repository-level steps — generating the documentation, deploying the portal, and cutting a release — and the rules that scripts, CI and dependencies follow.
 
 The engine's own build — the intermediate `lib/`, the bundles, and packaging — is in [`hyperformula/dev-docs/BUILD.md`](../hyperformula/dev-docs/BUILD.md).
 
@@ -43,3 +43,23 @@ Config is [`docs/wrangler.jsonc`](../docs/wrangler.jsonc); the Worker entry poin
 `npm run release` runs `script/release/release.sh`. Releasing is maintainer-owned — do not invent steps around it, and do not run it as part of another task.
 
 `npm run check:licenses` asserts that every production dependency carries a permissive licence.
+
+## Scripts and CI
+
+Where each script lives and what calls it is in [`STRUCTURE.md`](STRUCTURE.md#scripts-at-three-levels). The release script keeps its own rules in [`script/release/release-README.md`](../script/release/release-README.md).
+
+- **A step runs in the workflow that needs it.** A step only the tests need belongs to the test workflows, not to `lint`.
+- **`pre*` and `post*` scripts run the way the scripts are actually called** — by CI, and on a maintainer's machine. npm skips them when `ignore-scripts` is set, which is why `script/release/release.sh` copies the root files itself before `npm publish` instead of trusting `prepack` alone.
+- **Generated files are not committed.** They are listed in `.gitignore` and generated before use, like the [generated documentation](#generated-documentation).
+- **New npm scripts follow the existing naming:** `group:variant`, as in `test:jest`, `bundle:es` and `verify:typings`, with a `docs:` prefix at the root for the portal's.
+- **Checks compute from the real source**, such as actual file hashes or the directory listing, not from a hand-written list ([single source of truth](CODE-STYLE.md#design)).
+- **Every step verifies that it did something.** It prints no success message after a no-op, skips nothing silently ([never fail silently](CODE-STYLE.md#style)), and keeps file modes.
+- **Sibling commands and code paths are equally robust.** For example, the release script's `code-freeze` checks as much as its `publish`.
+- **Diagnostics are accurate.** The error class is the right one, and a message says "tag" or "commit" for the thing it actually found.
+- **CI covers new directories.** A new directory is added to the paths and checks of every workflow that should see it.
+
+## Dependencies
+
+- **A new dependency earns its place.** It is needed and maintained. One the published engine depends on is also ESM-friendly and headless — see the engine's [invariants](../hyperformula/dev-docs/ARCHITECTURE.md#invariants) — and its licence passes `check:licenses` ([above](#release-and-licences)).
+- **Declare a dependency in the package that uses it.** Never rely on one that arrives transitively or is hoisted from another package's tree; [Workspaces](STRUCTURE.md#workspaces) shows how that breaks. What the published code needs at runtime goes in `dependencies`, the rest in `devDependencies`, and a dependency nothing uses is removed.
+- **Fix vulnerabilities in runtime dependencies first.** `.github/workflows/audit.yml` runs `npm run audit` (`npm audit --omit=dev`) on every pull request. A vulnerability in a dev-only dependency is lower priority.

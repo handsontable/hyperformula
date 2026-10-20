@@ -7,14 +7,13 @@ description: Use before creating, pushing, opening, or updating a pull request i
 
 | File | Why |
 |---|---|
-| [`PULL-REQUESTS.md`](../../../dev-docs/PULL-REQUESTS.md) | Branch naming, the order of operations, the pre-flight gate, the template, and scope and upkeep |
-| [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md) | Every item the change must contain before review |
+| [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md) | Every item the change must contain before review, the pre-flight gate, branch naming, the order of operations, the template, and one change per pull request |
 | [`DOC-STANDARDS.md`](../../../dev-docs/DOC-STANDARDS.md#the-changelog) | The changelog entry that follows the pull request |
 
 ## 2. Follow the order of operations
 
-Work through [`PULL-REQUESTS.md`](../../../dev-docs/PULL-REQUESTS.md#order-of-operations) step by step, from the branch name to the pushed changelog entry. Write the entry with skill `changelog-creation`.
+Work through the [order of operations](../../../dev-docs/DEFINITION-OF-DONE.md#order-of-operations) step by step, from the branch name to the pushed changelog entry. Write the entry with skill `changelog-creation`.
 
 ## 3. Check before asking for review
 
-Go through [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md), then [Scope and upkeep](../../../dev-docs/PULL-REQUESTS.md#scope-and-upkeep) — including keeping the description current while the branch is open.
+Go through [`DEFINITION-OF-DONE.md`](../../../dev-docs/DEFINITION-OF-DONE.md), including [One pull request, one change](../../../dev-docs/DEFINITION-OF-DONE.md#one-pull-request-one-change), which covers keeping the description current while the branch is open.
