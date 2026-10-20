@@ -1,5 +1,5 @@
-import { FormulaBuilder } from "@hfe/core";
 import { buildHyperFormula, evaluateFormula } from "@hfe-demo/shared";
+import { FormulaBuilder } from "hyperformula-ui";
 import { requireEl } from "../shared/dom";
 import { bindEditorSizingControls } from "../shared/editorSizing";
 

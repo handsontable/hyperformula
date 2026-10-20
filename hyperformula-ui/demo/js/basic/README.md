@@ -1,10 +1,10 @@
-# basic — `@hfe/core` only, no grid
+# basic — `hyperformula-ui` only, no grid
 
 Demonstrates `FormulaBuilder` running without any grid adapter — the lowest
 layer of the integration surface. Constructs the builder against a host
 element and opens the editor imperatively via `openEditor`.
 
-**Imports:** `@hfe/core` (`FormulaBuilder`) only — no adapter package.
+**Imports:** `hyperformula-ui` (`FormulaBuilder`) only — no adapter package.
 
 **Construction** (`basic/main.ts`):
 
