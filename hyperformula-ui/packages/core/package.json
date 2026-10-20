@@ -18,7 +18,7 @@
     "src"
   ],
   "scripts": {
-    "build": "pnpm run build:styles && rspack build && tsc -p tsconfig.json --emitDeclarationOnly",
+    "build": "npm run build:styles && rspack build && tsc -p tsconfig.json --emitDeclarationOnly",
     "build:js": "rspack build",
     "build:styles": "node ../../scripts/generateCssText.mjs --source src/styles/index.scss --target src/theme/cssText.ts",
     "build:types": "tsc -p tsconfig.json --emitDeclarationOnly",
@@ -37,13 +37,14 @@
     }
   },
   "devDependencies": {
-    "@rspack/cli": "catalog:",
-    "@rspack/core": "catalog:",
-    "@types/node": "catalog:",
-    "happy-dom": "catalog:",
-    "hyperformula": "catalog:",
-    "sass": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:"
+    "@biomejs/biome": "^2.4.16",
+    "@rspack/cli": "^1.1.0",
+    "@rspack/core": "^1.1.0",
+    "@types/node": "^22.10.0",
+    "happy-dom": "^15.11.0",
+    "hyperformula": "^3.4.0",
+    "sass": "^1.100.0",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
   }
 }

@@ -19,8 +19,7 @@
       "!**/node_modules",
       "!**/playwright-report",
       "!**/test-results",
-      "!**/.vite",
-      "!pnpm-lock.yaml"
+      "!**/.vite"
     ]
   },
   "css": {

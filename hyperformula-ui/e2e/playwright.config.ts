@@ -11,11 +11,11 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "pnpm --filter demo-js dev",
+      command: "npm run dev --workspace=demo-js",
       url: "http://localhost:5173",
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,
-      cwd: "..",
+      cwd: "../..",
     },
   ],
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
