@@ -4,5 +4,5 @@
     "noEmit": true,
     "types": ["vite/client"]
   },
-  "include": ["basic/**/*", "plain-table/**/*", "ag-grid/**/*", "shared/**/*"]
+  "include": ["basic/**/*", "shared/**/*"]
 }

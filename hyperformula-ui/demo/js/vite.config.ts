@@ -20,8 +20,6 @@ export default defineConfig({
       input: {
         index: resolve(dirname, "index.html"),
         basic: resolve(dirname, "basic/index.html"),
-        "plain-table": resolve(dirname, "plain-table/index.html"),
-        "ag-grid": resolve(dirname, "ag-grid/index.html"),
       },
     },
   },

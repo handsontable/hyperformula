@@ -11,9 +11,6 @@
   "dependencies": {
     "@hfe-demo/shared": "workspace:*",
     "@hfe/core": "workspace:*",
-    "@hfe/ag-grid-adapter": "workspace:*",
-    "@hfe/plain-table-adapter": "workspace:*",
-    "ag-grid-community": "catalog:",
     "hyperformula": "catalog:"
   },
   "devDependencies": {

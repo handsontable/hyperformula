@@ -17,27 +17,6 @@ export default defineConfig({
       timeout: 60_000,
       cwd: "..",
     },
-    {
-      command: "pnpm --filter demo-react dev",
-      url: "http://localhost:5174",
-      reuseExistingServer: !process.env.CI,
-      timeout: 60_000,
-      cwd: "..",
-    },
-    {
-      command: "pnpm --filter demo-vue dev",
-      url: "http://localhost:5175",
-      reuseExistingServer: !process.env.CI,
-      timeout: 60_000,
-      cwd: "..",
-    },
-    {
-      command: "pnpm --filter demo-angular dev",
-      url: "http://localhost:5176",
-      reuseExistingServer: !process.env.CI,
-      timeout: 180_000,
-      cwd: "..",
-    },
   ],
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });
