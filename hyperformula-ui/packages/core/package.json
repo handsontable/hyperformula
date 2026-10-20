@@ -1,0 +1,49 @@
+{
+  "name": "@hfe/core",
+  "version": "0.0.1",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "development": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "pnpm run build:styles && rspack build && tsc -p tsconfig.json --emitDeclarationOnly",
+    "build:js": "rspack build",
+    "build:styles": "node ../../scripts/generateCssText.mjs --source src/styles/index.scss --target src/theme/cssText.ts",
+    "build:types": "tsc -p tsconfig.json --emitDeclarationOnly",
+    "dev": "rspack build --watch",
+    "docs": "node ../../scripts/generateApiDocs.mjs --target DOCS.md",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json"
+  },
+  "peerDependencies": {
+    "hyperformula": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "hyperformula": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@rspack/cli": "catalog:",
+    "@rspack/core": "catalog:",
+    "@types/node": "catalog:",
+    "happy-dom": "catalog:",
+    "hyperformula": "catalog:",
+    "sass": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

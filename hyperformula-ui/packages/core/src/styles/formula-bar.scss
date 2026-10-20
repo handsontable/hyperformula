@@ -1,0 +1,105 @@
+.hfe-formula-bar {
+  display: flex;
+  background: var(--hfe-formula-bar-background);
+  border: var(--hfe-formula-bar-border-width) solid var(--hfe-formula-bar-border);
+  color: var(--hfe-formula-bar-foreground);
+  border-radius: var(--hfe-formula-bar-border-radius);
+
+  &__cell {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    border-inline-end: var(--hfe-formula-bar-border-width) solid var(--hfe-formula-bar-border);
+
+    &--address {
+      flex: 0 0 var(--hfe-formula-bar-address-width);
+      gap: var(--hfe-formula-bar-gap-address);
+    }
+
+    &--formula {
+      flex: 1;
+      min-width: 0;
+      gap: var(--hfe-formula-bar-gap-formula);
+      padding: var(--hfe-formula-bar-padding-vertical) var(--hfe-formula-bar-padding-horizontal);
+      border-inline-end: none;
+    }
+  }
+
+  &__address-input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: inherit;
+    font-family: var(--hfe-font-family);
+    font-size: var(--hfe-font-size);
+    line-height: var(--hfe-line-height);
+    padding: var(--hfe-formula-bar-padding-vertical) var(--hfe-formula-bar-padding-horizontal);
+    border-start-start-radius: var(--hfe-formula-bar-border-radius);
+
+    &:hover {
+      background: var(--hfe-formula-bar-input-background-hover);
+    }
+
+    &:focus-visible {
+      outline: var(--hfe-border-width-focus) solid var(--hfe-formula-bar-input-focus-ring);
+      outline-offset: calc(-1 * var(--hfe-border-width-focus));
+    }
+  }
+
+  &__fx-icon {
+    flex: none;
+    color: var(--hfe-formula-bar-foreground);
+  }
+
+  &__body {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__idle {
+    cursor: text;
+    height: var(--hfe-line-height);
+    font-family: var(--hfe-font-family);
+    font-size: var(--hfe-font-size);
+    line-height: var(--hfe-line-height);
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    inset-inline: 0;
+    z-index: var(--hfe-z-index-formula-bar);
+  }
+
+  .hfe-editor {
+    display: block;
+    max-width: 100% !important;
+    background: var(--hfe-formula-bar-background);
+  }
+
+  .hfe-editor, .hfe-overlay, .hfe-editor__input {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    min-height: unset;
+  }
+
+  &__overlay .hfe-editor {
+    border-start-end-radius: var(--hfe-formula-bar-border-radius);
+  }
+}
+
+.hfe-formula-bar[dir="rtl"] {
+  .hfe-formula-bar__idle .hfe-overlay {
+    text-align: right;
+  }
+}

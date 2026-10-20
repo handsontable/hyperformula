@@ -1,0 +1,16 @@
+{
+  "name": "@hfe-demo/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "hyperformula": "catalog:"
+  },
+  "exports": {
+    ".": {
+      "development": "./datasets.ts",
+      "default": "./datasets.ts"
+    },
+    "./shared.css": "./shared.css"
+  }
+}

@@ -1,0 +1,138 @@
+.hfe-fn-help {
+  position: fixed;
+  z-index: var(--hfe-z-index-popup);
+  width: 320px;
+  border-radius: var(--hfe-menu-border-radius);
+  background: var(--hfe-menu-background);
+  color: var(--hfe-color-foreground);
+  border: var(--hfe-menu-border-width) solid var(--hfe-menu-border-color);
+  box-shadow: var(--hfe-menu-shadow);
+  font-family: var(--hfe-font-family);
+  font-size: var(--hfe-font-size);
+  padding: var(--hfe-menu-padding-vertical) var(--hfe-menu-padding-horizontal);
+  max-height: var(--hfe-menu-max-height);
+  display: flex;
+  flex-direction: column;
+
+  &[hidden] {
+    display: none;
+  }
+
+  &__body {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--hfe-scrollbar-color) transparent;
+
+    &:hover {
+      scrollbar-color: var(--hfe-scrollbar-color-hover) transparent;
+    }
+
+    &:focus-visible {
+      outline: var(--hfe-border-width-focus) solid var(--hfe-color-focus-ring);
+      outline-offset: calc(-1 * var(--hfe-border-width-focus));
+    }
+  }
+
+  &__signature {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: var(--hfe-menu-item-padding-vertical) var(--hfe-menu-item-padding-horizontal);
+    background: var(--hfe-color-highlight);
+    border-radius: var(--hfe-menu-item-border-radius);
+    font-family: var(--hfe-formula-font-family);
+    font-size: var(--hfe-font-size);
+    line-height: var(--hfe-line-height);
+  }
+
+  &__name {
+    color: var(--hfe-color-foreground);
+  }
+
+  &__arg {
+    color: var(--hfe-color-foreground);
+
+    &--active {
+      background: var(--hfe-menu-chip-background);
+      color: var(--hfe-menu-chip-foreground);
+      border-radius: var(--hfe-menu-chip-border-radius);
+      padding: 0 4px;
+    }
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hfe-gap);
+    padding: var(--hfe-menu-item-padding-vertical) var(--hfe-menu-item-padding-horizontal);
+    border-radius: var(--hfe-menu-item-border-radius);
+  }
+
+  &__section-label {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--hfe-color-foreground-secondary);
+    font-family: var(--hfe-font-family);
+  }
+
+  &__example {
+    font-family: var(--hfe-formula-font-family);
+    color: var(--hfe-color-accent);
+    font-size: var(--hfe-font-size);
+    line-height: var(--hfe-line-height);
+  }
+
+  &__about {
+    font-family: var(--hfe-font-family);
+    font-size: var(--hfe-font-size);
+    line-height: var(--hfe-line-height);
+    color: var(--hfe-color-foreground);
+  }
+
+  &__param-name {
+    font-family: var(--hfe-formula-font-family);
+    font-size: var(--hfe-font-size);
+    line-height: var(--hfe-line-height);
+    color: var(--hfe-color-foreground);
+
+    &--active {
+      color: var(--hfe-color-accent);
+    }
+  }
+
+  &__param-desc {
+    font-family: var(--hfe-font-family);
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--hfe-color-foreground);
+  }
+
+  &__separator {
+    height: 1px;
+    border: 0;
+    background: var(--hfe-menu-separator-color);
+    margin: var(--hfe-gap) var(--hfe-menu-item-padding-horizontal);
+  }
+
+  &__learn-more {
+    display: flex;
+    align-items: center;
+    gap: var(--hfe-gap);
+    padding: var(--hfe-menu-item-padding-vertical) var(--hfe-menu-item-padding-horizontal) calc(var(--hfe-menu-item-padding-vertical) + var(--hfe-gap));
+    border-radius: var(--hfe-menu-item-border-radius);
+    color: var(--hfe-color-foreground);
+    font-size: var(--hfe-font-size);
+    font-family: var(--hfe-font-family);
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: var(--hfe-border-width-focus) solid var(--hfe-color-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "demo-js",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5173",
+    "build": "vite build",
+    "preview": "vite preview --port 4173"
+  },
+  "dependencies": {
+    "@hfe-demo/shared": "workspace:*",
+    "@hfe/core": "workspace:*",
+    "@hfe/ag-grid-adapter": "workspace:*",
+    "@hfe/plain-table-adapter": "workspace:*",
+    "ag-grid-community": "catalog:",
+    "hyperformula": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vite": "^5.4.10"
+  }
+}

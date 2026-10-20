@@ -1,0 +1,118 @@
+:root {
+  /* ── Core colors ─────────────────────────────────────────── */
+  --hfe-color-background: light-dark(#ffffff, #1e1f22);
+  --hfe-color-foreground: light-dark(#1c1d20, #e6e6e6);
+  --hfe-color-foreground-secondary: light-dark(#4e4f52, #aaaaaa);
+  --hfe-color-border: light-dark(#eceef2, #28292c);
+  --hfe-color-highlight: light-dark(#f7f7f9, #000000);
+  --hfe-color-caret: light-dark(#1c1d20, #e6e6e6);
+  --hfe-color-accent: light-dark(#1a42e8, #8aa4ff);
+  --hfe-color-focus-ring: light-dark(#1a42e8, #8aa4ff);
+  --hfe-color-error: light-dark(#fa4d56, #fa4d56);
+  --hfe-color-shadow: color-mix(in srgb, #000000 var(--hfe-shadow-opacity), transparent);
+  --hfe-scrollbar-color: color-mix(in srgb, var(--hfe-color-foreground) 20%, transparent);
+  --hfe-scrollbar-color-hover: color-mix(in srgb, var(--hfe-color-foreground) 50%, transparent);
+
+  /* ── Syntax token colors ─────────────────────────────────── */
+  --hfe-token-fn: var(--hfe-color-foreground);
+  --hfe-token-fn-unknown: light-dark(#ea580c, #fdba74);
+  --hfe-token-num: var(--hfe-color-foreground);
+  --hfe-token-str: var(--hfe-color-foreground);
+  --hfe-token-bool: var(--hfe-color-foreground);
+  --hfe-token-op: var(--hfe-color-foreground);
+  --hfe-token-paren: var(--hfe-color-foreground);
+  --hfe-token-paren-err: var(--hfe-color-error);
+  --hfe-token-paren-match: var(--hfe-color-accent);
+  --hfe-token-bracket: var(--hfe-color-foreground);
+  --hfe-token-sep: var(--hfe-color-foreground);
+  --hfe-token-sheet: light-dark(#64748b, #7c8694);
+  --hfe-token-ident: var(--hfe-color-foreground);
+  --hfe-token-err: var(--hfe-color-error);
+  --hfe-token-ref-invalid: var(--hfe-color-error);
+  --hfe-token-comment: light-dark(#8a8f99, #6c7280);
+
+  /* ── Reference rainbow — global primitives ───────────────────────────────── */
+  --hfe-ref-1: light-dark(#007bff, #0A84FF);
+  --hfe-ref-2: light-dark(#ff9500, #FF9D0A);
+  --hfe-ref-3: light-dark(#af52de, #BF5AF2);
+  --hfe-ref-4: light-dark(#30d158, #34c759);
+  --hfe-ref-5: light-dark(#ff2d54, #ff375f);
+  --hfe-ref-6: light-dark(#30b0c7, #40c8e0);
+  --hfe-ref-7: light-dark(#5856d6, #5E5CE6);
+  --hfe-ref-8: light-dark(#a2855e, #AC8E68);
+
+  /* ── Typography & layout ─────────────────────────────────── */
+  --hfe-formula-font-family:
+    "Google Sans Code", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  --hfe-font-family: inherit;
+  --hfe-font-size: 14px;
+  --hfe-line-height: 20px;
+  --hfe-selection-opacity: 0.08;
+  --hfe-dim-opacity: 0.6;
+  --hfe-gap: 4px;
+
+  /* ── Shadow ──────────────────────────────────────────────── */
+  --hfe-shadow-x: 0;
+  --hfe-shadow-y: 8px;
+  --hfe-shadow-blur: 16px;
+  --hfe-shadow-opacity: 8%;
+
+  /* ── Editor box ──────────────────────────────────────────── */
+  --hfe-editor-color-border: var(--hfe-color-accent);
+  --hfe-padding-vertical: 8px;
+  --hfe-padding-horizontal: 12px;
+  --hfe-border-radius: 0;
+  --hfe-border-width: 1px;
+  --hfe-border-width-focus: 2px;
+  --hfe-reference-border-width: 1px;
+
+  /* ── Menu / dropdown ─────────────────────────────────────── */
+  --hfe-menu-item-padding-horizontal: 12px;
+  --hfe-menu-item-padding-vertical: 8px;
+  --hfe-menu-item-border-radius: 8px;
+  --hfe-menu-padding-horizontal: 4px;
+  --hfe-menu-padding-vertical: 4px;
+  --hfe-menu-border-radius: 12px;
+  --hfe-menu-border-width: 0;
+  --hfe-menu-border-color: var(--hfe-color-border);
+  --hfe-menu-background: var(--hfe-color-background);
+  --hfe-menu-max-height: 280px;
+  --hfe-menu-separator-color: var(--hfe-color-border);
+  --hfe-menu-kbd-row-border-width: 1px;
+  --hfe-menu-kbd-row-border-color: var(--hfe-color-border);
+  --hfe-menu-kbd-row-chip-color: light-dark(#f7f7f9, #000000);
+  --hfe-menu-chip-border-radius: 8px;
+  --hfe-menu-chip-background: var(--hfe-color-accent);
+  --hfe-menu-chip-foreground: var(--hfe-color-background);
+  --hfe-menu-shadow: var(--hfe-shadow-x) var(--hfe-shadow-y) var(--hfe-shadow-blur) var(--hfe-color-shadow);
+  --hfe-menu-close-bg: var(--hfe-menu-background);
+  --hfe-menu-close-hover-bg: var(--hfe-color-highlight);
+
+  /* ── Error popup ─────────────────────────────────────────── */
+  --hfe-error-padding-horizontal: 16px;
+  --hfe-error-padding-vertical: 8px;
+  --hfe-error-border-radius: 0;
+
+  /* ── Formula bar ─────────────────────────────────────────── */
+  --hfe-formula-bar-background: var(--hfe-color-background);
+  --hfe-formula-bar-foreground: var(--hfe-color-foreground);
+  --hfe-formula-bar-border: var(--hfe-color-border);
+  --hfe-formula-bar-border-width: var(--hfe-border-width);
+  --hfe-formula-bar-border-radius: var(--hfe-border-radius);
+  --hfe-formula-bar-padding-vertical: 4px;
+  --hfe-formula-bar-padding-horizontal: 8px;
+  --hfe-formula-bar-gap-address: 4px;
+  --hfe-formula-bar-gap-formula: 8px;
+  --hfe-formula-bar-address-width: 120px;
+  --hfe-formula-bar-input-background-hover: transparent;
+  --hfe-formula-bar-input-focus-ring: var(--hfe-color-focus-ring);
+
+  /* ── z-index ─────────────────────────────────────────────── */
+  --hfe-z-index-popup: 210;
+  --hfe-z-index-formula-bar: 200;
+}
+
+:where([class*="hfe-"]) {
+  color-scheme: light dark;
+}
