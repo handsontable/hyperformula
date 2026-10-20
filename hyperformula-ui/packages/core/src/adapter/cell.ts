@@ -46,7 +46,7 @@ export function parseCellInput(raw: string): number | string {
     return trimmed;
   }
 
-  if (/^-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/.test(trimmed)) {
+  if (/^-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(trimmed)) {
     return Number(trimmed);
   }
 

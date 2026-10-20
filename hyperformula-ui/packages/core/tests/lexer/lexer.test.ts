@@ -37,6 +37,12 @@ describe("Lexer", () => {
     expect(values('"a\\b"')).toEqual(['"a\\b"']);
   });
 
+  it("an unterminated string makes every quote after it an error", () => {
+    expect(values('="a\\"b\\"c')).toEqual(["=", '"', "a", "\\", '"', "b", "\\", '"', "c"]);
+    expect(types('="a\\"b\\"c').filter((type) => type === TokenType.ERROR)).toHaveLength(5);
+    expect(values('="x" & "y')).toEqual(["=", '"x"', "&", '"', "y"]);
+  });
+
   it("cell cellRefs absolute markers", () => {
     const tokens = lex.tokenize("A1 $A1 A$1 $A$1");
     const cellRefs = tokens.filter((token) => token.type === TokenType.CELL_REF);

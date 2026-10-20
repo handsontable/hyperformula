@@ -154,6 +154,7 @@ export class Lexer {
   tokenize(text: string): Token[] {
     const tokens: Token[] = [];
     let pos = 0;
+    let unterminatedStringFound = false;
     const textLength = text.length;
 
     while (pos < textLength) {
@@ -173,7 +174,7 @@ export class Lexer {
       const char = text.charAt(pos);
 
       if (char === '"') {
-        const stringMatch = matchSticky(RE_STRING, text, pos);
+        const stringMatch = unterminatedStringFound ? null : matchSticky(RE_STRING, text, pos);
 
         if (stringMatch && stringMatch.index === pos) {
           tokens.push({
@@ -187,6 +188,7 @@ export class Lexer {
           continue;
         }
 
+        unterminatedStringFound = true;
         tokens.push({ type: TokenType.ERROR, value: char, start, end: start + 1 });
         pos++;
 

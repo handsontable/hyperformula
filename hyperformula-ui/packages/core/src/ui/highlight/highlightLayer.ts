@@ -22,7 +22,7 @@ const DEFAULT_LAYER = "default";
  * @category Highlighting
  */
 export function fillColor(color: string): string {
-  const hslMatch = color.match(/^hsl\(([^/)]+?)(?:\s*\/\s*[\d.]+)?\)$/);
+  const hslMatch = color.match(/^hsl\(([^/)]+)(?:\/\s*[\d.]+)?\)$/);
 
   if (hslMatch?.[1]) {
     return `hsl(${hslMatch[1].trim()} / 0.12)`;

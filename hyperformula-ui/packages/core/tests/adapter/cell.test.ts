@@ -17,6 +17,22 @@ describe("parseCellInput", () => {
   it("leaves non-numeric text as a string", () => {
     expect(parseCellInput("hello")).toBe("hello");
   });
+
+  it("parses decimals, signs and exponents into numbers", () => {
+    expect(parseCellInput("1.")).toBe(1);
+    expect(parseCellInput(".5")).toBe(0.5);
+    expect(parseCellInput("-3.25")).toBe(-3.25);
+    expect(parseCellInput("1.5e3")).toBe(1500);
+    expect(parseCellInput("-2E-2")).toBe(-0.02);
+  });
+
+  it("leaves malformed numbers as strings", () => {
+    expect(parseCellInput("1.2.3")).toBe("1.2.3");
+    expect(parseCellInput("1e")).toBe("1e");
+    expect(parseCellInput(".")).toBe(".");
+    expect(parseCellInput("-")).toBe("-");
+    expect(parseCellInput(`0${"00".repeat(5)}x`)).toBe(`0${"00".repeat(5)}x`);
+  });
 });
 
 describe("formatCellValue", () => {

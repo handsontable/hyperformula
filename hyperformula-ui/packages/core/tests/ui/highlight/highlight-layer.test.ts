@@ -85,6 +85,12 @@ describe("HighlightLayer", () => {
   it("lowers opacity for the fill color", () => {
     expect(fillColor("hsl(120 75% 55% / 0.95)")).toBe("hsl(120 75% 55% / 0.12)");
     expect(fillColor("hsl(200 80% 50%)")).toBe("hsl(200 80% 50% / 0.12)");
+    expect(fillColor("hsl(210 80% 55%  /  0.9)")).toBe("hsl(210 80% 55% / 0.12)");
+  });
+
+  it("leaves a malformed hsl color unchanged", () => {
+    expect(fillColor("hsl(210 80% 55% / x)")).toBe("hsl(210 80% 55% / x)");
+    expect(fillColor("hsl((   ")).toBe("hsl((   ");
   });
 
   it("uses color-mix for CSS var references", () => {
