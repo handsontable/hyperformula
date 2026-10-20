@@ -95,7 +95,8 @@
     "clean": "rimraf coverage/ commonjs/ dist/ es/ languages/ lib/ typings/ test-jasmine/",
     "check:license-key-parser-drift": "node script/check-license-key-parser-drift.js",
     "compile": "tsc",
-    "tsnode": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"}"
+    "tsnode": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"}",
+    "postinstall": "node script/postinstall-skills-message.js"
   },
   "dependencies": {
     "chevrotain": "^6.5.0",

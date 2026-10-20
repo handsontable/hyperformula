@@ -21,7 +21,7 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 │   │   ├── fetch-tests.sh            # Clones/updates the private test repository
 │   │   └── hyperformula-tests/       # Private suite (git-ignored, branch-matched)
 │   ├── dev-docs/                     # the engine's own internals reference
-│   ├── script/                       # build checks (check-file, check-publish-package, if-ne-env); the key reader's drift check
+│   ├── script/                       # build checks (check-file, check-publish-package, if-ne-env); the key reader's drift check; the postinstall message
 │   ├── .config/                      # webpack, karma, and babel config factories
 │   ├── tsconfig.json  jest.config.js  karma.conf.js  webpack.config.js
 │   ├── babel.config.js  ht.config.js  jasmine.json  .npmignore
@@ -105,7 +105,7 @@ Each script lives with whatever invokes it, and every one has exactly one caller
 | Directory | Holds |
 |---|---|
 | `script/` | `release/` and `check-licenses.mjs` — both span the whole repository |
-| `hyperformula/script/` | `check-file.js`, `check-publish-package.js`, `if-ne-env.js` — called by the engine's build; `check-license-key-parser-drift.js` — called by `vendored-parser.yml` |
+| `hyperformula/script/` | `check-file.js`, `check-publish-package.js`, `if-ne-env.js` — called by the engine's build; `check-license-key-parser-drift.js` — called by `vendored-parser.yml`; `postinstall-skills-message.js` — shipped in the package and run by npm when a user installs it, silent inside this repository |
 | `docs/script/` | the built-in-functions generator and `prepare-cf-assets.js` — called by the portal |
 
 ## Directories with their own `AGENTS.md`

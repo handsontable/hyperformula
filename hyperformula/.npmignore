@@ -8,3 +8,4 @@
 !es/**/*
 !typings/**/*
 !CHANGELOG.md
+!script/postinstall-skills-message.js
