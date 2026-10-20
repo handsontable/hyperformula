@@ -19,6 +19,6 @@
     "sourceMap": true,
     "verbatimModuleSyntax": true,
     "useDefineForClassFields": true,
-    "customConditions": ["development"]
+    "customConditions": ["hyperformula-ui-source"]
   }
 }

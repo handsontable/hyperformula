@@ -10,7 +10,7 @@
   },
   "exports": {
     ".": {
-      "development": "./datasets.ts",
+      "hyperformula-ui-source": "./datasets.ts",
       "default": "./datasets.ts"
     },
     "./shared.css": "./shared.css"

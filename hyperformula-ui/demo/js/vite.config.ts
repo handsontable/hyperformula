@@ -7,7 +7,7 @@ const dirname = fileURLToPath(new URL(".", import.meta.url));
 export default defineConfig({
   appType: "mpa",
   resolve: {
-    conditions: ["development", "import", "module", "browser", "default"],
+    conditions: ["hyperformula-ui-source", "import", "module", "browser", "default"],
   },
   css: {
     preprocessorOptions: {

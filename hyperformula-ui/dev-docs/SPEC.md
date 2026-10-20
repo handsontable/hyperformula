@@ -34,7 +34,7 @@ hyperformula-ui/
 └── biome.json                       # single fmt+lint source of truth
 ```
 
-`hyperformula-ui` publishes ESM with `exports.development → src/index.ts` and `exports.default → dist/index.js`, so the demo (running under Vite) consumes source directly for HMR while production builds resolve `dist/`.
+`hyperformula-ui` publishes ESM with `exports.default → dist/index.js`. A private export condition, `hyperformula-ui-source → src/index.ts`, lets this repository's demo (running under Vite) and TypeScript consume the source directly, without a build. The condition is deliberately not `development`: webpack and Vite enable `development` by default in dev mode, so a package exporting its TypeScript source under it breaks other projects' dev builds.
 
 Grid integrations are not in this repository. Handsontable ships its own, as the built-in `formulaBuilder` plugin (`handsontable/src/plugins/formulaBuilder/`), consuming `hyperformula-ui` as an external dependency. Adapters for other grids are maintained outside this repository as examples.
 
