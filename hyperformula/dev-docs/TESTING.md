@@ -13,6 +13,8 @@ The standards these run against — what a change must prove, how a case is writ
 
 The full suite is kept in a separate private repository and is **git-ignored** here. It carries the unit tests, the browser and compatibility runs, and the performance benchmarks. External contributors put their tests in `hyperformula/test/`; the internal team moves them into the private repository through a separate pull request, and writes its own tests there directly, on the branch with the same name as the engine branch.
 
+Each built-in function's tests go in their own spec file in the private suite, `hyperformula/test/hyperformula-tests/unit/interpreter/function-<name>.spec.ts`. An intended behaviour change updates the expectations on the paired branch. Nothing new goes into `smoke.spec.ts`.
+
 ## Fetching the private suite
 
 ```bash
@@ -55,11 +57,13 @@ npm run test:setup-private   # fetches the suite into hyperformula/test/hyperfor
 | A config option | The default, a valid non-default value, and an invalid value that must be rejected |
 | A translation | A formula parsed using the translated name, asserted in that language |
 
+The expected values for a built-in function come from real Excel — see [`EXCEL-COMPATIBILITY.md`](EXCEL-COMPATIBILITY.md#verifying-expected-values).
+
 Skills: `hyperformula-unit-testing`, `test-writing-discipline`.
 
 ## Performance
 
-HyperFormula is a calculation engine, so production-code performance is a feature. Run `npm run test:performance` for any change that can touch the evaluation or CRUD hot paths. See [`CODE-STYLE.md`](../../dev-docs/CODE-STYLE.md#performance).
+Performance tests stay separate from correctness tests: the benchmarks live in `hyperformula/test/hyperformula-tests/performance/`, never in a unit spec. [`PERFORMANCE.md`](PERFORMANCE.md) says when to run `npm run test:performance` and how to judge the result.
 
 ## The browser run
 

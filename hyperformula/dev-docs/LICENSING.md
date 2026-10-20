@@ -2,6 +2,8 @@
 
 `hyperformula/src/license/` reads the license key, maps its capability tokens to built-in functions (`functionCapabilities.ts`) and to public API features (`featureCapabilities.ts`), and gates function calls and API methods.
 
+A gated function or feature is gated on every path that reaches it, an alias included. A refused function call evaluates to `#LIC!`; a refused API method throws `LicenseCapabilityMissingError`. A path that bypasses the gate is a bug, unless the pull request records it as a deliberate decision.
+
 ## The license capability table
 
 `hyperformula/src/license/functionCapabilities.ts` decides which license keys can call a built-in function. Add every new built-in either to its group in `FUNCTION_GROUPS` or, if it belongs to no group, to `UNGROUPED_FUNCTIONS`. An ungrouped function is granted only by `fun:all` and by its own `fun:<name>` token. Both lists use canonical names: an alias needs no entry, because it is gated as its canonical function.

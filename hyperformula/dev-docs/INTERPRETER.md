@@ -21,11 +21,12 @@
 - **Coerce through `ArithmeticHelper`.** Never write ad-hoc string-to-number or value-to-boolean conversion inside a function; the coercion rules are spreadsheet semantics, not JavaScript semantics, and they are already implemented once.
 - **Errors are values.** Return a `CellError` with a message from `hyperformula/src/error-message.ts`. Do not throw: a thrown error escapes the evaluation of one cell and takes the recalculation with it.
 - **The registry is keyed by id, not by implementation.** A custom plugin can be registered over a built-in id. Do not assume the plugin you are reading is the one that will answer for that id at run time.
+- **Evaluate each argument once.** Evaluating the same argument twice doubles its cost and, when it contains a volatile function such as `RAND`, can see two different values.
 - **This is the hot path.** `Interpreter.evaluateAst` runs once per formula, and once per cell for array-broadcast arguments. Allocation inside a per-cell loop is measurable.
 
 ## Built-in functions
 
-Every built-in function lives in a plugin class under `hyperformula/src/interpreter/plugin/` extending `FunctionPlugin`. One file per plugin; a plugin holds one function or a family of related ones.
+Every built-in function lives in a plugin class under `hyperformula/src/interpreter/plugin/` extending `FunctionPlugin`. One file per plugin; a plugin holds one function or a family of related ones. A function that works like an existing one is an alias: declare it in the plugin's static `aliases` rather than as a second implementation. It shares its target's catalogue description.
 
 Adding a built-in function is close to adding a custom one, so the [custom functions guide](../../docs/guide/custom-functions.md) is a useful reference for the implementation patterns: argument metadata, return types, and array handling.
 
@@ -85,7 +86,7 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 
 - **Never throw.** Return a `CellError` with a message from `hyperformula/src/error-message.ts`.
 - **Never hand-roll coercion.** Declare the `argumentType` and let `runFunction` coerce, or use `ArithmeticHelper`.
-- **Never describe Excel's behaviour when HyperFormula deviates.** Implement what is specified, then record the deviation in [`docs/guide/list-of-differences.md`](../../docs/guide/list-of-differences.md).
+- **Never describe Excel's behaviour when HyperFormula deviates.** Implement what is specified, then record the deviation in [`docs/guide/list-of-differences.md`](../../docs/guide/list-of-differences.md). What the results must be, and how to check them against Excel, is in [`EXCEL-COMPATIBILITY.md`](EXCEL-COMPATIBILITY.md).
 - **Never allocate inside a per-cell loop** when the value can be hoisted.
 
 ### The six places a function change must touch

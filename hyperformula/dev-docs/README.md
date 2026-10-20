@@ -12,6 +12,8 @@ Repository-wide standards — what a change must include, code style, testing st
 | Formula parsing | [`PARSER.md`](PARSER.md) |
 | Formula evaluation, or a built-in function | [`INTERPRETER.md`](INTERPRETER.md) |
 | Function descriptions in the API and the docs | [`FUNCTION-CATALOGUE.md`](FUNCTION-CATALOGUE.md) |
+| What a formula or function returns, and checking it against Excel | [`EXCEL-COMPATIBILITY.md`](EXCEL-COMPATIBILITY.md) |
+| The public API: `HyperFormula` methods, exported types, configuration options | [`PUBLIC-API.md`](PUBLIC-API.md) |
 | Dependency tracking and recalculation order | [`DEPENDENCY-GRAPH.md`](DEPENDENCY-GRAPH.md) |
 | Function-name translations | [`I18N.md`](I18N.md) |
 | License keys, and which functions and features a key grants | [`LICENSING.md`](LICENSING.md) |
