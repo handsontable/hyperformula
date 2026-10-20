@@ -1,5 +1,5 @@
 # Cloudflare Workers static-asset headers.
-# Copied to the root of the asset directory by `script/prepare-cf-assets.js`.
+# Copied to the root of the asset directory by `docs/script/prepare-cf-assets.js`.
 #
 # Every file under `/docs/hyperformula/assets/` has a content hash in its name,
 # so it can be cached indefinitely. HTML documents keep the default

@@ -33,5 +33,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install the documentation portal
+        run: npm run docs:install
+
+      - name: Lint the documentation portal
+        run: npm run docs:lint
+
       - name: Build docs
         run: npm run docs:build

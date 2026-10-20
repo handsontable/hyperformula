@@ -1,5 +1,5 @@
 # Cloudflare Workers static-asset redirects.
-# Copied to the root of the asset directory by `script/prepare-cf-assets.js`.
+# Copied to the root of the asset directory by `docs/script/prepare-cf-assets.js`.
 #
 # The documentation is built under `/docs/hyperformula/`, so the asset root
 # itself holds no document. Send it to the documentation entry point instead of
