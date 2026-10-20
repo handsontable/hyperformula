@@ -1,4 +1,5 @@
 ---
+title: "Internationalization features"
 tags:
   - i18n
   - localization
@@ -8,12 +9,7 @@ tags:
   - Intl.Collator
 ---
 
-# Internationalization features
-
 Configure HyperFormula to match the languages and regions of your users.
-
-**Contents:**
-[[toc]]
 
 ## Function names and errors
 
@@ -51,7 +47,7 @@ decimalSeparator: '.', // set by default
 thousandSeparator: ',',
 ```
 
-::: tip
+:::tip
   In HyperFormula, both [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) and [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator) must be different from [`functionArgSeparator`](../api/interfaces/configparams.md#functionargseparator).
   In some cases it might cause compatibility issues with other spreadsheets, e.g., [Microsoft Excel](compatibility-with-microsoft-excel.md#separators) or [Google Sheets](compatibility-with-google-sheets.md#separators).
 :::
@@ -109,7 +105,7 @@ localeLang: 'en-US',
 
 This demo shows HyperFormula configured for the `en-US` locale.
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/i18n/example1.html)
 

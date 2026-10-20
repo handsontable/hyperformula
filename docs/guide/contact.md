@@ -1,4 +1,5 @@
 ---
+title: "Contact"
 tags:
   - pricing
   - get a quote
@@ -8,8 +9,6 @@ tags:
   - invoice
   - Handsoncode
 ---
-
-# Contact
 
 HyperFormula is a product of Handsoncode, the company that stands behind
 [Handsontable](https://handsontable.com/). We are here to answer all

@@ -1,4 +1,5 @@
 ---
+title: "Cell references"
 tags:
   - A1 notation
   - dollar sign
@@ -8,8 +9,6 @@ tags:
   - "#CYCLE!"
   - circular dependency
 ---
-
-# Cell references
 
 A formula can reference one or more cells and automatically update its
 contents whenever any of the referenced cells change. The values from
@@ -207,7 +206,7 @@ The following restraints apply:
 - Range expressions can't contain [named expressions](/guide/named-expressions.md) (`=Name_1:Name_5` is a parse error). To name a whole column, see [Named columns](/guide/named-expressions.md#named-columns).
 - At the moment, HyperFormula doesn't support multi-cell range references (=A1:B2:C3).
 
-::: tip
+:::tip
 In contrast to Google Sheets or Microsoft Excel, HyperFormula doesn't treat single cells as ranges. Instead, it immediately instantiates references to single cells as their values. Applying a scalar value to a function that takes ranges throws the [`CellRangeExpected`](/api/classes/errormessage.md#cellrangeexpected) error.
 :::
 

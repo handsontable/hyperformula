@@ -1,12 +1,11 @@
 ---
+title: "Built-in functions"
 tags:
   - supported functions
   - function syntax
   - function categories
   - statistics
 ---
-
-# Built-in functions
 
 <!--
 The below dummy div uses a CSS class to alter the .page layout for the current page without any additional customization of VuePress.
@@ -48,7 +47,7 @@ The latest version of HyperFormula has an extensive collection of
 
 _Some categories such as compatibility and cube are yet to be supported._
 
-::: tip
+:::tip
 You can modify the built-in functions or create your own, by adding a [custom function](custom-functions.md).
 :::
 
