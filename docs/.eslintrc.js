@@ -15,8 +15,8 @@ module.exports = {
   extends: ['eslint:recommended'],
   overrides: [
     {
-      // The VuePress configuration, plugins and themes, loaded by Node.
-      files: ['.vuepress/**/*.js'],
+      // The VuePress configuration, plugins and themes, the build configuration, and the typedoc theme, loaded by Node.
+      files: ['.vuepress/**/*.js', 'build.config.js', 'typedoc-theme/**/*.js'],
       env: {
         worker: false,
         node: true,

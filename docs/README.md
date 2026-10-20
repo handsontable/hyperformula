@@ -50,7 +50,7 @@ From the repository root:
 
 * `npm run docs:install` - Installs the portal's own dependencies (`npm ci` inside `docs/`). Needed once, and again whenever `docs/package.json` changes.
 * `npm run docs:dev` - Starts a local docs server at http://localhost:8080/docs/hyperformula/.
-* `npm run docs:build` - Builds the docs into `docs/.vuepress/dist/docs/hyperformula` (the base path, `/docs/hyperformula/`, and the output directory are set in `docs/.vuepress/build.config.js`), then composes the Worker assets with `docs/script/prepare-cf-assets.js`, so CI catches a broken asset step before Workers Builds does.
+* `npm run docs:build` - Builds the docs into `docs/.vuepress/dist/docs/hyperformula` (the base path, `/docs/hyperformula/`, and the output directory are set in `docs/build.config.js`), then composes the Worker assets with `docs/script/prepare-cf-assets.js`, so CI catches a broken asset step before Workers Builds does.
 * `npm run docs:build:cf` - The build Cloudflare Workers Builds runs. Installs the portal and clears the previous output first, then runs the same build.
 * `npm run docs:generate-function-docs` - Regenerates the built-in functions guide page from the function metadata API. Runs automatically as the first step of `docs:dev` and `docs:build`.
 * `npm run docs:code-examples:generate-js docs/examples/<guide>/example1.ts` - Generates the JavaScript variant of one TypeScript example and formats it. The path is relative to where you run the command.
@@ -72,10 +72,10 @@ Configuration in the repository:
 
 - `docs/wrangler.jsonc` &mdash; Worker name, asset directory, and asset routing.
 - `docs/worker/index.js` &mdash; resolves directory and extensionless URLs and serves the 404 page, so that the URL behaviour matches the previous hosting.
-- `docs/.vuepress/cf/_headers`, `docs/.vuepress/cf/_redirects` &mdash; asset headers and redirects, copied into the root of the build output by `docs/script/prepare-cf-assets.js`.
+- `docs/cf/_headers`, `docs/cf/_redirects` &mdash; asset headers and redirects, copied into the root of the build output by `docs/script/prepare-cf-assets.js`.
 - `.nvmrc` at the repository root &mdash; Node.js version used by the build.
 
-The asset directory is `docs/.vuepress/dist` (written as `./.vuepress/dist` in `wrangler.jsonc`, which resolves against `docs/`), while VuePress writes to `docs/.vuepress/dist/docs/hyperformula` (see `docs/.vuepress/build.config.js`). This keeps the `/docs/hyperformula/` prefix that every document is built with, so the site is served under `https://handsontable.com/docs/hyperformula/`.
+The asset directory is `docs/.vuepress/dist` (written as `./.vuepress/dist` in `wrangler.jsonc`, which resolves against `docs/`), while VuePress writes to `docs/.vuepress/dist/docs/hyperformula` (see `docs/build.config.js`). This keeps the `/docs/hyperformula/` prefix that every document is built with, so the site is served under `https://handsontable.com/docs/hyperformula/`.
 
 Production traffic reaches this Worker through the handsontable.com Worker (`handsontable-com-v3-production`, repository `handsontable/handsontable.com-v3`), which proxies `/docs/hyperformula/*` to `https://hyperformula-docs.handsoncode.workers.dev` without changing the path, and rewrites this Worker's own redirects back onto handsontable.com. The rest of `/docs/*` there is the Handsontable documentation, a separate app. Its staging Worker does the same for https://dev.handsontable.com/docs/hyperformula/ from the `develop` branch preview.
 

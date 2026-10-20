@@ -85,10 +85,10 @@ const searchPattern = new RegExp('^/api', 'i');
 // Anchored, so a hand-written sibling page (e.g. /guide/built-in-functions-faq) keeps its edit link.
 const generatedPagePattern = new RegExp('^/guide/built-in-functions(\\.html)?$', 'i');
 
-// Build configuration (override via env vars or docs/.vuepress/build.config.js)
+// Build configuration (override via env vars or docs/build.config.js)
 const buildConfigOverrides = (() => {
   try {
-    return require('./build.config.js');
+    return require('../build.config.js');
   } catch (e) {
     return {};
   }
