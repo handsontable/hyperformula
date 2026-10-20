@@ -27,7 +27,8 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "DOCS.md"
   ],
   "scripts": {
     "build": "npm run build:styles && rspack build && tsc -p tsconfig.json --emitDeclarationOnly",
