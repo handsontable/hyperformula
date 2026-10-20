@@ -8,4 +8,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Added the `hyperformula-ui` package: a formula editor for HyperFormula with syntax and reference highlighting, function autocomplete and help, range picking, and an optional formula bar, connected to any grid through the `IGridAdapter` interface.
+- Added the `hyperformula-ui` package: a formula editor for HyperFormula with syntax and reference highlighting, function autocomplete and help, range picking, and an optional formula bar, connected to any grid through the `IGridAdapter` interface. [#1832](https://github.com/handsontable/hyperformula/pull/1832)
