@@ -63,7 +63,7 @@ Never force-push to `master`, `develop`, or a branch that already has an open pu
 
 The entry comes after the pull request exists, because it carries the link. Do not guess the number: read it from the URL `gh pr create` prints.
 
-**Multi-part features.** Each part's branch is cut from, and its pull request targets, the feature branch (type `feature`, otherwise named as in [Branch naming](#branch-naming): `feature/<ticket>-<slug>`) instead of `develop`. The whole feature is merged into `develop` once.
+**Multi-part features.** Each part's branch is cut from, and its pull request targets, the feature branch instead of `develop`. The whole feature is merged into `develop` once.
 
 ### The template
 
@@ -112,6 +112,6 @@ The public API is `hyperformula/src/HyperFormula.ts` and the types re-exported f
 
 **Planning.** A breaking change is planned for a major release, and its task is tagged "breaking change".
 
-**Found during development.** If a change turns out to be breaking, consult the product team before going further (see [One pull request, one change](#one-pull-request-one-change)). The solution is designed together for that specific problem.
+**Found during development.** Introducing a breaking change is always a product decision. If a change turns out to be breaking, consult the product team before going further (see [One pull request, one change](#one-pull-request-one-change)). The solution is designed together for that specific problem.
 
 **Deprecations** are decided like any other [product decision](#one-pull-request-one-change), not introduced by a pull request on its own. A deprecated API keeps working until the next major release.

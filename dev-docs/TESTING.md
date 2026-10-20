@@ -35,7 +35,7 @@ it('returns the divisor sign for arguments with opposite signs', () => {
   - no wall-clock bounds;
   - global state restored, for example language packs;
   - no output on the real console.
-- Use real inputs where they exist, for example real files or licence keys issued the way real ones are, not synthetic ones. Never put a real customer's key in a test (see [`SENSITIVE-INFORMATION.md`](SENSITIVE-INFORMATION.md)).
+- Use real inputs where they exist, for example real files, not synthetic ones. Build licence keys in the format real keys are issued in today, with the vendored key reader's own encoding and checksum, rather than writing key strings by hand. Never put a real customer's key in a test (see [`SENSITIVE-INFORMATION.md`](SENSITIVE-INFORMATION.md)).
 - Lower test-only constants so scenarios stay small, for example a configurable threshold.
 - A test must prove intended behaviour. Never relax an assertion, widen a matcher, or skip a case to turn a run green — if a test is red, the default assumption is that the **code** is wrong.
 

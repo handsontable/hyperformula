@@ -25,7 +25,7 @@
 
 ### Types of changes
 <!--- Put an `x` in each box that applies. -->
-- [ ] Breaking change (existing functionality no longer works as before) – agreed with the maintainers before the work started
+- [ ] Breaking change (existing functionality no longer works as before) – agreed with the maintainers
 - [ ] New feature or improvement (a non-breaking change that adds functionality)
 - [ ] Bug fix (a non-breaking change that fixes an issue)
 - [ ] Additional language file, or a change to an existing language file (translations)

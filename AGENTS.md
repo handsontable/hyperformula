@@ -16,7 +16,7 @@ Read the repository, not the web. The guides in `docs/guide/` and the generated 
 
 [`dev-docs/SENSITIVE-INFORMATION.md`](dev-docs/SENSITIVE-INFORMATION.md) says what must never appear in code, commits, pull requests, issues, or docs, and how to describe a change without it.
 
-If a change cannot be described without such information, stop and ask the user how to proceed.
+If a change cannot be described without sensitive information, stop and ask the user how to proceed.
 
 ## Keep the documentation single-sourced
 

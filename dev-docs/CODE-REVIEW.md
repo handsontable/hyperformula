@@ -52,7 +52,7 @@ Each line names the page that owns the rules and when it applies. Where reviews 
 - [ ] The code follows the [code style guide](CODE-STYLE.md) — *any code change*
   - Most often missed: names that say what things do now; dead code; duplication; JSDoc; comments that describe behaviour, not history; single source of truth; concepts nobody can explain.
 - [ ] New and moved files sit where the [repository structure](STRUCTURE.md) puts them — *files added or moved; new scripts*
-- [ ] The tests meet the [testing standards](TESTING.md) and the [engine testing guide](../hyperformula/dev-docs/TESTING.md) — *always*
+- [ ] The tests meet the [testing standards](TESTING.md) and the [engine testing guide](../hyperformula/dev-docs/TESTING.md) — *any change to production code*
   - Most often missed: every change in `hyperformula/src/` tested; a bug-fix test that fails without the fix; edge cases; tests written from the spec, not the implementation; assertions that tell the cases apart; tests in the right suite; expected values from real Excel.
 - [ ] Engine code respects the [architecture invariants](../hyperformula/dev-docs/ARCHITECTURE.md#invariants) — *any change in `hyperformula/src/`*
 - [ ] The change follows the page of each subsystem it touches: [interpreter](../hyperformula/dev-docs/INTERPRETER.md), [parser](../hyperformula/dev-docs/PARSER.md), [dependency graph](../hyperformula/dev-docs/DEPENDENCY-GRAPH.md), [function catalogue](../hyperformula/dev-docs/FUNCTION-CATALOGUE.md), [i18n](../hyperformula/dev-docs/I18N.md), [licensing](../hyperformula/dev-docs/LICENSING.md) — *the subsystems in the diff*
@@ -99,7 +99,7 @@ Each line names the page that owns the rules and when it applies. Where reviews 
 - [ ] Every `blocking:` comment is resolved, and I re-checked the fix — not only the "resolved" status.
 - [ ] The spec, changelog entry, documentation, translations, tests and description are consistent with the final code.
 - [ ] Every accepted trade-off and every accepted risk is written down — in the review, and in JSDoc where it matters for the code. No silent open threads.
-- [ ] I would be fine with this pull request being merged without anyone else looking at it.
+- [ ] I would co-own this pull request — see [Approval means co-ownership](#principles).
 
 ## Reporting findings
 
