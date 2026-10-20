@@ -6,3 +6,5 @@ A folder of npm workspaces, not a package: the published `hyperformula-ui` packa
 - Repository-wide standards: [`../dev-docs/README.md`](../dev-docs/README.md)
 
 The code style here is not the engine's. Read [`dev-docs/CODE-STYLE.md`](dev-docs/CODE-STYLE.md) before editing.
+
+Skill: `hyperformula-ui-dev`.

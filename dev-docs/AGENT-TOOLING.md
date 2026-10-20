@@ -40,6 +40,7 @@ A skill holds the **steps**: what to do, in what order, and what to check. It do
 | Skill | For |
 |---|---|
 | `hyperformula-dev` | Any work in `hyperformula/src/` — the entry point |
+| `hyperformula-ui-dev` | Any work in `hyperformula-ui/` — the entry point for the formula editor |
 | `hyperformula-function-dev` | Adding or changing a built-in function |
 | `hyperformula-unit-testing` | Writing or modifying tests |
 | `test-writing-discipline` | Any red test, and any test that might be going green for the wrong reason |
@@ -47,4 +48,4 @@ A skill holds the **steps**: what to do, in what order, and what to check. It do
 | `writing-docs-pages` | The documentation portal |
 | `changelog-creation` | The changelog entry |
 | `pr-creation` | Opening or updating a pull request |
-| `hyperformula-code-review` | Reviewing a diff, a branch, or a pull request |
+| `hyperformula-code-review` | Reviewing a diff, a branch, or a pull request, in the engine or the UI |

@@ -10,6 +10,7 @@ The internals of the UI packages in `hyperformula-ui/`. Repository-wide standard
 | What every key does in the editor | [`KEYBOARD-SHORTCUTS.md`](KEYBOARD-SHORTCUTS.md) |
 | Code style inside `hyperformula-ui/` | [`CODE-STYLE.md`](CODE-STYLE.md) |
 | The unit and end-to-end suites | [`TESTING.md`](TESTING.md) |
+| Reviewing a change to `hyperformula-ui/` | [`REVIEWING.md`](REVIEWING.md) |
 | Publishing the package to npm | [`RELEASE.md`](RELEASE.md) |
 
 The public API, generated from the JSDoc, is [`packages/core/DOCS.md`](../packages/core/DOCS.md).
