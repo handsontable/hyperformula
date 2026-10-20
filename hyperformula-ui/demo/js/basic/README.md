@@ -15,5 +15,4 @@ const editor = builder.editor;
 builder.openEditor(host, "=SUM(A1:B5) + 2");
 ```
 
-Details: `demo/README.md` for the layering table; `formula-editor-dev` skill
-for `FormulaEditor`/`FormulaBuilder` internals.
+`FormulaEditor`/`FormulaBuilder` internals: [`dev-docs/ARCHITECTURE.md`](../../../dev-docs/ARCHITECTURE.md).

@@ -1,4 +1,4 @@
-# Core Package — Architecture
+# Core package — architecture
 
 ## High-level picture
 
@@ -424,7 +424,7 @@ Theme (theme/)
 │                         head injection, SSR-guarded; injectStyles()/releaseStyles() wrap the
 │                         core instance (data-hfe-styles). Constructors inject, destroy()
 │                         releases, the tag is removed when the last instance dies; consumers
-│                         never import CSS (no @hfe/core/styles export). Adapters reuse
+│                         never import CSS (no hyperformula-ui/styles export). Adapters reuse
 │                         createStyleInjector for their own generated cssText.ts
 └── refPalette.ts       — REF_PALETTE + assignRefIndex/paletteColorForIndex ref coloring
 Styles (styles/)
@@ -679,8 +679,8 @@ inside their host-specific renderers, because each host renders cells differentl
 
 - External Handsontable `formulaBuilder` plugin: `FormulaBuilderPlugin.onAfterRenderer`
   (handsontable repo)
-- Plain table: `PlainTableSheet.renderCell` in `demo/js/plain-table` (the plain table has no host
-  library, so its grid scaffolding lives in the demo — see "Adapter scope" below)
+- Plain table: the host's own `renderCell` (the plain table has no host library, so its grid
+  scaffolding is example code — see "Adapter scope" below)
 
 The error tooltip itself is Esc-dismissible: `ErrorPopup` owns a window-level `keydown`
 (capture) listener, registered while attached; it consumes Escape only while the tooltip is
@@ -759,8 +759,7 @@ delivers, no more.
   required) and carries the bar-lifecycle callback bridge (`PlainTableAdapterOptions.host`,
   typed `PlainTableHost`) — when a host is injected, the thirteen bar-lifecycle methods delegate
   to it instead of the inherited `NullAdapter` no-ops; without one they stay no-ops. The grid
-  scaffolding itself (render/model/edit/select) is still example code, not adapter logic, and
-  lives in `demo/js/plain-table`.
+  scaffolding itself (render/model/edit/select) is still example code, not adapter logic.
 - **tanstack / ag-grid / mui-data-grid** — hosts are full grid libraries. These adapters are **rich**:
   they cover the library's features (frozen panes, virtualization, selection, hooks). Their
   controller/plugin/hook code is the library bridge and belongs in the package.
@@ -775,7 +774,7 @@ If yes:
 1. Add the method signature to `packages/core/src/adapter/types.ts`.
 2. Add a no-op implementation to `packages/core/src/adapter/nullAdapter.ts`.
 3. Implement in all concrete adapters.
-4. Run `pnpm typecheck` — TypeScript will flag any adapter that missed the method.
+4. Run `npm run typecheck` — TypeScript will flag any adapter that missed the method.
 
 ## EventManager — DOM listener lifecycle
 

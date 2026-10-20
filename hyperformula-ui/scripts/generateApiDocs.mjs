@@ -133,8 +133,8 @@ lines.push(
 lines.push("");
 lines.push(
   "Minimal reference built from the JSDoc on `src/index.ts`'s public exports.",
-  "Full contracts live on the declarations (IDE hover) and in `.ai/ARCHITECTURE.md`.",
-  "Runnable integrations for every supported grid live in `demo/` (see `demo/README.md`).",
+  "Full contracts live on the declarations (IDE hover) and in `hyperformula-ui/dev-docs/ARCHITECTURE.md`.",
+  "An editor-only example lives in `hyperformula-ui/demo/js/basic/`.",
 );
 lines.push("");
 

@@ -40,13 +40,15 @@ Config is [`docs/wrangler.jsonc`](../docs/wrangler.jsonc); the Worker entry poin
 
 ## Release and licences
 
-`npm run release` runs `script/release/release.sh`. Releasing is maintainer-owned — do not invent steps around it, and do not run it as part of another task.
+`npm run release` runs `script/release/release.sh`, which releases the engine only. Releasing is maintainer-owned — do not invent steps around it, and do not run it as part of another task.
+
+The `hyperformula-ui` package is released by hand, on its own version line: [`hyperformula-ui/dev-docs/RELEASE.md`](../hyperformula-ui/dev-docs/RELEASE.md).
 
 `npm run check:licenses` asserts that every production dependency carries a permissive licence.
 
 ## Scripts and CI
 
-Where each script lives and what calls it is in [`STRUCTURE.md`](STRUCTURE.md#scripts-at-three-levels). The release script keeps its own rules in [`script/release/release-README.md`](../script/release/release-README.md).
+Where each script lives and what calls it is in [`STRUCTURE.md`](STRUCTURE.md#scripts-at-each-level). The release script keeps its own rules in [`script/release/release-README.md`](../script/release/release-README.md).
 
 - **A step runs in the workflow that needs it.** A step only the tests need belongs to the test workflows, not to `lint`.
 - **`pre*` and `post*` scripts run the way the scripts are actually called** — by CI, and on a maintainer's machine. npm skips them when `ignore-scripts` is set, which is why `script/release/release.sh` copies the root files itself before `npm publish` instead of trusting `prepack` alone.

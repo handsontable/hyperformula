@@ -1,4 +1,4 @@
-# FormulaBuilder PoC — Implementation Spec
+# FormulaBuilder — Implementation Spec
 
 ## Context
 
@@ -7,10 +7,9 @@ Headless-first formula editor that plugs HyperFormula (or any compatible engine)
 **Why the design**: zero UI-framework dependency keeps the editor embeddable in any host (vanilla, React, Vue, Angular). Layered text editing (transparent `<textarea>` + visual overlay) preserves native caret/selection/IME while allowing rich token rendering. BEM + CSS variables + `light-dark()` give consumers full theming control without specificity wars.
 
 **Constraints (in effect)**:
-- pnpm workspaces monorepo (pnpm 10.30.2), Node ≥ 20
-- Rspack builds ESM only; `.d.ts` via `tsc --emitDeclarationOnly`; core + adapter styles compiled with `sass` via repo-root `scripts/generateCssText.mjs`
-- Per-framework `demo/` workspace packages: `demo/js` 5173, `demo/react` 5174, `demo/vue` 5175
-  (all Vite), `demo/angular` 5176 (Angular CLI via `@angular-builders/custom-esbuild`) — one page per adapter within each
+- npm workspaces, as part of the HyperFormula monorepo; Node from the root `.nvmrc`
+- Rspack builds ESM only; `.d.ts` via `tsc --emitDeclarationOnly`; styles compiled with `sass` via `hyperformula-ui/scripts/generateCssText.mjs`
+- One demo workspace package, `demo/js` (Vite, port 5173), with the editor-only `basic` page
 - Vitest (unit) + Playwright (e2e)
 - TypeScript strict; zero UI deps in core; CSS `hfe-` prefix; `light-dark()` theming
 - Biome single formatter + linter (no Prettier/ESLint); filenames start lowercase (camelCase source, kebab-case tests)
@@ -21,36 +20,27 @@ Headless-first formula editor that plugs HyperFormula (or any compatible engine)
 ## 1. Repo Layout
 
 ```
-formula-builder/
-├── pnpm-workspace.yaml              # packages/*, demo/*, e2e
-├── package.json                     # root scripts — see §12
-├── tsconfig.base.json               # strict, ES2022, moduleResolution:bundler
-├── biome.json                       # single fmt+lint source of truth
-├── .gitignore  .editorconfig  README.md  AGENTS.md (+CLAUDE.md symlink)  SPEC.md
-├── docs/superpowers/{plans,specs}/  # design docs per feature (generated; don't search)
+hyperformula-ui/
 ├── packages/
-│   ├── core/                        # @hfe/core              (rspack + sass + tsc)
-│   ├── ag-grid-adapter/             # @hfe/ag-grid-adapter
-│   ├── plain-table-adapter/         # @hfe/plain-table-adapter
-│   ├── tanstack-table-adapter/      # @hfe/tanstack-table-adapter
-│   └── mui-data-grid-adapter/       # @hfe/mui-data-grid-adapter
-├── scripts/                         # shared build scripts (generateCssText.mjs)
-├── demo/                            # per-framework Vite workspace packages — see demo/README.md
-│   ├── shared/                      # @hfe-demo/shared: datasets + shared.css only, no @hfe/* or framework imports
-│   ├── js/                          # demo-js, port 5173: basic, plain-table, ag-grid
-│   ├── react/                       # demo-react, port 5174: tanstack, ag-grid, mui
-│   ├── vue/                         # demo-vue, port 5175: ag-grid
-│   └── angular/                     # demo-angular, port 5176 (Angular CLI, @angular/build + custom-esbuild): ag-grid
-└── e2e/                             # Playwright specs against the demo servers (map: e2e/COVERAGE.md)
+│   └── core/                        # hyperformula-ui (rspack + sass + tsc)
+├── scripts/                         # shared build scripts (generateCssText.mjs, generateApiDocs.mjs)
+├── demo/
+│   ├── shared/                      # @hfe-demo/shared: datasets + shared.css only, no hyperformula-ui or framework imports
+│   └── js/                          # demo-js, port 5173: basic (editor only)
+├── e2e/                             # Playwright specs against the demo server (map: e2e/COVERAGE.md)
+├── dev-docs/                        # this spec, ARCHITECTURE.md, and the other internals pages
+├── tsconfig.base.json               # strict, ES2022, moduleResolution:bundler
+├── tsconfig.package.json  tsconfig.test.json  rspack.base.mjs  vitest.base.ts
+└── biome.json                       # single fmt+lint source of truth
 ```
 
-All packages publish ESM with `exports.development → src/index.ts` and `exports.default → dist/index.js`, so the demo (running under Vite) consumes source directly for HMR while production builds resolve `dist/`.
+`hyperformula-ui` publishes ESM with `exports.development → src/index.ts` and `exports.default → dist/index.js`, so the demo (running under Vite) consumes source directly for HMR while production builds resolve `dist/`.
 
-The Handsontable integration is not in this repo: it lives in the Handsontable monorepo as the built-in `formulaBuilder` plugin (`handsontable/src/plugins/formulaBuilder/`), consuming `@hfe/core` as an external dependency.
+Grid integrations are not in this repository. Handsontable ships its own, as the built-in `formulaBuilder` plugin (`handsontable/src/plugins/formulaBuilder/`), consuming `hyperformula-ui` as an external dependency. Adapters for other grids are maintained outside this repository as examples.
 
 ---
 
-## 2. Core Package (`@hfe/core`)
+## 2. Core Package (`hyperformula-ui`)
 
 Filenames are lowercase (camelCase for source, per Biome `useFilenamingConvention`).
 Every `src/` subdirectory exposes its surface through an `index.ts` barrel.
@@ -140,7 +130,7 @@ packages/core/src/
 ```
 
 Architecture detail (controller dependency order, popup hierarchy, EventManager scopes,
-single-editor host-switch model): `packages/core/.ai/ARCHITECTURE.md`.
+single-editor host-switch model): [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ---
 
@@ -215,13 +205,13 @@ Editing goes through textarea + relex; there is no in-place ref-mark editing.
 
 ### 6a. Decorations (multi-function / bracket-depth)
 
-`ui/text/decorations.ts` exports `computeDecorations(tokens, offset): Decorations` (caret offset) — a pure function feeding extra overlay styling without lexer changes: bracket-depth coloring by nesting level (emitted as a `data-parenDepth` attribute cycled through the depth palette, not a class), matching-paren highlight when the caret is adjacent (`hfe-token--paren-match`), unmatched-paren marking (`hfe-token--paren-err`), dimming of non-innermost calls (`hfe-token--dim`), and active-argument emphasis (`hfe-token--arg-active`). Design: `docs/superpowers/specs/2026-06-02-formula-highlighting-design.md`.
+`ui/text/decorations.ts` exports `computeDecorations(tokens, offset): Decorations` (caret offset) — a pure function feeding extra overlay styling without lexer changes: bracket-depth coloring by nesting level (emitted as a `data-parenDepth` attribute cycled through the depth palette, not a class), matching-paren highlight when the caret is adjacent (`hfe-token--paren-match`), unmatched-paren marking (`hfe-token--paren-err`), dimming of non-innermost calls (`hfe-token--dim`), and active-argument emphasis (`hfe-token--arg-active`).
 
 ---
 
 ## 7. Editor Behaviors
 
-Keybindings are declarative: `formulaEditor/keymap.ts` (`BINDINGS`, first match wins) dispatched by `ShortcutManager`, implemented in `KeyboardController.registerCommands()`. The canonical shortcut matrix — including Home/End and the full `rangeMode` (`auto`/`on`/`off`) case table — lives in `.claude/skills/formula-editor-dev/references/keyboard-shortcuts.md`.
+Keybindings are declarative: `formulaEditor/keymap.ts` (`BINDINGS`, first match wins) dispatched by `ShortcutManager`, implemented in `KeyboardController.registerCommands()`. The canonical shortcut matrix — including Home/End and the full `rangeMode` (`auto`/`on`/`off`) case table — lives in [`KEYBOARD-SHORTCUTS.md`](KEYBOARD-SHORTCUTS.md).
 
 - **Auto-close parens**: typing `(` while editing a formula inserts `()` and places the caret between. If a selection exists, it wraps the selection.
 - **Smart `)`**: typing `)` when one already sits at the caret moves the caret past it instead of inserting.
@@ -231,7 +221,7 @@ Keybindings are declarative: `formulaEditor/keymap.ts` (`BINDINGS`, first match 
 - **Point mode (keyboard range selection)**: at a value position, arrows move a grid marquee one visible cell (`adapter.stepCell`) and insert/replace the ref at the caret; `Shift+Arrow` extends the range; `Ctrl/Cmd+Arrow` jumps to the data-block edge (`adapter.getDataEdge`); `Ctrl/Cmd+Shift+Arrow` extends the range to the data-block edge (anchor kept). Both map visual↔engine indices in the adapter, so a step lands on the visually-adjacent cell even when rows/cols are trimmed or reordered. Each step draws an ephemeral preview highlight (`adapter.highlightRange`, cleared on exit/cancel) and scrolls the cursor cell into view. `F2` / `Ctrl/Cmd+E` toggles pointing on/off — toggling arms point state without inserting (the first arrow inserts); at a non-value position it force-inserts a ref. State machine: `pointModeController.ts`.
 - **F4**: cycles the ref under the caret `A1` → `$A$1` → `A$1` → `$A1` → `A1` (`adapter/refAbsolute.ts`).
 - **Popup**: function name suggestions for documented built-in functions (with short descriptions) plus matching named expressions; `↑/↓` moves, `Enter`/`Tab` selects (a function inserts `NAME()` with the caret inside; a named expression inserts the bare name), `Esc` closes. Items order prefix-matches before substring-matches and highlight the matched prefix; an optional keyboard-help footer is gated by `SuggestionsOptions.showKeyboardHelp`. Popups position via viewport-anchored strategies (flip/clamp + max-height) and hide when the anchor scrolls out of the clip rect; `PopupController` owns the ARIA wiring (`role="listbox"`/`option` + `aria-activedescendant` from `SuggestionsAriaState`; fn-help is a non-modal `role="dialog"` labeled `"<NAME> function help"` + `aria-describedby`; error stays `role="tooltip"` + `aria-describedby`).
-- **Function help**: when the caret sits inside a known call's argument list, `FunctionHelpPopup` shows the signature with the active argument highlighted. `F6`/`Shift+F6` move focus into the popup via the reusable `FocusTrap` primitive (`ui/focusTrap.ts`; first focusable element in DOM order via a generic `button, a[href], input, …` selector — normally the scrollable body, which carries `tabindex="0"` whenever it has content; falls through to the editor-host toggle below only when a content-free body leaves nothing focusable); the popup root advertises the exit via `aria-keyshortcuts="F6"`, and its keydown listener stops propagation of every key while the popup holds focus (host JS shortcuts stay quiet; a popup docked via `attachToHost` does not trap Tab — native tab order moves focus out); inside it, `Tab`/`Shift+Tab` wrap through the focusables (trap `exitKeys` is `["F6"]` only — key-name matching ignores shift, so Shift+F6 exits too), and `F6`/`Shift+F6` return focus to the editor without closing the popup, while `Escape` inside the popup closes it (same effect as the close button) and returns focus to the editor. From the editor, plain `Escape` closes fn-help via the ladder above instead of returning focus. Shift+F6 binds to dedicated `focusFnHelpBack`/`toggleEditorHostBack` commands that delegate to the forward `focusFnHelp`/`toggleEditorHost` logic (`ShortcutManager` itself stays no-arg; the reverse commands carry the direction). Closing the popup while it holds focus (e.g. `Enter` on the close button, or Escape) also returns focus to the editor. When the popup is closed, `F6`/`Shift+F6` instead toggle the editor host inline cell ↔ formula bar (active bar edit session only) via `FormulaEditor.setHostToggleDelegate` — popup mode always wins, so the host never switches while the popup is open. See `.claude/skills/formula-editor-dev/references/keyboard-shortcuts.md` for the full matrix.
+- **Function help**: when the caret sits inside a known call's argument list, `FunctionHelpPopup` shows the signature with the active argument highlighted. `F6`/`Shift+F6` move focus into the popup via the reusable `FocusTrap` primitive (`ui/focusTrap.ts`; first focusable element in DOM order via a generic `button, a[href], input, …` selector — normally the scrollable body, which carries `tabindex="0"` whenever it has content; falls through to the editor-host toggle below only when a content-free body leaves nothing focusable); the popup root advertises the exit via `aria-keyshortcuts="F6"`, and its keydown listener stops propagation of every key while the popup holds focus (host JS shortcuts stay quiet; a popup docked via `attachToHost` does not trap Tab — native tab order moves focus out); inside it, `Tab`/`Shift+Tab` wrap through the focusables (trap `exitKeys` is `["F6"]` only — key-name matching ignores shift, so Shift+F6 exits too), and `F6`/`Shift+F6` return focus to the editor without closing the popup, while `Escape` inside the popup closes it (same effect as the close button) and returns focus to the editor. From the editor, plain `Escape` closes fn-help via the ladder above instead of returning focus. Shift+F6 binds to dedicated `focusFnHelpBack`/`toggleEditorHostBack` commands that delegate to the forward `focusFnHelp`/`toggleEditorHost` logic (`ShortcutManager` itself stays no-arg; the reverse commands carry the direction). Closing the popup while it holds focus (e.g. `Enter` on the close button, or Escape) also returns focus to the editor. When the popup is closed, `F6`/`Shift+F6` instead toggle the editor host inline cell ↔ formula bar (active bar edit session only) via `FormulaEditor.setHostToggleDelegate` — popup mode always wins, so the host never switches while the popup is open. See [`KEYBOARD-SHORTCUTS.md`](KEYBOARD-SHORTCUTS.md) for the full matrix.
 - **Error tooltip**: shown on hover/focus of an error cell while the grid (not the editor) owns focus. `Escape`, captured by a window-level keydown listener owned by `ErrorPopup`, dismisses it and suppresses that cell's tooltip until both pointer and focus leave the cell — required for WCAG 1.4.13 (content shown on hover/focus must be dismissible via Escape without moving pointer or focus). The listener stands down while focus is inside an editor, fn-help, or formula-bar root, so the focused surface's own Escape handling (including the address box's Escape-revert) always wins over a hover-raised tooltip; suppression survives unrelated focus movement while the pointer stays on the cell, and re-entering the suppressed cell while the tooltip shows another cell's error closes the stale tooltip. No adapter or `IGridAdapter` involvement; self-contained in `ErrorPopup`.
 - **Ref insertion**: a single grid pick replaces the previously inserted ref if the caret hasn't moved past it (`lastRef` tracking) — picking again "edits" the ref instead of appending another.
 - **Mod+click multi-select**: holding Cmd/Ctrl while picking (click or drag) appends the new range as a comma-joined ref after the previously-picked one instead of replacing it, as long as that previous ref hasn't been edited away and the caret still sits at its end (the same pending-ref condition that gates a plain replace). A mod+click with no prior ref, or after the prior ref was edited away or the caret moved off it, falls back to a plain fresh insert (same `canInsertRef` gating as a normal click). `setValue` resets the tracked ref, so a re-seeded editor never appends after a ref from a previous edit session. Picks travel as `CellPick`/`RangePick` (`{ ref, append }`) through `CellPickListener`/`RangePickListener`.
@@ -269,20 +259,13 @@ The three required role interfaces mirror the three core consumers: `GridPickSur
 
 `setHighlights` is the canonical, idempotent push from editor to grid (replaces the full set every keystroke). `highlightRange` / `clearEphemeralHighlight` are used for transient drag-pick visuals driven by `DomRangePicker`.
 
-**Important**: never add adapter-shaped methods directly to a concrete adapter — extend `IGridAdapter` first so every host stays in sync (then `NullAdapter`, then every concrete adapter; `pnpm typecheck` flags stragglers).
+**Important**: never add adapter-shaped methods directly to a concrete adapter — extend `IGridAdapter` first so every host stays in sync (then `NullAdapter`, then every concrete adapter; `npm run typecheck` flags stragglers).
 
 ---
 
-## 9. Adapters Shipped
+## 9. Adapters
 
-| Package | Main exports | Notes |
-|---|---|---|
-| `@hfe/plain-table-adapter` | `PlainTableAdapter`, `PlainTableAdapterOptions`, `PlainTableHost` | Basic tier against a plain `<table>`, no host library: native DOM geometry (`rowIndex`/`cellIndex`), no `data-*` markup required. Extends `NullAdapter`; bar-lifecycle methods delegate to an injected `PlainTableHost` when supplied. Implements `GridHeaderPickSurface` via native TH geometry (corner `th` inert). Grid scaffolding + error markers (`PlainTableSheet.renderCell`) live in `demo/js/plain-table` as example code. |
-| `@hfe/tanstack-table-adapter` | `TanStackTableAdapter`, `TanStackTableAdapterOptions`, `HyperFormulaForTanStack`, `AdapterChangeEvent`, `useFormulaBuilder`, `FormulaBuilderConnectors`, `UseFormulaBuilderOptions`, `FormulaBar`, `FormulaBarProps`, `SuggestionsPopupHost`, `FunctionHelpPopupHost`, `PopupHostProps`, `CellCoords`, `CellProps`, `ColHeaderProps`, `RowHeaderProps`, `TanStackTableLike`, `TanStackCellLike`, `TanStackHeaderLike`, `TanStackRowLike`, `TanStackColumnLike`, `columnLetter`, `FrozenPredicate`, `useMergedRef`, `STACKING_ORDER`, `ReactPopupsOptions` (+ re-exported `SuggestionsOptions`) | Full IGridAdapter for React + `@tanstack/react-table` + `@tanstack/react-virtual`. Hook-first API: `useFormulaBuilder({table, hyperformula, ...})` returns identity-stable `FormulaBuilderConnectors` (no provider, no context); optional `scrollToCell` lets hosts scroll their row virtualizer to unmounted rows; optional `shouldStartEdit` (keyboard edit-start predicate, default `resolveEditStartKey`) gates edit open on key context; consumers distribute it themselves and render the bar via `<FormulaBar formulaBuilder={fb} />`. Implements `GridHeaderPickSurface` via `data-header-col`/`data-header-row` attributes; the public `TanStackTableAdapter` delegates to the underlying DOM adapter. Internals: `tableBridge`/`tanStackIndexMapping` (stable id↔HF-index mapping); `useTableOrderSync` replays table reorders as real HyperFormula `moveRows`/`moveColumns` calls so relative references stay correct. Popup docking via `<SuggestionsPopupHost/>`/`<FunctionHelpPopupHost/>` components; `popups` option is the container-less `ReactPopupsOptions`. |
-| `@hfe/ag-grid-adapter` | `AgGridAdapter`, `AgGridAdapterOptions`, `HyperFormulaForAg`, `createFormulaCellEditor`, `FormulaEditorHost`, `createFormulaCellRenderer`, `FormulaCellRendererHost`, `columnLetter`, `withFormulaBuilder`, `WithFormulaBuilderOptions`, `FormulaGridHandle`, `FormulaGridEngine`, `SheetDimensions` (+ re-exported `LayoutDirection`, `PopupsOptions`, `SuggestionsOptions`) | Full IGridAdapter for AG Grid Community v33+ (vanilla `createGrid` and the `<AgGridReact>` component — the default `cellRenderer`/`cellEditor` are classes, which AG treats as framework-agnostic JS comps). `outsideClickCommitMode: "emitted"`. HyperFormula is the source of truth (grid is a spreadsheet-shaped read-through: `valueGetter` reads `getCellValue`, `readOnlyEdit: true`, commits go through the adapter and refresh only the rows HF's exported changes touched, falling back to a full `refreshCells({force:true})` when the change list can't be resolved to row nodes). Editing: AG owns the lifecycle via a native `ICellEditor` (`createFormulaCellEditor`) whose `getGui()` is an inert placeholder, but core's editor RENDERS in an adapter overlay (`.hfe-ag-editor-host`, z:2) that is a sibling of the highlight layer (`.hfe-ag-overlay-host`, z:1) — one stacking context so cells < highlights < editor (an in-cell editor can't be z-ordered above a grid-level highlight overlay because AG rows are stacking contexts). The overlay tracks its cell on `bodyScroll`; short formulas fill+center the cell, long/multiline ones expand over neighbors and cap at the grid (editor-host `overflow:hidden`). AG owns triggers (dblclick/Enter/F2/printable `eventKey` seed); `getValue()`+`isCancelAfterEnd` keep AG from applying values — commits flow adapter→HF only. While editing, document-capture interception (pointerdown routes pick/commit, mousedown+click swallowed) stops AG from self-terminating the edit on other-cell clicks. Internals: `bridge/agGridIndexMapping` (colId↔HF-col, display-row↔HF-row, sort-proof); `dom/agGridDomAdapter` (core `DomRangePicker` for bar-mode picks + `HighlightLayer` geometry from live cell rects); adapter-level `RangeDragTracker`+`PickEmitter` for in-edit picks; `AgGridAdapterOptions.onMappingMiss` reports unresolvable row/col lookups at the two edit entry points (default `console.warn`). Theme adoption: an SCSS bridge maps AG's Theming-API `--ag-*` params to core `--hfe-*` tokens (scoped to AG's `ag-theme-params-*` class); `adapter.themeClassName` can be forwarded as `FormulaBuilder`'s `className` so portaled popups/bar adopt the theme too. Implements `GridHeaderPickSurface` on the column axis only, dual path: the `DomRangePicker` path (bar-hosted editing, `headerSelector` + `resolveHeader`) and an inline-edit interceptor feeding an adapter-owned `HeaderDragTracker`; an ineligible/unresolvable header click stays swallowed dead (deliberate — protects against mid-edit sorting). `getColHeaderEl` on the geometry renders the whole-column header tint. v1 defers pinned rows/columns and column reorder. **`withFormulaBuilder(options: WithFormulaBuilderOptions): FormulaGridHandle`** (`src/withFormulaBuilder.ts`) is an optional host-glue decorator wrapping `AgGridAdapter` + `FormulaBuilder` construction behind AG's own lifecycle: `options` is `{ hyperformula: FormulaGridEngine; sheetName?; container?: HTMLElement; formulaBar?: HTMLElement \| "auto"; readOnly?: () => boolean; direction?: LayoutDirection; popups?: PopupsOptions; mapping?: Pick<AgGridAdapterOptions, "hfColForColId" \| "colIdForHfCol" \| "rowIdForHfRow" \| "hfRowOfNode"> }` (`FormulaGridEngine extends HyperFormulaForAg` with an optional `getSheetDimensions(sheetId): { width; height }` used to auto-generate `columnDefs`/`rowData` when the caller omits them); the returned `FormulaGridHandle` is `{ gridOptions<TData>(userOptions?: GridOptions<TData>): GridOptions<TData>; readonly adapter: AgGridAdapter \| null; readonly builder: FormulaBuilder \| null }`. `gridOptions()` injects a default `getRowId` (`String(data.hfRow)`) only when `options.mapping` sets neither `rowIdForHfRow` nor `hfRowOfNode` (validation is bidirectional: a custom row mapping requires the caller's own `getRowId`, and a caller-supplied `getRowId` requires a custom row mapping — either mismatch throws), plus `readOnlyEdit`/`suppressMovableColumns` and a `defaultColDef` (`valueGetter` returns the raw HyperFormula value honoring a custom `hfRowOfNode` mapping, `valueFormatter` formats it for display, `cellRenderer` — the default error-marking renderer for this package, a class `ICellRendererComp` (`createFormulaCellRenderer`) whose `getGui()` span uses `textContent`, so it works under both `createGrid` and `<AgGridReact>` and never goes through AG's `innerHTML` insertion path; a function renderer would be misdetected as a React component and throw on its returned DOM node; plus `editable`/`cellEditor`), and wraps `onGridReady`/`onGridPreDestroyed` to construct/tear down the adapter and builder (user handlers still run, after construction / before teardown respectively; `onGridPreDestroyed` ignores events from a grid the handle isn't attached to). Container resolution: explicit `options.container`, else the grid's `.ag-root-wrapper` parent, else throws. `formulaBar` accepts an element, `"auto"` (decorator creates a sibling host), or omitted (no bar attached). See `packages/ag-grid-adapter/AGENTS.md` for full behavior (leak-proofing on construction failure, theme-swap limitation). |
-| `@hfe/mui-data-grid-adapter` | `useFormulaBuilder`, `MuiFormulaBuilderConnectors`, `UseFormulaBuilderOptions`, `FormulaBar`, `FormulaBarProps`, `SuggestionsPopupHost`, `FunctionHelpPopupHost`, `PopupHostProps`, `HyperFormulaForMui`, `MuiApiRef`, `MuiCellId`, `MuiGridSelection`, `MuiSelectionController`, type-only `MuiDataGridAdapter`, plus the structural `Mui*Like` host-shape types (`MuiGridApiLike`, `MuiColDefLike`, `MuiCellParamsLike`, `MuiGridProps`, `MuiInjectedColDef`, `MuiRowId`, `MuiThemeLike`, …) that keep the package free of `@mui/*` type imports, `ReactPopupsOptions` (+ re-exported `SuggestionsOptions`) | Full IGridAdapter for React + `@mui/x-data-grid` Community. Hook-first API: `useFormulaBuilder({apiRef, columns, hyperformula, ...})` (user's own `useGridApiRef()`, no provider/context) returns stable connectors incl. column-injected `columns` and `gridProps`. Range selection is host-owned: an optional `selection` option (`MuiSelectionController`) speaks MUI-native `{ id, field }` pairs; the adapter translates to/from HF coordinates, pushes ref-picker state via the controller's optional `setGestureGuard`, and falls back to single-cell `cellFocusIn` selection when absent — `demo/react/mui/useGridSelection.ts` is the reference gesture implementation. apiRef-centric internals: `bridge/gridStateReader.ts` (selector seam over `apiRef`, never cell-DOM geometry), `bridge/coordinateMapper.ts` over `bridge/rowMapping.ts`/`colMapping.ts` (`mapper.read()` → `CoordinateReader`: visual↔sheet↔grid-cell translation + navigation over row/col maps built fresh per read — no cached rebuild-on-event), `bridge/geometry.ts` (point-to-cell/range-rect from selector data); the adapter composes `viewportGeometry.ts` (`ViewportGeometry`, snapshot/overlay-host/hit-test/edit-overlay/row-height sync), `selectionBridge.ts` (`SelectionBridge`, selection-controller contract + `cellFocusIn` fallback), `editSession.ts` (`EditSessionController`, overlay/native edit sessions) and `refPick.ts` (`RefPickController`, ref-selection mode + drag picks, implementing `GridHeaderPickSurface` on the column axis only via direct DOM `mousedown` on `.MuiDataGrid-columnHeader[data-field]` plus an apiRef `columnHeaderOver` extension — no `columnHeaderMouseDown` apiRef event exists; `getColHeaderEl` on `ViewportGeometry` renders the whole-column header tint). Theme via `styles/themeTokens.ts` (MUI `Theme` → `--hfe-*` custom props in an injected class-scoped style rule on the adapter root + popup portal, no inline styles); `rspack.config.mjs` externalizes `@mui/material/styles` so the built adapter shares the host's `ThemeContext`. Popup docking via `<SuggestionsPopupHost/>`/`<FunctionHelpPopupHost/>` components; `popups` option is the container-less `ReactPopupsOptions`. |
-
-All four use `HighlightLayer` from core, with `DomRangePicker` or `RangeDragTracker` as the picker machinery; pick emission goes through core's `PickEmitter` — instantiated directly by AG Grid/MUI, and owned internally by `DomRangePicker` for plain-table/TanStack. Error display always lives in the host renderer, never in core (§11 of ARCHITECTURE.md).
+No adapter ships in this repository; see §1. An adapter implements `IGridAdapter` (§8), using `HighlightLayer` from core with `DomRangePicker` or `RangeDragTracker` as the picker machinery, and core's `PickEmitter` for pick emission. Error display always lives in the host (see the error display policy in [`ARCHITECTURE.md`](ARCHITECTURE.md#error-display-policy)).
 
 ---
 
@@ -300,13 +283,11 @@ All four use `HighlightLayer` from core, with `DomRangePicker` or `RangeDragTrac
 ## 11. CSS Architecture
 
 - Sources in SCSS (`packages/core/src/styles/*.scss`); compiled with `sass` into the committed,
-  generated `src/theme/cssText.ts` string module (repo-root `scripts/generateCssText.mjs`, run by `build:styles`).
+  generated `src/theme/cssText.ts` string module (`hyperformula-ui/scripts/generateCssText.mjs`, run by `build:styles`).
 - Styles auto-inject: `injectStyles()` appends one `<style data-hfe-styles>` tag on first
   `FormulaBuilder`/`FormulaEditor` construction (ref-counted, idempotent, SSR-guarded). There is no
-  `@hfe/core/styles` export; consumers import no CSS. Adapters reuse the exported
-  `createStyleInjector(marker, cssText)` for their own generated `cssText.ts`
-  (`data-hfe-tanstack-styles`, `data-hfe-ag-styles`, `data-hfe-mui-styles`;
-  the MUI adapter injects a second runtime style for theme tokens, `data-hfe-mui-theme`).
+  `hyperformula-ui/styles` export; consumers import no CSS. Adapters reuse the exported
+  `createStyleInjector(marker, cssText)` for their own generated stylesheets.
 - BEM blocks: `hfe-editor`, `hfe-overlay`, `hfe-ref-mark`, `hfe-popup`, `hfe-popup-portal`, `hfe-suggestions`, `hfe-fn-help`, `hfe-highlight`, `hfe-token`, `hfe-error`, `hfe-cell--error`, `hfe-formula-bar` (`__cell`, `__cell--address`, `__cell--formula`, `__address-input`, `__fx-icon`, `__body`, `__idle`, `__overlay`). Decoration modifiers: `hfe-token--paren-match`, `hfe-token--paren-err`, `hfe-token--dim`, `hfe-token--arg-active`; error/status modifiers `hfe-token--{comment-err,fn-unknown,ref-invalid}`; per-token-type classes via `TOKEN_CN`. Full element/modifier inventory: `theme/classNames.ts`.
 - Every class name string lives in `theme/classNames.ts` (`CN`, `TOKEN_CN`) — no string literals scattered in components.
 - `color-scheme` is set on the editor root in `tokens.scss`: `light` under `[data-theme="light"]`, `dark` under `[data-theme="dark"]`. All themed colors via `light-dark(lightVal, darkVal)`; auto when no `data-theme` override.
@@ -318,23 +299,17 @@ All four use `HighlightLayer` from core, with `DomRangePicker` or `RangeDragTrac
 
 ## 12. Build & Commands
 
-Root scripts (`package.json`):
-- `pnpm run check` — `biome check --write .` (format + lint, auto-fix, safe).
-- `pnpm run check:ci` — `biome check .` (read-only; what CI runs).
-- `pnpm run format` / `format:check` — Biome format only.
-- `pnpm run lint` / `lint:fix` — Biome lint; `lint:fix` applies unsafe fixes.
-- `pnpm typecheck` — `pnpm -r exec tsc --noEmit` across every package. (Scoped `pnpm --filter <pkg> typecheck` additionally covers `tsconfig.test.json`.)
-- `pnpm test` — every unit suite (`pnpm -r --filter './packages/*' test` — all five packages have suites).
-- `pnpm test:core` / `pnpm test:adapters` / `pnpm test:demos` — scoped aliases: core unit, adapter units, and the e2e basic-smoke suite (`test:demos` = `test:e2e`).
-- `pnpm test:e2e` — builds `packages/*` dist first, then `pnpm --filter e2e exec playwright test`; starts all four demo servers itself.
-- `pnpm verify` — `build && check:ci && typecheck && test` — exactly what CI runs. Run before every commit.
-- `pnpm dev:js` / `dev:react` / `dev:vue` / `dev:angular` — per-framework demo server (5173/5174/5175/5176); `pnpm dev` aliases `dev:js` (long-running).
-- `pnpm run build` — packages first (`pnpm -r --filter './packages/*' build`, topological: core before adapters), then every `demo/*` package.
-- `pnpm run clean` — rimraf `dist .turbo node_modules/.cache` per package.
+Run from the repository root; the full list of root scripts is in [`dev-docs/BUILD.md`](../../dev-docs/BUILD.md). The package's own scripts take `--workspace=hyperformula-ui/packages/core`; name the workspace by path, because `--workspace=hyperformula-ui` also matches workspaces by folder.
 
-Adapter unit tests run per package: `pnpm --filter @hfe/ag-grid-adapter test`.
+- `npm run build:ui` — styles, JS and declarations for the package.
+- `npm run lint` — every workspace lints itself; the UI packages run `biome check .`, and the core also checks the shared configuration and scripts. `npm run lint:fix` applies fixes.
+- `npm run typecheck` — `tsc` in every UI package; the core's script also covers `tsconfig.test.json`. The demo and the e2e suite need the engine built first (`npm run bundle-all`), because they resolve `hyperformula` from this workspace.
+- `npm run test:ui` — the core's vitest suite.
+- `npm run test:e2e` — the Playwright suite; starts the demo server itself.
+- `npm run dev:ui` — the demo server on port 5173 (long-running).
+- `npm run docs --workspace=hyperformula-ui/packages/core` — regenerates `DOCS.md`.
 
-Per-package builds: `build:styles` (styles, all style-bearing packages via repo-root `scripts/generateCssText.mjs`) → `rspack build` (JS, ESM via `experiments.outputModule` + `library.type: "module"`, swc-loader targeting ES2022, peer deps as externals) → `tsc -p tsconfig.json --emitDeclarationOnly` (`.d.ts`). The demo uses Vite, not rspack.
+Build steps: `build:styles` (`scripts/generateCssText.mjs`) → `rspack build` (JS, ESM via `experiments.outputModule` + `library.type: "module"`, swc-loader targeting ES2022, `hyperformula` as an external) → `tsc -p tsconfig.json --emitDeclarationOnly` (`.d.ts`). The demo uses Vite, not rspack.
 
 ---
 
@@ -351,21 +326,19 @@ These are the **canonical boundary**. `FormulaEditor.setValue` runs `nToComments
 
 ## 14. Tests
 
-Exact counts rot fast — run `pnpm test` / see `e2e/COVERAGE.md` for the live picture.
+Exact counts rot fast — run `npm run test:ui` / see `e2e/COVERAGE.md` for the live picture.
 
 **Vitest — `packages/core/tests/`**: mirrors the `src/` subdirectory layout (`tests/adapter/`, `engine/`, `events/`, `formulaBar/`, `formulaEditor/`, `kernel/`, `lexer/`, `theme/`, `ui/{caret,highlight,popup,text}/`), kebab-case filenames, ~85 files. Shared fakes and DOM helpers live in `tests/helpers/` (barrel) — extend them instead of redefining per-file fakes. The keyboard matrix (`formulaEditor/keyboard-controller.test.ts`), point mode, popups, lexer, comment boundary, named expressions, and highlight geometry are all unit-owned here.
 
-**Vitest — adapter packages**: each of the four adapters has its own `tests/` suite (`pnpm --filter <pkg> test`).
+**Playwright — `e2e/tests/`**: a **basic integration smoke** tier, not a behavior suite. Each spec is one line calling the shared `runBasicSuite(findDemo(...))` factory (`tests/_shared/{demos,drivers,basicSuite}.ts`); the editor-only `js/basic` demo gets 1 DOM-only check (`=1+2` → `#result` `3`). Details in `e2e/COVERAGE.md`. All behavior is unit-owned.
 
-**Playwright — `e2e/tests/`**: a **basic integration smoke** tier, not a behavior suite. The tree mirrors the demo tree — `tests/<framework>/<adapter>/formula-builder.spec.ts` — and every spec is one line calling the shared `runBasicSuite(findDemo(...))` factory (`tests/_shared/{demos,drivers,basicSuite}.ts`). Grid demos get 3 DOM-only checks (renders + formula bar with A1, selection syncs on click, `=1+1` recomputes to `2`); the editor-only `js/basic` demo gets 1 (`=1+2` → `#result` `3`). Tests use only shared `.hfe-*` DOM + per-adapter cell selectors — no `window.*` demo hooks — so the same suite runs on all four framework servers (js 5173, react 5174, vue 5175, angular 5176). Details in `e2e/COVERAGE.md`. E2e owns host-integration smoke; all behavior is unit-owned.
-
-Conventions and the failing-test-first workflow: `.claude/skills/testing/SKILL.md`.
+Conventions and the failing-test-first workflow: [`TESTING.md`](TESTING.md).
 
 ---
 
 ## 15. Critical Files
 
-- `pnpm-workspace.yaml`, `tsconfig.base.json`, `biome.json`
+- `tsconfig.base.json`, `biome.json`
 - `packages/core/src/index.ts` — public surface
 - `packages/core/src/formulaBuilder.ts` — consumer-facing master class
 - `packages/core/src/formulaEditor/formulaEditor.ts` — editor facade + controller wiring
@@ -380,9 +353,5 @@ Conventions and the failing-test-first workflow: `.claude/skills/testing/SKILL.m
 - `packages/core/src/events/eventManager.ts` — DOM listener lifecycle
 - `packages/core/src/theme/classNames.ts` — all BEM names; `theme/refPalette.ts` — ref colors
 - `packages/core/src/styles/tokens.scss` — theme variables
-- `packages/plain-table-adapter/src/plainTableAdapter.ts` (+ `demo/js/plain-table/plainTableSheet.ts` reference host)
-- `packages/tanstack-table-adapter/src/tanStackTableAdapter.ts`, `src/hooks/useFormulaBuilder.ts`, `src/bridge/{tableBridge,tanStackIndexMapping}.ts`, `src/components/formulaBar.tsx`
-- `packages/ag-grid-adapter/src/{agGridAdapter,agSelectors,formulaCellEditor,withFormulaBuilder}.ts`, `src/bridge/agGridIndexMapping.ts`, `src/dom/{agGridDomAdapter,gridTarget}.ts`
-- `packages/mui-data-grid-adapter/src/{muiDataGridAdapter,viewportGeometry,selectionBridge,editSession,refPick,columns}.ts(x)`, `src/hooks/useFormulaBuilder.ts`, `src/bridge/{gridStateReader,rowMapping,colMapping,coordinateMapper,geometry}.ts`
-- `demo/js/vite.config.ts`, `demo/react/vite.config.ts`
+- `demo/js/vite.config.ts`
 - `e2e/playwright.config.ts`, `e2e/tests/fixtures.ts`
