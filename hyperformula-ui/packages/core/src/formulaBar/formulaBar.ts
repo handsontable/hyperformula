@@ -6,6 +6,7 @@ import type { FormulaEditor } from "../formulaEditor/formulaEditor";
 import { CN } from "../theme/classNames";
 import type { LiveRegion } from "../ui/liveRegion";
 import type { LayoutDirection } from "../ui/popup/types";
+import type { IconsOptions } from "../ui/types";
 import type { AddressBoxRange, AddressBoxTarget } from "./formulaBarAddressBox";
 import { FormulaBarAddressBox } from "./formulaBarAddressBox";
 import { FormulaBarCell } from "./formulaBarCell";
@@ -36,6 +37,9 @@ export interface FormulaBarOptions {
    * @defaultValue `"ltr"`
    */
   direction?: LayoutDirection;
+
+  /** Host factories replacing the built-in icons; the bar renders the `function` icon. */
+  icons?: IconsOptions;
 }
 
 function asDisposable(unsub: () => void): Disposable {
@@ -95,6 +99,7 @@ export class FormulaBar {
       knownFunctions: options.knownFunctions,
       separators: options.editor.engine.getSeparators(),
       onActivate: () => this.activateFromIdle(),
+      ...(options.icons !== undefined && { icons: options.icons }),
     });
     this.container.append(this.addressBox.root, this.formulaCell.root);
     this.editor.attachTo(this.formulaCell.overlayMount);
@@ -281,8 +286,8 @@ export class FormulaBar {
     this.editor.enterRefSelectionMode();
 
     if (this.barInitiated) {
-      this.editor.attachTo(this.formulaCell.overlayMount);
       this.formulaCell.setOverlayVisible(true);
+      this.editor.attachTo(this.formulaCell.overlayMount);
       this.adapter.setInlineEditorVisible(false);
     } else {
       this.editor.attachTo(mount);
@@ -291,6 +296,11 @@ export class FormulaBar {
     }
 
     this.editor.focus();
+
+    if (this.barInitiated) {
+      this.editor.scrollToStart();
+    }
+
     this.formulaCell.renderValue(this.editor.getValue());
     this.barInitiated = false;
     this.barInitiatedWithFocus = false;
@@ -302,8 +312,8 @@ export class FormulaBar {
     }
 
     if (this.formulaCell.overlayMount.hidden) {
-      this.editor.attachTo(this.formulaCell.overlayMount);
       this.formulaCell.setOverlayVisible(true);
+      this.editor.attachTo(this.formulaCell.overlayMount);
       this.adapter.setInlineEditorVisible(false);
     }
 

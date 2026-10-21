@@ -20,7 +20,7 @@
 
   &__body {
     overflow-y: auto;
-    scrollbar-width: thin;
+    scrollbar-width: var(--hfe-scrollbar-width);
     scrollbar-color: var(--hfe-scrollbar-color) transparent;
 
     &:hover {

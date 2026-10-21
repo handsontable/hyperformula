@@ -1,4 +1,5 @@
-import type { SvgIcon } from "./icons";
+import { BUILT_IN_ICONS, type SvgIcon } from "./icons";
+import type { IconName, IconsOptions } from "./types";
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 
@@ -128,4 +129,8 @@ export function createSvgIcon(icon: SvgIcon): SVGSVGElement {
   }
 
   return svg;
+}
+
+export function createIcon(name: IconName, icons?: IconsOptions): Element {
+  return icons?.[name]?.() ?? createSvgIcon(BUILT_IN_ICONS[name]);
 }

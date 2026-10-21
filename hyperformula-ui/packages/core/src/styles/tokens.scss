@@ -12,6 +12,7 @@
   --hfe-color-shadow: color-mix(in srgb, #000000 var(--hfe-shadow-opacity), transparent);
   --hfe-scrollbar-color: color-mix(in srgb, var(--hfe-color-foreground) 20%, transparent);
   --hfe-scrollbar-color-hover: color-mix(in srgb, var(--hfe-color-foreground) 50%, transparent);
+  --hfe-scrollbar-width: thin;
 
   /* ── Syntax token colors ─────────────────────────────────── */
   --hfe-token-fn: var(--hfe-color-foreground);
@@ -105,6 +106,7 @@
   --hfe-formula-bar-gap-address: 4px;
   --hfe-formula-bar-gap-formula: 8px;
   --hfe-formula-bar-address-width: 120px;
+  --hfe-formula-bar-scrollbar-width: auto;
   --hfe-formula-bar-input-background-hover: transparent;
   --hfe-formula-bar-input-focus-ring: var(--hfe-color-focus-ring);
 

@@ -88,9 +88,15 @@ carries `max-width: 100% !important` — formula-bar.scss — so it wraps at the
 regardless of EditorSizeController's clip-derived inline cap, which stays in charge of the
 height cap); the idle view wraps the same way
 (`pre-wrap` + `break-all`) but keeps a static one-line height and scrolls vertically
-(`overflow-y: auto`) — never a horizontal scrollbar, never a growing bar while inline. When the user clicks the idle formula cell, the bar triggers a host-switch: the
+(`overflow-y: auto`) — never a horizontal scrollbar, never a growing bar while inline. The
+bar's vertical padding sits on the overlay and the textarea, not on the formula cell, so the
+idle view and a bar-hosted editor capped at one line (`--hfe-editor-max-lines: 1`) are the
+same height, and the capped editor's scroll port spans the whole cell. When the user clicks the idle formula cell, the bar triggers a host-switch: the
 editor reparents to the bar mount (`FormulaBarCell.overlayMount`), the cell overlay is hidden, and focus moves to the bar
-input.
+input. The bar shows the mount before `attachTo`, so `EditorSizeController` measures a visible
+editor and applies its cap before `focus()` can scroll an ancestor to the caret. A
+bar-initiated open then calls `FormulaEditor.scrollToStart()`: the caret stays at the end, but
+a capped bar shows the formula's first line, as the idle view did.
 
 Formula bar activation (a11y design decision, 2026-07, revised 2026-07): the idle formula
 cell is a focusable `role="textbox"` placeholder (`tabindex="0"`, `aria-label="Formula
@@ -208,6 +214,10 @@ formulaEditor/ (facade + controllers)
 │                             ancestor scroll, and window resize; no clipping ancestor → falls
 │                             back to the viewport (documentElement client box at 0,0) as the
 │                             clip, so hosts without an overflow wrapper still get both caps.
+│                             The height cap never exceeds the clip's clientHeight: once an
+│                             ancestor scrolls the editor's top above the clip, the rect-based
+│                             distance to the clip bottom grows by the scroll, and the clamp
+│                             keeps that from growing the editor.
 │                             A host may tighten the width cap below the clip edge by setting the
 │                             --hfe-editor-max-width CSS variable on the editor's mount (the
 │                             external Handsontable formulaBuilder plugin sets it in its
@@ -372,7 +382,10 @@ IGridAdapter (adapter/)
 │                         RangeDragTracker
 └── pickEmitter.ts      — cell/range/header pick event wiring
 UI (ui/) — split by concern: popup/, text/, caret/, highlight/, plus shared dom.ts, icons.ts
-├── dom.ts                — createEl / clear / ensureRelativePosition helpers (shared primitive)
+├── dom.ts                — createEl / clear / ensureRelativePosition helpers (shared primitive);
+│                           createIcon builds a glyph from a host IconsOptions factory or,
+│                           failing that, from the built-in SVG data via createSvgIcon
+│                           (createElementNS — no HTML sink)
 ├── focusTrap.ts          — FocusTrap: reusable focus-scope primitive (focusable discovery via
 │                           generic selector, focusFirst, focusNext with Tab/Shift+Tab wrap,
 │                           exit-key callback — default exit key is Escape, hosts override via
@@ -382,8 +395,9 @@ UI (ui/) — split by concern: popup/, text/, caret/, highlight/, plus shared do
 │                           listeners — the host registers
 │                           keydown and delegates to interceptKeydown (used by
 │                           FunctionHelpPopup's F6 scope)
-├── icons.ts              — SVG icon markup shared by popups and FormulaBarCell's fx icon
-│                           (moved out of popup/ — no longer popup-only)
+├── icons.ts              — SVG icon data shared by popups and FormulaBarCell's fx icon,
+│                           keyed by IconName in BUILT_IN_ICONS
+├── types.ts              — IconName, IconsOptions (public: the `icons` option)
 ├── popup/
 │   ├── basePopup.ts        — base class for all popup-style overlays; self-appends root to container
 │   ├── suggestionsPopup.ts — suggestions dropdown (extends BasePopup)

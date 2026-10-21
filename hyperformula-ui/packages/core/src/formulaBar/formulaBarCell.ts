@@ -3,9 +3,9 @@ import { nToComments } from "../kernel/commentTransform";
 import { Lexer } from "../lexer";
 import type { LexerOptions } from "../lexer/types";
 import { CN } from "../theme/classNames";
-import { createEl, createSvgIcon } from "../ui/dom";
-import { MATH_FUNCTION_ICON } from "../ui/icons";
+import { createEl, createIcon } from "../ui/dom";
 import { VisualOverlay } from "../ui/text/visualOverlay";
+import type { IconsOptions } from "../ui/types";
 
 /**
  * Options for {@link FormulaBarCell}.
@@ -25,6 +25,9 @@ export interface FormulaBarCellOptions {
    * @defaultValue the lexer defaults (`,` argument separator, `.` decimal separator)
    */
   separators?: Partial<LexerOptions>;
+
+  /** Host factories replacing the built-in icons; the cell renders the `function` icon. */
+  icons?: IconsOptions;
 }
 
 /**
@@ -40,7 +43,7 @@ export class FormulaBarCell {
   private readonly lexer: Lexer;
   private readonly separators: Partial<LexerOptions> | undefined;
   private readonly idleOverlay: VisualOverlay;
-  private readonly fxIcon: SVGSVGElement;
+  private readonly fxIcon: Element;
   private readonly bodyEl: HTMLElement;
   private readonly idleEl: HTMLElement;
   private readonly overlayEl: HTMLElement;
@@ -49,7 +52,7 @@ export class FormulaBarCell {
     this.separators = options.separators;
     this.lexer = new Lexer(options.separators);
     this.root = createEl("div", { class: `${CN.formulaBarCell} ${CN.formulaBarCellFormula}` });
-    this.fxIcon = createSvgIcon(MATH_FUNCTION_ICON);
+    this.fxIcon = createIcon("function", options.icons);
     this.fxIcon.classList.add(CN.formulaBarFxIcon);
     this.idleOverlay = new VisualOverlay({
       knownFunctions: options.knownFunctions,

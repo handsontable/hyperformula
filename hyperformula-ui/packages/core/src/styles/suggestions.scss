@@ -21,7 +21,7 @@
   &__list {
     overflow-y: auto;
     padding: var(--hfe-menu-padding-vertical) var(--hfe-menu-padding-horizontal) 0;
-    scrollbar-width: thin;
+    scrollbar-width: var(--hfe-scrollbar-width);
     scrollbar-color: var(--hfe-scrollbar-color) transparent;
 
     &:hover {

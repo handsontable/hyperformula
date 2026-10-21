@@ -1,8 +1,8 @@
 import type { FunctionSignature } from "../../engine/types";
 import { CN } from "../../theme/classNames";
-import { createEl, createSvgIcon } from "../dom";
+import { createEl, createIcon } from "../dom";
 import { FocusTrap } from "../focusTrap";
-import { EXTERNAL_LINK } from "../icons";
+import type { IconsOptions } from "../types";
 import { BasePopup } from "./basePopup";
 import type { AnchorRect, FunctionHelpOptions } from "./types";
 
@@ -13,6 +13,7 @@ export interface FunctionHelpPopupOptions {
   onFocusLeave?: (nextTarget: Node | null) => void;
   container?: HTMLElement;
   options?: FunctionHelpOptions;
+  icons?: IconsOptions;
 }
 
 let tooltipIdCounter = 0;
@@ -86,11 +87,13 @@ export class FunctionHelpPopup extends BasePopup {
     onFocusLeave,
     container,
     options,
+    icons,
   }: FunctionHelpPopupOptions = {}) {
     super({
       ...(container !== undefined && { container }),
       ...(options?.showClose !== undefined && { showClose: options.showClose }),
       ...(onExplicitClose !== undefined && { onExplicitClose }),
+      ...(icons !== undefined && { icons }),
     });
     tooltipIdCounter += 1;
     this.root.id = `${CN.fnHelp}-${tooltipIdCounter}`;
@@ -281,7 +284,7 @@ export class FunctionHelpPopup extends BasePopup {
       event.preventDefault();
     });
     link.appendChild(document.createTextNode("Learn more"));
-    link.appendChild(createSvgIcon(EXTERNAL_LINK));
+    link.appendChild(createIcon("externalLink", this.icons));
 
     return link;
   }

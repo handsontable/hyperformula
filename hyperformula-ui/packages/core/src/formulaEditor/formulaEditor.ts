@@ -113,6 +113,7 @@ export class FormulaEditor {
         ...opts.suggestionsOptions,
       },
       opts.popupCtx.portal,
+      opts.icons,
     );
     this.fnHelp = new FunctionHelpPopup({
       onExplicitClose: () => {
@@ -130,6 +131,7 @@ export class FormulaEditor {
         this.popupCtrl.applyFnHelpAria(visible, tooltipId),
       container: opts.popupCtx.portal,
       ...(opts.fnHelpOptions !== undefined && { options: opts.fnHelpOptions }),
+      ...(opts.icons !== undefined && { icons: opts.icons }),
     });
 
     this.rootEl = createEl("div", { class: CN.editor });
@@ -491,6 +493,12 @@ export class FormulaEditor {
     this.focused = true;
     this.highlights.pushHighlights();
     this.input.focus();
+  }
+
+  /** Scrolls the editor back to its first line without moving the caret. */
+  scrollToStart(): void {
+    this.input.textarea.scrollTop = 0;
+    this.overlay.root.scrollTop = 0;
   }
 
   /** Re-pushes the current ref highlights to the grid (e.g. after a host re-render). */

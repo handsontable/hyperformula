@@ -472,6 +472,79 @@ describe("FormulaBuilder", () => {
     });
   });
 
+  describe("icons", () => {
+    function customIcon(name: string): () => Element {
+      return () => {
+        const icon = document.createElement("i");
+
+        icon.dataset.icon = name;
+
+        return icon;
+      };
+    }
+
+    it("renders host-supplied icons in the popups and the formula bar", () => {
+      const iconRoot = document.createElement("div");
+      const barHost = document.createElement("div");
+      document.body.append(iconRoot, barHost);
+      const iconBuilder = new FormulaBuilder({
+        rootEl: iconRoot,
+        formulaBarContainer: barHost,
+        popups: { showClose: true },
+        icons: {
+          close: customIcon("close"),
+          externalLink: customIcon("externalLink"),
+          namedExpression: customIcon("namedExpression"),
+          function: customIcon("function"),
+        },
+      });
+
+      expect(barHost.querySelector(`.${CN.formulaBarFxIcon}`)?.getAttribute("data-icon")).toBe(
+        "function",
+      );
+
+      // biome-ignore lint/suspicious/noExplicitAny: accessing private field for test assertion
+      (iconBuilder.editor as any).suggestions.show([{ value: "Rate", kind: "named" }], {
+        left: 0,
+        top: 0,
+        height: 20,
+        width: 100,
+      });
+      expect(
+        document.body.querySelector(sel(CN.suggestionsItem))?.querySelector("i")?.dataset.icon,
+      ).toBe("namedExpression");
+      expect(
+        document.body.querySelector(sel(CN.popupClose))?.querySelector("i")?.dataset.icon,
+      ).toBe("close");
+      // biome-ignore lint/suspicious/noExplicitAny: accessing private field for test assertion
+      (iconBuilder.editor as any).suggestions.close();
+
+      // biome-ignore lint/suspicious/noExplicitAny: accessing private field for test assertion
+      (iconBuilder.editor as any).fnHelp.show(
+        { name: "SUM", params: [], repeatLast: 0, docUrl: "https://example.com/sum" },
+        0,
+        { left: 0, top: 0, height: 20, width: 100 },
+      );
+      expect(
+        document.body.querySelector(sel(CN.fnHelpLearnMore))?.querySelector("i")?.dataset.icon,
+      ).toBe("externalLink");
+      // biome-ignore lint/suspicious/noExplicitAny: accessing private field for test assertion
+      (iconBuilder.editor as any).fnHelp.close();
+
+      const cell = document.createElement("td");
+      iconRoot.appendChild(cell);
+      iconBuilder.markCell(cell, { type: "REF", value: "#REF!" });
+      cell.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+      expect(
+        document.body.querySelector(sel(CN.popupClose))?.querySelector("i")?.dataset.icon,
+      ).toBe("close");
+
+      iconBuilder.destroy();
+      iconRoot.remove();
+      barHost.remove();
+    });
+  });
+
   describe("formula bar attach/detach", () => {
     let barHost: HTMLDivElement;
 

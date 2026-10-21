@@ -156,6 +156,114 @@ describe("FormulaBar single-editor host switch", () => {
     editor.destroy();
   });
 
+  it("shows the bar overlay before attaching the editor to it on a bar-initiated edit", () => {
+    const container = document.createElement("div");
+    const mount = document.createElement("div");
+    const { adapter, fireInlineStart } = makeBarAdapter({
+      getActiveCell: activeCellAtOrigin,
+      getCellFormula: () => "=BAR",
+      beginEdit: () => {
+        fireInlineStart(mount, "=BAR");
+
+        return true;
+      },
+    });
+    const editor = makeEditor(adapter);
+    const controller = makeFormulaBar(container, { adapter, editor, knownFunctions: new Set() });
+    const overlayHiddenOnAttach: boolean[] = [];
+    const attachTo = editor.attachTo.bind(editor);
+
+    vi.spyOn(editor, "attachTo").mockImplementation((target) => {
+      overlayHiddenOnAttach.push(target.hidden);
+      attachTo(target);
+    });
+    placeholderEl(container).dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+    expect(overlayHiddenOnAttach).toEqual([false]);
+    controller.destroy();
+    editor.destroy();
+  });
+
+  it("opens a bar-initiated edit scrolled to the first line with the caret at the end", () => {
+    const container = document.createElement("div");
+    const mount = document.createElement("div");
+    const formula = "=SUM(\nA1,\nA2\n)";
+    const { adapter, fireInlineStart } = makeBarAdapter({
+      getActiveCell: activeCellAtOrigin,
+      getCellFormula: () => formula,
+      beginEdit: () => {
+        fireInlineStart(mount, formula);
+
+        return true;
+      },
+    });
+    const editor = makeEditor(adapter);
+    const controller = makeFormulaBar(container, { adapter, editor, knownFunctions: new Set() });
+    const textarea = container.querySelector("textarea");
+
+    if (!textarea) {
+      throw new Error("expected the bar editor textarea");
+    }
+
+    vi.spyOn(textarea, "focus").mockImplementation(() => {
+      textarea.scrollTop = 40;
+    });
+    placeholderEl(container).dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+    expect(textarea.scrollTop).toBe(0);
+    expect(editor.getCaretOffset()).toBe(formula.length);
+    controller.destroy();
+    editor.destroy();
+  });
+
+  it("keeps the caret line scrolled into view when switching from the cell to the bar", () => {
+    const container = document.createElement("div");
+    const mount = document.createElement("div");
+    const { adapter, fireInlineStart } = makeBarAdapter({ getActiveCell: activeCellAtOrigin });
+    const editor = makeEditor(adapter);
+    const controller = makeFormulaBar(container, { adapter, editor, knownFunctions: new Set() });
+
+    fireInlineStart(mount, "=SUM(\nA1,\nA2\n)");
+
+    const textarea = container.querySelector("textarea") ?? mount.querySelector("textarea");
+
+    if (!textarea) {
+      throw new Error("expected the editor textarea");
+    }
+
+    vi.spyOn(textarea, "focus").mockImplementation(() => {
+      textarea.scrollTop = 40;
+    });
+    placeholderEl(container).dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+    expect(textarea.scrollTop).toBe(40);
+    controller.destroy();
+    editor.destroy();
+  });
+
+  it("shows the bar overlay before attaching the editor to it when switching from the cell", () => {
+    const container = document.createElement("div");
+    const mount = document.createElement("div");
+    const { adapter, fireInlineStart } = makeBarAdapter({ getActiveCell: activeCellAtOrigin });
+    const editor = makeEditor(adapter);
+    const controller = makeFormulaBar(container, { adapter, editor, knownFunctions: new Set() });
+
+    fireInlineStart(mount, "=A1");
+
+    const overlayHiddenOnAttach: boolean[] = [];
+    const attachTo = editor.attachTo.bind(editor);
+
+    vi.spyOn(editor, "attachTo").mockImplementation((target) => {
+      overlayHiddenOnAttach.push(target.hidden);
+      attachTo(target);
+    });
+    placeholderEl(container).dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+    expect(overlayHiddenOnAttach).toEqual([false]);
+    controller.destroy();
+    editor.destroy();
+  });
+
   it("rolls back the bar session when beginEdit does not start an edit", () => {
     const container = document.createElement("div");
     const { adapter, fireSelection } = makeBarAdapter({

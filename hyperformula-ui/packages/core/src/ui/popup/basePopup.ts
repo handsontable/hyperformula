@@ -1,8 +1,8 @@
 import { EventManager, type EventScope } from "../../events/eventManager";
 import type { DomEventOptions } from "../../events/types";
 import { CN } from "../../theme/classNames";
-import { clear, createEl, createSvgIcon } from "../dom";
-import { CLOSE_BUTTON } from "../icons";
+import { clear, createEl, createIcon } from "../dom";
+import type { IconsOptions } from "../types";
 import { BottomViewportAnchoredStrategy } from "./positionStrategy";
 import type { AnchorRect, BoundsRect, PositionStrategy, Viewport } from "./types";
 
@@ -11,11 +11,13 @@ interface BasePopupOptions {
   container?: HTMLElement;
   showClose?: boolean;
   onExplicitClose?: () => void;
+  icons?: IconsOptions;
 }
 
 export abstract class BasePopup {
   protected readonly root: HTMLElement;
   protected readonly events = new EventManager();
+  protected readonly icons: IconsOptions | undefined;
   private readonly strategy: PositionStrategy;
   private visible = false;
   private readonly closeButton: HTMLButtonElement | null;
@@ -35,8 +37,10 @@ export abstract class BasePopup {
     container = document.body,
     showClose = false,
     onExplicitClose,
+    icons,
   }: BasePopupOptions = {}) {
     this.strategy = strategy;
+    this.icons = icons;
     this.root = this.createRoot();
     this.root.classList.add(CN.popup);
     this.staticScope = this.events.createScope("popup-static");
@@ -54,7 +58,7 @@ export abstract class BasePopup {
       type: "button",
       "aria-label": "Close",
     });
-    button.appendChild(createSvgIcon(CLOSE_BUTTON) as unknown as HTMLElement);
+    button.appendChild(createIcon("close", this.icons));
     this.staticScope.listen(button, "mousedown", (event) => {
       event.preventDefault();
       this.close();

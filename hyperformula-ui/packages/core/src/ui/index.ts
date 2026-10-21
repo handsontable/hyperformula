@@ -42,3 +42,4 @@ export {
   withSharedClose,
 } from "./popup";
 export { RichInput, VisualOverlay } from "./text";
+export type { IconName, IconsOptions } from "./types";

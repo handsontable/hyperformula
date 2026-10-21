@@ -13,6 +13,7 @@ import { ErrorPopup } from "./ui/popup/errorPopup";
 import { PopupContext } from "./ui/popup/popupContext";
 import { withSharedClose } from "./ui/popup/popupsOptions";
 import type { LayoutDirection, PopupsOptions } from "./ui/popup/types";
+import type { IconsOptions } from "./ui/types";
 
 /**
  * Options for {@link FormulaBuilder}; editor behavior options are inherited from
@@ -78,6 +79,7 @@ export class FormulaBuilder {
   private readonly events = new EventManager();
   private readonly sharedClassName: string | undefined;
   private readonly direction: LayoutDirection | undefined;
+  private readonly icons: IconsOptions | undefined;
   private destroyed = false;
 
   constructor(options: FormulaBuilderOptions) {
@@ -91,6 +93,7 @@ export class FormulaBuilder {
       onCommit,
       onCancel,
       popups,
+      icons,
       formulaBarContainer,
     } = options;
 
@@ -105,6 +108,7 @@ export class FormulaBuilder {
     this.adapter = adapter ?? new NullAdapter();
     this.sharedClassName = className;
     this.direction = direction;
+    this.icons = icons;
 
     const baseCommitHandler =
       onCommit ?? ((value: string, direction?: Direction) => this.adapter.commit(value, direction));
@@ -132,6 +136,7 @@ export class FormulaBuilder {
       container: this.popupCtx.portal,
       ...(errorOptions !== undefined && { options: errorOptions }),
       ...(direction !== undefined && { direction }),
+      ...(icons !== undefined && { icons }),
     });
 
     this.detachedMount = document.createElement("div");
@@ -147,6 +152,7 @@ export class FormulaBuilder {
       onCancel: cancelHandler,
       ...(suggestionsOptions !== undefined && { suggestionsOptions }),
       ...(fnHelpOptions !== undefined && { fnHelpOptions }),
+      ...(icons !== undefined && { icons }),
     });
 
     this.errorPopup.attach(rootEl);
@@ -294,6 +300,7 @@ export class FormulaBuilder {
       liveRegion: this.liveRegion,
       ...(this.sharedClassName !== undefined && { className: this.sharedClassName }),
       ...(this.direction !== undefined && { direction: this.direction }),
+      ...(this.icons !== undefined && { icons: this.icons }),
     });
   }
 

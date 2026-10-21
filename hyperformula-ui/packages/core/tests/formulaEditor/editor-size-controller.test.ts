@@ -165,6 +165,17 @@ describe("EditorSizeController", () => {
     expect(overlay.style.maxHeight).toBe("0px");
   });
 
+  it("never caps the height above the clip's client height when the clip has scrolled the editor up", () => {
+    const { root, overlay, controller } = makeHarness("auto", 300);
+
+    stubRect(root, { left: 210, top: -60 });
+    controller.update();
+
+    expect(root.style.maxHeight).toBe("200px");
+    expect(overlay.style.maxHeight).toBe("200px");
+    expect(root.classList.contains(CN.editorHeightCapped)).toBe(true);
+  });
+
   it("subtracts the root border from the overlay height cap", () => {
     const { root, overlay, controller } = makeHarness("hidden", 186);
 

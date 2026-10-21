@@ -1,6 +1,6 @@
 import { CN } from "../../theme/classNames";
-import { clear, createEl, createSvgIcon } from "../dom";
-import { TABLE_ICON } from "../icons";
+import { clear, createEl, createIcon } from "../dom";
+import type { IconsOptions } from "../types";
 import { BasePopup } from "./basePopup";
 import type { AnchorRect, SuggestionItem, SuggestionsHandlers, SuggestionsOptions } from "./types";
 
@@ -83,6 +83,7 @@ export class SuggestionsPopup extends BasePopup {
     handlers: SuggestionsHandlers,
     options: SuggestionsOptions = {},
     container?: HTMLElement,
+    icons?: IconsOptions,
   ) {
     const resolvedOptions: Required<SuggestionsOptions> = {
       showKeyboardHelp: options.showKeyboardHelp ?? true,
@@ -93,6 +94,7 @@ export class SuggestionsPopup extends BasePopup {
       ...(container !== undefined && { container }),
       showClose: resolvedOptions.showClose,
       onExplicitClose: handlers.onExplicitClose,
+      ...(icons !== undefined && { icons }),
     });
     listboxIdCounter += 1;
     this.listboxId = `${CN.suggestions}-${listboxIdCounter}`;
@@ -189,7 +191,7 @@ export class SuggestionsPopup extends BasePopup {
     if (item.kind === "named") {
       const textEl = createEl("span");
       textEl.append(...textContent);
-      labelEl.append(createSvgIcon(TABLE_ICON), textEl);
+      labelEl.append(createIcon("namedExpression", this.icons), textEl);
     } else {
       labelEl.append(...textContent);
     }

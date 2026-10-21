@@ -91,6 +91,8 @@ export type {
   FunctionHelpOptions,
   HighlightLayerKind,
   HighlightLayerOptions,
+  IconName,
+  IconsOptions,
   LayoutDirection,
   PopupHostOption,
   PopupsOptions,

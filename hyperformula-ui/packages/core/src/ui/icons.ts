@@ -1,3 +1,5 @@
+import type { IconName } from "./types";
+
 export interface SvgIcon {
   attributes: Record<string, string>;
   paths: Record<string, string>[];
@@ -16,7 +18,7 @@ const ROUNDED_STROKE = {
   "stroke-linejoin": "round",
 };
 
-export const CLOSE_BUTTON: SvgIcon = {
+const CLOSE_BUTTON: SvgIcon = {
   attributes: OUTLINE_16,
   paths: [
     {
@@ -28,7 +30,7 @@ export const CLOSE_BUTTON: SvgIcon = {
   ],
 };
 
-export const EXTERNAL_LINK: SvgIcon = {
+const EXTERNAL_LINK: SvgIcon = {
   attributes: OUTLINE_16,
   paths: [
     {
@@ -38,7 +40,7 @@ export const EXTERNAL_LINK: SvgIcon = {
   ],
 };
 
-export const TABLE_ICON: SvgIcon = {
+const TABLE_ICON: SvgIcon = {
   attributes: OUTLINE_16,
   paths: [
     {
@@ -48,7 +50,7 @@ export const TABLE_ICON: SvgIcon = {
   ],
 };
 
-export const MATH_FUNCTION_ICON: SvgIcon = {
+const MATH_FUNCTION_ICON: SvgIcon = {
   attributes: {
     width: "16",
     height: "16",
@@ -64,4 +66,11 @@ export const MATH_FUNCTION_ICON: SvgIcon = {
     { d: "M15 12l6 6" },
     { d: "M15 18l6 -6" },
   ],
+};
+
+export const BUILT_IN_ICONS: Record<IconName, SvgIcon> = {
+  close: CLOSE_BUTTON,
+  externalLink: EXTERNAL_LINK,
+  namedExpression: TABLE_ICON,
+  function: MATH_FUNCTION_ICON,
 };

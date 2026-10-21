@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { clear, createEl, createSvgIcon, ensureRelativePosition } from "../../src/ui/dom";
+import {
+  clear,
+  createEl,
+  createIcon,
+  createSvgIcon,
+  ensureRelativePosition,
+} from "../../src/ui/dom";
 
 describe("ensureRelativePosition", () => {
   afterEach(() => {
@@ -159,5 +165,23 @@ describe("createSvgIcon", () => {
     } finally {
       Object.defineProperty(Element.prototype, "innerHTML", descriptor);
     }
+  });
+});
+
+describe("createIcon", () => {
+  it("builds the built-in SVG when no factory is given for the icon", () => {
+    const icon = createIcon("close", { function: () => document.createElement("i") });
+
+    expect(icon).toBeInstanceOf(SVGSVGElement);
+  });
+
+  it("calls the host factory for each icon it renders", () => {
+    const factory = vi.fn(() => document.createElement("i"));
+    const first = createIcon("close", { close: factory });
+    const second = createIcon("close", { close: factory });
+
+    expect(first.tagName).toBe("I");
+    expect(second).not.toBe(first);
+    expect(factory).toHaveBeenCalledTimes(2);
   });
 });

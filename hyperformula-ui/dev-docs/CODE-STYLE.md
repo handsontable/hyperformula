@@ -128,7 +128,7 @@ The shared `tsconfig.base.json` turns on `strict`, `noUncheckedIndexedAccess`, `
 ### Strings and numbers
 
 - Template literals, never string concatenation.
-- No HTML strings in the DOM: never `innerHTML`, `outerHTML` or `insertAdjacentHTML`. Hosts may run under a Trusted Types policy, which rejects them. Build elements with `createEl`, and icons from the data in `ui/icons.ts` with `createSvgIcon`.
+- No HTML strings in the DOM: never `innerHTML`, `outerHTML` or `insertAdjacentHTML`. Hosts may run under a Trusted Types policy, which rejects them. Build elements with `createEl`, and icons with `createIcon`, which takes a host's `icons` factory or the built-in data in `ui/icons.ts`.
 - No magic numbers: geometry, retry counts, timeouts and intervals become named module-level constants.
 
 ## Type naming and placement

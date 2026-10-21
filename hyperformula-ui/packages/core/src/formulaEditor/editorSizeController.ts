@@ -280,7 +280,10 @@ export class EditorSizeController {
     const clip = this.resolveClip();
     const rootRect = this.rootEl.getBoundingClientRect();
     const availableWidth = this.availableWidth(clip, rootRect, rootStyle);
-    const clipHeight = clip.top + clip.element.clientTop + clip.element.clientHeight - rootRect.top;
+    const clipHeight = Math.min(
+      clip.top + clip.element.clientTop + clip.element.clientHeight - rootRect.top,
+      clip.element.clientHeight,
+    );
     const availableHeight = maxLinesPx === null ? clipHeight : Math.min(clipHeight, maxLinesPx);
     const contentHeight = this.mirrorContentHeight();
 
