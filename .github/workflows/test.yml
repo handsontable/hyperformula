@@ -36,10 +36,10 @@ jobs:
         with:
           ssh-key: ${{ secrets.DEPLOY_TOKEN }}
           repository: handsontable/hyperformula-tests
-          path: test/hyperformula-tests
+          path: hyperformula/test/hyperformula-tests
 
       - name: Fetch hyperformula-tests and sync branches
-        run: cd test && ./fetch-tests.sh
+        run: cd hyperformula/test && ./fetch-tests.sh
 
       - name: Install dependencies
         run: npm ci
@@ -74,10 +74,10 @@ jobs:
         with:
           ssh-key: ${{ secrets.DEPLOY_TOKEN }}
           repository: handsontable/hyperformula-tests
-          path: test/hyperformula-tests
+          path: hyperformula/test/hyperformula-tests
 
       - name: Fetch hyperformula-tests and sync branches
-        run: cd test && ./fetch-tests.sh
+        run: cd hyperformula/test && ./fetch-tests.sh
 
       - name: Install dependencies
         run: npm ci
