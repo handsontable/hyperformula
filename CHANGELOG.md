@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- Added a message after `npm i hyperformula` that points AI assistants to the SKILLS file. The message needs `--foreground-scripts` to be visible in npm, and pnpm 10 needs the `postinstall` script to be approved first. [#1829](https://github.com/handsontable/hyperformula/pull/1829)
 - Added a new function: RANK.AVG. [#1787](https://github.com/handsontable/hyperformula/pull/1787)
 
 ### Fixed
