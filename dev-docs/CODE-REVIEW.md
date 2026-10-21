@@ -84,7 +84,7 @@ Each line names the page that owns the rules and when it applies. Where reviews 
 
 - [ ] Every claim in the description is true — "matches Excel", "no performance impact", "all tests pass", every listed test exists — and every "cannot", "known gap" or "known limitation" has a real technical reason. Under-selling is an error too.
 - [ ] The implementation matches the spec item by item: each table row, each numbered decision.
-- [ ] The description's compatibility section matches reality, and no test locks in a divergence from Excel.
+- [ ] The description's compatibility section matches reality, and no test locks in an undocumented divergence from Excel.
 - [ ] For a non-trivial behaviour change, I ran it — checked out the branch, or at least evaluated the key formulas — instead of only reading the diff.
 - [ ] For a bug fix, I reverted the fix and saw its test fail.
 - [ ] Every line the coverage report marks as uncovered in the patch has a test or a stated reason.
