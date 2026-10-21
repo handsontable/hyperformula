@@ -1,0 +1,102 @@
+.hfe-editor {
+  position: relative;
+  display: inline-block;
+  width: max-content;
+  background: var(--hfe-color-background);
+  color: var(--hfe-color-foreground);
+  border: none;
+  box-shadow: inset 0 0 0 var(--hfe-border-width) var(--hfe-editor-color-border);
+  border-radius: var(--hfe-border-radius);
+  font-family: var(--hfe-font-family);
+  font-size: var(--hfe-font-size);
+  font-variant-ligatures: none;
+  line-height: var(--hfe-line-height);
+  min-width: var(--hfe-editor-min-width, 100%);
+  min-height: 100%;
+  box-sizing: border-box !important;
+  overflow: hidden;
+  resize: var(--hfe-editor-resize, none);
+
+  &--focused {
+    box-shadow: inset 0 0 0 var(--hfe-border-width-focus) var(--hfe-color-focus-ring);
+  }
+
+  &--height-capped {
+    overflow: hidden;
+
+    .hfe-overlay,
+    .hfe-editor__input {
+      overflow-x: hidden;
+      overflow-y: scroll;
+      scrollbar-width: var(--hfe-scrollbar-width);
+      scrollbar-color: var(--hfe-scrollbar-color) transparent;
+    }
+
+    &:hover {
+      .hfe-overlay,
+      .hfe-editor__input {
+        scrollbar-color: var(--hfe-scrollbar-color-hover) transparent;
+      }
+    }
+  }
+
+  &__layers {
+    display: inline-block;
+    vertical-align: top;
+    min-width: 100%;
+    max-width: 100%;
+    min-height: inherit;
+    box-sizing: border-box !important;
+  }
+
+  &__input {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    color: transparent;
+    caret-color: var(--hfe-color-caret);
+    resize: none;
+    outline: none;
+    overflow: hidden;
+    z-index: 2;
+
+    &::selection {
+      background: color-mix(in srgb, var(--hfe-color-accent) 15%, transparent);
+      color: transparent;
+    }
+  }
+}
+
+.hfe-editor__input,
+.hfe-overlay {
+  font-family: var(--hfe-font-family);
+  font-size: var(--hfe-font-size);
+  font-weight: 400;
+  font-variant-ligatures: none;
+  letter-spacing: 0;
+  line-height: var(--hfe-line-height);
+  padding: var(--hfe-padding-vertical) var(--hfe-padding-horizontal);
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  word-break: break-all;
+  tab-size: 4;
+  margin: 0;
+  border: 0;
+}
+
+.hfe-editor[dir="rtl"] {
+  .hfe-editor__input,
+  .hfe-overlay {
+    text-align: right;
+  }
+}
+
+.hfe-editor--formula {
+  .hfe-editor__input,
+  .hfe-overlay {
+    font-family: var(--hfe-formula-font-family);
+  }
+}

@@ -38,7 +38,7 @@ const hf = HyperFormula.buildFromArray([
   ['Revenue', 100],
   ['Cost',     60],
   ['Profit', '=B1-B2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 const agent = createReactAgent({
   llm: new ChatOpenAI({ model: 'gpt-4o' }),
