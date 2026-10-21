@@ -1,7 +1,7 @@
 import { buildHyperFormula, evaluateFormula } from "@hfe-demo/shared";
 import { FormulaBuilder } from "hyperformula-ui";
-import { requireEl } from "../shared/dom";
-import { bindEditorSizingControls } from "../shared/editorSizing";
+import { requireEl } from "../helpers/dom";
+import { bindEditorSizingControls } from "../helpers/editorSizing";
 
 const host = requireEl("editor-host");
 const tokensEl = requireEl("tokens");
@@ -33,7 +33,7 @@ const onChange = (text: string) => {
 editor.on("change", ({ state }) => {
   tokensEl.textContent = JSON.stringify(state.tokens, null, 2);
   stateEl.textContent = JSON.stringify({ text: state.text, cursor: state.cursor }, null, 2);
-  onChange(state.text);
+  onChange(editor.getValue());
 });
 
 builder.openEditor(host, "=SUM(A1:B5) + 2");

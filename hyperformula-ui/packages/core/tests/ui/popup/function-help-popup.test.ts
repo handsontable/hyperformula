@@ -113,6 +113,24 @@ describe("FunctionHelpPopup rendering", () => {
     help.destroy();
   });
 
+  it("omits the learn more link when docUrl is not an http or https URL", () => {
+    for (const docUrl of ["javascript:alert(1)", "data:text/html,x", "not a url"]) {
+      const help = makeHelp();
+
+      help.show({ ...SIGNATURE, docUrl }, 0, {
+        left: 0,
+        top: 0,
+        height: 20,
+        width: 100,
+        direction: "ltr",
+      });
+
+      expect(document.body.querySelector(sel(CN.fnHelpLearnMore))).toBeNull();
+
+      help.destroy();
+    }
+  });
+
   it("omits example, about, params, and learn more when the signature has none", () => {
     const help = makeHelp();
     const minimal: FunctionSignature = { name: "NOW", params: [], repeatLast: 0 };

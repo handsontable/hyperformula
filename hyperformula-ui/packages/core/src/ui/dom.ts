@@ -1,3 +1,7 @@
+import type { SvgIcon } from "./icons";
+
+const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+
 export type AttrValue =
   | string
   | number
@@ -105,9 +109,23 @@ export function findAncestor(
   return null;
 }
 
-export function createSvgIcon(markup: string): SVGSVGElement {
-  const wrapper = createEl("span");
-  wrapper.innerHTML = markup;
+function setSvgAttributes(element: SVGElement, attributes: Record<string, string>): void {
+  for (const [name, value] of Object.entries(attributes)) {
+    element.setAttribute(name, value);
+  }
+}
 
-  return wrapper.firstElementChild as SVGSVGElement;
+export function createSvgIcon(icon: SvgIcon): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NAMESPACE, "svg");
+
+  setSvgAttributes(svg, icon.attributes);
+
+  for (const pathAttributes of icon.paths) {
+    const path = document.createElementNS(SVG_NAMESPACE, "path");
+
+    setSvgAttributes(path, pathAttributes);
+    svg.appendChild(path);
+  }
+
+  return svg;
 }

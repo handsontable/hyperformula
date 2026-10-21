@@ -17,6 +17,16 @@ export interface FunctionHelpPopupOptions {
 
 let tooltipIdCounter = 0;
 
+const WEB_PROTOCOLS = new Set(["http:", "https:"]);
+
+function isWebUrl(url: string): boolean {
+  try {
+    return WEB_PROTOCOLS.has(new URL(url).protocol);
+  } catch {
+    return false;
+  }
+}
+
 function signatureParamLabel(
   param: FunctionSignature["params"][number],
   index: number,
@@ -177,7 +187,7 @@ export class FunctionHelpPopup extends BasePopup {
 
     this.root.appendChild(body);
 
-    if (signature.docUrl) {
+    if (signature.docUrl && isWebUrl(signature.docUrl)) {
       this.root.appendChild(createEl("hr", { class: CN.fnHelpSeparator }));
       this.root.appendChild(this.renderLearnMore(signature.docUrl));
     }

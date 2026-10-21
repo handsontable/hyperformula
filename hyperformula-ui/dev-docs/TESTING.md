@@ -13,7 +13,7 @@ Both commands run from the repository root.
 
 ### Layout
 
-`tests/` mirrors `src/`: a test for `src/formulaEditor/keyboardController.ts` lives at `tests/formulaEditor/keyboard-controller.test.ts`. Only `formula-builder.test.ts`, for the root `src/formulaBuilder.ts`, sits at the top of `tests/`. Test files are kebab-case and named after the module under test.
+`tests/` mirrors `src/`: a test for `src/formulaEditor/keyboardController.ts` lives at `tests/formulaEditor/keyboard-controller.test.ts`. Only `formula-builder.test.ts`, for the root `src/formulaBuilder.ts`, sits at the top of `tests/`. A file covers either one module or one behaviour (`tab-commit.test.ts`, `rich-input-ime.test.ts`), is named in kebab-case, and sits in the directory that mirrors the code it exercises. A module can be covered by several behaviour files instead of a file of its own.
 
 ### Shared helpers
 

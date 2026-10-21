@@ -122,10 +122,42 @@ describe("clear", () => {
 });
 
 describe("createSvgIcon", () => {
-  it("parses SVG markup into an SVGSVGElement", () => {
-    const icon = createSvgIcon('<svg viewBox="0 0 16 16"><path d="M0 0"/></svg>');
+  const ICON = {
+    attributes: { viewBox: "0 0 16 16", fill: "none" },
+    paths: [{ d: "M0 0L4 4", stroke: "currentColor" }, { d: "M4 0L0 4" }],
+  };
+
+  it("builds an SVG element with its attributes and paths", () => {
+    const icon = createSvgIcon(ICON);
 
     expect(icon).toBeInstanceOf(SVGSVGElement);
+    expect(icon.namespaceURI).toBe("http://www.w3.org/2000/svg");
     expect(icon.getAttribute("viewBox")).toBe("0 0 16 16");
+    expect([...icon.children].map((path) => path.getAttribute("d"))).toEqual([
+      "M0 0L4 4",
+      "M4 0L0 4",
+    ]);
+    expect(icon.children[0]?.getAttribute("stroke")).toBe("currentColor");
+  });
+
+  it("does not assign HTML, so it works under a Trusted Types policy", () => {
+    const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, "innerHTML");
+
+    if (!descriptor) {
+      throw new Error("expected an innerHTML descriptor");
+    }
+
+    Object.defineProperty(Element.prototype, "innerHTML", {
+      ...descriptor,
+      set() {
+        throw new TypeError("This document requires 'TrustedHTML' assignment.");
+      },
+    });
+
+    try {
+      expect(() => createSvgIcon(ICON)).not.toThrow();
+    } finally {
+      Object.defineProperty(Element.prototype, "innerHTML", descriptor);
+    }
   });
 });

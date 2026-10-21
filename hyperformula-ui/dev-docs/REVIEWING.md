@@ -11,6 +11,8 @@ A broken invariant is `blocking:`. The canonical statement of each is in [`ARCHI
 - **`IGridAdapter` first.** A method an adapter needs is added to `packages/core/src/adapter/types.ts`, then to `NullAdapter`, and only then used. See [Adding a new public API](ARCHITECTURE.md#adding-a-new-public-api).
 - **Errors stay in the host.** The core renders no formula errors itself: no error text set through `innerHTML`, no new error classes, no `console.error` in `formulaEditor/` or `ui/` triggered by a parse error. See [Error display policy](ARCHITECTURE.md#error-display-policy).
 - **`Kernel` stays DOM-free**, and raw `HyperFormulaLike` is touched only inside `src/engine/`.
+- **No HTML sinks.** No `innerHTML`, `outerHTML` or `insertAdjacentHTML` in `src/`: under a host's Trusted Types policy (`require-trusted-types-for 'script'`) the assignment throws and the grid does not render. See [`CODE-STYLE.md`](CODE-STYLE.md#strings-and-numbers).
+- **A URL from engine metadata is checked before it becomes a link.** A custom function's `docUrl` can carry any scheme; only `http:` and `https:` are rendered.
 - **Every regex run on editor text is linear.** The lexer runs on every keystroke, over text a user can paste. A pattern with overlapping quantifiers (`\d+\.?\d*`, a lazy group followed by `\s*`), or a scan that restarts from many positions, is quadratic on long input.
 
 ## Completeness

@@ -4,5 +4,5 @@
     "noEmit": true,
     "types": ["vite/client"]
   },
-  "include": ["basic/**/*", "shared/**/*"]
+  "include": ["basic/**/*", "helpers/**/*"]
 }

@@ -127,7 +127,8 @@ The shared `tsconfig.base.json` turns on `strict`, `noUncheckedIndexedAccess`, `
 
 ### Strings and numbers
 
-- Template literals, never string concatenation. For SVG markup, one element per line.
+- Template literals, never string concatenation.
+- No HTML strings in the DOM: never `innerHTML`, `outerHTML` or `insertAdjacentHTML`. Hosts may run under a Trusted Types policy, which rejects them. Build elements with `createEl`, and icons from the data in `ui/icons.ts` with `createSvgIcon`.
 - No magic numbers: geometry, retry counts, timeouts and intervals become named module-level constants.
 
 ## Type naming and placement
