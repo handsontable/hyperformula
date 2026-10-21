@@ -48,7 +48,7 @@ const hf = HyperFormula.buildFromArray([
   [true],          // Logical
   [new Date()],    // Date/DateTime
   [null],          // Empty
-]);
+], { licenseKey: 'gpl-v3' });
 ```
 
 ### For string values
@@ -76,7 +76,7 @@ const hf = HyperFormula.buildFromArray([
   ["22/06/2022"],           // Date
   ["10:40:16"],             // Time
   ["Hello"],                // Text
-]);
+], { licenseKey: 'gpl-v3' });
 ```
 
 ### Forcing the text value type
@@ -92,7 +92,7 @@ const hf = HyperFormula.buildFromArray([
     ["'11201"], // a string: "11201"
     ["22/06/2022"], // a date: June 22nd 2022
     ["'22/06/2022"], // a string: "22/06/2022"
-]);
+], { licenseKey: 'gpl-v3' });
 
 // a formula: SUM(B1,B2)
 hf.setCellContents({ col: 0, row: 4, sheet: 0 }, [["=SUM(B1,B2)"]]);

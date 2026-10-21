@@ -6,7 +6,8 @@ const jsdocOff = Object.keys(require('eslint-plugin-jsdoc').rules)
   }, {});
 
 module.exports = {
-  extends: ['../../.eslintrc.js', 'plugin:prettier/recommended'],
+  // The examples call the engine's API, so they follow the engine's rules.
+  extends: ['../../hyperformula/.eslintrc.js', 'plugin:prettier/recommended'],
   parserOptions: {
     requireConfigFile: false
   },

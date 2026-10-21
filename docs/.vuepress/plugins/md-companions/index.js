@@ -20,12 +20,12 @@ function resolvePageVars(md, page) {
 
 /**
  * Rewrite root-relative Markdown links (`](/guide/…)`, `](/api/…)`) to include
- * the configured `base` (`/docs/`). VuePress rebases these for the HTML site,
- * but the raw `.md` companions do not — so without this an agent resolving them
- * from the site origin lands outside `/docs/` and 404s. Protocol-relative
+ * the configured `base` (`/docs/hyperformula/`). VuePress rebases these for the
+ * HTML site, but the raw `.md` companions do not — so without this an agent
+ * resolving them from the site origin lands outside `/docs/hyperformula/` and 404s. Protocol-relative
  * (`//…`), absolute (`http…`), anchor (`#…`) and relative links are untouched.
  * @param {string} md stripped markdown
- * @param {string} base configured base, e.g. '/docs/'
+ * @param {string} base configured base, e.g. '/docs/hyperformula/'
  * @returns {string}
  */
 function rebaseRootLinks(md, base) {
@@ -90,7 +90,7 @@ function absolutizeLinks(md, pageUrl) {
 module.exports = (options, ctx) => ({
   name: 'md-companions',
   async generated() {
-    const hostname = (options && options.hostname) || 'https://hyperformula.handsontable.com';
+    const hostname = (options && options.hostname) || 'https://handsontable.com';
     const base = ctx.base || '/';
     // Include `.html` pages AND clean-URL / section-index pages whose path ends
     // in `/` (home, directory landings) — otherwise they are silently absent
@@ -118,7 +118,9 @@ module.exports = (options, ctx) => ({
         await fs.promises.mkdir(path.dirname(outFile), { recursive: true });
         await fs.promises.writeFile(outFile, clean, 'utf8');
 
-        const url = hostname + base.replace(/\/$/, '') + page.path.replace(/\.html$/, '');
+        // Keep `.html`: the Worker treats a last segment containing a dot as a file name, so the
+        // extensionless URL of a page such as `guide/migration-from-2.x-to-3.0` would answer 404.
+        const url = hostname + base.replace(/\/$/, '') + page.path;
         // The per-page `.md` keeps relative links (resolve within the companion
         // tree); the aggregated corpus needs absolute links (single-file URL).
         corpus.push('---', '', `## ${page.title || page.path}`, '', `URL: ${url}`, '', absolutizeLinks(clean, url), '');
@@ -136,10 +138,9 @@ module.exports = (options, ctx) => ({
       console.warn(`[md-companions] failed to write llms-full.txt: ${err.message}`);
     }
 
-    // The docs site is served under base `/docs/`, so its corpus lives at
-    // `/docs/llms-full.txt`. The domain-root `/llms.txt` is owned by the
-    // website repo (it advertises more than just the docs), so this plugin
-    // deliberately does NOT write to the served root — see the note in
-    // netlify.toml.
+    // The docs site is served under base `/docs/hyperformula/`, so its corpus
+    // lives at `/docs/hyperformula/llms-full.txt`. The domain-root `/llms.txt`
+    // belongs to handsontable.com (it advertises more than just the docs), so
+    // this plugin deliberately does NOT write to the served root.
   }
 });
