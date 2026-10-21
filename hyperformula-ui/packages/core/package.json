@@ -1,0 +1,71 @@
+{
+  "name": "hyperformula-ui",
+  "version": "0.0.1",
+  "description": "Formula editor UI for HyperFormula: syntax and reference highlighting, autocomplete, function help, and a formula bar, for any grid.",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/handsontable/hyperformula.git",
+    "directory": "hyperformula-ui/packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/handsontable/hyperformula/issues"
+  },
+  "homepage": "https://handsontable.com/hyperformula/",
+  "author": "Handsoncode <hello@handsontable.com>",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "hyperformula-ui-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/.tsbuildinfo",
+    "src",
+    "DOCS.md"
+  ],
+  "scripts": {
+    "build": "npm run build:styles && rspack build && npm run build:types",
+    "build:js": "rspack build",
+    "build:styles": "node ../../scripts/generateCssText.mjs --source src/styles/index.scss --target src/theme/cssText.ts",
+    "build:types": "tsc -p tsconfig.json --emitDeclarationOnly && node ../../scripts/addDeclarationExtensions.mjs --dir dist",
+    "check:types": "attw --pack . --profile esm-only",
+    "dev": "rspack build --watch",
+    "docs": "node ../../scripts/generateApiDocs.mjs --target DOCS.md",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json",
+    "lint": "biome check . ../../scripts ../../rspack.base.mjs ../../vitest.base.ts ../../biome.json ../../tsconfig.base.json ../../tsconfig.package.json ../../tsconfig.test.json",
+    "lint:fix": "biome check --write . ../../scripts ../../rspack.base.mjs ../../vitest.base.ts ../../biome.json ../../tsconfig.base.json ../../tsconfig.package.json ../../tsconfig.test.json",
+    "copy-root-files": "node -e \"require('fs').copyFileSync('../../../LICENSE.txt', 'LICENSE.txt')\"",
+    "prepack": "npm run copy-root-files",
+    "postpack": "node -e \"require('fs').rmSync('LICENSE.txt', { force: true })\""
+  },
+  "peerDependencies": {
+    "hyperformula": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "hyperformula": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@biomejs/biome": "2.4.16",
+    "@rspack/cli": "^1.1.0",
+    "@rspack/core": "^1.1.0",
+    "@types/node": "^22.10.0",
+    "happy-dom": "^15.11.0",
+    "hyperformula": "^3.4.0",
+    "sass": "^1.100.0",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
+  }
+}

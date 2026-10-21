@@ -15,6 +15,7 @@
  * LICENSE file when the manifest field is missing.
  */
 import { execFileSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -25,8 +26,11 @@ const ALLOWED = new Set([
   'MIT', 'Apache-2.0', 'BSD-3-Clause', 'BSD-2-Clause', 'ISC', 'BSD', 'Unlicense',
 ])
 
-/** Workspaces whose production dependencies are checked. */
-const WORKSPACES = ['hyperformula']
+/**
+ * Workspaces whose production dependencies are checked, by path: a name such as
+ * `hyperformula-ui` would also match the folder of that name and every package in it.
+ */
+const WORKSPACES = ['hyperformula', 'hyperformula-ui/packages/core']
 
 /**
  * Runs a command and parses its stdout as JSON.
@@ -140,8 +144,10 @@ for (const workspace of WORKSPACES) {
 
 // The workspace packages themselves are GPL and are not their own dependencies.
 for (const workspace of WORKSPACES) {
+  const { name } = JSON.parse(readFileSync(path.join(REPO_ROOT, workspace, 'package.json'), 'utf8'))
+
   for (const id of [...production]) {
-    if (id.startsWith(`${workspace}@`)) {
+    if (id.startsWith(`${name}@`)) {
       production.delete(id)
     }
   }

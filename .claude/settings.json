@@ -15,6 +15,7 @@
       "Read(/hyperformula/test-jasmine/**)",
       "Read(/hyperformula/typedoc/**)",
       "Read(/hyperformula/storage/**)",
+      "Read(/hyperformula-ui/packages/core/dist/**)",
       "Read(/docs/functions/**)",
       "Read(/docs/.vuepress/dist/**)",
       "Read(/docs/.vuepress/api-sidebar.json)",
