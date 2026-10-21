@@ -67,9 +67,10 @@ The example releases `0.1.0-next.0`. Replace the version throughout.
 
    ```bash
    npm pack --dry-run --workspace=hyperformula-ui/packages/core
+   npm run check:types --workspace=hyperformula-ui/packages/core
    ```
 
-   It lists `LICENSE.txt`, `README.md`, `DOCS.md`, `package.json`, `dist/` and `src/`, and nothing from the shared configuration, the demo or the end-to-end suite. `dist/index.js` and `dist/index.d.ts` must be there.
+   The first lists `LICENSE.txt`, `README.md`, `DOCS.md`, `package.json`, `dist/` and `src/`, and nothing from the shared configuration, the demo or the end-to-end suite. `dist/index.js` and `dist/index.d.ts` must be there. The second must show no problem for `node16 (from ESM)` or `bundler`.
 
 8. Publish under `next`:
 

@@ -653,17 +653,22 @@ LOCK_VERSION="$(PKG_DIR="$PKG_DIR" node -e 'try{process.stdout.write(require("./
 if [[ "$LOCK_VERSION" == "$VERSION" && -d node_modules ]]; then
   skip "package-lock.json already regenerated for $VERSION"
 else
-  # The workspace's own node_modules too: npm keeps there whatever it could not
-  # hoist, and an install without a lock file starts from what is on disk, so a
-  # stale copy left there would be written into the new lock file.
-  run rm -rf ./node_modules "$PKG_DIR/node_modules"
+  # Every workspace's own node_modules too: npm keeps there whatever it could
+  # not hoist, and an install without a lock file starts from what is on disk,
+  # so a stale copy left there would be written into the new lock file. The
+  # globs mirror the root package.json "workspaces".
+  run rm -rf ./node_modules "$PKG_DIR/node_modules" \
+    hyperformula-ui/packages/*/node_modules \
+    hyperformula-ui/demo/*/node_modules \
+    hyperformula-ui/e2e/node_modules
   run rm -f package-lock.json
   run npm i
 fi
 
 # 5. Build / lint / test  (the private test suite was already pointed at this
 #    branch in step 2, and nothing since has changed the branch it follows).
-#    'npm run test' is lint, the unit tests and the browser suite, so it needs
+#    'npm run test' is lint (engine and hyperformula-ui), the engine's unit
+#    tests, the browser suite and the hyperformula-ui unit tests, so it needs
 #    headless Chrome and Firefox on this machine - there is no separate lint
 #    call here because that script runs it first.
 step "5. Build, lint + test"

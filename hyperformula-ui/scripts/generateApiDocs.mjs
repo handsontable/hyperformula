@@ -3,6 +3,9 @@ import { createRequire } from "node:module";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+const REPOSITORY_URL = "https://github.com/handsontable/hyperformula";
+const RELEASE_BRANCH = "develop";
+
 const require = createRequire(resolve(process.cwd(), "package.json"));
 const ts = require("typescript");
 
@@ -133,8 +136,8 @@ lines.push(
 lines.push("");
 lines.push(
   "Minimal reference built from the JSDoc on `src/index.ts`'s public exports.",
-  "Full contracts live on the declarations (IDE hover) and in `hyperformula-ui/dev-docs/ARCHITECTURE.md`.",
-  "An editor-only example lives in `hyperformula-ui/demo/js/basic/`.",
+  `Full contracts live on the declarations (IDE hover) and in [\`ARCHITECTURE.md\`](${REPOSITORY_URL}/blob/${RELEASE_BRANCH}/hyperformula-ui/dev-docs/ARCHITECTURE.md).`,
+  `An editor-only example lives in [\`hyperformula-ui/demo/js/basic/\`](${REPOSITORY_URL}/tree/${RELEASE_BRANCH}/hyperformula-ui/demo/js/basic).`,
 );
 lines.push("");
 

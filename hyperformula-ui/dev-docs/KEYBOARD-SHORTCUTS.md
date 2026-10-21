@@ -140,10 +140,10 @@ resting on an error cell. No adapter involvement.
 ## Host scope
 
 Point mode requires `adapter.getActiveCell()` to return a cell. Every known adapter
-supports it: Handsontable reads its selection directly; TanStack tracks the selected cell
-internally; AG Grid and MUI DataGrid track it through their focus/selection bridges;
-plain-table takes an optional `getActiveCell` provider (wired from the host's
-selected cell). An adapter without a current cell returns
+supports it: the Handsontable plugin reads its selection directly. Of the example adapters
+maintained outside this repository, TanStack tracks the selected cell internally; AG Grid and
+MUI DataGrid track it through their focus/selection bridges; plain-table takes an optional
+`getActiveCell` provider (wired from the host's selected cell). An adapter without a current cell returns
 `null` and point mode no-ops (arrows just move the caret). Commit direction is delivered via
 `onCommit(value, direction?)` → `IGridAdapter.commit(value, direction?)`; the host owns the
 selection move (core never moves the selection).
@@ -181,9 +181,9 @@ guard. `FormulaBar` owns its own `editor-guard` scope (`stopPropagation: true`) 
 keystrokes don't leak into the grid.
 
 **Gotcha — the guard is intrinsic to OUR editor.** A cell using a stock HOT editor has no guard,
-so arrows there navigate the grid (standard HOT). The demo therefore assigns
-`editor: "formula"` to every column (`demo/js/handsontable/main.ts` `cellMeta`). If a future host
-uses a different editor per column, the guard only applies where our editor is active.
+so arrows there navigate the grid (standard HOT). The guard applies only to columns that use the
+formula editor of Handsontable's `formulaBuilder` plugin (`handsontable/src/plugins/formulaBuilder/`
+in the handsontable repository); a column with a different editor navigates the grid as usual.
 
 ## Notes
 

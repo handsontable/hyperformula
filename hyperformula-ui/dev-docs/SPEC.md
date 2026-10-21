@@ -8,7 +8,7 @@ Headless-first formula editor that plugs HyperFormula (or any compatible engine)
 
 **Constraints (in effect)**:
 - npm workspaces, as part of the HyperFormula monorepo; Node from the root `.nvmrc`
-- Rspack builds ESM only; `.d.ts` via `tsc --emitDeclarationOnly`; styles compiled with `sass` via `hyperformula-ui/scripts/generateCssText.mjs`
+- Rspack builds ESM only; `.d.ts` via `tsc --emitDeclarationOnly`, then `scripts/addDeclarationExtensions.mjs` adds `.js` to their relative imports so `node16`/`nodenext` consumers resolve them; styles compiled with `sass` via `hyperformula-ui/scripts/generateCssText.mjs`
 - One demo workspace package, `demo/js` (Vite, port 5173), with the editor-only `basic` page
 - Vitest (unit) + Playwright (e2e)
 - TypeScript strict; zero UI deps in core; CSS `hfe-` prefix; `light-dark()` theming
@@ -34,7 +34,7 @@ hyperformula-ui/
 └── biome.json                       # single fmt+lint source of truth
 ```
 
-`hyperformula-ui` publishes ESM with `exports.default → dist/index.js`. A private export condition, `hyperformula-ui-source → src/index.ts`, lets this repository's demo (running under Vite) and TypeScript consume the source directly, without a build. The condition is deliberately not `development`: webpack and Vite enable `development` by default in dev mode, so a package exporting its TypeScript source under it breaks other projects' dev builds.
+`hyperformula-ui` publishes ESM with `exports.default → dist/index.js`. A private export condition, `hyperformula-ui-source → src/index.ts`, lets this repository's demo (running under Vite) and TypeScript consume the source directly, without a build. It is listed before `types` because TypeScript takes the first matching condition. The condition is deliberately not `development`: webpack and Vite enable `development` by default in dev mode, so a package exporting its TypeScript source under it breaks other projects' dev builds.
 
 Grid integrations are not in this repository. Handsontable ships its own, as the built-in `formulaBuilder` plugin (`handsontable/src/plugins/formulaBuilder/`), consuming `hyperformula-ui` as an external dependency. Adapters for other grids are maintained outside this repository as examples.
 
@@ -227,7 +227,7 @@ Keybindings are declarative: `formulaEditor/keymap.ts` (`BINDINGS`, first match 
 - **Ref insertion**: a single grid pick replaces the previously inserted ref if the caret hasn't moved past it (`lastRef` tracking) — picking again "edits" the ref instead of appending another.
 - **Mod+click multi-select**: holding Cmd/Ctrl while picking (click or drag) appends the new range as a comma-joined ref after the previously-picked one instead of replacing it, as long as that previous ref hasn't been edited away and the caret still sits at its end (the same pending-ref condition that gates a plain replace). A mod+click with no prior ref, or after the prior ref was edited away or the caret moved off it, falls back to a plain fresh insert (same `canInsertRef` gating as a normal click). `setValue` resets the tracked ref, so a re-seeded editor never appends after a ref from a previous edit session. Picks travel as `CellPick`/`RangePick` (`{ ref, append }`) through `CellPickListener`/`RangePickListener`.
 - **canInsertRef gate**: refs only insert if the text starts with `=` and the caret follows whitespace + an opener. Openers are `= + - * / ^ & < > ( :` plus the active locale's `argSeparator` and `arrayRowSeparator` (`refOpeners`), so no orphan refs glue to identifiers.
-- **Header click/drag whole-ref insertion**: clicking or dragging a grid row/column header while ref-eligible inserts a whole-row/whole-column ref (`A:A`, `3:3`) via the optional `GridHeaderPickSurface.onHeaderPick` (§8); shipped in all four adapters — plain-table and TanStack cover both row and column axes, AG Grid and MUI are column-axis only (their hosts don't expose row headers as a pickable surface).
+- **Header click/drag whole-ref insertion**: clicking or dragging a grid row/column header while ref-eligible inserts a whole-row/whole-column ref (`A:A`, `3:3`) via the optional `GridHeaderPickSurface.onHeaderPick` (§8); implemented by the Handsontable plugin and the four example adapters maintained outside this repository — plain-table and TanStack cover both row and column axes, AG Grid and MUI are column-axis only (their hosts don't expose row headers as a pickable surface).
 
 ### 7a. Formula bar
 
@@ -252,11 +252,11 @@ Role interfaces and their members:
 | `IGridAdapter` | extends the three required role interfaces plus `Partial<GridHeaderPickSurface>`; adds `destroy()` |
 | `GridGeometry` | adapter-side geometry contract consumed by `HighlightLayer`: `getOverlayHost()`, `getRangeRects(range)`, `getViewportClip?()`, `onViewportChange(callback)`, `getColHeaderEl?(col)`, `getRowHeaderEl?(row)` |
 
-`NullAdapter` implements all required methods as no-ops and doubles as the base class for basic adapters (`PlainTableAdapter extends NullAdapter`); it implements nothing for the optional `GridHeaderPickSurface`.
+`NullAdapter` implements all required methods as no-ops and doubles as the base class for basic adapters (the plain-table example's `PlainTableAdapter extends NullAdapter`); it implements nothing for the optional `GridHeaderPickSurface`.
 
 The three required role interfaces mirror the three core consumers: `GridPickSurface` is driven by `FormulaEditor` and its controllers (highlights, picks, ref-selection mode), `GridNavigation` by `PointModeController` plus the outside-click select, and `GridEditLifecycle` by `FormulaBar` (and `FormulaBuilder`'s barless inline-edit subscription). The optional `GridHeaderPickSurface` is also driven by `FormulaEditor`, which subscribes defensively via `adapter.onHeaderPick?.(...)` (`wireAdapter`) and formats each pick with `formatWholeRef(pick)` (`adapter/refFormat.ts`, `A:C` / `4:4` shape) before inserting; `expandHeaderSpan(pick, size)` (`adapter/range.ts`) converts a `HeaderPick` to the equivalent `CellRange` for highlighting. Adapters implementing it must never intercept an ineligible header interaction (outside ref-selection mode, or not aimed at a real header) — no `preventDefault`, no synthetic emit; host-native behavior runs unmodified. `destroy()` sits on `IGridAdapter` directly because the host — not core — owns the adapter lifecycle. `EditorGridAdapter` (`GridPickSurface & GridNavigation & Pick<GridEditLifecycle, "getActiveCell"> & Partial<GridHeaderPickSurface>`) is the slice `FormulaEditorOptions.adapter` and `EditorContext.adapter` are typed against — the editor never sees the edit-lifecycle surface beyond `getActiveCell` (the point-mode anchor); `FormulaBar` and `FormulaBuilder` take the full `IGridAdapter`.
 
-`outsideClickCommitMode` declares who commits when a mousedown lands on another cell while the caret is pick-ineligible: `"emitted"` adapters (NullAdapter default, plain-table, TanStack, AG Grid, MUI) emit `onOutsideCellClick` and core commits; `"native"` adapters (none in-repo — exercised by the external Handsontable `formulaBuilder` plugin) let the host's own editor manager commit and select, and `FormulaBuilder` skips the `onOutsideCellClick` subscription entirely.
+`outsideClickCommitMode` declares who commits when a mousedown lands on another cell while the caret is pick-ineligible: `"emitted"` adapters (the `NullAdapter` default and the plain-table, TanStack, AG Grid and MUI examples) emit `onOutsideCellClick` and core commits; `"native"` adapters (none in-repo — exercised by the external Handsontable `formulaBuilder` plugin) let the host's own editor manager commit and select, and `FormulaBuilder` skips the `onOutsideCellClick` subscription entirely.
 
 `setHighlights` is the canonical, idempotent push from editor to grid (replaces the full set every keystroke). `highlightRange` / `clearEphemeralHighlight` are used for transient drag-pick visuals driven by `DomRangePicker`.
 
@@ -311,7 +311,7 @@ Run from the repository root; the full list of root scripts is in [`dev-docs/BUI
 - `npm run dev:ui` — the demo server on port 5173 (long-running).
 - `npm run docs --workspace=hyperformula-ui/packages/core` — regenerates `DOCS.md`.
 
-Build steps: `build:styles` (`scripts/generateCssText.mjs`) → `rspack build` (JS, ESM via `experiments.outputModule` + `library.type: "module"`, swc-loader targeting ES2022, `hyperformula` as an external) → `tsc -p tsconfig.json --emitDeclarationOnly` (`.d.ts`). The demo uses Vite, not rspack.
+Build steps: `build:styles` (`scripts/generateCssText.mjs`) → `rspack build` (JS, ESM via `experiments.outputModule` + `library.type: "module"`, swc-loader targeting ES2022, `hyperformula` as an external) → `build:types`: `tsc -p tsconfig.json --emitDeclarationOnly` (`.d.ts`), then `scripts/addDeclarationExtensions.mjs --dir dist`, which rewrites each relative import in the emitted declarations to the `.js` path a `node16`/`nodenext` consumer needs, and fails on one it cannot resolve. `check:types` runs `attw --pack . --profile esm-only` on the packed package; CI runs it after the build. The demo uses Vite, not rspack.
 
 ---
 

@@ -132,11 +132,12 @@ describe decisions made from stale refs. The script marks these fetches
    `hyperformula` workspace *and* `node_modules` exists.
    Both are required: an interrupted install can leave the lock file written and
    `node_modules` missing, and skipping then would carry a broken install
-   straight into the build. A reinstall deletes `hyperformula/node_modules` as
-   well as the root one, because npm resolves a lock-free install from what is
-   already on disk.
-5. **Builds, then lints and runs the whole test suite** — the unit tests and the
-   browser suite, which needs headless Chrome and Firefox on this machine.
+   straight into the build. A reinstall deletes every workspace's `node_modules`
+   (`hyperformula/` and the `hyperformula-ui/` ones) as well as the root one,
+   because npm resolves a lock-free install from what is already on disk.
+5. **Builds, then lints and runs the whole test suite** — the engine's unit
+   tests, the browser suite, which needs headless Chrome and Firefox on this
+   machine, and the `hyperformula-ui` unit tests.
    These always run, even when resuming a freeze that got this far before.
 6. **Adds the version section to `CHANGELOG.md`**, directly under
    `## [Unreleased]` so that the bullets accumulated during development become

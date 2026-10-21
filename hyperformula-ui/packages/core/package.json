@@ -20,8 +20,8 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "hyperformula-ui-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
   },
@@ -32,10 +32,11 @@
     "DOCS.md"
   ],
   "scripts": {
-    "build": "npm run build:styles && rspack build && tsc -p tsconfig.json --emitDeclarationOnly",
+    "build": "npm run build:styles && rspack build && npm run build:types",
     "build:js": "rspack build",
     "build:styles": "node ../../scripts/generateCssText.mjs --source src/styles/index.scss --target src/theme/cssText.ts",
-    "build:types": "tsc -p tsconfig.json --emitDeclarationOnly",
+    "build:types": "tsc -p tsconfig.json --emitDeclarationOnly && node ../../scripts/addDeclarationExtensions.mjs --dir dist",
+    "check:types": "attw --pack . --profile esm-only",
     "dev": "rspack build --watch",
     "docs": "node ../../scripts/generateApiDocs.mjs --target DOCS.md",
     "test": "vitest run",
@@ -48,7 +49,7 @@
     "postpack": "node -e \"require('fs').rmSync('LICENSE.txt', { force: true })\""
   },
   "peerDependencies": {
-    "hyperformula": "^3.4.0"
+    "hyperformula": "^3.0.0"
   },
   "peerDependenciesMeta": {
     "hyperformula": {
@@ -56,6 +57,7 @@
     }
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@biomejs/biome": "2.4.16",
     "@rspack/cli": "^1.1.0",
     "@rspack/core": "^1.1.0",

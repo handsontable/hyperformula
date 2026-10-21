@@ -22,10 +22,10 @@ reparents between two locations via `FormulaEditor.attachTo(mount)`:
   `PointModeController.enter()` starts from). Addresses are HF-space: the external Handsontable
   `formulaBuilder` plugin (handsontable repo) maps its tracked visual selection through
   `visualToHfRow`/`visualToHfCol` and returns `null`
-  when the selection is not a formula-capable cell; the TanStack adapter reads its tracked
-  selection directly; the plain-table adapter delegates to the injected `PlainTableHost` when
-  one is provided (the demo's `PlainTableSheet`), else falls back to the `getActiveCell`
-  constructor option, else `null`. The controller handles the `null` path by calling
+  when the selection is not a formula-capable cell. Of the example adapters maintained outside
+  this repository, the TanStack one reads its tracked selection directly, and the plain-table one
+  delegates to its injected `PlainTableHost` when one is provided (its demo's `PlainTableSheet`),
+  else falls back to its `getActiveCell` constructor option, else `null`. The controller handles the `null` path by calling
   `selectFirstCell()`, so new adapters may return `null` safely.
 - `onSelectionChange(callback)` — adapter fires `GridSelection | null` (`{ active, range }`)
   when the selection changes; the bar mirrors the active cell's value and the address box
@@ -33,9 +33,8 @@ reparents between two locations via `FormulaEditor.attachTo(mount)`:
 - `setSelection(range)` — adapter selects the given `CellRange`; called by the address box
   when a typed `A1:B5` range is submitted. Gesture ownership (mouse drag, shift+click,
   shift+arrows) is host-owned, not core's: the external Handsontable plugin rides HOT's
-  native selection, the plain-table
-  demo host implements its own mousedown/mouseover/keydown gestures, and the TanStack
-  adapter ships default gestures through `getCellProps` and owns the resulting
+  native selection, the plain-table example host implements its own
+  mousedown/mouseover/keydown gestures, and the TanStack example adapter ships default gestures through `getCellProps` and owns the resulting
   anchor+focus state. Core and adapters carry the data contract only — no gesture code, no
   selection visuals.
 - `onInlineEditStart(callback)` — adapter fires when a cell editor opens; the formula-bar
@@ -65,12 +64,12 @@ reparents between two locations via `FormulaEditor.attachTo(mount)`:
   `Direction` drives the host's post-commit selection move (Enter → down, Tab → right, …).
   `commit(value, direction)` must apply the value to the engine synchronously before
   returning — commit-error announcements read the engine and capture `valuesUpdated`
-  inside the commit call. Applies equally to `PlainTableHost.commit` and any
-  consumer-supplied `onCommit`. A deferred write degrades announcements to silence
+  inside the commit call. Applies equally to a host-side commit bridge (such as the plain-table
+  example's `PlainTableHost.commit`) and any consumer-supplied `onCommit`. A deferred write degrades announcements to silence
   (no crash, no wrong message).
 - `cancel()` — controller calls to cancel the current edit.
 - `setInlineEditorVisible(visible)` — hides or shows the cell overlay mount while the editor
-  is hosted in the bar (plain-table and TanStack adapters toggle the container's CSS display;
+  is hosted in the bar (the plain-table and TanStack example adapters toggle the container's CSS display;
   the external Handsontable plugin hides HOT's editor container via `_hfeHidden`).
 
 `FormulaBar` composes two own-root sub-components, each with its own `EventManager` scope:
@@ -146,13 +145,13 @@ across edit sessions. The plugin's cell editor calls
 `editor.input.replaceChildren()` on close, which detaches the editor's root element from
 the mount but does not delete it. On the next open, `attachTo(mount)` re-appends the same
 element — all DOM listeners survive (see the reparent invariant below). The plain-table
-adapter always assumes a `FormulaBar` is present and does not have this fallback;
-the TanStack adapter's bar is dynamically attachable/detachable, so it relies on the same
+example adapter always assumes a `FormulaBar` is present and does not have this fallback;
+the TanStack example adapter's bar is dynamically attachable/detachable, so it relies on the same
 barless inline-edit subscription when the bar is absent. That barless subscription
 (`FormulaBuilder.subscribeInlineEditLifecycle`, scope `inline-edit`) handles both ends of the
 session: `onInlineEditStart` → `openEditor(mount, seed)`, and `onInlineEditClose` → reattach
 the editor to the builder's detached mount plus `closeEditor()`. The close half exists because
-adapters may remove the inline mount on close (the TanStack adapter deletes its overlay);
+adapters may remove the inline mount on close (the TanStack example adapter deletes its overlay);
 without the reattach the live editor DOM would be torn out with the mount. With a bar
 attached, `FormulaBar` owns the same reattachment instead.
 
@@ -323,9 +322,10 @@ IGridAdapter (adapter/)
 │                          that do implement it must never intercept a header interaction that
 │                          is ineligible (outside ref-selection mode, or drag/click not aimed at
 │                          a real header) — no preventDefault, no synthetic emit; host-native
-│                          behavior runs unmodified. Shipped in all four adapters (plus the
-│                          external Handsontable formulaBuilder plugin, which covers both axes
-│                          via its CellPickController): AG Grid (column-only, dual path — DomRangePicker for
+│                          behavior runs unmodified. Implemented by the external Handsontable
+│                          formulaBuilder plugin, which covers both axes via its
+│                          CellPickController, and by the four example adapters maintained
+│                          outside this repository: AG Grid (column-only, dual path — DomRangePicker for
 │                          bar-hosted editing, plus an inline-edit interceptor feeding an
 │                          adapter-owned HeaderDragTracker; ineligible/unresolvable header
 │                          clicks stay swallowed dead, a deliberate exception protecting
@@ -333,7 +333,7 @@ IGridAdapter (adapter/)
 │                          the header cell plus an apiRef columnHeaderOver extension — no
 │                          columnHeaderMouseDown apiRef event exists); plain-table and TanStack
 │                          (both axes, via DomRangePicker, riding HeaderDragTracker
-│                          transitively — unchanged this round). IGridAdapter extends all four and adds
+│                          transitively). IGridAdapter extends all four and adds
 │                          destroy() (host-owned lifecycle, never called by core);
 │                          EditorGridAdapter = GridPickSurface & GridNavigation &
 │                          Pick<GridEditLifecycle, "getActiveCell"> &
@@ -342,7 +342,7 @@ IGridAdapter (adapter/)
 │                          take the full IGridAdapter); also GridGeometry, RangeRect
 ├── nullAdapter.ts      — no-op implementation FormulaBuilder falls back to when constructed
 │                         without an adapter; also the base class for basic adapters
-│                         (PlainTableAdapter extends it)
+│                         (the plain-table example's PlainTableAdapter extends it)
 ├── cell.ts             — parseCellInput / formatCellValue / stepCell (single-step clamped move)
 │                         / findDataEdge (data-aware boundary walk shared by every adapter's
 │                         getDataEdge; the caller supplies a hasData predicate in its own
@@ -766,17 +766,19 @@ native mousedown, and HOT's editor manager commits and selects the clicked cell 
 ## Adapter scope
 
 An adapter's scope tracks its host library's capability — it delivers as much as the host
-delivers, no more.
+delivers, no more. The adapters below are examples maintained outside this repository; the only
+adapter in it is `NullAdapter`, and Handsontable ships its own as the `formulaBuilder` plugin.
 
-- **plain-table** — host is a raw `<table>`, no library. The adapter is **basic**: it bridges
+- **plain-table example** — host is a raw `<table>`, no library. The adapter is **basic**: it bridges
   any plain `<table>` via native DOM geometry (`rowIndex`/`cellIndex`, no `data-*` markup
   required) and carries the bar-lifecycle callback bridge (`PlainTableAdapterOptions.host`,
   typed `PlainTableHost`) — when a host is injected, the thirteen bar-lifecycle methods delegate
   to it instead of the inherited `NullAdapter` no-ops; without one they stay no-ops. The grid
   scaffolding itself (render/model/edit/select) is still example code, not adapter logic.
-- **tanstack / ag-grid / mui-data-grid** — hosts are full grid libraries. These adapters are **rich**:
+- **TanStack / AG Grid / MUI DataGrid examples** — hosts are full grid libraries. These adapters are **rich**:
   they cover the library's features (frozen panes, virtualization, selection, hooks). Their
-  controller/plugin/hook code is the library bridge and belongs in the package.
+  controller/plugin/hook code is the library bridge and belongs in the adapter, not in the
+  host's example code.
 
 Rule of thumb for new code: if it is generic spreadsheet scaffolding the host library does not
 provide, it is demo/example code, not adapter code.
@@ -787,8 +789,8 @@ Before adding a method to a concrete adapter only, ask: should all adapters supp
 If yes:
 1. Add the method signature to `packages/core/src/adapter/types.ts`.
 2. Add a no-op implementation to `packages/core/src/adapter/nullAdapter.ts`.
-3. Implement in all concrete adapters.
-4. Run `npm run typecheck` — TypeScript will flag any adapter that missed the method.
+3. Implement it in the Handsontable plugin and the example adapters outside this repository.
+4. Typecheck each of them against the new core — TypeScript flags any adapter that missed the method.
 
 ## EventManager — DOM listener lifecycle
 
@@ -809,8 +811,8 @@ instance. Owners call `events.disposeAll()` in their teardown.
 | `cell-editor-guard` | external HOT plugin `formulaCellEditor.ts`  | active while the inline cell editor is open |
 | `subscriptions`  | `FormulaBuilder` / `FormulaBar`                | adapter callback teardown, owner lifetime |
 | `inline-edit`    | `FormulaBuilder`                               | barless inline start/close subscription; disposed while a formula bar is attached |
-| `range-pick`     | `DomRangePicker` (plain + tanstack adapters)   | persistent for adapter lifetime  |
-| `host-bindings`  | plain-table / tanstack (+ external HOT `FormulaBuilderPlugin`) | active for adapter lifetime      |
+| `range-pick`     | `DomRangePicker` (plain-table + TanStack examples) | persistent for adapter lifetime  |
+| `host-bindings`  | plain-table / TanStack examples (+ external HOT `FormulaBuilderPlugin`) | active for adapter lifetime      |
 | `popup-static`   | `BasePopup` (suggestions / fnHelp / error)     | root + close button, popup lifetime |
 | `fn-help-focus`  | `FunctionHelpPopup`                            | root keydown (F6/Escape/Tab focus scope), popup lifetime |
 | `popup-render`   | `BasePopup`                                    | recreated each `open`, disposed on `close` |

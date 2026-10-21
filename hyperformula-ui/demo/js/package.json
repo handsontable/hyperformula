@@ -14,7 +14,7 @@
   "dependencies": {
     "@hfe-demo/shared": "0.0.0",
     "hyperformula": "^3.4.0",
-    "hyperformula-ui": "0.0.1"
+    "hyperformula-ui": "*"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.16",

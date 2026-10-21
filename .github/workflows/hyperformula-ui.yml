@@ -57,6 +57,9 @@ jobs:
       - name: Check the package contents
         run: npm pack --dry-run --workspace=hyperformula-ui/packages/core
 
+      - name: Check the published types resolve under every module setting
+        run: npm run check:types --workspace=hyperformula-ui/packages/core
+
   e2e:
     strategy:
       matrix:
