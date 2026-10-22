@@ -48,7 +48,7 @@ A prefix does not add a function. If HyperFormula does not support the function 
 
 This example uses [ExcelJS](https://www.npmjs.com/package/exceljs) to import XLSX files into HyperFormula.
 
-See full example on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/3.4.x/read-excel-file).
+See full example on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/3.5.x/read-excel-file).
 
 ```js
 const ExcelJS = require('exceljs');
