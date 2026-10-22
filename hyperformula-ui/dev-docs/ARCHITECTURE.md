@@ -613,9 +613,12 @@ All popup-style overlays share a common base class `BasePopup`
   string` (selector via `document.querySelector`, throwing on a miss) plus
   `popups.suggestions.container`/`popups.fnHelp.container` constructor sugar
   (`PopupHostOption`) that delegates to attach after construction — mirroring
-  `formulaBarContainer`/`attachFormulaBar`. All three constructor selectors resolve
-  first thing in the constructor, before styles/portal/editor allocate, so a bad
-  selector throws without leaking resources.
+  `formulaBarContainer`/`attachFormulaBar`. The constructor never throws on a selector:
+  one that matches nothing logs a `console.warn` once per message and falls back to the
+  default placement (a floating popup, no bar), because a host that rebuilds the builder
+  from an event handler may pass a container its framework unmounted in between, and a
+  throw there would leave the host without a builder. The `attach*` methods still throw on
+  a miss: the host calls them directly and can handle the error.
 
 ### BasePopup lifecycle invariants
 

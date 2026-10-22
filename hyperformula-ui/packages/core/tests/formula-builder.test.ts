@@ -728,25 +728,34 @@ describe("FormulaBuilder", () => {
       builder = new FormulaBuilder({ rootEl });
     });
 
-    it("constructor throws on a missing popup host before allocating any resources", () => {
-      const portalCount = document.querySelectorAll(sel(CN.popupPortal)).length;
+    it("constructor falls back to the default placement when a selector matches nothing", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const scoped = new FormulaBuilder({
+        rootEl,
+        popups: { suggestions: { container: "#missing" }, fnHelp: { container: "#missing" } },
+        formulaBarContainer: "#missing",
+      });
 
-      expect(
-        () => new FormulaBuilder({ rootEl, popups: { suggestions: { container: "#missing" } } }),
-      ).toThrow('FormulaBuilder: suggestions host "#missing" not found');
-      expect(
-        () => new FormulaBuilder({ rootEl, popups: { fnHelp: { container: "#missing" } } }),
-      ).toThrow('FormulaBuilder: fnHelp host "#missing" not found');
-      expect(() => new FormulaBuilder({ rootEl, formulaBarContainer: "#missing" })).toThrow(
-        'FormulaBuilder: formulaBarContainer "#missing" not found',
-      );
+      expect(scoped.hasFormulaBar).toBe(false);
+      expect(warn.mock.calls.map(([message]) => message)).toEqual([
+        'FormulaBuilder: suggestions host "#missing" not found; using the default placement',
+        'FormulaBuilder: fnHelp host "#missing" not found; using the default placement',
+        'FormulaBuilder: formulaBarContainer "#missing" not found; using the default placement',
+      ]);
 
-      expect(document.querySelectorAll(sel(CN.popupPortal)).length).toBe(portalCount);
+      scoped.destroy();
+      warn.mockRestore();
+    });
 
-      builder.destroy();
+    it("constructor warns only once per missing selector", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const options = { rootEl, popups: { suggestions: { container: "#gone-once" } } };
 
-      expect(document.head.querySelector("style[data-hfe-styles]")).toBeNull();
-      builder = new FormulaBuilder({ rootEl });
+      new FormulaBuilder(options).destroy();
+      new FormulaBuilder(options).destroy();
+
+      expect(warn).toHaveBeenCalledOnce();
+      warn.mockRestore();
     });
 
     it("popups.*.container constructor options delegate to attach", () => {

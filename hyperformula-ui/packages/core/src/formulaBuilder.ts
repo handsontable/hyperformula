@@ -15,6 +15,8 @@ import { withSharedClose } from "./ui/popup/popupsOptions";
 import type { LayoutDirection, PopupsOptions } from "./ui/popup/types";
 import type { IconsOptions } from "./ui/types";
 
+const reportedMissingContainers = new Set<string>();
+
 /**
  * Options for {@link FormulaBuilder}; editor behavior options are inherited from
  * `FormulaEditorOptions`.
@@ -42,7 +44,10 @@ export interface FormulaBuilderOptions
    */
   className?: string;
 
-  /** Sugar for calling {@link FormulaBuilder.attachFormulaBar} during construction. */
+  /**
+   * Sugar for calling {@link FormulaBuilder.attachFormulaBar} during construction. A selector
+   * that matches nothing logs a warning once and the builder starts without a bar.
+   */
   formulaBarContainer?: HTMLElement | string;
 
   /** Popup behavior overrides (shared `showClose` default with per-popup overrides). */
@@ -99,9 +104,9 @@ export class FormulaBuilder {
 
     const { container: suggestionsHost, ...suggestionsOwn } = popups?.suggestions ?? {};
     const { container: fnHelpHost, ...fnHelpOwn } = popups?.fnHelp ?? {};
-    const suggestionsHostEl = this.resolveContainer(suggestionsHost, "suggestions host");
-    const fnHelpHostEl = this.resolveContainer(fnHelpHost, "fnHelp host");
-    const formulaBarEl = this.resolveContainer(formulaBarContainer, "formulaBarContainer");
+    const suggestionsHostEl = this.resolveOptionalContainer(suggestionsHost, "suggestions host");
+    const fnHelpHostEl = this.resolveOptionalContainer(fnHelpHost, "fnHelp host");
+    const formulaBarEl = this.resolveOptionalContainer(formulaBarContainer, "formulaBarContainer");
 
     injectStyles();
     this.liveRegion = new LiveRegion();
@@ -205,12 +210,18 @@ export class FormulaBuilder {
     this.closeEditor();
   }
 
-  private resolveContainer(container: HTMLElement | string, label: string): HTMLElement;
-  private resolveContainer(
-    container: HTMLElement | string | undefined,
-    label: string,
-  ): HTMLElement | undefined;
-  private resolveContainer(
+  private resolveContainer(container: HTMLElement | string, label: string): HTMLElement {
+    const containerEl =
+      typeof container === "string" ? document.querySelector<HTMLElement>(container) : container;
+
+    if (containerEl === null) {
+      throw new Error(`FormulaBuilder: ${label} "${container}" not found`);
+    }
+
+    return containerEl;
+  }
+
+  private resolveOptionalContainer(
     container: HTMLElement | string | undefined,
     label: string,
   ): HTMLElement | undefined {
@@ -221,11 +232,18 @@ export class FormulaBuilder {
     const containerEl =
       typeof container === "string" ? document.querySelector<HTMLElement>(container) : container;
 
-    if (containerEl === null) {
-      throw new Error(`FormulaBuilder: ${label} "${container}" not found`);
+    if (containerEl !== null) {
+      return containerEl;
     }
 
-    return containerEl;
+    const warning = `FormulaBuilder: ${label} "${container}" not found; using the default placement`;
+
+    if (!reportedMissingContainers.has(warning)) {
+      reportedMissingContainers.add(warning);
+      console.warn(warning);
+    }
+
+    return undefined;
   }
 
   private announceCommitErrors(
