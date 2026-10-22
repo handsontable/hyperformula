@@ -378,7 +378,9 @@ export class FormulaBuilder {
   /**
    * Tears down everything the builder owns (bar, editor, popups, subscriptions) and clears
    * the theming class from the adapter overlay. Idempotent. The adapter itself is host-owned
-   * and is NOT destroyed.
+   * and is NOT destroyed. Safe to call after the host has destroyed the HyperFormula
+   * instance. A step that throws does not stop the others; the first error is rethrown once
+   * every step has run.
    */
   destroy(): void {
     if (this.destroyed) {
@@ -386,17 +388,33 @@ export class FormulaBuilder {
     }
 
     this.destroyed = true;
-    this.events.disposeAll();
-    this.formulaBar?.destroy();
-    this.formulaEditor.destroy();
-    this.errorPopup.destroy();
-    this.liveRegion.destroy();
-    this.popupCtx.destroy();
 
-    if (this.sharedClassName !== undefined) {
-      this.adapter.setOverlayClassName(null);
+    const steps: Array<() => void> = [
+      () => this.events.disposeAll(),
+      () => this.formulaBar?.destroy(),
+      () => this.formulaEditor.destroy(),
+      () => this.errorPopup.destroy(),
+      () => this.liveRegion.destroy(),
+      () => this.popupCtx.destroy(),
+      () => {
+        if (this.sharedClassName !== undefined) {
+          this.adapter.setOverlayClassName(null);
+        }
+      },
+      () => releaseStyles(),
+    ];
+    const errors: unknown[] = [];
+
+    for (const step of steps) {
+      try {
+        step();
+      } catch (error) {
+        errors.push(error);
+      }
     }
 
-    releaseStyles();
+    if (errors.length > 0) {
+      throw errors[0];
+    }
   }
 }

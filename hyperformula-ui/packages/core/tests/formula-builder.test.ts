@@ -890,3 +890,62 @@ describe("FormulaBuilder", () => {
     });
   });
 });
+
+class DestroyedEngine implements HyperFormulaLike {
+  private destroyed = false;
+
+  on(): void {}
+
+  off(): void {
+    if (this.destroyed) {
+      throw new TypeError("Cannot read properties of undefined (reading 'off')");
+    }
+  }
+
+  destroy(): void {
+    this.destroyed = true;
+  }
+}
+
+class FailingOverlayAdapter extends NullAdapter {
+  override setOverlayClassName(className: string | null): void {
+    if (className === null) {
+      throw new Error("overlay already gone");
+    }
+  }
+}
+
+describe("FormulaBuilder teardown", () => {
+  afterEach(() => {
+    document.body.replaceChildren();
+  });
+
+  function leftovers() {
+    return {
+      portal: document.querySelector(sel(CN.popupPortal)),
+      liveRegion: document.querySelector(sel(CN.liveRegion)),
+      styles: document.head.querySelector("style[data-hfe-styles]"),
+    };
+  }
+
+  it("does not throw when the host destroyed the engine first", () => {
+    const engine = new DestroyedEngine();
+    const builder = new FormulaBuilder({ rootEl: document.body, hyperformula: engine });
+
+    engine.destroy();
+
+    expect(() => builder.destroy()).not.toThrow();
+    expect(leftovers()).toEqual({ portal: null, liveRegion: null, styles: null });
+  });
+
+  it("finishes every teardown step when one throws, then rethrows the error", () => {
+    const builder = new FormulaBuilder({
+      rootEl: document.body,
+      adapter: new FailingOverlayAdapter(),
+      className: "host-theme",
+    });
+
+    expect(() => builder.destroy()).toThrow("overlay already gone");
+    expect(leftovers()).toEqual({ portal: null, liveRegion: null, styles: null });
+  });
+});

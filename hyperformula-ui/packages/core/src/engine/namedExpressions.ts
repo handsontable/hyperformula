@@ -175,7 +175,10 @@ export class NamedExpressions {
 
   destroy(): void {
     this.changeListeners.clear();
-    this.engine?.off?.("namedExpressionAdded", this.onNamedExpressionChanged);
-    this.engine?.off?.("namedExpressionRemoved", this.onNamedExpressionChanged);
+
+    try {
+      this.engine?.off?.("namedExpressionAdded", this.onNamedExpressionChanged);
+      this.engine?.off?.("namedExpressionRemoved", this.onNamedExpressionChanged);
+    } catch {}
   }
 }
