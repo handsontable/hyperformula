@@ -23,11 +23,14 @@ function declarations(selector: string): Record<string, string> {
 
 describe("package stylesheet", () => {
   it("renders the error value in a cell and the error popup title in the same font", () => {
-    const cellFont = declarations(".hfe-cell--error")["font-family"];
+    const font = "var(--hfe-error-font-family, var(--hfe-font-family))";
 
-    expect(cellFont).toBe("var(--hfe-error-font-family)");
-    expect(declarations(".hfe-error__title")["font-family"]).toBe(cellFont);
-    expect(declarations(":root")["--hfe-error-font-family"]).toBe("var(--hfe-font-family)");
+    expect(declarations(".hfe-cell--error")["font-family"]).toBe(font);
+    expect(declarations(".hfe-error__title")["font-family"]).toBe(font);
+  });
+
+  it("leaves --hfe-error-font-family unset, so --hfe-font-family resolves where the error renders", () => {
+    expect(declarations(":root")["--hfe-error-font-family"]).toBeUndefined();
   });
 });
 
