@@ -1420,24 +1420,24 @@ describe("FormulaBar address box when the grid cannot select", () => {
     return input;
   }
 
-  it("rejects a cell the grid could not select", () => {
+  it("rejects a cell the grid could not select, and says it could not be selected", () => {
     const harness = makeRefusingHarness({ setActiveCell: vi.fn(() => false) });
     const input = submit(harness.container, "B3");
 
     expect(input.value).toBe("A1");
-    expect(harness.announce).toHaveBeenCalledWith("Invalid cell address: B3");
+    expect(harness.announce).toHaveBeenCalledWith("Cannot select B3");
     expect(harness.scrollCellIntoView).not.toHaveBeenCalled();
 
     harness.controller.destroy();
     harness.editor.destroy();
   });
 
-  it("rejects a range the grid could not select", () => {
+  it("rejects a range the grid could not select, and says it could not be selected", () => {
     const harness = makeRefusingHarness({ setSelection: vi.fn(() => false) });
     const input = submit(harness.container, "B3:C4");
 
     expect(input.value).toBe("A1");
-    expect(harness.announce).toHaveBeenCalledWith("Invalid cell address: B3:C4");
+    expect(harness.announce).toHaveBeenCalledWith("Cannot select B3:C4");
     expect(harness.scrollCellIntoView).not.toHaveBeenCalled();
 
     harness.controller.destroy();
@@ -1467,6 +1467,17 @@ describe("FormulaBar address box when the grid cannot select", () => {
 
     controller.destroy();
     editor.destroy();
+  });
+
+  it("still calls an address outside the grid invalid", () => {
+    const harness = makeRefusingHarness({ setActiveCell: vi.fn(() => false) });
+
+    submit(harness.container, "Z99");
+
+    expect(harness.announce).toHaveBeenCalledWith("Invalid cell address: Z99");
+
+    harness.controller.destroy();
+    harness.editor.destroy();
   });
 
   it("accepts a cell when the adapter returns nothing", () => {

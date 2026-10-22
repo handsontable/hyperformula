@@ -64,6 +64,7 @@ export type {
 export { readCellText } from "./engine";
 export * from "./events";
 export type {
+  AddressBoxNavigation,
   AddressBoxRange,
   AddressBoxTarget,
   FormulaBarAddressBoxOptions,

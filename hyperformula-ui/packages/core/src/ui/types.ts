@@ -54,8 +54,11 @@ export interface Phrases {
   /** Accessible name of a popup's close button. */
   close: string;
 
-  /** Announcement for address-box input that names no cell or range the grid can select. */
+  /** Announcement for address-box input that is not a cell or range of the grid. */
   invalidCellAddress: (text: string) => string;
+
+  /** Announcement for a valid address-box target the grid could not select (hidden, filtered out). */
+  cellUnavailable: (text: string) => string;
 
   /** Announcement for a committed cell that now shows an error. */
   cellError: (cellAddress: string, message: string) => string;

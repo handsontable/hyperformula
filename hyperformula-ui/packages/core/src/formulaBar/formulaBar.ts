@@ -9,7 +9,11 @@ import { deepActiveElement } from "../ui/dom";
 import type { LiveRegion } from "../ui/liveRegion";
 import type { LayoutDirection } from "../ui/popup/types";
 import type { IconsOptions } from "../ui/types";
-import type { AddressBoxRange, AddressBoxTarget } from "./formulaBarAddressBox";
+import type {
+  AddressBoxNavigation,
+  AddressBoxRange,
+  AddressBoxTarget,
+} from "./formulaBarAddressBox";
 import { FormulaBarAddressBox } from "./formulaBarAddressBox";
 import { FormulaBarCell } from "./formulaBarCell";
 
@@ -97,6 +101,8 @@ export class FormulaBar {
       onNavigateRange: (range) => this.navigateToRange(range),
       onInvalidInput: (text) =>
         options.liveRegion.announce(options.editor.phrases.invalidCellAddress(text)),
+      onUnavailableTarget: (text) =>
+        options.liveRegion.announce(options.editor.phrases.cellUnavailable(text)),
       phrases: options.editor.phrases,
     });
     this.formulaCell = new FormulaBarCell({
@@ -190,7 +196,7 @@ export class FormulaBar {
     }
   }
 
-  private navigateTo(target: AddressBoxTarget): boolean {
+  private navigateTo(target: AddressBoxTarget): AddressBoxNavigation {
     const { rows, cols } = this.adapter.getGridSize();
 
     if (target.row < 0 || target.row >= rows || target.col < 0 || target.col >= cols) {
@@ -201,7 +207,7 @@ export class FormulaBar {
     const address = { sheet, col: target.col, row: target.row };
 
     if (this.adapter.setActiveCell(address) === false) {
-      return false;
+      return "unavailable";
     }
 
     this.adapter.scrollCellIntoView(address);
@@ -209,7 +215,7 @@ export class FormulaBar {
     return true;
   }
 
-  private navigateToRange(range: AddressBoxRange): boolean {
+  private navigateToRange(range: AddressBoxRange): AddressBoxNavigation {
     const { rows, cols } = this.adapter.getGridSize();
 
     if (
@@ -228,7 +234,7 @@ export class FormulaBar {
     };
 
     if (this.adapter.setSelection(cellRange) === false) {
-      return false;
+      return "unavailable";
     }
 
     this.adapter.scrollCellIntoView(cellRange.start);

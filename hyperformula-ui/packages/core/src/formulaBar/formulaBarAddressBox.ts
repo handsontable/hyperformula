@@ -31,16 +31,27 @@ export interface AddressBoxRange {
 }
 
 /**
- * Options for {@link FormulaBarAddressBox}. Each navigation callback returns whether the
- * navigation was accepted — `false` reverts the input to the last-synced address and
- * reports the rejected text through `onInvalidInput`.
+ * Outcome of an address-box navigation: `true` accepted, `false` not a target in the grid,
+ * `"unavailable"` a valid target the grid could not select (a hidden or filtered-out cell).
+ *
+ * @category Formula Bar
+ */
+export type AddressBoxNavigation = boolean | "unavailable";
+
+/**
+ * Options for {@link FormulaBarAddressBox}. Each navigation callback returns its
+ * {@link AddressBoxNavigation} outcome; a rejected one reverts the input to the last-synced
+ * address and reports the rejected text through `onInvalidInput` or `onUnavailableTarget`.
  *
  * @category Formula Bar
  */
 export interface FormulaBarAddressBoxOptions {
-  onNavigate: (target: AddressBoxTarget) => boolean;
-  onNavigateRange: (range: AddressBoxRange) => boolean;
+  onNavigate: (target: AddressBoxTarget) => AddressBoxNavigation;
+  onNavigateRange: (range: AddressBoxRange) => AddressBoxNavigation;
   onInvalidInput?: (text: string) => void;
+
+  /** Receives the text of a valid address or range the grid could not select. */
+  onUnavailableTarget?: (text: string) => void;
 
   /**
    * Phrases for the input's accessible name.
@@ -145,8 +156,10 @@ export class FormulaBarAddressBox {
   }
 
   private commitSingle(target: AddressBoxTarget): void {
-    if (!this.options.onNavigate(target)) {
-      this.rejectInput();
+    const outcome = this.options.onNavigate(target);
+
+    if (outcome !== true) {
+      this.rejectInput(outcome);
 
       return;
     }
@@ -155,8 +168,10 @@ export class FormulaBarAddressBox {
   }
 
   private commitRange(range: AddressBoxRange): void {
-    if (!this.options.onNavigateRange(range)) {
-      this.rejectInput();
+    const outcome = this.options.onNavigateRange(range);
+
+    if (outcome !== true) {
+      this.rejectInput(outcome);
 
       return;
     }
@@ -174,11 +189,16 @@ export class FormulaBarAddressBox {
     this.input.value = this.currentText;
   }
 
-  private rejectInput(): void {
+  private rejectInput(outcome: AddressBoxNavigation = false): void {
     const rejectedText = this.input.value.trim();
 
     this.revert();
-    this.options.onInvalidInput?.(rejectedText);
+
+    if (outcome === "unavailable") {
+      this.options.onUnavailableTarget?.(rejectedText);
+    } else {
+      this.options.onInvalidInput?.(rejectedText);
+    }
   }
 
   /** Mirrors the grid selection into the input (`A1` single cell, `A1:B5` range, empty none). */

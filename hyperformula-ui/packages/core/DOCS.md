@@ -78,6 +78,7 @@ const builder = new FormulaBuilder({ rootEl: gridRoot, adapter, formulaBarContai
 
 | Export | Kind | Summary |
 |---|---|---|
+| `AddressBoxNavigation` | type | Outcome of an address-box navigation: `true` accepted, `false` not a target in the grid, `"unavailable"` a valid target the grid could not select (a hidden or filtered-out cell). |
 | `AddressBoxRange` | interface | Normalized coordinates a typed `A1:B5` range resolves to. |
 | `AddressBoxTarget` | interface | Sheet-less cell coordinates a typed `A1` address resolves to. |
 | `FormulaBar` ★ | class | Excel-style formula bar composing `FormulaBarAddressBox` and `FormulaBarCell`. |

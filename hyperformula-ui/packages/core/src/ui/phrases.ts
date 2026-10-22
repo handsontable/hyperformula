@@ -17,6 +17,7 @@ export const DEFAULT_PHRASES: Readonly<Phrases> = Object.freeze({
   learnMore: "Learn more",
   close: "Close",
   invalidCellAddress: (text: string) => `Invalid cell address: ${text}`,
+  cellUnavailable: (text: string) => `Cannot select ${text}`,
   cellError: (cellAddress: string, message: string) => `Error in ${cellAddress}: ${message}.`,
   dependentCellErrors: (count: number) =>
     count === 1 ? "1 more cell now contains an error." : `${count} more cells now contain errors.`,

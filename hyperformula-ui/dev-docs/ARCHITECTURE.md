@@ -62,7 +62,8 @@ reparents between two locations via `FormulaEditor.attachTo(mount)`:
   the external Handsontable plugin maps them back to visual indices before selecting.
   Both `setActiveCell` and `setSelection` return `boolean | void`: `false` means the host could
   not select the target (a filtered-out row, a hidden column), and the address box then rejects
-  the typed address — it reverts, announces "Invalid cell address", and skips
+  the typed address — `FormulaBar` returns `"unavailable"` to it, so it reverts, announces
+  `Phrases.cellUnavailable` ("Cannot select B7") rather than `invalidCellAddress`, and skips
   `scrollCellIntoView`. `void` counts as success, so adapters written before the result keep
   working.
 - `commit(value, direction?)` — controller calls to commit the current value; the optional
