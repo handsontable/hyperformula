@@ -517,7 +517,10 @@ All popup-style overlays share a common base class `BasePopup`
   stylesheet goes into. Every other element (editor, popups, icons, highlights) is created in the
   global `document` and adopted when it is appended. Styles are injected per root
   (`createStyleInjector(...).inject(root)`, ref-counted per document or shadow root): into
-  `rootDocument`, plus into the portal parent's shadow root when it is in one. Focus checks
+  `rootDocument`, plus into the portal parent's shadow root when it is in one. Container selectors
+  (`formulaBarContainer`, `popups.*.container`, the `attach*` methods) are looked up in that shadow
+  root first, then in `rootDocument`. No other shadow root receives the styles, so a popup docked
+  in a third tree renders unstyled; hosts dock popups in the grid's own tree. Focus checks
   never read `document.activeElement`: they call `deepActiveElement(element.ownerDocument)`
   (`ui/dom.ts`), which follows open shadow roots down to the focused element and reads the
   document the element is actually in. Window and document listeners follow the element too:

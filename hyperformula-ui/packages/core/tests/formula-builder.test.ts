@@ -1105,6 +1105,30 @@ describe("FormulaBuilder document and portal parent", () => {
     builder.destroy();
   });
 
+  it("resolves container selectors inside the portal parent's shadow root", () => {
+    const shadow = shadowHost();
+    const rootEl = document.createElement("div");
+    const helpHost = document.createElement("div");
+    const suggestionsHost = document.createElement("div");
+
+    helpHost.id = "help-host";
+    suggestionsHost.id = "suggestions-host";
+    shadow.append(rootEl, helpHost, suggestionsHost);
+
+    const builder = new FormulaBuilder({
+      rootEl,
+      portalParent: shadow,
+      popups: { fnHelp: { container: "#help-host" } },
+    });
+
+    builder.attachSuggestionsHost("#suggestions-host");
+
+    expect(helpHost.querySelector(sel(CN.fnHelp))).not.toBeNull();
+    expect(suggestionsHost.querySelector(sel(CN.suggestions))).not.toBeNull();
+
+    builder.destroy();
+  });
+
   it("takes the document from the portal parent when only the portal parent is given", () => {
     const frameDocument = document.implementation.createHTMLDocument("grid");
     const rootEl = frameDocument.createElement("div");

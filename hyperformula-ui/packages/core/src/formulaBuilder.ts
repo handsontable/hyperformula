@@ -8,6 +8,7 @@ import { FormulaEditor } from "./formulaEditor/formulaEditor";
 import type { FormulaEditorOptions } from "./formulaEditor/types";
 import { indexToColLetters } from "./lexer";
 import { injectStyles, releaseStyles, type StyleRoot } from "./theme/injectStyles";
+import { isShadowRoot } from "./ui/dom";
 import { LiveRegion } from "./ui/liveRegion";
 import { resolvePhrases } from "./ui/phrases";
 import { cellErrorMessage, setCellError } from "./ui/popup/cellError";
@@ -24,9 +25,8 @@ function styleRootsFor(
   portalParent: HTMLElement | ShadowRoot,
 ): StyleRoot[] {
   const portalRoot = portalParent.getRootNode();
-  const isShadowRoot = portalRoot.nodeType === Node.DOCUMENT_FRAGMENT_NODE && "host" in portalRoot;
 
-  return isShadowRoot ? [rootDocument, portalRoot as ShadowRoot] : [rootDocument];
+  return isShadowRoot(portalRoot) ? [rootDocument, portalRoot] : [rootDocument];
 }
 
 /**
@@ -78,7 +78,8 @@ export interface FormulaBuilderOptions
    * Where the popup portal and the screen-reader live region are appended. Pass the grid's
    * shadow root (or an element in it) to keep the popups in the same tree as the editor, so
    * the editor's ARIA references resolve; the styles are then injected into that shadow root
-   * too.
+   * too, and container selectors are looked up in it before `rootDocument`. Dock a popup only
+   * in the grid's own tree: no other shadow root receives the styles.
    *
    * @defaultValue `rootDocument.body`
    */
@@ -117,6 +118,7 @@ export class FormulaBuilder {
   private readonly direction: LayoutDirection | undefined;
   private readonly icons: IconsOptions | undefined;
   private readonly rootDocument: Document;
+  private readonly selectorRoots: ParentNode[];
   private readonly styleRoots: StyleRoot[];
   private destroyed = false;
 
@@ -139,6 +141,10 @@ export class FormulaBuilder {
     const portalParent = options.portalParent ?? rootDocument.body;
 
     this.rootDocument = rootDocument;
+
+    const portalRoot = portalParent.getRootNode();
+
+    this.selectorRoots = isShadowRoot(portalRoot) ? [portalRoot, rootDocument] : [rootDocument];
 
     const { container: suggestionsHost, ...suggestionsOwn } = popups?.suggestions ?? {};
     const { container: fnHelpHost, ...fnHelpOwn } = popups?.fnHelp ?? {};
@@ -268,11 +274,20 @@ export class FormulaBuilder {
     this.closeEditor();
   }
 
+  private queryContainer(selector: string): HTMLElement | null {
+    for (const root of this.selectorRoots) {
+      const containerEl = root.querySelector<HTMLElement>(selector);
+
+      if (containerEl !== null) {
+        return containerEl;
+      }
+    }
+
+    return null;
+  }
+
   private resolveContainer(container: HTMLElement | string, label: string): HTMLElement {
-    const containerEl =
-      typeof container === "string"
-        ? this.rootDocument.querySelector<HTMLElement>(container)
-        : container;
+    const containerEl = typeof container === "string" ? this.queryContainer(container) : container;
 
     if (containerEl === null) {
       throw new Error(`FormulaBuilder: ${label} "${container}" not found`);
@@ -283,7 +298,7 @@ export class FormulaBuilder {
 
   private findContainer(selector: string): HTMLElement | null {
     try {
-      return this.rootDocument.querySelector<HTMLElement>(selector);
+      return this.queryContainer(selector);
     } catch {
       return null;
     }
