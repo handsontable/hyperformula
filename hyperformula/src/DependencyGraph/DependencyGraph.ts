@@ -493,17 +493,11 @@ export class DependencyGraph {
    * never a range that cannot be spanned at all, so those keep `#SPILL!` too.
    */
   public canOverwriteArrayResult(arrayVertex: ArrayFormulaVertex): boolean {
-    if (arrayVertex.getRangeOrUndef() === undefined) {
-      return false
-    }
-    return this.config.arrayFunctionResultOverwritesData && !this.overwriteWouldHitArray(arrayVertex)
+    const range = arrayVertex.getRangeOrUndef()
+    return range !== undefined && this.config.arrayFunctionResultOverwritesData && !this.overwriteWouldHitArray(arrayVertex, range)
   }
 
-  private overwriteWouldHitArray(arrayVertex: ArrayFormulaVertex): boolean {
-    const range = arrayVertex.getRangeOrUndef()
-    if (range === undefined) {
-      return false
-    }
+  private overwriteWouldHitArray(arrayVertex: ArrayFormulaVertex, range: AbsoluteCellRange): boolean {
     for (const address of range.addresses(this)) {
       const vertexUnderAddress = this.addressMapping.getCell(address)
       if (vertexUnderAddress instanceof ArrayFormulaVertex && vertexUnderAddress !== arrayVertex) {
