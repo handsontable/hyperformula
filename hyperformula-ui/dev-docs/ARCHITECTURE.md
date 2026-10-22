@@ -732,6 +732,12 @@ re-render clears that identity, so a re-render after Esc-dismiss can make the to
 even though pointer/focus never logically left the cell. Accepted as a documented limitation;
 re-keying by logical cell would need a host render hook — future work if it bites.
 
+`setCellError` (behind `FormulaBuilder.markCell`) also writes the message into the cell's
+`aria-description`, so a screen reader that lands on an error cell reads the message without the
+popup ever opening; `aria-errormessage` support is uneven (VoiceOver mostly ignores it). Clearing
+the error removes the description only when it still holds the message `setCellError` wrote, so a
+host's own description survives a cell that never had an error.
+
 While a hovered/focused error cell surfaces its message via `ErrorPopup` and
 `aria-invalid`/`aria-errormessage` (the popup root carries a generated id, associated onto the
 cell for the screen reader to resolve on demand), committing a formula moves focus away before

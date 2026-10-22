@@ -180,7 +180,7 @@ const builder = new FormulaBuilder({ rootEl: gridRoot, adapter, formulaBarContai
 | `FunctionHelpOptions` | interface | Function-help popup options. |
 | `PopupHostOption` | interface | Docks a popup into a host container instead of the floating overlay. |
 | `PopupsOptions` | interface | Popup options bag on `FormulaBuilderOptions`: the top-level `showClose` is the shared default, overridable per popup. |
-| `setCellError` | function | Marks (`message`) or clears (`null`) a cell element's error state — class, data attribute, and `aria-invalid`. |
+| `setCellError` | function | Marks (`message`) or clears (`null`) a cell element's error state — class, data attribute, `aria-invalid`, and an `aria-description` carrying the message, so a screen reader reads the error without the error popup open. |
 | `SuggestionItem` | interface | One autocomplete row: a function name or (`kind: "named"`) a named expression. |
 | `SuggestionsAriaState` | interface | ARIA combobox state the suggestions popup reports so the host input can mirror it. |
 | `SuggestionsHandlers` | interface | Callbacks the suggestions popup invokes on selection, explicit close, and ARIA changes. |

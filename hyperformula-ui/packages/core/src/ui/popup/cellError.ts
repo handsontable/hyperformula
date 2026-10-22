@@ -19,18 +19,32 @@ export function cellErrorMessage(value: unknown): string | null {
 
 /**
  * Marks (`message`) or clears (`null`) a cell element's error state — class, data attribute,
- * and `aria-invalid`. Adapter-facing: the host renders the error, core never does.
+ * `aria-invalid`, and an `aria-description` carrying the message, so a screen reader reads
+ * the error without the error popup open. Clearing removes the description only when it is
+ * the one this function set. Adapter-facing: the host renders the error, core never does.
  *
  * @category Popups
  */
 export function setCellError(element: HTMLElement, message: string | null): void {
+  const previousMessage = element.dataset.hfeError;
+
   if (message) {
     element.classList.add(CN.cellError);
     element.dataset.hfeError = message;
     element.setAttribute("aria-invalid", "true");
-  } else {
-    element.classList.remove(CN.cellError);
-    delete element.dataset.hfeError;
-    element.removeAttribute("aria-invalid");
+    element.setAttribute("aria-description", message);
+
+    return;
+  }
+
+  element.classList.remove(CN.cellError);
+  delete element.dataset.hfeError;
+  element.removeAttribute("aria-invalid");
+
+  if (
+    previousMessage !== undefined &&
+    element.getAttribute("aria-description") === previousMessage
+  ) {
+    element.removeAttribute("aria-description");
   }
 }
