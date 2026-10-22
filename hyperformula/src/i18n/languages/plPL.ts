@@ -399,6 +399,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'UFNOŚĆ.T',
     DEVSQ: 'ODCH.KWADRATOWE',
     GEOMEAN: 'ŚREDNIA.GEOMETRYCZNA',
+    GESTEP: 'SPRAWDŹ.PRÓG',
     HARMEAN: 'ŚREDNIA.HARMONICZNA',
     CRITBINOM: 'PRÓG.ROZKŁAD.DWUM',
     PEARSON: 'PEARSON',

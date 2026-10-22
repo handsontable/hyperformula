@@ -129,6 +129,13 @@ export const ENGINEERING_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=DELTA(5, 5)', '=DELTA(5, 4)', '=DELTA(0)'],
   },
+  GESTEP: {
+    category: 'Engineering',
+    shortDescription: 'Returns 1 if number is greater than or equal to step, otherwise returns 0.',
+    parameters: [{name: 'number', description: 'The value to compare against the step.'}, {name: 'step', description: 'The threshold value; defaults to 0 when omitted.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=GESTEP(5, 4)', '=GESTEP(3, 4)', '=GESTEP(-1)'],
+  },
   ERF: {
     category: 'Engineering',
     shortDescription: 'Returns values of the Gaussian error integral.',
