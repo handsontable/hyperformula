@@ -38,7 +38,11 @@ returns the negative value of that number.
 | :--- | :--- | :--- | :--- |
 | - | Unary minus | -a | Returns the negative of its argument. |
 | + | Unary plus | +a | Returns the positive of its argument. |
-| % | Percent | a% | Calculate the percent of an argument. |
+| % | Percent | a% | Divides its argument by 100. |
+
+HyperFormula supports consecutive percent operators. Each `%` divides the
+preceding result by `100`. For example, `=5%%` is equivalent to `=(5%)%`
+and returns `0.0005`, while `=5%%%` returns `0.000005`.
 
 ## Binary arithmetic operators
 
