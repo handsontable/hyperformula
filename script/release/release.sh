@@ -46,6 +46,14 @@ manual_checklist() {
   printf '%s\n\n%s%s\n' "$(cat)" "$CHECKLIST_RULE" "$RESET"
 }
 
+# The published package moved into hyperformula/ when the repository became a
+# monorepo. package-lock.json stays at the root, where the workspace resolves it.
+PKG_DIR="hyperformula"
+PKG_JSON="$PKG_DIR/package.json"
+PKG_CHANGELOG="CHANGELOG.md"   # one changelog for every package, at the repository root
+PKG_HT_CONFIG="$PKG_DIR/ht.config.js"
+PKG_README="$PKG_DIR/README.md"   # the package README, shown on npm; the root one describes the monorepo
+
 # Prints the body of a CHANGELOG.md section: every line between the given
 # heading and the next '## ' heading, without the surrounding blank lines.
 changelog_section_body() {
@@ -54,7 +62,7 @@ changelog_section_body() {
     found && /^## /         { exit }
     found                   { body = body $0 "\n" }
     END { sub(/^\n+/, "", body); sub(/\n+$/, "", body); if (body != "") print body }
-  ' CHANGELOG.md
+  ' "$PKG_CHANGELOG"
 }
 
 # Prints a step that needed no work. The '=' marker mirrors 'run's '$' marker,
@@ -342,9 +350,9 @@ wait_for_npm() { # wait_for_npm <version>
   until on_npm "$version"; do
     # Say that the publish itself succeeded: by this point it has, and a bare
     # "not visible" reads like the publish failed, which would invite a retry.
-    [[ $waited -ge 60 ]] && die "npm publish reported success, but hyperformula@$version is still not visible on npm after ${waited}s - check the registry before retrying."
+    [[ $waited -ge 600 ]] && die "npm publish reported success, but hyperformula@$version is still not visible on npm after ${waited}s - check the registry before retrying."
     sleep 5; waited=$((waited + 5))
-    printf '    waiting for hyperformula@%s on npm (%ss)\n' "$version" "$waited"
+    (( waited % 15 == 0 )) && printf '    waiting for hyperformula@%s on npm (%ss)\n' "$version" "$waited"
   done
 }
 
@@ -369,7 +377,7 @@ Usage: release.sh code-freeze <version> <release-date> [options]
 Starts a HyperFormula code freeze. Previews by default (prints commands,
 changes nothing); add --real-run to make changes.
 
-Requires usable hyperformula-tests (test/hyperformula-tests) and
+Requires usable hyperformula-tests (hyperformula/test/hyperformula-tests) and
 hyperformula-demos clones - present, clean, with a reachable origin - and a clean
 working tree here unless it is resuming a freeze this clone already started.
 It exits early otherwise.
@@ -449,14 +457,14 @@ done
 # The private test suite always lives here: test/fetch-tests.sh and the CI
 # workflows all hardcode this path, so there is nothing to configure and no way
 # for the freeze to end up validating one clone and mutating another.
-TESTS_DIR="test/hyperformula-tests"
+TESTS_DIR="$PKG_DIR/test/hyperformula-tests"
 
 # ---- preflight ----
 # Named, as in publish, so a failure in any of the checks below is reported
 # against a step instead of against "startup".
 step "Preflight"
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "Not inside a git repo."
-[[ -f package.json ]] || die "No package.json here - run from the hyperformula repo root."
+[[ -f "$PKG_JSON" ]] || die "No $PKG_JSON here - run from the hyperformula repo root."
 branch_exists develop || die "No 'develop' branch."
 # node runs the version, date and release-notes edits; perl rewrites the demo
 # URLs. Both are checked here rather than at first use, where a missing one
@@ -498,13 +506,13 @@ DATE_HT="$(CF="$DATE_ISO" node -e 'const[y,m,d]=process.env.CF.split("-");consol
 # develop and then to the tree, so an unusual checkout still gets an answer.
 PRE_FREEZE_VERSION=""
 for ref in origin/develop develop; do
-  PRE_FREEZE_VERSION="$(git show "$ref:package.json" 2>/dev/null \
+  PRE_FREEZE_VERSION="$(git show "$ref:$PKG_JSON" 2>/dev/null \
     | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(JSON.parse(s).version||"")}catch(e){}})' 2>/dev/null || true)"
   [[ -n "$PRE_FREEZE_VERSION" ]] && break
 done
 if [[ -z "$PRE_FREEZE_VERSION" ]]; then
-  PRE_FREEZE_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
-  warn "Could not read develop's package.json, so the release was classified against the checked-out version (${PRE_FREEZE_VERSION:-unknown}) - on a resumed freeze that reads a minor release as a patch and skips the demos and CodeSandbox work. Check whether step 8 should have run."
+  PRE_FREEZE_VERSION="$(PKG_JSON="$PKG_JSON" node -e 'process.stdout.write(require("./"+process.env.PKG_JSON).version||"")' 2>/dev/null || true)"
+  warn "Could not read develop's $PKG_JSON, so the release was classified against the checked-out version (${PRE_FREEZE_VERSION:-unknown}) - on a resumed freeze that reads a minor release as a patch and skips the demos and CodeSandbox work. Check whether step 8 should have run."
 fi
 IFS='.' read -r nM nm _ <<<"$VERSION"
 IFS='.' read -r cM cm _ <<<"${PRE_FREEZE_VERSION:-0.0.0}"
@@ -593,42 +601,42 @@ step "2. Create release/$VERSION in hyperformula-tests, then sync the suite"
 run npm run test:setup-private
 
 # 3. Bump version + release date (each half skipped when already correct, so a
-CURRENT_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
 #    re-run after a later failure does not rewrite files it already wrote)
 step "3. Bump version + HT_RELEASE_DATE"
+CURRENT_VERSION="$(PKG_JSON="$PKG_JSON" node -e 'process.stdout.write(require("./"+process.env.PKG_JSON).version||"")' 2>/dev/null || true)"
 if [[ "$CURRENT_VERSION" == "$VERSION" ]]; then
-  skip "package.json already at $VERSION"
+  skip "$PKG_JSON already at $VERSION"
 elif $DRY_RUN; then
-  echo "    (set package.json version=$VERSION)"
+  echo "    (set $PKG_JSON version=$VERSION)"
 else
-  CF_V="$VERSION" node -e 'const f="package.json",j=require("./"+f);j.version=process.env.CF_V;require("fs").writeFileSync(f,JSON.stringify(j,null,2)+"\n")'
-  echo "    package.json version -> $VERSION"
+  CF_V="$VERSION" PKG_JSON="$PKG_JSON" node -e 'const f=process.env.PKG_JSON,j=require("./"+f);j.version=process.env.CF_V;require("fs").writeFileSync(f,JSON.stringify(j,null,2)+"\n")'
+  echo "    $PKG_JSON version -> $VERSION"
 fi
 
 # Read the current date only once the file is known to exist and carry the key:
 # under 'set -Eeuo pipefail' a sed against a missing file fails the assignment
 # and trips the ERR trap, which would kill the run before the guard below could
 # report the problem in its own words.
-if [[ ! -f ht.config.js ]]; then
-  warn "There is no ht.config.js, so the release date was not set anywhere - if the file was moved, set the release date to $DATE_HT in its new home and commit it on release/$VERSION."
-elif ! grep -q HT_RELEASE_DATE ht.config.js; then
+if [[ ! -f "$PKG_HT_CONFIG" ]]; then
+  warn "There is no $PKG_HT_CONFIG, so the release date was not set anywhere - if the file was moved, set the release date to $DATE_HT in its new home and commit it on release/$VERSION."
+elif ! grep -q HT_RELEASE_DATE "$PKG_HT_CONFIG"; then
   warn "ht.config.js has no HT_RELEASE_DATE key, so the release date was not set - add HT_RELEASE_DATE: '$DATE_HT' and commit it on release/$VERSION."
 else
   # Accept either quote style, matching the write below: a double-quoted value
   # the read could not see would defeat the skip this step exists to add.
-  CURRENT_HT_DATE="$(sed -n "s/.*HT_RELEASE_DATE[[:space:]]*:[[:space:]]*['\"]\([^'\"]*\)['\"].*/\1/p" ht.config.js | head -1 || true)"
+  CURRENT_HT_DATE="$(sed -n "s/.*HT_RELEASE_DATE[[:space:]]*:[[:space:]]*['\"]\([^'\"]*\)['\"].*/\1/p" "$PKG_HT_CONFIG" | head -1 || true)"
   if [[ "$CURRENT_HT_DATE" == "$DATE_HT" ]]; then
-    skip "ht.config.js HT_RELEASE_DATE already $DATE_HT"
+    skip "$PKG_HT_CONFIG HT_RELEASE_DATE already $DATE_HT"
   elif $DRY_RUN; then
-    echo "    (set ht.config.js HT_RELEASE_DATE='$DATE_HT')"
-  elif CF_D="$DATE_HT" node -e 'const f="ht.config.js",fs=require("fs");const s=fs.readFileSync(f,"utf8");const n=s.replace(/(HT_RELEASE_DATE\s*:\s*)([\x27"])[^\x27"]*\2/,`$1$2${process.env.CF_D}$2`);if(n===s)process.exit(1);fs.writeFileSync(f,n)'; then
-    echo "    ht.config.js HT_RELEASE_DATE -> $DATE_HT"
+    echo "    (set $PKG_HT_CONFIG HT_RELEASE_DATE='$DATE_HT')"
+  elif CF_D="$DATE_HT" PKG_HT_CONFIG="$PKG_HT_CONFIG" node -e 'const f=process.env.PKG_HT_CONFIG,fs=require("fs");const s=fs.readFileSync(f,"utf8");const n=s.replace(/(HT_RELEASE_DATE\s*:\s*)([\x27"])[^\x27"]*\2/,`$1$2${process.env.CF_D}$2`);if(n===s)process.exit(1);fs.writeFileSync(f,n)'; then
+    echo "    $PKG_HT_CONFIG HT_RELEASE_DATE -> $DATE_HT"
   else
     # The replace above matched nothing - the value is not a plain quoted string
     # (a template literal, an extracted constant, a quoted key). The key was
     # there, so the earlier grep passed; without this branch the file would be
     # rewritten unchanged and the '-> DATE' success line would still print.
-    warn "ht.config.js HT_RELEASE_DATE is not a plain quoted string, so the release date was not set - set it to $DATE_HT by hand and commit it on release/$VERSION."
+    warn "$PKG_HT_CONFIG HT_RELEASE_DATE is not a plain quoted string, so the release date was not set - set it to $DATE_HT by hand and commit it on release/$VERSION."
   fi
 fi
 
@@ -639,18 +647,28 @@ fi
 #    while node_modules is missing - and skipping then would take a broken
 #    install straight into the build.
 step "4. Reinstall dependencies"
-LOCK_VERSION="$(node -e 'try{process.stdout.write(require("./package-lock.json").version||"")}catch(e){}' 2>/dev/null || true)"
+# The workspace lock file has no top-level version: the engine's sits in the
+# entry for its directory.
+LOCK_VERSION="$(PKG_DIR="$PKG_DIR" node -e 'try{process.stdout.write(require("./package-lock.json").packages[process.env.PKG_DIR].version||"")}catch(e){}' 2>/dev/null || true)"
 if [[ "$LOCK_VERSION" == "$VERSION" && -d node_modules ]]; then
   skip "package-lock.json already regenerated for $VERSION"
 else
-  run rm -rf ./node_modules
+  # Every workspace's own node_modules too: npm keeps there whatever it could
+  # not hoist, and an install without a lock file starts from what is on disk,
+  # so a stale copy left there would be written into the new lock file. The
+  # globs mirror the root package.json "workspaces".
+  run rm -rf ./node_modules "$PKG_DIR/node_modules" \
+    hyperformula-ui/packages/*/node_modules \
+    hyperformula-ui/demo/*/node_modules \
+    hyperformula-ui/e2e/node_modules
   run rm -f package-lock.json
   run npm i
 fi
 
 # 5. Build / lint / test  (the private test suite was already pointed at this
 #    branch in step 2, and nothing since has changed the branch it follows).
-#    'npm run test' is lint, the unit tests and the browser suite, so it needs
+#    'npm run test' is lint (engine and hyperformula-ui), the engine's unit
+#    tests, the browser suite and the hyperformula-ui unit tests, so it needs
 #    headless Chrome and Firefox on this machine - there is no separate lint
 #    call here because that script runs it first.
 step "5. Build, lint + test"
@@ -658,10 +676,10 @@ run npm run bundle-all
 run npm run test
 
 # 6. CHANGELOG.md - add version heading under [Unreleased]
-step "6. Update CHANGELOG.md"
-if [[ ! -f CHANGELOG.md ]] || ! grep -q '^## \[Unreleased\]' CHANGELOG.md; then
+step "6. Update $PKG_CHANGELOG"
+if [[ ! -f "$PKG_CHANGELOG" ]] || ! grep -q '^## \[Unreleased\]' "$PKG_CHANGELOG"; then
   warn "Could not find '## [Unreleased]' in CHANGELOG.md, so there is no $VERSION section - add it by hand and commit it on release/$VERSION (the release notes and the GitHub release both come from it)."
-elif grep -q "^## \[${VERSION//./\\.}\]" CHANGELOG.md; then
+elif grep -q "^## \[${VERSION//./\\.}\]" "$PKG_CHANGELOG"; then
   skip "already has an entry for $VERSION"
 elif $DRY_RUN; then
   echo "    (insert '## [$VERSION] - $DATE_ISO' under [Unreleased] - the new section will read:)"
@@ -673,8 +691,8 @@ else
   local tmp; tmp="$(mktemp)"
   awk -v v="## [$VERSION] - $DATE_ISO" '
     {print}
-    /^## \[Unreleased\]/ && !d {print ""; print v; d=1}' CHANGELOG.md >"$tmp"
-  cat "$tmp" > CHANGELOG.md
+    /^## \[Unreleased\]/ && !d {print ""; print v; d=1}' "$PKG_CHANGELOG" >"$tmp"
+  cat "$tmp" > "$PKG_CHANGELOG"
   rm -f "$tmp"
   echo "    inserted '## [$VERSION] - $DATE_ISO'"
 fi
@@ -683,7 +701,7 @@ fi
 #    (## [x] - iso  ->  ## x  +  **Release date: Month D, YYYY**  + same bullets)
 step "7. Generate release notes"
 RN="docs/guide/release-notes.md"
-if [[ ! -f CHANGELOG.md || ! -f "$RN" ]]; then
+if [[ ! -f "$PKG_CHANGELOG" || ! -f "$RN" ]]; then
   warn "CHANGELOG.md or $RN is missing, so no release notes were generated - write the $VERSION entry by hand and commit it on release/$VERSION."
 else
   # Extract the changelog body with the SAME helper step 6's preview uses, then
@@ -695,7 +713,7 @@ else
   else
     RN_HEADING="## [$VERSION]"; RN_PATTERN="^## \[${VERSION//./\\.}\]"
   fi
-  grep -q "$RN_PATTERN" CHANGELOG.md && RN_FOUND=1 || RN_FOUND=0
+  grep -q "$RN_PATTERN" "$PKG_CHANGELOG" && RN_FOUND=1 || RN_FOUND=0
   CF_V="$VERSION" CF_LONG="$DATE_LONG" CF_RN="$RN" CF_FENCE="$PREVIEW_FENCE" \
   CF_FOUND="$RN_FOUND" CF_BODY="$(changelog_section_body "$RN_HEADING")" \
   CF_DRY="$($DRY_RUN && echo 1 || echo '')" node <<'NODE'
@@ -776,14 +794,16 @@ else
     merge_develop_into_version_branch "$VERSION_BRANCH" )
   # CodeSandbox / StackBlitz demo URLs in this repo's docs: point every one at
   # the new branch, whatever branch it names now (old releases left several
-  # behind). Scans docs/guide and docs/index.md only - the tracked files that
-  # carry these URLs. Walking all of docs/ would also descend into the gitignored
-  # generated trees (docs/api, docs/functions, docs/.vuepress/dist), whose built
-  # HTML repeats the same URLs but is never committed - it would bury the dry-run
-  # preview under hundreds of lines and inflate the reported file count.
+  # behind). Scans docs/guide, docs/index.md and $PKG_README only - the tracked
+  # files that carry these URLs. Walking all of docs/ would also descend into the
+  # gitignored generated trees (docs/api, docs/functions, docs/.vuepress/dist),
+  # whose built HTML repeats the same URLs but is never committed - it would bury
+  # the dry-run preview under hundreds of lines and inflate the reported file
+  # count. If you add one here, add it to step 9's ADD_PATHS too.
   DOC_URL_PATHS=()
   [[ -d docs/guide ]] && DOC_URL_PATHS+=(docs/guide)
   [[ -f docs/index.md ]] && DOC_URL_PATHS+=(docs/index.md)
+  [[ -f "$PKG_README" ]] && DOC_URL_PATHS+=("$PKG_README")
   if [[ ${#DOC_URL_PATHS[@]} -gt 0 ]]; then
     CF_NEW="$VERSION_BRANCH" CF_FENCE="$PREVIEW_FENCE" \
     CF_DRY="$($DRY_RUN && echo 1 || echo '')" perl - "${DOC_URL_PATHS[@]}" <<'PERL'
@@ -854,7 +874,7 @@ if (!$count) {
 }
 PERL
   else
-    skip "no docs/guide or docs/index.md here - no demo URLs to rewrite"
+    skip "no docs/guide, docs/index.md or $PKG_README here - no demo URLs to rewrite"
   fi
 fi
 
@@ -866,17 +886,18 @@ step "9. Commit + push release/$VERSION"
 # though, not a list of files this run wrote, so they cannot tell the freeze's
 # edits from the operator's inside the same path - which is why the preflight
 # refuses to start a fresh freeze on a dirty tree.
-# package-lock.json, ht.config.js and docs/ are each conditional on existing:
-# step 4 deletes and regenerates the lock file, so between an 'npm i' and its
-# write it is briefly gone, and both files can be legitimately absent altogether
-# (see step 3) - a bare pathspec for any of them would die under 'set -e' when
-# it is not there.
+# package-lock.json, ht.config.js, docs/ and $PKG_README are each conditional on
+# existing: step 4 deletes and regenerates the lock file, so between an 'npm i'
+# and its write it is briefly gone, and the others can be legitimately absent
+# altogether (see steps 3 and 8) - a bare pathspec for any of them would die
+# under 'set -e' when it is not there.
 # Anything a future step writes outside these paths will not be committed, so
 # add its path here too.
-ADD_PATHS=(package.json CHANGELOG.md)
+ADD_PATHS=("$PKG_JSON" "$PKG_CHANGELOG")
 [[ -f package-lock.json ]] && ADD_PATHS+=(package-lock.json)
-[[ -f ht.config.js ]] && ADD_PATHS+=(ht.config.js)
+[[ -f "$PKG_HT_CONFIG" ]] && ADD_PATHS+=("$PKG_HT_CONFIG")
 [[ -d docs ]] && ADD_PATHS+=(docs)
+[[ -f "$PKG_README" ]] && ADD_PATHS+=("$PKG_README")
 run git add "${ADD_PATHS[@]}"
 if $DRY_RUN || [[ -n "$(git status --porcelain -- "${ADD_PATHS[@]}")" ]]; then
   run git commit -m "$VERSION"
@@ -938,14 +959,14 @@ done
 
 # Not configurable, as in code-freeze: test/fetch-tests.sh and the CI workflows
 # all hardcode this path.
-TESTS_DIR="test/hyperformula-tests"
+TESTS_DIR="$PKG_DIR/test/hyperformula-tests"
 
 # ---- sanity checks ----
 # Named, as in code-freeze, so a failure in any of the checks below is reported
 # against a step instead of against "startup".
 step "Preflight"
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "Not inside a git repo."
-[[ -f package.json ]] || die "No package.json here - run from the hyperformula repo root."
+[[ -f "$PKG_JSON" ]] || die "No $PKG_JSON here - run from the hyperformula repo root."
 # node reads package.json on the release ref in the preflight below.
 for tool in npm node; do
   command -v "$tool" >/dev/null || die "$tool not found."
@@ -991,12 +1012,12 @@ RELEASE_TIP="$RESOLVED_TIP"
 # Tolerant read, then explicit checks: under 'pipefail' an unreadable file or a
 # throwing JSON.parse would fail this assignment and trip the ERR trap, which
 # reports far less than the two messages below.
-REF_VERSION="$(git show "$RELEASE_REF:package.json" 2>/dev/null \
+REF_VERSION="$(git show "$RELEASE_REF:$PKG_JSON" 2>/dev/null \
   | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(JSON.parse(s).version||"")}catch(e){}})' 2>/dev/null || true)"
 [[ -n "$REF_VERSION" ]] \
-  || die "Could not read a version from package.json on $RELEASE_REF."
+  || die "Could not read a version from $PKG_JSON on $RELEASE_REF."
 [[ "$REF_VERSION" == "$VERSION" ]] \
-  || die "package.json on $RELEASE_REF says $REF_VERSION, not $VERSION."
+  || die "$PKG_JSON on $RELEASE_REF says $REF_VERSION, not $VERSION."
 
 # Same requirement in the tests repo, checked here so the run fails before it
 # touches master, rather than half-way through the merge-back. The same helper,
@@ -1033,9 +1054,10 @@ fi
 # but as a warning, not an error: by the time step 8 runs the release is out,
 # so refusing there would leave a published package and a dead script. A branch
 # that is missing at publish time usually means the freeze's demos step never
-# completed, which also means the CodeSandbox URLs in docs/ were never rewritten.
+# completed, which also means the CodeSandbox URLs in docs/ and $PKG_README were
+# never rewritten.
 if ! branch_exists "$VERSION_BRANCH" "$DEMOS_DIR" && ! remote_branch_exists "$VERSION_BRANCH" "$DEMOS_DIR"; then
-  note "hyperformula-demos has no $VERSION_BRANCH branch, so step 8 will create it from develop. For a major or minor release the freeze's demos step should already have created it, so check that the CodeSandbox URLs in docs/ name tree/$VERSION_BRANCH as well. For the first patch on a new minor line there may simply be nothing there yet."
+  note "hyperformula-demos has no $VERSION_BRANCH branch, so step 8 will create it from develop. For a major or minor release the freeze's demos step should already have created it, so check that the CodeSandbox URLs in docs/ and $PKG_README name tree/$VERSION_BRANCH as well. For the first patch on a new minor line there may simply be nothing there yet."
 fi
 
 step "Plan"
@@ -1142,10 +1164,16 @@ run git checkout master
 if on_npm "$VERSION"; then
   skip "hyperformula@$VERSION is already on npm - not publishing again"
 elif $DRY_RUN; then
-  echo "    (would ask for confirmation, then run: npm publish --tag $NPM_TAG)"
+  echo "    (would ask for confirmation, then run: npm run copy-root-files --workspace=hyperformula, then npm publish --workspace=hyperformula --tag $NPM_TAG)"
 else
   confirm_publish "$VERSION" "$NPM_USER"
-  run npm publish --tag "$NPM_TAG"
+  # Publish the workspace, not the root, whose manifest is private. The changelog
+  # and licence live at the repository root and npm cannot pack outside the
+  # package. The package's prepack copies them in, but npm skips lifecycle
+  # scripts entirely when ignore-scripts is set in the maintainer's npmrc - and
+  # then the tarball ships without both. So copy them explicitly as well.
+  run npm run copy-root-files --workspace=hyperformula
+  run npm publish --workspace=hyperformula --tag "$NPM_TAG"
   wait_for_npm "$VERSION"
 fi
 
@@ -1186,7 +1214,8 @@ if $DRY_RUN; then echo "  (dry run - nothing changed; re-run with --real-run to 
 manual_checklist <<NEXT
   [ ] Create the GitHub release for $VERSION (body = the $VERSION section of CHANGELOG.md):
         https://github.com/handsontable/hyperformula/releases/new?tag=$VERSION&title=$VERSION$($IS_PRERELEASE && printf '&prerelease=1\n      (prerelease - leave the "Set as the latest release" box unchecked)')
-  [ ] Check that the docs workflow deployed the documentation to gh-pages
+  [ ] Check that Workers Builds deployed the docs from master (the "Workers Builds:
+      hyperformula-docs" check on the master commit) to https://handsontable.com/docs/hyperformula/
   [ ] Review the deployed docs and test the demos
   [ ] Announce the release in #hyperformula and #release
   [ ] Close the GitHub and ClickUp tasks in this release, announcing $VERSION,
