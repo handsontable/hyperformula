@@ -234,7 +234,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    *
    * Returns the text representation of a value. An error value is returned as text rather than propagated.
    * Format 0 (default) is concise; format 1 is strict: text is wrapped in double quotes with embedded quotes doubled.
-   * The format is truncated to an integer and must end up as 0 or 1, otherwise the result is #VALUE!.
+   * The format is rounded down to an integer and must end up as 0 or 1, otherwise the result is #VALUE!.
    *
    * @param {ProcedureAst} ast - The procedure AST node
    * @param {InterpreterState} state - The interpreter state
@@ -250,7 +250,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         return new CellError(ErrorType.VALUE)
       }
 
-      const formatCode = Math.trunc(getRawValue(format))
+      const formatCode = Math.floor(getRawValue(format))
       if (formatCode !== 0 && formatCode !== 1) {
         return new CellError(ErrorType.VALUE)
       }
