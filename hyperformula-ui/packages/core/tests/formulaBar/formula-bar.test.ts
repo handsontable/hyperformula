@@ -1257,6 +1257,22 @@ class TaxRateHF {
     this.emit("namedExpressionAdded", name);
   }
 
+  undoNamedExpression(name: string, changes: unknown[]) {
+    this.names = this.names.filter((item) => item !== name);
+    this.emitValues(changes);
+  }
+
+  emitValues(changes: unknown[]) {
+    for (const listener of this.listeners.get("valuesUpdated") ?? []) {
+      (listener as unknown as (changes: unknown[]) => void)(changes);
+    }
+  }
+
+  removeSheetWithNames(names: string[]) {
+    this.names = this.names.filter((item) => !names.includes(item));
+    this.emit("sheetRemoved", "Sheet2");
+  }
+
   removeNamedExpression(name: string) {
     this.names = this.names.filter((item) => item !== name);
     this.emit("namedExpressionRemoved", name);
@@ -1324,6 +1340,46 @@ describe("FormulaBar named expressions", () => {
     engine.removeNamedExpression("Rate");
     expect(refIndexByText(placeholderEl(container)).Rate).toBeUndefined();
     expect(refIndexByText(placeholderEl(container)).B2).toBe("0");
+
+    controller.destroy();
+    editor.destroy();
+  });
+
+  it("recolors the idle view when an undo removes a named expression without a named event", () => {
+    const engine = new TaxRateHF();
+    const { container, editor, controller } = makeNamedHarness(engine, "=TaxRate+B2");
+
+    expect(refIndexByText(placeholderEl(container)).TaxRate).toBe("0");
+
+    engine.undoNamedExpression("TaxRate", [{ address: { sheet: 0, col: 0, row: 0 } }]);
+
+    expect(refIndexByText(placeholderEl(container)).TaxRate).toBeUndefined();
+    expect(refIndexByText(placeholderEl(container)).B2).toBe("0");
+
+    controller.destroy();
+    editor.destroy();
+  });
+
+  it("recolors the idle view when removing a sheet takes its named expressions along", () => {
+    const engine = new TaxRateHF();
+    const { container, editor, controller } = makeNamedHarness(engine, "=TaxRate+B2");
+
+    engine.removeSheetWithNames(["TaxRate"]);
+
+    expect(refIndexByText(placeholderEl(container)).TaxRate).toBeUndefined();
+
+    controller.destroy();
+    editor.destroy();
+  });
+
+  it("resolves named expressions afresh each time a value is set", () => {
+    const engine = new TaxRateHF();
+    const { container, editor, controller } = makeNamedHarness(engine, "=TaxRate+B2");
+
+    engine.undoNamedExpression("TaxRate", []);
+    editor.setValue("=TaxRate+B2");
+
+    expect(refIndexByText(container.querySelector(".hfe-editor")).TaxRate).toBeUndefined();
 
     controller.destroy();
     editor.destroy();

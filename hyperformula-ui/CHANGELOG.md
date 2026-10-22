@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed `color-scheme` to be set only on the editor, the formula bar, the popup roots and the grid highlight layer, so a host theme class on them controls light and dark mode. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 
 ### Fixed
+- Fixed a removed named expression staying colored as a reference in the editor and the formula bar after `undo()`, `redo()`, `changeNamedExpression()` or `removeSheet()`. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 - Fixed the idle formula bar coloring references differently from the editor when the formula contains a named expression. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 - Fixed `FormulaBuilder.destroy()` throwing, and leaving the popups and styles in the page, when the HyperFormula instance was destroyed first. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 - Fixed slow tokenizing of a long run of apostrophes, which took about 600 ms for 40,000 characters. [#1839](https://github.com/handsontable/hyperformula/pull/1839)

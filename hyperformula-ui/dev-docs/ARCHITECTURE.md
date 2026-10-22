@@ -93,7 +93,7 @@ seeded with `FormulaEditor.knownFunctionNames`, rendered via `renderValue()` thr
 view's tokens go through the same `annotateNamedExprs` step as the editor's kernel
 (`FormulaBarCellOptions.tokenPostProcess`), so a named expression takes a reference color slot
 in both and every later reference keeps the same color; `FormulaBar` re-renders the idle view
-through `FormulaBarCell.refresh()` when `EngineBridge.onNamedExpressionsChange` fires.
+through `FormulaBarCell.refresh()` when `EngineBridge.onNamedExpressionsChange` fires (on HyperFormula's named-expression, `valuesUpdated` and `sheetRemoved` events — see SPEC.md §10 for why the named-expression events alone are not enough).
 
 While the editor is inline, `FormulaBarCell`'s idle view shows a live colored mirror of the
 current text. Because the wrap styles are shared, a bar-hosted editor soft-wraps at the bar

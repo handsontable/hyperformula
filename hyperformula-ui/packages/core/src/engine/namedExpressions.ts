@@ -27,6 +27,8 @@ export class NamedExpressions {
     this.sheetId = sheetId;
     this.engine?.on?.("namedExpressionAdded", this.onNamedExpressionChanged);
     this.engine?.on?.("namedExpressionRemoved", this.onNamedExpressionChanged);
+    this.engine?.on?.("valuesUpdated", this.onNamedExpressionChanged);
+    this.engine?.on?.("sheetRemoved", this.onNamedExpressionChanged);
   }
 
   private buildScopeByUpperName(): Map<string, number | "global"> {
@@ -179,6 +181,8 @@ export class NamedExpressions {
     try {
       this.engine?.off?.("namedExpressionAdded", this.onNamedExpressionChanged);
       this.engine?.off?.("namedExpressionRemoved", this.onNamedExpressionChanged);
+      this.engine?.off?.("valuesUpdated", this.onNamedExpressionChanged);
+      this.engine?.off?.("sheetRemoved", this.onNamedExpressionChanged);
     } catch {}
   }
 }

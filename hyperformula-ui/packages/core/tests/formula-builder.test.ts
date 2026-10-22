@@ -20,6 +20,7 @@ class FakeCommitEngine implements HyperFormulaLike {
     event: "namedExpressionAdded" | "namedExpressionRemoved",
     listener: (name: string) => void,
   ): void;
+  on(event: "sheetRemoved", listener: (sheetName: string) => void): void;
   on(event: string, listener: (...args: never[]) => void): void {
     if (event === "valuesUpdated") {
       this.listeners.push(listener as (changes: unknown[]) => void);
@@ -31,6 +32,7 @@ class FakeCommitEngine implements HyperFormulaLike {
     event: "namedExpressionAdded" | "namedExpressionRemoved",
     listener: (name: string) => void,
   ): void;
+  off(event: "sheetRemoved", listener: (sheetName: string) => void): void;
   off(event: string, listener: (...args: never[]) => void): void {
     if (event === "valuesUpdated") {
       this.listeners = this.listeners.filter((registered) => registered !== listener);

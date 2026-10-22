@@ -401,6 +401,7 @@ export class FormulaEditor {
     const internal = nToComments(text, this.separators);
     const caretOffset = Math.min(options?.caret ?? internal.length, internal.length);
 
+    this.engine.invalidateNamedExpressionCache();
     this.point.exit();
     this.keyboard.resetRangeMode();
     this.refs.resetLastRef();
