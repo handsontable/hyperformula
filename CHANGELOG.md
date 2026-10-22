@@ -9,24 +9,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- Added a message after `npm i hyperformula` that points AI assistants to the SKILLS file. The message needs `--foreground-scripts` to be visible in npm, and pnpm 10 needs the `postinstall` script to be approved first. [#1829](https://github.com/handsontable/hyperformula/pull/1829)
 - Added `DetailedCellError.hasMessage`, so a consumer can tell a cell error that never carried a message (e.g. a custom function that omitted one) apart from one with a deliberately empty message — both previously surfaced identically as `message: ''`. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
-- Added `DetailedCellError.originFunction` and `DetailedCellError.argumentIndex`, so a consumer can tell which function or operator produced a cell error and, when it failed coercing one of its own arguments, which argument that was. First occurrence wins: a function or operator that only reads or propagates an error never claims to have produced it. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Added `DetailedCellError.originFunction` and `DetailedCellError.argumentIndex`, which name the function or operator that produced a cell error and, when it failed to coerce an argument, that argument's position as written in the formula. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ### Changed
 
 - Changed the cell errors thrown by the formula engine to always carry a message describing their cause. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
-- Changed the cell errors thrown outside the formula interpreter — invalidated references, references the parser cannot resolve, references exceeding the sheet size, circular references, cleaned-up array results, and error values typed directly into a formula — to also carry a message describing their cause. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Changed the cell errors produced outside the formula interpreter, such as invalidated references, circular references and error values typed into a formula, to also carry a message describing their cause. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ### Fixed
 
-- Fixed a cell holding a static error value — a formula the parser rejected, or an error value entered directly — being reported under the address of whichever cell read it first. Such a cell now reports its own address, and keeps reporting it as rows and columns move around it. After a very long run of structural changes the original position can no longer be reconstructed, and the address is omitted rather than guessed. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
-- A parsing error, an error value typed directly into a cell, and an error literal written into a formula are now attributed to `parser`, `user input`, or `literal` respectively, instead of being silently unattributed or (for a parsing error) reporting no address at all. `#SPILL!` errors now report the cell that failed to spill instead of no address. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
-- Fixed a function or operator being reported as the producer of an error it only read. A reference that cannot be resolved now reports `reference`, and one destroyed by removing rows or columns reports `removed reference`, so `=SUM(A2:A99999999999)` no longer reports `SUM` and `=ABS(A2:A99999999999)` no longer reports an argument index that belongs to nothing. Errors that arise inside an array are attributed to the operation that built the array, so a broadcast gap in `=INDEX(A1:A2+B1:B3, 3, 1)` now reports the `+` operator rather than `INDEX`, and a per-element coercion failure reports the function alongside the argument index. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
+- Fixed a cell holding a static error value, such as a rejected formula or a typed-in error, being reported under the address of the cell that read it first instead of its own address. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Fixed parsing errors, error values typed into a cell and error literals in a formula having no origin, which is now `parser`, `user input` or `literal`, and `#SPILL!` errors reporting no address instead of the cell that failed to spill. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Fixed a function or operator being reported as the producer of an error it only read: an unresolvable reference now reports `reference`, a removed one `removed reference`, and an error inside an array the operation that built the array. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 - Reading a formula cell's value before it has been computed now throws a `CellValueNotComputedError` naming the cell's address, instead of a plain `Error` with no way to trace which cell caused it. [#444](https://github.com/handsontable/hyperformula/issues/444)
+
+## [3.5.0] - 2026-10-09
+
+### Added
+
+- Added support for the new license key format. A proprietary key can now grant a subset of the library: a function your key does not include evaluates to a `#LIC!` error, and the matching parts of the API throw a `LicenseCapabilityMissingError`. `getAvailableFunctions()` and `getFunctionDetails()` describe only the functions your key includes. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+
+### Changed
+
+- Changed the `VERSION` function to return only the HyperFormula version (e.g. `HyperFormula v3.4.0`), without the license key status. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+- Changed the API methods gated by the license key to throw a `LicenseCapabilityMissingError` when the key is missing or invalid, when a classic key has expired, or when a trial key is past its grace period. The gated methods are the ones that edit cells, rows, columns, and sheets, `copy()`, `cut()`, `paste()`, `undo()`, `redo()`, `batch()`, `suspendEvaluation()`, and the methods that add, change, or remove named expressions. Building an engine with named expressions throws the same error, and the matching `isItPossibleTo*()` methods, `isThereSomethingToUndo()`, and `isThereSomethingToRedo()` return `false`. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
+- Changed the `MAXPOOL` and `MEDIANPOOL` functions to accept a stride greater than the window size in a cell, where they returned the `#VALUE!` error before. The windows then skip the rows and columns between them, as `calculateFormula()` already did. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
+
+### Fixed
+
+- Fixed the validation of classic (25-character) license keys depending on the time zone: east of UTC, a key that expired the day before the build was released was still accepted, and west of UTC, the console message printed an expiry date one day too early. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
 - Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`. [#1733](https://github.com/handsontable/hyperformula/pull/1733)
 - Fixed the localized names of `VSTACK` and `HSTACK` in 14 language packs to match Microsoft Excel. [#1748](https://github.com/handsontable/hyperformula/pull/1748)
-- Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
+- Fixed the `MAXPOOL` and `MEDIANPOOL` functions throwing an uncaught `TypeError` or `RangeError`. They now return the `#VALUE!` error when the window is larger than the range or the range dimensions, reduced by the window size, are not whole multiples of the stride, and the `#NUM!` error when the window size or the stride is not a positive integer. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
+- Fixed the `VAR`, `STDEV`, `DEVSQ`, `COVARIANCE.P`, `COVARIANCE.S`, `SLOPE`, `STEYX`, `DVAR` and `DSTDEV` functions, their variants, and the matching `SUBTOTAL` modes losing precision on data with a large mean and a small spread. [#1784](https://github.com/handsontable/hyperformula/pull/1784)
+- Fixed a bug where `SLOPE` and `STEYX` returned `#NUM!` or an arbitrary number instead of `#DIV/0!` when all the x values are equal. [#1784](https://github.com/handsontable/hyperformula/pull/1784)
+- Fixed a bug where `STEYX` returned `#NUM!` or `0` instead of the standard error for points that lie almost on a line. [#1784](https://github.com/handsontable/hyperformula/pull/1784)
+- Fixed a bug where `VAR`, `STDEV`, `DVAR`, `DSTDEV`, `COVARIANCE.P`, `COVARIANCE.S`, `SLOPE`, `STEYX`, their variants, and the matching `SUBTOTAL` modes returned an error or `0` for very large or very small values although the result was within the range of numbers, and `DEVSQ` returned `0` for very small values. [#1784](https://github.com/handsontable/hyperformula/pull/1784)
 - Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
+- Fixed a bug where moving or pasting a formula with an undefined name to another sheet incorrectly added an empty global named expression. [#1728](https://github.com/handsontable/hyperformula/pull/1728)
 
 ## [3.4.0] - 2026-08-10
 

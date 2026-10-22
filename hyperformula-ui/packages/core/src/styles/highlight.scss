@@ -1,0 +1,16 @@
+.hfe-highlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  &__item {
+    position: absolute;
+    pointer-events: none;
+    border-width: var(--hfe-reference-border-width);
+    border-radius: var(--hfe-border-radius);
+    border-style: dashed;
+    box-sizing: border-box !important;
+    z-index: 5;
+    display: none;
+  }
+}
