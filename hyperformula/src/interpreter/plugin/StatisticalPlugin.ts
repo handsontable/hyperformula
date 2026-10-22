@@ -37,14 +37,14 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
     'ERF': {
       method: 'erf',
       parameters: [
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.SCALAR, optionalArg: true},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
       ]
     },
     'ERFC': {
       method: 'erfc',
       parameters: [
-        {argumentType: FunctionArgumentType.SCALAR}
+        {argumentType: FunctionArgumentType.NUMBER}
       ]
     },
     'ERF.PRECISE': {
@@ -433,7 +433,7 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
   }
 
   /**
-   * Converts an argument the way Excel does for the error functions: numbers, dates, numeric text and empty cells are
+   * Converts an argument the way Excel does for ERF.PRECISE: numbers, dates, numeric text and empty cells are
    * accepted, while a boolean or the empty text is #VALUE!. Errors are passed on.
    */
   private strictNumber(value: InternalScalarValue): number | CellError {
@@ -448,24 +448,17 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
   }
 
   public erf(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('ERF'), (lower: InternalScalarValue, upper?: InternalScalarValue) => {
-      const lowerBound = this.strictNumber(lower)
-      if (lowerBound instanceof CellError) {
-        return lowerBound
-      }
-      if (upper === undefined) {
+    return this.runFunction(ast.args, state, this.metadata('ERF'), (lowerBound, upperBound) => {
+      if (upperBound === undefined) {
         return erf(lowerBound)
+      } else {
+        return erf(upperBound) - erf(lowerBound)
       }
-      const upperBound = this.strictNumber(upper)
-      return upperBound instanceof CellError ? upperBound : erf(upperBound) - erf(lowerBound)
     })
   }
 
   public erfc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('ERFC'), (x: InternalScalarValue) => {
-      const value = this.strictNumber(x)
-      return value instanceof CellError ? value : erfc(value)
-    })
+    return this.runFunction(ast.args, state, this.metadata('ERFC'), erfc)
   }
 
   public erfprecise(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
