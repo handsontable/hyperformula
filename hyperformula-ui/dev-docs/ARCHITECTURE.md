@@ -496,6 +496,19 @@ All popup-style overlays share a common base class `BasePopup`
   (`popupCtx.portal`) is the shared DOM parent all three popups append to. All three popups
   take a plain `container: HTMLElement`, not the full `PopupContext` — `FormulaBuilder` passes
   `popupCtx.portal` to each; `popupCtx.destroy()` runs in `FormulaBuilder.destroy()`.
+- **Document and portal parent:** `FormulaBuilder`'s `portalParent` option (default
+  `rootDocument.body`) is where the portal and the `LiveRegion` go; both are created in the
+  parent's own document. A host inside a shadow root passes that shadow root, so the
+  textarea's `aria-controls`/`aria-activedescendant` and a cell's `aria-errormessage` resolve
+  in one tree, and an axe scan of that root sees the popups. `rootDocument` (default the global
+  `document`) is the document selector options are resolved against, the detached mount is
+  created in, and the stylesheet goes into. Styles are injected per root
+  (`createStyleInjector(...).inject(root)`, ref-counted per document or shadow root): into
+  `rootDocument`, plus into the portal parent's shadow root when it is in one. Focus checks
+  never read `document.activeElement`: they call `deepActiveElement(element.ownerDocument)`
+  (`ui/dom.ts`), which follows open shadow roots down to the focused element and reads the
+  document the element is actually in. Window-level listeners (scroll, resize, the error
+  popup's keydown) and viewport sizes still use the global `window`.
 - `FormulaBar` constructor signature:
   `(container: HTMLElement, options: { adapter: IGridAdapter; editor: FormulaEditor; knownFunctions: ReadonlySet<string>; className?: string })`.
   It receives the pre-built `FormulaEditor` from `FormulaBuilder` — it does not construct
@@ -717,7 +730,7 @@ inside their host-specific renderers, because each host renders cells differentl
 The error tooltip itself is Esc-dismissible: `ErrorPopup` owns a window-level `keydown`
 (capture) listener, registered while attached; it consumes Escape only while the tooltip is
 visible AND no builder surface holds focus (`builderSurfaceHasFocus()` —
-`document.activeElement` inside a `.hfe-editor`, `.hfe-fn-help`, or `.hfe-formula-bar` root;
+the deep active element inside a `.hfe-editor`, `.hfe-fn-help`, or `.hfe-formula-bar` root;
 the fn-help dialog's own Escape handler and the address box's Escape-revert must win the
 same way the editor's ladder does), acted on in `attach()`'s
 scope alongside its existing scroll listener — no adapter or

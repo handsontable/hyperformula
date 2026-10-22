@@ -17,8 +17,9 @@ export function createEl<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   attrs?: Attrs,
   children?: (Node | string)[],
+  ownerDocument: Document = document,
 ): HTMLElementTagNameMap[K] {
-  const element = document.createElement(tag);
+  const element = ownerDocument.createElement(tag);
 
   if (attrs) {
     applyAttrs(element, attrs);
@@ -26,7 +27,7 @@ export function createEl<K extends keyof HTMLElementTagNameMap>(
 
   if (children) {
     for (const child of children) {
-      element.append(typeof child === "string" ? document.createTextNode(child) : child);
+      element.append(typeof child === "string" ? ownerDocument.createTextNode(child) : child);
     }
   }
 
@@ -91,6 +92,16 @@ export function clear(element: HTMLElement): void {
   while (element.firstChild) {
     element.removeChild(element.firstChild);
   }
+}
+
+export function deepActiveElement(ownerDocument: Document): Element | null {
+  let active = ownerDocument.activeElement;
+
+  while (active?.shadowRoot?.activeElement) {
+    active = active.shadowRoot.activeElement;
+  }
+
+  return active;
 }
 
 export function findAncestor(

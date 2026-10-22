@@ -6,7 +6,7 @@ import { FormulaBar } from "./formulaBar/formulaBar";
 import { FormulaEditor } from "./formulaEditor/formulaEditor";
 import type { FormulaEditorOptions } from "./formulaEditor/types";
 import { indexToColLetters } from "./lexer";
-import { injectStyles, releaseStyles } from "./theme/injectStyles";
+import { injectStyles, releaseStyles, type StyleRoot } from "./theme/injectStyles";
 import { LiveRegion } from "./ui/liveRegion";
 import { cellErrorMessage, setCellError } from "./ui/popup/cellError";
 import { ErrorPopup } from "./ui/popup/errorPopup";
@@ -16,6 +16,16 @@ import type { LayoutDirection, PopupsOptions } from "./ui/popup/types";
 import type { IconsOptions } from "./ui/types";
 
 const reportedMissingContainers = new Set<string>();
+
+function styleRootsFor(
+  rootDocument: Document,
+  portalParent: HTMLElement | ShadowRoot,
+): StyleRoot[] {
+  const portalRoot = portalParent.getRootNode();
+  const isShadowRoot = portalRoot.nodeType === Node.DOCUMENT_FRAGMENT_NODE && "host" in portalRoot;
+
+  return isShadowRoot ? [rootDocument, portalRoot as ShadowRoot] : [rootDocument];
+}
 
 /**
  * Options for {@link FormulaBuilder}; editor behavior options are inherited from
@@ -52,6 +62,24 @@ export interface FormulaBuilderOptions
 
   /** Popup behavior overrides (shared `showClose` default with per-popup overrides). */
   popups?: PopupsOptions;
+
+  /**
+   * Document the grid lives in, such as an iframe's: the builder creates its elements in it,
+   * resolves selector options against it, and injects its styles into its `<head>`.
+   *
+   * @defaultValue the global `document`
+   */
+  rootDocument?: Document;
+
+  /**
+   * Where the popup portal and the screen-reader live region are appended. Pass the grid's
+   * shadow root (or an element in it) to keep the popups in the same tree as the editor, so
+   * the editor's ARIA references resolve; the styles are then injected into that shadow root
+   * too.
+   *
+   * @defaultValue `rootDocument.body`
+   */
+  portalParent?: HTMLElement | ShadowRoot;
 }
 
 /**
@@ -85,6 +113,8 @@ export class FormulaBuilder {
   private readonly sharedClassName: string | undefined;
   private readonly direction: LayoutDirection | undefined;
   private readonly icons: IconsOptions | undefined;
+  private readonly rootDocument: Document;
+  private readonly styleRoots: StyleRoot[];
   private destroyed = false;
 
   constructor(options: FormulaBuilderOptions) {
@@ -101,7 +131,11 @@ export class FormulaBuilder {
       popups,
       icons,
       formulaBarContainer,
+      rootDocument = document,
+      portalParent = rootDocument.body,
     } = options;
+
+    this.rootDocument = rootDocument;
 
     const { container: suggestionsHost, ...suggestionsOwn } = popups?.suggestions ?? {};
     const { container: fnHelpHost, ...fnHelpOwn } = popups?.fnHelp ?? {};
@@ -109,8 +143,13 @@ export class FormulaBuilder {
     const fnHelpHostEl = this.resolveOptionalContainer(fnHelpHost, "fnHelp host");
     const formulaBarEl = this.resolveOptionalContainer(formulaBarContainer, "formulaBarContainer");
 
-    injectStyles();
-    this.liveRegion = new LiveRegion();
+    this.styleRoots = styleRootsFor(rootDocument, portalParent);
+
+    for (const styleRoot of this.styleRoots) {
+      injectStyles(styleRoot);
+    }
+
+    this.liveRegion = new LiveRegion(portalParent);
     this.adapter = adapter ?? new NullAdapter();
     this.sharedClassName = className;
     this.direction = direction;
@@ -141,7 +180,10 @@ export class FormulaBuilder {
       this.adapter.setOverlayClassName(className);
     }
 
-    this.popupCtx = new PopupContext(className === undefined ? undefined : { className });
+    this.popupCtx = new PopupContext({
+      parent: portalParent,
+      ...(className !== undefined && { className }),
+    });
 
     const suggestionsOptions = withSharedClose(popups?.showClose, suggestionsOwn);
     const fnHelpOptions = withSharedClose(popups?.showClose, fnHelpOwn);
@@ -154,7 +196,7 @@ export class FormulaBuilder {
       ...(icons !== undefined && { icons }),
     });
 
-    this.detachedMount = document.createElement("div");
+    this.detachedMount = rootDocument.createElement("div");
 
     this.formulaEditor = new FormulaEditor(this.detachedMount, {
       popupCtx: this.popupCtx,
@@ -223,7 +265,9 @@ export class FormulaBuilder {
 
   private resolveContainer(container: HTMLElement | string, label: string): HTMLElement {
     const containerEl =
-      typeof container === "string" ? document.querySelector<HTMLElement>(container) : container;
+      typeof container === "string"
+        ? this.rootDocument.querySelector<HTMLElement>(container)
+        : container;
 
     if (containerEl === null) {
       throw new Error(`FormulaBuilder: ${label} "${container}" not found`);
@@ -241,7 +285,9 @@ export class FormulaBuilder {
     }
 
     const containerEl =
-      typeof container === "string" ? document.querySelector<HTMLElement>(container) : container;
+      typeof container === "string"
+        ? this.rootDocument.querySelector<HTMLElement>(container)
+        : container;
 
     if (containerEl !== null) {
       return containerEl;
@@ -430,7 +476,7 @@ export class FormulaBuilder {
           this.adapter.setOverlayClassName(null);
         }
       },
-      () => releaseStyles(),
+      ...this.styleRoots.map((styleRoot) => () => releaseStyles(styleRoot)),
     ];
     const errors: unknown[] = [];
 

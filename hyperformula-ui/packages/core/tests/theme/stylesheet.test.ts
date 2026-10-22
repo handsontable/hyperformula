@@ -79,13 +79,12 @@ function contrastRatio(foreground: string, background: string): number {
 describe("reference palette", () => {
   const [lightBackground, darkBackground] = lightDarkPair("--hfe-color-background");
 
-  it.each(Array.from({ length: REF_COLOR_COUNT }, (_, i) => `--hfe-ref-${i + 1}`))(
-    "%s clears 4.5:1 on the light and dark editor backgrounds",
-    (property) => {
-      const [light, dark] = lightDarkPair(property);
+  it.each(
+    Array.from({ length: REF_COLOR_COUNT }, (_, i) => `--hfe-ref-${i + 1}`),
+  )("%s clears 4.5:1 on the light and dark editor backgrounds", (property) => {
+    const [light, dark] = lightDarkPair(property);
 
-      expect(contrastRatio(light, lightBackground)).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST);
-      expect(contrastRatio(dark, darkBackground)).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST);
-    },
-  );
+    expect(contrastRatio(light, lightBackground)).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST);
+    expect(contrastRatio(dark, darkBackground)).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST);
+  });
 });

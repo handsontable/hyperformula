@@ -1013,3 +1013,89 @@ describe("FormulaBuilder fill commit", () => {
     builder.destroy();
   });
 });
+
+describe("FormulaBuilder document and portal parent", () => {
+  afterEach(() => {
+    document.body.replaceChildren();
+  });
+
+  function shadowHost(): ShadowRoot {
+    const hostEl = document.createElement("div");
+
+    document.body.appendChild(hostEl);
+
+    return hostEl.attachShadow({ mode: "open" });
+  }
+
+  it("puts the popup portal, the live region and the styles into a shadow root", () => {
+    const shadow = shadowHost();
+    const rootEl = document.createElement("div");
+
+    shadow.appendChild(rootEl);
+
+    const builder = new FormulaBuilder({ rootEl, portalParent: shadow });
+
+    expect(shadow.querySelector(sel(CN.popupPortal))).not.toBeNull();
+    expect(shadow.querySelector(sel(CN.liveRegion))).not.toBeNull();
+    expect(shadow.querySelector("style[data-hfe-styles]")).not.toBeNull();
+    expect(document.body.querySelector(sel(CN.popupPortal))).toBeNull();
+    expect(document.body.querySelector(sel(CN.liveRegion))).toBeNull();
+
+    builder.destroy();
+
+    expect(shadow.querySelector(sel(CN.popupPortal))).toBeNull();
+    expect(shadow.querySelector(sel(CN.liveRegion))).toBeNull();
+    expect(shadow.querySelector("style[data-hfe-styles]")).toBeNull();
+  });
+
+  it("keeps the popups in the editor's shadow root, so their ids resolve from it", () => {
+    const shadow = shadowHost();
+    const rootEl = document.createElement("div");
+    const mount = document.createElement("div");
+
+    shadow.append(rootEl, mount);
+
+    const builder = new FormulaBuilder({ rootEl, portalParent: shadow });
+
+    builder.openEditor(mount, "=SUM(A1)");
+
+    const textareaRoot = mount.querySelector("textarea")?.getRootNode();
+    const suggestions = shadow.querySelector(sel(CN.suggestions));
+    const errorPopup = shadow.querySelector(sel(CN.errorPopup));
+
+    expect(textareaRoot).toBe(shadow);
+    expect(suggestions?.getRootNode()).toBe(shadow);
+    expect(errorPopup?.id).toBeTruthy();
+    expect(shadow.getElementById(errorPopup?.id ?? "")).toBe(errorPopup);
+
+    builder.destroy();
+  });
+
+  it("creates its elements in, and resolves selectors against, the given document", () => {
+    const frameDocument = document.implementation.createHTMLDocument("grid");
+    const barEl = frameDocument.createElement("div");
+
+    barEl.id = "bar";
+    frameDocument.body.appendChild(barEl);
+
+    const rootEl = frameDocument.createElement("div");
+
+    frameDocument.body.appendChild(rootEl);
+
+    const builder = new FormulaBuilder({
+      rootEl,
+      rootDocument: frameDocument,
+      formulaBarContainer: "#bar",
+    });
+
+    expect(builder.hasFormulaBar).toBe(true);
+    expect(frameDocument.body.querySelector(sel(CN.popupPortal))).not.toBeNull();
+    expect(frameDocument.body.querySelector(sel(CN.liveRegion))).not.toBeNull();
+    expect(frameDocument.head.querySelector("style[data-hfe-styles]")).not.toBeNull();
+    expect(document.body.querySelector(sel(CN.popupPortal))).toBeNull();
+
+    builder.destroy();
+
+    expect(frameDocument.head.querySelector("style[data-hfe-styles]")).toBeNull();
+  });
+});

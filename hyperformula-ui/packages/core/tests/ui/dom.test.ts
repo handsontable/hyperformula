@@ -4,6 +4,7 @@ import {
   createEl,
   createIcon,
   createSvgIcon,
+  deepActiveElement,
   ensureRelativePosition,
 } from "../../src/ui/dom";
 
@@ -183,5 +184,35 @@ describe("createIcon", () => {
     expect(first.tagName).toBe("I");
     expect(second).not.toBe(first);
     expect(factory).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("deepActiveElement", () => {
+  it("returns the focused element inside an open shadow root, not its host", () => {
+    const hostEl = document.createElement("div");
+
+    document.body.appendChild(hostEl);
+
+    const shadow = hostEl.attachShadow({ mode: "open" });
+    const input = document.createElement("input");
+
+    shadow.appendChild(input);
+    input.focus();
+
+    expect(document.activeElement).toBe(hostEl);
+    expect(deepActiveElement(document)).toBe(input);
+
+    hostEl.remove();
+  });
+
+  it("returns the document's active element outside shadow roots", () => {
+    const input = document.createElement("input");
+
+    document.body.appendChild(input);
+    input.focus();
+
+    expect(deepActiveElement(document)).toBe(input);
+
+    input.remove();
   });
 });

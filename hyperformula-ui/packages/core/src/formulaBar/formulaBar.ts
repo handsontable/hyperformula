@@ -5,6 +5,7 @@ import { EventManager } from "../events/eventManager";
 import type { Disposable } from "../events/types";
 import type { FormulaEditor } from "../formulaEditor/formulaEditor";
 import { CN } from "../theme/classNames";
+import { deepActiveElement } from "../ui/dom";
 import type { LiveRegion } from "../ui/liveRegion";
 import type { LayoutDirection } from "../ui/popup/types";
 import type { IconsOptions } from "../ui/types";
@@ -254,7 +255,9 @@ export class FormulaBar {
 
     this.editing = true;
     this.barInitiated = true;
-    this.barInitiatedWithFocus = this.formulaCell.root.contains(document.activeElement);
+    this.barInitiatedWithFocus = this.formulaCell.root.contains(
+      deepActiveElement(this.container.ownerDocument),
+    );
     this.pristineValue = this.editor.normalizeFormula(formula);
 
     const started = this.adapter.beginEdit(address, formula);
@@ -277,7 +280,7 @@ export class FormulaBar {
     if (
       this.barInitiated &&
       this.barInitiatedWithFocus &&
-      !this.formulaCell.root.contains(document.activeElement)
+      !this.formulaCell.root.contains(deepActiveElement(this.container.ownerDocument))
     ) {
       this.editing = false;
       this.barInitiated = false;

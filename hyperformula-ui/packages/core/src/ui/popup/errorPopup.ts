@@ -1,6 +1,6 @@
 import type { EventScope } from "../../events/eventManager";
 import { CN } from "../../theme/classNames";
-import { createEl } from "../dom";
+import { createEl, deepActiveElement } from "../dom";
 import type { IconsOptions } from "../types";
 import { BasePopup } from "./basePopup";
 import { EndViewportAnchoredStrategy } from "./positionStrategy";
@@ -14,6 +14,15 @@ export interface ErrorPopupOptions {
 }
 
 let errorPopupIdCounter = 0;
+
+function isHTMLElement(target: unknown): target is HTMLElement {
+  return (
+    typeof target === "object" &&
+    target !== null &&
+    (target as Node).nodeType === Node.ELEMENT_NODE &&
+    "dataset" in target
+  );
+}
 
 export class ErrorPopup extends BasePopup {
   private container: HTMLElement | null = null;
@@ -79,16 +88,13 @@ export class ErrorPopup extends BasePopup {
   }
 
   private builderSurfaceHasFocus(): boolean {
-    const active = document.activeElement;
+    const active = deepActiveElement(this.root.ownerDocument);
 
-    return (
-      active instanceof HTMLElement &&
-      active.closest(`.${CN.editor}, .${CN.fnHelp}, .${CN.formulaBar}`) !== null
-    );
+    return active?.closest(`.${CN.editor}, .${CN.fnHelp}, .${CN.formulaBar}`) != null;
   }
 
   private markerFrom(target: EventTarget | null): HTMLElement | null {
-    const element = target instanceof HTMLElement ? target : null;
+    const element = isHTMLElement(target) ? target : null;
 
     if (!element) {
       return null;
@@ -101,7 +107,7 @@ export class ErrorPopup extends BasePopup {
     }
 
     for (const child of element.children) {
-      if (child instanceof HTMLElement && child.dataset.hfeError !== undefined) {
+      if (isHTMLElement(child) && child.dataset.hfeError !== undefined) {
         return child;
       }
     }
@@ -223,7 +229,7 @@ export class ErrorPopup extends BasePopup {
 
     const suppressedStillHeld =
       this.suppressedCell !== null &&
-      (this.suppressedCell.contains(document.activeElement) ||
+      (this.suppressedCell.contains(deepActiveElement(this.suppressedCell.ownerDocument)) ||
         this.pointerCell === this.suppressedCell ||
         this.focusCell === this.suppressedCell);
 

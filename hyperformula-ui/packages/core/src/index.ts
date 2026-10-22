@@ -81,7 +81,7 @@ export type {
   HostToggleDelegate,
 } from "./formulaEditor";
 export { indexToColLetters } from "./lexer";
-export type { StyleInjector } from "./theme";
+export type { StyleInjector, StyleRoot } from "./theme";
 export { CN, createStyleInjector } from "./theme";
 export type {
   CellRect,

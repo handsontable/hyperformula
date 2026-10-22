@@ -191,10 +191,11 @@ const builder = new FormulaBuilder({ rootEl: gridRoot, adapter, formulaBarContai
 | Export | Kind | Summary |
 |---|---|---|
 | `CN` | const | The `hfe-` BEM class-name table shared by core, adapters, and consumer CSS overrides. |
-| `createStyleInjector` | function | Creates a ref-counted, SSR-guarded injector that maintains one `<style [marker]>` tag in `document.head`. |
+| `createStyleInjector` | function | Creates a ref-counted, SSR-guarded injector that maintains one `<style [marker]>` tag per document (in its `<head>`) or shadow root. |
 | `IconName` | type | A glyph the editor renders: the popup close button (`close`), the function-help "Learn more" link (`externalLink`), the named-expression marker in suggestions (`namedExpression`), and the formula bar's fx icon (`function`). |
 | `IconsOptions` | type | Host factories that replace the built-in glyphs, keyed by `IconName`. |
 | `StyleInjector` | interface | Ref-counted style handle returned by `createStyleInjector`. |
+| `StyleRoot` | type | Where an injected stylesheet lives: a document (its `<head>`) or a shadow root. |
 
 ## Utilities
 
