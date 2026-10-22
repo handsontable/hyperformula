@@ -750,6 +750,21 @@ describe("FormulaBuilder", () => {
       warn.mockRestore();
     });
 
+    it("constructor treats a selector that is not valid CSS as missing", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const scoped = new FormulaBuilder({
+        rootEl,
+        popups: { suggestions: { container: "#[not valid" } },
+      });
+
+      expect(warn).toHaveBeenCalledWith(
+        'FormulaBuilder: suggestions host "#[not valid" not found; using the default placement',
+      );
+
+      scoped.destroy();
+      warn.mockRestore();
+    });
+
     it("constructor warns only once per missing selector", () => {
       const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
       const options = { rootEl, popups: { suggestions: { container: "#gone-once" } } };

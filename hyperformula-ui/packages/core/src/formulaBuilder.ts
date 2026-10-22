@@ -281,6 +281,14 @@ export class FormulaBuilder {
     return containerEl;
   }
 
+  private findContainer(selector: string): HTMLElement | null {
+    try {
+      return this.rootDocument.querySelector<HTMLElement>(selector);
+    } catch {
+      return null;
+    }
+  }
+
   private resolveOptionalContainer(
     container: HTMLElement | string | undefined,
     label: string,
@@ -289,10 +297,7 @@ export class FormulaBuilder {
       return undefined;
     }
 
-    const containerEl =
-      typeof container === "string"
-        ? this.rootDocument.querySelector<HTMLElement>(container)
-        : container;
+    const containerEl = typeof container === "string" ? this.findContainer(container) : container;
 
     if (containerEl !== null) {
       return containerEl;

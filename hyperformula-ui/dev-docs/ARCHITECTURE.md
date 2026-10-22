@@ -656,7 +656,7 @@ All popup-style overlays share a common base class `BasePopup`
   `popups.suggestions.container`/`popups.fnHelp.container` constructor sugar
   (`PopupHostOption`) that delegates to attach after construction — mirroring
   `formulaBarContainer`/`attachFormulaBar`. The constructor never throws on a selector:
-  one that matches nothing logs a `console.warn` once per message and falls back to the
+  one that matches nothing, or is not valid CSS, logs a `console.warn` once per message and falls back to the
   default placement (a floating popup, no bar), because a host that rebuilds the builder
   from an event handler may pass a container its framework unmounted in between, and a
   throw there would leave the host without a builder. The `attach*` methods still throw on
