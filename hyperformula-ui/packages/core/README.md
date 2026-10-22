@@ -32,7 +32,7 @@ Styles are injected automatically on first use; there is no CSS file to import.
 
 ## Reference colors
 
-Each reference in a formula takes one of eight colors, in the editor text and in the grid highlight. The colors are the custom properties `--hfe-ref-1` to `--hfe-ref-8`, and each default clears a 4.5:1 contrast ratio on the editor's light and dark backgrounds. To replace them, set the properties on the class you pass as `className`, which the builder adds to the editor, the formula bar, the popups and the adapter's highlight overlays:
+Each reference in a formula takes one of eight colors, in the editor text and in the grid highlight. The colors are the custom properties `--hfe-ref-1` to `--hfe-ref-8`, and each default clears a 4.5:1 contrast ratio on the editor's light and dark backgrounds. While the caret is inside a nested function call, the enclosing calls are dimmed by `--hfe-dim-opacity` (default `0.6`), which lowers the contrast of their references to about 2.3:1; set it to `1` to turn the dimming off. To replace them, set the properties on the class you pass as `className`, which the builder adds to the editor, the formula bar, the popups and the adapter's highlight overlays:
 
 ```css
 .my-theme {
