@@ -46,4 +46,4 @@ The public API is listed in [`DOCS.md`](DOCS.md).
 
 ## License
 
-GPL-3.0-only. See [`LICENSE.txt`](https://github.com/handsontable/hyperformula/blob/master/LICENSE.txt).
+MIT. See [`LICENSE.txt`](LICENSE.txt).
