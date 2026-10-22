@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed the default reference colors (`--hfe-ref-1` to `--hfe-ref-8`) so that each clears a 4.5:1 contrast ratio on the light and dark editor backgrounds. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 - Changed the `FormulaBuilder` constructor to log a warning and use the default placement, instead of throwing, when a `popups.*.container` or `formulaBarContainer` selector matches nothing. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 - Changed the address box to reject a cell or range when the adapter's `setActiveCell` or `setSelection` returns `false`. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
-- Changed `color-scheme` to be set only on the editor, the formula bar and the popup roots, so a host theme class on them controls light and dark mode. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
+- Changed `color-scheme` to be set only on the editor, the formula bar, the popup roots and the grid highlight layer, so a host theme class on them controls light and dark mode. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 
 ### Fixed
 - Fixed the idle formula bar coloring references differently from the editor when the formula contains a named expression. [#1839](https://github.com/handsontable/hyperformula/pull/1839)

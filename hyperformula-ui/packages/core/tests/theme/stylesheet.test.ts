@@ -39,8 +39,9 @@ describe("package color scheme", () => {
     expect(CSS_TEXT).not.toContain("[class*=");
   });
 
-  it("sets the color scheme only on the package roots, where a host theme class overrides it", () => {
-    const roots = ":where(.hfe-editor,.hfe-formula-bar,.hfe-popup-portal,.hfe-popup--hosted)";
+  it("sets the color scheme only on the package roots and the grid highlights, where a host theme class overrides it", () => {
+    const roots =
+      ":where(.hfe-editor,.hfe-formula-bar,.hfe-popup-portal,.hfe-popup--hosted,.hfe-highlight)";
 
     expect(declarations(roots)["color-scheme"]).toBe("light dark");
     expect(CSS_TEXT.match(/color-scheme:/g)).toHaveLength(1);
