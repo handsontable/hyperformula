@@ -225,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'ODPIS.NELIN',
     T: 'T',
+    TAKE: 'VZÍT',
     TAN: 'TG',
     TANH: 'TGH',
     TBILLEQ: 'TBILLEQ',
