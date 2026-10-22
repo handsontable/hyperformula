@@ -104,12 +104,13 @@ HyperFormula.registerLanguage('es', spanish);
 
 // Use it in your configuration
 const hf = HyperFormula.buildEmpty({
+  licenseKey: 'gpl-v3',
   language: 'es'
 });
 ```
 
 ::: tip
-You can use an existing language pack as a template. Check the [language files in the repository](https://github.com/handsontable/hyperformula/tree/master/src/i18n/languages) to see complete examples with all available functions.
+You can use an existing language pack as a template. Check the [language files in the repository](https://github.com/handsontable/hyperformula/tree/master/hyperformula/src/i18n/languages) to see complete examples with all available functions.
 :::
 
 ## Localizing custom functions
