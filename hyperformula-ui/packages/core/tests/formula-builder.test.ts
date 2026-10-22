@@ -1071,6 +1071,22 @@ describe("FormulaBuilder document and portal parent", () => {
     builder.destroy();
   });
 
+  it("takes the document from the portal parent when only the portal parent is given", () => {
+    const frameDocument = document.implementation.createHTMLDocument("grid");
+    const rootEl = frameDocument.createElement("div");
+
+    frameDocument.body.appendChild(rootEl);
+
+    const builder = new FormulaBuilder({ rootEl, portalParent: frameDocument.body });
+
+    expect(frameDocument.head.querySelector("style[data-hfe-styles]")).not.toBeNull();
+    expect(frameDocument.body.querySelector(sel(CN.popupPortal))).not.toBeNull();
+
+    builder.destroy();
+
+    expect(frameDocument.head.querySelector("style[data-hfe-styles]")).toBeNull();
+  });
+
   it("creates its elements in, and resolves selectors against, the given document", () => {
     const frameDocument = document.implementation.createHTMLDocument("grid");
     const barEl = frameDocument.createElement("div");

@@ -65,10 +65,11 @@ export interface FormulaBuilderOptions
   popups?: PopupsOptions;
 
   /**
-   * Document the grid lives in, such as an iframe's: the builder creates its elements in it,
-   * resolves selector options against it, and injects its styles into its `<head>`.
+   * Document the grid lives in, such as an iframe's: selector options resolve against it, the
+   * styles go into its `<head>`, and the builder's own mount is created in it. The popup portal
+   * and the live region are created in `portalParent`'s document.
    *
-   * @defaultValue the global `document`
+   * @defaultValue `portalParent`'s document, else the global `document`
    */
   rootDocument?: Document;
 
@@ -132,9 +133,9 @@ export class FormulaBuilder {
       popups,
       icons,
       formulaBarContainer,
-      rootDocument = document,
-      portalParent = rootDocument.body,
     } = options;
+    const rootDocument = options.rootDocument ?? options.portalParent?.ownerDocument ?? document;
+    const portalParent = options.portalParent ?? rootDocument.body;
 
     this.rootDocument = rootDocument;
 

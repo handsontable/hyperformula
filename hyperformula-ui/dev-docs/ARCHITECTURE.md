@@ -500,9 +500,11 @@ All popup-style overlays share a common base class `BasePopup`
   `rootDocument.body`) is where the portal and the `LiveRegion` go; both are created in the
   parent's own document. A host inside a shadow root passes that shadow root, so the
   textarea's `aria-controls`/`aria-activedescendant` and a cell's `aria-errormessage` resolve
-  in one tree, and an axe scan of that root sees the popups. `rootDocument` (default the global
-  `document`) is the document selector options are resolved against, the detached mount is
-  created in, and the stylesheet goes into. Styles are injected per root
+  in one tree, and an axe scan of that root sees the popups. `rootDocument` (default the portal
+  parent's document, else the global `document`, so passing only an iframe's `body` is enough) is
+  the document selector options are resolved against, the detached mount is created in, and the
+  stylesheet goes into. Every other element (editor, popups, icons, highlights) is created in the
+  global `document` and adopted when it is appended. Styles are injected per root
   (`createStyleInjector(...).inject(root)`, ref-counted per document or shadow root): into
   `rootDocument`, plus into the portal parent's shadow root when it is in one. Focus checks
   never read `document.activeElement`: they call `deepActiveElement(element.ownerDocument)`
