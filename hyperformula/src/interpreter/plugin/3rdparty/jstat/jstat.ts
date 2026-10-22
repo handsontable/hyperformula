@@ -25,7 +25,7 @@ const SQRT_PI = Math.sqrt(Math.PI)
 
 /**
  * erf(x) for 0 <= x < 2 from its series exp(-x^2) * 2 / sqrt(pi) * sum(2^n * x^(2n + 1) / (2n + 1)!!).
- * All terms are positive, so there is no cancellation, and the relative error stays near 1e-16 down to the
+ * All terms are positive, so there is no cancellation, and the relative error stays below about 1.1e-15 down to the
  * smallest numbers (the earlier 1 - exp(...) form lost every digit below about 1e-16).
  */
 function erfSeries(x: number): number {
@@ -44,7 +44,9 @@ function erfSeries(x: number): number {
 
 /**
  * erfc(x) for x >= 1 from the continued fraction exp(-x^2) / sqrt(pi) / (x + (1/2) / (x + 1 / (x + (3/2) / (x + ...)))),
- * evaluated from the tail. Accurate to about 1e-16 relative, also where erfc is tiny and 1 - erf(x) would be 0.
+ * evaluated from the tail. The relative error is below about 4e-15 up to x = 6.5 and grows with x^2 beyond that,
+ * to about 6e-14 near x = 24, because x * x is rounded before exp(-x * x). It stays accurate where erfc is tiny
+ * and 1 - erf(x) would be 0.
  */
 function erfcFraction(x: number): number {
   let tail = 0
