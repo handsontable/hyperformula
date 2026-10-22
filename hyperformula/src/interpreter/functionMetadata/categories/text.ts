@@ -31,6 +31,13 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=CODE("A")', '=CODE(A1)'],
   },
+  CONCAT: {
+    category: 'Text',
+    shortDescription: 'Joins the text of all arguments into one string, reading each range or array row by row.',
+    parameters: [{name: 'text1', description: 'A text value, cell reference, range, or array to include in the joined string. Further values can be passed as additional arguments and are appended in order.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=CONCAT("Hello", " ", "World")', '=CONCAT(A1:C3)'],
+  },
   CONCATENATE: {
     category: 'Text',
     shortDescription: 'Combines several text strings into one string.',
@@ -184,5 +191,12 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'text', description: 'The text to parse as a number, date, time, datetime, currency, or percentage.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=VALUE("123")', '=VALUE("50%")', '=VALUE(A1)'],
+  },
+  VALUETOTEXT: {
+    category: 'Text',
+    shortDescription: 'Returns a value as text. Errors are returned as text instead of being propagated.',
+    parameters: [{name: 'value', description: 'The value to convert to text.'}, {name: 'format', description: 'The output format: 0 (default) returns concise text, 1 returns strict text, in which text is wrapped in double quotes. The value is truncated to an integer; any other result gives #VALUE!.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=VALUETOTEXT(A1)', '=VALUETOTEXT("Hello", 1)'],
   },
 }

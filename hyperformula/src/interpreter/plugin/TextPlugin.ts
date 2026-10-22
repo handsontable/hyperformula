@@ -10,7 +10,7 @@ import {ProcedureAst} from '../../parser'
 import {coerceScalarToString} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {ExtendedNumber, InterpreterValue, isExtendedNumber, RawScalarValue, InternalScalarValue} from '../InterpreterValue'
+import {ExtendedNumber, getRawValue, InterpreterValue, isExtendedNumber, RawScalarValue, InternalScalarValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
@@ -25,6 +25,13 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       ],
       repeatLastArgs: 1,
       expandRanges: true,
+    },
+    'CONCAT': {
+      method: 'concat',
+      parameters: [
+        { argumentType: FunctionArgumentType.ANY }
+      ],
+      repeatLastArgs: 1,
     },
     'EXACT': {
       method: 'exact',
@@ -157,6 +164,13 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         { argumentType: FunctionArgumentType.SCALAR }
       ]
     },
+    'VALUETOTEXT': {
+      method: 'valuetotext',
+      parameters: [
+        { argumentType: FunctionArgumentType.SCALAR },
+        { argumentType: FunctionArgumentType.SCALAR, defaultValue: 0 },
+      ]
+    },
     'TEXTJOIN': {
       method: 'textjoin',
       repeatLastArgs: 1,
@@ -179,6 +193,76 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
   public concatenate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CONCATENATE'), (...args) => {
       return ''.concat(...args)
+    })
+  }
+
+  /**
+   * Corresponds to CONCAT(text1, [text2, ...])
+   *
+   * Joins the text of all arguments, reading every range or array row by row.
+   * Numbers are written to 15 significant digits, booleans as TRUE or FALSE, empty cells as nothing.
+   * An error in an argument that is not a range (a single-cell reference included) is returned first; otherwise the first
+   * error found reading the ranges in order. Returns #VALUE! if the result exceeds 32,767 characters (Excel cell content limit).
+   *
+   * @param {ProcedureAst} ast - The procedure AST node
+   * @param {InterpreterState} state - The interpreter state
+   */
+  public concat(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CONCAT'), (...args: (InternalScalarValue | SimpleRangeValue)[]) => {
+      const texts: string[] = []
+      for (const arg of args) {
+        const values: InternalScalarValue[] = arg instanceof SimpleRangeValue ? arg.valuesFromTopLeftCorner() : [arg]
+        for (const value of values) {
+          const text = this.coerceScalarToText(value)
+          if (text instanceof CellError) {
+            return text
+          }
+          texts.push(text)
+        }
+      }
+
+      const result = texts.join('')
+
+      if (result.length > 32767) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.ResultTooLong)
+      }
+      return result
+    })
+  }
+
+  /**
+   * Corresponds to VALUETOTEXT(value, [format])
+   *
+   * Returns the text representation of a value. An error value is returned as text rather than propagated.
+   * Format 0 (default) is concise; format 1 is strict: text is wrapped in double quotes with embedded quotes doubled.
+   * The format is rounded down to an integer and must end up as 0 or 1, otherwise the result is #VALUE!.
+   *
+   * @param {ProcedureAst} ast - The procedure AST node
+   * @param {InterpreterState} state - The interpreter state
+   */
+  public valuetotext(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('VALUETOTEXT'), (value: InternalScalarValue, formatArg: InternalScalarValue) => {
+      if (formatArg instanceof CellError) {
+        return formatArg
+      }
+
+      const format = formatArg === '' ? undefined : this.coerceScalarToNumberOrError(formatArg)
+      if (format === undefined || !isExtendedNumber(format)) {
+        return new CellError(ErrorType.VALUE)
+      }
+
+      const formatCode = Math.floor(getRawValue(format))
+      if (formatCode !== 0 && formatCode !== 1) {
+        return new CellError(ErrorType.VALUE)
+      }
+
+      if (value instanceof CellError) {
+        return this.config.translationPackage.getErrorTranslation(value.type)
+      }
+      if (formatCode === 1 && typeof value === 'string') {
+        return `"${value.replace(/"/g, '""')}"`
+      }
+      return this.coerceScalarToText(value)
     })
   }
 
@@ -504,6 +588,43 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       result.push(coerced)
     }
     return result
+  }
+
+  /**
+   * Converts a scalar to its text. A number is written to 15 significant digits, in plain decimal notation as long as
+   * that takes at most 20 digits, and in scientific notation with a two-digit exponent otherwise (`1E+20`, `1.5E-20`).
+   * Other values are converted like in `coerceScalarToString`.
+   *
+   * @param {InternalScalarValue} value - The scalar to convert
+   * @returns {string | CellError} - The text, or the value itself if it is an error
+   */
+  private coerceScalarToText(value: InternalScalarValue): string | CellError {
+    if (!isExtendedNumber(value)) {
+      return coerceScalarToString(value)
+    }
+
+    const number = getRawValue(value)
+    if (number === 0) {
+      return '0'
+    }
+
+    const [mantissa, exponentText] = Math.abs(number).toExponential(14).split('e')
+    const digits = mantissa.replace('.', '').replace(/0+$/, '')
+    const exponent = Number(exponentText)
+    const sign = number < 0 ? '-' : ''
+    const decimalDigitCount = exponent >= 0 ? Math.max(exponent + 1, digits.length) : -exponent + digits.length
+
+    if (decimalDigitCount > 20) {
+      const fraction = digits.length > 1 ? `.${digits.slice(1)}` : ''
+      return `${sign}${digits[0]}${fraction}E${exponent < 0 ? '-' : '+'}${String(Math.abs(exponent)).padStart(2, '0')}`
+    }
+    if (exponent < 0) {
+      return `${sign}0.${'0'.repeat(-exponent - 1)}${digits}`
+    }
+    if (exponent + 1 >= digits.length) {
+      return `${sign}${digits}${'0'.repeat(exponent + 1 - digits.length)}`
+    }
+    return `${sign}${digits.slice(0, exponent + 1)}.${digits.slice(exponent + 1)}`
   }
 
   /**
