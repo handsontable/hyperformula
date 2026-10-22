@@ -60,6 +60,11 @@ reparents between two locations via `FormulaEditor.attachTo(mount)`:
   address box), paired with `scrollCellIntoView`, and by `FormulaBuilder` after an
   outside-click commit (see the outside-click commit policy below). Addresses are HF-space;
   the external Handsontable plugin maps them back to visual indices before selecting.
+  Both `setActiveCell` and `setSelection` return `boolean | void`: `false` means the host could
+  not select the target (a filtered-out row, a hidden column), and the address box then rejects
+  the typed address — it reverts, announces "Invalid cell address", and skips
+  `scrollCellIntoView`. `void` counts as success, so adapters written before the result keep
+  working.
 - `commit(value, direction?)` — controller calls to commit the current value; the optional
   `Direction` drives the host's post-commit selection move (Enter → down, Tab → right, …).
   `commit(value, direction)` must apply the value to the engine synchronously before

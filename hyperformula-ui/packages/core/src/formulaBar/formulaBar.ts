@@ -196,7 +196,10 @@ export class FormulaBar {
     const sheet = this.adapter.getActiveCell()?.sheet ?? "";
     const address = { sheet, col: target.col, row: target.row };
 
-    this.adapter.setActiveCell(address);
+    if (this.adapter.setActiveCell(address) === false) {
+      return false;
+    }
+
     this.adapter.scrollCellIntoView(address);
 
     return true;
@@ -220,7 +223,10 @@ export class FormulaBar {
       end: { sheet, col: range.end.col, row: range.end.row },
     };
 
-    this.adapter.setSelection(cellRange);
+    if (this.adapter.setSelection(cellRange) === false) {
+      return false;
+    }
+
     this.adapter.scrollCellIntoView(cellRange.start);
 
     return true;

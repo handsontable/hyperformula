@@ -1329,3 +1329,73 @@ describe("FormulaBar named expressions", () => {
     editor.destroy();
   });
 });
+
+describe("FormulaBar address box when the grid cannot select", () => {
+  function makeRefusingHarness(overrides: Partial<IGridAdapter>) {
+    const container = document.createElement("div");
+    const announce = vi.fn();
+    const scrollCellIntoView = vi.fn();
+    const { adapter, fireSelection } = makeBarAdapter({
+      getActiveCell: activeCellAtOrigin,
+      getGridSize: () => ({ rows: 10, cols: 10 }),
+      scrollCellIntoView,
+      ...overrides,
+    });
+    const editor = makeEditor(adapter);
+    const liveRegion = { announce, destroy: () => {} } as unknown as LiveRegion;
+    const controller = makeFormulaBar(container, {
+      adapter,
+      editor,
+      knownFunctions: new Set(),
+      liveRegion,
+    });
+
+    fireSelection(singleCellSelection({ sheet: "", col: 0, row: 0 }));
+
+    return { container, editor, controller, announce, scrollCellIntoView };
+  }
+
+  function submit(container: HTMLElement, text: string): HTMLInputElement {
+    const input = addressInput(container);
+
+    input.value = text;
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+
+    return input;
+  }
+
+  it("rejects a cell the grid could not select", () => {
+    const harness = makeRefusingHarness({ setActiveCell: vi.fn(() => false) });
+    const input = submit(harness.container, "B3");
+
+    expect(input.value).toBe("A1");
+    expect(harness.announce).toHaveBeenCalledWith("Invalid cell address: B3");
+    expect(harness.scrollCellIntoView).not.toHaveBeenCalled();
+
+    harness.controller.destroy();
+    harness.editor.destroy();
+  });
+
+  it("rejects a range the grid could not select", () => {
+    const harness = makeRefusingHarness({ setSelection: vi.fn(() => false) });
+    const input = submit(harness.container, "B3:C4");
+
+    expect(input.value).toBe("A1");
+    expect(harness.announce).toHaveBeenCalledWith("Invalid cell address: B3:C4");
+    expect(harness.scrollCellIntoView).not.toHaveBeenCalled();
+
+    harness.controller.destroy();
+    harness.editor.destroy();
+  });
+
+  it("accepts a cell when the adapter returns nothing", () => {
+    const harness = makeRefusingHarness({ setActiveCell: vi.fn(() => undefined) });
+    const input = submit(harness.container, "B3");
+
+    expect(input.value).toBe("B3");
+    expect(harness.announce).not.toHaveBeenCalled();
+
+    harness.controller.destroy();
+    harness.editor.destroy();
+  });
+});
