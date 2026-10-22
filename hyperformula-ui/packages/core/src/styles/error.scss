@@ -1,7 +1,7 @@
 .hfe-cell--error {
   position: relative;
   color: var(--hfe-token-err) !important;
-  font-family: var(--hfe-formula-font-family);
+  font-family: var(--hfe-error-font-family);
   font-size: var(--hfe-font-size);
   font-weight: 400;
   line-height: var(--hfe-line-height);
@@ -40,7 +40,7 @@
   &__title {
     font-size: var(--hfe-font-size);
     color: var(--hfe-color-error);
-    font-family: var(--hfe-font-family);
+    font-family: var(--hfe-error-font-family);
   }
 
   &__message {
