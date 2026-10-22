@@ -210,7 +210,7 @@ const dictionary: RawTranslationPackage = {
     SINH: 'SENH',
     SLN: 'AMMORT.COST',
     SORT: 'DATI.ORDINA',
-    SORTBY: 'SORTBY',
+    SORTBY: 'DATI.ORDINA.PER',
     SPLIT: 'SPLIT',
     SQRT: 'RADQ',
     STDEVA: 'DEV.ST.VALORI',
