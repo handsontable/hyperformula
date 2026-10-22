@@ -132,7 +132,7 @@ This example shows the change after the move operation was done:
 // build with a simple dataset
 const hfInstance = HyperFormula.buildFromArray([
  ['=B2', '=A1', ''],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // these are the coordinates for a move operation
 const source = { sheet: 0, col: 1, row: 0 };
