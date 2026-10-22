@@ -444,6 +444,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=QUARTILE.INC(A1:A10, 3)'],
   },
+  'RANK.EQ': {
+    category: 'Statistical',
+    shortDescription: 'Returns the rank of a number in a range; tied numbers share the top rank.',
+    parameters: [{name: 'number', description: 'The number whose rank to find.'}, {name: 'ref', description: 'The range of numbers to rank against; non-numeric cells are ignored.'}, {name: 'order', description: 'Optional. 0 or omitted ranks in descending order; any other value ranks in ascending order.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=RANK.EQ(A1, A1:A10)', '=RANK.EQ(A1, A1:A10, 1)'],
+  },
   RSQ: {
     category: 'Statistical',
     shortDescription: 'Returns the squared correlation coefficient between two data sets.',
