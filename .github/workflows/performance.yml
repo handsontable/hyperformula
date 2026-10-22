@@ -26,8 +26,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       # Base and head live side by side so their runs can alternate (base, head, base, head). Measuring one side
-      # in a single block and the other afterwards lets the drift of a shared runner show up as a "regression"
-      #, alternating spreads that drift over both sides.
+      # in a single block and the other afterwards lets the drift of a shared runner show up as a "regression";
+      # alternating spreads that drift over both sides.
       - name: (base) Checkout main repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # https://github.com/actions/checkout/releases/tag/v2.3.4
         with:
@@ -44,22 +44,22 @@ jobs:
         with:
           ssh-key: ${{ secrets.DEPLOY_TOKEN }}
           repository: handsontable/hyperformula-tests
-          path: head/test/hyperformula-tests
+          path: head/hyperformula/test/hyperformula-tests
 
       - name: Fetch hyperformula-tests and sync branches
-        run: cd head/test && ./fetch-tests.sh
+        run: cd head/hyperformula/test && ./fetch-tests.sh
 
       # Both sides run the same (head) copy of the suite; only the engine under test differs.
       - name: Share the tests between base and head
-        run: cp -r head/test/hyperformula-tests base/test/hyperformula-tests
+        run: cp -r head/hyperformula/test/hyperformula-tests base/hyperformula/test/hyperformula-tests
 
       - name: Record the revisions under test
         id: revisions
         run: |
           echo "base:  $(git -C base rev-parse HEAD)"
           echo "head:  $(git -C head rev-parse HEAD)"
-          echo "tests: $(git -C head/test/hyperformula-tests rev-parse HEAD)"
-          echo "tests=$(git -C head/test/hyperformula-tests rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          echo "tests: $(git -C head/hyperformula/test/hyperformula-tests rev-parse HEAD)"
+          echo "tests=$(git -C head/hyperformula/test/hyperformula-tests rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: (base) Install dependencies
         run: cd base && npm ci
@@ -74,7 +74,7 @@ jobs:
         env:
           PERF_SAMPLE_SCALE: '0.5'
         run: |
-          run() { (cd "$1" && npm run benchmark:write-to-file "$GITHUB_WORKSPACE/$1-$2.json"); }
+          run() { (cd "$1" && npm run benchmark:write-to-file --workspace=hyperformula "$GITHUB_WORKSPACE/$1-$2.json"); }
           run base 1; run head 1
           run head 2; run base 2
 
@@ -84,9 +84,9 @@ jobs:
       # earlier on identical code.
       - name: Compare the results
         run: |
-          HISTORY=test/hyperformula-tests/performance/noise-history.json
-          if [ -f "head/$HISTORY" ]; then export PERF_HISTORY_FILE="$HISTORY"; fi
-          cd head && npm run benchmark:compare-benchmarks "$GITHUB_WORKSPACE/base-1.json,$GITHUB_WORKSPACE/base-2.json" "$GITHUB_WORKSPACE/head-1.json,$GITHUB_WORKSPACE/head-2.json" "$GITHUB_WORKSPACE/performance-report.md"
+          HISTORY="$GITHUB_WORKSPACE/head/hyperformula/test/hyperformula-tests/performance/noise-history.json"
+          if [ -f "$HISTORY" ]; then export PERF_HISTORY_FILE="$HISTORY"; fi
+          cd head && npm run benchmark:compare-benchmarks --workspace=hyperformula "$GITHUB_WORKSPACE/base-1.json,$GITHUB_WORKSPACE/base-2.json" "$GITHUB_WORKSPACE/head-1.json,$GITHUB_WORKSPACE/head-2.json" "$GITHUB_WORKSPACE/performance-report.md"
 
       # The runner is gone after the job; the raw samples in the log are what a later analysis can use.
       - name: Print the raw samples

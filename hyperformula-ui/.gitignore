@@ -1,0 +1,6 @@
+dist
+*.tsbuildinfo
+playwright-report
+test-results
+.vite
+packages/core/LICENSE.txt
