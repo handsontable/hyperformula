@@ -47,20 +47,20 @@ jobs:
         with:
           ssh-key: ${{ secrets.DEPLOY_TOKEN }}
           repository: handsontable/hyperformula-tests
-          path: head/test/hyperformula-tests
+          path: head/hyperformula/test/hyperformula-tests
 
       - name: Fetch hyperformula-tests and sync branches
-        run: cd head/test && ./fetch-tests.sh
+        run: cd head/hyperformula/test && ./fetch-tests.sh
 
       # Both sides run the same (head) copy of the suite; only the engine under test differs.
       - name: Share the tests between base and head
-        run: cp -r head/test/hyperformula-tests base/test/hyperformula-tests
+        run: cp -r head/hyperformula/test/hyperformula-tests base/hyperformula/test/hyperformula-tests
 
       - name: Record the revisions under test
         run: |
           echo "base:  $(git -C base rev-parse HEAD)"
           echo "head:  $(git -C head rev-parse HEAD)"
-          echo "tests: $(git -C head/test/hyperformula-tests rev-parse HEAD)"
+          echo "tests: $(git -C head/hyperformula/test/hyperformula-tests rev-parse HEAD)"
           node --version
 
       - name: (base) Install dependencies
@@ -69,18 +69,18 @@ jobs:
       - name: (head) Install dependencies
         run: cd head && npm ci
 
-      # The runner comes with the shared tests and is started through the generic tsnode script, which every revision of
-      # package.json has. Each run compiles the engine of its own tree into the same build directory and measures it
+      # The runner comes with the shared tests and is started through the generic tsnode script of the engine's
+      # package.json, which every revision has. Each run compiles the engine of its own tree into the same build directory and measures it
       # there, so the two runs must stay sequential: the count depends on the paths a process sees.
       - name: (base) Count instructions
-        run: cd base && npm run tsnode test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json"
+        run: cd base && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json"
 
       - name: (head) Count instructions
-        run: cd head && npm run tsnode test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/head-instructions.json"
+        run: cd head && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/head-instructions.json"
 
       - name: Compare the counts
         run: |
-          cd head && npm run tsnode test/hyperformula-tests/performance/compare-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json" "$GITHUB_WORKSPACE/head-instructions.json" "$GITHUB_WORKSPACE/instructions-report.md"
+          cd head && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/compare-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json" "$GITHUB_WORKSPACE/head-instructions.json" "$GITHUB_WORKSPACE/instructions-report.md"
           cat "$GITHUB_WORKSPACE/instructions-report.md" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Print the raw counts
