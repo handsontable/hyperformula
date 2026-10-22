@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildNumberPattern,
+  buildQuotedSheetEnds,
   matchCell,
   matchSheetPrefix,
   matchSticky,
@@ -209,5 +210,28 @@ describe("matchSheetPrefix", () => {
   it("matches a quoted name that starts inside a run of quotes", () => {
     expect(matchSheetPrefix("''a'!A1", 0)).toBeNull();
     expect(matchSheetPrefix("''a'!A1", 1)).toEqual({ sheet: "a", length: 4 });
+  });
+});
+
+describe("buildQuotedSheetEnds", () => {
+  it("finds the closing quote of a quoted sheet name from each position, in one pass", () => {
+    const ends = buildQuotedSheetEnds("'a''b'!A1");
+
+    expect(ends[1]).toBe(5);
+    expect(ends[0]).toBe(-1);
+  });
+
+  it("finds no closing quote anywhere in a run of apostrophes without a bang", () => {
+    const ends = buildQuotedSheetEnds("'".repeat(1_000));
+
+    expect(Array.from(ends).every((end) => end === -1)).toBe(true);
+  });
+
+  it("matches the same name as a quoted sheet prefix scanned on its own", () => {
+    const text = "=SUM('My Sheet'!A1, 'It''s'!B2)";
+    const ends = buildQuotedSheetEnds(text);
+
+    expect(matchSheetPrefix(text, 5, ends)).toEqual({ sheet: "My Sheet", length: 11 });
+    expect(matchSheetPrefix(text, 20, ends)).toEqual({ sheet: "It's", length: 8 });
   });
 });
