@@ -22,7 +22,7 @@ If you'd like to try it, [join the early access list](https://2fmjvg.share-eu1.h
 - **Evaluate formulas deterministically** — your agent runs any Excel-compatible formula through HyperFormula instead of asking the LLM to do math. Results are exact, reproducible, and auditable.
 - **Read and write cells and ranges** — the agent inspects, populates, or modifies sheet data through typed tool calls.
 - **Trace dependencies** — precedents and dependents are surfaced so the agent can explain how every value was derived.
-- **400+ built-in functions out of the box** — the agent has access to the full Excel-compatible function set (`SUM`, `VLOOKUP`, `IRR`, `INDEX/MATCH`, and the rest), no implementation work required.
+- **{{ $page.functionsCount }} built-in functions out of the box** — the agent has access to the full Excel-compatible function set (`SUM`, `VLOOKUP`, `IRR`, `INDEX/MATCH`, and the rest), no implementation work required.
 
 ## Example
 
@@ -38,7 +38,7 @@ const hf = HyperFormula.buildFromArray([
   ['Revenue', 100],
   ['Cost',     60],
   ['Profit', '=B1-B2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 const agent = createReactAgent({
   llm: new ChatOpenAI({ model: 'gpt-4o' }),

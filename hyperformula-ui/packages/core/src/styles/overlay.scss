@@ -1,0 +1,65 @@
+.hfe-overlay {
+  position: static;
+  display: block;
+  pointer-events: none;
+  color: var(--hfe-color-foreground);
+  z-index: 1;
+}
+
+.hfe-token {
+  &--fn         { color: var(--hfe-token-fn); }
+  &--fn-unknown { color: var(--hfe-token-fn-unknown); }
+  &--num        { color: var(--hfe-token-num); }
+  &--str        { color: var(--hfe-token-str); }
+  &--op         { color: var(--hfe-token-op); }
+  &--paren      { color: var(--hfe-token-paren); }
+  &--paren-err  { color: var(--hfe-token-paren-err); }
+  &--bracket    { color: var(--hfe-token-bracket); }
+  &--sep        { color: var(--hfe-token-sep); }
+  &--sheet      { color: var(--hfe-token-sheet); }
+  &--ident      { color: var(--hfe-token-ident); }
+
+  &--err {
+    color: var(--hfe-token-err);
+    text-decoration: underline wavy var(--hfe-token-err);
+  }
+
+  &--errlit {
+    color: var(--hfe-token-err);
+    font-weight: 600;
+  }
+
+  &--ref-invalid {
+    color: var(--hfe-token-ref-invalid);
+    text-decoration: line-through;
+  }
+
+  &--comment {
+    color: var(--hfe-token-comment);
+    font-style: italic;
+  }
+
+  &--comment-err {
+    text-decoration: underline wavy var(--hfe-token-err);
+    text-underline-offset: 2px;
+  }
+
+  &--paren-match {
+    background: color-mix(
+      in srgb,
+      var(--hfe-token-paren-match) calc(var(--hfe-selection-opacity) * 100%),
+      transparent
+    );
+    border-radius: 3px;
+  }
+
+  &--dim {
+    opacity: var(--hfe-dim-opacity);
+  }
+
+  &--arg-active {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+}
