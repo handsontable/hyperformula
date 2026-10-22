@@ -134,9 +134,10 @@ resting on an error cell. No adapter involvement.
 | 14 | Enter / Tab / Shift+Tab commit | Commit value, move active cell down / right / left |
 | 15 | Shift+Enter commit | Commit value, move active cell up one cell |
 | 16 | Ctrl/Cmd+Enter | Commit to every selected cell when the host fills; else insert a newline |
-| 17 | Escape while pointing | First press removes the pending ref (stay editing); second cancels the edit |
-| 18 | `(` typed in a formula | Auto-insert `)` and place the caret inside |
-| 19 | `)` typed before an existing `)` | Skip over it instead of inserting a duplicate |
+| 17 | Alt+Enter | Insert a newline instead of committing |
+| 18 | Escape while pointing | First press removes the pending ref (stay editing); second cancels the edit |
+| 19 | `(` typed in a formula | Auto-insert `)` and place the caret inside |
+| 20 | `)` typed before an existing `)` | Skip over it instead of inserting a duplicate |
 
 ## Host scope
 
