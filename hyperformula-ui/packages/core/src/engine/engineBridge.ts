@@ -171,6 +171,10 @@ export class EngineBridge {
     this.namedExprs.invalidate();
   }
 
+  onNamedExpressionsChange(listener: () => void): () => void {
+    return this.namedExprs.onChange(listener);
+  }
+
   destroy(): void {
     this.namedExprs.destroy();
   }

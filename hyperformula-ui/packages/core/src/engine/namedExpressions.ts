@@ -1,3 +1,4 @@
+import { ListenerSet } from "../events/listenerSet";
 import { indexToColLetters, quoteSheetName } from "../lexer/tokens";
 import { expandWholeSpan } from "./namedExpr";
 import type { HyperFormulaLike, NamedExprResolution } from "./types";
@@ -18,7 +19,8 @@ export class NamedExpressions {
   private readonly sheetId: number;
   private scopeByUpperName: Map<string, number | "global"> | null = null;
   private resolveCache = new Map<string, NamedExprResolution | null>();
-  private readonly onNamedExpressionChanged = (): void => this.invalidate();
+  private readonly changeListeners = new ListenerSet();
+  private readonly onNamedExpressionChanged = (): void => this.handleNamedExpressionChanged();
 
   constructor(engine: HyperFormulaLike | undefined, sheetId: number) {
     this.engine = engine;
@@ -54,6 +56,11 @@ export class NamedExpressions {
 
   private sheetNameFor(sheetId: number): string {
     return this.engine?.getSheetName?.(sheetId) ?? "";
+  }
+
+  private handleNamedExpressionChanged(): void {
+    this.invalidate();
+    this.changeListeners.emit();
   }
 
   private resolveUncached(name: string): NamedExprResolution | null {
@@ -162,7 +169,12 @@ export class NamedExpressions {
     this.resolveCache.clear();
   }
 
+  onChange(listener: () => void): () => void {
+    return this.changeListeners.add(listener);
+  }
+
   destroy(): void {
+    this.changeListeners.clear();
     this.engine?.off?.("namedExpressionAdded", this.onNamedExpressionChanged);
     this.engine?.off?.("namedExpressionRemoved", this.onNamedExpressionChanged);
   }

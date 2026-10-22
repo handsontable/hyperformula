@@ -1,7 +1,7 @@
 import { EventManager } from "../events";
 import { nToComments } from "../kernel/commentTransform";
 import { Lexer } from "../lexer";
-import type { LexerOptions } from "../lexer/types";
+import type { LexerOptions, Token } from "../lexer/types";
 import { CN } from "../theme/classNames";
 import { createEl, createIcon } from "../ui/dom";
 import { VisualOverlay } from "../ui/text/visualOverlay";
@@ -28,6 +28,12 @@ export interface FormulaBarCellOptions {
 
   /** Host factories replacing the built-in icons; the cell renders the `function` icon. */
   icons?: IconsOptions;
+
+  /**
+   * Post-processes the lexed tokens before they render, the same step the editor's kernel
+   * applies, so the idle view and the editor color references alike.
+   */
+  tokenPostProcess?: (tokens: Token[], text: string) => Token[];
 }
 
 /**
@@ -42,6 +48,8 @@ export class FormulaBarCell {
   private readonly events = new EventManager();
   private readonly lexer: Lexer;
   private readonly separators: Partial<LexerOptions> | undefined;
+  private readonly tokenPostProcess: ((tokens: Token[], text: string) => Token[]) | undefined;
+  private lastValue = "";
   private readonly idleOverlay: VisualOverlay;
   private readonly fxIcon: Element;
   private readonly bodyEl: HTMLElement;
@@ -50,6 +58,7 @@ export class FormulaBarCell {
 
   constructor(options: FormulaBarCellOptions) {
     this.separators = options.separators;
+    this.tokenPostProcess = options.tokenPostProcess;
     this.lexer = new Lexer(options.separators);
     this.root = createEl("div", { class: `${CN.formulaBarCell} ${CN.formulaBarCellFormula}` });
     this.fxIcon = createIcon("function", options.icons);
@@ -92,14 +101,23 @@ export class FormulaBarCell {
    * be invisible work.
    */
   renderValue(text: string): void {
+    this.lastValue = text;
+
     if (!this.overlayEl.hidden) {
       return;
     }
 
     const display = nToComments(text, this.separators);
+    const lexed = this.lexer.tokenize(display);
+    const tokens = this.tokenPostProcess ? this.tokenPostProcess(lexed, display) : lexed;
 
     this.idleEl.classList.toggle(CN.editorFormula, text.startsWith("="));
-    this.idleOverlay.render(this.lexer.tokenize(display), display);
+    this.idleOverlay.render(tokens, display);
+  }
+
+  /** Re-renders the last value passed to {@link FormulaBarCell.renderValue}. */
+  refresh(): void {
+    this.renderValue(this.lastValue);
   }
 
   /** Toggles between the editor overlay (`true`) and the idle view (`false`). */

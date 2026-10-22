@@ -1,5 +1,6 @@
 import { singleCellSelection } from "../adapter/range";
 import type { GridSelection, IGridAdapter } from "../adapter/types";
+import { annotateNamedExprs } from "../engine/namedExpr";
 import { EventManager } from "../events/eventManager";
 import type { Disposable } from "../events/types";
 import type { FormulaEditor } from "../formulaEditor/formulaEditor";
@@ -98,6 +99,8 @@ export class FormulaBar {
     this.formulaCell = new FormulaBarCell({
       knownFunctions: options.knownFunctions,
       separators: options.editor.engine.getSeparators(),
+      tokenPostProcess: (tokens) =>
+        annotateNamedExprs(tokens, (name) => options.editor.engine.resolveNamedExpression(name)),
       onActivate: () => this.activateFromIdle(),
       ...(options.icons !== undefined && { icons: options.icons }),
     });
@@ -137,6 +140,10 @@ export class FormulaBar {
           }
         }),
       ),
+    );
+
+    subsScope.add(
+      asDisposable(this.editor.engine.onNamedExpressionsChange(() => this.formulaCell.refresh())),
     );
 
     subsScope.add(

@@ -1210,3 +1210,122 @@ describe("FormulaBar deferred inline-edit start", () => {
     editor.destroy();
   });
 });
+
+class TaxRateHF {
+  private names = ["TaxRate"];
+  private readonly listeners = new Map<string, Set<(name: string) => void>>();
+
+  private emit(event: string, name: string) {
+    for (const listener of this.listeners.get(event) ?? []) {
+      listener(name);
+    }
+  }
+
+  listNamedExpressions(scope?: number) {
+    return scope === undefined ? this.names : [];
+  }
+
+  getNamedExpressionFormula() {
+    return "=0.23";
+  }
+
+  simpleCellRangeFromString() {
+    return undefined;
+  }
+
+  simpleCellAddressFromString() {
+    return undefined;
+  }
+
+  getSheetName() {
+    return "";
+  }
+
+  on(event: string, listener: (name: string) => void) {
+    const set = this.listeners.get(event) ?? new Set();
+
+    set.add(listener);
+    this.listeners.set(event, set);
+  }
+
+  off(event: string, listener: (name: string) => void) {
+    this.listeners.get(event)?.delete(listener);
+  }
+
+  addNamedExpression(name: string) {
+    this.names = [...this.names, name];
+    this.emit("namedExpressionAdded", name);
+  }
+
+  removeNamedExpression(name: string) {
+    this.names = this.names.filter((item) => item !== name);
+    this.emit("namedExpressionRemoved", name);
+  }
+}
+
+function refIndexByText(root: Element | null): Record<string, string | null> {
+  const marks = root?.querySelectorAll("[data-ref-index]") ?? [];
+
+  return Object.fromEntries(
+    Array.from(marks, (mark) => [mark.textContent ?? "", mark.getAttribute("data-ref-index")]),
+  );
+}
+
+describe("FormulaBar named expressions", () => {
+  function makeNamedHarness(engine: TaxRateHF, formula: string) {
+    const container = document.createElement("div");
+    const { adapter } = makeBarAdapter({
+      getActiveCell: activeCellAtOrigin,
+      getCellFormula: () => formula,
+    });
+    const editor = new FormulaEditorImpl(document.createElement("div"), {
+      popupCtx: sharedPopupCtx,
+      adapter,
+      hyperformula: engine as never,
+      sheetId: 0,
+      onCommit: (value) => adapter.commit(value),
+      onCancel: () => adapter.cancel(),
+    });
+    const controller = makeFormulaBar(container, {
+      adapter,
+      editor,
+      knownFunctions: new Set(["SUM"]),
+    });
+
+    return { container, editor, controller };
+  }
+
+  it("assigns the idle view the same reference colors as the editor", () => {
+    const { container, editor, controller } = makeNamedHarness(
+      new TaxRateHF(),
+      "=B3*(1+TaxRate)+23+SUM(B2:B3)",
+    );
+
+    const idle = refIndexByText(placeholderEl(container));
+    const inEditor = refIndexByText(container.querySelector(".hfe-editor"));
+
+    expect(idle.TaxRate).not.toBeUndefined();
+    expect(idle).toEqual(inEditor);
+
+    controller.destroy();
+    editor.destroy();
+  });
+
+  it("recolors the idle view when a named expression is added or removed", () => {
+    const engine = new TaxRateHF();
+    const { container, editor, controller } = makeNamedHarness(engine, "=Rate+B2");
+
+    expect(refIndexByText(placeholderEl(container)).Rate).toBeUndefined();
+
+    engine.addNamedExpression("Rate");
+    expect(refIndexByText(placeholderEl(container)).Rate).toBe("0");
+    expect(refIndexByText(placeholderEl(container)).B2).toBe("1");
+
+    engine.removeNamedExpression("Rate");
+    expect(refIndexByText(placeholderEl(container)).Rate).toBeUndefined();
+    expect(refIndexByText(placeholderEl(container)).B2).toBe("0");
+
+    controller.destroy();
+    editor.destroy();
+  });
+});
