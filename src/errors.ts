@@ -63,7 +63,7 @@ export class InvalidAddressError extends Error {
  * Error thrown when a formula cell's value is read before it has been computed.
  *
  * Carries the address as a field, so callers can trace the cell without parsing
- * it back out of the message. The missing address was the complaint in issue #444.
+ * it back out of the message.
  * Thrown by both ScalarFormulaVertex and ArrayFormulaVertex.
  */
 export class CellValueNotComputedError extends Error {
