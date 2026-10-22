@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HFE — Basic</title>
+    <link rel="stylesheet" href="/shared.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="app__header">
+        <h1><a href="/">←</a> Basic</h1>
+        <div class="app__controls">
+          <button id="set-example" type="button">Load example</button>
+          <button id="clear" type="button">Clear</button>
+        </div>
+      </header>
+
+      <div class="demo-bars">
+        <div class="demo-bar demo-bar--editor">
+          <span class="demo-bar__label">Editor sizing</span>
+          <div class="demo-bar__group">
+            <label>min lines
+              <input id="opt-min-lines" type="number" min="1" max="20" step="1" value="1" />
+            </label>
+            <label>max lines
+              <input id="opt-max-lines" type="number" min="1" max="40" step="1" value="10" />
+            </label>
+            <label>resize
+              <select id="opt-resize">
+                <option value="none">none</option>
+                <option value="vertical">vertical</option>
+                <option value="horizontal">horizontal</option>
+                <option value="both" selected>both</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <section class="app__editor" id="editor-host"></section>
+
+      <section class="app__result">
+        <span class="app__result-label">Result</span>
+        <span class="app__result-value" id="result">—</span>
+      </section>
+
+      <section class="app__inspect">
+        <div>
+          <h2>Tokens</h2>
+          <pre id="tokens">(start typing)</pre>
+        </div>
+        <div>
+          <h2>State</h2>
+          <pre id="state"></pre>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

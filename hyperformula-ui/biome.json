@@ -1,0 +1,111 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "includes": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.mjs",
+      "**/*.cjs",
+      "**/*.json",
+      "**/*.jsonc",
+      "**/*.css",
+      "!**/dist",
+      "!**/node_modules",
+      "!**/playwright-report",
+      "!**/test-results",
+      "!**/.vite"
+    ]
+  },
+  "css": {
+    "formatter": {
+      "enabled": true,
+      "quoteStyle": "double"
+    },
+    "linter": {
+      "enabled": true
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "bracketSameLine": false
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "style": {
+        "useConst": "error",
+        "useTemplate": "error",
+        "noNonNullAssertion": "warn",
+        "noParameterAssign": "error",
+        "useImportType": "error",
+        "useExportType": "error",
+        "useNodejsImportProtocol": "error",
+        "useBlockStatements": "error",
+        "noNegationElse": "error",
+        "useShorthandAssign": "error",
+        "useNumberNamespace": "error",
+        "noUselessElse": "error",
+        "useDefaultParameterLast": "error",
+        "useShorthandFunctionType": "error",
+        "useSingleVarDeclarator": "error",
+        "useConsistentArrayType": { "level": "error", "options": { "syntax": "shorthand" } },
+        "useSelfClosingElements": "error",
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": { "filenameCases": ["camelCase", "kebab-case"], "requireAscii": true }
+        }
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noConsole": { "level": "warn", "options": { "allow": ["error", "warn"] } },
+        "noDoubleEquals": "error",
+        "noAssignInExpressions": "error",
+        "noShadowRestrictedNames": "error"
+      },
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error",
+        "noUnusedFunctionParameters": "warn"
+      },
+      "complexity": {
+        "noBannedTypes": "error",
+        "useFlatMap": "error",
+        "noImportantStyles": "off",
+        "noUselessTernary": "error",
+        "noUselessCatch": "error",
+        "noUselessFragments": "error",
+        "noUselessRename": "error",
+        "noUselessUndefinedInitialization": "error",
+        "useOptionalChain": "error",
+        "useLiteralKeys": "error",
+        "useRegexLiterals": "error"
+      },
+      "performance": {
+        "noDelete": "error"
+      },
+      "a11y": {
+        "useSemanticElements": "off"
+      }
+    }
+  }
+}
