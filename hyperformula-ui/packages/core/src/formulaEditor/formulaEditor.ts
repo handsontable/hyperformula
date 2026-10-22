@@ -4,6 +4,7 @@ import type { CellAddress, CellRange, EditorGridAdapter, HeaderAxis } from "../a
 import { EngineBridge } from "../engine/engineBridge";
 import { annotateNamedExprs } from "../engine/namedExpr";
 import { EventManager } from "../events/eventManager";
+import { runAll } from "../events/runAll";
 import { commentsToN, nToComments } from "../kernel/commentTransform";
 import { Kernel } from "../kernel/kernel";
 import type { LexerOptions } from "../lexer/types";
@@ -520,27 +521,24 @@ export class FormulaEditor {
       return;
     }
 
-    this.events.disposeAll();
     this.destroyed = true;
-    this.engine.destroy();
-    this.suggestions.destroy();
-    this.fnHelp.destroy();
-    this.scroll.detach();
-    this.size.detach();
 
-    for (const unsub of this.adapterUnsubs) {
-      unsub();
-    }
+    const adapterUnsubs = this.adapterUnsubs;
 
     this.adapterUnsubs = [];
-    this.adapter.setHighlights([]);
-    this.adapter.clearHighlights();
-    this.kernel.bus.clear();
-
-    if (this.rootEl.parentNode) {
-      this.rootEl.parentNode.removeChild(this.rootEl);
-    }
-
-    releaseStyles();
+    runAll([
+      () => this.events.disposeAll(),
+      () => this.engine.destroy(),
+      () => this.suggestions.destroy(),
+      () => this.fnHelp.destroy(),
+      () => this.scroll.detach(),
+      () => this.size.detach(),
+      ...adapterUnsubs,
+      () => this.adapter.setHighlights([]),
+      () => this.adapter.clearHighlights(),
+      () => this.kernel.bus.clear(),
+      () => this.rootEl.remove(),
+      () => releaseStyles(),
+    ]);
   }
 }

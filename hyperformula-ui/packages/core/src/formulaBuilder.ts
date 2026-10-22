@@ -2,6 +2,7 @@ import { NullAdapter } from "./adapter/nullAdapter";
 import type { CellAddress, Direction, IGridAdapter } from "./adapter/types";
 import type { EngineValueChange } from "./engine/types";
 import { EventManager, type EventScope } from "./events/eventManager";
+import { runAll } from "./events/runAll";
 import { FormulaBar } from "./formulaBar/formulaBar";
 import { FormulaEditor } from "./formulaEditor/formulaEditor";
 import type { FormulaEditorOptions } from "./formulaEditor/types";
@@ -464,7 +465,7 @@ export class FormulaBuilder {
 
     this.destroyed = true;
 
-    const steps: Array<() => void> = [
+    runAll([
       () => this.events.disposeAll(),
       () => this.formulaBar?.destroy(),
       () => this.formulaEditor.destroy(),
@@ -477,19 +478,6 @@ export class FormulaBuilder {
         }
       },
       ...this.styleRoots.map((styleRoot) => () => releaseStyles(styleRoot)),
-    ];
-    const errors: unknown[] = [];
-
-    for (const step of steps) {
-      try {
-        step();
-      } catch (error) {
-        errors.push(error);
-      }
-    }
-
-    if (errors.length > 0) {
-      throw errors[0];
-    }
+    ]);
   }
 }
