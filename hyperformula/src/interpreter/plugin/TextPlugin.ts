@@ -201,7 +201,8 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    *
    * Joins the text of all arguments, reading every range or array row by row.
    * Numbers are written to 15 significant digits, booleans as TRUE or FALSE, empty cells as nothing.
-   * Returns the first error found in the arguments, or #VALUE! if the result exceeds 32,767 characters (Excel cell content limit).
+   * An error in an argument that is not a range (a single-cell reference included) is returned first; otherwise the first
+   * error found reading the ranges in order. Returns #VALUE! if the result exceeds 32,767 characters (Excel cell content limit).
    *
    * @param {ProcedureAst} ast - The procedure AST node
    * @param {InterpreterState} state - The interpreter state
