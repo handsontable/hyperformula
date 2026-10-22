@@ -41,7 +41,7 @@ const hf = HyperFormula.buildFromArray([
   ['Revenue', 100],
   ['Cost',     60],
   ['Profit', '=B1-B2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // Pass the spreadsheet tools straight into generateText.
 const result = await generateText({

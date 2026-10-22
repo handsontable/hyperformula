@@ -356,7 +356,7 @@ easily check if that action is allowed, and if it is not, throw an error.
 // an instance with some example data
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // a variable used to carry the message for the user
 let messageUsedInUI;
@@ -395,7 +395,7 @@ const hf = HyperFormula.buildFromArray([
   [1],
   ['=SUM(A1:A2)'],
   ['=COUNTBLANK(A1:A3)'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // insert an empty row between the row 0 and the row 1
 const changes = hf.addRows(0, [1, 1]);
