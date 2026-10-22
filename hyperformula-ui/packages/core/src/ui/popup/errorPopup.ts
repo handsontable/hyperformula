@@ -1,6 +1,6 @@
 import type { EventScope } from "../../events/eventManager";
 import { CN } from "../../theme/classNames";
-import { createEl, deepActiveElement } from "../dom";
+import { createEl, deepActiveElement, isHTMLElement, viewOf } from "../dom";
 import type { IconsOptions } from "../types";
 import { BasePopup } from "./basePopup";
 import { EndViewportAnchoredStrategy } from "./positionStrategy";
@@ -14,15 +14,6 @@ export interface ErrorPopupOptions {
 }
 
 let errorPopupIdCounter = 0;
-
-function isHTMLElement(target: unknown): target is HTMLElement {
-  return (
-    typeof target === "object" &&
-    target !== null &&
-    (target as Node).nodeType === Node.ELEMENT_NODE &&
-    "dataset" in target
-  );
-}
 
 export class ErrorPopup extends BasePopup {
   private container: HTMLElement | null = null;
@@ -287,8 +278,8 @@ export class ErrorPopup extends BasePopup {
     this.containerScope.listen(container, "focusout", this.onFocusOut);
     this.containerScope.listen(this.root, "mouseout", this.onOut);
     this.containerScope.listen(this.root, "focusout", this.onFocusOut);
-    this.containerScope.listen(window, "scroll", this.onScroll, { capture: true });
-    this.containerScope.listen(window, "keydown", this.onKeydown, { capture: true });
+    this.containerScope.listen(viewOf(container), "scroll", this.onScroll, { capture: true });
+    this.containerScope.listen(viewOf(container), "keydown", this.onKeydown, { capture: true });
     this.containerScope.activate();
   }
 

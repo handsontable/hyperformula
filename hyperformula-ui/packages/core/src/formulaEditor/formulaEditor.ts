@@ -3,14 +3,14 @@ import { formatWholeRef } from "../adapter/refFormat";
 import type { CellAddress, CellRange, EditorGridAdapter, HeaderAxis } from "../adapter/types";
 import { EngineBridge } from "../engine/engineBridge";
 import { annotateNamedExprs } from "../engine/namedExpr";
-import { EventManager } from "../events/eventManager";
+import { EventManager, type EventScope } from "../events/eventManager";
 import { runAll } from "../events/runAll";
 import { commentsToN, nToComments } from "../kernel/commentTransform";
 import { Kernel } from "../kernel/kernel";
 import type { LexerOptions } from "../lexer/types";
 import { CN } from "../theme/classNames";
 import { injectStyles, releaseStyles } from "../theme/injectStyles";
-import { createEl } from "../ui/dom";
+import { createEl, isHTMLElement, isNode, viewOf } from "../ui/dom";
 import { FunctionHelpPopup } from "../ui/popup/functionHelpPopup";
 import { SuggestionsPopup } from "../ui/popup/suggestionsPopup";
 import { RichInput } from "../ui/text/richInput";
@@ -65,6 +65,8 @@ export class FormulaEditor {
   private destroyed = false;
   private focused = false;
   private reparenting = false;
+  private viewScope: EventScope | null = null;
+  private listenedView: Window | null = null;
 
   constructor(container: HTMLElement, opts: FormulaEditorOptions) {
     if (typeof document === "undefined") {
@@ -221,7 +223,7 @@ export class FormulaEditor {
   }
 
   private restoreBlurTarget(relatedTarget: EventTarget | null): void {
-    if (relatedTarget instanceof HTMLElement && relatedTarget.isConnected) {
+    if (isHTMLElement(relatedTarget) && relatedTarget.isConnected) {
       relatedTarget.focus();
     }
   }
@@ -265,7 +267,7 @@ export class FormulaEditor {
         return;
       }
 
-      if (!focused && relatedTarget instanceof Node && this.fnHelp.contains(relatedTarget)) {
+      if (!focused && isNode(relatedTarget) && this.fnHelp.contains(relatedTarget)) {
         return;
       }
 
@@ -280,6 +282,22 @@ export class FormulaEditor {
     this.input.on("keydown", (event) => this.keyboard.handleKeydown(event));
     this.scroll.attach();
     this.size.attach();
+    this.listenToView();
+  }
+
+  private listenToView(): void {
+    const view = viewOf(this.rootEl);
+
+    if (view === this.listenedView) {
+      return;
+    }
+
+    this.viewScope?.dispose();
+    this.viewScope = this.events.createScope("editor-view");
+    this.scroll.listenToView(this.viewScope, view);
+    this.size.listenToView(this.viewScope, view);
+    this.viewScope.activate();
+    this.listenedView = view;
   }
 
   private wireAdapter(): void {
@@ -455,6 +473,11 @@ export class FormulaEditor {
 
     try {
       container.appendChild(this.rootEl);
+
+      if (this.viewScope !== null) {
+        this.listenToView();
+      }
+
       this.size.resetManualSize();
       this.size.invalidateCache();
       this.popupCtrl?.invalidateClipCache();

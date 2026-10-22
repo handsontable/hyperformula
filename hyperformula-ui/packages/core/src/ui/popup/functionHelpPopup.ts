@@ -1,6 +1,6 @@
 import type { FunctionSignature } from "../../engine/types";
 import { CN } from "../../theme/classNames";
-import { createEl, createIcon } from "../dom";
+import { createEl, createIcon, isNode } from "../dom";
 import { FocusTrap } from "../focusTrap";
 import type { IconsOptions } from "../types";
 import { BasePopup } from "./basePopup";
@@ -128,7 +128,7 @@ export class FunctionHelpPopup extends BasePopup {
         return;
       }
 
-      const nextTarget = event.relatedTarget instanceof Node ? event.relatedTarget : null;
+      const nextTarget = isNode(event.relatedTarget) ? event.relatedTarget : null;
 
       if (nextTarget && this.root.contains(nextTarget)) {
         return;

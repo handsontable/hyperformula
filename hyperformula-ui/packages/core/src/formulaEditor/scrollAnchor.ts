@@ -4,6 +4,7 @@ import type { EditorContext } from "./types";
 export class ScrollAnchor {
   private scrollRaf = 0;
   private scrollArrivedDuringFrame = false;
+  private attached = false;
 
   private readonly onInputScroll = (): void => {
     this.ctx.overlay.root.scrollTop = this.ctx.input.textarea.scrollTop;
@@ -19,6 +20,10 @@ export class ScrollAnchor {
   ) {}
 
   private handleAncestorScroll(event: Event): void {
+    if (!this.attached) {
+      return;
+    }
+
     if (this.ctx.suggestions.contains(event.target as Node)) {
       return;
     }
@@ -65,8 +70,8 @@ export class ScrollAnchor {
   }
 
   attach(): void {
+    this.attached = true;
     this.scope.listen(this.ctx.input.textarea, "scroll", this.onInputScroll);
-    this.scope.listen(window, "scroll", this.onAncestorScroll, { capture: true });
     this.scope.add({
       dispose: () => {
         this.scrollArrivedDuringFrame = false;
@@ -80,7 +85,12 @@ export class ScrollAnchor {
     this.scope.activate();
   }
 
+  listenToView(viewScope: EventScope, view: Window): void {
+    viewScope.listen(view, "scroll", this.onAncestorScroll, { capture: true });
+  }
+
   detach(): void {
+    this.attached = false;
     this.scope.deactivate();
     this.scrollArrivedDuringFrame = false;
 

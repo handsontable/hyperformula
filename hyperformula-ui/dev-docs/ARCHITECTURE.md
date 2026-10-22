@@ -509,8 +509,18 @@ All popup-style overlays share a common base class `BasePopup`
   `rootDocument`, plus into the portal parent's shadow root when it is in one. Focus checks
   never read `document.activeElement`: they call `deepActiveElement(element.ownerDocument)`
   (`ui/dom.ts`), which follows open shadow roots down to the focused element and reads the
-  document the element is actually in. Window-level listeners (scroll, resize, the error
-  popup's keydown) and viewport sizes still use the global `window`.
+  document the element is actually in. Window and document listeners follow the element too:
+  `viewOf(node)` gives the window of the document a node is in, and the error popup, popup
+  viewport sizes, `PopupController`'s fallback clip, and `DomRangePicker` read it instead of the
+  global `window`/`document`. The editor's ambient scroll/resize listeners (`ScrollAnchor`,
+  `EditorSizeController`) live in an `editor-view` scope that `FormulaEditor.attachTo` rebinds when
+  the editor moves into another document (`listenToView`). Node checks never use `instanceof`:
+  an element from an iframe belongs to another realm and fails `instanceof Element`, so
+  `isElement`/`isHTMLElement`/`isNode` (`ui/dom.ts`) test `nodeType`. `DomRangePicker` reads a
+  document-level event's cell from `eventOrigin(event)` (the first node of `composedPath()`),
+  because a shadow root retargets `event.target` to its host, also listens for scroll on its
+  shadow root (scroll is not composed), and hit-tests through the shadow root's own
+  `elementFromPoint` (`elementAt`).
 - `FormulaBar` constructor signature:
   `(container: HTMLElement, options: { adapter: IGridAdapter; editor: FormulaEditor; knownFunctions: ReadonlySet<string>; className?: string })`.
   It receives the pre-built `FormulaEditor` from `FormulaBuilder` — it does not construct

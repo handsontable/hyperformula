@@ -6,6 +6,8 @@ import {
   createSvgIcon,
   deepActiveElement,
   ensureRelativePosition,
+  eventOrigin,
+  isElement,
 } from "../../src/ui/dom";
 
 describe("ensureRelativePosition", () => {
@@ -214,5 +216,40 @@ describe("deepActiveElement", () => {
     expect(deepActiveElement(document)).toBe(input);
 
     input.remove();
+  });
+});
+
+describe("eventOrigin", () => {
+  it("returns the innermost node of the composed path, not the retargeted shadow host", () => {
+    const cell = document.createElement("td");
+    const shadowHost = document.createElement("div");
+    const event = {
+      composedPath: () => [cell, shadowHost],
+      target: shadowHost,
+    } as unknown as Event;
+
+    expect(eventOrigin(event)).toBe(cell);
+  });
+
+  it("falls back to the target when the event has no composed path", () => {
+    const target = document.createElement("div");
+    const event = { composedPath: () => [], target } as unknown as Event;
+
+    expect(eventOrigin(event)).toBe(target);
+  });
+});
+
+describe("isElement", () => {
+  it("recognizes an element from another window by its node type", () => {
+    const foreignElement = { nodeType: Node.ELEMENT_NODE, closest: () => null };
+
+    expect(foreignElement instanceof Element).toBe(false);
+    expect(isElement(foreignElement)).toBe(true);
+  });
+
+  it("rejects text nodes and non-nodes", () => {
+    expect(isElement(document.createTextNode("x"))).toBe(false);
+    expect(isElement(null)).toBe(false);
+    expect(isElement({})).toBe(false);
   });
 });

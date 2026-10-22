@@ -1,7 +1,7 @@
 import { EventManager, type EventScope } from "../../events/eventManager";
 import type { DomEventOptions } from "../../events/types";
 import { CN } from "../../theme/classNames";
-import { clear, createEl, createIcon } from "../dom";
+import { clear, createEl, createIcon, viewOf } from "../dom";
 import type { IconsOptions } from "../types";
 import { BottomViewportAnchoredStrategy } from "./positionStrategy";
 import type { AnchorRect, BoundsRect, PositionStrategy, Viewport } from "./types";
@@ -129,7 +129,8 @@ export abstract class BasePopup {
     this.root.style.maxWidth = "";
 
     const popupRect = this.root.getBoundingClientRect();
-    const viewport: Viewport = { width: window.innerWidth, height: window.innerHeight };
+    const view = viewOf(this.root);
+    const viewport: Viewport = { width: view.innerWidth, height: view.innerHeight };
     const position = this.strategy.compute(anchor, popupRect, viewport, this.getBounds());
     this.root.style.left = `${position.left}px`;
     this.root.style.top = `${position.top}px`;

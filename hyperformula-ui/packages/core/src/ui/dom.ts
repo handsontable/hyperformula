@@ -94,6 +94,41 @@ export function clear(element: HTMLElement): void {
   }
 }
 
+export function isElement(value: unknown): value is Element {
+  return (
+    typeof value === "object" && value !== null && (value as Node).nodeType === Node.ELEMENT_NODE
+  );
+}
+
+export function isHTMLElement(value: unknown): value is HTMLElement {
+  return isElement(value) && "dataset" in value;
+}
+
+export function isNode(value: unknown): value is Node {
+  return (
+    typeof value === "object" && value !== null && typeof (value as Node).nodeType === "number"
+  );
+}
+
+export function isShadowRoot(node: Node): node is ShadowRoot {
+  return node.nodeType === Node.DOCUMENT_FRAGMENT_NODE && "host" in node;
+}
+
+export function viewOf(node: Node): Window {
+  return node.ownerDocument?.defaultView ?? window;
+}
+
+export function eventOrigin(event: Event): EventTarget | null {
+  return event.composedPath()[0] ?? event.target;
+}
+
+export function elementAt(node: Node, x: number, y: number): Element | null {
+  const rootNode = node.getRootNode();
+  const hitRoot = isShadowRoot(rootNode) ? rootNode : (node.ownerDocument ?? document);
+
+  return hitRoot.elementFromPoint(x, y);
+}
+
 export function deepActiveElement(ownerDocument: Document): Element | null {
   let active = ownerDocument.activeElement;
 
@@ -110,7 +145,7 @@ export function findAncestor(
 ): HTMLElement | null {
   let current = start;
 
-  while (current && current !== document.body) {
+  while (current && current !== current.ownerDocument.body) {
     if (matches(getComputedStyle(current))) {
       return current;
     }
