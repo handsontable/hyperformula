@@ -201,6 +201,7 @@ const builder = new FormulaBuilder({ rootEl: gridRoot, adapter, formulaBarContai
 
 | Export | Kind | Summary |
 |---|---|---|
+| `DEFAULT_PHRASES` | const | The English phrases the editor uses unless the `phrases` option replaces them. |
 | `ensureRelativePosition` | function | Forces `position: relative` onto a statically-positioned element so absolute overlays can anchor inside it; returns a restore function. |
 | `expandHeaderSpan` | function | Expands a whole-row/column `HeaderPick` to the concrete cell range it covers in a grid of `size`. |
 | `findDataEdge` | function | Walks from `from` in `direction` to the edge of the contiguous data block — ctrl+arrow-style navigation. |
@@ -212,6 +213,7 @@ const builder = new FormulaBuilder({ rootEl: gridRoot, adapter, formulaBarContai
 | `LiveRegion` | class | Visually-hidden polite `aria-live` region for screen-reader announcements; messages are cleared then re-set after a short delay so repeat announcements are re-spoken. |
 | `normalizeRange` | function | Builds the normalized `CellRange` spanning two corners: `start` gets the minima, `end` the maxima, regardless of drag direction. |
 | `parseCellInput` | function | Parses raw cell input into its stored form: numeric text becomes a `number`; formulas (leading `=`) and everything else stay strings. |
+| `Phrases` | interface | The words the editor shows or speaks: accessible names, hints, and screen-reader announcements. |
 | `splitRangeByFrozen` | function | Splits a range into per-pane pieces along frozen row/column boundaries (top, bottom, and left panes), so each piece can be drawn inside its own overlay pane. |
 | `stepCell` | function | Clamped single-step move from `from` in `direction`, staying inside `size`. |
 | `unionRectRelativeTo` | function | Returns the bounding `RangeRect` of two cell elements relative to `host` (including its scroll offset), or `null` when either element is missing. |

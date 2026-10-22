@@ -1444,6 +1444,31 @@ describe("FormulaBar address box when the grid cannot select", () => {
     harness.editor.destroy();
   });
 
+  it("announces a rejected address in the editor's phrases", () => {
+    const container = document.createElement("div");
+    const announce = vi.fn();
+    const { adapter } = makeBarAdapter({ getGridSize: () => ({ rows: 10, cols: 10 }) });
+    const editor = new FormulaEditorImpl(document.createElement("div"), {
+      popupCtx: sharedPopupCtx,
+      adapter,
+      phrases: { invalidCellAddress: (text) => `Ungültiger Zellbezug: ${text}` },
+    });
+    const liveRegion = { announce, destroy: () => {} } as unknown as LiveRegion;
+    const controller = makeFormulaBar(container, {
+      adapter,
+      editor,
+      knownFunctions: new Set(),
+      liveRegion,
+    });
+
+    submit(container, "ZZ99999");
+
+    expect(announce).toHaveBeenCalledWith("Ungültiger Zellbezug: ZZ99999");
+
+    controller.destroy();
+    editor.destroy();
+  });
+
   it("accepts a cell when the adapter returns nothing", () => {
     const harness = makeRefusingHarness({ setActiveCell: vi.fn(() => undefined) });
     const input = submit(harness.container, "B3");

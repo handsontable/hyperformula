@@ -2,7 +2,8 @@ import { EventManager, type EventScope } from "../../events/eventManager";
 import type { DomEventOptions } from "../../events/types";
 import { CN } from "../../theme/classNames";
 import { clear, createEl, createIcon, viewOf } from "../dom";
-import type { IconsOptions } from "../types";
+import { DEFAULT_PHRASES } from "../phrases";
+import type { IconsOptions, Phrases } from "../types";
 import { BottomViewportAnchoredStrategy } from "./positionStrategy";
 import type { AnchorRect, BoundsRect, PositionStrategy, Viewport } from "./types";
 
@@ -12,10 +13,12 @@ interface BasePopupOptions {
   showClose?: boolean;
   onExplicitClose?: () => void;
   icons?: IconsOptions;
+  phrases?: Phrases;
 }
 
 export abstract class BasePopup {
   protected readonly root: HTMLElement;
+  protected readonly phrases: Phrases;
   protected readonly events = new EventManager();
   protected readonly icons: IconsOptions | undefined;
   private readonly strategy: PositionStrategy;
@@ -38,9 +41,11 @@ export abstract class BasePopup {
     showClose = false,
     onExplicitClose,
     icons,
+    phrases = DEFAULT_PHRASES,
   }: BasePopupOptions = {}) {
     this.strategy = strategy;
     this.icons = icons;
+    this.phrases = phrases;
     this.root = this.createRoot();
     this.root.classList.add(CN.popup);
     this.staticScope = this.events.createScope("popup-static");
@@ -56,7 +61,7 @@ export abstract class BasePopup {
     const button = createEl("button", {
       class: CN.popupClose,
       type: "button",
-      "aria-label": "Close",
+      "aria-label": this.phrases.close,
     });
     button.appendChild(createIcon("close", this.icons));
     this.staticScope.listen(button, "mousedown", (event) => {

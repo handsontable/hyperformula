@@ -9,6 +9,7 @@ import type { FormulaEditorOptions } from "./formulaEditor/types";
 import { indexToColLetters } from "./lexer";
 import { injectStyles, releaseStyles, type StyleRoot } from "./theme/injectStyles";
 import { LiveRegion } from "./ui/liveRegion";
+import { resolvePhrases } from "./ui/phrases";
 import { cellErrorMessage, setCellError } from "./ui/popup/cellError";
 import { ErrorPopup } from "./ui/popup/errorPopup";
 import { PopupContext } from "./ui/popup/popupContext";
@@ -196,6 +197,7 @@ export class FormulaBuilder {
       ...(errorOptions !== undefined && { options: errorOptions }),
       ...(direction !== undefined && { direction }),
       ...(icons !== undefined && { icons }),
+      phrases: resolvePhrases(options.phrases),
     });
 
     this.detachedMount = rootDocument.createElement("div");
@@ -213,6 +215,7 @@ export class FormulaBuilder {
       ...(suggestionsOptions !== undefined && { suggestionsOptions }),
       ...(fnHelpOptions !== undefined && { fnHelpOptions }),
       ...(icons !== undefined && { icons }),
+      ...(options.phrases !== undefined && { phrases: options.phrases }),
     });
 
     this.errorPopup.attach(rootEl);
@@ -327,13 +330,11 @@ export class FormulaBuilder {
     if (committedMessage) {
       const cellLabel = `${indexToColLetters(committedAddress.col)}${committedAddress.row + 1}`;
 
-      parts.push(`Error in ${cellLabel}: ${committedMessage}.`);
+      parts.push(this.formulaEditor.phrases.cellError(cellLabel, committedMessage));
     }
 
-    if (dependentErrorCount === 1) {
-      parts.push("1 more cell now contains an error.");
-    } else if (dependentErrorCount > 1) {
-      parts.push(`${dependentErrorCount} more cells now contain errors.`);
+    if (dependentErrorCount > 0) {
+      parts.push(this.formulaEditor.phrases.dependentCellErrors(dependentErrorCount));
     }
 
     if (parts.length > 0) {

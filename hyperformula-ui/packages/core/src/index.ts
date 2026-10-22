@@ -94,6 +94,7 @@ export type {
   IconName,
   IconsOptions,
   LayoutDirection,
+  Phrases,
   PopupHostOption,
   PopupsOptions,
   SuggestionItem,
@@ -104,6 +105,7 @@ export type {
 export {
   cellErrorMessage,
   classifyCellLayer,
+  DEFAULT_PHRASES,
   EPHEMERAL_COLOR,
   ensureRelativePosition,
   fillColor,

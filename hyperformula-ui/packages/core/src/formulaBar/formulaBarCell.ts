@@ -4,8 +4,9 @@ import { Lexer } from "../lexer";
 import type { LexerOptions, Token } from "../lexer/types";
 import { CN } from "../theme/classNames";
 import { createEl, createIcon } from "../ui/dom";
+import { DEFAULT_PHRASES } from "../ui/phrases";
 import { VisualOverlay } from "../ui/text/visualOverlay";
-import type { IconsOptions } from "../ui/types";
+import type { IconsOptions, Phrases } from "../ui/types";
 
 /**
  * Options for {@link FormulaBarCell}.
@@ -34,6 +35,13 @@ export interface FormulaBarCellOptions {
    * applies, so the idle view and the editor color references alike.
    */
   tokenPostProcess?: (tokens: Token[], text: string) => Token[];
+
+  /**
+   * Phrases for the cell's accessible name.
+   *
+   * @defaultValue {@link DEFAULT_PHRASES}
+   */
+  phrases?: Pick<Phrases, "formulaInput">;
 }
 
 /**
@@ -71,7 +79,7 @@ export class FormulaBarCell {
       class: CN.formulaBarIdle,
       tabindex: "0",
       role: "textbox",
-      "aria-label": "Formula input",
+      "aria-label": (options.phrases ?? DEFAULT_PHRASES).formulaInput,
     });
     this.idleEl.appendChild(this.idleOverlay.root);
     this.overlayEl = createEl("div", { class: CN.formulaBarOverlay });

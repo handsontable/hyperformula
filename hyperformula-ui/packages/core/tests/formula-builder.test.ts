@@ -5,6 +5,7 @@ import { FormulaBuilder } from "../src/formulaBuilder";
 import { FormulaEditor } from "../src/formulaEditor/formulaEditor";
 import { CN } from "../src/theme/classNames";
 import { REF_PALETTE } from "../src/theme/refPalette";
+import { DEFAULT_PHRASES } from "../src/ui/phrases";
 import { press, sel, TestGridAdapter } from "./helpers";
 
 class FakeCommitEngine implements HyperFormulaLike {
@@ -830,6 +831,22 @@ describe("FormulaBuilder", () => {
       adapter.fireOutsideCellClick({ sheet: "", row: 4, col: 2 });
     }
 
+    it("announces a commit error in the phrases the host passed", () => {
+      scoped = new FormulaBuilder({
+        rootEl: host,
+        adapter,
+        hyperformula: engine as never,
+        onCommit: () => {
+          engine.setCellValue(0, 0, { type: "NA", value: "#N/A", message: "Wert fehlt" });
+        },
+        phrases: { cellError: (cellAddress, message) => `Fehler in ${cellAddress}: ${message}.` },
+      });
+      scoped.openEditor(mount, "=SUM(");
+      press(mount, "Enter");
+
+      expect(liveRegionText()).toBe("Fehler in A1: #N/A — Wert fehlt.");
+    });
+
     it("announces the committed cell's error through the live region", () => {
       commitViaEditor("=SUM(", () => {
         engine.setCellValue(0, 0, { type: "NA", value: "#N/A", message: "value not found" });
@@ -1115,5 +1132,62 @@ describe("FormulaBuilder document and portal parent", () => {
     builder.destroy();
 
     expect(frameDocument.head.querySelector("style[data-hfe-styles]")).toBeNull();
+  });
+});
+
+describe("FormulaBuilder phrases", () => {
+  afterEach(() => {
+    document.body.replaceChildren();
+  });
+
+  function label(selector: string): string | null {
+    return document.querySelector(selector)?.getAttribute("aria-label") ?? null;
+  }
+
+  it("names the editor, the formula bar and the popups with the phrases the host passed", () => {
+    const barEl = document.createElement("div");
+
+    document.body.appendChild(barEl);
+
+    const builder = new FormulaBuilder({
+      rootEl: document.body,
+      formulaBarContainer: barEl,
+      popups: { showClose: true },
+      phrases: {
+        formulaEditor: "Formeleditor",
+        formulaInput: "Formeleingabe",
+        cellAddress: "Zellbezug",
+        functionHelp: "Funktionshilfe",
+        close: "Schließen",
+      },
+    });
+
+    expect(label("textarea")).toBe("Formeleditor");
+    expect(label(sel(CN.formulaBarIdle))).toBe("Formeleingabe");
+    expect(label(sel(CN.formulaBarAddressInput))).toBe("Zellbezug");
+    expect(label(sel(CN.fnHelp))).toBe("Funktionshilfe");
+
+    const errorCell = document.createElement("div");
+
+    builder.markCell(errorCell, { type: "REF", value: "#REF!" });
+    document.body.appendChild(errorCell);
+    errorCell.dispatchEvent(new MouseEvent("mouseover", { bubbles: true, relatedTarget: null }));
+
+    expect(label(`${sel(CN.errorPopup)} ${sel(CN.popupClose)}`)).toBe("Schließen");
+
+    builder.destroy();
+  });
+
+  it("keeps the English default for every phrase the host left out", () => {
+    const builder = new FormulaBuilder({
+      rootEl: document.body,
+      phrases: { formulaEditor: "Formeleditor" },
+    });
+
+    expect(builder.editor.phrases.formulaEditor).toBe("Formeleditor");
+    expect(builder.editor.phrases.close).toBe(DEFAULT_PHRASES.close);
+    expect(builder.editor.phrases.dependentCellErrors(2)).toBe("2 more cells now contain errors.");
+
+    builder.destroy();
   });
 });

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the `rootDocument` and `portalParent` options to `FormulaBuilder`, so the popups, the screen-reader announcements and the styles can live in the grid's iframe document or shadow root. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 - Added fill commit: Ctrl/Cmd+Enter commits the formula to every selected cell when the adapter implements the new optional `commitFill` method, or the `onCommitFill` option is set. Alt+Enter inserts a newline. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 - Added the `--hfe-error-font-family` CSS variable, used by both a cell's error value and the error popup title. When it is not set, both use `--hfe-font-family`. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
+- Added the `phrases` option to `FormulaBuilder` and `FormulaEditor`, which translates every accessible name, hint and screen-reader announcement, with the English defaults exported as `DEFAULT_PHRASES`. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 
 ### Changed
 - Changed the font of a cell's error value from the monospace formula font to the host's font (`--hfe-font-family`), to match the error popup title. To keep monospace, set `--hfe-error-font-family: var(--hfe-formula-font-family)`. [#1839](https://github.com/handsontable/hyperformula/pull/1839)

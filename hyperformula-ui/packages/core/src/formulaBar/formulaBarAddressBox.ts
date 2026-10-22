@@ -4,6 +4,8 @@ import { EventManager } from "../events";
 import { colLettersToIndex, indexToColLetters } from "../lexer";
 import { CN } from "../theme/classNames";
 import { createEl } from "../ui/dom";
+import { DEFAULT_PHRASES } from "../ui/phrases";
+import type { Phrases } from "../ui/types";
 
 const A1_PATTERN = /^([A-Za-z]{1,3})(\d{1,7})$/;
 const RANGE_PATTERN = /^([A-Za-z]{1,3})(\d{1,7}):([A-Za-z]{1,3})(\d{1,7})$/;
@@ -39,6 +41,13 @@ export interface FormulaBarAddressBoxOptions {
   onNavigate: (target: AddressBoxTarget) => boolean;
   onNavigateRange: (range: AddressBoxRange) => boolean;
   onInvalidInput?: (text: string) => void;
+
+  /**
+   * Phrases for the input's accessible name.
+   *
+   * @defaultValue {@link DEFAULT_PHRASES}
+   */
+  phrases?: Pick<Phrases, "cellAddress">;
 }
 
 function formatTarget(target: AddressBoxTarget): string {
@@ -71,7 +80,7 @@ export class FormulaBarAddressBox {
       id: `${CN.formulaBarAddressInput}-${addressInputIdCounter}`,
     });
     this.input.spellcheck = false;
-    this.input.setAttribute("aria-label", "Cell address");
+    this.input.setAttribute("aria-label", (options.phrases ?? DEFAULT_PHRASES).cellAddress);
     this.root.appendChild(this.input);
 
     const scope = this.events.createScope("address-box", { stopPropagation: true });

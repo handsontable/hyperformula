@@ -2,7 +2,7 @@ import type { FunctionSignature } from "../../engine/types";
 import { CN } from "../../theme/classNames";
 import { createEl, createIcon, isNode } from "../dom";
 import { FocusTrap } from "../focusTrap";
-import type { IconsOptions } from "../types";
+import type { IconsOptions, Phrases } from "../types";
 import { BasePopup } from "./basePopup";
 import type { AnchorRect, FunctionHelpOptions } from "./types";
 
@@ -14,6 +14,7 @@ export interface FunctionHelpPopupOptions {
   container?: HTMLElement;
   options?: FunctionHelpOptions;
   icons?: IconsOptions;
+  phrases?: Phrases;
 }
 
 let tooltipIdCounter = 0;
@@ -88,12 +89,14 @@ export class FunctionHelpPopup extends BasePopup {
     container,
     options,
     icons,
+    phrases,
   }: FunctionHelpPopupOptions = {}) {
     super({
       ...(container !== undefined && { container }),
       ...(options?.showClose !== undefined && { showClose: options.showClose }),
       ...(onExplicitClose !== undefined && { onExplicitClose }),
       ...(icons !== undefined && { icons }),
+      ...(phrases !== undefined && { phrases }),
     });
     tooltipIdCounter += 1;
     this.root.id = `${CN.fnHelp}-${tooltipIdCounter}`;
@@ -143,7 +146,7 @@ export class FunctionHelpPopup extends BasePopup {
     return createEl("div", {
       class: CN.fnHelp,
       role: "dialog",
-      "aria-label": "Function help",
+      "aria-label": this.phrases.functionHelp,
       "aria-keyshortcuts": "F6",
       hidden: true,
     });
@@ -283,7 +286,7 @@ export class FunctionHelpPopup extends BasePopup {
     this.renderListen(link, "mousedown", (event) => {
       event.preventDefault();
     });
-    link.appendChild(document.createTextNode("Learn more"));
+    link.appendChild(document.createTextNode(this.phrases.learnMore));
     link.appendChild(createIcon("externalLink", this.icons));
 
     return link;
@@ -303,7 +306,7 @@ export class FunctionHelpPopup extends BasePopup {
 
     this.signature = signature;
     this.activeIndex = activeIndex;
-    this.root.setAttribute("aria-label", `${signature.name} function help`);
+    this.root.setAttribute("aria-label", this.phrases.functionHelpFor(signature.name));
     this.open(anchor);
   }
 

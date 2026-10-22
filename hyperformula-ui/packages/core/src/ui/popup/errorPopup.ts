@@ -1,7 +1,7 @@
 import type { EventScope } from "../../events/eventManager";
 import { CN } from "../../theme/classNames";
 import { createEl, deepActiveElement, isHTMLElement, viewOf } from "../dom";
-import type { IconsOptions } from "../types";
+import type { IconsOptions, Phrases } from "../types";
 import { BasePopup } from "./basePopup";
 import { EndViewportAnchoredStrategy } from "./positionStrategy";
 import type { BoundsRect, ErrorOptions, LayoutDirection } from "./types";
@@ -11,6 +11,7 @@ export interface ErrorPopupOptions {
   options?: ErrorOptions;
   direction?: LayoutDirection;
   icons?: IconsOptions;
+  phrases?: Phrases;
 }
 
 let errorPopupIdCounter = 0;
@@ -33,12 +34,13 @@ export class ErrorPopup extends BasePopup {
   private readonly onScroll = (): void => this.scheduleScrollReposition();
   private readonly onKeydown = (event: KeyboardEvent): void => this.handleEscape(event);
 
-  constructor({ container, options, direction, icons }: ErrorPopupOptions) {
+  constructor({ container, options, direction, icons, phrases }: ErrorPopupOptions) {
     super({
       strategy: new EndViewportAnchoredStrategy(),
       container,
       showClose: options?.showClose ?? false,
       ...(icons !== undefined && { icons }),
+      ...(phrases !== undefined && { phrases }),
     });
     this.direction = direction ?? "ltr";
     errorPopupIdCounter += 1;

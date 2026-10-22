@@ -170,6 +170,17 @@ adapters may remove the inline mount on close (the TanStack example adapter dele
 without the reattach the live editor DOM would be torn out with the mount. With a bar
 attached, `FormulaBar` owns the same reattachment instead.
 
+### Phrases
+
+No user-visible or spoken English is hard-coded in a component. Every accessible name, hint
+and announcement is a member of `Phrases` (`ui/types.ts`), with English defaults in
+`DEFAULT_PHRASES` (`ui/phrases.ts`); phrases that take values (a function name, a cell address,
+an error count) are functions, so a translation can reorder words and handle plurals.
+`FormulaEditor` resolves the `phrases` option once and exposes the result as
+`FormulaEditor.phrases`; the popups receive it through `BasePopupOptions.phrases` (read in
+`createRoot`, which runs inside the base constructor), and `FormulaBar` and `FormulaBuilder` read
+it from the editor. A new string goes into `Phrases`, not into the component.
+
 ## Component map
 
 ```

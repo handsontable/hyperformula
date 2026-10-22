@@ -9,7 +9,7 @@ import type { SuggestionsPopup } from "../ui/popup/suggestionsPopup";
 import type { FunctionHelpOptions, LayoutDirection, SuggestionsOptions } from "../ui/popup/types";
 import type { RichInput } from "../ui/text/richInput";
 import type { VisualOverlay } from "../ui/text/visualOverlay";
-import type { IconsOptions } from "../ui/types";
+import type { IconsOptions, Phrases } from "../ui/types";
 
 /**
  * Options for `FormulaEditor`.
@@ -73,6 +73,14 @@ export interface FormulaEditorOptions {
 
   /** Host factories replacing the built-in icons; each one left out keeps its built-in SVG. */
   icons?: IconsOptions;
+
+  /**
+   * Translations of the accessible names, hints and announcements; every phrase left out keeps
+   * its English default.
+   *
+   * @defaultValue {@link DEFAULT_PHRASES}
+   */
+  phrases?: Partial<Phrases>;
 
   /** Shared popup portal/positioning context, owned by `FormulaBuilder`. */
   popupCtx: PopupContext;

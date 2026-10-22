@@ -95,7 +95,9 @@ export class FormulaBar {
     this.addressBox = new FormulaBarAddressBox({
       onNavigate: (target) => this.navigateTo(target),
       onNavigateRange: (range) => this.navigateToRange(range),
-      onInvalidInput: (text) => options.liveRegion.announce(`Invalid cell address: ${text}`),
+      onInvalidInput: (text) =>
+        options.liveRegion.announce(options.editor.phrases.invalidCellAddress(text)),
+      phrases: options.editor.phrases,
     });
     this.formulaCell = new FormulaBarCell({
       knownFunctions: options.knownFunctions,
@@ -103,6 +105,7 @@ export class FormulaBar {
       tokenPostProcess: (tokens) =>
         annotateNamedExprs(tokens, (name) => options.editor.engine.resolveNamedExpression(name)),
       onActivate: () => this.activateFromIdle(),
+      phrases: options.editor.phrases,
       ...(options.icons !== undefined && { icons: options.icons }),
     });
     this.container.append(this.addressBox.root, this.formulaCell.root);

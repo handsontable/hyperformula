@@ -11,10 +11,12 @@ import type { LexerOptions } from "../lexer/types";
 import { CN } from "../theme/classNames";
 import { injectStyles, releaseStyles } from "../theme/injectStyles";
 import { createEl, isHTMLElement, isNode, viewOf } from "../ui/dom";
+import { resolvePhrases } from "../ui/phrases";
 import { FunctionHelpPopup } from "../ui/popup/functionHelpPopup";
 import { SuggestionsPopup } from "../ui/popup/suggestionsPopup";
 import { RichInput } from "../ui/text/richInput";
 import { VisualOverlay } from "../ui/text/visualOverlay";
+import type { Phrases } from "../ui/types";
 import { isFormula } from "./editorContext";
 import { EditorSizeController } from "./editorSizeController";
 import { HighlightController } from "./highlightController";
@@ -42,6 +44,7 @@ export class FormulaEditor {
   readonly kernel: Kernel;
   readonly engine: EngineBridge;
   readonly adapter: EditorGridAdapter;
+  private readonly resolvedPhrases: Phrases;
   private readonly separators: LexerOptions;
   private readonly refOpeners: string;
   private readonly rootEl: HTMLDivElement;
@@ -100,7 +103,8 @@ export class FormulaEditor {
     this.adapter = opts.adapter;
 
     const inputScope = this.events.createScope("editor-input");
-    this.input = new RichInput(inputScope);
+    this.resolvedPhrases = resolvePhrases(opts.phrases);
+    this.input = new RichInput(inputScope, this.resolvedPhrases.formulaEditor);
     inputScope.activate();
     this.knownFunctions = new Set(this.engine.getFunctionNames().map((name) => name.toUpperCase()));
     this.overlay = new VisualOverlay({ knownFunctions: this.knownFunctions });
@@ -117,6 +121,7 @@ export class FormulaEditor {
       },
       opts.popupCtx.portal,
       opts.icons,
+      this.resolvedPhrases,
     );
     this.fnHelp = new FunctionHelpPopup({
       onExplicitClose: () => {
@@ -135,6 +140,7 @@ export class FormulaEditor {
       container: opts.popupCtx.portal,
       ...(opts.fnHelpOptions !== undefined && { options: opts.fnHelpOptions }),
       ...(opts.icons !== undefined && { icons: opts.icons }),
+      phrases: this.resolvedPhrases,
     });
 
     this.rootEl = createEl("div", { class: CN.editor });
@@ -359,6 +365,11 @@ export class FormulaEditor {
   /** Suppresses grid highlights until the next resume (focus, input, or non-silent `setValue`). */
   suppressHighlights(): void {
     this.highlights.suppress();
+  }
+
+  /** The phrases in effect: the `phrases` option over the English defaults. */
+  get phrases(): Phrases {
+    return this.resolvedPhrases;
   }
 
   /** Function names known to the engine, used to seed idle colored-formula views. */
