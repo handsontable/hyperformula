@@ -125,10 +125,8 @@ function splitIntoSections(formatStr: string): string[] {
 
 /**
  * Strips the delimiting double-quotes from quoted literals so `"zł"` renders as
- * `zł`. NUANCE (documented, out of HF-287 scope): quotes are removed globally,
- * so digit/placeholder characters *inside* quotes are NOT protected from the
- * number tokenizer — a rare Excel case that this incremental formatter does not
- * cover.
+ * `zł`. Quotes are removed from the whole section, so digit and placeholder
+ * characters inside quotes still reach the number tokenizer.
  *
  * @param section a single format section
  * @returns the section with double-quote delimiters removed
@@ -273,13 +271,13 @@ function countChars(text: string, char: string) {
  * `pickSection`.
  *
  * Per integer-format token:
- * - a *trailing* comma run (Excel's scaler, OUT of HF-287 scope) is peeled off
+ * - a *trailing* comma run (Excel's scaler) is peeled off
  *   and re-emitted as a literal so the output is recognizably un-scaled rather
  *   than silently mis-scaled;
  * - grouping is requested when an *interior* comma exists (`#,##0`), and the
  *   grouping glyph is `config.thousandSeparator` (empty on default config → no
  *   visible glyph);
- * - the decimal glyph is `config.decimalSeparator` (was a hardcoded `.`).
+ * - the decimal glyph is `config.decimalSeparator`.
  *
  * @param tokens the tokenized number-format section
  * @param value the sign-adjusted numeric value to render

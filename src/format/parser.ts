@@ -16,7 +16,7 @@ const dateFormatRegex = /(\\.|dd|DD|d|D|mm|MM|m|M|YYYY|YY|yyyy|yy|HH|hh|H|h|ss(\
  * inspection in `format.ts`, never by regex structure.
  *
  * Synchronous catastrophic backtracking is not catchable by jest/jasmine
- * wall-clock timeouts (see DEV-2120), so this pattern MUST NOT be rewritten
+ * wall-clock timeouts, so this pattern MUST NOT be rewritten
  * into a nested-quantifier form such as `([#0]+,)*[#0]+`. Its shape is pinned
  * by a white-box test via {@link NUMBER_FORMAT_REGEX_SOURCE}.
  */
