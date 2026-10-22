@@ -268,3 +268,21 @@ describe("Lexer", () => {
     ]);
   });
 });
+
+describe("Lexer quoted sheet names", () => {
+  const RUN_LENGTH = 40_000;
+  const BUDGET_MS = 50;
+
+  it("tokenizes a long run of apostrophes in linear time", () => {
+    const text = `=${"'".repeat(RUN_LENGTH)}`;
+    const startedAt = performance.now();
+    const tokens = lex.tokenize(text);
+
+    expect(performance.now() - startedAt).toBeLessThan(BUDGET_MS);
+    expect(tokens).toHaveLength(RUN_LENGTH + 1);
+  });
+
+  it("keeps tokenizing quotes that do not open a sheet name one by one", () => {
+    expect(values("='abc'+A1")).toEqual(["=", "'", "abc", "'", "+", "A1"]);
+  });
+});

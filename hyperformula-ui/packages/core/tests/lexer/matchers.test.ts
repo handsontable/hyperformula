@@ -201,4 +201,13 @@ describe("matchSheetPrefix", () => {
   it("no longer treats backslash-quote as an escaped quote", () => {
     expect(matchSheetPrefix("'a\\'b'!A1", 0)).toBeNull();
   });
+
+  it("takes the longest quoted name when doubled quotes precede the closing quote", () => {
+    expect(matchSheetPrefix("'a'''!A1", 0)).toEqual({ sheet: "a'", length: 6 });
+  });
+
+  it("matches a quoted name that starts inside a run of quotes", () => {
+    expect(matchSheetPrefix("''a'!A1", 0)).toBeNull();
+    expect(matchSheetPrefix("''a'!A1", 1)).toEqual({ sheet: "a", length: 4 });
+  });
 });
