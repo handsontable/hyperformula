@@ -52,7 +52,7 @@ import {
   NamedExpressions
 } from './NamedExpressions'
 import { NamedExpressionDependency, ParserWithCaching, ParsingErrorType, RelativeDependency } from './parser'
-import { ParsingError } from './parser/Ast'
+import { Ast, ParsingError } from './parser/Ast'
 import { ParsingResult } from './parser/ParserWithCaching'
 import { ColumnsSpan, RowsSpan } from './Span'
 import { Statistics, StatType } from './statistics'
@@ -495,7 +495,7 @@ export class Operations {
     for (const [address, clipboardCell] of cells) {
       this.restoreCell(address, clipboardCell)
       if (clipboardCell.type === ClipboardCellType.FORMULA) {
-        const { dependencies } = this.parser.fetchCachedResult(clipboardCell.hash)
+        const { dependencies } = this.parser.fetchCachedResultForAst(clipboardCell.ast)
         addedNamedExpressions.push(...this.updateNamedExpressionsForTargetAddress(sourceSheetId, address, dependencies))
       }
     }
@@ -513,7 +513,7 @@ export class Operations {
         break
       }
       case ClipboardCellType.FORMULA: {
-        this.setFormulaToCellFromCache(clipboardCell.hash, address)
+        this.setFormulaToCellFromAst(clipboardCell.ast, address)
         break
       }
       case ClipboardCellType.EMPTY: {
@@ -537,7 +537,7 @@ export class Operations {
     } else if (vertex instanceof FormulaVertex) {
       return [vertex.getAddress(this.lazilyTransformingAstService), {
         type: ClipboardCellType.FORMULA,
-        hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService))
+        ast: vertex.getFormula(this.lazilyTransformingAstService)
       }]
     } else if (vertex instanceof ParsingErrorVertex) {
       return [address, { type: ClipboardCellType.PARSING_ERROR, rawInput: vertex.rawInput, errors: vertex.errors }]
@@ -562,7 +562,7 @@ export class Operations {
     } else if (vertex instanceof ScalarFormulaVertex) {
       return {
         type: ClipboardCellType.FORMULA,
-        hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService))
+        ast: vertex.getFormula(this.lazilyTransformingAstService)
       }
     } else if (vertex instanceof ParsingErrorVertex) {
       return { type: ClipboardCellType.PARSING_ERROR, rawInput: vertex.rawInput, errors: vertex.errors }
@@ -706,13 +706,14 @@ export class Operations {
     this.changes.addChange(EmptyValue, address)
   }
 
-  public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
+  /** Restores a retained formula without depending on its parsing cache entry. */
+  public setFormulaToCellFromAst(formula: Ast, address: SimpleCellAddress) {
     const {
       ast,
       hasVolatileFunction,
       hasStructuralChangeFunction,
       dependencies
-    } = this.parser.fetchCachedResult(formulaHash)
+    } = this.parser.fetchCachedResultForAst(formula)
     const absoluteDependencies = absolutizeDependencies(dependencies, address)
     const [cleanedAst] = new CleanOutOfScopeDependenciesTransformer(address.sheet).transformSingleAst(ast, address)
     this.parser.rememberNewAst(cleanedAst)
@@ -842,8 +843,7 @@ export class Operations {
       }
       const ast = arrayVertex.getFormula(this.lazilyTransformingAstService)
       const address = arrayVertex.getAddress(this.lazilyTransformingAstService)
-      const hash = this.parser.computeHashFromAst(ast)
-      this.setFormulaToCellFromCache(hash, address)
+      this.setFormulaToCellFromAst(ast, address)
     }
   }
 

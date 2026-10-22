@@ -10,10 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Added a message after `npm i hyperformula` that points AI assistants to the SKILLS file. The message needs `--foreground-scripts` to be visible in npm, and pnpm 10 needs the `postinstall` script to be approved first. [#1829](https://github.com/handsontable/hyperformula/pull/1829)
+- Added the `maxParserCacheSize` configuration option to control the number of cached formulas. [#1760](https://github.com/handsontable/hyperformula/pull/1760)
 
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
+- Fixed unbounded parser cache growth in long-running instances that process many distinct formulas, including when undo is disabled. [#1760](https://github.com/handsontable/hyperformula/pull/1760)
 
 ## [3.5.0] - 2026-10-09
 
