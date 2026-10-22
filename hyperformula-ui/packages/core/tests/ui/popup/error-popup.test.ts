@@ -37,28 +37,6 @@ describe("setCellError", () => {
     setCellError(cell, null);
     expect(cell.getAttribute("aria-invalid")).toBeNull();
   });
-
-  it("describes the error to assistive technology without the popup open", () => {
-    const cell = document.createElement("div");
-
-    setCellError(cell, "#REF! — bad reference");
-    expect(cell.getAttribute("aria-description")).toBe("#REF! — bad reference");
-
-    setCellError(cell, "#NAME?");
-    expect(cell.getAttribute("aria-description")).toBe("#NAME?");
-
-    setCellError(cell, null);
-    expect(cell.getAttribute("aria-description")).toBeNull();
-  });
-
-  it("keeps a description the host set when the cell has no error", () => {
-    const cell = document.createElement("div");
-
-    cell.setAttribute("aria-description", "Total for the quarter");
-    setCellError(cell, null);
-
-    expect(cell.getAttribute("aria-description")).toBe("Total for the quarter");
-  });
 });
 
 describe("ErrorPopup DOM rendering", () => {

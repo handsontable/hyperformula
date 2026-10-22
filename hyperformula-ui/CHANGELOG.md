@@ -22,7 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed the idle formula bar coloring references differently from the editor when the formula contains a named expression. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 - Fixed `FormulaBuilder.destroy()` throwing, and leaving the popups and styles in the page, when the HyperFormula instance was destroyed first. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 - Fixed slow tokenizing of a long run of apostrophes, which took about 600 ms for 40,000 characters. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
-- Fixed screen readers not reading a cell's error message unless the error popup was open. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 
 ## [0.3.5] - 2026-10-21
 
