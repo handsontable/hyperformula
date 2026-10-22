@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
+- Fixed cell values smaller than about `1e-298` being returned as `NaN` instead of the rounded number when the `smartRounding` option is on, which is the default. [#1837](https://github.com/handsontable/hyperformula/pull/1837)
 
 ## [3.5.0] - 2026-10-09
 
