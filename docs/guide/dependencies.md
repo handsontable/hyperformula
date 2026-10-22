@@ -23,7 +23,7 @@ features.
 | [jStat](https://github.com/jstat/jstat)                     | The MIT License | jStat                              |
 | [tiny-emitter](https://github.com/scottcorgan/tiny-emitter) | The MIT License | Scott Corgan                       |
 
-The _bessel_ and _jStat_ projects are distributed with the code repository at the path `src/interpreter/plugin/3rdparty` and bundled with the code package.
+The _bessel_ and _jStat_ projects are distributed with the code repository at the path `hyperformula/src/interpreter/plugin/3rdparty` and bundled with the code package.
 
 We want to express gratitude and appreciation for all the hard
 work put into these awesome libraries by their authors and maintainers.
