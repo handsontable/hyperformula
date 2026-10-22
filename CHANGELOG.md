@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed the MAXPOOL and MEDIANPOOL functions throwing an uncaught `TypeError` instead of returning the `#VALUE!` error when the range dimensions are not a whole multiple of the window size and the stride. [#1718](https://github.com/handsontable/hyperformula/pull/1718)
 - Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
-- Fixed `Exporter` ignoring the `evaluateNullToZero` config option: with the flag on, `getCellValue`, `getSheetValues`, `getAllSheetsValues`, and `ExportedCellChange` now return `0` for empty cells instead of `null`, matching the interpreter's own empty-to-zero coercion. Code that relied on `null` from `getCellValue` to tell a truly empty cell apart from a computed zero under this flag must use `ISBLANK` instead. [#1738](https://github.com/handsontable/hyperformula/pull/1738)
+- Fixed `getCellValue()`, `getSheetValues()` and the other methods that export cell values ignoring the `evaluateNullToZero` option: with the option on, they now return `0` for empty cells instead of `null`. [#1738](https://github.com/handsontable/hyperformula/pull/1738)
 
 ## [3.4.0] - 2026-08-10
 
