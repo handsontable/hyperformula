@@ -164,6 +164,8 @@ export class KeyboardController {
 
     this.manager.register("commitLeft", () => this.commit("left"));
 
+    this.manager.register("commitFill", () => this.commitFill());
+
     this.manager.register("togglePointMode", () => this.toggleRangeMode());
 
     this.manager.register("cycleRef", () => this.cycleRefAtCaret());
@@ -206,6 +208,18 @@ export class KeyboardController {
     this.closeUnbalancedParens();
     this.highlights.suppress();
     this.ctx.opts.onCommit(this.getValue(), direction);
+
+    return true;
+  }
+
+  private commitFill(): boolean {
+    if (!this.ctx.opts.onCommitFill) {
+      return false;
+    }
+
+    this.closeUnbalancedParens();
+    this.highlights.suppress();
+    this.ctx.opts.onCommitFill(this.getValue());
 
     return true;
   }

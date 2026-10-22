@@ -72,6 +72,12 @@ reparents between two locations via `FormulaEditor.attachTo(mount)`:
   inside the commit call. Applies equally to a host-side commit bridge (such as the plain-table
   example's `PlainTableHost.commit`) and any consumer-supplied `onCommit`. A deferred write degrades announcements to silence
   (no crash, no wrong message).
+- `commitFill?(value)` — optional; Ctrl/Cmd+Enter calls it (through `FormulaBuilder`'s
+  commit wrapper, so commit-error announcements work the same) to write `value` into every
+  selected cell. A builder `onCommitFill` option takes precedence, as `onCommit` does over
+  `commit`. With neither, the `commitFill` command returns `false` and `ShortcutManager` falls
+  through to the next Ctrl/Cmd+Enter binding, `insertNewline`; Alt+Enter always inserts a
+  newline.
 - `cancel()` — controller calls to cancel the current edit.
 - `setInlineEditorVisible(visible)` — hides or shows the cell overlay mount while the editor
   is hosted in the bar (the plain-table and TanStack example adapters toggle the container's CSS display;

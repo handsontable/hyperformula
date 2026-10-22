@@ -96,6 +96,7 @@ export class FormulaBuilder {
       sheetId,
       direction,
       onCommit,
+      onCommitFill,
       onCancel,
       popups,
       icons,
@@ -117,14 +118,23 @@ export class FormulaBuilder {
 
     const baseCommitHandler =
       onCommit ?? ((value: string, direction?: Direction) => this.adapter.commit(value, direction));
-    const commitHandler = (value: string, direction?: Direction): void => {
+    const announcingCommit = (write: () => void): void => {
       const committedAddress = this.adapter.getActiveCell();
-      const changes = this.formulaEditor.engine.captureValueChanges(() =>
-        baseCommitHandler(value, direction),
-      );
+      const changes = this.formulaEditor.engine.captureValueChanges(write);
 
       this.announceCommitErrors(committedAddress, changes);
     };
+    const commitHandler = (value: string, direction?: Direction): void =>
+      announcingCommit(() => baseCommitHandler(value, direction));
+    const baseFillHandler =
+      onCommitFill ??
+      (this.adapter.commitFill === undefined
+        ? undefined
+        : (value: string) => this.adapter.commitFill?.(value));
+    const fillHandler =
+      baseFillHandler === undefined
+        ? undefined
+        : (value: string): void => announcingCommit(() => baseFillHandler(value));
     const cancelHandler = onCancel ?? (() => this.adapter.cancel());
 
     if (className !== undefined) {
@@ -154,6 +164,7 @@ export class FormulaBuilder {
       ...(sheetId !== undefined && { sheetId }),
       ...(direction !== undefined && { direction }),
       onCommit: commitHandler,
+      ...(fillHandler !== undefined && { onCommitFill: fillHandler }),
       onCancel: cancelHandler,
       ...(suggestionsOptions !== undefined && { suggestionsOptions }),
       ...(fnHelpOptions !== undefined && { fnHelpOptions }),

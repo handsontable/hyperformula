@@ -56,6 +56,12 @@ export interface FormulaEditorOptions {
   /** Receives the committed value; the optional `direction` drives the selection move. */
   onCommit?: (value: string, direction?: Direction) => void;
 
+  /**
+   * Receives the value committed with Ctrl/Cmd+Enter, to write into every selected cell.
+   * When omitted, Ctrl/Cmd+Enter inserts a newline, like Alt+Enter.
+   */
+  onCommitFill?: (value: string) => void;
+
   /** Fires when the edit is cancelled (Escape). */
   onCancel?: () => void;
 

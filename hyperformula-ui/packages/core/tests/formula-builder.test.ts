@@ -958,3 +958,58 @@ describe("FormulaBuilder teardown", () => {
     expect(leftovers()).toEqual({ portal: null, liveRegion: null, styles: null });
   });
 });
+
+class FillAdapter extends NullAdapter {
+  readonly fills: string[] = [];
+
+  commitFill(value: string): void {
+    this.fills.push(value);
+  }
+}
+
+describe("FormulaBuilder fill commit", () => {
+  afterEach(() => {
+    document.body.replaceChildren();
+  });
+
+  function pressCtrlEnter(mount: HTMLElement): void {
+    press(mount, "Enter", { ctrlKey: true });
+  }
+
+  it("commits Ctrl+Enter to every selected cell through the adapter", () => {
+    const adapter = new FillAdapter();
+    const builder = new FormulaBuilder({ rootEl: document.body, adapter });
+    const mount = document.createElement("div");
+
+    builder.openEditor(mount, "=A1");
+    pressCtrlEnter(mount);
+
+    expect(adapter.fills).toEqual(["=A1"]);
+    builder.destroy();
+  });
+
+  it("prefers the onCommitFill option over the adapter", () => {
+    const adapter = new FillAdapter();
+    const onCommitFill = vi.fn();
+    const builder = new FormulaBuilder({ rootEl: document.body, adapter, onCommitFill });
+    const mount = document.createElement("div");
+
+    builder.openEditor(mount, "=A1");
+    pressCtrlEnter(mount);
+
+    expect(onCommitFill).toHaveBeenCalledWith("=A1");
+    expect(adapter.fills).toEqual([]);
+    builder.destroy();
+  });
+
+  it("inserts a newline on Ctrl+Enter when the adapter cannot fill", () => {
+    const builder = new FormulaBuilder({ rootEl: document.body, adapter: new NullAdapter() });
+    const mount = document.createElement("div");
+
+    builder.openEditor(mount, "=A1");
+    pressCtrlEnter(mount);
+
+    expect(builder.editor.getValue()).toBe("=A1\n");
+    builder.destroy();
+  });
+});

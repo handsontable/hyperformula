@@ -325,6 +325,13 @@ export interface GridEditLifecycle {
    */
   commit(value: string, direction?: Direction): void;
 
+  /**
+   * Commits `value` to every selected cell (Ctrl/Cmd+Enter). Optional: when absent,
+   * Ctrl/Cmd+Enter inserts a newline. Like `commit`, it must write to the engine before
+   * returning.
+   */
+  commitFill?(value: string): void;
+
   /** Cancels the current edit without committing. */
   cancel(): void;
 
