@@ -526,7 +526,7 @@ export class Operations {
       case ClipboardCellType.FORMULA: {
         // Apply the resulting content changes to the column index so that when an array
         // formula shrinks on restore (e.g. undoing an overwrite-expand), the vacated spill
-        // values are dropped from the index (HF-305). The removeRows / version-restore
+        // values are dropped from the index. The removeRows / version-restore
         // callers deliberately ignore the return value and keep their own index bookkeeping.
         const changes = this.setFormulaToCellFromCache(clipboardCell.hash, address)
         this.columnSearch.applyChanges(changes.getChanges())
@@ -925,7 +925,7 @@ export class Operations {
       }
       // Capture the array's footprint BEFORE re-placing it, to tell apart two kinds of
       // ContentChanges that setFormulaToCellFromCache returns below:
-      // - genuinely NEW occupants a grown array just claimed (HF-305 overwrite, outside this range)
+      // - genuinely NEW occupants a grown array just claimed (overwrite mode, outside this range)
       // - the routine shrink-then-recreate artifact of re-placing an array in the same spot
       //   (cleanAddressMappingUnderArray clears the array's OWN previous cells every time an array
       //   vertex is re-set, overwrite flag or not) -- these are already reconciled by the normal
