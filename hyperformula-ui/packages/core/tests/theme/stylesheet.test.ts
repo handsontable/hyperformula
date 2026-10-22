@@ -30,3 +30,16 @@ describe("package stylesheet", () => {
     expect(declarations(":root")["--hfe-error-font-family"]).toBe("var(--hfe-font-family)");
   });
 });
+
+describe("package color scheme", () => {
+  it("never selects package elements by a class-attribute substring", () => {
+    expect(CSS_TEXT).not.toContain("[class*=");
+  });
+
+  it("sets the color scheme only on the package roots, where a host theme class overrides it", () => {
+    const roots = ":where(.hfe-editor,.hfe-formula-bar,.hfe-popup-portal,.hfe-popup--hosted)";
+
+    expect(declarations(roots)["color-scheme"]).toBe("light dark");
+    expect(CSS_TEXT.match(/color-scheme:/g)).toHaveLength(1);
+  });
+});

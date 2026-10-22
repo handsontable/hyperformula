@@ -116,6 +116,6 @@
   --hfe-z-index-formula-bar: 200;
 }
 
-:where([class*="hfe-"]) {
+:where(.hfe-editor, .hfe-formula-bar, .hfe-popup-portal, .hfe-popup--hosted) {
   color-scheme: light dark;
 }
