@@ -114,7 +114,3 @@
   --hfe-z-index-popup: 210;
   --hfe-z-index-formula-bar: 200;
 }
-
-:where(.hfe-editor, .hfe-formula-bar, .hfe-popup-portal, .hfe-popup--hosted, .hfe-highlight) {
-  color-scheme: light dark;
-}
