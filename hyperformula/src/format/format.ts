@@ -1,0 +1,330 @@
+/**
+ * @license
+ * Copyright (c) 2025 Handsoncode. All rights reserved.
+ */
+
+import {Config} from '../Config'
+import {TIME_FORMAT_SECONDS_ITEM_REGEXP} from '../DateTimeDefault'
+import {DateTimeHelper, numberToSimpleTime, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
+import {RawScalarValue} from '../interpreter/InterpreterValue'
+import {Maybe} from '../Maybe'
+import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
+
+/**
+ * Detects Excel LCID-tagged currency tags (`[$SYMBOL-LCID]` with a non-empty
+ * SYMBOL portion). Shared by `defaultStringifyDateTime` and
+ * `defaultStringifyDuration` so a format string carrying such a tag short-
+ * circuits both date and duration dispatch and falls through to the
+ * number formatter (or the user-supplied `stringifyCurrency` callback).
+ *
+ * The pattern is intentionally unanchored: any occurrence of `[$SYMBOL-`
+ * in the format string triggers the guard. Excel does not mix date/time
+ * tokens with a currency tag in the same format string, so a mid-string
+ * match cannot misclassify a legitimate composite — every observed
+ * format string with a currency tag is currency-only.
+ */
+const LCID_CURRENCY_TAG = /\[\$[^\-\]]+-/
+
+export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): RawScalarValue {
+  // Currency callback runs first so a user-supplied stringifyCurrency can
+  // intercept LCID-tagged or bare-letter currency formats before the
+  // date/time parser greedily consumes characters like 'D', 'M', 'S', 'Y'
+  // (e.g. '[$USD-409] #,##0.00' would otherwise become '[$US9-409] #,##0.00').
+  // The default callback returns undefined for every input. For non-currency
+  // formats (dates, durations, $#,##0.00, etc.) this preserves the existing
+  // dispatch path bit-for-bit. For LCID-tagged currency formats (`[$SYMBOL-LCID] ...`)
+  // the LCID guards in defaultStringifyDateTime/Duration also short-circuit,
+  // so the value falls through to parseForNumberFormat — a deliberate change
+  // versus pre-HF-24 behavior, where the date parser would mangle the symbol.
+  const tryCurrency = config.stringifyCurrency(value, formatArg)
+  if (tryCurrency !== undefined) {
+    return tryCurrency
+  }
+  const tryDateTime = config.stringifyDateTime(dateHelper.numberToSimpleDateTime(value), formatArg) // default points to defaultStringifyDateTime()
+  if (tryDateTime !== undefined) {
+    return tryDateTime
+  }
+  const tryDuration = config.stringifyDuration(numberToSimpleTime(value), formatArg)
+  if (tryDuration !== undefined) {
+    return tryDuration
+  }
+  const expression = parseForNumberFormat(formatArg)
+  if (expression !== undefined) {
+    return numberFormat(expression.tokens, value)
+  }
+  return formatArg
+}
+
+export function padLeft(number: number | string, size: number) {
+  let result = `${number}`
+  while (result.length < size) {
+    result = '0' + result
+  }
+  return result
+}
+
+export function padRight(number: number | string, size: number) {
+  let result = `${number}`
+  while (result.length < size) {
+    result = result + '0'
+  }
+  return result
+}
+
+function countChars(text: string, char: string) {
+  return text.split(char).length - 1
+}
+
+function numberFormat(tokens: FormatToken[], value: number): RawScalarValue {
+  let result = ''
+
+  for (let i = 0; i < tokens.length; ++i) {
+    const token = tokens[i]
+    if (token.type === TokenType.FREE_TEXT) {
+      result += token.value
+      continue
+    }
+
+    const tokenParts = token.value.split('.')
+    const integerFormat = tokenParts[0]
+    const decimalFormat = tokenParts[1] || ''
+    const separator = tokenParts[1] ? '.' : ''
+
+    /* get fixed-point number without trailing zeros */
+    const valueParts = Number(value.toFixed(decimalFormat.length)).toString().split('.')
+    let integerPart = valueParts[0] || ''
+    let decimalPart = valueParts[1] || ''
+
+    if (integerFormat.length > integerPart.length) {
+      const padSizeInteger = countChars(integerFormat.substr(0, integerFormat.length - integerPart.length), '0')
+      integerPart = padLeft(integerPart, padSizeInteger + integerPart.length)
+    }
+
+    const padSizeDecimal = countChars(decimalFormat.substr(decimalPart.length, decimalFormat.length - decimalPart.length), '0')
+    decimalPart = padRight(decimalPart, padSizeDecimal + decimalPart.length)
+
+    result += integerPart + separator + decimalPart
+  }
+
+  return result
+}
+
+/**
+ * Default `stringifyDuration` callback — formats a duration value against an
+ * Excel-style time format string (e.g. `[hh]:mm:ss`).
+ *
+ * Returns `undefined` for format strings that are not duration formats so the
+ * dispatcher in `format()` can fall through to other handlers.
+ *
+ * **LCID currency-tag guard** — sibling to the same guard in
+ * `defaultStringifyDateTime`; explicitly returns `undefined` for Excel
+ * currency tags `[$SYMBOL-LCID]` because the SYMBOL portion contains
+ * duration-token letters (`H` in CHF/HUF, `m` in AMD/HMD) that
+ * `parseForDateTimeFormat` would otherwise interpret as time tokens and
+ * mangle the output. See `defaultStringifyDateTime` for the full
+ * symbol-vs-locale-modifier rationale and the historical pre-HF-24
+ * behaviour the guard corrects.
+ *
+ * @param time parsed duration value to render
+ * @param formatArg Excel-style format string
+ * @returns formatted string, or `undefined` to defer to the next dispatch step
+ */
+export function defaultStringifyDuration(time: SimpleTime, formatArg: string): Maybe<string> {
+  if (LCID_CURRENCY_TAG.test(formatArg)) {
+    return undefined
+  }
+  const expression = parseForDateTimeFormat(formatArg)
+  if (expression === undefined) {
+    return undefined
+  }
+  const tokens = expression.tokens
+  let result = ''
+
+  for (const token of tokens) {
+    if (token.type === TokenType.FREE_TEXT) {
+      result += token.value
+      continue
+    }
+
+    switch (token.value.toLowerCase()) {
+      case 'h':
+      case 'hh': {
+        result += padLeft(time.hours, token.value.length)
+        time.hours = 0
+        break
+      }
+
+      case '[hh]': {
+        result += padLeft(time.hours, token.value.length - 2)
+        time.hours = 0
+        break
+      }
+
+      case 'm':
+      case 'mm': {
+        result += padLeft(time.minutes, token.value.length)
+        time.minutes = 0
+        break
+      }
+
+      case '[mm]': {
+        result += padLeft(time.minutes + 60 * time.hours, token.value.length - 2)
+        time.minutes = 0
+        time.hours = 0
+        break
+      }
+
+      /* seconds */
+      case 's':
+      case 'ss': {
+        result += padLeft(Math.floor(time.seconds), token.value.length)
+        break
+      }
+
+      default: {
+        if (TIME_FORMAT_SECONDS_ITEM_REGEXP.test(token.value)) {
+          const fractionOfSecondPrecision = Math.max(token.value.length - 3, 0)
+          result += `${time.seconds < 10 ? '0' : ''}${Math.floor(time.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)}`
+          continue
+        }
+        return undefined
+      }
+    }
+  }
+  return result
+}
+
+/**
+ * Default `stringifyDateTime` callback — formats a date/time value against an
+ * Excel-style format string (e.g. `YYYY-MM-DD HH:mm:ss`).
+ *
+ * Returns `undefined` for format strings that are not date/time formats so the
+ * dispatcher in `format()` can fall through to `parseForNumberFormat` (or to a
+ * user-supplied `stringifyCurrency` callback for currency-tagged formats).
+ *
+ * **LCID currency-tag guard** — explicitly returns `undefined` for Excel
+ * currency tags `[$SYMBOL-LCID]` (non-empty SYMBOL portion). Without the
+ * guard, `parseForDateTimeFormat` greedily consumes letters like `D`/`M`/`S`/`Y`/`H`
+ * inside the currency code (e.g. `D` in USD, `H` in CHF, `M`+`D` in AMD),
+ * mangling the output of an `[$USD-409] #,##0.00` format into
+ * `[$US9-409] #,##0.00` because `D` is read as a day token. The pre-HF-24
+ * behaviour was to mis-format; the guarded return is the deliberate
+ * correction, not a regression. Bit-for-bit compatibility is preserved for
+ * every non-currency format (dates, durations, `$#,##0.00`, etc.).
+ *
+ * The guard pattern (`/\[\$[^\-\]]+-/`) requires ≥1 character between `[$`
+ * and `-` so it distinguishes currency tags (`[$USD-409]`, `[$€-2]`) from
+ * Excel's locale-only modifier (`[$-409]`, `[$-F800]`), which is valid on
+ * date/time formats and must continue to flow through this function.
+ *
+ * @param dateTime parsed date/time value to render
+ * @param formatArg Excel-style format string
+ * @returns formatted string, or `undefined` to defer to the next dispatch step
+ */
+export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: string): Maybe<string> {
+  if (LCID_CURRENCY_TAG.test(formatArg)) {
+    return undefined
+  }
+  const expression = parseForDateTimeFormat(formatArg)
+  if (expression === undefined) {
+    return undefined
+  }
+  const tokens = expression.tokens
+  let result = ''
+  let minutes: boolean = false
+
+  const ampm = tokens.some((token) => token.type === TokenType.FORMAT &&
+    (token.value === 'a/p' || token.value === 'A/P' || token.value === 'am/pm' || token.value === 'AM/PM'))
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]
+    if (token.type === TokenType.FREE_TEXT) {
+      result += token.value
+      continue
+    }
+
+    switch (token.value.toLowerCase()) {
+      /* hours*/
+      case 'h':
+      case 'hh': {
+        minutes = true
+        result += padLeft(ampm ? (dateTime.hours + 11) % 12 + 1 : dateTime.hours, token.value.length)
+        break
+      }
+
+      /* days */
+      case 'd':
+      case 'dd': {
+        result += padLeft(dateTime.day, token.value.length)
+        break
+      }
+
+      /* seconds */
+      case 's':
+      case 'ss': {
+        result += padLeft(Math.floor(dateTime.seconds), token.value.length)
+        break
+      }
+
+      /* minutes / months */
+      case 'm':
+      case 'mm': {
+        if (i + 1 < tokens.length && tokens[i + 1].value.startsWith(':')) {
+          minutes = true
+        }
+        if (minutes) {
+          result += padLeft(dateTime.minutes, token.value.length)
+        } else {
+          result += padLeft(dateTime.month, token.value.length)
+        }
+        minutes = true
+        break
+      }
+
+      /* years */
+      case 'yy': {
+        result += padLeft(dateTime.year % 100, token.value.length)
+        break
+      }
+      case 'yyyy': {
+        result += dateTime.year
+        break
+      }
+
+      /* AM / PM */
+      case 'am/pm':
+      case 'a/p': {
+        const [am, pm] = token.value.split('/')
+        result += dateTime.hours < 12 ? am : pm
+        break
+      }
+      default: {
+        if (TIME_FORMAT_SECONDS_ITEM_REGEXP.test(token.value)) {
+          const fractionOfSecondPrecision = token.value.length - 3
+          result += `${dateTime.seconds < 10 ? '0' : ''}${Math.floor(dateTime.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)}`
+          continue
+        }
+        return undefined
+      }
+    }
+  }
+
+  return result
+}
+
+/**
+ * Default implementation of the `stringifyCurrency` config option.
+ *
+ * Returning `undefined` instructs the formatter to fall through to the
+ * built-in number formatter, preserving HyperFormula's zero-dependency
+ * default behavior. Replace this default by setting the
+ * [`stringifyCurrency`](../../api/interfaces/configparams.md#stringifycurrency)
+ * config option.
+ *
+ * @param _value - the numeric value to format (unused in default).
+ * @param _formatArg - the format string passed to `TEXT` (unused in default).
+ * @returns `undefined` — caller should fall through to the built-in formatter.
+ */
+export function defaultStringifyCurrency(_value: number, _formatArg: string): Maybe<string> {
+  return undefined
+}

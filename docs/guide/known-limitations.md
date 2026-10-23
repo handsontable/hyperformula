@@ -1,3 +1,13 @@
+---
+tags:
+  - unsupported features
+  - multiple workbooks
+  - 3D references
+  - dynamic arrays
+  - asynchronous functions
+  - structured references
+---
+
 # Known limitations
 
 This page lists the known limitations of HyperFormula at its current development stage:
@@ -14,9 +24,7 @@ the full evaluation of expressions and condition statements. The
 most prominent example of this behavior is the "IF" function which
 returns a cycle error regardless of whether TRUE or FALSE causes
 a circular reference.
-* There is no data validation against named ranges. For example,
-you can't compare the arguments in a formula like this:
-=IF(firstRange>secondRange, TRUE, FALSE).
+* Named ranges behave differently depending on where they are used in a formula. For details, see [Using named ranges in formulas](named-expressions.md#using-named-ranges-in-formulas).
 * [Custom functions](custom-functions.md) don't automatically recalculate the size of their [result arrays](custom-functions.md#return-an-array-of-data) when the formula dependencies change.
 * There is no relative referencing in named ranges.
 * The library doesn't offer (at least not yet) the following features:
@@ -38,6 +46,20 @@ you can't compare the arguments in a formula like this:
 * The INDEX function doesn't support returning whole rows or columns of the source range – it always returns the contents of a single cell.
 * The FILTER function accepts either single rows of equal width or single columns of equal height. In other words, all arrays passed to the FILTER function must have equal dimensions, and at least one of those dimensions must be 1.
 * Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
+* The TEXT function does not accept embedded double-quote literals in the format string. In Excel, `""` inside a format string is an escape sequence for a literal `"` character — e.g. `=TEXT(1234.5, "#,##0.00 ""zł""")` returns `"1,234.50 zł"`. If your application requires this escape sequence, supply a custom [`stringifyCurrency`](currency-handling.md) callback.
+
+### UNIQUE function
+
+* Comparison of values follows HyperFormula's own equality rules, which honor the `caseSensitive` and `accentSensitive` configuration options. By default comparison is case-insensitive.
+
+* When `ExactlyOnce` is TRUE and no row or column occurs exactly once, `UNIQUE` returns a `#N/A` error (the result would otherwise be empty).
+### SORT function
+
+* The `SortIndex` argument accepts a single key only. Multi-key sorting through an array constant (for example `=SORT(A1:B9, {1,2})`) is not supported; sort by one column or row at a time.
+
+* The `SortOrder` argument must be exactly `1` (ascending) or `-1` (descending). Any other value returns a `#VALUE!` error.
+
+* Ordering (including mixed types, empty cells, and text collation) follows HyperFormula's own comparison rules, which honor the `caseSensitive` and `accentSensitive` configuration options. Numbers sort before text, and text before logical values.
 
 ### OFFSET function
 
@@ -69,6 +91,6 @@ HyperFormula resolves the OFFSET function at parse time rather than during evalu
 * OFFSET is resolved at parse time, so `getCellFormula` returns the computed reference, not the original `OFFSET` call.
 
   ```js
-  const hf = HyperFormula.buildFromArray([[1, 45, '=OFFSET(A1, 0, 1)']]);
+  const hf = HyperFormula.buildFromArray([[1, 45, '=OFFSET(A1, 0, 1)']], { licenseKey: 'gpl-v3' });
   hf.getCellFormula({ sheet: 0, row: 0, col: 2 }); // '=B1'
   ```
