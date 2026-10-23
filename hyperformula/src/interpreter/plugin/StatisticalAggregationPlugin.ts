@@ -218,8 +218,12 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
           return values
         }
         const occurrences = new Map<number, number>()
-        values.forEach(value => occurrences.set(value, (occurrences.get(value) ?? 0) + 1))
-        const highestCount = Math.max(...occurrences.values())
+        let highestCount = 0
+        for (const value of values) {
+          const count = (occurrences.get(value) ?? 0) + 1
+          occurrences.set(value, count)
+          highestCount = Math.max(highestCount, count)
+        }
         if (highestCount < 2) {
           return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
         }
@@ -347,7 +351,9 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
       if (found instanceof CellError) {
         return found
       }
-      numbers.push(...found)
+      for (const value of found) {
+        numbers.push(value)
+      }
     }
     return numbers
   }
