@@ -517,16 +517,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
         return acc
       }
 
-      // A parenthesized argument reaches this reducer as a PARENTHESIS node wrapping the actual
-      // expression (e.g. `(B1)` is `{type: PARENTHESIS, expression: {type: CELL_REFERENCE, ...}}`),
-      // not as a CELL_REFERENCE/CELL_RANGE/COLUMN_RANGE/ROW_RANGE node itself. Both type checks below
-      // key off `arg.type` to decide whether this argument is a reference (whose non-numeric values
-      // are ignored) or a literal/computed value (which is coerced to a number, erroring on non-numeric
-      // text). Unwrapping first -- the same idiom used in FunctionPlugin#runFunctionWithReferenceArgument
-      // and InformationPlugin -- makes a parenthesized reference behave exactly like the bare one, which
-      // is what Excel does (measured live: SUM((A1)), COUNT((A1)), AVERAGE((A1)), MIN((A1)), MAX((A1))
-      // all equal their unparenthesized form). PARENTHESIS is a pure passthrough in evaluateAst, so this
-      // does not change what evaluateAst(arg, state) returns below -- only which branch handles it.
+      // A parenthesized argument such as `(A1)` arrives as a PARENTHESIS node wrapping the reference.
+      // Unwrap it so that the checks below see the reference and ignore its non-numeric values.
       while (arg.type === AstNodeType.PARENTHESIS) {
         arg = arg.expression
       }

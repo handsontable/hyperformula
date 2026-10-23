@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- A **breaking change**: an empty string (`""`) is no longer coerced to `0` in numeric contexts, so `=""+0` returns `#VALUE!` as in Excel; see the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html#changes-to-empty-string-coercion). [#1768](https://github.com/handsontable/hyperformula/pull/1768)
+- **Breaking change**: Changed numeric contexts to read `""` as text, not `0` (`=""+0` returns `#VALUE!`), and `(A1)` as a reference; see the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html#changes-to-empty-string-coercion). [#1768](https://github.com/handsontable/hyperformula/pull/1768)
 
 ### Fixed
 

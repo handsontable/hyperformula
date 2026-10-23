@@ -5,8 +5,6 @@ tags:
   - upgrade
   - breaking changes
   - v4.0
-  - empty string
-  - coercion
 ---
 
 # Migrating from 3.x to 4.0
@@ -70,6 +68,17 @@ This is the important half, and the one most likely to be misread. The aggregati
 | `=COUNT(A1:C1)` on the same range | `2` | `2` (unchanged) |
 
 So a sheet whose empty strings only ever reach `SUM`, `COUNT` and their relatives sees no change at all. What breaks is arithmetic and number-typed arguments, per the first table.
+
+### A reference in parentheses now counts as a reference
+
+In 3.x, `SUM`, `COUNT`, `AVERAGE`, `MIN`, `MAX`, `PRODUCT` and `SUMSQ` treated a reference wrapped in parentheses, such as `(A1)`, like a value typed into the formula, not like a reference. In 4.0 a parenthesized reference behaves exactly like the bare one, whatever the cell holds:
+
+| Formula | 3.x | 4.0 |
+| --- | --- | --- |
+| `=SUM((A1))` where `A1` holds `abc` | `#VALUE!` | `0`, like `=SUM(A1)` |
+| `=SUM((A1))` where `A1` holds `TRUE` | `1` | `0`, like `=SUM(A1)` |
+| `=COUNT((A1))` where `A1` is empty | `1` | `0`, like `=COUNT(A1)` |
+| `=AVERAGE((A1))` where `A1` is empty | `0` | `#DIV/0!`, like `=AVERAGE(A1)` |
 
 ### What changes for the better: an empty string produced mid-formula
 
