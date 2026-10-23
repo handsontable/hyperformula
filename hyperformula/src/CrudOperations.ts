@@ -94,8 +94,8 @@ export class CrudOperations {
     this.ensureItIsPossibleToAddRows(sheet, ...indexes)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    this.operations.addRows(addRowsCommand)
-    this.undoRedo.saveOperation(new AddRowsUndoEntry(addRowsCommand))
+    const overwrittenCells = this.operations.addRows(addRowsCommand)
+    this.undoRedo.saveOperation(new AddRowsUndoEntry(addRowsCommand, overwrittenCells))
   }
 
   public removeRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
@@ -112,8 +112,8 @@ export class CrudOperations {
     this.ensureItIsPossibleToAddColumns(sheet, ...indexes)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    this.operations.addColumns(addColumnsCommand)
-    this.undoRedo.saveOperation(new AddColumnsUndoEntry(addColumnsCommand))
+    const overwrittenCells = this.operations.addColumns(addColumnsCommand)
+    this.undoRedo.saveOperation(new AddColumnsUndoEntry(addColumnsCommand, overwrittenCells))
   }
 
   public removeColumns(sheet: number, ...indexes: ColumnRowIndex[]): void {

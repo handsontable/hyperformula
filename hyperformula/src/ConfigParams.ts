@@ -391,20 +391,20 @@ export interface ConfigParams {
    */
   useArrayArithmetic: boolean,
   /**
-   * When set to `true`, an array function whose result spills onto already-occupied cells
-   * overwrites those cells (clearing their previous content, spilling the array, and rerouting
-   * any dependents to the spilled values) instead of returning a `#SPILL!` error.
+   * When set to `true`, an array whose result spills onto occupied cells overwrites them: their
+   * previous content is cleared, the array spills, and formulas that read those cells get the
+   * spilled values. When set to `false`, such an array returns the `#SPILL!` error and the cells
+   * keep their content (the default, Excel-compatible behavior).
    *
-   * **Warning:** this is a destructive, opt-in behavior. Enabling it clears whatever data
-   * happens to sit in the spill range on the live sheet, so use it only when overwriting is the
-   * intended outcome. The cleared cells are restored by `undo()`.
+   * **Warning:** overwriting is destructive. Turn it on only when clearing the data in the spill
+   * range is the intended outcome. `undo()` restores the cleared cells.
    *
-   * The overwrite is applied when the array formula is evaluated (e.g. via `setCellContents`).
-   * When set to `false`, an array spill onto an occupied cell yields `#SPILL!` and leaves the
-   * occupant intact (the default, Excel-compatible behavior).
-   *
-   * Even when set to `true`, a spill that would collide with *another array* still yields
-   * `#SPILL!` and leaves that array intact — overwrite mode never clobbers another array.
+   * An array overwrites cells when it is entered (for example with `setCellContents`) and when it
+   * grows because rows or columns were added inside the range it reads. Even when set to `true`,
+   * an array does not overwrite:
+   * - another array: that spill still returns `#SPILL!` and leaves the other array intact,
+   * - data declared in the same `buildFromArray` call as the array,
+   * - cells it would reach while rows or columns are moved with `moveRows` or `moveColumns`.
    * @default false
    * @category Engine
    */

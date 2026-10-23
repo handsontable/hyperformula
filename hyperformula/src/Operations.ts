@@ -205,16 +205,22 @@ export class Operations {
     return rowsRemovals
   }
 
-  public addRows(cmd: AddRowsCommand) {
-    for (const addedRows of cmd.rowsSpans()) {
-      this.doAddRows(addedRows)
-    }
+  /**
+   * Adds the rows of every span of the command.
+   *
+   * Returns, per span, the cells that arrays grown by that span overwrote in the coordinates from before that span.
+   */
+  public addRows(cmd: AddRowsCommand): [SimpleCellAddress, ClipboardCell][][] {
+    return cmd.rowsSpans().map(addedRows => this.doAddRows(addedRows))
   }
 
-  public addColumns(cmd: AddColumnsCommand) {
-    for (const addedColumns of cmd.columnsSpans()) {
-      this.doAddColumns(addedColumns)
-    }
+  /**
+   * Adds the columns of every span of the command.
+   *
+   * Returns, per span, the cells that arrays grown by that span overwrote in the coordinates from before that span.
+   */
+  public addColumns(cmd: AddColumnsCommand): [SimpleCellAddress, ClipboardCell][][] {
+    return cmd.columnsSpans().map(addedColumns => this.doAddColumns(addedColumns))
   }
 
   public removeColumns(cmd: RemoveColumnsCommand): ColumnsRemoval[] {
@@ -313,7 +319,23 @@ export class Operations {
     }
   }
 
+  /**
+   * Moves rows. An array that reads the moved rows never overwrites data during the move, whatever
+   * `arrayFunctionResultOverwritesData` says (see `DependencyGraph.withoutOverwritingData`).
+   */
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): number {
+    return this.dependencyGraph.withoutOverwritingData(() => this.doMoveRows(sheet, startRow, numberOfRows, targetRow))
+  }
+
+  /**
+   * Moves columns. An array that reads the moved columns never overwrites data during the move, whatever
+   * `arrayFunctionResultOverwritesData` says (see `DependencyGraph.withoutOverwritingData`).
+   */
+  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): number {
+    return this.dependencyGraph.withoutOverwritingData(() => this.doMoveColumns(sheet, startColumn, numberOfColumns, targetColumn))
+  }
+
+  private doMoveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): number {
     const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, targetRow, numberOfRows)
     this.lazilyTransformingAstService.beginCombinedMode(sheet)
 
@@ -332,7 +354,7 @@ export class Operations {
     return this.lazilyTransformingAstService.commitCombinedMode()
   }
 
-  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): number {
+  private doMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): number {
     const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, targetColumn, numberOfColumns)
     this.lazilyTransformingAstService.beginCombinedMode(sheet)
 
@@ -673,7 +695,7 @@ export class Operations {
    * nor is reported as an occupant.
    */
   private overwrittenOccupantAddresses(anchorAddress: SimpleCellAddress, size: ArraySize): SimpleCellAddress[] {
-    if (!this.dependencyGraph.config.arrayFunctionResultOverwritesData || size.isScalar()) {
+    if (!this.dependencyGraph.isOverwritingDataAllowed() || size.isScalar()) {
       return []
     }
 
@@ -902,9 +924,9 @@ export class Operations {
    * Does nothing if rows are outside of effective sheet size.
    * @param {RowsSpan} addedRows - rows to add
    */
-  private doAddRows(addedRows: RowsSpan) {
+  private doAddRows(addedRows: RowsSpan): [SimpleCellAddress, ClipboardCell][] {
     if (this.rowEffectivelyNotInSheet(addedRows.rowStart, addedRows.sheet)) {
-      return
+      return []
     }
 
     const { affectedArrays } = this.dependencyGraph.addRows(addedRows)
@@ -915,10 +937,18 @@ export class Operations {
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedArrays(affectedArrays)
+    const overwrittenCells = this.rewriteAffectedArrays(affectedArrays)
+    return this.overwrittenCellsBeforeSpan(overwrittenCells, addedRows)
   }
 
-  private rewriteAffectedArrays(affectedArrays: Set<ArrayFormulaVertex>) {
+  /**
+   * Re-places the arrays whose source ranges a structural operation resized.
+   *
+   * Returns the cells, in the coordinates after the operation, that the re-placed arrays overwrote
+   * because they grew onto occupied cells. Empty unless `arrayFunctionResultOverwritesData` is on.
+   */
+  private rewriteAffectedArrays(affectedArrays: Set<ArrayFormulaVertex>): [SimpleCellAddress, ClipboardCell][] {
+    const overwrittenCells: [SimpleCellAddress, ClipboardCell][] = []
     for (const arrayVertex of affectedArrays.values()) {
       if (arrayVertex.array.size.isRef) {
         continue
@@ -936,11 +966,36 @@ export class Operations {
       const ast = arrayVertex.getFormula(this.lazilyTransformingAstService)
       const address = arrayVertex.getAddress(this.lazilyTransformingAstService)
       const hash = this.parser.computeHashFromAst(ast)
+      if (this.dependencyGraph.isOverwritingDataAllowed()) {
+        overwrittenCells.push(...this.snapshotOverwrittenOccupants(address, this.arraySizePredictor.checkArraySize(ast, address)))
+      }
       const changes = this.setFormulaToCellFromCache(hash, address)
       const overwriteChanges = changes.getChanges()
         .filter(change => oldRange === undefined || !oldRange.addressInRange(change.address))
       this.columnSearch.applyChanges(overwriteChanges)
     }
+    return overwrittenCells
+  }
+
+  /**
+   * Expresses cells snapshotted right after a span of rows or columns was added in the coordinates
+   * from before that span, so that undo can restore them once it has removed the span again.
+   *
+   * Each cell moves back the way the removal of the span moves it. A formula also has its references
+   * rewritten the way that removal rewrites every other formula, for example `=F1` back to `=E1`
+   * after a column was inserted before column E. No snapshotted cell lies inside the added span:
+   * the cells of the span are new and empty, so no array overwrites them.
+   */
+  private overwrittenCellsBeforeSpan(overwrittenCells: [SimpleCellAddress, ClipboardCell][], addedSpan: RowsSpan | ColumnsSpan): [SimpleCellAddress, ClipboardCell][] {
+    const removal = addedSpan instanceof RowsSpan ? new RemoveRowsTransformer(addedSpan) : new RemoveColumnsTransformer(addedSpan)
+    return overwrittenCells.map(([address, clipboardCell]) => {
+      if (clipboardCell.type !== ClipboardCellType.FORMULA) {
+        return [addressBeforeSpan(address, addedSpan), clipboardCell]
+      }
+      const [ast, addressBefore] = removal.transformSingleAst(this.parser.fetchCachedResult(clipboardCell.hash).ast, address)
+      const cachedAst = this.parser.rememberNewAst(ast)
+      return [addressBefore, {type: ClipboardCellType.FORMULA, hash: this.parser.computeHashFromAst(cachedAst)}]
+    })
   }
 
   /**
@@ -948,9 +1003,9 @@ export class Operations {
    * Does nothing if columns are outside of effective sheet size
    * @param {ColumnsSpan} addedColumns - object containing information about columns to add
    */
-  private doAddColumns(addedColumns: ColumnsSpan): void {
+  private doAddColumns(addedColumns: ColumnsSpan): [SimpleCellAddress, ClipboardCell][] {
     if (this.columnEffectivelyNotInSheet(addedColumns.columnStart, addedColumns.sheet)) {
-      return
+      return []
     }
 
     const { affectedArrays, contentChanges } = this.dependencyGraph.addColumns(addedColumns)
@@ -963,7 +1018,8 @@ export class Operations {
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedArrays(affectedArrays)
+    const overwrittenCells = this.rewriteAffectedArrays(affectedArrays)
+    return this.overwrittenCellsBeforeSpan(overwrittenCells, addedColumns)
   }
 
   /**
@@ -1203,4 +1259,17 @@ function isPositiveInteger(n: number): boolean {
 function isRowOrColumnRange(leftCorner: SimpleCellAddress, width: number, height: number): boolean {
   return (leftCorner.row === 0 && isPositiveInteger(width) && height === Number.POSITIVE_INFINITY)
     || (leftCorner.col === 0 && isPositiveInteger(height) && width === Number.POSITIVE_INFINITY)
+}
+
+/**
+ * Where a cell that sits outside an added span of rows or columns was before that span was added.
+ */
+function addressBeforeSpan(address: SimpleCellAddress, addedSpan: RowsSpan | ColumnsSpan): SimpleCellAddress {
+  if (address.sheet !== addedSpan.sheet) {
+    return address
+  }
+  if (addedSpan instanceof RowsSpan) {
+    return address.row >= addedSpan.rowStart ? {...address, row: address.row - addedSpan.numberOfRows} : address
+  }
+  return address.col >= addedSpan.columnStart ? {...address, col: address.col - addedSpan.numberOfColumns} : address
 }

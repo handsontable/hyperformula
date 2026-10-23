@@ -52,6 +52,8 @@ import { findBoundaries } from '../Sheet'
 export class DependencyGraph {
   public readonly graph: Graph<Vertex>
   private changes: ContentChanges = ContentChanges.empty()
+  /** Set while `withoutOverwritingData` runs. */
+  private isOverwritingDataSuspended = false
   public readonly sheetReferenceRegistrar: SheetReferenceRegistrar
 
   constructor(
@@ -494,7 +496,32 @@ export class DependencyGraph {
    */
   public canOverwriteArrayResult(arrayVertex: ArrayFormulaVertex): boolean {
     const range = arrayVertex.getRangeOrUndef()
-    return range !== undefined && this.config.arrayFunctionResultOverwritesData && !this.overwriteWouldHitArray(arrayVertex, range)
+    return range !== undefined && this.isOverwritingDataAllowed() && !this.overwriteWouldHitArray(arrayVertex, range)
+  }
+
+  /**
+   * True when `arrayFunctionResultOverwritesData` is on and no row or column move is running
+   * (see `withoutOverwritingData`).
+   */
+  public isOverwritingDataAllowed(): boolean {
+    return this.config.arrayFunctionResultOverwritesData && !this.isOverwritingDataSuspended
+  }
+
+  /**
+   * Runs `operation` with overwriting disabled, as if `arrayFunctionResultOverwritesData` were off.
+   *
+   * Used for row and column moves. A move first adds the moved rows or columns at the target and only
+   * then removes them at the source, so an array that reads them grows for a moment. Overwriting the
+   * cells it reaches in that moment would clear data that the array does not cover once the move ends.
+   */
+  public withoutOverwritingData<T>(operation: () => T): T {
+    const wasSuspended = this.isOverwritingDataSuspended
+    this.isOverwritingDataSuspended = true
+    try {
+      return operation()
+    } finally {
+      this.isOverwritingDataSuspended = wasSuspended
+    }
   }
 
   private overwriteWouldHitArray(arrayVertex: ArrayFormulaVertex, range: AbsoluteCellRange): boolean {

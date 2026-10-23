@@ -175,3 +175,30 @@ When the [array arithmetic mode](#array-arithmetic-mode) is disabled, and you op
 |:--------------------------------------------------|:---------------------------------------|
 | In the same row as as one of the range's elements | Only that particular element is taken. |
 | Any other cell                                    | `#VALUE!` error                        |
+
+## Spilling onto occupied cells
+
+By default, an array that would spill onto cells that already hold data returns the `#SPILL!` error, and the cells keep their data.
+
+To let the array overwrite that data instead, set the [`arrayFunctionResultOverwritesData`](../api/interfaces/configparams.md#arrayfunctionresultoverwritesdata) option to `true`:
+
+```js
+const hfInstance = HyperFormula.buildFromArray([
+  [1, 2],
+  [],
+  ['old value'],
+], {
+  licenseKey: 'gpl-v3',
+  arrayFunctionResultOverwritesData: true,
+});
+
+// the result spills into A2:A3 and overwrites 'old value' in A3
+hfInstance.setCellContents({ sheet: 0, col: 0, row: 1 }, '=TRANSPOSE(A1:B1)');
+hfInstance.getCellValue({ sheet: 0, col: 0, row: 2 }); // 2
+
+// undo brings 'old value' back
+hfInstance.undo();
+hfInstance.getCellValue({ sheet: 0, col: 0, row: 2 }); // 'old value'
+```
+
+With the option enabled, an array overwrites cells when you enter it and when it grows because rows or columns were added inside the range it reads. It never overwrites another array: that spill still returns `#SPILL!`. Data declared in the same `buildFromArray` call as the array, and cells an array would reach while you move rows or columns, keep their content too.
