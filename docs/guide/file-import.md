@@ -25,11 +25,13 @@ HyperFormula. Add it only if you use these two methods:
 npm install exceljs
 ```
 
-Everything else in HyperFormula works without it. Calling `buildFromFile` or
-`toFile` without ExcelJS installed fails at the point of the call rather than at
-import time, because the library is loaded on demand. In the UMD `full` build the
-same applies: ExcelJS is kept out of the bundle and has to be provided as the
-global `ExcelJS`.
+In Node.js, everything else in HyperFormula works without it: the library is
+loaded on demand, so calling `buildFromFile` or `toFile` without ExcelJS
+installed fails at the point of the call. A bundler such as webpack or esbuild,
+however, resolves the library when it builds your application, so the build
+fails if ExcelJS is not installed, even if your code never calls these two
+methods. In the UMD `full` build, ExcelJS is kept out of the bundle and has to
+be provided as the global `ExcelJS`.
 
 For any other format (for example CSV), HyperFormula's
 [factory methods](../api/classes/hyperformula.md#factories) accept standard
@@ -39,8 +41,11 @@ JavaScript arrays, so you can plug in any third-party parser.
 Only **cell values and formulas** are imported and exported. Cell styling,
 number formats, merged cells, charts, images, data validation, and other
 Excel-specific features are **not** preserved &mdash; HyperFormula stores only
-values and formulas. Formula import assumes the English (`en`) function dialect.
-On export, formulas that use newer or dynamic-array Excel functions are written
+values and formulas. A cell that holds a value is exported as its value, so a
+number entered as a string, such as `'1'`, is exported as a number. Formulas are
+converted between the syntax of the file (English function names, `,` between
+arguments, `.` as the decimal separator) and the language and separators your
+configuration uses. On export, formulas that use newer or dynamic-array Excel functions are written
 without Excel's internal `_xlfn.` prefix, so they may not resolve when the
 exported file is opened in real Excel.
 :::
