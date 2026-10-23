@@ -264,13 +264,17 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     if (arg === undefined) {
       return false
     }
-    if (arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
-      return true
+    if (arg.type !== AstNodeType.CELL_RANGE && arg.type !== AstNodeType.COLUMN_RANGE && arg.type !== AstNodeType.ROW_RANGE) {
+      return false
+    }
+    if (arg.start.sheet !== arg.end.sheet) {
+      // A range across sheets makes ROW and COLUMN return #REF!, which TYPE classifies as an error.
+      return false
     }
     if (arg.type === AstNodeType.CELL_RANGE) {
       return AbsoluteCellRange.fromAst(arg, state.formulaAddress).size() > 1
     }
-    return false
+    return true
   }
 
   /**
