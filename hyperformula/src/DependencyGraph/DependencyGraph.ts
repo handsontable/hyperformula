@@ -937,17 +937,51 @@ export class DependencyGraph {
     }
   }
 
+  /**
+   * Returns the formulas in cells that depend on a vertex directly or through named expressions.
+   *
+   * A formula that refers to a named expression depends on the name's own vertex, not on what the
+   * name stands for, so the formulas a range or a name reaches through other names are collected by
+   * following every named expression on the way. The named expressions themselves are left out,
+   * and each is visited once, so a cycle of names that refer to one another terminates.
+   */
+  public getCellFormulasDependingOn(vertex: Vertex): FormulaVertex[] {
+    const formulas: FormulaVertex[] = []
+    const visited = new Set<Vertex>([vertex])
+    const queue: Vertex[] = [vertex]
+
+    while (queue.length > 0) {
+      const current = queue.pop() as Vertex
+
+      if (!this.graph.hasNode(current)) {
+        continue
+      }
+
+      for (const adjacentVertex of this.graph.adjacentNodes(current)) {
+        if (!(adjacentVertex instanceof FormulaVertex) || visited.has(adjacentVertex)) {
+          continue
+        }
+
+        visited.add(adjacentVertex)
+
+        if (adjacentVertex.getAddress(this.lazilyTransformingAstService).sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
+          queue.push(adjacentVertex)
+        } else {
+          formulas.push(adjacentVertex)
+        }
+      }
+    }
+
+    return formulas
+  }
+
   private getArrayVerticesRelatedToRanges(ranges: RangeVertex[]): Set<ArrayFormulaVertex> {
     const arrayVertices = new Set<ArrayFormulaVertex>()
 
     ranges.forEach(range => {
-      if (!this.graph.hasNode(range)) {
-        return
-      }
-
-      this.graph.adjacentNodes(range).forEach(adjacentVertex => {
-        if (adjacentVertex instanceof ArrayFormulaVertex) {
-          arrayVertices.add(adjacentVertex)
+      this.getCellFormulasDependingOn(range).forEach(formulaVertex => {
+        if (formulaVertex instanceof ArrayFormulaVertex) {
+          arrayVertices.add(formulaVertex)
         }
       })
     })
