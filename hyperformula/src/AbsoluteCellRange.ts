@@ -861,11 +861,11 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
 
   /**
    * Returns a new row range shifted by the given row offset (column offset is ignored).
-   * @param {number} _byCols - Ignored
+   * @param {number} byCols - Ignored
    * @param {number} byRows - Row offset
    * @returns {AbsoluteCellRange} New row range
    */
-  public shifted(_byCols: number, byRows: number): AbsoluteCellRange {
+  public shifted(byCols: number, byRows: number): AbsoluteCellRange {
     return new AbsoluteRowRange(this.sheet, this.start.row + byRows, this.end.row + byRows)
   }
 
