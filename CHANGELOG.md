@@ -23,7 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
 - Fixed a cell holding a static error value, such as a rejected formula or a typed-in error, being reported under the address of the cell that read it first instead of its own address. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 - Fixed `#SPILL!` errors reporting no address; their `address` is now the cell whose array result could not spill. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
-- Reading a formula cell's value before it has been computed now throws a `CellValueNotComputedError` naming the cell's address, instead of a plain `Error` with no way to trace which cell caused it. [#444](https://github.com/handsontable/hyperformula/issues/444)
+- Fixed reading a formula cell's value before it was computed throwing a plain `Error` that did not say which cell it was; it now throws `CellValueNotComputedError`, which carries the cell's address. [#444](https://github.com/handsontable/hyperformula/issues/444)
 
 ## [3.5.0] - 2026-10-09
 
