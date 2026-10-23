@@ -25,16 +25,22 @@ export class DetailedCellError {
   public readonly hasMessage: boolean
 
   /**
-   * What produced this error: the function or operator that rejected a value, e.g. `'SQRT'`
-   * or `'divide'`. An operator is named after the arithmetic helper it dispatches to.
+   * What produced this error.
    *
-   * First occurrence wins, so a function that only received the error from a nested call
-   * never replaces it: `=SUM(SQRT(-1))` reports `'SQRT'`. An error read from another cell
-   * keeps the origin it had there.
+   * Usually the function or operator that rejected a value, e.g. `'SQRT'` or `'divide'`; an
+   * operator is named after the arithmetic helper it dispatches to. An error that exists
+   * before any function reads it names what built it instead: `'reference'` for a reference
+   * that cannot be resolved, `'removed reference'` for one destroyed by removing rows or
+   * columns, `'parser'` for a formula that could not be parsed, `'user input'` for an error
+   * value typed into a cell, `'literal'` for one written into a formula, and
+   * `'array literal'` for an array literal whose rows differ in length.
    *
-   * `undefined` when no function or operator produced the error, e.g. for `#SPILL!`,
-   * `#CYCLE!`, a parsing error, or an error value typed into a cell. An error from a
-   * reference the engine cannot resolve is attributed to the function that reads it.
+   * First occurrence wins, so a function that only read the error never replaces that:
+   * `=SUM(SQRT(-1))` reports `'SQRT'`, and `=SUM(A2:A99999999999)` reports `'reference'`.
+   * An error inside an array result names the operation that built the array.
+   *
+   * `undefined` for `#SPILL!` and `#CYCLE!`, which arise from the layout of a sheet rather
+   * than from evaluating a value.
    */
   public readonly originFunction?: string
 
@@ -57,12 +63,6 @@ export class DetailedCellError {
    * is the argument the user wrote: `=MULTINOMIAL(1,A1:A3)` with text in `A3` reports `1`.
    * The index names the argument to look at, not the cell; the address of the offending
    * cell is not part of this field.
-   *
-   * Two cases report an index that is less useful than it looks: an argument that is a
-   * reference the engine cannot resolve is claimed by the function reading it
-   * (`=DATE(2020,A99999999999,1)` reports `DATE` with index `1`), and an error raised per
-   * element while a function is applied across an array carries an index with no
-   * `originFunction` (`=DATE(2020,A1:A2,1)` over text, with array arithmetic on).
    */
   public readonly argumentIndex?: number
 

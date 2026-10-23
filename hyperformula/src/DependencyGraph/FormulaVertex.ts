@@ -177,7 +177,7 @@ export class ArrayFormulaVertex extends FormulaVertex {
   }
 
   setNoSpace(): InterpreterValue {
-    this.array = new ErroredArray(new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult), ArraySize.error())
+    this.array = new ErroredArray(new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult, this), ArraySize.error())
     return this.getCellValue()
   }
 

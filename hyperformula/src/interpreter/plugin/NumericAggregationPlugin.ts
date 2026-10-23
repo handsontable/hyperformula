@@ -587,14 +587,14 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       range = AbsoluteCellRange.fromAst(ast, state.formulaAddress)
     } catch (err) {
       if (err instanceof SheetsNotEqual) {
-        return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
+        return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin('reference')
       } else {
         throw err
       }
     }
 
     if (!this.isSheetValid(range)) {
-      return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+      return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
     }
 
     const rangeVertex = this.dependencyGraph.getRange(range.start, range.end)
