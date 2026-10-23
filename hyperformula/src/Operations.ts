@@ -154,6 +154,17 @@ export interface MoveCellsResult {
   addedGlobalNamedExpressions: string[],
 }
 
+export interface SetCellContentResult {
+  /** Previous content of the anchor cell (the cell the new content is written to). */
+  oldContent: [SimpleCellAddress, ClipboardCell],
+  /**
+   * Content of the non-anchor cells that an array formula overwrote while spilling
+   * (only populated when `arrayFunctionResultOverwritesData` is on and the spill actually
+   * overwrites static occupants). Empty otherwise. Used to make the overwrite undoable.
+   */
+  overwrittenCells: [SimpleCellAddress, ClipboardCell][],
+}
+
 export class Operations {
   private changes: ContentChanges = ContentChanges.empty()
   private readonly maxRows: number
@@ -194,16 +205,22 @@ export class Operations {
     return rowsRemovals
   }
 
-  public addRows(cmd: AddRowsCommand) {
-    for (const addedRows of cmd.rowsSpans()) {
-      this.doAddRows(addedRows)
-    }
+  /**
+   * Adds the rows of every span of the command.
+   *
+   * Returns, per span, the cells that arrays grown by that span overwrote in the coordinates from before that span.
+   */
+  public addRows(cmd: AddRowsCommand): [SimpleCellAddress, ClipboardCell][][] {
+    return cmd.rowsSpans().map(addedRows => this.doAddRows(addedRows))
   }
 
-  public addColumns(cmd: AddColumnsCommand) {
-    for (const addedColumns of cmd.columnsSpans()) {
-      this.doAddColumns(addedColumns)
-    }
+  /**
+   * Adds the columns of every span of the command.
+   *
+   * Returns, per span, the cells that arrays grown by that span overwrote in the coordinates from before that span.
+   */
+  public addColumns(cmd: AddColumnsCommand): [SimpleCellAddress, ClipboardCell][][] {
+    return cmd.columnsSpans().map(addedColumns => this.doAddColumns(addedColumns))
   }
 
   public removeColumns(cmd: RemoveColumnsCommand): ColumnsRemoval[] {
@@ -302,7 +319,23 @@ export class Operations {
     }
   }
 
+  /**
+   * Moves rows. An array that reads the moved rows never overwrites data during the move, whatever
+   * `arrayFunctionResultOverwritesData` says (see `DependencyGraph.withoutOverwritingData`).
+   */
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): number {
+    return this.dependencyGraph.withoutOverwritingData(() => this.doMoveRows(sheet, startRow, numberOfRows, targetRow))
+  }
+
+  /**
+   * Moves columns. An array that reads the moved columns never overwrites data during the move, whatever
+   * `arrayFunctionResultOverwritesData` says (see `DependencyGraph.withoutOverwritingData`).
+   */
+  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): number {
+    return this.dependencyGraph.withoutOverwritingData(() => this.doMoveColumns(sheet, startColumn, numberOfColumns, targetColumn))
+  }
+
+  private doMoveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): number {
     const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, targetRow, numberOfRows)
     this.lazilyTransformingAstService.beginCombinedMode(sheet)
 
@@ -321,7 +354,7 @@ export class Operations {
     return this.lazilyTransformingAstService.commitCombinedMode()
   }
 
-  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): number {
+  private doMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): number {
     const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, targetColumn, numberOfColumns)
     this.lazilyTransformingAstService.beginCombinedMode(sheet)
 
@@ -513,7 +546,12 @@ export class Operations {
         break
       }
       case ClipboardCellType.FORMULA: {
-        this.setFormulaToCellFromCache(clipboardCell.hash, address)
+        // Apply the resulting content changes to the column index so that when an array
+        // formula shrinks on restore (e.g. undoing an overwrite-expand), the vacated spill
+        // values are dropped from the index. The removeRows / version-restore
+        // callers deliberately ignore the return value and keep their own index bookkeeping.
+        const changes = this.setFormulaToCellFromCache(clipboardCell.hash, address)
+        this.columnSearch.applyChanges(changes.getChanges())
         break
       }
       case ClipboardCellType.EMPTY: {
@@ -595,9 +633,10 @@ export class Operations {
     return result
   }
 
-  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): [SimpleCellAddress, ClipboardCell] {
+  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): SetCellContentResult {
     const parsedCellContent = this.cellContentParser.parse(newCellContent)
     const oldContent = this.getOldContent(address)
+    let overwrittenCells: [SimpleCellAddress, ClipboardCell][] = []
 
     if (parsedCellContent instanceof CellContent.Formula) {
       const parserResult = this.parser.parse(parsedCellContent.formula, address)
@@ -612,6 +651,7 @@ export class Operations {
             throw Error('Incorrect array size')
           }
 
+          overwrittenCells = this.snapshotOverwrittenOccupants(address, size)
           this.setFormulaToCell(address, size, parserResult)
         } catch (error) {
           if (!(error as Error).message) {
@@ -628,7 +668,67 @@ export class Operations {
       this.setValueToCell({ parsedValue: parsedCellContent.value, rawValue: newCellContent }, address)
     }
 
-    return oldContent
+    return { oldContent, overwrittenCells }
+  }
+
+  /**
+   * Snapshots the cells that an array formula is about to overwrite while spilling, so the
+   * overwrite can be undone. Returns an empty list unless `arrayFunctionResultOverwritesData`
+   * is on and the array is non-scalar. Mirrors `DependencyGraph.canOverwriteArrayResult`:
+   * if a DIFFERENT pre-existing array sits in the spill range, the spill will be blocked
+   * (`#SPILL!`) and nothing is overwritten, so nothing is captured. The array currently anchored
+   * at `anchorAddress` (the one being replaced/expanded) does not block and is not snapshotted —
+   * its cells are re-created when the old anchor formula is restored on undo. The anchor cell
+   * itself is excluded because its previous content is captured separately as `oldContent`.
+   */
+  private snapshotOverwrittenOccupants(anchorAddress: SimpleCellAddress, size: ArraySize): [SimpleCellAddress, ClipboardCell][] {
+    return this.overwrittenOccupantAddresses(anchorAddress, size)
+      .map(occupantAddress => [occupantAddress, this.getClipboardCell(occupantAddress)] as [SimpleCellAddress, ClipboardCell])
+  }
+
+  /**
+   * The occupied, non-array cells (excluding the anchor) that an array formula will overwrite while
+   * spilling. Empty unless `arrayFunctionResultOverwritesData` is on and the array is non-scalar.
+   * Mirrors `DependencyGraph.canOverwriteArrayResult`: if a DIFFERENT pre-existing array sits in
+   * the spill range, the spill is blocked (`#SPILL!`) and nothing is overwritten, so the list is
+   * empty. The array currently anchored at `anchorAddress` (being replaced/expanded) neither blocks
+   * nor is reported as an occupant.
+   */
+  private overwrittenOccupantAddresses(anchorAddress: SimpleCellAddress, size: ArraySize): SimpleCellAddress[] {
+    if (!this.dependencyGraph.isOverwritingDataAllowed() || size.isScalar()) {
+      return []
+    }
+
+    const spillRange = AbsoluteCellRange.spanFromOrUndef(anchorAddress, size.width, size.height)
+    if (spillRange === undefined) {
+      return []
+    }
+
+    const occupants: SimpleCellAddress[] = []
+    for (const occupantAddress of spillRange.addresses(this.dependencyGraph)) {
+      const vertex = this.dependencyGraph.getCell(occupantAddress)
+
+      if (vertex instanceof ArrayFormulaVertex) {
+        // The array currently anchored at `anchorAddress` is the one being replaced/expanded.
+        // Its cells (corner + internal) are re-created when the old anchor formula is restored
+        // on undo, so they must be neither snapshotted nor treated as a blocking collision.
+        // A DIFFERENT pre-existing array still blocks the overwrite (the spill stays #SPILL!
+        // and overwrites nothing), matching DependencyGraph.canOverwriteArrayResult /
+        // overwriteWouldHitArray.
+        if (!vertex.isLeftCorner(anchorAddress)) {
+          return []
+        }
+        continue
+      }
+
+      if (equalSimpleCellAddress(occupantAddress, anchorAddress) || vertex === undefined || vertex instanceof EmptyCellVertex) {
+        continue
+      }
+
+      occupants.push(occupantAddress)
+    }
+
+    return occupants
   }
 
   public setSheetContent(sheetId: number, newSheetContent: RawCellContent[][]) {
@@ -670,6 +770,11 @@ export class Operations {
 
     const arrayChanges = this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
 
+    // In overwrite mode the spill clears occupied cells; their stale values are dropped from the
+    // column index here uniformly, because `exchangeOrAddFormulaVertex` records a content change
+    // (new value EmptyValue, carrying the old value) for every occupant it claims and
+    // `applyChanges` removes any change whose `oldValue` is set. Applies to the free-spill and
+    // non-overwrite paths too, where no occupants are claimed and this is a no-op.
     this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)
   }
@@ -706,7 +811,7 @@ export class Operations {
     this.changes.addChange(EmptyValue, address)
   }
 
-  public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
+  public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress): ContentChanges {
     const {
       ast,
       hasVolatileFunction,
@@ -718,7 +823,7 @@ export class Operations {
     this.parser.rememberNewAst(cleanedAst)
     const cleanedDependencies = filterDependenciesOutOfScope(absoluteDependencies)
     const size = this.arraySizePredictor.checkArraySize(ast, address)
-    this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, size, hasVolatileFunction, hasStructuralChangeFunction)
+    return this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, size, hasVolatileFunction, hasStructuralChangeFunction)
   }
 
   /**
@@ -819,9 +924,9 @@ export class Operations {
    * Does nothing if rows are outside of effective sheet size.
    * @param {RowsSpan} addedRows - rows to add
    */
-  private doAddRows(addedRows: RowsSpan) {
+  private doAddRows(addedRows: RowsSpan): [SimpleCellAddress, ClipboardCell][] {
     if (this.rowEffectivelyNotInSheet(addedRows.rowStart, addedRows.sheet)) {
-      return
+      return []
     }
 
     const { affectedArrays } = this.dependencyGraph.addRows(addedRows)
@@ -832,19 +937,65 @@ export class Operations {
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedArrays(affectedArrays)
+    const overwrittenCells = this.rewriteAffectedArrays(affectedArrays)
+    return this.overwrittenCellsBeforeSpan(overwrittenCells, addedRows)
   }
 
-  private rewriteAffectedArrays(affectedArrays: Set<ArrayFormulaVertex>) {
+  /**
+   * Re-places the arrays whose source ranges a structural operation resized.
+   *
+   * Returns the cells, in the coordinates after the operation, that the re-placed arrays overwrote
+   * because they grew onto occupied cells. Empty unless `arrayFunctionResultOverwritesData` is on.
+   */
+  private rewriteAffectedArrays(affectedArrays: Set<ArrayFormulaVertex>): [SimpleCellAddress, ClipboardCell][] {
+    const overwrittenCells: [SimpleCellAddress, ClipboardCell][] = []
     for (const arrayVertex of affectedArrays.values()) {
       if (arrayVertex.array.size.isRef) {
         continue
       }
+      // Capture the array's footprint BEFORE re-placing it, to tell apart two kinds of
+      // ContentChanges that setFormulaToCellFromCache returns below:
+      // - genuinely NEW occupants a grown array just claimed (overwrite mode, outside this range)
+      // - the routine shrink-then-recreate artifact of re-placing an array in the same spot
+      //   (cleanAddressMappingUnderArray clears the array's OWN previous cells every time an array
+      //   vertex is re-set, overwrite flag or not) -- these are already reconciled by the normal
+      //   recompute cycle right after this method returns, so re-applying them to the column index
+      //   here double-touches entries the row/column-shift machinery already moved and corrupts it
+      //   (this is what broke the column-index removeRows canary in an earlier attempt).
+      const oldRange = arrayVertex.getRangeOrUndef()
       const ast = arrayVertex.getFormula(this.lazilyTransformingAstService)
       const address = arrayVertex.getAddress(this.lazilyTransformingAstService)
       const hash = this.parser.computeHashFromAst(ast)
-      this.setFormulaToCellFromCache(hash, address)
+      if (this.dependencyGraph.isOverwritingDataAllowed()) {
+        overwrittenCells.push(...this.snapshotOverwrittenOccupants(address, this.arraySizePredictor.checkArraySize(ast, address)))
+      }
+      const changes = this.setFormulaToCellFromCache(hash, address)
+      const overwriteChanges = changes.getChanges()
+        .filter(change => oldRange === undefined || !oldRange.addressInRange(change.address))
+      this.columnSearch.applyChanges(overwriteChanges)
     }
+    return overwrittenCells
+  }
+
+  /**
+   * Expresses cells snapshotted right after a span of rows or columns was added in the coordinates
+   * from before that span, so that undo can restore them once it has removed the span again.
+   *
+   * Each cell moves back the way the removal of the span moves it. A formula also has its references
+   * rewritten the way that removal rewrites every other formula, for example `=F1` back to `=E1`
+   * after a column was inserted before column E. No snapshotted cell lies inside the added span:
+   * the cells of the span are new and empty, so no array overwrites them.
+   */
+  private overwrittenCellsBeforeSpan(overwrittenCells: [SimpleCellAddress, ClipboardCell][], addedSpan: RowsSpan | ColumnsSpan): [SimpleCellAddress, ClipboardCell][] {
+    const removal = addedSpan instanceof RowsSpan ? new RemoveRowsTransformer(addedSpan) : new RemoveColumnsTransformer(addedSpan)
+    return overwrittenCells.map(([address, clipboardCell]) => {
+      if (clipboardCell.type !== ClipboardCellType.FORMULA) {
+        return [addressBeforeSpan(address, addedSpan), clipboardCell]
+      }
+      const [ast, addressBefore] = removal.transformSingleAst(this.parser.fetchCachedResult(clipboardCell.hash).ast, address)
+      const cachedAst = this.parser.rememberNewAst(ast)
+      return [addressBefore, {type: ClipboardCellType.FORMULA, hash: this.parser.computeHashFromAst(cachedAst)}]
+    })
   }
 
   /**
@@ -852,9 +1003,9 @@ export class Operations {
    * Does nothing if columns are outside of effective sheet size
    * @param {ColumnsSpan} addedColumns - object containing information about columns to add
    */
-  private doAddColumns(addedColumns: ColumnsSpan): void {
+  private doAddColumns(addedColumns: ColumnsSpan): [SimpleCellAddress, ClipboardCell][] {
     if (this.columnEffectivelyNotInSheet(addedColumns.columnStart, addedColumns.sheet)) {
-      return
+      return []
     }
 
     const { affectedArrays, contentChanges } = this.dependencyGraph.addColumns(addedColumns)
@@ -867,7 +1018,8 @@ export class Operations {
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedArrays(affectedArrays)
+    const overwrittenCells = this.rewriteAffectedArrays(affectedArrays)
+    return this.overwrittenCellsBeforeSpan(overwrittenCells, addedColumns)
   }
 
   /**
@@ -1107,4 +1259,17 @@ function isPositiveInteger(n: number): boolean {
 function isRowOrColumnRange(leftCorner: SimpleCellAddress, width: number, height: number): boolean {
   return (leftCorner.row === 0 && isPositiveInteger(width) && height === Number.POSITIVE_INFINITY)
     || (leftCorner.col === 0 && isPositiveInteger(height) && width === Number.POSITIVE_INFINITY)
+}
+
+/**
+ * Where a cell that sits outside an added span of rows or columns was before that span was added.
+ */
+function addressBeforeSpan(address: SimpleCellAddress, addedSpan: RowsSpan | ColumnsSpan): SimpleCellAddress {
+  if (address.sheet !== addedSpan.sheet) {
+    return address
+  }
+  if (addedSpan instanceof RowsSpan) {
+    return address.row >= addedSpan.rowStart ? {...address, row: address.row - addedSpan.numberOfRows} : address
+  }
+  return address.col >= addedSpan.columnStart ? {...address, col: address.col - addedSpan.numberOfColumns} : address
 }
