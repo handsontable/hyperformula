@@ -85,8 +85,12 @@ export class ScrollAnchor {
     this.scope.activate();
   }
 
-  listenToView(viewScope: EventScope, view: Window): void {
+  listenToView(viewScope: EventScope, view: Window, shadowRoot: ShadowRoot | null): void {
     viewScope.listen(view, "scroll", this.onAncestorScroll, { capture: true });
+
+    if (shadowRoot !== null) {
+      viewScope.listen(shadowRoot, "scroll", this.onAncestorScroll, { capture: true });
+    }
   }
 
   detach(): void {

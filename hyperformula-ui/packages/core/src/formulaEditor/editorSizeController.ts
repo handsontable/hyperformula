@@ -346,9 +346,13 @@ export class EditorSizeController {
     this.scope.activate();
   }
 
-  listenToView(viewScope: EventScope, view: Window): void {
+  listenToView(viewScope: EventScope, view: Window, shadowRoot: ShadowRoot | null): void {
     viewScope.listen(view, "scroll", this.handleAmbientResize, { capture: true });
     viewScope.listen(view, "resize", this.handleAmbientResize);
+
+    if (shadowRoot !== null) {
+      viewScope.listen(shadowRoot, "scroll", this.handleAmbientResize, { capture: true });
+    }
   }
 
   detach(): void {

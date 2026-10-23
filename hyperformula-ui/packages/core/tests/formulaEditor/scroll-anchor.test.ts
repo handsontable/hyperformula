@@ -29,7 +29,7 @@ class PopupStub {
 
 interface ScrollAnchorHarness {
   anchor: ScrollAnchor;
-  attach: () => void;
+  attach: (shadowRoot?: ShadowRoot) => void;
   textarea: HTMLTextAreaElement;
   overlayRoot: HTMLDivElement;
   suggestions: PopupStub;
@@ -58,11 +58,11 @@ function createScrollAnchorHarness(): ScrollAnchorHarness {
 
   return {
     anchor,
-    attach: () => {
+    attach: (shadowRoot?: ShadowRoot) => {
       const viewScope = events.createScope("scroll-anchor-view-test");
 
       anchor.attach();
-      anchor.listenToView(viewScope, window);
+      anchor.listenToView(viewScope, window, shadowRoot ?? null);
       viewScope.activate();
     },
     textarea,
@@ -131,6 +131,31 @@ describe("ScrollAnchor", () => {
     expect(harness.suggestions.closeCount).toBe(0);
     expect(harness.fnHelp.closeCount).toBe(0);
 
+    harness.destroy();
+  });
+
+  it("reanchors after a scroll inside the editor's shadow root, which never reaches the window", async () => {
+    const harness = createScrollAnchorHarness();
+    const shadowHost = document.createElement("div");
+    const shadowRoot = shadowHost.attachShadow({ mode: "open" });
+    const scroller = document.createElement("div");
+    const windowScrolls = vi.fn();
+
+    document.body.appendChild(shadowHost);
+    shadowRoot.appendChild(scroller);
+    window.addEventListener("scroll", windowScrolls, true);
+    harness.suggestions.visible = true;
+    stubVisibleTextareaRects(harness.textarea);
+    harness.attach(shadowRoot);
+
+    scroller.dispatchEvent(new Event("scroll"));
+    await nextFrame();
+
+    expect(windowScrolls).not.toHaveBeenCalled();
+    expect(harness.reanchor).toHaveBeenCalledTimes(1);
+
+    window.removeEventListener("scroll", windowScrolls, true);
+    shadowHost.remove();
     harness.destroy();
   });
 

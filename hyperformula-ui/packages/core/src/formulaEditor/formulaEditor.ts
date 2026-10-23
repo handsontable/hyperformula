@@ -10,7 +10,7 @@ import { Kernel } from "../kernel/kernel";
 import type { LexerOptions } from "../lexer/types";
 import { CN } from "../theme/classNames";
 import { injectStyles, releaseStyles } from "../theme/injectStyles";
-import { createEl, isHTMLElement, isNode, viewOf } from "../ui/dom";
+import { createEl, isHTMLElement, isNode, isShadowRoot, viewOf } from "../ui/dom";
 import { resolvePhrases } from "../ui/phrases";
 import { FunctionHelpPopup } from "../ui/popup/functionHelpPopup";
 import { SuggestionsPopup } from "../ui/popup/suggestionsPopup";
@@ -70,6 +70,7 @@ export class FormulaEditor {
   private reparenting = false;
   private viewScope: EventScope | null = null;
   private listenedView: Window | null = null;
+  private listenedShadowRoot: ShadowRoot | null = null;
 
   constructor(container: HTMLElement, opts: FormulaEditorOptions) {
     if (typeof document === "undefined") {
@@ -293,17 +294,20 @@ export class FormulaEditor {
 
   private listenToView(): void {
     const view = viewOf(this.rootEl);
+    const rootNode = this.rootEl.getRootNode();
+    const shadowRoot = isShadowRoot(rootNode) ? rootNode : null;
 
-    if (view === this.listenedView) {
+    if (view === this.listenedView && shadowRoot === this.listenedShadowRoot) {
       return;
     }
 
     this.viewScope?.dispose();
     this.viewScope = this.events.createScope("editor-view");
-    this.scroll.listenToView(this.viewScope, view);
-    this.size.listenToView(this.viewScope, view);
+    this.scroll.listenToView(this.viewScope, view, shadowRoot);
+    this.size.listenToView(this.viewScope, view, shadowRoot);
     this.viewScope.activate();
     this.listenedView = view;
+    this.listenedShadowRoot = shadowRoot;
   }
 
   private wireAdapter(): void {

@@ -78,7 +78,7 @@ function makeHarness(clipOverflow: string | null = "hidden", inputScrollHeight =
   const viewScope = events.createScope("editor-size-view-test");
 
   controller.attach();
-  controller.listenToView(viewScope, window);
+  controller.listenToView(viewScope, window, null);
   viewScope.activate();
   cleanups.push(() => {
     controller.detach();

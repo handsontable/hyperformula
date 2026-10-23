@@ -533,7 +533,10 @@ All popup-style overlays share a common base class `BasePopup`
   viewport sizes, `PopupController`'s fallback clip, and `DomRangePicker` read it instead of the
   global `window`/`document`. The editor's ambient scroll/resize listeners (`ScrollAnchor`,
   `EditorSizeController`) live in an `editor-view` scope that `FormulaEditor.attachTo` rebinds when
-  the editor moves into another document (`listenToView`). Node checks never use `instanceof`:
+  the editor moves into another document or shadow root (`listenToView`). `scroll` is not composed,
+  so a scroller inside a shadow root never reaches a window listener: the editor's controllers, the
+  error popup and `DomRangePicker` also listen for scroll (capture) on the shadow root their element
+  is in. Node checks never use `instanceof`:
   an element from an iframe belongs to another realm and fails `instanceof Element`, so
   `isElement`/`isHTMLElement`/`isNode` (`ui/dom.ts`) test `nodeType`. `DomRangePicker` reads a
   document-level event's cell from `eventOrigin(event)` (the first node of `composedPath()`),

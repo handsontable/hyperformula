@@ -1,6 +1,6 @@
 import type { EventScope } from "../../events/eventManager";
 import { CN } from "../../theme/classNames";
-import { createEl, deepActiveElement, isHTMLElement, viewOf } from "../dom";
+import { createEl, deepActiveElement, isHTMLElement, isShadowRoot, viewOf } from "../dom";
 import type { IconsOptions, Phrases } from "../types";
 import { BasePopup } from "./basePopup";
 import { EndViewportAnchoredStrategy } from "./positionStrategy";
@@ -281,6 +281,13 @@ export class ErrorPopup extends BasePopup {
     this.containerScope.listen(this.root, "mouseout", this.onOut);
     this.containerScope.listen(this.root, "focusout", this.onFocusOut);
     this.containerScope.listen(viewOf(container), "scroll", this.onScroll, { capture: true });
+
+    const containerRoot = container.getRootNode();
+
+    if (isShadowRoot(containerRoot)) {
+      this.containerScope.listen(containerRoot, "scroll", this.onScroll, { capture: true });
+    }
+
     this.containerScope.listen(viewOf(container), "keydown", this.onKeydown, { capture: true });
     this.containerScope.activate();
   }

@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed the stylesheet to set no `color-scheme`, so the editor, the formula bar, the popups and the grid highlights follow the scheme the host page sets, on `<html>` or on the class passed as `className`, instead of the operating system. A page that sets no scheme now gets the light colors; to follow the operating system, set `color-scheme: light dark` on `<html>`. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 
 ### Fixed
-- Fixed reference picking with `DomRangePicker` and the error popup in a grid inside a shadow root or an iframe: a drag picked only its first cell, and the error popup did not open or close with Escape. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
+- Fixed reference picking with `DomRangePicker` and the error popup in a grid inside a shadow root or an iframe: a drag picked only its first cell, the error popup did not open or close with Escape, and the popups did not follow a scroll inside the shadow root. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 - Fixed a removed named expression staying colored as a reference in the editor and the formula bar after `undo()`, `redo()`, `changeNamedExpression()` or `removeSheet()`. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 - Fixed the idle formula bar coloring references differently from the editor when the formula contains a named expression. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
 - Fixed `FormulaBuilder.destroy()` throwing, and leaving the popups and styles in the page, when the HyperFormula instance was destroyed first. [#1839](https://github.com/handsontable/hyperformula/pull/1839)
