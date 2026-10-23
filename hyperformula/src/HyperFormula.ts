@@ -57,6 +57,7 @@ import {FormatInfo} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {sheetsToXlsx} from './io/xlsx/exporter'
+import {formulaSyntaxOf, hasXlsxFormulaSyntax, XLSX_FORMULA_SYNTAX} from './io/xlsx/formulaSyntax'
 import {loadXlsxWorkbook} from './io/xlsx/loadWorkbook'
 import {workbookToSheets} from './io/xlsx/importer'
 import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
@@ -342,7 +343,13 @@ export class HyperFormula implements TypedEmitter {
    * Can be configured with the optional second parameter that represents a [[ConfigParams]].
    * If not specified the engine will be built with the default configuration.
    *
-   * v1 scope: no import options, no named expressions, no cell-format detection (see HF-107).
+   * Only cell values and formulas are read: no named expressions, styles or number formats.
+   * A text cell stays text even when it starts with `=`.
+   *
+   * Formulas in an .xlsx file always use English function names, `,` between arguments and
+   * `.` as the decimal separator. When the configuration sets another `language`,
+   * `functionArgSeparator`, `decimalSeparator`, `thousandSeparator`, `arrayColumnSeparator` or
+   * `arrayRowSeparator`, the formulas are converted to it, which builds the engine twice.
    *
    * @param {ArrayBuffer | Uint8Array} data - the raw bytes of an .xlsx file
    * @param {Partial<ConfigParams>} configInput - engine configuration
@@ -373,7 +380,17 @@ export class HyperFormula implements TypedEmitter {
   public static async buildFromFile(data: ArrayBuffer | Uint8Array, configInput: Partial<ConfigParams> = {}): Promise<HyperFormula> {
     const workbook = await loadXlsxWorkbook(data)
     const sheets = workbookToSheets(workbook)
-    return HyperFormula.buildFromSheets(sheets, configInput)
+
+    if (hasXlsxFormulaSyntax(configInput)) {
+      return HyperFormula.buildFromSheets(sheets, configInput)
+    }
+
+    const engineInFileSyntax = HyperFormula.buildFromSheets(sheets, {...configInput, ...XLSX_FORMULA_SYNTAX})
+    const configuredSyntax = engineInFileSyntax._config.mergeConfig(formulaSyntaxOf(configInput), false)
+    const sheetsInConfiguredSyntax = engineInFileSyntax._serialization.withNewConfig(configuredSyntax, engineInFileSyntax._namedExpressions).getAllSheetsSerialized()
+    engineInFileSyntax.destroy()
+
+    return HyperFormula.buildFromSheets(sheetsInConfiguredSyntax, configInput)
   }
 
   /**
@@ -1232,9 +1249,11 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Exports the current engine state to `.xlsx` file bytes.
    *
-   * v1 scope: values and formulas only, no styles/number-formats/merged cells
-   * (see HF-107). Formulas are serialized exactly as {@link getAllSheetsSerialized}
-   * would return them.
+   * Only cell values and formulas are written: no named expressions, styles or number formats.
+   * A cell that holds a value is written as its value, so a number entered as a string, such as
+   * `'1'`, is written as a number. Formulas are written in the syntax of an .xlsx file (English
+   * function names, `,` between arguments, `.` as the decimal separator), whatever the engine's
+   * language and separators are.
    *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
@@ -1252,7 +1271,11 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public async toFile(): Promise<Uint8Array> {
-    return sheetsToXlsx(this.getAllSheetsSerialized())
+    const values = this.getAllSheetsValues()
+    const fileSyntax = this._config.mergeConfig(XLSX_FORMULA_SYNTAX, false)
+    const formulas = this._serialization.withNewConfig(fileSyntax, this._namedExpressions).getAllSheetsSerialized()
+
+    return sheetsToXlsx(formulas, values)
   }
 
   /**

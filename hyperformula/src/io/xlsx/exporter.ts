@@ -3,28 +3,37 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import type {CellErrorValue} from 'exceljs'
+import {ErrorType} from '../../Cell'
 import {RawCellContent} from '../../CellContentParser'
+import {CellValue, DetailedCellError} from '../../CellValue'
+import {loadExcelJs} from './loadExcelJs'
 
 /**
- * Converts HF's serialized sheets (as returned by
- * {@link HyperFormula#getAllSheetsSerialized}) into `.xlsx` file bytes.
+ * Writes HyperFormula's sheets as `.xlsx` file bytes.
  *
  * Pure and async (ExcelJS's writer is async); does not touch a live engine.
  *
- * v1 mapping (deliberately minimal, see HF-107 task brief):
- * - a `null`/`undefined` cell is left unset, so it reloads blank (not `0`/`''`).
- * - a formula string (`cell[0] === '='`) becomes an ExcelJS formula cell.
- * - `number` | `string` | `boolean` | `Date` pass through as-is.
+ * Both arguments are keyed by sheet name. `formulas` holds the serialized cells, as returned by
+ * {@link HyperFormula#getAllSheetsSerialized}, with the formulas already in Excel's syntax, and
+ * `values` the computed values, as returned by {@link HyperFormula#getAllSheetsValues}:
+ * - a cell whose serialized content is a formula (starts with `=`) becomes an Excel formula cell.
+ * - a cell whose serialized content is empty is left unset, so it reloads blank (not `0`/`''`).
+ *   This also covers the cells a formula's array result spills into.
+ * - any other cell is written as its computed value, so a number or a boolean entered as text
+ *   (for example `'1'`) is written as a number or a boolean, and a text value is written without
+ *   the `'` that marks it as text in HyperFormula.
  *
  * Values and formulas only &mdash; no styles, number formats, or merged cells.
  */
-export async function sheetsToXlsx(sheets: Record<string, RawCellContent[][]>): Promise<Uint8Array> {
-  const ExcelJS = await import(/* webpackMode: "eager" */ 'exceljs')
+export async function sheetsToXlsx(formulas: Record<string, RawCellContent[][]>, values: Record<string, CellValue[][]>): Promise<Uint8Array> {
+  const ExcelJS = await loadExcelJs()
   const workbook = new ExcelJS.Workbook()
 
-  for (const sheetName of Object.keys(sheets)) {
+  for (const sheetName of Object.keys(formulas)) {
     const worksheet = workbook.addWorksheet(sheetName)
-    const rows = sheets[sheetName]
+    const rows = formulas[sheetName]
+    const valueRows = values[sheetName] ?? []
 
     for (let r = 0; r < rows.length; r++) {
       const row = rows[r]
@@ -41,7 +50,7 @@ export async function sheetsToXlsx(sheets: Record<string, RawCellContent[][]>): 
         if (typeof cell === 'string' && cell[0] === '=') {
           xc.value = {formula: cell.slice(1)}
         } else {
-          xc.value = cell
+          xc.value = toExcelValue(valueRows[r]?.[c] ?? null)
         }
       }
     }
@@ -53,4 +62,37 @@ export async function sheetsToXlsx(sheets: Record<string, RawCellContent[][]>): 
   // drops the bytes, corrupting browser exports; `new Uint8Array(...)` copies a
   // Buffer and views an ArrayBuffer, so it is correct on both targets.
   return buffer instanceof ArrayBuffer ? new Uint8Array(buffer) : new Uint8Array(buffer as Uint8Array)
+}
+
+/** Maps a computed HyperFormula value to the value of an ExcelJS cell. */
+function toExcelValue(value: CellValue): number | string | boolean | CellErrorValue | null {
+  if (value instanceof DetailedCellError) {
+    const excelError = toExcelError(value.type)
+    return excelError === undefined ? value.value : {error: excelError}
+  }
+
+  return value
+}
+
+/**
+ * Returns the Excel error value a HyperFormula error type is written as, or `undefined` for the
+ * error types Excel does not have, which are written as the text of the error instead.
+ */
+function toExcelError(type: ErrorType): CellErrorValue['error'] | undefined {
+  switch (type) {
+    case ErrorType.DIV_BY_ZERO:
+      return '#DIV/0!'
+    case ErrorType.NA:
+      return '#N/A'
+    case ErrorType.NAME:
+      return '#NAME?'
+    case ErrorType.NUM:
+      return '#NUM!'
+    case ErrorType.REF:
+      return '#REF!'
+    case ErrorType.VALUE:
+      return '#VALUE!'
+    default:
+      return undefined
+  }
 }
