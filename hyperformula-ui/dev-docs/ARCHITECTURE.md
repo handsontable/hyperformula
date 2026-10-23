@@ -180,7 +180,11 @@ an error count) are functions, so a translation can reorder words and handle plu
 `FormulaEditor` resolves the `phrases` option once and exposes the result as
 `FormulaEditor.phrases`; the popups receive it through `BasePopupOptions.phrases` (read in
 `createRoot`, which runs inside the base constructor), and `FormulaBar` and `FormulaBuilder` read
-it from the editor. A new string goes into `Phrases`, not into the component.
+it from the editor. A new string goes into `Phrases`, not into the component. The one exception is a key
+name shown as a key chip (`Tab`, `↑`, `↓`): it names the key on the keyboard, as Excel and Google Sheets
+show it in every language. Phrases that end up inside brackets or after a key chip carry no brackets
+or surrounding spaces; the component adds them, so a host dictionary that trims whitespace or treats
+`[name]` as a variable (Handsontable's) can hold them.
 
 ## Component map
 

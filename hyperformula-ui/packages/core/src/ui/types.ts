@@ -48,6 +48,18 @@ export interface Phrases {
   /** Accessible name of the function help popup showing `functionName`. */
   functionHelpFor: (functionName: string) => string;
 
+  /** Label of the example section of the function help. */
+  functionExample: string;
+
+  /** Label of the description section of the function help. */
+  functionDescription: string;
+
+  /** Note after an optional argument in the function help; the popup puts it in brackets. */
+  optionalArgument: string;
+
+  /** Note after an argument that can repeat in the function help. */
+  repeatableArgument: string;
+
   /** Text of the link to a function's documentation. */
   learnMore: string;
 

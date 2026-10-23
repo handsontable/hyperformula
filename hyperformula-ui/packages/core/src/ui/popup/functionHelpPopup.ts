@@ -57,17 +57,18 @@ function paramListLabel(
   index: number,
   total: number,
   repeatLast: number,
+  phrases: Pick<Phrases, "optionalArgument" | "repeatableArgument">,
 ): string {
   const isRepeating = repeatLast > 0 && index >= total - repeatLast;
   const base = isRepeating ? `${param.label}...` : param.label;
   const annotations: string[] = [];
 
   if (param.optional) {
-    annotations.push("[optional]");
+    annotations.push(`[${phrases.optionalArgument}]`);
   }
 
   if (isRepeating) {
-    annotations.push("repeatable");
+    annotations.push(phrases.repeatableArgument);
   }
 
   return annotations.length > 0 ? `${base} - ${annotations.join(" ")}` : base;
@@ -168,11 +169,23 @@ export class FunctionHelpPopup extends BasePopup {
     this.root.appendChild(this.renderSignatureRow(signature, activeArg));
 
     if (signature.example) {
-      body.appendChild(this.renderLabeledSection("Example", signature.example, CN.fnHelpExample));
+      body.appendChild(
+        this.renderLabeledSection(
+          this.phrases.functionExample,
+          signature.example,
+          CN.fnHelpExample,
+        ),
+      );
     }
 
     if (signature.description) {
-      body.appendChild(this.renderLabeledSection("About", signature.description, CN.fnHelpAbout));
+      body.appendChild(
+        this.renderLabeledSection(
+          this.phrases.functionDescription,
+          signature.description,
+          CN.fnHelpAbout,
+        ),
+      );
     }
 
     if (signature.params.length > 0) {
@@ -264,7 +277,13 @@ export class FunctionHelpPopup extends BasePopup {
       index === activeArg
         ? `${CN.fnHelpParamName} ${CN.fnHelpParamNameActive}`
         : CN.fnHelpParamName;
-    const label = paramListLabel(param, index, signature.params.length, signature.repeatLast);
+    const label = paramListLabel(
+      param,
+      index,
+      signature.params.length,
+      signature.repeatLast,
+      this.phrases,
+    );
 
     section.appendChild(createEl("span", { class: nameClass }, [label]));
 
