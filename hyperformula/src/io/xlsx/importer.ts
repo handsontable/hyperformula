@@ -13,20 +13,20 @@ import {Sheet, Sheets} from '../../Sheet'
  *
  * Pure and synchronous: byte-loading happens upstream in `loadXlsxWorkbook`.
  *
- * v1 mapping (deliberately minimal, see HF-107 task brief):
+ * Each cell maps as follows:
  * - a formula cell (`cell.formula != null`) becomes the string `'=' + formula`.
  * - `null`/`undefined` values become `null`.
- * - a `Date` value passes through as-is (best-effort).
- * - `number` | `string` | `boolean` pass through as-is.
- * - any other (object-valued: error / rich text / hyperlink) cell falls back
- *   to `cell.text` so we never emit the raw object.
+ * - a `Date` value passes through as-is.
+ * - `number` and `boolean` values pass through as-is.
+ * - a text value stays text: one that starts with `=` or `'` gets a leading `'`,
+ *   which HyperFormula reads as "the rest is text", so it is not parsed as a formula.
+ * - an error value becomes its error literal, such as `#DIV/0!`.
+ * - any other object value (rich text, hyperlink) becomes its displayed text.
  *
  * Excel's `_xlfn.` / `_xlws.` function-name prefixes are stripped from
  * formula strings (see {@link stripFunctionPrefixes}); shared formulas and
  * cross-sheet references already come back correctly rebased/verbatim from
  * ExcelJS, so no further formula rewriting is needed.
- *
- * A full Excel/HF error-token table is out of scope here (deferred).
  */
 export function workbookToSheets(workbook: Workbook): Sheets {
   const sheets: Sheets = {}
@@ -76,15 +76,14 @@ function worksheetToSheet(worksheet: Worksheet): Sheet {
  * fail to recognize the function name (`_xlfn.XLOOKUP` → `#NAME?`) even when
  * it natively supports the function.
  *
- * NOTE: this operates on the whole formula string, so a matching substring
- * inside a string literal (e.g. `="_xlfn."`) would also be rewritten. That
- * edge case is not handled here — accepted best-effort limitation for v1.
+ * This operates on the whole formula string, so a matching substring inside a
+ * string literal (e.g. `="_xlfn."`) is also rewritten.
  */
 function stripFunctionPrefixes(formula: string): string {
   return formula.replace(/_xlfn\.|_xlws\./g, '')
 }
 
-/** Maps a single ExcelJS cell to a HyperFormula {@link RawCellContent} per the v1 mapping rule. */
+/** Maps a single ExcelJS cell to a HyperFormula {@link RawCellContent}. */
 function cellToRawContent(cell: Cell): RawCellContent {
   if (cell.formula != null) {
     return '=' + stripFunctionPrefixes(cell.formula)
@@ -96,13 +95,27 @@ function cellToRawContent(cell: Cell): RawCellContent {
     return null
   }
 
-  if (value instanceof Date) {
+  if (value instanceof Date || typeof value === 'number' || typeof value === 'boolean') {
     return value
   }
 
-  if (typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean') {
-    return value
+  if (typeof value === 'string') {
+    return asText(value)
   }
 
-  return cell.text ?? null
+  if (typeof value === 'object' && 'error' in value) {
+    return value.error
+  }
+
+  return asText(cell.text ?? '')
+}
+
+/**
+ * Returns raw cell content that HyperFormula reads as the given text.
+ *
+ * HyperFormula parses a string that starts with `=` as a formula and drops a leading `'`, so a text
+ * that starts with either character is prefixed with `'`.
+ */
+function asText(text: string): RawCellContent {
+  return text.startsWith('=') || text.startsWith("'") ? `'${text}` : text
 }
