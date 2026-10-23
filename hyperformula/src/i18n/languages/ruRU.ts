@@ -163,7 +163,7 @@ const dictionary: RawTranslationPackage = {
     MDETERM: 'МОПРЕД',
     MINVERSE: 'МОБР',
     MMULT: 'МУМНОЖ',
-    MUNIT: 'ЕДМАТРИЦА',
+    MUNIT: 'МЕДИН',
     MOD: 'ОСТАТ',
     MONTH: 'МЕСЯЦ',
     N: 'Ч',

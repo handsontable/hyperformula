@@ -163,7 +163,7 @@ export const dictionary: RawTranslationPackage = {
     MDETERM: 'MDETERM',
     MINVERSE: 'MINVERSA',
     MMULT: 'MMULT',
-    MUNIT: 'MUNIT',
+    MUNIT: 'M.UNIDAD',
     MOD: 'RESIDUO',
     MONTH: 'MES',
     N: 'N',
