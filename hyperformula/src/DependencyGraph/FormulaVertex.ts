@@ -155,7 +155,7 @@ export class ArrayFormulaVertex extends FormulaVertex {
     try {
       return this.array.get(col, row)
     } catch (e) {
-      return new CellError(ErrorType.REF)
+      return new CellError(ErrorType.REF, ErrorMessage.OutsideArrayResult)
     }
   }
 

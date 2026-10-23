@@ -6,10 +6,17 @@
 import {SimpleCellAddress} from './Cell'
 import {CombinedTransformer} from './dependencyTransformers/CombinedTransformer'
 import {FormulaTransformer} from './dependencyTransformers/Transformer'
-import {Ast, ParserWithCaching} from './parser'
+import {Maybe} from './Maybe'
+import {Ast, AstNodeType, ParserWithCaching} from './parser'
 import {StatType} from './statistics'
 import {Statistics} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
+
+/**
+ * Stand-in node for an address-only transformation. Every transformer leaves an EMPTY node
+ * untouched, so only the address it returns alongside it carries information.
+ */
+const ADDRESS_ONLY_NODE: Ast = {type: AstNodeType.EMPTY}
 
 /**
  * Manages lazy application of formula AST transformations.
@@ -104,6 +111,39 @@ export class LazilyTransformingAstService {
 
     this.stats.end(StatType.TRANSFORM_ASTS_POSTPONED)
     return [cachedAst, address, currentVersion]
+  }
+
+  /**
+   * Replays stored transformations over a bare address that carries no formula.
+   *
+   * `applyTransformations` above does the same walk for a formula vertex, which owns an AST and so
+   * also records undo data as it goes. A value has no AST to record, and the vertex that owns the
+   * formula still writes its own undo entry when it catches up, so this walk deliberately records
+   * nothing. It reuses each transformation's own `transformSingleAst` with an empty node rather
+   * than reaching for `fixNodeAddress`, because two transformers do more than shift coordinates:
+   * `MoveCellsTransformer` only moves an address that lies inside the range being moved, and that
+   * decision lives in `transformSingleAst`, not in `fixNodeAddress`.
+   *
+   * Returns `undefined` when the stamp predates the last compaction. Compaction brings every
+   * vertex up to date before it discards transformations, but a `CellError` cached inside a
+   * vertex's value is not a vertex and is never brought up to date, so its version can fall behind
+   * `versionOffset`. The transformations needed to move the address are gone by then, and naming
+   * some other cell is worse than naming none.
+   *
+   * @param {SimpleCellAddress} address - the address as it was at `version`
+   * @param {number} version - the version the address was current at
+   */
+  public applyTransformationsToAddress(address: SimpleCellAddress, version: number): Maybe<SimpleCellAddress> {
+    if (version < this.versionOffset) {
+      return undefined
+    }
+
+    let transformed = address
+    const currentVersion = this.version()
+    for (let v = version; v < currentVersion; v++) {
+      transformed = this.transformations[v - this.versionOffset].transformSingleAst(ADDRESS_ONLY_NODE, transformed)[1]
+    }
+    return transformed
   }
 
   public* getTransformationsFrom(version: number, filter?: (transformation: FormulaTransformer) => boolean): IterableIterator<FormulaTransformer> {

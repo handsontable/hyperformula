@@ -213,11 +213,11 @@ export class FormulaParser extends EmbeddedActionsParser {
     const secondAddress = this.ACTION(() => columnAddressFromString(endImage, this.formulaAddress, this.resolveSheetReference))
 
     if (firstAddress === undefined || secondAddress === undefined) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference))
     }
 
     if (firstAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns) || secondAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns)) {
-      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
+      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME, ErrorMessage.ReferenceExceedsSheetSize), range.leadingWhitespace)
     }
 
     if (firstAddress.sheet === undefined && secondAddress.sheet !== undefined) {
@@ -239,11 +239,11 @@ export class FormulaParser extends EmbeddedActionsParser {
     const secondAddress = this.ACTION(() => rowAddressFromString(endImage, this.formulaAddress, this.resolveSheetReference))
 
     if (firstAddress === undefined || secondAddress === undefined) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference))
     }
 
     if (firstAddress.exceedsSheetSizeLimits(this.lexerConfig.maxRows) || secondAddress.exceedsSheetSizeLimits(this.lexerConfig.maxRows)) {
-      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
+      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME, ErrorMessage.ReferenceExceedsSheetSize), range.leadingWhitespace)
     }
 
     if (firstAddress.sheet === undefined && secondAddress.sheet !== undefined) {
@@ -265,9 +265,9 @@ export class FormulaParser extends EmbeddedActionsParser {
     })
 
     if (address === undefined) {
-      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF), cell.leadingWhitespace)
+      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference), cell.leadingWhitespace)
     } else if (address.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
-      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.NAME), cell.leadingWhitespace)
+      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.NAME, ErrorMessage.ReferenceExceedsSheetSize), cell.leadingWhitespace)
     } else {
       return buildCellReferenceAst(address, cell.leadingWhitespace)
     }
@@ -288,12 +288,12 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     if (startAddress === undefined || endAddress === undefined) {
       return this.ACTION(() => {
-        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.REF), start.leadingWhitespace)
+        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference), start.leadingWhitespace)
       })
     } else if (startAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)
       || endAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
       return this.ACTION(() => {
-        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.NAME), start.leadingWhitespace)
+        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.NAME, ErrorMessage.ReferenceExceedsSheetSize), start.leadingWhitespace)
       })
     }
 
@@ -319,7 +319,7 @@ export class FormulaParser extends EmbeddedActionsParser {
             return cellAddressFromString(start.image, this.formulaAddress, this.resolveSheetReference)
           })
           if (startAddress === undefined) {
-            return buildCellErrorAst(new CellError(ErrorType.REF))
+            return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference))
           }
           if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
             return this.buildCellRange(startAddress, offsetProcedure.reference, start.leadingWhitespace?.image)
@@ -352,7 +352,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     if (endAddress === undefined) {
       return this.ACTION(() => {
-        return buildCellErrorAst(new CellError(ErrorType.REF))
+        return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.UnresolvedReference))
       })
     }
 
@@ -552,7 +552,7 @@ export class FormulaParser extends EmbeddedActionsParser {
           const errString = token.image.toUpperCase()
           const errorType = this.lexerConfig.errorMapping[errString]
           if (errorType) {
-            return buildCellErrorAst(new CellError(errorType), token.leadingWhitespace)
+            return buildCellErrorAst(new CellError(errorType, ErrorMessage.ErrorLiteral), token.leadingWhitespace)
           } else {
             return this.parsingError(ParsingErrorType.ParserError, 'Unknown error literal')
           }
