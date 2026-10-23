@@ -10,10 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Added a message after `npm i hyperformula` that points AI assistants to the SKILLS file. The message needs `--foreground-scripts` to be visible in npm, and pnpm 10 needs the `postinstall` script to be approved first. [#1829](https://github.com/handsontable/hyperformula/pull/1829)
+- Added the `emptyAsAbsent` argument-validation option for custom functions, which passes an empty argument slot to the function as `undefined` instead of the zero value for its type. [#1739](https://github.com/handsontable/hyperformula/pull/1739)
 
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
+- Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is left out or is an empty argument slot (`=ADDRESS(2,3,1,FALSE(),)`), while an explicit `""` keeps it, as in Excel. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
 
 ## [3.5.0] - 2026-10-09
 
