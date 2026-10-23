@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
-- Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is left out or is an empty argument slot (`=ADDRESS(2,3,1,FALSE(),)`), while an explicit `""` keeps it, as in Excel. [#1739](https://github.com/handsontable/hyperformula/pull/1739)
+- Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is left out or is an empty argument slot (`=ADDRESS(2,3,1,FALSE(),)`), while an explicit `""` keeps it, as in Excel. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
 
 ## [3.5.0] - 2026-10-09
 
