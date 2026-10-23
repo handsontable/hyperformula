@@ -14,8 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- Changed the cell errors thrown by the formula engine to always carry a message describing their cause. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
-- Changed the cell errors produced outside the formula interpreter, such as invalidated references, circular references and error values typed into a formula, to also carry a message describing their cause. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Changed the cell errors the engine produces, including invalidated references, circular references and error values typed into a formula, to carry a message describing their cause. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ### Fixed
 
