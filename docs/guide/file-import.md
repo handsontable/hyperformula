@@ -27,7 +27,7 @@ To import XLSX files, use a third-party [XLSX parser](https://www.npmjs.com/sear
 
 Excel stores some function names with an internal prefix. It marks every function added after Excel 2007 this way, so a file can contain `_xlfn.IFS(...)` where the user typed `IFS(...)`. The prefixes are an artifact of how Excel saves the file, not part of the function name.
 
-Whether the prefixes reach your code depends on the parser you use: some pass them through, others remove only some of them.
+Whether the prefixes reach your code depends on the parser you use: ExcelJS, for example, passes them through.
 
 HyperFormula ignores these prefixes, so you can pass the formula straight to the engine:
 
