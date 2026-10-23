@@ -56,6 +56,10 @@ import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/Funct
 import {FormatInfo} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
+import {sheetsToXlsx} from './io/xlsx/exporter'
+import {formulaSyntaxOf, hasXlsxFormulaSyntax, XLSX_FORMULA_SYNTAX} from './io/xlsx/formulaSyntax'
+import {loadXlsxWorkbook} from './io/xlsx/loadWorkbook'
+import {workbookToSheets} from './io/xlsx/importer'
 import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
@@ -330,6 +334,63 @@ export class HyperFormula implements TypedEmitter {
    */
   public static buildFromSheets(sheets: Sheets, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
     return this.buildFromEngineState(BuildEngineFactory.buildFromSheets(sheets, configInput, namedExpressions))
+  }
+
+  /**
+   * Builds the engine from the raw bytes of an .xlsx file. The file is parsed and its
+   * worksheets are converted into sheets, keyed by worksheet name, exactly as if they had
+   * been passed to [[buildFromSheets]].
+   * Can be configured with the optional second parameter that represents a [[ConfigParams]].
+   * If not specified the engine will be built with the default configuration.
+   *
+   * Only cell values and formulas are read: no named expressions, styles or number formats.
+   * A text cell stays text even when it starts with `=`.
+   *
+   * Formulas in an .xlsx file always use English function names, `,` between arguments and
+   * `.` as the decimal separator. When the configuration sets another `language`,
+   * `functionArgSeparator`, `decimalSeparator`, `thousandSeparator`, `arrayColumnSeparator` or
+   * `arrayRowSeparator`, the formulas are converted to it, which builds the engine twice.
+   *
+   * @param {ArrayBuffer | Uint8Array} data - the raw bytes of an .xlsx file
+   * @param {Partial<ConfigParams>} configInput - engine configuration
+   *
+   * @returns {Promise<HyperFormula>} a promise that resolves to the built engine
+   *
+   * @throws [[UnsupportedFileError]] when `data` cannot be read as a valid .xlsx workbook
+   * (e.g. it is empty or not a well-formed .xlsx file)
+   * @throws [[SheetSizeLimitExceededError]] when a worksheet size exceeds the limits
+   *
+   * @example
+   * ```js
+   * // Node.js: read the file from disk first
+   * const fs = require('fs/promises');
+   * const buffer = await fs.readFile('example.xlsx');
+   * const hfInstance = await HyperFormula.buildFromFile(buffer, { licenseKey: 'gpl-v3' });
+   * ```
+   *
+   * @example
+   * ```js
+   * // Browser: read bytes from a File (e.g. an <input type="file"> element)
+   * const arrayBuffer = await file.arrayBuffer();
+   * const hfInstance = await HyperFormula.buildFromFile(arrayBuffer, { licenseKey: 'gpl-v3' });
+   * ```
+   *
+   * @category Factories
+   */
+  public static async buildFromFile(data: ArrayBuffer | Uint8Array, configInput: Partial<ConfigParams> = {}): Promise<HyperFormula> {
+    const workbook = await loadXlsxWorkbook(data)
+    const sheets = workbookToSheets(workbook)
+
+    if (hasXlsxFormulaSyntax(configInput)) {
+      return HyperFormula.buildFromSheets(sheets, configInput)
+    }
+
+    const engineInFileSyntax = HyperFormula.buildFromSheets(sheets, {...configInput, ...XLSX_FORMULA_SYNTAX})
+    const configuredSyntax = engineInFileSyntax._config.mergeConfig(formulaSyntaxOf(configInput), false)
+    const sheetsInConfiguredSyntax = engineInFileSyntax._serialization.withNewConfig(configuredSyntax, engineInFileSyntax._namedExpressions).getAllSheetsSerialized()
+    engineInFileSyntax.destroy()
+
+    return HyperFormula.buildFromSheets(sheetsInConfiguredSyntax, configInput)
   }
 
   /**
@@ -1183,6 +1244,38 @@ export class HyperFormula implements TypedEmitter {
   public getAllSheetsSerialized(): Record<string, RawCellContent[][]> {
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getAllSheetsSerialized()
+  }
+
+  /**
+   * Exports the current engine state to `.xlsx` file bytes.
+   *
+   * Only cell values and formulas are written: no named expressions, styles or number formats.
+   * A cell that holds a value is written as its value, so a number entered as a string, such as
+   * `'1'`, is written as a number. Formulas are written in the syntax of an .xlsx file (English
+   * function names, `,` between arguments, `.` as the decimal separator), whatever the engine's
+   * language and separators are.
+   *
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @returns {Promise<Uint8Array>} a promise that resolves to the raw bytes of an .xlsx file
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2', '=A1+10'],
+   * ]);
+   *
+   * const bytes = await hfInstance.toFile();
+   * ```
+   *
+   * @category Sheets
+   */
+  public async toFile(): Promise<Uint8Array> {
+    const values = this.getAllSheetsValues()
+    const fileSyntax = this._config.mergeConfig(XLSX_FORMULA_SYNTAX, false)
+    const formulas = this._serialization.withNewConfig(fileSyntax, this._namedExpressions).getAllSheetsSerialized()
+
+    return sheetsToXlsx(formulas, values)
   }
 
   /**

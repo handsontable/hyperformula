@@ -55,6 +55,9 @@ have  dependencies, they need to be added manually
 * `./dist/hyperformula.full.min.js` - a minified version with
 dependencies
 
+None of them includes ExcelJS, which the `buildFromFile` and `toFile` methods
+need: load it separately, as the global `ExcelJS`.
+
 ## Build the project
 
 To build the project you can use the following commands:

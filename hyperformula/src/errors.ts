@@ -396,6 +396,18 @@ export class AliasAlreadyExisting extends Error {
 }
 
 /**
+ * Error thrown when a file cannot be read as a supported spreadsheet format,
+ * e.g. when its byte buffer is empty or cannot be parsed as an .xlsx workbook.
+ */
+export class UnsupportedFileError extends Error {
+  constructor(public readonly reason: 'empty' | 'unparseable', detail?: string) {
+    super(detail === undefined
+      ? `Unsupported or unreadable file (${reason})`
+      : `Unsupported or unreadable file (${reason}): ${detail}`)
+  }
+}
+
+/**
  * Error thrown when a public API method is called for a {@link FeatureId} that the current
  * license entitlement does not grant, or when the license key itself blocks every gated feature
  * (a missing or invalid key, an expired classic key, or a trial past its grace period); the

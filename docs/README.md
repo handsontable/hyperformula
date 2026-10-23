@@ -122,7 +122,7 @@ docs                            # All documentation files
 │   ├── subtheme                # Subtheme files
 │   ├── templates               # HTML templates
 │   ├── theme                   # Local theme extending the default theme (see below)
-│   ├── config.js               # VuePress configuration
+│   ├── config.js               # VuePress configuration; keeps exceljs external in the server-side bundle
 │   ├── enhanceApp.js           # VuePress app-level enhancements
 │   └── highlight.js            # Code highlight configuration
 ├── api                         # The API reference files, generated automatically from JsDoc. Do not edit!
