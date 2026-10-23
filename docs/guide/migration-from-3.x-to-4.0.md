@@ -86,8 +86,8 @@ The most common real shape of this bug was never a literal `""` — it was an ex
 
 | Formula | Excel | 3.x | 4.0 |
 | --- | --- | --- | --- |
-| `=SUM(IF(TRUE,"",1))` | `#VALUE!` | `0` | `#VALUE!` |
-| `=COUNT(IF(TRUE,"",1))` | `0` | `1` | `0` |
+| `=SUM(IF(TRUE(),"",1))` | `#VALUE!` | `0` | `#VALUE!` |
+| `=COUNT(IF(TRUE(),"",1))` | `0` | `1` | `0` |
 | `=SUM(LEFT("abc",0))` | `#VALUE!` | `0` | `#VALUE!` |
 | `=LEFT("abc",0)+1` | `#VALUE!` | `1` | `#VALUE!` |
 
