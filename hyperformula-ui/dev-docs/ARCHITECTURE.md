@@ -60,6 +60,12 @@ reparents between two locations via `FormulaEditor.attachTo(mount)`:
   address box), paired with `scrollCellIntoView`, and by `FormulaBuilder` after an
   outside-click commit (see the outside-click commit policy below). Addresses are HF-space;
   the external Handsontable plugin maps them back to visual indices before selecting.
+  Both `setActiveCell` and `setSelection` return `boolean | void`: `false` means the host could
+  not select the target (a filtered-out row, a hidden column), and the address box then rejects
+  the typed address — `FormulaBar` returns `"unavailable"` to it, so it reverts, announces
+  `Phrases.cellUnavailable` ("Cannot select B7") rather than `invalidCellAddress`, and skips
+  `scrollCellIntoView`. `void` counts as success, so adapters written before the result keep
+  working.
 - `commit(value, direction?)` — controller calls to commit the current value; the optional
   `Direction` drives the host's post-commit selection move (Enter → down, Tab → right, …).
   `commit(value, direction)` must apply the value to the engine synchronously before
@@ -67,6 +73,12 @@ reparents between two locations via `FormulaEditor.attachTo(mount)`:
   inside the commit call. Applies equally to a host-side commit bridge (such as the plain-table
   example's `PlainTableHost.commit`) and any consumer-supplied `onCommit`. A deferred write degrades announcements to silence
   (no crash, no wrong message).
+- `commitFill?(value)` — optional; Ctrl/Cmd+Enter calls it (through `FormulaBuilder`'s
+  commit wrapper, so commit-error announcements work the same) to write `value` into every
+  selected cell. A builder `onCommitFill` option takes precedence, as `onCommit` does over
+  `commit`. With neither, the `commitFill` command returns `false` and `ShortcutManager` falls
+  through to the next Ctrl/Cmd+Enter binding, `insertNewline`; Alt+Enter always inserts a
+  newline.
 - `cancel()` — controller calls to cancel the current edit.
 - `setInlineEditorVisible(visible)` — hides or shows the cell overlay mount while the editor
   is hosted in the bar (the plain-table and TanStack example adapters toggle the container's CSS display;
@@ -78,7 +90,11 @@ calls `adapter.setActiveCell` + `scrollCellIntoView` for a single cell or `adapt
 for an `A1:B5` range, and mirrors the current `GridSelection` via `setSelection()` — and `FormulaBarCell` (`formula-cell` scope) — the fx-icon +
 formula area, owning both the idle read-only colored-formula view (its own `VisualOverlay`
 seeded with `FormulaEditor.knownFunctionNames`, rendered via `renderValue()` through
-`nToComments`) and the `overlayMount` the shared editor `attachTo`'s while bar-hosted.
+`nToComments`) and the `overlayMount` the shared editor `attachTo`'s while bar-hosted. The idle
+view's tokens go through the same `annotateNamedExprs` step as the editor's kernel
+(`FormulaBarCellOptions.tokenPostProcess`), so a named expression takes a reference color slot
+in both and every later reference keeps the same color; `FormulaBar` re-renders the idle view
+through `FormulaBarCell.refresh()` when `EngineBridge.onNamedExpressionsChange` fires (on HyperFormula's named-expression, `valuesUpdated` and `sheetRemoved` events — see SPEC.md §10 for why the named-expression events alone are not enough).
 
 While the editor is inline, `FormulaBarCell`'s idle view shows a live colored mirror of the
 current text. Because the wrap styles are shared, a bar-hosted editor soft-wraps at the bar
@@ -154,6 +170,21 @@ the editor to the builder's detached mount plus `closeEditor()`. The close half 
 adapters may remove the inline mount on close (the TanStack example adapter deletes its overlay);
 without the reattach the live editor DOM would be torn out with the mount. With a bar
 attached, `FormulaBar` owns the same reattachment instead.
+
+### Phrases
+
+No user-visible or spoken English is hard-coded in a component. Every accessible name, hint
+and announcement is a member of `Phrases` (`ui/types.ts`), with English defaults in
+`DEFAULT_PHRASES` (`ui/phrases.ts`); phrases that take values (a function name, a cell address,
+an error count) are functions, so a translation can reorder words and handle plurals.
+`FormulaEditor` resolves the `phrases` option once and exposes the result as
+`FormulaEditor.phrases`; the popups receive it through `BasePopupOptions.phrases` (read in
+`createRoot`, which runs inside the base constructor), and `FormulaBar` and `FormulaBuilder` read
+it from the editor. A new string goes into `Phrases`, not into the component. The one exception is a key
+name shown as a key chip (`Tab`, `↑`, `↓`): it names the key on the keyboard, as Excel and Google Sheets
+show it in every language. Phrases that end up inside brackets or after a key chip carry no brackets
+or surrounding spaces; the component adds them, so a host dictionary that trims whitespace or treats
+`[name]` as a variable (Handsontable's) can hold them.
 
 ## Component map
 
@@ -481,6 +512,37 @@ All popup-style overlays share a common base class `BasePopup`
   (`popupCtx.portal`) is the shared DOM parent all three popups append to. All three popups
   take a plain `container: HTMLElement`, not the full `PopupContext` — `FormulaBuilder` passes
   `popupCtx.portal` to each; `popupCtx.destroy()` runs in `FormulaBuilder.destroy()`.
+- **Document and portal parent:** `FormulaBuilder`'s `portalParent` option (default
+  `rootDocument.body`) is where the portal and the `LiveRegion` go; both are created in the
+  parent's own document. A host inside a shadow root passes that shadow root, so the
+  textarea's `aria-controls`/`aria-activedescendant` and a cell's `aria-errormessage` resolve
+  in one tree, and an axe scan of that root sees the popups. `rootDocument` (default the portal
+  parent's document, else the global `document`, so passing only an iframe's `body` is enough) is
+  the document selector options are resolved against, the detached mount is created in, and the
+  stylesheet goes into. Every other element (editor, popups, icons, highlights) is created in the
+  global `document` and adopted when it is appended. Styles are injected per root
+  (`createStyleInjector(...).inject(root)`, ref-counted per document or shadow root): into
+  `rootDocument`, plus into the portal parent's shadow root when it is in one. Container selectors
+  (`formulaBarContainer`, `popups.*.container`, the `attach*` methods) are looked up in that shadow
+  root first, then in `rootDocument`. No other shadow root receives the styles, so a popup docked
+  in a third tree renders unstyled; hosts dock popups in the grid's own tree. Focus checks
+  never read `document.activeElement`: they call `deepActiveElement(element.ownerDocument)`
+  (`ui/dom.ts`), which follows open shadow roots down to the focused element and reads the
+  document the element is actually in. Window and document listeners follow the element too:
+  `viewOf(node)` gives the window of the document a node is in, and the error popup, popup
+  viewport sizes, `PopupController`'s fallback clip, and `DomRangePicker` read it instead of the
+  global `window`/`document`. The editor's ambient scroll/resize listeners (`ScrollAnchor`,
+  `EditorSizeController`) live in an `editor-view` scope that `FormulaEditor.attachTo` rebinds when
+  the editor moves into another document or shadow root (`listenToView`). `scroll` is not composed,
+  so a scroller inside a shadow root never reaches a window listener: the editor's controllers, the
+  error popup and `DomRangePicker` also listen for scroll (capture) on the shadow root their element
+  is in. Node checks never use `instanceof`:
+  an element from an iframe belongs to another realm and fails `instanceof Element`, so
+  `isElement`/`isHTMLElement`/`isNode` (`ui/dom.ts`) test `nodeType`. `DomRangePicker` reads a
+  document-level event's cell from `eventOrigin(event)` (the first node of `composedPath()`),
+  because a shadow root retargets `event.target` to its host, also listens for scroll on its
+  shadow root (scroll is not composed), and hit-tests through the shadow root's own
+  `elementFromPoint` (`elementAt`).
 - `FormulaBar` constructor signature:
   `(container: HTMLElement, options: { adapter: IGridAdapter; editor: FormulaEditor; knownFunctions: ReadonlySet<string>; className?: string })`.
   It receives the pre-built `FormulaEditor` from `FormulaBuilder` — it does not construct
@@ -604,9 +666,12 @@ All popup-style overlays share a common base class `BasePopup`
   string` (selector via `document.querySelector`, throwing on a miss) plus
   `popups.suggestions.container`/`popups.fnHelp.container` constructor sugar
   (`PopupHostOption`) that delegates to attach after construction — mirroring
-  `formulaBarContainer`/`attachFormulaBar`. All three constructor selectors resolve
-  first thing in the constructor, before styles/portal/editor allocate, so a bad
-  selector throws without leaking resources.
+  `formulaBarContainer`/`attachFormulaBar`. The constructor never throws on a selector:
+  one that matches nothing, or is not valid CSS, logs a `console.warn` once per message and falls back to the
+  default placement (a floating popup, no bar), because a host that rebuilds the builder
+  from an event handler may pass a container its framework unmounted in between, and a
+  throw there would leave the host without a builder. The `attach*` methods still throw on
+  a miss: the host calls them directly and can handle the error.
 
 ### BasePopup lifecycle invariants
 
@@ -699,7 +764,7 @@ inside their host-specific renderers, because each host renders cells differentl
 The error tooltip itself is Esc-dismissible: `ErrorPopup` owns a window-level `keydown`
 (capture) listener, registered while attached; it consumes Escape only while the tooltip is
 visible AND no builder surface holds focus (`builderSurfaceHasFocus()` —
-`document.activeElement` inside a `.hfe-editor`, `.hfe-fn-help`, or `.hfe-formula-bar` root;
+the deep active element inside a `.hfe-editor`, `.hfe-fn-help`, or `.hfe-formula-bar` root;
 the fn-help dialog's own Escape handler and the address box's Escape-revert must win the
 same way the editor's ladder does), acted on in `attach()`'s
 scope alongside its existing scroll listener — no adapter or
@@ -727,6 +792,11 @@ virtualized host (e.g. Handsontable) that recreates the cell's DOM element on sc
 re-render clears that identity, so a re-render after Esc-dismiss can make the tooltip reopen
 even though pointer/focus never logically left the cell. Accepted as a documented limitation;
 re-keying by logical cell would need a host render hook — future work if it bites.
+
+`markCell` does not write `aria-description`: the host owns the cell's accessible
+description and its accessibility settings, so it adds the error message itself (the external
+Handsontable plugin writes it from `data-hfe-error`, only under its `ariaTags` setting, and keeps
+an application's own description). A package-side write would override both.
 
 While a hovered/focused error cell surfaces its message via `ErrorPopup` and
 `aria-invalid`/`aria-errormessage` (the popup root carries a generated id, associated onto the

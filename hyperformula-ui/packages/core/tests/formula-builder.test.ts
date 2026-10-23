@@ -5,6 +5,7 @@ import { FormulaBuilder } from "../src/formulaBuilder";
 import { FormulaEditor } from "../src/formulaEditor/formulaEditor";
 import { CN } from "../src/theme/classNames";
 import { REF_PALETTE } from "../src/theme/refPalette";
+import { DEFAULT_PHRASES } from "../src/ui/phrases";
 import { press, sel, TestGridAdapter } from "./helpers";
 
 class FakeCommitEngine implements HyperFormulaLike {
@@ -20,6 +21,7 @@ class FakeCommitEngine implements HyperFormulaLike {
     event: "namedExpressionAdded" | "namedExpressionRemoved",
     listener: (name: string) => void,
   ): void;
+  on(event: "sheetRemoved", listener: (sheetName: string) => void): void;
   on(event: string, listener: (...args: never[]) => void): void {
     if (event === "valuesUpdated") {
       this.listeners.push(listener as (changes: unknown[]) => void);
@@ -31,6 +33,7 @@ class FakeCommitEngine implements HyperFormulaLike {
     event: "namedExpressionAdded" | "namedExpressionRemoved",
     listener: (name: string) => void,
   ): void;
+  off(event: "sheetRemoved", listener: (sheetName: string) => void): void;
   off(event: string, listener: (...args: never[]) => void): void {
     if (event === "valuesUpdated") {
       this.listeners = this.listeners.filter((registered) => registered !== listener);
@@ -728,25 +731,49 @@ describe("FormulaBuilder", () => {
       builder = new FormulaBuilder({ rootEl });
     });
 
-    it("constructor throws on a missing popup host before allocating any resources", () => {
-      const portalCount = document.querySelectorAll(sel(CN.popupPortal)).length;
+    it("constructor falls back to the default placement when a selector matches nothing", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const scoped = new FormulaBuilder({
+        rootEl,
+        popups: { suggestions: { container: "#missing" }, fnHelp: { container: "#missing" } },
+        formulaBarContainer: "#missing",
+      });
 
-      expect(
-        () => new FormulaBuilder({ rootEl, popups: { suggestions: { container: "#missing" } } }),
-      ).toThrow('FormulaBuilder: suggestions host "#missing" not found');
-      expect(
-        () => new FormulaBuilder({ rootEl, popups: { fnHelp: { container: "#missing" } } }),
-      ).toThrow('FormulaBuilder: fnHelp host "#missing" not found');
-      expect(() => new FormulaBuilder({ rootEl, formulaBarContainer: "#missing" })).toThrow(
-        'FormulaBuilder: formulaBarContainer "#missing" not found',
+      expect(scoped.hasFormulaBar).toBe(false);
+      expect(warn.mock.calls.map(([message]) => message)).toEqual([
+        'FormulaBuilder: suggestions host "#missing" not found; using the default placement',
+        'FormulaBuilder: fnHelp host "#missing" not found; using the default placement',
+        'FormulaBuilder: formulaBarContainer "#missing" not found; using the default placement',
+      ]);
+
+      scoped.destroy();
+      warn.mockRestore();
+    });
+
+    it("constructor treats a selector that is not valid CSS as missing", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const scoped = new FormulaBuilder({
+        rootEl,
+        popups: { suggestions: { container: "#[not valid" } },
+      });
+
+      expect(warn).toHaveBeenCalledWith(
+        'FormulaBuilder: suggestions host "#[not valid" not found; using the default placement',
       );
 
-      expect(document.querySelectorAll(sel(CN.popupPortal)).length).toBe(portalCount);
+      scoped.destroy();
+      warn.mockRestore();
+    });
 
-      builder.destroy();
+    it("constructor warns only once per missing selector", () => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const options = { rootEl, popups: { suggestions: { container: "#gone-once" } } };
 
-      expect(document.head.querySelector("style[data-hfe-styles]")).toBeNull();
-      builder = new FormulaBuilder({ rootEl });
+      new FormulaBuilder(options).destroy();
+      new FormulaBuilder(options).destroy();
+
+      expect(warn).toHaveBeenCalledOnce();
+      warn.mockRestore();
     });
 
     it("popups.*.container constructor options delegate to attach", () => {
@@ -819,6 +846,22 @@ describe("FormulaBuilder", () => {
       adapter.fireOutsideCellClick({ sheet: "", row: 4, col: 2 });
     }
 
+    it("announces a commit error in the phrases the host passed", () => {
+      scoped = new FormulaBuilder({
+        rootEl: host,
+        adapter,
+        hyperformula: engine as never,
+        onCommit: () => {
+          engine.setCellValue(0, 0, { type: "NA", value: "#N/A", message: "Wert fehlt" });
+        },
+        phrases: { cellError: (cellAddress, message) => `Fehler in ${cellAddress}: ${message}.` },
+      });
+      scoped.openEditor(mount, "=SUM(");
+      press(mount, "Enter");
+
+      expect(liveRegionText()).toBe("Fehler in A1: #N/A — Wert fehlt.");
+    });
+
     it("announces the committed cell's error through the live region", () => {
       commitViaEditor("=SUM(", () => {
         engine.setCellValue(0, 0, { type: "NA", value: "#N/A", message: "value not found" });
@@ -888,5 +931,302 @@ describe("FormulaBuilder", () => {
 
       expect(liveRegionText()).toBe("Error in A1: #N/A — value not found.");
     });
+  });
+});
+
+class DestroyedEngine implements HyperFormulaLike {
+  private destroyed = false;
+
+  on(): void {}
+
+  off(): void {
+    if (this.destroyed) {
+      throw new TypeError("Cannot read properties of undefined (reading 'off')");
+    }
+  }
+
+  destroy(): void {
+    this.destroyed = true;
+  }
+}
+
+class FailingOverlayAdapter extends NullAdapter {
+  override setOverlayClassName(className: string | null): void {
+    if (className === null) {
+      throw new Error("overlay already gone");
+    }
+  }
+}
+
+describe("FormulaBuilder teardown", () => {
+  afterEach(() => {
+    document.body.replaceChildren();
+  });
+
+  function leftovers() {
+    return {
+      portal: document.querySelector(sel(CN.popupPortal)),
+      liveRegion: document.querySelector(sel(CN.liveRegion)),
+      styles: document.head.querySelector("style[data-hfe-styles]"),
+    };
+  }
+
+  it("does not throw when the host destroyed the engine first", () => {
+    const engine = new DestroyedEngine();
+    const builder = new FormulaBuilder({ rootEl: document.body, hyperformula: engine });
+
+    engine.destroy();
+
+    expect(() => builder.destroy()).not.toThrow();
+    expect(leftovers()).toEqual({ portal: null, liveRegion: null, styles: null });
+  });
+
+  it("finishes every teardown step when one throws, then rethrows the error", () => {
+    const builder = new FormulaBuilder({
+      rootEl: document.body,
+      adapter: new FailingOverlayAdapter(),
+      className: "host-theme",
+    });
+
+    expect(() => builder.destroy()).toThrow("overlay already gone");
+    expect(leftovers()).toEqual({ portal: null, liveRegion: null, styles: null });
+  });
+});
+
+class FillAdapter extends NullAdapter {
+  readonly fills: string[] = [];
+
+  commitFill(value: string): void {
+    this.fills.push(value);
+  }
+}
+
+describe("FormulaBuilder fill commit", () => {
+  afterEach(() => {
+    document.body.replaceChildren();
+  });
+
+  function pressCtrlEnter(mount: HTMLElement): void {
+    press(mount, "Enter", { ctrlKey: true });
+  }
+
+  it("commits Ctrl+Enter to every selected cell through the adapter", () => {
+    const adapter = new FillAdapter();
+    const builder = new FormulaBuilder({ rootEl: document.body, adapter });
+    const mount = document.createElement("div");
+
+    builder.openEditor(mount, "=A1");
+    pressCtrlEnter(mount);
+
+    expect(adapter.fills).toEqual(["=A1"]);
+    builder.destroy();
+  });
+
+  it("prefers the onCommitFill option over the adapter", () => {
+    const adapter = new FillAdapter();
+    const onCommitFill = vi.fn();
+    const builder = new FormulaBuilder({ rootEl: document.body, adapter, onCommitFill });
+    const mount = document.createElement("div");
+
+    builder.openEditor(mount, "=A1");
+    pressCtrlEnter(mount);
+
+    expect(onCommitFill).toHaveBeenCalledWith("=A1");
+    expect(adapter.fills).toEqual([]);
+    builder.destroy();
+  });
+
+  it("inserts a newline on Ctrl+Enter when the adapter cannot fill", () => {
+    const builder = new FormulaBuilder({ rootEl: document.body, adapter: new NullAdapter() });
+    const mount = document.createElement("div");
+
+    builder.openEditor(mount, "=A1");
+    pressCtrlEnter(mount);
+
+    expect(builder.editor.getValue()).toBe("=A1\n");
+    builder.destroy();
+  });
+});
+
+describe("FormulaBuilder document and portal parent", () => {
+  afterEach(() => {
+    document.body.replaceChildren();
+  });
+
+  function shadowHost(): ShadowRoot {
+    const hostEl = document.createElement("div");
+
+    document.body.appendChild(hostEl);
+
+    return hostEl.attachShadow({ mode: "open" });
+  }
+
+  it("puts the popup portal, the live region and the styles into a shadow root", () => {
+    const shadow = shadowHost();
+    const rootEl = document.createElement("div");
+
+    shadow.appendChild(rootEl);
+
+    const builder = new FormulaBuilder({ rootEl, portalParent: shadow });
+
+    expect(shadow.querySelector(sel(CN.popupPortal))).not.toBeNull();
+    expect(shadow.querySelector(sel(CN.liveRegion))).not.toBeNull();
+    expect(shadow.querySelector("style[data-hfe-styles]")).not.toBeNull();
+    expect(document.body.querySelector(sel(CN.popupPortal))).toBeNull();
+    expect(document.body.querySelector(sel(CN.liveRegion))).toBeNull();
+
+    builder.destroy();
+
+    expect(shadow.querySelector(sel(CN.popupPortal))).toBeNull();
+    expect(shadow.querySelector(sel(CN.liveRegion))).toBeNull();
+    expect(shadow.querySelector("style[data-hfe-styles]")).toBeNull();
+  });
+
+  it("keeps the popups in the editor's shadow root, so their ids resolve from it", () => {
+    const shadow = shadowHost();
+    const rootEl = document.createElement("div");
+    const mount = document.createElement("div");
+
+    shadow.append(rootEl, mount);
+
+    const builder = new FormulaBuilder({ rootEl, portalParent: shadow });
+
+    builder.openEditor(mount, "=SUM(A1)");
+
+    const textareaRoot = mount.querySelector("textarea")?.getRootNode();
+    const suggestions = shadow.querySelector(sel(CN.suggestions));
+    const errorPopup = shadow.querySelector(sel(CN.errorPopup));
+
+    expect(textareaRoot).toBe(shadow);
+    expect(suggestions?.getRootNode()).toBe(shadow);
+    expect(errorPopup?.id).toBeTruthy();
+    expect(shadow.getElementById(errorPopup?.id ?? "")).toBe(errorPopup);
+
+    builder.destroy();
+  });
+
+  it("resolves container selectors inside the portal parent's shadow root", () => {
+    const shadow = shadowHost();
+    const rootEl = document.createElement("div");
+    const helpHost = document.createElement("div");
+    const suggestionsHost = document.createElement("div");
+
+    helpHost.id = "help-host";
+    suggestionsHost.id = "suggestions-host";
+    shadow.append(rootEl, helpHost, suggestionsHost);
+
+    const builder = new FormulaBuilder({
+      rootEl,
+      portalParent: shadow,
+      popups: { fnHelp: { container: "#help-host" } },
+    });
+
+    builder.attachSuggestionsHost("#suggestions-host");
+
+    expect(helpHost.querySelector(sel(CN.fnHelp))).not.toBeNull();
+    expect(suggestionsHost.querySelector(sel(CN.suggestions))).not.toBeNull();
+
+    builder.destroy();
+  });
+
+  it("takes the document from the portal parent when only the portal parent is given", () => {
+    const frameDocument = document.implementation.createHTMLDocument("grid");
+    const rootEl = frameDocument.createElement("div");
+
+    frameDocument.body.appendChild(rootEl);
+
+    const builder = new FormulaBuilder({ rootEl, portalParent: frameDocument.body });
+
+    expect(frameDocument.head.querySelector("style[data-hfe-styles]")).not.toBeNull();
+    expect(frameDocument.body.querySelector(sel(CN.popupPortal))).not.toBeNull();
+
+    builder.destroy();
+
+    expect(frameDocument.head.querySelector("style[data-hfe-styles]")).toBeNull();
+  });
+
+  it("creates its elements in, and resolves selectors against, the given document", () => {
+    const frameDocument = document.implementation.createHTMLDocument("grid");
+    const barEl = frameDocument.createElement("div");
+
+    barEl.id = "bar";
+    frameDocument.body.appendChild(barEl);
+
+    const rootEl = frameDocument.createElement("div");
+
+    frameDocument.body.appendChild(rootEl);
+
+    const builder = new FormulaBuilder({
+      rootEl,
+      rootDocument: frameDocument,
+      formulaBarContainer: "#bar",
+    });
+
+    expect(builder.hasFormulaBar).toBe(true);
+    expect(frameDocument.body.querySelector(sel(CN.popupPortal))).not.toBeNull();
+    expect(frameDocument.body.querySelector(sel(CN.liveRegion))).not.toBeNull();
+    expect(frameDocument.head.querySelector("style[data-hfe-styles]")).not.toBeNull();
+    expect(document.body.querySelector(sel(CN.popupPortal))).toBeNull();
+
+    builder.destroy();
+
+    expect(frameDocument.head.querySelector("style[data-hfe-styles]")).toBeNull();
+  });
+});
+
+describe("FormulaBuilder phrases", () => {
+  afterEach(() => {
+    document.body.replaceChildren();
+  });
+
+  function label(selector: string): string | null {
+    return document.querySelector(selector)?.getAttribute("aria-label") ?? null;
+  }
+
+  it("names the editor, the formula bar and the popups with the phrases the host passed", () => {
+    const barEl = document.createElement("div");
+
+    document.body.appendChild(barEl);
+
+    const builder = new FormulaBuilder({
+      rootEl: document.body,
+      formulaBarContainer: barEl,
+      popups: { showClose: true },
+      phrases: {
+        formulaEditor: "Formeleditor",
+        formulaInput: "Formeleingabe",
+        cellAddress: "Zellbezug",
+        functionHelp: "Funktionshilfe",
+        close: "Schließen",
+      },
+    });
+
+    expect(label("textarea")).toBe("Formeleditor");
+    expect(label(sel(CN.formulaBarIdle))).toBe("Formeleingabe");
+    expect(label(sel(CN.formulaBarAddressInput))).toBe("Zellbezug");
+    expect(label(sel(CN.fnHelp))).toBe("Funktionshilfe");
+
+    const errorCell = document.createElement("div");
+
+    builder.markCell(errorCell, { type: "REF", value: "#REF!" });
+    document.body.appendChild(errorCell);
+    errorCell.dispatchEvent(new MouseEvent("mouseover", { bubbles: true, relatedTarget: null }));
+
+    expect(label(`${sel(CN.errorPopup)} ${sel(CN.popupClose)}`)).toBe("Schließen");
+
+    builder.destroy();
+  });
+
+  it("keeps the English default for every phrase the host left out", () => {
+    const builder = new FormulaBuilder({
+      rootEl: document.body,
+      phrases: { formulaEditor: "Formeleditor" },
+    });
+
+    expect(builder.editor.phrases.formulaEditor).toBe("Formeleditor");
+    expect(builder.editor.phrases.close).toBe(DEFAULT_PHRASES.close);
+    expect(builder.editor.phrases.dependentCellErrors(2)).toBe("2 more cells now contain errors.");
+
+    builder.destroy();
   });
 });

@@ -60,7 +60,8 @@ the formula). `rangeMode ∈ { auto, on, off }`, held in `KeyboardController`, d
 | Shift + Enter | Commit, move **up** | same |
 | Tab | Commit, move **right** | same |
 | Shift + Tab | Commit, move **left** | same |
-| Ctrl/Cmd + Enter | Insert a newline in the formula | same |
+| Ctrl/Cmd + Enter | Commit to every selected cell when the host supports it (`IGridAdapter.commitFill` or the `onCommitFill` option); otherwise insert a newline in the formula | same |
+| Alt + Enter | Insert a newline in the formula | same |
 | Escape | Ladder first (see below); if neither popup is open, cancels the pending point ref and stays editing — a 2nd Escape cancels the edit | Ladder: close suggestions popup if open, else close fn-help popup if open (suppressing it for the edit session), else cancel the edit |
 | `(` | Auto-insert the matching `)`, caret inside | same |
 | `)` | Skip over an existing `)` (else insert) | same |
@@ -132,10 +133,11 @@ resting on an error cell. No adapter involvement.
 | 13 | Ctrl/Cmd + E | Identical to F2 |
 | 14 | Enter / Tab / Shift+Tab commit | Commit value, move active cell down / right / left |
 | 15 | Shift+Enter commit | Commit value, move active cell up one cell |
-| 16 | Ctrl/Cmd+Enter | Insert a newline instead of committing |
-| 17 | Escape while pointing | First press removes the pending ref (stay editing); second cancels the edit |
-| 18 | `(` typed in a formula | Auto-insert `)` and place the caret inside |
-| 19 | `)` typed before an existing `)` | Skip over it instead of inserting a duplicate |
+| 16 | Ctrl/Cmd+Enter | Commit to every selected cell when the host fills; else insert a newline |
+| 17 | Alt+Enter | Insert a newline instead of committing |
+| 18 | Escape while pointing | First press removes the pending ref (stay editing); second cancels the edit |
+| 19 | `(` typed in a formula | Auto-insert `)` and place the caret inside |
+| 20 | `)` typed before an existing `)` | Skip over it instead of inserting a duplicate |
 
 ## Host scope
 
