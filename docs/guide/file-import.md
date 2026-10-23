@@ -139,4 +139,4 @@ third-party [XLSX parser](https://www.npmjs.com/search?q=xlsx) such as
 [xlsx](https://www.npmjs.com/package/xlsx), convert the result to JavaScript
 arrays, and pass them to
 [`buildFromSheets`](../api/classes/hyperformula.md#buildfromsheets). See a full
-example on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/3.4.x/read-excel-file).
+example on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/3.5.x/read-excel-file).
