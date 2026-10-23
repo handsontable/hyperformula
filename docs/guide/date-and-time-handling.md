@@ -1,3 +1,15 @@
+---
+tags:
+  - dates
+  - dateFormats
+  - timeFormats
+  - parseDateTime
+  - stringifyDateTime
+  - stringifyDuration
+  - nullYear
+  - date parsing
+---
+
 # Date and time handling
 
 The formats for the default date and time parsing functions can be set using configuration options:

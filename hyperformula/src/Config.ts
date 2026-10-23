@@ -1,0 +1,451 @@
+/**
+ * @license
+ * Copyright (c) 2025 Handsoncode. All rights reserved.
+ */
+
+import {
+  configCheckIfParametersNotInConflict,
+  configValueFromParam,
+  configValueFromParamCheck,
+  validateNumberToBeAtLeast,
+  validateNumberToBeAtMost
+} from './ArgumentSanitization'
+import {TranslatableErrorType} from './Cell'
+import {defaultParseToDateTime} from './DateTimeDefault'
+import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
+import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {ConfigValueEmpty, ExpectedValueOfTypeError} from './errors'
+import {defaultStringifyCurrency, defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
+import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {HyperFormula} from './HyperFormula'
+import {TranslationPackage} from './i18n'
+import {FunctionPluginDefinition} from './interpreter'
+import {CapabilityRegistry, ResolvedCapabilities} from './license/CapabilityRegistry'
+import {resolveLicense} from './license/licenseResolution'
+import {Maybe} from './Maybe'
+import {ParserConfig} from './parser/ParserConfig'
+import {ConfigParams, ConfigParamsList} from './ConfigParams'
+import { RawCellContent } from '.'
+
+/**
+ * The license-derived state kept off the public `ConfigParams` surface — see
+ * {@link Config.licenseCapabilities}.
+ */
+interface LicensePrivateState {
+  licenseKeyValidityState: LicenseKeyValidityState,
+  licenseBlocksEvaluation: boolean,
+  licenseCapabilities: ResolvedCapabilities,
+  capabilityRegistry: CapabilityRegistry,
+}
+
+const privatePool: WeakMap<Config, LicensePrivateState> = new WeakMap()
+
+export class Config implements ConfigParams, ParserConfig {
+
+  public static defaultConfig: ConfigParams = {
+    accentSensitive: false,
+    currencySymbol: ['$'],
+    caseSensitive: false,
+    caseFirst: 'lower',
+    context: undefined,
+    chooseAddressMappingPolicy: new AlwaysDense(),
+    dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'],
+    decimalSeparator: '.',
+    evaluateNullToZero: false,
+    functionArgSeparator: ',',
+    functionPlugins: [],
+    ignorePunctuation: false,
+    language: 'enGB',
+    ignoreWhiteSpace: 'standard',
+    licenseKey: '',
+    leapYear1900: false,
+    localeLang: 'en',
+    matchWholeCell: true,
+    arrayColumnSeparator: ',',
+    arrayRowSeparator: ';',
+    maxRows: 40_000,
+    maxColumns: 18_278,
+    nullYear: 30,
+    nullDate: {year: 1899, month: 12, day: 30},
+    parseDateTime: defaultParseToDateTime,
+    precisionEpsilon: 1e-13,
+    precisionRounding: 10,
+    smartRounding: true,
+    stringifyDateTime: defaultStringifyDateTime,
+    stringifyDuration: defaultStringifyDuration,
+    stringifyCurrency: defaultStringifyCurrency,
+    timeFormats: ['hh:mm', 'hh:mm:ss.sss'],
+    thousandSeparator: '',
+    undoLimit: 20,
+    maxPendingLazyTransformations: 50,
+    useRegularExpressions: false,
+    useWildcards: true,
+    useColumnIndex: false,
+    useStats: false,
+    useArrayArithmetic: false,
+    enableIterativeCalculation: false,
+    iterativeCalculationLimit: 100,
+    iterativeCalculationThreshold: 0.001,
+    iterativeCalculationInitialValue: 0,
+  }
+
+  /** @inheritDoc */
+  public readonly useArrayArithmetic: boolean
+  /** @inheritDoc */
+  public readonly caseSensitive: boolean
+  /** @inheritDoc */
+  public readonly chooseAddressMappingPolicy: ChooseAddressMapping
+  /** @inheritDoc */
+  public readonly accentSensitive: boolean
+  /** @inheritDoc */
+  public readonly caseFirst: 'upper' | 'lower' | 'false'
+  /** @inheritDoc */
+  public readonly dateFormats: string[]
+  /** @inheritDoc */
+  public readonly timeFormats: string[]
+  /** @inheritDoc */
+  public readonly functionArgSeparator: string
+  /** @inheritDoc */
+  public readonly arrayColumnSeparator: ',' | ';'
+  /** @inheritDoc */
+  public readonly arrayRowSeparator: ';' | '|'
+  /** @inheritDoc */
+  public readonly decimalSeparator: '.' | ','
+  /** @inheritDoc */
+  public readonly thousandSeparator: '' | ',' | ' ' | '.'
+  /** @inheritDoc */
+  public readonly language: string
+  /** @inheritDoc */
+  public readonly ignoreWhiteSpace: 'standard' | 'any'
+  /** @inheritDoc */
+  public readonly licenseKey: string
+  /** @inheritDoc */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public readonly functionPlugins: FunctionPluginDefinition[]
+  /** @inheritDoc */
+  public readonly leapYear1900: boolean
+  /** @inheritDoc */
+  public readonly ignorePunctuation: boolean
+  /** @inheritDoc */
+  public readonly localeLang: string
+  /** @inheritDoc */
+  public readonly evaluateNullToZero: boolean
+  /** @inheritDoc */
+  public readonly nullYear: number
+  /** @inheritDoc */
+  public readonly parseDateTime: (dateTimeString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>
+  /** @inheritDoc */
+  public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
+  /** @inheritDoc */
+  public readonly stringifyDuration: (time: SimpleTime, formatArg: string) => Maybe<string>
+  /** @inheritDoc */
+  public readonly stringifyCurrency: (value: number, currencyFormat: string) => Maybe<string>
+  /** @inheritDoc */
+  public readonly precisionEpsilon: number
+  /** @inheritDoc */
+  public readonly precisionRounding: number
+  /** @inheritDoc */
+  public readonly smartRounding: boolean
+  /** @inheritDoc */
+  public readonly useColumnIndex: boolean
+  /** @inheritDoc */
+  public readonly useStats: boolean
+  /** @inheritDoc */
+  public readonly nullDate: SimpleDate
+  /** @inheritDoc */
+  public readonly currencySymbol: string[]
+  /** @inheritDoc */
+  public readonly undoLimit: number
+  /** @inheritDoc */
+  public readonly maxPendingLazyTransformations: number
+  /** @inheritDoc */
+  public readonly context: unknown
+
+  /**
+   * Built automatically based on translation package.
+   *
+   * @internal
+   */
+  public readonly errorMapping: Record<string, TranslatableErrorType>
+  /** @inheritDoc */
+  public readonly maxRows: number
+  /** @inheritDoc */
+  public readonly maxColumns: number
+
+  /**
+   * Built automatically based on language.
+   *
+   * @internal
+   */
+  public readonly translationPackage: TranslationPackage
+  /** @inheritDoc */
+  public readonly useRegularExpressions: boolean
+  /** @inheritDoc */
+  public readonly useWildcards: boolean
+  /** @inheritDoc */
+  public readonly matchWholeCell: boolean
+  /** @inheritDoc */
+  public readonly enableIterativeCalculation: boolean
+  /** @inheritDoc */
+  public readonly iterativeCalculationLimit: number
+  /** @inheritDoc */
+  public readonly iterativeCalculationThreshold: number
+  /** @inheritDoc */
+  public readonly iterativeCalculationInitialValue: RawCellContent
+
+  constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true, notifyLicenseMessages: boolean = true) {
+    const {
+      accentSensitive,
+      caseSensitive,
+      caseFirst,
+      chooseAddressMappingPolicy,
+      context,
+      currencySymbol,
+      dateFormats,
+      decimalSeparator,
+      evaluateNullToZero,
+      functionArgSeparator,
+      functionPlugins,
+      ignorePunctuation,
+      leapYear1900,
+      localeLang,
+      language,
+      ignoreWhiteSpace,
+      licenseKey,
+      matchWholeCell,
+      arrayColumnSeparator,
+      arrayRowSeparator,
+      maxRows,
+      maxColumns,
+      nullYear,
+      nullDate,
+      parseDateTime,
+      precisionEpsilon,
+      precisionRounding,
+      stringifyDateTime,
+      stringifyDuration,
+      stringifyCurrency,
+      smartRounding,
+      timeFormats,
+      thousandSeparator,
+      useArrayArithmetic,
+      useStats,
+      undoLimit,
+      maxPendingLazyTransformations,
+      useColumnIndex,
+      useRegularExpressions,
+      useWildcards,
+      enableIterativeCalculation,
+      iterativeCalculationLimit,
+      iterativeCalculationThreshold,
+      iterativeCalculationInitialValue,
+    } = options
+
+    if (showDeprecatedWarns) {
+      Config.warnDeprecatedOptions(options)
+    }
+
+    this.useArrayArithmetic = configValueFromParam(useArrayArithmetic, 'boolean', 'useArrayArithmetic')
+    this.accentSensitive = configValueFromParam(accentSensitive, 'boolean', 'accentSensitive')
+    this.caseSensitive = configValueFromParam(caseSensitive, 'boolean', 'caseSensitive')
+    this.caseFirst = configValueFromParam(caseFirst, ['upper', 'lower', 'false'], 'caseFirst')
+    this.ignorePunctuation = configValueFromParam(ignorePunctuation, 'boolean', 'ignorePunctuation')
+    this.chooseAddressMappingPolicy = chooseAddressMappingPolicy ?? Config.defaultConfig.chooseAddressMappingPolicy
+    this.dateFormats = [...configValueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')]
+    this.timeFormats = [...configValueFromParamCheck(timeFormats, Array.isArray, 'array', 'timeFormats')]
+    this.functionArgSeparator = configValueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
+    this.decimalSeparator = configValueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
+    this.language = configValueFromParam(language, 'string', 'language')
+    this.ignoreWhiteSpace = configValueFromParam(ignoreWhiteSpace, ['standard', 'any'], 'ignoreWhiteSpace')
+    this.licenseKey = configValueFromParam(licenseKey, 'string', 'licenseKey')
+    this.thousandSeparator = configValueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
+    this.arrayColumnSeparator = configValueFromParam(arrayColumnSeparator, [',', ';'], 'arrayColumnSeparator')
+    this.arrayRowSeparator = configValueFromParam(arrayRowSeparator, [';', '|'], 'arrayRowSeparator')
+    this.localeLang = configValueFromParam(localeLang, 'string', 'localeLang')
+    this.functionPlugins = [...(functionPlugins ?? Config.defaultConfig.functionPlugins)]
+    this.smartRounding = configValueFromParam(smartRounding, 'boolean', 'smartRounding')
+    this.evaluateNullToZero = configValueFromParam(evaluateNullToZero, 'boolean', 'evaluateNullToZero')
+    this.nullYear = configValueFromParam(nullYear, 'number', 'nullYear')
+    validateNumberToBeAtLeast(this.nullYear, 'nullYear', 0)
+    validateNumberToBeAtMost(this.nullYear, 'nullYear', 100)
+    this.precisionRounding = configValueFromParam(precisionRounding, 'number', 'precisionRounding')
+    validateNumberToBeAtLeast(this.precisionRounding, 'precisionRounding', 0)
+    this.precisionEpsilon = configValueFromParam(precisionEpsilon, 'number', 'precisionEpsilon')
+    validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
+    this.useColumnIndex = configValueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
+    this.useStats = configValueFromParam(useStats, 'boolean', 'useStats')
+    this.parseDateTime = configValueFromParam(parseDateTime, 'function', 'parseDateTime')
+    this.stringifyDateTime = configValueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
+    this.stringifyDuration = configValueFromParam(stringifyDuration, 'function', 'stringifyDuration')
+    this.stringifyCurrency = configValueFromParam(stringifyCurrency, 'function', 'stringifyCurrency')
+    this.translationPackage = HyperFormula.getLanguage(this.language)
+    this.errorMapping = this.translationPackage.buildErrorMapping()
+    this.nullDate = configValueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
+    this.leapYear1900 = configValueFromParam(leapYear1900, 'boolean', 'leapYear1900')
+    this.undoLimit = configValueFromParam(undoLimit, 'number', 'undoLimit')
+    this.maxPendingLazyTransformations = configValueFromParam(maxPendingLazyTransformations, 'number', 'maxPendingLazyTransformations')
+    this.useRegularExpressions = configValueFromParam(useRegularExpressions, 'boolean', 'useRegularExpressions')
+    this.useWildcards = configValueFromParam(useWildcards, 'boolean', 'useWildcards')
+    this.matchWholeCell = configValueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
+    validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)
+    validateNumberToBeAtLeast(this.maxPendingLazyTransformations, 'maxPendingLazyTransformations', 1)
+    this.maxRows = configValueFromParam(maxRows, 'number', 'maxRows')
+    validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
+    this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')
+    this.currencySymbol = this.setupCurrencySymbol(currencySymbol)
+    validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
+    this.context = context
+
+    // Iterative calculation config
+    this.enableIterativeCalculation = configValueFromParam(enableIterativeCalculation, 'boolean', 'enableIterativeCalculation')
+    this.iterativeCalculationLimit = configValueFromParam(iterativeCalculationLimit, 'number', 'iterativeCalculationLimit')
+    this.validateIterativeCalculationLimit(this.iterativeCalculationLimit)
+    this.iterativeCalculationThreshold = configValueFromParam(iterativeCalculationThreshold, 'number', 'iterativeCalculationThreshold')
+    validateNumberToBeAtLeast(this.iterativeCalculationThreshold, 'iterativeCalculationThreshold', 0)
+    this.iterativeCalculationInitialValue = this.validateIterativeCalculationInitialValue(iterativeCalculationInitialValue)
+
+    const {validityState: licenseKeyValidityState, blocksEvaluation: licenseBlocksEvaluation, entitlement} = resolveLicense(this.licenseKey, notifyLicenseMessages)
+    const capabilityRegistry = new CapabilityRegistry()
+    const licenseCapabilities = capabilityRegistry.resolve(entitlement)
+
+    privatePool.set(this, {
+      licenseKeyValidityState,
+      licenseBlocksEvaluation,
+      licenseCapabilities,
+      capabilityRegistry,
+    })
+
+    configCheckIfParametersNotInConflict(
+      {value: this.decimalSeparator, name: 'decimalSeparator'},
+      {value: this.functionArgSeparator, name: 'functionArgSeparator'},
+      {value: this.thousandSeparator, name: 'thousandSeparator'},
+    )
+
+    configCheckIfParametersNotInConflict(
+      {value: this.arrayRowSeparator, name: 'arrayRowSeparator'},
+      {value: this.arrayColumnSeparator, name: 'arrayColumnSeparator'},
+    )
+  }
+
+  private setupCurrencySymbol(currencySymbol: string[] | undefined): string[] {
+    const valueAfterCheck = [...configValueFromParamCheck(currencySymbol, Array.isArray, 'array', 'currencySymbol')]
+
+    valueAfterCheck.forEach((val) => {
+      if (typeof val !== 'string') {
+        throw new ExpectedValueOfTypeError('string[]', 'currencySymbol')
+      }
+
+      if (val === '') {
+        throw new ConfigValueEmpty('currencySymbol')
+      }
+    })
+
+    return valueAfterCheck as string[]
+  }
+
+  private validateIterativeCalculationLimit(value: number): void {
+    if (!Number.isInteger(value) || value < 1) {
+      throw new ExpectedValueOfTypeError('positive integer', 'iterativeCalculationLimit')
+    }
+  }
+
+  private validateIterativeCalculationInitialValue(value: unknown): RawCellContent {
+    if (value === undefined) {
+      return Config.defaultConfig.iterativeCalculationInitialValue
+    }
+    if (typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean' || value instanceof Date) {
+      return value as RawCellContent
+    }
+
+    throw new ExpectedValueOfTypeError('number, string, boolean or Date object', 'iterativeCalculationInitialValue')
+  }
+
+  /**
+   * Proxied property to its private counterpart. This makes the property
+   * as accessible as the other Config options but without ability to change the value.
+   *
+   * @internal
+   */
+  public get licenseKeyValidityState(): LicenseKeyValidityState {
+    return (privatePool.get(this) as LicensePrivateState).licenseKeyValidityState
+  }
+
+  /**
+   * Gate A: `true` when function calls must evaluate to `#LIC!`. Proxied to its private
+   * counterpart for the same reason as {@link licenseKeyValidityState}.
+   *
+   * @internal
+   */
+  public get licenseBlocksEvaluation(): boolean {
+    return (privatePool.get(this) as LicensePrivateState).licenseBlocksEvaluation
+  }
+
+  /**
+   * The functions and features this config's license entitles it to, already resolved from
+   * whatever tokens the license key carries. Proxied to its private counterpart for the same
+   * reason as {@link licenseKeyValidityState}: it must never become part of {@link getConfig}.
+   *
+   * @internal
+   */
+  public get licenseCapabilities(): ResolvedCapabilities {
+    return (privatePool.get(this) as LicensePrivateState).licenseCapabilities
+  }
+
+
+  /**
+   * The registry used to resolve this config's entitlement into {@link licenseCapabilities}.
+   * Exposed so the interpreter can tell a custom, instance-registered function apart from a
+   * built-in outside the capability table without constructing a second registry.
+   *
+   * @internal
+   */
+  public get capabilityRegistry(): CapabilityRegistry {
+    return (privatePool.get(this) as LicensePrivateState).capabilityRegistry
+  }
+
+  public getConfig(): ConfigParams {
+    return getFullConfigFromPartial(this)
+  }
+
+  public mergeConfig(init: Partial<ConfigParams>, notifyLicenseMessages: boolean = true): Config {
+    const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
+
+    Config.warnDeprecatedOptions(init)
+
+    return new Config(mergedConfig, false, notifyLicenseMessages)
+  }
+
+  private static warnDeprecatedOptions(options: Partial<ConfigParams>) {
+    // an example of deprecation warning
+    // Config.warnDeprecatedIfUsed(options.binarySearchThreshold, 'binarySearchThreshold', '1.1')
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName?: string) {
+    if (inputValue !== undefined) {
+      if (replacementName === undefined) {
+        console.warn(`${paramName} option is deprecated since ${fromVersion}`)
+      } else {
+        console.warn(`${paramName} option is deprecated since ${fromVersion}, please use ${replacementName}`)
+      }
+    }
+  }
+}
+
+function getFullConfigFromPartial(partialConfig: Partial<ConfigParams>): ConfigParams {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ret: { [key: string]: any } = {}
+  for (const key in Config.defaultConfig) {
+    const val = partialConfig[key as ConfigParamsList] ?? Config.defaultConfig[key as ConfigParamsList]
+    if (Array.isArray(val)) {
+      ret[key] = [...val]
+    } else {
+      ret[key] = val
+    }
+  }
+  return ret as ConfigParams
+}
+
+export function getDefaultConfig(): ConfigParams {
+  return getFullConfigFromPartial({})
+}

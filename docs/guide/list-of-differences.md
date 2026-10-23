@@ -1,3 +1,13 @@
+---
+tags:
+  - Microsoft Excel
+  - Google Sheets
+  - compatibility
+  - OpenDocument
+  - negative numbers
+  - rounding
+---
+
 # List of differences with other spreadsheets
 
 <!--
@@ -41,6 +51,7 @@ See a full list of differences between HyperFormula, Microsoft Excel, and Google
 | TIMEVALUE function                                 | =TIMEVALUE("14:31")                                                       | Type of the returned value: `CellValueDetailedType.NUMBER_TIME` (compliant with the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard)                                                                                                                                  | Cell auto-formatted as **regular number**                                                                                      | Cell auto-formatted as **regular number**                                                                                      |
 | EDATE function                                     | =EDATE(DATE(2019, 7, 31), 1)                                              | Type of the returned value: `CellValueDetailedType.NUMBER_DATE`. This is non-compliant with the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard, which defines the return type as a Number, while describing it as a Date serial number through the function summary. | Cell auto-formatted as **date**                                                                                                | Cell auto-formatted as **regular number**                                                                                      |
 | EOMONTH function                                   | =EOMONTH(DATE(2019, 7, 31), 1)                                            | Type of the returned value: `CellValueDetailedType.NUMBER_DATE`. This is non-compliant with the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard, which defines the return type as a Number, while describing it as a Date serial number through the function summary. | Cell auto-formatted as **date**                                                                                                | Cell auto-formatted as **regular number**                                                                                      |
+| EDATE and EOMONTH results in February 1900        | =EDATE(DATE(1900, 1, 31), 1)<br><br>=EOMONTH(DATE(1900, 1, 31), 1)       | With the [`leapYear1900`](/api/interfaces/configparams.md#leapyear1900) option set to `true`, February 1900 has 29 days, so both examples return 29 February 1900 (serial `60` with `nullDate` set to 1899-12-31). With the default `false`, both return 28 February 1900.                                                                                                                              | 28 February 1900 for both examples. Google Sheets does not treat 1900 as a leap year.                                          | 28 February 1900 (serial `59`) for both examples. Excel keeps the 1900 leap day only in the serial-to-date mapping (`DAY(60)` is `29`); its month arithmetic treats February 1900 as having 28 days, so no `EDATE` or `EOMONTH` result is ever serial `60`. |
 | Empty cells in lookup search                      | =XLOOKUP(3, A1:A4, A1:A4, "NF", 0, 2)<br>where A1:A4 = 1, 2, (empty), 3   | Empty cells are skipped during the search. A value that is present is found even when it sits past an interspersed empty cell (exact match is gap-independent), and approximate `MATCH`/`VLOOKUP`/`HLOOKUP`/`XLOOKUP` skip empty cells — but not empty strings — when finding the lower/upper bound. Returns `3`. On an all-empty range in a binary search mode, HyperFormula returns the `if_not_found` result (never row 1). | Skips empty cells in approximate search (parity with HyperFormula). | With binary search modes (`search_mode` ±2), a range with interspersed empty cells is not strictly sorted; per Excel's documentation the result may be invalid, so a value past an empty cell is not reliably found. On an all-empty range in a binary mode, Excel returns the first row's value. |
 
 ## Built-in functions
@@ -107,7 +118,6 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
-| MOD           | =MOD(-10, 3)                                                   |           -1 |             2 |               2 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
 | CEILING.MATH  | =CEILING.MATH(-4.3, 2, 2)                                      |           -4 |            -6 |              -6 |
@@ -116,6 +126,5 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 A few of the rows above share a root cause worth stating once:
 
 - **Rounding toward zero, not down.** `INT` discards the fractional part rather than rounding toward negative infinity, so it differs from Excel and Google Sheets for negative input only. `ROUNDDOWN`/`ROUNDUP` are unaffected — they are defined in terms of zero in all three.
-- **`MOD` takes the sign of the dividend.** Excel and Google Sheets return a result with the sign of the *divisor*.
 - **`ISEVEN`/`ISODD` do not truncate.** They test the remainder of the value as given, so a value with a fractional part returns `FALSE` from *both*. Excel and Google Sheets truncate to an integer first, so exactly one of the two is always `TRUE`.
 - **`CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1.** Excel and Google Sheets switch the negative-number rounding direction for any non-zero `mode`.
