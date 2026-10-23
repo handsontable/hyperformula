@@ -139,7 +139,7 @@ Treat **every page as page one.**
 4. **Keep a glossary and spell out acronyms on first use** on each page — "Abstract
   Syntax Tree (AST)", "Cyclic Reference (CREF)". Link related glossary terms.
 5. **One language per page.** Write docs in English; do not interleave other natural
-  languages. (This is about prose, not about supporting HyperFormula's 17 formula
+  languages. (This is about prose, not about supporting HyperFormula's formula
     locales — those are a documented feature.)
 6. **State everything explicitly; assume no prior knowledge.** List prerequisites
   inside the procedure instead of assuming setup. If a step depends on an external
