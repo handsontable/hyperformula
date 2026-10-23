@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Changed the licence of the `hyperformula-ui` package from GPL-3.0-only to MIT. [#1840](https://github.com/handsontable/hyperformula/pull/1840)
+
 ## [0.3.5] - 2026-10-21
 
 ### Added
