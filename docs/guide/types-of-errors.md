@@ -59,15 +59,19 @@ argument. `originFunction` names a function or an operator helper when one of th
 rejected a value, and otherwise names what built the error: `reference` for a
 reference that cannot be resolved, `removed reference` for one destroyed by
 removing rows or columns, `parser` for a formula that could not be parsed, `user
-input` for an error value typed into a cell, or `literal` for one written into a
-formula. `argumentIndex` is zero-based.
+input` for an error value typed into a cell, `literal` for one written into a
+formula, or `array literal` for an array literal whose rows differ in length.
+`argumentIndex` is zero-based.
 
 ```javascript
-const hf = HyperFormula.buildFromArray([['=SUM(SQRT(-1))'], ['=DATE(2000, "x", 1)'], ['=SUM(A99999999999:A99999999999)']]);
+const hf = HyperFormula.buildFromArray(
+  [['=SUM(SQRT(-1))'], ['=DATE(2000, "x", 1)'], ['=SUM(A99999999999:A99999999999)']],
+  { licenseKey: 'gpl-v3' }
+);
 
-hf.getCellValue({ sheet: 0, col: 0, row: 0 }).originFunction; // 'SQRT', not 'SUM'
-hf.getCellValue({ sheet: 0, col: 0, row: 1 }).argumentIndex;  // 1, the second argument
-hf.getCellValue({ sheet: 0, col: 0, row: 2 }).originFunction; // 'reference'
+hf.getCellValue({ sheet: 0, row: 0, col: 0 }).originFunction; // 'SQRT', not 'SUM'
+hf.getCellValue({ sheet: 0, row: 1, col: 0 }).argumentIndex;  // 1, the second argument
+hf.getCellValue({ sheet: 0, row: 2, col: 0 }).originFunction; // 'reference'
 ```
 
 The first occurrence wins, so a function that only read an error never replaces
