@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Added a message after `npm i hyperformula` that points AI assistants to the SKILLS file. The message needs `--foreground-scripts` to be visible in npm, and pnpm 10 needs the `postinstall` script to be approved first. [#1829](https://github.com/handsontable/hyperformula/pull/1829)
+- Added the `TYPE` and `ERROR.TYPE` information functions: `TYPE` returns the code of a value's type (number, text, boolean, error, array), and `ERROR.TYPE` returns the code of an error, or `#N/A` for any other value. [#1813](https://github.com/handsontable/hyperformula/pull/1813)
 
 ### Fixed
 
