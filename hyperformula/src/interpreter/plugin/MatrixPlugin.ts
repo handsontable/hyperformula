@@ -108,41 +108,70 @@ function numbersOrError(matrix: SimpleRangeValue): number[][] | CellError {
 }
 
 /**
- * Calculates the determinant with the fraction-free Bareiss elimination, so that a matrix of integers is
- * eliminated without rounding noise and a singular one gives exactly 0. Rows are swapped to bring the
- * entry of the greatest magnitude to the pivot position.
+ * The LU decomposition of a square matrix with partial pivoting: the rows of the matrix, reordered by `permutation`,
+ * equal the product of a lower triangular matrix with ones on the diagonal and an upper triangular matrix.
+ */
+interface LuDecomposition {
+  /** The upper triangular factor on and above the diagonal, the multipliers of the lower one below it. */
+  factors: number[][],
+  /** For each row of `factors`, the index of the row of the original matrix it comes from. */
+  permutation: number[],
+  /** 1 or -1: the sign of the permutation, by which the product of the pivots is multiplied to give the determinant. */
+  sign: number,
+}
+
+/**
+ * Factorizes a square matrix with Gaussian elimination and partial pivoting: at each step, the row with the entry of
+ * the greatest magnitude in the pivot column becomes the pivot row.
+ *
+ * @param matrix - a square matrix, left unchanged
+ * @returns the decomposition, or undefined when a pivot is exactly 0, that is when the matrix is singular
+ */
+function luDecomposition(matrix: number[][]): Maybe<LuDecomposition> {
+  const size = matrix.length
+  const factors = matrix.map((row) => row.slice())
+  const permutation = factors.map((_, index) => index)
+  let sign = 1
+
+  for (let k = 0; k < size; k++) {
+    let pivotRow = k
+    for (let i = k + 1; i < size; i++) {
+      if (Math.abs(factors[i][k]) > Math.abs(factors[pivotRow][k])) {
+        pivotRow = i
+      }
+    }
+    if (factors[pivotRow][k] === 0) {
+      return undefined
+    }
+    if (pivotRow !== k) {
+      [factors[k], factors[pivotRow]] = [factors[pivotRow], factors[k]];
+      [permutation[k], permutation[pivotRow]] = [permutation[pivotRow], permutation[k]]
+      sign = -sign
+    }
+    for (let i = k + 1; i < size; i++) {
+      const multiplier = factors[i][k] / factors[k][k]
+      factors[i][k] = multiplier
+      for (let j = k + 1; j < size; j++) {
+        factors[i][j] -= multiplier * factors[k][j]
+      }
+    }
+  }
+
+  return {factors, permutation, sign}
+}
+
+/**
+ * Calculates the determinant as the product of the pivots of the LU decomposition. A singular matrix whose
+ * elimination meets an exact zero pivot gives 0; otherwise the result carries the rounding error of the elimination.
  *
  * @param matrix - a square matrix
  */
 function determinant(matrix: number[][]): number {
-  const elements = matrix.map((row) => row.slice())
-  const size = elements.length
-  let sign = 1
-  let previousPivot = 1
-
-  for (let k = 0; k < size - 1; k++) {
-    let pivotRow = k
-    for (let i = k + 1; i < size; i++) {
-      if (Math.abs(elements[i][k]) > Math.abs(elements[pivotRow][k])) {
-        pivotRow = i
-      }
-    }
-    if (elements[pivotRow][k] === 0) {
-      return 0
-    }
-    if (pivotRow !== k) {
-      [elements[k], elements[pivotRow]] = [elements[pivotRow], elements[k]]
-      sign = -sign
-    }
-    for (let i = k + 1; i < size; i++) {
-      for (let j = k + 1; j < size; j++) {
-        elements[i][j] = (elements[i][j] * elements[k][k] - elements[i][k] * elements[k][j]) / previousPivot
-      }
-    }
-    previousPivot = elements[k][k]
+  const decomposition = luDecomposition(matrix)
+  if (decomposition === undefined) {
+    return 0
   }
-
-  return sign * elements[size - 1][size - 1]
+  return decomposition.factors.reduce((product, row, index) => product * row[index], decomposition.sign)
 }
 
 /**
@@ -155,34 +184,34 @@ function identityMatrix(size: number): number[][] {
 }
 
 /**
- * Inverts a non-singular square matrix with the Gauss-Jordan elimination and partial pivoting.
+ * Calculates the inverse from the LU decomposition, solving one triangular system pair per column of the identity matrix.
  *
- * @param matrix - a square matrix with a non-zero determinant
+ * @param decomposition - the LU decomposition of a non-singular matrix
  */
-function invert(matrix: number[][]): number[][] {
-  const size = matrix.length
-  const identity = identityMatrix(size)
-  const augmented = matrix.map((row, i) => row.concat(identity[i]))
+function inverse(decomposition: LuDecomposition): number[][] {
+  const {factors, permutation} = decomposition
+  const size = factors.length
+  const result = identityMatrix(size)
 
-  for (let k = 0; k < size; k++) {
-    let pivotRow = k
-    for (let i = k + 1; i < size; i++) {
-      if (Math.abs(augmented[i][k]) > Math.abs(augmented[pivotRow][k])) {
-        pivotRow = i
-      }
-    }
-    [augmented[k], augmented[pivotRow]] = [augmented[pivotRow], augmented[k]]
-    const pivot = augmented[k][k]
-    augmented[k] = augmented[k].map((value) => value / pivot)
+  for (let column = 0; column < size; column++) {
+    const solution = permutation.map((originalRow) => originalRow === column ? 1 : 0)
     for (let i = 0; i < size; i++) {
-      if (i !== k) {
-        const factor = augmented[i][k]
-        augmented[i] = augmented[i].map((value, j) => value - factor * augmented[k][j])
+      for (let j = 0; j < i; j++) {
+        solution[i] -= factors[i][j] * solution[j]
       }
     }
+    for (let i = size - 1; i >= 0; i--) {
+      for (let j = i + 1; j < size; j++) {
+        solution[i] -= factors[i][j] * solution[j]
+      }
+      solution[i] /= factors[i][i]
+    }
+    solution.forEach((value, row) => {
+      result[row][column] = value
+    })
   }
 
-  return augmented.map((row) => row.slice(size))
+  return result
 }
 
 export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MatrixPlugin> {
@@ -320,7 +349,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
    * Corresponds to MDETERM(Array).
    *
    * Returns the determinant of a square matrix of numbers. A non-square matrix or a non-numeric value
-   * returns the #VALUE! error. The elimination is exact for integers, so a singular matrix gives 0.
+   * returns the #VALUE! error, and a determinant too large for a number returns the #NUM! error.
    */
   public mdeterm(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MDETERM'), (matrix: SimpleRangeValue) => {
@@ -340,7 +369,8 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
    * Corresponds to MINVERSE(Array).
    *
    * Returns the inverse of a square matrix of numbers. A non-square matrix or a non-numeric value returns
-   * the #VALUE! error; a singular matrix returns the #NUM! error.
+   * the #VALUE! error. A matrix whose elimination meets a pivot that is exactly 0, or whose inverse has an element
+   * too large for a number, returns the #NUM! error.
    */
   public minverse(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MINVERSE'), (matrix: SimpleRangeValue) => {
@@ -351,10 +381,11 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (matrix.width() !== matrix.height()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.ArrayDimensions)
       }
-      if (determinant(numbers) === 0) {
+      const decomposition = luDecomposition(numbers)
+      if (decomposition === undefined) {
         return new CellError(ErrorType.NUM, ErrorMessage.SingularMatrix)
       }
-      const result = invert(numbers)
+      const result = inverse(decomposition)
       if (!result.every((row) => row.every(Number.isFinite))) {
         return new CellError(ErrorType.NUM, ErrorMessage.NaN)
       }
