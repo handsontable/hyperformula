@@ -1,0 +1,22 @@
+{
+  /*
+  * This file allows to debug jest tests locally and resolve custom matchers properly.
+  * Moving or renaming it can cause local development painful.
+  * It should not affect jasmine tests.
+  */
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "../test-jest",
+    /* Make sure proper types are used */
+    "types": [
+      "jest",
+      "node"
+    ]
+  },
+  "extends": "../tsconfig",
+  "include": [
+    "../src",
+    "."
+  ],
+  "exclude": []
+}

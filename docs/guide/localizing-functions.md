@@ -1,7 +1,15 @@
+---
+tags:
+  - translations
+  - translate
+  - locales
+  - registerLanguage
+---
+
 # Localizing functions
 
 You can localize a function's ID and error
-messages. Currently, HyperFormula supports 17 languages, with British English
+messages. Currently, HyperFormula supports {{ $page.languagesCount }} languages, with British English
 as the default.
 
 To change the language all you need to do is import and
@@ -96,12 +104,13 @@ HyperFormula.registerLanguage('es', spanish);
 
 // Use it in your configuration
 const hf = HyperFormula.buildEmpty({
+  licenseKey: 'gpl-v3',
   language: 'es'
 });
 ```
 
 ::: tip
-You can use an existing language pack as a template. Check the [language files in the repository](https://github.com/handsontable/hyperformula/tree/master/src/i18n/languages) to see complete examples with all available functions.
+You can use an existing language pack as a template. Check the [language files in the repository](https://github.com/handsontable/hyperformula/tree/master/hyperformula/src/i18n/languages) to see complete examples with all available functions.
 :::
 
 ## Localizing custom functions
@@ -128,6 +137,7 @@ You can localize your custom functions as well. For details, see the [Custom fun
 | Spanish          | esES          |
 | Swedish          | svSE          |
 | Turkish          | trTR          |
+| Indonesian       | idID          |
 
 ## Demo
 

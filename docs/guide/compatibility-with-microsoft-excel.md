@@ -1,3 +1,15 @@
+---
+tags:
+  - MS Excel
+  - missing Excel functions
+  - wildcards
+  - regex
+  - useRegularExpressions
+  - 1900 leap year
+  - OpenDocument
+  - interoperability
+---
+
 # Compatibility with Microsoft Excel
 
 Achieve nearly full compatibility with Microsoft Excel, using the right HyperFormula configuration.
@@ -156,6 +168,10 @@ Options related to date and time formats:
 - [`stringifyDateTime()`](../api/interfaces/configparams.md#stringifydatetime)
 - [`stringifyDuration()`](../api/interfaces/configparams.md#stringifyduration)
 
+### `TEXT` function formats
+
+Excel's `TEXT` function supports a wide range of date, time, and currency formats. To cover the full range in HyperFormula, supply both [`stringifyDateTime()`](../api/interfaces/configparams.md#stringifydatetime) (for dates and durations) and [`stringifyCurrency()`](../api/interfaces/configparams.md#stringifycurrency) (for currency formats — locale-aware grouping, non-`$` symbols, accounting two-section patterns). See [Currency handling](currency-handling.md) for an `Intl.NumberFormat`-based example.
+
 ## Full configuration
 
 This configuration aligns HyperFormula with the default behavior of Microsoft Excel (set to locale `en-US`), as closely as possible at this development stage (version `{{ $page.version }}`).
@@ -163,6 +179,7 @@ This configuration aligns HyperFormula with the default behavior of Microsoft Ex
 ```js
 // define options
 const options = {
+  licenseKey: 'gpl-v3',
   dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
   timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
   currencySymbol: ['$', 'USD'],

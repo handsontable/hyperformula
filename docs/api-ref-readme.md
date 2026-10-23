@@ -43,7 +43,7 @@ For example, subscribing to `sheetAdded` event:
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 const handler = ( ) => { console.log('baz') }
 

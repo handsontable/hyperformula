@@ -18,7 +18,7 @@ description: HyperFormula® - An open-source headless spreadsheet for business w
   <a href="https://npmjs.com/package/hyperformula"><img src="https://img.shields.io/npm/dt/hyperformula.svg" alt="npm total downloads"></a>
   <a href="https://npmjs.com/package/hyperformula"><img src="https://img.shields.io/npm/dm/hyperformula.svg" alt="npm monthly downloads"></a>
   <a href="https://github.com/handsontable/hyperformula/graphs/contributors"><img src="https://img.shields.io/github/contributors/handsontable/hyperformula" alt="GitHub contributors"></a>
-  <a href="https://snyk.io/test/github/handsontable/hyperformula?targetFile=package.json"><img src="https://snyk.io/test/github/handsontable/hyperformula/badge.svg?targetFile=package.json" alt="Known Vulnerabilities"></a>
+  <a href="https://snyk.io/test/github/handsontable/hyperformula?targetFile=hyperformula/package.json"><img src="https://snyk.io/test/github/handsontable/hyperformula/badge.svg?targetFile=hyperformula/package.json" alt="Known Vulnerabilities"></a>
   <br>
   <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula?ref=badge_shield"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula.svg?type=shield" alt="FOSSA Status"></a>
   <a href="https://github.com/handsontable/hyperformula/actions?query=workflow%3Abuild+branch%3Amaster"><img src="https://img.shields.io/github/actions/workflow/status/handsontable/hyperformula/build.yml?branch=master" alt="GitHub Workflow Status"></a>
@@ -45,7 +45,7 @@ HyperFormula doesn't assume any existing user interface, making it a general-pur
 
 - [Function syntax compatible with Microsoft Excel](guide/compatibility-with-microsoft-excel.md) and [Google Sheets](guide/compatibility-with-google-sheets.md)
 - High-speed parsing and evaluation of spreadsheet formulas
-- [A library of ~400 built-in functions](guide/built-in-functions.md)
+- [A library of {{ $page.functionsCount }} built-in functions](guide/built-in-functions.md)
 - [Support for custom functions](guide/custom-functions.md)
 - [Support for Node.js](guide/server-side-installation.md#install-with-npm-or-yarn)
 - [Support for undo/redo](guide/undo-redo.md)
@@ -53,7 +53,7 @@ HyperFormula doesn't assume any existing user interface, making it a general-pur
 - [Support for clipboard](guide/clipboard-operations.md)
 - [Support for named expressions](guide/named-expressions.md)
 - [Support for data sorting](guide/sorting-data.md)
-- [Support for formula localization with 17 built-in languages](guide/i18n-features.md)
+- [Support for formula localization with {{ $page.languagesCount }} built-in languages](guide/i18n-features.md)
 - Easy integration with any front-end or back-end application
 - GPLv3 or a [commercial license](https://handsontable.com/get-a-quote)
 - Maintained by the team that stands behind the [Handsontable](https://handsontable.com/) data grid
@@ -106,7 +106,9 @@ hf.setCellContents({ sheet: sheetId, row: 0, col: 0 }, [['Monthly Payment', '=PM
 console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCellValue({ sheet: sheetId, row: 0, col: 1 })}`);
 ```
 
-[Run this code in StackBlitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.1.x/mortgage-calculator)
+[Run this code in StackBlitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/mortgage-calculator)
+
+HyperFormula ships an official Claude skill and machine-readable docs, so your AI coding agent can scaffold, configure, and debug HyperFormula correctly. To install the skill in Claude Code, or to point Cursor, GitHub Copilot, or another agent at the docs, see [Set up your coding agent](guide/setup-coding-agent.md). You can also connect any MCP-capable agent to the first-party [docs MCP server](https://handsontable.com/docs/javascript-data-grid/docs-mcp-server/) — semantic search over the full HyperFormula and Handsontable knowledge base: docs guides, API reference, code recipes, release notes, blog posts, and GitHub issues, always current with the latest release.
 
 ## Contributing
 
