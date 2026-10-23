@@ -383,7 +383,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     return this.runFunction(ast.args, state, this.metadata('DDB'),
       (cost: number, salvage: number, life: number, period: number, factor: number) => {
         if (period > life) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.PeriodLong)
         }
         let rate = factor / life
         let oldValue
@@ -407,7 +407,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     return this.runFunction(ast.args, state, this.metadata('DOLLARDE'),
       (dollar: number, fraction: number) => {
         if (fraction < 1) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         fraction = Math.trunc(fraction)
 
@@ -423,7 +423,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     return this.runFunction(ast.args, state, this.metadata('DOLLARFR'),
       (dollar: number, fraction: number) => {
         if (fraction < 1) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         fraction = Math.trunc(fraction)
 
@@ -448,7 +448,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     return this.runFunction(ast.args, state, this.metadata('ISPMT'),
       (rate, period, periods, value) => {
         if (periods === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         return value * rate * (period / periods - 1)
       }
@@ -469,7 +469,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
       (rate: number, payment: number, present: number, future: number, type: number) => {
         if (rate === 0) {
           if (payment === 0) {
-            return new CellError(ErrorType.DIV_BY_ZERO)
+            return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
           }
           return (-present - future) / payment
         }
@@ -486,7 +486,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     return this.runFunction(ast.args, state, this.metadata('RATE'),
       (periods: number, payment: number, present: number, future: number, type: number, guess: number) => {
         if (guess <= -1) {
-          return new CellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE, ErrorMessage.RateGuess)
         }
 
         const epsMax = 1e-7
@@ -497,7 +497,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         type = type ? 1 : 0
         for (let i = 0; i < iterMax; i++) {
           if (rate <= -1) {
-            return new CellError(ErrorType.NUM)
+            return new CellError(ErrorType.NUM, ErrorMessage.NoConvergence)
           }
           let y
           if (Math.abs(rate) < epsMax) {
@@ -519,7 +519,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
           }
           rate -= y / dy
         }
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NoConvergence)
       }
     )
   }
@@ -530,9 +530,9 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         type = type ? 1 : 0
         if (rate === -1) {
           if (periods === 0) {
-            return new CellError(ErrorType.NUM)
+            return new CellError(ErrorType.NUM, ErrorMessage.NonZeroPeriods)
           } else {
-            return new CellError(ErrorType.DIV_BY_ZERO)
+            return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
           }
         }
         if (rate === 0) {
@@ -548,7 +548,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     return this.runFunction(ast.args, state, this.metadata('RRI'),
       (periods, present, future) => {
         if (present === 0 || (future < 0 && present > 0) || (future > 0 && present < 0)) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
         }
 
         return Math.pow(future / present, 1 / periods) - 1
@@ -560,7 +560,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     return this.runFunction(ast.args, state, this.metadata('SLN'),
       (cost, salvage, life) => {
         if (life === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         return (cost - salvage) / life
       }
@@ -571,7 +571,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     return this.runFunction(ast.args, state, this.metadata('SYD'),
       (cost: number, salvage: number, life: number, period: number) => {
         if (period > life) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.PeriodLong)
         }
         return ((cost - salvage) * (life - period + 1) * 2) / (life * (life + 1))
       }
@@ -584,20 +584,20 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
         if (settlement >= maturity) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
         }
 
         const startDate = this.dateTimeHelper.numberToSimpleDate(settlement)
         const endDate = this.dateTimeHelper.numberToSimpleDate(maturity)
         if (endDate.year > startDate.year + 1 || (endDate.year === startDate.year + 1 && (endDate.month > startDate.month || (endDate.month === startDate.month && endDate.day > startDate.day)))) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.MaturityLong)
         }
         const denom = 360 - discount * (maturity - settlement)
         if (denom === 0) {
           return 0
         }
         if (denom < 0) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         return 365 * discount / denom
       }
@@ -610,20 +610,20 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
         if (settlement >= maturity) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
         }
 
         const startDate = this.dateTimeHelper.numberToSimpleDate(settlement)
         const endDate = this.dateTimeHelper.numberToSimpleDate(maturity)
         if (endDate.year > startDate.year + 1 || (endDate.year === startDate.year + 1 && (endDate.month > startDate.month || (endDate.month === startDate.month && endDate.day > startDate.day)))) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.MaturityLong)
         }
         const denom = 360 - discount * (maturity - settlement)
         if (denom === 0) {
           return 0
         }
         if (denom < 0) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         return 100 * (1 - discount * (maturity - settlement) / 360)
       }
@@ -636,13 +636,13 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
         if (settlement >= maturity) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
         }
 
         const startDate = this.dateTimeHelper.numberToSimpleDate(settlement)
         const endDate = this.dateTimeHelper.numberToSimpleDate(maturity)
         if (endDate.year > startDate.year + 1 || (endDate.year === startDate.year + 1 && (endDate.month > startDate.month || (endDate.month === startDate.month && endDate.day > startDate.day)))) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.MaturityLong)
         }
         return (100 - price) * 360 / (price * (maturity - settlement))
       }
@@ -707,7 +707,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
           }
         }
         if (!posFlag || !negFlag) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         const n = vals.length
         const nom = npvCore(rrate, posValues)
@@ -779,7 +779,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     return this.runFunction(ast.args, state, this.metadata('IRR'),
       (range: SimpleRangeValue, guess: number) => {
         if (guess <= -1) {
-          return new CellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE, ErrorMessage.RateGuess)
         }
 
         const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
@@ -791,7 +791,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         const hasPositive = vals.some(val => val > 0)
         const hasNegative = vals.some(val => val < 0)
         if (!hasPositive || !hasNegative) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.PositiveAndNegative)
         }
 
         return irrCore(vals, guess)
@@ -809,7 +809,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     return this.runFunction(ast.args, state, this.metadata('XIRR'),
       (values: SimpleRangeValue, dates: SimpleRangeValue, guess: number) => {
         if (guess <= -1) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.RateGuess)
         }
 
         const cashFlows = sanitizeXirrRange(values.valuesFromTopLeftCorner())
@@ -828,13 +828,13 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
         // A schedule needs at least two cash flows to define a rate of return.
         if (cashFlows.length < 2) {
-          return new CellError(ErrorType.NA)
+          return new CellError(ErrorType.NA, ErrorMessage.TwoCashFlows)
         }
 
         const hasPositive = cashFlows.some(value => value > 0)
         const hasNegative = cashFlows.some(value => value < 0)
         if (!hasPositive || !hasNegative) {
-          return new CellError(ErrorType.NUM)
+          return new CellError(ErrorType.NUM, ErrorMessage.PositiveAndNegative)
         }
 
         return xirrCore(cashFlows, paymentDates, guess)
@@ -882,7 +882,7 @@ function npvCore(rate: number, args: number[]): number | CellError {
       if (acc === 0) {
         continue
       } else {
-        return new CellError(ErrorType.DIV_BY_ZERO)
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
       }
     }
     acc /= 1 + rate
@@ -910,7 +910,7 @@ function irrCore(values: number[], guess: number): number | CellError {
     for (let i = 0; i < values.length; i++) {
       const factor = Math.pow(1 + rate, i)
       if (!isFinite(factor) || factor === 0) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NoConvergence)
       }
       npv += values[i] / factor
       if (i > 0) {
@@ -925,14 +925,14 @@ function irrCore(values: number[], guess: number): number | CellError {
 
     // Check if derivative is too small (avoid division by zero)
     if (Math.abs(dnpv) < epsMax) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, ErrorMessage.NoConvergence)
     }
 
     // Newton-Raphson step
     let newRate = rate - npv / dnpv
 
     if (!isFinite(newRate)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, ErrorMessage.NoConvergence)
     }
 
     // Clamp: when Newton overshoots past -1, bisect between current rate and -1
@@ -948,7 +948,7 @@ function irrCore(values: number[], guess: number): number | CellError {
     rate = newRate
   }
 
-  return new CellError(ErrorType.NUM)
+  return new CellError(ErrorType.NUM, ErrorMessage.NoConvergence)
 }
 
 /**
@@ -1016,14 +1016,14 @@ function xirrCore(values: number[], dates: number[], guess: number): number | Ce
       const base = 1 + rate
       const factor = Math.pow(base, exponent)
       if (!isFinite(factor) || factor === 0) {
-        return new CellError(ErrorType.NUM)
+        return new CellError(ErrorType.NUM, ErrorMessage.NoConvergence)
       }
       npv += values[i] / factor
       dnpv -= exponent * values[i] / (factor * base)
     }
 
     if (!isFinite(npv) || !isFinite(dnpv)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, ErrorMessage.NoConvergence)
     }
 
     // Check for convergence.
@@ -1033,13 +1033,13 @@ function xirrCore(values: number[], dates: number[], guess: number): number | Ce
 
     // Check if the derivative is too small (avoid division by zero).
     if (Math.abs(dnpv) < epsMax) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, ErrorMessage.NoConvergence)
     }
 
     // Newton-Raphson step.
     let newRate = rate - npv / dnpv
     if (!isFinite(newRate)) {
-      return new CellError(ErrorType.NUM)
+      return new CellError(ErrorType.NUM, ErrorMessage.NoConvergence)
     }
 
     // Clamp: when Newton overshoots past -1, bisect between current rate and -1.
@@ -1055,5 +1055,5 @@ function xirrCore(values: number[], dates: number[], guess: number): number | Ce
     rate = newRate
   }
 
-  return new CellError(ErrorType.NUM)
+  return new CellError(ErrorType.NUM, ErrorMessage.NoConvergence)
 }
