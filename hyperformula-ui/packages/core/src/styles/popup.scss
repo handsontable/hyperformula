@@ -1,0 +1,32 @@
+.hfe-popup {
+  &__close {
+    position: absolute;
+    inset-block-start: -10px;
+    inset-inline-end: -10px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 12px;
+    background: var(--hfe-menu-close-bg);
+    border: var(--hfe-menu-border-width) solid var(--hfe-menu-border-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: var(--hfe-menu-close-hover-bg);
+    }
+
+    &:focus-visible {
+      outline: var(--hfe-border-width-focus) solid var(--hfe-color-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.hfe-popup.hfe-popup--hosted {
+  position: static;
+  width: 100%;
+  max-height: none;
+}
