@@ -31,6 +31,14 @@ export class NamedExpressions {
     this.engine?.on?.("sheetRemoved", this.onNamedExpressionChanged);
   }
 
+  private localNames(): string[] {
+    try {
+      return this.engine?.listNamedExpressions?.(this.sheetId) ?? [];
+    } catch {
+      return [];
+    }
+  }
+
   private buildScopeByUpperName(): Map<string, number | "global"> {
     const scopeByUpperName = new Map<string, number | "global">();
     const global = this.engine?.listNamedExpressions?.() ?? [];
@@ -39,9 +47,7 @@ export class NamedExpressions {
       scopeByUpperName.set(name.toUpperCase(), "global");
     }
 
-    const local = this.engine?.listNamedExpressions?.(this.sheetId) ?? [];
-
-    for (const name of local) {
+    for (const name of this.localNames()) {
       scopeByUpperName.set(name.toUpperCase(), this.sheetId);
     }
 
@@ -117,9 +123,8 @@ export class NamedExpressions {
   }
 
   filter(prefix: string): string[] {
-    const local = this.engine?.listNamedExpressions?.(this.sheetId) ?? [];
     const global = this.engine?.listNamedExpressions?.() ?? [];
-    const all = [...new Set([...local, ...global])];
+    const all = [...new Set([...this.localNames(), ...global])];
 
     if (!prefix) {
       return all.slice(0, 20);
