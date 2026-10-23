@@ -241,6 +241,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=FISHERINV(0.5)'],
   },
+  FREQUENCY: {
+    category: 'Statistical',
+    shortDescription: 'Returns a column that counts how many numbers of data_array fall into each interval set by bins_array.',
+    parameters: [{name: 'data_array', description: 'The range or array of values to count; text, booleans and empty cells are skipped.'}, {name: 'bins_array', description: 'The range or array of interval upper bounds; the result has one row more than there are bounds, the last row counting the values above the largest bound.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=FREQUENCY(A1:A10, B1:B3)'],
+  },
   GAMMA: {
     category: 'Statistical',
     shortDescription: 'Returns value of Gamma function.',
@@ -346,6 +353,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=MEDIAN(1, 2, 3)', '=MEDIAN(A1:A10)'],
   },
+  'MODE.MULT': {
+    category: 'Statistical',
+    shortDescription: 'Returns a column of the most frequently occurring numbers, in order of first occurrence; #N/A when no number repeats.',
+    parameters: [{name: 'number1', description: 'A number, cell reference, or range to search for the most frequent numbers; text, booleans and empty cells are skipped. Further numbers or ranges can be passed as additional arguments.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=MODE.MULT(1, 1, 2, 2, 3)', '=MODE.MULT(A1:A10)'],
+  },
   MIN: {
     category: 'Statistical',
     shortDescription: 'Returns the minimum value in a list of arguments.',
@@ -416,6 +430,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=PERCENTILE.INC(A1:A10, 0.9)'],
   },
+  'PERCENTRANK.INC': {
+    category: 'Statistical',
+    shortDescription: 'Returns the rank of a value within a range as a fraction between 0 and 1, inclusive of both ends.',
+    parameters: [{name: 'array', description: 'The range of values that defines the ranking; text, booleans and empty cells are skipped.'}, {name: 'x', description: 'The value to rank; #N/A when it lies outside of the numbers in array.'}, {name: 'significance', description: 'The number of decimal digits of the result, truncated rather than rounded; at least 1, 3 by default.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=PERCENTRANK.INC(A1:A10, 5)', '=PERCENTRANK.INC(A1:A10, 5, 2)'],
+  },
   PHI: {
     category: 'Statistical',
     shortDescription: 'Returns probability density of normal distribution.',
@@ -429,6 +450,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'x', description: 'The number of events; must be non-negative.'}, {name: 'mean', description: 'The expected number of events; must be non-negative.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=POISSON.DIST(3, 5, FALSE())', '=POISSON.DIST(3, 5, TRUE())'],
+  },
+  PROB: {
+    category: 'Statistical',
+    shortDescription: 'Returns the probability that a value falls within the given limits, from a range of values and their probabilities.',
+    parameters: [{name: 'x_range', description: 'The range of numeric values.'}, {name: 'prob_range', description: 'The range of probabilities of the values in x_range, of the same size; each must be greater than 0 and at most 1, and together they must sum up to 1.'}, {name: 'lower_limit', description: 'The lower limit of the values, or the single value whose probability is returned when upper_limit is omitted.'}, {name: 'upper_limit', description: 'The upper limit of the values; the limits are inclusive.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=PROB(A1:A4, B1:B4, 2)', '=PROB(A1:A4, B1:B4, 2, 3)'],
   },
   'QUARTILE.EXC': {
     category: 'Statistical',
