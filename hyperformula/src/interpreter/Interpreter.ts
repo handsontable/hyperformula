@@ -565,17 +565,6 @@ function originNameForAstNode(ast: Ast): Maybe<string> {
 }
 
 /**
- * Stamps the origin function on an error, once per evaluation.
- *
- * Placed in `evaluateAst`'s single postprocessing tail rather than in each `switch` case, so it
- * also catches the overflow guard's freshly-minted error, and so no case can be forgotten. Every
- * nested sub-expression runs its own `evaluateAst` first, so an inner error is always stamped
- * before an outer function could overwrite it — and `withOrigin` is a no-op once set anyway.
- *
- * @param {CellError} val - the error produced by this evaluation
- * @param {Ast} ast - the node being evaluated
- */
-/**
  * Stamps the origin function on errors sitting inside an array this node produced.
  *
  * An error that is one element of a returned array never reaches the scalar branch above, so
@@ -612,6 +601,17 @@ function stampOriginForArrayElements(val: SimpleRangeValue, ast: Ast): SimpleRan
   return changed ? SimpleRangeValue.onlyValues(stamped) : val
 }
 
+/**
+ * Stamps the origin function on an error, once per evaluation.
+ *
+ * Placed in `evaluateAst`'s single postprocessing tail rather than in each `switch` case, so it
+ * also catches the overflow guard's freshly-minted error, and so no case can be forgotten. Every
+ * nested sub-expression runs its own `evaluateAst` first, so an inner error is always stamped
+ * before an outer function could overwrite it — and `withOrigin` is a no-op once set anyway.
+ *
+ * @param {CellError} val - the error produced by this evaluation
+ * @param {Ast} ast - the node being evaluated
+ */
 function stampOriginForAstNode(val: CellError, ast: Ast): CellError {
   const originName = originNameForAstNode(ast)
   return originName === undefined ? val : val.withOrigin(originName)
