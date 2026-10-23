@@ -105,7 +105,7 @@ hfInstance.setCellContents({sheet: 0, col: 2, row: 1}, [['=SUM(SalesData) * TaxR
 
 A named expression that resolves to a range of cells behaves differently depending on where it is used:
 
-- **As a function argument** — it works as expected. `=SUM(myRange)`, `=COUNT(myRange)`, and `=INDEX(myRange, 1, 1)` all operate on the full range.
+- **As a function argument** — it works as expected. `=SUM(myRange)`, `=COUNT(myRange)`, and `=INDEX(myRange, 1, 1)` all operate on the full range. A function that returns an array receives the full range too, and its result spills: `=TRANSPOSE(myRange)` produces the same block as `=TRANSPOSE(Sheet1!$A$1:$A$5)`.
 - **As an operand of an operator** — the range is reduced to a single cell before the operation. In `=myRange + 1`, only the cell of the range that shares the formula's row (for a vertical range) or column (for a horizontal range) is used. If the formula's row or column falls outside the range, or the range is two-dimensional, the result is a `#VALUE!` error.
 - **As a bare reference** — `=myRange` on its own returns a `#VALUE!` error; a range cannot be placed directly into a single cell.
 
@@ -113,7 +113,7 @@ In the default mode the range is reduced before the operator runs, so `=SUM(myRa
 
 When array arithmetic is enabled (`useArrayArithmetic: true`), named ranges still work as function arguments and aggregate correctly, but as an operand they behave differently from the default mode:
 
-- A bare `=myRange + 1` does not spill — it returns a `#VALUE!` error rather than producing one result per element.
+- `=myRange + 1` spills, producing one result per element, exactly as the range it stands for does: the result is the same as for `=A1:A5 + 1`.
 - Inside an aggregate the operator becomes element-wise. `=SUM(myRange + 1)` adds 1 to every element and then sums, so for `myRange` covering values `1..5` it returns `20` (`SUM(2, 3, 4, 5, 6)`), not the single reduced value of the default mode.
 
 ## Named columns

@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
+- Fixed a named range evaluating to the `#VALUE!` error instead of spilling when passed to an array-returning function, or used as an operand with `useArrayArithmetic` enabled: `=TRANSPOSE(myRange)` now gives the same result as `=TRANSPOSE(A1:A5)`. [#1772](https://github.com/handsontable/hyperformula/pull/1772)
 
 ## [3.5.0] - 2026-10-09
 
