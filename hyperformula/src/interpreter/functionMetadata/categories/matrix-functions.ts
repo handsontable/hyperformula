@@ -50,6 +50,6 @@ export const MATRIX_FUNCTIONS_DOCS: Record<string, FunctionDoc> = {
     shortDescription: 'Returns the identity matrix of the given dimension. A fractional dimension is truncated; a dimension below 1 or a non-numeric one returns the #VALUE! error.',
     parameters: [{name: 'dimension', description: 'The number of rows and columns of the returned matrix.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    examples: ['=MUNIT(3)', '=MUNIT(A1)'],
+    examples: ['=MUNIT(3)', '=MMULT(A1:C3, MUNIT(3))'],
   },
 }
