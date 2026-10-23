@@ -13,7 +13,7 @@ To upgrade your HyperFormula version from 3.x.x to 4.0.0, follow this guide.
 
 ## Changes to empty string coercion
 
-An empty string (`""`) used to be coerced to `0` wherever a number was expected. It no longer is: as in Excel, `""` is text, and text that is not a number produces the `#VALUE!` error. The Excel results quoted below were verified in Excel Online, so where this guide says "as in Excel", that is a measured result rather than an intention.
+An empty string (`""`) used to be coerced to `0` wherever a number was expected. It no longer is: as in Excel, `""` is text, and text that is not a number produces the `#VALUE!` error. The Excel values in the tables below were measured in Excel Online.
 
 Nothing in your code needs to change for this on its own. What may change are results in your sheets, and only where an empty string reaches a numeric context — see [When a cell holds an empty string](#when-a-cell-holds-an-empty-string) for the case that is easy to hit without writing `""` anywhere.
 
@@ -98,7 +98,6 @@ Where Excel evaluates an argument as an **array containing only text**, it ignor
 | Formula | Excel | 3.x | 4.0 |
 | --- | --- | --- | --- |
 | `=SUM(IF(A1:A3>0,"",A1:A3))` | `0` | `0` | `#VALUE!` |
-| `=SUM({""})` | `0` | `0` | `#VALUE!` |
 | `=COUNT(IF({1,0},"",5))` | `1` | `1` | `0` |
 
 That agreement was a coincidence rather than support for the idiom: HyperFormula's `IF` is not array-aware, so it collapses such an argument to a single value regardless. `=SUM(IF(A1:A3>5,"",A1:A3))` over `1, 2, 3` is `6` in Excel and `1` in HyperFormula — in 3.x as much as in 4.0. What changes is only that the collapsed value is no longer silently read as `0`. Ranges and array literals with more than one element are unaffected: `=SUM({1,"",2})` is `3` and `=COUNT({1,"",2})` is `2`, before and after.
@@ -146,4 +145,4 @@ Two places worth auditing in a host application:
 - **Paste.** Clipboard content is text, so a blank cell inside a copied range parses to `''` rather than to `null` unless something maps it back.
 
 To find affected formulas rather than affected code, look for numeric formulas that reference cells your application can blank out, and for `IF(..., "")` used as a "leave it empty" branch feeding another calculation — for example
-`=IF(SUM(A1:A2)>0, SUM(A1:A2), "")/1000`, which returned a number in 3.x and returns `#VALUE!` in 4.0. That pattern is Excel-correct in 4.0: Excel reports `#VALUE!` for it too. Where the intent is "treat the empty branch as zero", write `0` instead of `""` in the branch, or wrap the reference in [`N()`](built-in-functions.md#information) / [`IFERROR`](built-in-functions.md#logical).
+`=IF(SUM(A1:A2)>0, SUM(A1:A2), "")/1000`, which returned a number in 3.x and returns `#VALUE!` in 4.0. Where the intent is "treat the empty branch as zero", write `0` instead of `""` in the branch, or wrap the reference in [`N()`](built-in-functions.md#information) / [`IFERROR`](built-in-functions.md#logical).
