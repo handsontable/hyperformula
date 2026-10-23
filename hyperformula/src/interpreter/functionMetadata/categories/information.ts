@@ -13,7 +13,7 @@ import {FunctionDoc} from '../FunctionDescription'
 export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
   'ERROR.TYPE': {
     category: 'Information',
-    shortDescription: 'Returns the number of an error type: 2 for #DIV/0!, 3 for #VALUE!, 4 for #REF!, 5 for #NAME?, 6 for #NUM! and 7 for #N/A, or #N/A for a value that is not an error.',
+    shortDescription: 'Returns the number of an error type: 2 for #DIV/0!, 3 for #VALUE!, 4 for #REF!, 5 for #NAME?, 6 for #NUM!, 7 for #N/A and 9 for #SPILL!, or #N/A for a value that is not an error or an error without a number.',
     parameters: [{name: 'value', description: 'The value or cell reference to inspect; any value that is not an error, a number or text included, results in #N/A.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=ERROR.TYPE(1/0)', '=ERROR.TYPE(A1)', '=ERROR.TYPE(NA())'],
