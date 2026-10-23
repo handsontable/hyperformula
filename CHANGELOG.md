@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added a message after `npm i hyperformula` that points AI assistants to the SKILLS file. The message needs `--foreground-scripts` to be visible in npm, and pnpm 10 needs the `postinstall` script to be approved first. [#1829](https://github.com/handsontable/hyperformula/pull/1829)
 - Added `DetailedCellError.hasMessage`, so a consumer can tell a cell error that never carried a message (e.g. a custom function that omitted one) apart from one with a deliberately empty message — both previously surfaced identically as `message: ''`. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Added `DetailedCellError.originFunction` and `DetailedCellError.argumentIndex`, which name the function or operator that produced a cell error and, when it failed to coerce an argument, that argument's position as written in the formula. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ### Changed
 
