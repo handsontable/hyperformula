@@ -36,6 +36,7 @@ const IGNORED_IN_STRUCTURAL_COMPARE = {
   address: undefined,
   originFunction: undefined,
   argumentIndex: undefined,
+  hasMessage: undefined,
   propagated: undefined,
   originAddress: undefined,
   originAddressVersion: undefined,
