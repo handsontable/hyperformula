@@ -6,7 +6,7 @@
 import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {getRawValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {Maybe} from '../../Maybe'
@@ -175,6 +175,22 @@ function determinant(matrix: number[][]): number {
 }
 
 /**
+ * Reads a number written directly in a formula, with an optional sign, such as `3`, `+3` or `-3`.
+ *
+ * @param node - an argument of a function call
+ * @returns the number, or undefined when the argument is anything else and its value is known only after evaluation
+ */
+function numberLiteral(node: Ast): Maybe<number> {
+  if (node.type === AstNodeType.NUMBER) {
+    return node.value
+  }
+  if ((node.type === AstNodeType.PLUS_UNARY_OP || node.type === AstNodeType.MINUS_UNARY_OP) && node.value.type === AstNodeType.NUMBER) {
+    return node.type === AstNodeType.MINUS_UNARY_OP ? -node.value.value : node.value.value
+  }
+  return undefined
+}
+
+/**
  * Builds the identity matrix.
  *
  * @param size - the number of rows and columns
@@ -329,6 +345,9 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (!(size >= 1)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
+      if (size > this.largestIdentityMatrix()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
+      }
       return SimpleRangeValue.onlyNumbers(identityMatrix(size))
     })
   }
@@ -337,12 +356,19 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     if (ast.args.length !== 1) {
       return ArraySize.error()
     }
-    const argument = ast.args[0]
-    if (argument.type !== AstNodeType.NUMBER) {
+    const dimension = numberLiteral(ast.args[0])
+    if (dimension === undefined) {
       return ArraySize.scalar()
     }
-    const size = Math.trunc(argument.value)
-    return size >= 1 ? new ArraySize(size, size) : ArraySize.error()
+    const size = Math.trunc(dimension)
+    return size >= 1 && size <= this.largestIdentityMatrix() ? new ArraySize(size, size) : ArraySize.error()
+  }
+
+  /**
+   * The largest dimension `MUNIT` accepts: the identity matrix must fit within both the row and the column limit of a sheet.
+   */
+  private largestIdentityMatrix(): number {
+    return Math.min(this.config.maxRows, this.config.maxColumns)
   }
 
   /**
