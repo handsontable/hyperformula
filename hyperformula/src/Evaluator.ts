@@ -113,6 +113,7 @@ export class Evaluator {
       )
       nextSeeds = [...deferred, ...retrySeeds]
     }
+    this.dependencyGraph.removeUnusedRuntimeVertices()
   }
 
   /**
@@ -221,6 +222,8 @@ export class Evaluator {
   private evaluateAstToCellValue(ast: Ast, state: InterpreterState): InterpreterValue {
     const interpreterValue = this.interpreter.evaluateAst(ast, state)
     if (interpreterValue instanceof SimpleRangeValue) {
+      // Formulas that read this cell later read the range's cells, so they become dependencies of this formula now
+      interpreterValue.runBeforeRead()
       return interpreterValue
     } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
       return 0

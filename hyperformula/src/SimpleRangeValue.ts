@@ -233,7 +233,12 @@ export class SimpleRangeValue {
   /**
    * Computes the range data if it is not computed yet.
    */
-  private runBeforeRead(): void {
+  /**
+   * Runs the function given to {@link onlyRangeWithReadHook} unless it has already run.
+   *
+   * @internal
+   */
+  public runBeforeRead(): void {
     if (this.beforeRead !== undefined) {
       this.beforeRead()
       this.beforeRead = undefined

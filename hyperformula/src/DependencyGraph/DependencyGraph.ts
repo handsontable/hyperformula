@@ -58,6 +58,10 @@ export class DependencyGraph {
    * a formula makes progress.
    */
   public runtimeEdgesAdded = 0
+  /**
+   * Vertices that lost a runtime dependent during evaluation, with the address they were read at. See {@link removeUnusedRuntimeVertices}.
+   */
+  private readonly runtimeVerticesToRemoveIfUnused = new Map<RangeVertex | EmptyCellVertex, SimpleCellAddress | SimpleCellRange>()
 
   constructor(
     public readonly addressMapping: AddressMapping,
@@ -614,6 +618,9 @@ export class DependencyGraph {
             emptyVertex = emptyVertex ?? this.fetchCellOrCreateEmpty(sourceAddress).vertex
             this.graph.addEdge(emptyVertex, adjacentNode)
             this.graph.removeEdge(sourceVertex, adjacentNode)
+          } else if (adjacentNode instanceof FormulaVertex && adjacentNode.runtimeDependencies?.some(dependency => dependency.vertex === sourceVertex)) {
+            // A runtime dependency comes from an address that does not move with the cell, so the formula reads it again
+            this.graph.markNodeAsDirty(adjacentNode)
           }
         }
         if (emptyVertex) {
@@ -1515,21 +1522,37 @@ export class DependencyGraph {
   /**
    * Removes the edge of a runtime dependency. Removes the read cell's vertex too if it is an empty cell nothing else depends on.
    */
+  /**
+   * Removes the edge of a runtime dependency. A range vertex or empty cell vertex left without dependents is removed
+   * later, by {@link removeUnusedRuntimeVertices}: the edge is removed during evaluation, while the sort may still hold the vertex.
+   */
   private removeRuntimeEdge(dependency: RuntimeDependency, dependent: FormulaVertex): void {
     const {address, vertex} = dependency
     this.graph.removeEdgeIfExists(vertex, dependent)
-    if (vertex instanceof RangeVertex) {
-      if (this.graph.adjacentNodesCount(vertex) === 0) {
+    if (vertex instanceof RangeVertex || vertex instanceof EmptyCellVertex) {
+      this.runtimeVerticesToRemoveIfUnused.set(vertex, address)
+    }
+  }
+
+  /**
+   * Removes the range and empty cell vertices that lost a runtime dependent and have no dependents left.
+   * Called after evaluation.
+   */
+  public removeUnusedRuntimeVertices(): void {
+    for (const [vertex, address] of this.runtimeVerticesToRemoveIfUnused) {
+      if (!this.graph.hasNode(vertex) || this.graph.adjacentNodesCount(vertex) > 0) {
+        continue
+      }
+      if (vertex instanceof RangeVertex) {
         this.removeVertexAndCleanupDependencies(vertex)
         this.rangeMapping.removeVertexIfExists(vertex)
+      } else if (isSimpleCellAddress(address) && this.addressMapping.getCell(address) === vertex) {
+        this.graph.removeNode(vertex)
+        this.addressMapping.removeCell(address)
+        this.cleanupPlaceholderSheets(new Set([address.sheet]))
       }
-      return
     }
-    if (vertex instanceof EmptyCellVertex && isSimpleCellAddress(address) && this.graph.adjacentNodesCount(vertex) === 0 && this.addressMapping.getCell(address) === vertex) {
-      this.graph.removeNode(vertex)
-      this.addressMapping.removeCell(address)
-      this.cleanupPlaceholderSheets(new Set([address.sheet]))
-    }
+    this.runtimeVerticesToRemoveIfUnused.clear()
   }
 
   /**
