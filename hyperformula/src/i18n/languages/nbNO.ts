@@ -239,6 +239,7 @@ const dictionary: RawTranslationPackage = {
     TODAY: 'IDAG',
     TRANSPOSE: 'TRANSPONER',
     TRIM: 'TRIMME',
+    TRIMRANGE: 'TRIMMEOMRÅDE',
     TRUE: 'SANN',
     TRUNC: 'AVKORT',
     UNICHAR: 'UNICODETEGN',

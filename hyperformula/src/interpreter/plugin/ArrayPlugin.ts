@@ -5,18 +5,19 @@
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {ArraySize} from '../../ArraySize'
-import {CellError, ErrorType} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {ArrayFormulaVertex, EmptyCellVertex} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {BooleanPlugin} from './BooleanPlugin'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
- * Classifies a TAKE or DROP count expression whose value may be known before evaluation.
+ * Classifies a count or code expression of TAKE, DROP or TRIMRANGE whose value may be known before evaluation.
  *
  * @internal
  */
@@ -33,10 +34,29 @@ type LiteralCount =
  */
 type TakeLiteralDimension = LiteralCount | {kind: 'unbounded'}
 
+/**
+ * The rows and columns of a TRIMRANGE source that hold content, relative to the source.
+ *
+ * @internal
+ */
+interface ContentBounds {
+  top: number,
+  bottom: number,
+  left: number,
+  right: number,
+}
+
+/**
+ * TRIMRANGE trim codes: 0 trims nothing, 1 leading blank lines, 2 trailing blank lines, 3 both.
+ */
+const TRIM_LEADING = 1
+const TRIM_TRAILING = 2
+const TRIM_BOTH = 3
+
 export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ArrayPlugin> {
   /**
-   * Evaluates the dependency-free subset of TAKE and DROP count expressions
-   * used for static result-size prediction.
+   * Evaluates the dependency-free subset of TAKE and DROP count expressions,
+   * and of TRIMRANGE code expressions, used for static result-size prediction.
    *
    * @param {Ast | undefined} argument - The count expression to inspect before evaluation.
    * @returns {LiteralCount} The constant value, an invalid-literal marker, or an unresolved marker.
@@ -150,7 +170,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 
   /**
-   * Resolves a direct TAKE or DROP source reference without evaluating its values.
+   * Resolves a direct TAKE, DROP or TRIMRANGE source reference without evaluating its values.
    * The range supplies materialized dimensions only; spill placement never
    * depends on its sheet.
    *
@@ -215,7 +235,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 
   /**
-   * Measures a TAKE or DROP source whose predicted size is unbounded. A direct
+   * Measures a TAKE, DROP or TRIMRANGE source whose predicted size is unbounded. A direct
    * whole-column or whole-row reference is measured by its effective size; a
    * computed array falls back to the configured sheet limits.
    *
@@ -309,6 +329,19 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
         {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
+      ],
+      vectorizationForbidden: true,
+    },
+    'TRIMRANGE': {
+      method: 'trimrange',
+      sizeOfResultArrayMethod: 'trimrangeArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        // Coerced in the method: an empty text is #VALUE!, and both codes are coerced before either is range-checked.
+        // SCALAR, so that an error in either code reaches the method and the codes are checked in order.
+        {argumentType: FunctionArgumentType.SCALAR, optionalArg: true, defaultValue: TRIM_BOTH, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.SCALAR, optionalArg: true, defaultValue: TRIM_BOTH, emptyAsDefault: true},
       ],
       vectorizationForbidden: true,
     },
@@ -591,21 +624,345 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const width = columnDimension.kind === 'value'
       ? Math.min(sourceSize.width, columnDimension.value, this.config.maxColumns)
       : sourceSize.width
-    const startsBelowFirstRow = rowDimension.kind === 'unbounded' && !Number.isFinite(height) && state.formulaAddress.row !== 0
-    const startsRightOfFirstColumn = columnDimension.kind === 'unbounded' && !Number.isFinite(width) && state.formulaAddress.col !== 0
-    const effectiveSourceSize = this.effectiveSourceSize(ast.args[0], state)
-    const effectiveHeight = !Number.isFinite(height) ? effectiveSourceSize.height : height
-    const effectiveWidth = !Number.isFinite(width) ? effectiveSourceSize.width : width
+
+    return this.sizeAtSheetEdge(
+      ast.args[0], state, width, height, columnDimension.kind === 'unbounded', rowDimension.kind === 'unbounded',
+    )
+  }
+
+  /**
+   * Finishes the predicted size of a result that may span a whole column or
+   * row. A spreadsheet result of that kind reaches the sheet edge, so it fits
+   * only when it starts in the first row (column); elsewhere its unbounded
+   * dimension is kept, so that array-space validation reports a spill error.
+   * In the first row (column), or for a dimension the rule does not apply to,
+   * an unbounded dimension is replaced by the source's effective size.
+   *
+   * @param {Ast} source - The source expression, measured when a dimension is unbounded.
+   * @param {InterpreterState} state - The formula state whose address anchors the spill.
+   * @param {number} width - The predicted width, possibly unbounded.
+   * @param {number} height - The predicted height, possibly unbounded.
+   * @param {boolean} widthReachesSheetEdge - Whether an unbounded width must start in the first column.
+   * @param {boolean} heightReachesSheetEdge - Whether an unbounded height must start in the first row.
+   * @returns {ArraySize} The predicted size, an unbounded one that will not fit, or an invalid size when empty.
+   * @internal
+   */
+  private sizeAtSheetEdge(
+    source: Ast,
+    state: InterpreterState,
+    width: number,
+    height: number,
+    widthReachesSheetEdge: boolean,
+    heightReachesSheetEdge: boolean,
+  ): ArraySize {
+    const startsBelowFirstRow = heightReachesSheetEdge && !Number.isFinite(height) && state.formulaAddress.row !== 0
+    const startsRightOfFirstColumn = widthReachesSheetEdge && !Number.isFinite(width) && state.formulaAddress.col !== 0
 
     if (startsBelowFirstRow || startsRightOfFirstColumn) {
       return new ArraySize(width, height)
     }
 
+    const effectiveSourceSize = this.effectiveSourceSize(source, state)
+    const effectiveHeight = Number.isFinite(height) ? height : effectiveSourceSize.height
+    const effectiveWidth = Number.isFinite(width) ? width : effectiveSourceSize.width
+
     if (effectiveHeight < 1 || effectiveWidth < 1) {
       return ArraySize.error()
     }
 
+    // A fresh size: a reference's size would make the formula a single cell.
     return new ArraySize(effectiveWidth, effectiveHeight)
+  }
+
+  /**
+   * Corresponds to TRIMRANGE(range, [trim_rows], [trim_cols]).
+   *
+   * Removes the blank rows and columns at the edges of the range and returns
+   * the rest as values. Each code is 0 (trim nothing), 1 (leading blank lines),
+   * 2 (trailing blank lines) or 3 (both, the default); any other value is a
+   * #VALUE! error. A cell of a range is blank when it is empty: a formula is
+   * content even when its value is blank. A source with nothing left to keep
+   * returns a #REF! error.
+   *
+   * @param {ProcedureAst} ast - The parsed TRIMRANGE call.
+   * @param {InterpreterState} state - The current formula evaluation state.
+   * @returns {InterpreterValue} The trimmed source values or a spreadsheet error.
+   */
+  public trimrange(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    // An empty range argument would otherwise evaluate to a blank cell and be trimmed away.
+    if (ast.args[0]?.type === AstNodeType.EMPTY) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.EmptyArg)
+    }
+
+    return this.runFunction(ast.args, state, this.metadata('TRIMRANGE'),
+      (range: SimpleRangeValue, trimRows: InternalScalarValue, trimColumns: InternalScalarValue) => {
+        // A spreadsheet lifts an array of codes into an array of results; a function returning an array cannot be
+        // lifted here, so a code larger than one cell is an error.
+        if (this.isMultiCellArgument(ast.args[1], state) || this.isMultiCellArgument(ast.args[2], state)) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+        }
+
+        const rowMode = this.coerceTrimCode(trimRows)
+        if (rowMode instanceof CellError) {
+          return rowMode
+        }
+        const columnMode = this.coerceTrimCode(trimColumns)
+        if (columnMode instanceof CellError) {
+          return columnMode
+        }
+        if (!this.isTrimMode(rowMode) || !this.isTrimMode(columnMode)) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
+        }
+
+        const height = range.height()
+        const width = range.width()
+        const bounds = this.contentBounds(range, range.range ?? this.directSourceCell(ast.args[0], state))
+
+        if (bounds === undefined) {
+          return rowMode === 0 && columnMode === 0
+            ? this.sliceSourceArray(range, 0, 0, height, width)
+            : new CellError(ErrorType.REF, ErrorMessage.EmptyRange)
+        }
+
+        const top = (rowMode & TRIM_LEADING) !== 0 ? bounds.top : 0
+        const bottom = (rowMode & TRIM_TRAILING) !== 0 ? bounds.bottom : height - 1
+        const left = (columnMode & TRIM_LEADING) !== 0 ? bounds.left : 0
+        const right = (columnMode & TRIM_TRAILING) !== 0 ? bounds.right : width - 1
+
+        return this.sliceSourceArray(range, top, left, bottom - top + 1, right - left + 1)
+      }
+    )
+  }
+
+  /**
+   * Calculates the spilled array size of TRIMRANGE. Which rows and columns are
+   * blank is known only after evaluation, so the untrimmed source is reserved:
+   * the result fills its top-left corner and the rest stays blank. A
+   * whole-column or whole-row source follows the same sheet-edge rule as TAKE
+   * (see `sizeAtSheetEdge`). A trim code that is certainly
+   * invalid is reported as an invalid size, so the formula is a single error
+   * cell instead of reserving space.
+   *
+   * @param {ProcedureAst} ast - The parsed TRIMRANGE call.
+   * @param {InterpreterState} state - The formula state whose address anchors the spill.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  public trimrangeArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 1 || ast.args.length > 3) {
+      return ArraySize.error()
+    }
+
+    if (
+      !this.isPossibleTrimCode(ast.args[1])
+      || !this.isPossibleTrimCode(ast.args[2])
+      || this.isMultiCellArgument(ast.args[1], state)
+      || this.isMultiCellArgument(ast.args[2], state)
+    ) {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata('TRIMRANGE')
+    const sourceSize = this.arraySizeForAst(
+      ast.args[0],
+      new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
+    )
+
+    if (sourceSize.isScalar() && !sourceSize.isRef) {
+      return ArraySize.scalar()
+    }
+
+    return this.sizeAtSheetEdge(ast.args[0], state, sourceSize.width, sourceSize.height, true, true)
+  }
+
+  /**
+   * Coerces a TRIMRANGE trim code to a number. An error is returned as it is,
+   * and an empty text is a #VALUE! error rather than 0; numbers, numeric text,
+   * booleans and blank cells coerce as numbers.
+   *
+   * @param {InternalScalarValue} value - The code as passed to the function.
+   * @returns {number | CellError} The code as a number, not yet range-checked, or an error.
+   */
+  private coerceTrimCode(value: InternalScalarValue): number | CellError {
+    if (value instanceof CellError) {
+      return value
+    }
+    if (value === '') {
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+    }
+    const coercedValue = this.arithmeticHelper.coerceScalarToNumberOrError(value)
+    return coercedValue instanceof CellError ? coercedValue : getRawValue(coercedValue)
+  }
+
+  /**
+   * Checks that a number is a TRIMRANGE trim code: an integer from 0 to 3.
+   * Fractions are rejected, not truncated.
+   *
+   * @param {number} value - The coerced code.
+   * @returns {boolean} Whether the code is valid.
+   */
+  private isTrimMode(value: number): boolean {
+    return Number.isInteger(value) && value >= 0 && value <= TRIM_BOTH
+  }
+
+  /**
+   * Checks a TRIMRANGE trim code before evaluation. Omitted, empty and
+   * unresolved codes may be valid; a literal is valid only when it is a trim
+   * code, and an empty text never is.
+   *
+   * @param {Ast | undefined} argument - The code expression to inspect.
+   * @returns {boolean} False when the code is certainly invalid.
+   */
+  private isPossibleTrimCode(argument: Ast | undefined): boolean {
+    if (argument === undefined || argument.type === AstNodeType.EMPTY) {
+      return true
+    }
+    if (argument.type === AstNodeType.STRING && argument.value === '') {
+      return false
+    }
+
+    const code = this.parseLiteralCount(argument)
+    if (code.kind === 'invalid') {
+      return false
+    }
+    return code.kind === 'unresolved' || this.isTrimMode(code.value)
+  }
+
+  /**
+   * Checks whether an argument is predicted to be larger than one cell: an
+   * array constant, a multi-cell range or an array-returning function.
+   *
+   * @param {Ast | undefined} argument - The argument expression to inspect.
+   * @param {InterpreterState} state - The formula state used to resolve relative addresses.
+   * @returns {boolean} True when the argument is predicted to have more than one cell.
+   */
+  private isMultiCellArgument(argument: Ast | undefined, state: InterpreterState): boolean {
+    if (argument === undefined || argument.type === AstNodeType.EMPTY) {
+      return false
+    }
+    const size = this.arraySizeForAst(argument, new InterpreterState(state.formulaAddress, true))
+    return size.width > 1 || size.height > 1
+  }
+
+  /**
+   * Resolves a TRIMRANGE source written as a single cell reference to a
+   * one-cell range, so that the cell is judged by its content like any cell of
+   * a range. A single cell reference evaluates to its value, which carries no
+   * range.
+   *
+   * @param {Ast | undefined} argument - The source expression to inspect.
+   * @param {InterpreterState} state - The formula state used to resolve relative addresses.
+   * @returns {AbsoluteCellRange | undefined} The one-cell range, or `undefined` for any other source.
+   */
+  private directSourceCell(argument: Ast | undefined, state: InterpreterState): AbsoluteCellRange | undefined {
+    if (argument?.type === AstNodeType.PARENTHESIS) {
+      return this.directSourceCell(argument.expression, state)
+    }
+    if (argument?.type !== AstNodeType.CELL_REFERENCE) {
+      return undefined
+    }
+    return AbsoluteCellRange.spanFrom(argument.reference.toSimpleCellAddress(state.formulaAddress), 1, 1)
+  }
+
+  /**
+   * Finds the rows and columns of a TRIMRANGE source that hold content. A
+   * range is read cell by cell, only inside the part of it that lies within
+   * its sheet's current height and width, since nothing beyond holds content.
+   * A computed array is read element by element, a blank element being an
+   * empty value. Both are scanned inward from the edges.
+   *
+   * @param {SimpleRangeValue} source - The evaluated source.
+   * @param {AbsoluteCellRange | undefined} sourceRange - The cells the source was read from, or `undefined` for a computed array.
+   * @returns {ContentBounds | undefined} The bounds relative to the source, or `undefined` when every cell is blank.
+   */
+  private contentBounds(source: SimpleRangeValue, sourceRange: AbsoluteCellRange | undefined): ContentBounds | undefined {
+    if (sourceRange === undefined) {
+      const data = source.data
+      return this.scanContentBounds(data.length, source.width(), (row, column) => data[row][column] !== EmptyValue)
+    }
+
+    const address: SimpleCellAddress = {sheet: sourceRange.sheet, row: 0, col: 0}
+    const height = Math.min(sourceRange.end.row, this.dependencyGraph.getSheetHeight(sourceRange.sheet) - 1) - sourceRange.start.row + 1
+    const width = Math.min(sourceRange.end.col, this.dependencyGraph.getSheetWidth(sourceRange.sheet) - 1) - sourceRange.start.col + 1
+    return this.scanContentBounds(height, width, (row, column) => {
+      address.row = sourceRange.start.row + row
+      address.col = sourceRange.start.col + column
+      return this.isContentCell(address)
+    })
+  }
+
+  /**
+   * Scans a block inward from each edge for the first row and column that
+   * hold content: rows from the top and the bottom, then columns from the left
+   * and the right within those rows. The cost is the blank border plus one
+   * line per edge, not the whole block, unless the block is blank.
+   *
+   * @param {number} height - The number of rows to scan; zero or less means none.
+   * @param {number} width - The number of columns to scan; zero or less means none.
+   * @param {(row: number, column: number) => boolean} hasContent - Whether the cell at a block position holds content.
+   * @returns {ContentBounds | undefined} The bounds within the block, or `undefined` when every cell is blank.
+   */
+  private scanContentBounds(height: number, width: number, hasContent: (row: number, column: number) => boolean): ContentBounds | undefined {
+    const rowHasContent = (row: number) => {
+      for (let column = 0; column < width; column++) {
+        if (hasContent(row, column)) {
+          return true
+        }
+      }
+      return false
+    }
+    const columnHasContent = (column: number, top: number, bottom: number) => {
+      for (let row = top; row <= bottom; row++) {
+        if (hasContent(row, column)) {
+          return true
+        }
+      }
+      return false
+    }
+
+    let top = 0
+    while (top < height && !rowHasContent(top)) {
+      top++
+    }
+    if (top >= height) {
+      return undefined
+    }
+    let bottom = height - 1
+    while (bottom > top && !rowHasContent(bottom)) {
+      bottom--
+    }
+    let left = 0
+    while (!columnHasContent(left, top, bottom)) {
+      left++
+    }
+    let right = width - 1
+    while (right > left && !columnHasContent(right, top, bottom)) {
+      right--
+    }
+
+    return {top, bottom, left, right}
+  }
+
+  /**
+   * Checks whether a cell holds content for TRIMRANGE. An empty cell is blank;
+   * any formula is content, even one whose value is blank, including the cell
+   * that holds an array formula; any other cell of a spilled array is content
+   * when its value is not blank, so the blank padding of another array result
+   * counts as blank.
+   *
+   * @param {SimpleCellAddress} address - The cell to inspect.
+   * @returns {boolean} True when the cell holds content.
+   */
+  private isContentCell(address: SimpleCellAddress): boolean {
+    const vertex = this.dependencyGraph.getCell(address)
+    if (vertex === undefined || vertex instanceof EmptyCellVertex) {
+      return false
+    }
+    if (vertex instanceof ArrayFormulaVertex) {
+      const formulaAddress = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+      const holdsFormula = formulaAddress.sheet === address.sheet && formulaAddress.row === address.row && formulaAddress.col === address.col
+      return holdsFormula || this.dependencyGraph.getCellValue(address) !== EmptyValue
+    }
+    return true
   }
 
   /**

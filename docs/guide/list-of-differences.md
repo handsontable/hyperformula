@@ -126,6 +126,11 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | DROP          | =DROP(Data!A:A, B1)                                            | Spills from row 1 only; returns SPILL below row 1, because the count is read after the result size is set. | No such function. | Spills 1,048,576 minus B1 rows when entered in row B1+1 or above; returns SPILL below. |
 | DROP          | =DROP(A1:C3, {1,2})                                            | Uses the first count and drops one row. | No such function. | Returns a 1x2 array of VALUE errors. |
 | DROP          | =ISREF(DROP(Data!A1:C3, 1))                                    | FALSE (returns values, not a reference) | No such function. | TRUE |
+| TRIMRANGE     | =TRIMRANGE(A1:C10)                                             | Reserves the whole range (10x3): the trimmed values fill its top-left corner, the other cells stay blank, and a value in one of them makes the formula return SPILL. | No such function. | Spills only the trimmed rows and columns, and follows the data. |
+| TRIMRANGE     | =TRIMRANGE(Data!A:A)                                           | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | No such function. | Spills the trimmed rows from any row. |
+| TRIMRANGE     | =TRIMRANGE(A1:C3, {0,3})                                       |        VALUE | No such function. | Returns a 1x2 array of VALUE errors. |
+| TRIMRANGE     | =ISREF(TRIMRANGE(A1:C3))                                       | FALSE (returns values, not a reference) | No such function. | TRUE |
+| TRIMRANGE     | =A1:.C10                                                       | ERROR: the trim reference operators (`.:`, `:.`, `.:.`) are not supported. | ERROR: formula parse error. | Same as =TRIMRANGE(A1:C10, 2, 2). |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |

@@ -239,6 +239,7 @@ const dictionary: RawTranslationPackage = {
     TODAY: 'TÄMÄ.PÄIVÄ',
     TRANSPOSE: 'TRANSPONOI',
     TRIM: 'POISTA.VÄLIT',
+    TRIMRANGE: 'RAJAAALUE',
     TRUE: 'TOSI',
     TRUNC: 'KATKAISE',
     UNICHAR: 'UNICODEMERKKI',

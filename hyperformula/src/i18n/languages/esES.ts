@@ -239,6 +239,7 @@ export const dictionary: RawTranslationPackage = {
     TODAY: 'HOY',
     TRANSPOSE: 'TRANSPONER',
     TRIM: 'ESPACIOS',
+    TRIMRANGE: 'RECORTAR.RANGO',
     TRUE: 'VERDADERO',
     TRUNC: 'TRUNCAR',
     UNICHAR: 'UNICHAR',

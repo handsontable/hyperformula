@@ -239,6 +239,7 @@ const dictionary: RawTranslationPackage = {
     TODAY: 'HEUTE',
     TRANSPOSE: 'MTRANS',
     TRIM: 'GLÄTTEN',
+    TRIMRANGE: 'ABSCHNBEREICH',
     TRUE: 'WAHR',
     TRUNC: 'KÜRZEN',
     UNICHAR: 'UNIZEICHEN',
