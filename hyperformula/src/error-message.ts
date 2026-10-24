@@ -38,6 +38,7 @@ export class ErrorMessage {
   public static CellRefExpected = 'Cell reference expected.'
   public static EmptyRange = 'Empty range not allowed.'
   public static BadRef = 'Address is not correct.'
+  public static R1C1NotSupported = 'R1C1 notation is not supported.'
   public static NumberRange = 'Number-only range expected.'
   public static ValueNotFound = 'Value not found.'
   public static ValueBaseLarge = 'Value in base too large.'

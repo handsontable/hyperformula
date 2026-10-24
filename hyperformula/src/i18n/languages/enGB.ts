@@ -123,6 +123,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'IFNA',
     IFS: 'IFS',
     INDEX: 'INDEX',
+    INDIRECT: 'INDIRECT',
     INT: 'INT',
     INTERVAL: 'INTERVAL',
     IPMT: 'IPMT',

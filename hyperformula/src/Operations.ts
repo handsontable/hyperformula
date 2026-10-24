@@ -284,6 +284,8 @@ export class Operations {
     mergedPlaceholderSheetId?: number,
   } {
     const { previousDisplayName, mergedWithPlaceholderSheet } = this.sheetMapping.renameSheet(sheetId, newName)
+    // a formula like INDIRECT("OldName!A1") must resolve again
+    this.dependencyGraph.markStructureDependentFormulasAsDirty()
 
     let version: number | undefined
     if (mergedWithPlaceholderSheet !== undefined) {

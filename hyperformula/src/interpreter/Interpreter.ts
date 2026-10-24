@@ -8,6 +8,7 @@ import {ArraySizePredictor} from '../ArraySize'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
 import {CellError, ErrorType, isColOrRowInvalid} from '../Cell'
 import {Config} from '../Config'
+import {EvaluationPass} from '../EvaluationPass'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
 import {FormulaVertex} from '../DependencyGraph/FormulaVertex'
@@ -44,6 +45,11 @@ import { AddressWithSheet } from '../parser/Address'
 
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
+  /**
+   * Context of the formula evaluation in progress, set by the Evaluator. Undefined outside of evaluation passes
+   * (e.g., in calculateFormula).
+   */
+  public evaluationPass?: EvaluationPass
 
   /** Decides which function calls the license stops; see {@link FunctionCallLicenseGate}. */
   private readonly functionCallLicenseGate: FunctionCallLicenseGate

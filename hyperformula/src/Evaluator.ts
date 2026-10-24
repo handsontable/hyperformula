@@ -10,12 +10,17 @@ import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {ArrayFormulaVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
 import {FormulaVertex} from './DependencyGraph/FormulaVertex'
+import {TopSortPass} from './DependencyGraph/Graph'
+import {NodeProcessingResult} from './DependencyGraph/TopSort'
+import {EvaluationPass} from './EvaluationPass'
+import {EVALUATION_DEFERRED} from './interpreter/EvaluationDeferred'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterState} from './interpreter/InterpreterState'
 import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
+import {Maybe} from './Maybe'
 import {Ast, RelativeDependency} from './parser'
 import {Statistics, StatType} from './statistics'
 
@@ -32,12 +37,11 @@ export class Evaluator {
   }
 
   public run(): void {
-    this.stats.start(StatType.TOP_SORT)
-    const {sorted, cycled} = this.dependencyGraph.topSortWithScc()
-    this.stats.end(StatType.TOP_SORT)
-
     this.stats.measure(StatType.EVALUATION, () => {
-      this.recomputeFormulas(cycled, sorted)
+      this.evaluateInPasses(this.dependencyGraph.graph.getNodes(),
+        (vertex: Vertex, pass: EvaluationPass) => this.computeVertexOnInitialRun(vertex, pass),
+        (vertex: Vertex) => this.setCycleErrorOnInitialRun(vertex),
+      )
     })
   }
 
@@ -45,8 +49,8 @@ export class Evaluator {
     const changes = ContentChanges.empty()
 
     this.stats.measure(StatType.EVALUATION, () => {
-      this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
-        (vertex: Vertex) => this.recomputeVertex(vertex, changes),
+      this.evaluateInPasses(vertices,
+        (vertex: Vertex, pass: EvaluationPass) => this.recomputeVertex(vertex, changes, pass),
         (vertex: Vertex) => this.processVertexOnCycle(vertex, changes),
       )
     })
@@ -75,24 +79,96 @@ export class Evaluator {
   }
 
   /**
-   * Recalculates the value of a single vertex assuming its dependencies have already been recalculated
+   * Evaluates the graph starting from the seeds.
+   *
+   * A formula that reads a cell which is not current yet (see {@link EVALUATION_DEFERRED}) requests that cell. The sort
+   * computes the cell, and the pending cells it depends on, right away and then retries the formula, all in the same pass.
+   *
+   * A formula on a cycle loses its runtime dependencies and is recomputed once more, in another pass, so that a formula
+   * that no longer reads a cell on the cycle can leave it. If it reads one again, it keeps #CYCLE!.
    */
-  private recomputeVertex(vertex: Vertex, changes: ContentChanges): boolean {
+  private evaluateInPasses(
+    seeds: Vertex[],
+    operatingFunction: (vertex: Vertex, pass: EvaluationPass) => NodeProcessingResult,
+    onCycle: (vertex: Vertex) => void,
+  ): void {
+    const retriedAfterCycle = new Set<FormulaVertex>()
+    let nextSeeds = seeds
+
+    while (nextSeeds.length > 0) {
+      const retrySeeds: Vertex[] = []
+      let evaluationPass: Maybe<EvaluationPass> = undefined
+      const {deferred} = this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(nextSeeds,
+        (vertex: Vertex, topSortPass: TopSortPass<Vertex>) => {
+          evaluationPass = evaluationPass ?? new EvaluationPass(this.dependencyGraph, topSortPass)
+          return operatingFunction(vertex, evaluationPass)
+        },
+        (vertex: Vertex) => {
+          onCycle(vertex)
+          if (vertex instanceof FormulaVertex && !retriedAfterCycle.has(vertex) && this.dependencyGraph.clearRuntimeDependencies(vertex)) {
+            retriedAfterCycle.add(vertex)
+            retrySeeds.push(vertex)
+          }
+        },
+      )
+      nextSeeds = [...deferred, ...retrySeeds]
+    }
+  }
+
+  /**
+   * Computes the value of a vertex during the initial evaluation of the whole graph.
+   */
+  private computeVertexOnInitialRun(vertex: Vertex, pass: EvaluationPass): NodeProcessingResult {
     if (vertex instanceof FormulaVertex) {
-      const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
-      const newCellValue = this.recomputeFormulaVertexValue(vertex)
-      if (newCellValue !== currentValue) {
-        const address = vertex.getAddress(this.lazilyTransformingAstService)
-        changes.addChange(newCellValue, address)
-        this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
-        return true
+      const address = vertex.getAddress(this.lazilyTransformingAstService)
+      const previousValue = vertex.valueOrUndef()
+      const newCellValue = this.recomputeFormulaVertexValue(vertex, address, pass)
+      if (newCellValue === undefined) {
+        return NodeProcessingResult.DEFERRED
       }
-      return false
+      if (previousValue === undefined) {
+        this.columnSearch.add(getRawValue(newCellValue), address)
+      } else {
+        // recomputed in a retry pass after a cycle
+        this.columnSearch.change(getRawValue(previousValue), getRawValue(newCellValue), address)
+      }
     } else if (vertex instanceof RangeVertex) {
       vertex.clearCache()
-      return true
+    }
+    return NodeProcessingResult.CHANGED
+  }
+
+  /**
+   * Sets the cycle error on a vertex that is part of a cycle, during the initial evaluation of the whole graph.
+   */
+  private setCycleErrorOnInitialRun(vertex: Vertex): void {
+    if (vertex instanceof FormulaVertex) {
+      vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex))
+    }
+  }
+
+  /**
+   * Recalculates the value of a single vertex assuming its dependencies have already been recalculated
+   */
+  private recomputeVertex(vertex: Vertex, changes: ContentChanges, pass: EvaluationPass): NodeProcessingResult {
+    if (vertex instanceof FormulaVertex) {
+      const address = vertex.getAddress(this.lazilyTransformingAstService)
+      const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
+      const newCellValue = this.recomputeFormulaVertexValue(vertex, address, pass)
+      if (newCellValue === undefined) {
+        return NodeProcessingResult.DEFERRED
+      }
+      if (newCellValue !== currentValue) {
+        changes.addChange(newCellValue, address)
+        this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
+        return NodeProcessingResult.CHANGED
+      }
+      return NodeProcessingResult.UNCHANGED
+    } else if (vertex instanceof RangeVertex) {
+      vertex.clearCache()
+      return NodeProcessingResult.CHANGED
     } else {
-      return true
+      return NodeProcessingResult.CHANGED
     }
   }
 
@@ -112,34 +188,34 @@ export class Evaluator {
   }
 
   /**
-   * Recalculates formulas in the topological sort order
+   * Evaluates a formula vertex and stores its value and runtime dependencies.
+   *
+   * @returns the new value, or undefined if the evaluation was deferred to a later pass
    */
-  private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
-    cycled.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaVertex) {
-        vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex))
-      }
-    })
-    sorted.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaVertex) {
-        const newCellValue = this.recomputeFormulaVertexValue(vertex)
-        const address = vertex.getAddress(this.lazilyTransformingAstService)
-        this.columnSearch.add(getRawValue(newCellValue), address)
-      } else if (vertex instanceof RangeVertex) {
-        vertex.clearCache()
-      }
-    })
-  }
-
-  private recomputeFormulaVertexValue(vertex: FormulaVertex): InterpreterValue {
-    const address = vertex.getAddress(this.lazilyTransformingAstService)
+  private recomputeFormulaVertexValue(vertex: FormulaVertex, address: SimpleCellAddress, evaluationPass: EvaluationPass): Maybe<InterpreterValue> {
     if (vertex instanceof ArrayFormulaVertex && (vertex.array.size.isRef || !this.dependencyGraph.isThereSpaceForArray(vertex))) {
+      this.dependencyGraph.clearRuntimeDependencies(vertex)
       return vertex.setNoSpace()
-    } else {
-      const formula = vertex.getFormula(this.lazilyTransformingAstService)
-      const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic, vertex))
-      return vertex.setCellValue(newCellValue)
     }
+
+    const formula = vertex.getFormula(this.lazilyTransformingAstService)
+    let newCellValue: InterpreterValue
+    evaluationPass.begin(vertex)
+    this.interpreter.evaluationPass = evaluationPass
+    try {
+      newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic, vertex))
+    } catch (e) {
+      this.dependencyGraph.keepRuntimeDependencies(vertex, evaluationPass.end())
+      if (e === EVALUATION_DEFERRED) {
+        return undefined
+      }
+      throw e
+    } finally {
+      this.interpreter.evaluationPass = undefined
+    }
+
+    this.dependencyGraph.commitRuntimeDependencies(vertex, evaluationPass.end())
+    return vertex.setCellValue(newCellValue)
   }
 
   private evaluateAstToCellValue(ast: Ast, state: InterpreterState): InterpreterValue {
