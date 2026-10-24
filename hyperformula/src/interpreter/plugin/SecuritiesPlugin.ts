@@ -83,8 +83,8 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    *
    * Returns the discount rate of a security.
    *
-   * @param ast
-   * @param state
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
    */
   public disc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.discountedSecurity(ast, state, 'DISC',
@@ -97,8 +97,8 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    *
    * Returns the interest rate of a fully invested security.
    *
-   * @param ast
-   * @param state
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
    */
   public intrate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.discountedSecurity(ast, state, 'INTRATE',
@@ -111,8 +111,8 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    *
    * Returns the price per $100 face value of a discounted security.
    *
-   * @param ast
-   * @param state
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
    */
   public pricedisc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.discountedSecurity(ast, state, 'PRICEDISC',
@@ -127,8 +127,8 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    * Returns #NUM! when the discount for the whole period reaches the investment, that is when
    * `discount * dayCount / yearDays` is 1 or more.
    *
-   * @param ast
-   * @param state
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
    */
   public received(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.discountedSecurity(ast, state, 'RECEIVED',
@@ -147,8 +147,8 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    *
    * Returns the annual yield of a discounted security.
    *
-   * @param ast
-   * @param state
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
    */
   public yielddisc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.discountedSecurity(ast, state, 'YIELDDISC',
@@ -163,8 +163,8 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    * Arguments are validated from left to right, as in Excel; an empty `issue`, `settlement` or `rate` is #N/A.
    * `issue` equal to `settlement` gives 0.
    *
-   * @param ast
-   * @param state
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
    */
   public accrintm(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ACCRINTM'),
