@@ -3,8 +3,9 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange, simpleCellRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
-import {CellVertex, DependencyGraph, Vertex} from './DependencyGraph'
+import {CellVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
 import {FormulaVertex, RuntimeDependency} from './DependencyGraph/FormulaVertex'
 import {TopSortPass} from './DependencyGraph/Graph'
 
@@ -62,6 +63,24 @@ export class EvaluationPass {
    */
   public requestPull(vertex: Vertex): void {
     this.topSortPass.requestPull(vertex)
+  }
+
+  /**
+   * Records that the evaluated formula reads the given range, and adds an edge from the range's vertex to the graph,
+   * creating the range vertex if needed.
+   *
+   * @returns the range vertex
+   */
+  public recordRangeDependency(range: AbsoluteCellRange): RangeVertex {
+    if (this.currentDependent === undefined) {
+      throw new Error('No formula is being evaluated.')
+    }
+    const vertex = this.dependencyGraph.addRuntimeRangeDependency(this.currentDependent, range)
+    this.currentRecorded = this.currentRecorded ?? []
+    if (!this.currentRecorded.some(dependency => dependency.vertex === vertex)) {
+      this.currentRecorded.push({address: simpleCellRange(range.start, range.end), vertex})
+    }
+    return vertex
   }
 
   /**

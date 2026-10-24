@@ -185,52 +185,8 @@ export class DependencyGraph {
 
     cellDependencies.forEach((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
-        const range = dep
-
-        let rangeVertex = this.getRange(range.start, range.end)
-        if (rangeVertex === undefined) {
-          rangeVertex = new RangeVertex(range)
-          this.rangeMapping.addOrUpdateVertex(rangeVertex)
-        }
-
-        this.graph.addNodeIfNotExists(rangeVertex)
-        const rangeVertexId = rangeVertex.idInGraph
-
-        if (rangeVertexId === undefined) {
-          throw new Error('Range vertex not found')
-        }
-
-        if (!range.isFinite()) {
-          this.graph.markNodeAsInfiniteRange(rangeVertexId)
-        }
-
-        const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(range)
-        if (smallerRangeVertex !== undefined) {
-          this.graph.addEdge(smallerRangeVertex, rangeVertexId)
-          if (rangeVertex.bruteForce) {
-            rangeVertex.bruteForce = false
-            for (const cellFromRange of range.addresses(this)) { //if we ever switch heuristic to processing by sorted sizes, this would be unnecessary
-              this.graph.removeEdge(this.fetchCell(cellFromRange), rangeVertexId)
-            }
-          }
-        } else {
-          rangeVertex.bruteForce = true
-        }
-
-        const array = this.arrayMapping.getArray(restRange)
-        if (array !== undefined) {
-          this.graph.addEdge(array, rangeVertexId)
-        } else {
-          for (const cellFromRange of restRange.addresses(this)) {
-            const { vertex, id } = this.fetchCellOrCreateEmpty(cellFromRange)
-            this.graph.addEdge(id ?? vertex, rangeVertexId)
-          }
-        }
-        this.graph.addEdge(rangeVertexId, endVertexId)
-
-        if (range.isFinite()) {
-          this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
-        }
+        const rangeVertex = this.ensureRangeVertex(dep)
+        this.graph.addEdge(rangeVertex, endVertexId)
       } else if (dep instanceof NamedExpressionDependency) {
         const sheetOfVertex = (endVertex as ScalarFormulaVertex).getAddress(this.lazilyTransformingAstService).sheet
         const { vertex, id } = this.fetchNamedExpressionVertex(dep.name, sheetOfVertex)
@@ -240,6 +196,57 @@ export class DependencyGraph {
         this.graph.addEdge(id ?? vertex, endVertexId)
       }
     })
+  }
+
+  /**
+   * Returns the range vertex of a range, creating it if needed, and makes sure it has its edges from its cells
+   * (or from a smaller range vertex). Safe to call again for a range that already has a vertex.
+   */
+  public ensureRangeVertex(range: AbsoluteCellRange): RangeVertex {
+    let rangeVertex = this.getRange(range.start, range.end)
+    if (rangeVertex === undefined) {
+      rangeVertex = new RangeVertex(range)
+      this.rangeMapping.addOrUpdateVertex(rangeVertex)
+    }
+
+    this.graph.addNodeIfNotExists(rangeVertex)
+    const rangeVertexId = rangeVertex.idInGraph
+
+    if (rangeVertexId === undefined) {
+      throw new Error('Range vertex not found')
+    }
+
+    if (!range.isFinite()) {
+      this.graph.markNodeAsInfiniteRange(rangeVertexId)
+    }
+
+    const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(range)
+    if (smallerRangeVertex !== undefined) {
+      this.graph.addEdge(smallerRangeVertex, rangeVertexId)
+      if (rangeVertex.bruteForce) {
+        rangeVertex.bruteForce = false
+        for (const cellFromRange of range.addresses(this)) { //if we ever switch heuristic to processing by sorted sizes, this would be unnecessary
+          this.graph.removeEdge(this.fetchCell(cellFromRange), rangeVertexId)
+        }
+      }
+    } else {
+      rangeVertex.bruteForce = true
+    }
+
+    const array = this.arrayMapping.getArray(restRange)
+    if (array !== undefined) {
+      this.graph.addEdge(array, rangeVertexId)
+    } else {
+      for (const cellFromRange of restRange.addresses(this)) {
+        const { vertex, id } = this.fetchCellOrCreateEmpty(cellFromRange)
+        this.graph.addEdge(id ?? vertex, rangeVertexId)
+      }
+    }
+
+    if (range.isFinite()) {
+      this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
+    }
+    return rangeVertex
   }
 
   public fetchNamedExpressionVertex(expressionName: string, sheetId: number): { vertex: CellVertex, id: Maybe<number>} {
@@ -281,6 +288,21 @@ export class DependencyGraph {
       this.runtimeEdgesAdded++
     }
     return vertex
+  }
+
+  /**
+   * Adds an edge from the range vertex of a range to a formula that read the range during evaluation.
+   * Creates the range vertex, with its edges from the cells, if the graph does not have it.
+   *
+   * @returns the range vertex
+   */
+  public addRuntimeRangeDependency(dependent: FormulaVertex, range: AbsoluteCellRange): RangeVertex {
+    const rangeVertex = this.ensureRangeVertex(range)
+    if (!this.graph.existsEdge(rangeVertex, dependent)) {
+      this.graph.addEdge(rangeVertex, dependent)
+      this.runtimeEdgesAdded++
+    }
+    return rangeVertex
   }
 
   /**
@@ -1448,10 +1470,13 @@ export class DependencyGraph {
     if (runtimeDependencies === undefined) {
       return addresses
     }
-    const keys = new Set(addresses.map(address => isSimpleCellAddress(address) ? addressKey(address) : undefined))
+    const key = (address: SimpleCellAddress | SimpleCellRange) => isSimpleCellAddress(address)
+      ? addressKey(address)
+      : `${addressKey(address.start)}:${addressKey(address.end)}`
+    const keys = new Set(addresses.map(key))
     for (const {address, vertex: dependencyVertex} of runtimeDependencies) {
-      if (this.graph.hasNode(dependencyVertex) && !keys.has(addressKey(address))) {
-        keys.add(addressKey(address))
+      if (this.graph.hasNode(dependencyVertex) && !keys.has(key(address))) {
+        keys.add(key(address))
         addresses.push(address)
       }
     }
@@ -1470,6 +1495,10 @@ export class DependencyGraph {
     const [formulaAddress, dependencies] = dependenciesResult
     for (const dependency of dependencies) {
       if (dependency instanceof AbsoluteCellRange) {
+        const rangeVertex = this.rangeMapping.getRangeVertex(dependency.start, dependency.end)
+        if (rangeVertex !== undefined) {
+          result.add(rangeVertex)
+        }
         continue
       }
       const address = dependency instanceof NamedExpressionDependency
@@ -1489,7 +1518,14 @@ export class DependencyGraph {
   private removeRuntimeEdge(dependency: RuntimeDependency, dependent: FormulaVertex): void {
     const {address, vertex} = dependency
     this.graph.removeEdgeIfExists(vertex, dependent)
-    if (vertex instanceof EmptyCellVertex && this.graph.adjacentNodesCount(vertex) === 0 && this.addressMapping.getCell(address) === vertex) {
+    if (vertex instanceof RangeVertex) {
+      if (this.graph.adjacentNodesCount(vertex) === 0) {
+        this.removeVertexAndCleanupDependencies(vertex)
+        this.rangeMapping.removeVertexIfExists(vertex)
+      }
+      return
+    }
+    if (vertex instanceof EmptyCellVertex && isSimpleCellAddress(address) && this.graph.adjacentNodesCount(vertex) === 0 && this.addressMapping.getCell(address) === vertex) {
       this.graph.removeNode(vertex)
       this.addressMapping.removeCell(address)
       this.cleanupPlaceholderSheets(new Set([address.sheet]))

@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange, SimpleCellRange} from '../AbsoluteCellRange'
 import {ArraySize} from '../ArraySize'
 import {ArrayValue, ErroredArray, CellArray, NotComputedArray} from '../ArrayValue'
 import {CellError, equalSimpleCellAddress, ErrorType, SimpleCellAddress} from '../Cell'
@@ -15,16 +15,17 @@ import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {CellVertex} from './CellVertex'
+import {RangeVertex} from './RangeVertex'
 
 /**
  * A dependency discovered while evaluating a formula (e.g., the target of INDIRECT), as opposed to one collected
  * from the formula's AST.
  */
 export interface RuntimeDependency {
-  /** Address read by the formula. Informational: the vertex is the source of truth. */
-  address: SimpleCellAddress,
-  /** Vertex that was read. The graph has an edge from it to the formula vertex. */
-  vertex: CellVertex,
+  /** Address or range read by the formula. Informational: the vertex is the source of truth. */
+  address: SimpleCellAddress | SimpleCellRange,
+  /** Vertex that was read: a cell, or the range vertex of a range. The graph has an edge from it to the formula vertex. */
+  vertex: CellVertex | RangeVertex,
 }
 
 /**

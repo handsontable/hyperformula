@@ -49,7 +49,9 @@ export class TopSort<T> {
   private finalized: boolean[] = []
   private onPullPath: boolean[] = []
   private pendingPrecedents: Map<number, number[]> = new Map()
-  private pullRequest?: number
+  private pullRequests: number[] = []
+  /** Nodes a deferred node requested, still to be computed before it is retried. */
+  private requested: Map<number, number[]> = new Map()
   private shouldBeUpdatedMapping: boolean[] = []
   private sorted: T[] = []
   private cycled: T[] = []
@@ -94,11 +96,12 @@ export class TopSort<T> {
   }
 
   /**
-   * Requests that a pending node is computed before the node being processed is retried.
-   * The operating function calls it right before it returns {@link NodeProcessingResult.DEFERRED}.
+   * Requests that a pending node is computed before the node being processed is retried. Can be called several times
+   * for one evaluation, e.g., for every pending cell of a range. The operating function calls it right before it
+   * returns {@link NodeProcessingResult.DEFERRED}.
    */
   public requestPull(id: number): void {
-    this.pullRequest = id
+    this.pullRequests.push(id)
   }
 
   /**
@@ -219,7 +222,7 @@ export class TopSort<T> {
       if (this.finalized[t] || this.nodesSparseArray[t] === undefined) {
         continue
       }
-      this.pullRequest = undefined
+      this.pullRequests = []
       if (this.processNode(t, onCycle, operatingFunction) === NodeProcessingResult.DEFERRED) {
         this.pullFor(t, onCycle, operatingFunction)
       }
@@ -229,12 +232,14 @@ export class TopSort<T> {
   }
 
   /**
-   * Called after the root node was deferred: pulls the pending nodes it reads and retries it until it is finalized.
+   * Called after the root node was deferred: computes the pending nodes it requested and retries it until it is
+   * finalized. Nodes on the stack form a chain: each one waits for the one above it, so reaching a node already on
+   * the stack is a cycle.
    */
   private pullFor(root: number, onCycle: (node: T) => void, operatingFunction: (node: T) => NodeProcessingResult): void {
     const stack: number[] = [root]
     this.onPullPath[root] = true
-    this.pushRequestedNode(stack, onCycle)
+    this.recordRequests(root)
 
     while (stack.length > 0) {
       const t = stack[stack.length - 1]
@@ -242,44 +247,55 @@ export class TopSort<T> {
       if (this.finalized[t] || this.nodesSparseArray[t] === undefined) {
         stack.pop()
         this.onPullPath[t] = false
+        this.requested.delete(t)
         continue
       }
 
-      if (t !== root) {
-        const precedent = this.nextPendingPrecedent(t)
-        if (precedent !== undefined) {
-          if (this.onPullPath[precedent]) {
-            this.finalizeCycle(stack, precedent, onCycle)
-          } else {
-            stack.push(precedent)
-            this.onPullPath[precedent] = true
-          }
-          continue
+      const next = this.nextRequested(t) ?? (t !== root ? this.nextPendingPrecedent(t) : undefined)
+      if (next !== undefined) {
+        if (this.onPullPath[next]) {
+          this.finalizeCycle(stack, next, onCycle)
+        } else {
+          stack.push(next)
+          this.onPullPath[next] = true
         }
+        continue
       }
 
-      this.pullRequest = undefined
+      this.pullRequests = []
       if (this.processNode(t, onCycle, operatingFunction) === NodeProcessingResult.DEFERRED) {
-        this.pushRequestedNode(stack, onCycle)
+        this.recordRequests(t)
       }
     }
   }
 
   /**
-   * Pushes the node requested by the deferred node on top of the stack, or gives the cycle treatment to the pull path
-   * if the requested node is already on it.
+   * Stores the nodes a just-deferred node requested, to be computed one by one before it is retried.
    */
-  private pushRequestedNode(stack: number[], onCycle: (node: T) => void): void {
-    const target = this.pullRequest
-    if (target === undefined || !this.isPending(target)) {
+  private recordRequests(t: number): void {
+    const pending = [...new Set(this.pullRequests)].filter(id => this.isPending(id))
+    if (pending.length === 0) {
       throw new Error('A node was deferred without requesting a pending node.')
     }
-    if (this.onPullPath[target]) {
-      this.finalizeCycle(stack, target, onCycle)
-    } else {
-      stack.push(target)
-      this.onPullPath[target] = true
+    this.requested.set(t, pending.reverse())
+  }
+
+  /**
+   * Returns a node the given node requested that is still pending, or undefined if there is none.
+   */
+  private nextRequested(t: number): number | undefined {
+    const requested = this.requested.get(t)
+    if (requested === undefined) {
+      return undefined
     }
+    while (requested.length > 0 && !this.isPending(requested[requested.length - 1])) {
+      requested.pop()
+    }
+    if (requested.length === 0) {
+      this.requested.delete(t)
+      return undefined
+    }
+    return requested[requested.length - 1]
   }
 
   /**

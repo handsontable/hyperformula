@@ -20,23 +20,36 @@ export class SimpleRangeValue {
    */
   public readonly size: ArraySize
 
+  private readonly _range?: AbsoluteCellRange
+
+  /**
+   * Runs before the range's cells are first read, e.g., to make sure they are computed. May throw to defer the
+   * evaluation that reads them; it runs again on the next read.
+   */
+  private beforeRead?: () => void
+
   /**
    * In most cases, it's more convenient to create a `SimpleRangeValue` object
    * by calling one of the [static factory methods](#fromrange).
    */
   constructor(
     private _data?: InternalScalarValue[][],
-
-    /**
-     * A property that represents the address of the range.
-     */
-    public readonly range?: AbsoluteCellRange,
+    range?: AbsoluteCellRange,
     private readonly dependencyGraph?: DependencyGraph,
     private _hasOnlyNumbers?: boolean,
   ) {
+    this._range = range
     this.size = _data === undefined
       ? new ArraySize(range!.effectiveWidth(dependencyGraph!), range!.effectiveHeight(dependencyGraph!))
       : new ArraySize(_data[0].length, _data.length)
+  }
+
+  /**
+   * A property that represents the address of the range.
+   */
+  public get range(): AbsoluteCellRange | undefined {
+    this.runBeforeRead()
+    return this._range
   }
 
   /**
@@ -76,6 +89,18 @@ export class SimpleRangeValue {
   }
 
   /**
+   * A factory method. Like {@link onlyRange}, but runs the given function before the range's cells or address are
+   * first used (its size can be read without it). Used for ranges that functions discover at runtime, e.g., INDIRECT.
+   *
+   * @internal
+   */
+  public static onlyRangeWithReadHook(range: AbsoluteCellRange, dependencyGraph: DependencyGraph, beforeRead: () => void): SimpleRangeValue {
+    const value = new SimpleRangeValue(undefined, range, dependencyGraph, undefined)
+    value.beforeRead = beforeRead
+    return value
+  }
+
+  /**
    * A factory method. Returns a `SimpleRangeValue` object that contains a single value.
    */
   public static fromScalar(scalar: InternalScalarValue): SimpleRangeValue {
@@ -86,7 +111,7 @@ export class SimpleRangeValue {
    * Returns `true` if and only if the `SimpleRangeValue` has no address set.
    */
   public isAdHoc(): boolean {
-    return this.range === undefined
+    return this._range === undefined
   }
 
   /**
@@ -208,13 +233,21 @@ export class SimpleRangeValue {
   /**
    * Computes the range data if it is not computed yet.
    */
+  private runBeforeRead(): void {
+    if (this.beforeRead !== undefined) {
+      this.beforeRead()
+      this.beforeRead = undefined
+    }
+  }
+
   private ensureThatComputed(): void {
     if (this._data !== undefined) {
       return
     }
 
+    this.runBeforeRead()
     this._hasOnlyNumbers = true
-    this._data = this.range!.addressesArrayMap(this.dependencyGraph!, cellFromRange => {
+    this._data = this._range!.addressesArrayMap(this.dependencyGraph!, cellFromRange => {
       const value = this.dependencyGraph!.getCellValue(cellFromRange)
       if (value instanceof SimpleRangeValue) {
         this._hasOnlyNumbers = false
