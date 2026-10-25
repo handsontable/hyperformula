@@ -1,3 +1,13 @@
+---
+tags:
+  - commercial licence
+  - non-commercial
+  - dual licensing
+  - open source
+  - free
+  - buy a license
+---
+
 # Licensing
 
 To make HyperFormula a better fit for different types of projects, the source code is available under different licenses.

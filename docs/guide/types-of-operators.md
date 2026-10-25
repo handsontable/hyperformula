@@ -1,3 +1,17 @@
+---
+tags:
+  - modulo
+  - caseSensitive
+  - accentSensitive
+  - caseFirst
+  - ignorePunctuation
+  - implicit conversion
+  - case insensitive
+  - concatenate
+  - intersection
+  - union
+---
+
 # Types of operators
 
 The operators specify what type of actions are performed on arguments

@@ -1,3 +1,15 @@
+---
+tags:
+  - MS Excel
+  - missing Excel functions
+  - wildcards
+  - regex
+  - useRegularExpressions
+  - 1900 leap year
+  - OpenDocument
+  - interoperability
+---
+
 # Compatibility with Microsoft Excel
 
 Achieve nearly full compatibility with Microsoft Excel, using the right HyperFormula configuration.
@@ -167,6 +179,7 @@ This configuration aligns HyperFormula with the default behavior of Microsoft Ex
 ```js
 // define options
 const options = {
+  licenseKey: 'gpl-v3',
   dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
   timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
   currencySymbol: ['$', 'USD'],

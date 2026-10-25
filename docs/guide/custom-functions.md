@@ -1,3 +1,15 @@
+---
+tags:
+  - registerFunctionPlugin
+  - implementedFunctions
+  - runFunction
+  - FunctionArgumentType
+  - SimpleRangeValue
+  - CellError
+  - UDF
+  - user-defined function
+---
+
 # Custom functions
 
 Expand the function library of your application by adding custom functions.
@@ -148,7 +160,7 @@ Now, you're ready to use your GREET function in a formula.
 
 ```js
 // build a HyperFormula instance where you can use your function directly
-const hfInstance = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']]);
+const hfInstance = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']], { licenseKey: 'gpl-v3' });
 
 // read the value of cell B1
 const result = hfInstance.getCellValue({ sheet: 0, col: 1, row: 0 });
@@ -358,7 +370,7 @@ it('returns a VALUE error if the range argument contains a string', () => {
 
 ## Working demo
 
-Explore the full working example on <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.3.x/custom-functions?v=' + $page.buildDateURIEncoded">Stackblitz</a>.
+Explore the full working example on <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/custom-functions?v=' + $page.buildDateURIEncoded">Stackblitz</a>.
 
 This demo contains the implementation of both the
 [`GREET`](#add-a-simple-custom-function) and
@@ -374,7 +386,7 @@ You can set the following options for your function:
 | `parameters`                        | Array   | Specification of the arguments accepted by the function and their [validation options](#argument-validation-options).                                                                                                                         |
 | `sizeOfResultArrayMethod`                   | String  | Name of the method that calculates the size of the result array. Not required for functions that never return an array.                                                                                                                       |
 | `returnNumberType`                  | String  | If the function returns a numeric value, this option indicates how to interpret the returned number.<br/>Possible values: `NUMBER_RAW, NUMBER_DATE, NUMBER_TIME, NUMBER_DATETIME, NUMBER_CURRENCY, NUMBER_PERCENT`.<br/>Default: `NUMBER_RAW` |
-| `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.<br/>Default: `0`                                                                                                                |
+| `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely. Must be a positive integer no larger than the number of `parameters`. A value that is not a positive integer (`0`, a negative number, a fraction, `NaN`, or `Infinity`) is ignored, and the function keeps a fixed number of arguments. A value larger than the number of `parameters` is not supported and must not be used: the function then accepts an erratic set of argument counts instead of a repeating one (with one parameter and `repeatLastArgs: 5`, calls with 1, 2, 4, or 5 arguments are accepted, while 3 and 8 return `#N/A!`).<br/>Default: `0`                                                                                                                |
 | `expandRanges`                      | Boolean | `true`: ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.<br/>Default: `false`                                                                                                                          |
 | `isVolatile`                        | Boolean | `true`: the function is [volatile](volatile-functions.md).<br/>Default: `false`                                                                                                                                                               |
 | `isDependentOnSheetStructureChange` | Boolean | `true`: the function gets recalculated with each sheet shape change (e.g., when adding/removing rows or columns).<br/>Default: `false`                                                                                                        |

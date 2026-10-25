@@ -1,0 +1,14 @@
+# Cloudflare Workers static-asset redirects.
+# Copied to the root of the asset directory by `docs/script/prepare-cf-assets.js`.
+#
+# The documentation is built under `/docs/hyperformula/`, so the asset root
+# itself holds no document. Send it to the documentation entry point instead of
+# a 404 - this makes preview URLs
+# (`https://<branch>-hyperformula-docs.<subdomain>.workers.dev`) usable without
+# manually appending the path.
+#
+# The documentation's former addresses (`/docs/*` outside the new base) are
+# redirected by `worker/index.js`, not here: a `/docs/*` rule in this file
+# would also match `/docs/hyperformula/*`, and redirects here apply even when
+# an asset matches.
+/ /docs/hyperformula/ 302

@@ -1,3 +1,13 @@
+---
+tags:
+  - audits
+  - OWASP
+  - penetration testing
+  - test coverage
+  - vulnerability scanning
+  - reliability
+---
+
 # Quality & Security
 
 HyperFormula is built with the highest standards of software quality, backed by rigorous research, comprehensive testing, and transparent development practices.
@@ -87,4 +97,4 @@ HyperFormula offers comprehensive support options to ensure your success:
 
 Our expert team has been supporting enterprises since 2012 and understands how to respond to individual business needs.
 
-[Learn more about support options &#8594;](support.md)
+[Learn more about support options &#8594;](https://handsontable.com/support)
