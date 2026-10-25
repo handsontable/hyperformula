@@ -37,10 +37,11 @@ import {
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
- * How far the probabilities of PROB may be from summing up to exactly 1; absorbs the rounding of the
- * binary floating-point sum (0.4 + 0.3 + 0.2 + 0.1 is 0.9999999999999999).
+ * PROB accepts its probabilities when their sum, rounded to this many significant digits, is exactly 1.
+ * The rounding absorbs the error of the binary floating-point sum (0.1 added ten times is 0.9999999999999999),
+ * while a sum that is off by 1e-14 or more is rejected.
  */
-const PROBABILITY_SUM_TOLERANCE = 1e-9
+const PROBABILITY_SUM_SIGNIFICANT_DIGITS = 15
 
 export class StatisticalAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<StatisticalAggregationPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
@@ -328,7 +329,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         }
         const [xs, ps] = pairs
         const probabilitySum = ps.reduce((sum, p) => sum + p, 0)
-        if (ps.some(p => p <= 0 || p > 1) || Math.abs(probabilitySum - 1) > PROBABILITY_SUM_TOLERANCE) {
+        if (ps.some(p => p <= 0 || p > 1) || Number(probabilitySum.toPrecision(PROBABILITY_SUM_SIGNIFICANT_DIGITS)) !== 1) {
           return new CellError(ErrorType.NUM, ErrorMessage.ProbabilityBounds)
         }
         const upper = upperLimit ?? lowerLimit
