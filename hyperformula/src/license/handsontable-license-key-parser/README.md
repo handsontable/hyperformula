@@ -62,7 +62,7 @@ A key is plain-English text for humans, then a block for the library:
 ```
 This is a Handsontable license key for Acme Corp, issued on 2026-08-12. It includes 1 license:
 
-> 1. Subscription license under Handsontable Subscription License Agreement 2.0 of 2022-05-21, for Handsontable on the Enterprise package, for internal use, valid until 2027-08-12 (UTC). Use after that date is not permitted. To renew, contact sales@handsontable.com.
+> 1. Subscription license under Handsontable Subscription License Agreement 2.0 of 2022-05-21, for Handsontable, for internal use, valid until 2027-08-12 (UTC). Use after that date is not permitted. To renew, contact sales@handsontable.com.
 
 [eyJwcm9kdWN0cyI6eyJoYW5k...<payload>...<128 hex characters of SHA-512>]
 ```
@@ -85,7 +85,7 @@ This is a Handsontable license key for Acme Corp, issued on 2026-08-12. It inclu
   {
     "products": {
       "hyperformula": {
-        "capabilities": ["functions_1", "functions_2", "spreadsheet"],
+        "capabilities": ["fun:math.a", "fun:stat.a", "feat:crud"],
         "release_until": "2027-03-31",
         "notice": 0,
         "grace": 0,
@@ -199,7 +199,10 @@ export function checkLicense(rawKey: unknown): LicenseGrants {
 // Anywhere a feature is gated:
 const grants = checkLicense(settings.licenseKey);
 
-if (!hasCapability(grants, PRODUCT, 'spreadsheet')) {
+// The token exactly as the key carries it. A product whose tokens mean more than
+// themselves (HyperFormula's `fun:all`, `feat:all`, `fun:math.a`) resolves them in
+// its own registry instead - see "What each product supplies".
+if (!hasCapability(grants, PRODUCT, 'core')) {
   // not unlocked by this key
 }
 ```
@@ -275,8 +278,12 @@ Each of these has broken a real implementation, or a specification fixture exist
 | `product` | `'handsontable'` | `'hyperformula'` |
 | Build date | `process.env.HOT_RELEASE_DATE` (`DD/MM/YYYY`) | `process.env.HT_RELEASE_DATE` (`DD/MM/YYYY`) |
 | Literal keys | `non-commercial-and-evaluation`, `ht68e-1f2b7-47158-70b05-0842f` | `gpl-v3`, `internal-use-in-handsontable`, `hftrial-0168e-1f2b7-47158-70b05-0842f` |
-| Capability tokens | `core` | `functions_1` ... `functions_4`, `spreadsheet`, `import_export` |
+| Capability tokens | `core` | `fun:` and `feat:` tokens of the HyperFormula license key syntax spec (`fun:all`, `fun:math.a`, `fun:xnpv`, `feat:all`, `feat:crud`, ...) |
 | Legacy keys | own obfuscated validator | own obfuscated validator |
+
+`hasCapability` compares a token exactly, as the key spells it, and expands nothing. The generator issues lowercase tokens only, so compare against lowercase. A product that wants to be lenient (HyperFormula lowercases and trims) does it in its own code - the reader keeps the token as the key carries it.
+
+**Tokens that stand for more than themselves are the product's to expand.** A HyperFormula key issued today carries `["core", "fun:all", "feat:all"]`. `hasCapability(grants, 'hyperformula', 'feat:crud')` answers `false` for it - the key does not contain `feat:crud`, it contains `feat:all`. Gate on what the product's own registry makes of the tokens (`getProductCapabilities` returns them; it returns `null` for unrestricted grants, which unlock everything, and for a product the key does not grant): HyperFormula resolves `fun:all`, `feat:all` and group tokens such as `fun:math.a` in its own capability table. Asking `hasCapability` for one feature's token would lock out a customer who bought all of them. Do not gate on `core` either: HyperFormula ignores it, and HyperFormula keys issued by license-key 5.2.0, or from a schema without the default, carry none.
 
 Pass **every** literal key the product accepts today, including the ones shaped like a legacy key: checked first, they never reach the legacy validator. The lists above are what each product accepted when this reader was written - check the product's own validator before copying them.
 
@@ -307,12 +314,12 @@ The windows are evaluated in this directory and are already covered by `license-
 - the build date constant reaches `readEntitlementLicense` in your real bundle, not only in tests,
 - pin `now` (or mock `Date.now`) in every test - never rely on the real clock.
 
-For fixture keys, generate real ones with the `license-key` CLI, so a misunderstanding shared by your test and your code cannot pass:
+For fixture keys, generate real ones with the `license-key` CLI, so a misunderstanding shared by your test and your code cannot pass. List the capability tokens in the record - the default schema gives both Handsontable and HyperFormula `core` (HyperFormula does not read it), and adds what the record lists. The tokens below are the HyperFormula license key syntax spec's Example 1:
 
 ```bash
 # in a checkout of license-key
 npm install && npm run build
-npm run generate-entitlement-key --record='{"holder":"Test Fixture","issued":"2026-08-12","licenses":[{"product":"hyperformula","contractType":"perpetual","agreement":"perpetual-2.0","package":"Pro","mode":"internal","date":"2027-03-31","notice":0,"grace":0}]}'
+npm run generate-entitlement-key --record='{"holder":"Test Fixture","issued":"2026-08-12","licenses":[{"product":"hyperformula","contractType":"perpetual","agreement":"perpetual-2.0","capabilities":["fun:math.a","fun:stat.a","fun:logic.a","fun:operator.a","fun:info.a","fun:lookup.a","fun:time.b","fun:text.b","fun:logic.b","fun:math.b","fun:stat.b","feat:crud","feat:undo_redo"],"mode":"internal","date":"2027-03-31","notice":0,"grace":0}]}'
 ```
 
 For the shapes the generator refuses (both dates, a bad date, an unknown token), build the key yourself in a test-only helper - kept in a `__tests__/` directory beside the copy, and never imported from your source:
