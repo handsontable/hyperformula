@@ -83,28 +83,32 @@ function poolFunctionArgumentsError(matrix: SimpleRangeValue, windowSize: number
  * Reads the numbers of a matrix argument, treating typed numbers (percentages, dates, currency) as plain numbers.
  *
  * @param matrix - the matrix argument
- * @returns the numbers of the matrix, the first error found in it, or the #VALUE! error when it holds any non-numeric value
+ * @returns the numbers of the matrix; the #VALUE! error when it holds any value that is neither a number nor an error, even
+ *   after an error; otherwise the first error found in it
  */
 function numbersOrError(matrix: SimpleRangeValue): number[][] | CellError {
   let hasNonNumericValue = false
+  let firstError: Maybe<CellError>
   const numbers: number[][] = []
 
   for (const row of matrix.rawData()) {
     const numbersInRow: number[] = []
     for (const value of row) {
       if (value instanceof CellError) {
-        return value
-      }
-      if (!isExtendedNumber(value)) {
+        firstError = firstError ?? value
+      } else if (isExtendedNumber(value)) {
+        numbersInRow.push(getRawValue(value))
+      } else {
         hasNonNumericValue = true
-        continue
       }
-      numbersInRow.push(getRawValue(value))
     }
     numbers.push(numbersInRow)
   }
 
-  return hasNonNumericValue ? new CellError(ErrorType.VALUE, ErrorMessage.NumberRange) : numbers
+  if (hasNonNumericValue) {
+    return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
+  }
+  return firstError ?? numbers
 }
 
 /**
@@ -175,7 +179,8 @@ function determinant(matrix: number[][]): number {
 }
 
 /**
- * Reads a number written directly in a formula, with an optional sign, such as `3`, `+3` or `-3`.
+ * Reads a number written directly in a formula, with an optional sign, such as `3`, `+3` or `-3`, or as a text
+ * literal that is a number, such as `"3"`.
  *
  * @param node - an argument of a function call
  * @returns the number, or undefined when the argument is anything else and its value is known only after evaluation
@@ -183,6 +188,10 @@ function determinant(matrix: number[][]): number {
 function numberLiteral(node: Ast): Maybe<number> {
   if (node.type === AstNodeType.NUMBER) {
     return node.value
+  }
+  if (node.type === AstNodeType.STRING) {
+    const value = Number(node.value)
+    return node.value.trim() !== '' && Number.isFinite(value) ? value : undefined
   }
   if ((node.type === AstNodeType.PLUS_UNARY_OP || node.type === AstNodeType.MINUS_UNARY_OP) && node.value.type === AstNodeType.NUMBER) {
     return node.type === AstNodeType.MINUS_UNARY_OP ? -node.value.value : node.value.value
@@ -253,7 +262,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       method: 'munit',
       sizeOfResultArrayMethod: 'munitArraySize',
       parameters: [
-        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
       vectorizationForbidden: true,
     },
@@ -329,18 +338,12 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
   /**
    * Corresponds to MUNIT(Dimension).
    *
-   * Returns the identity matrix of `Dimension` x `Dimension` cells. A fractional dimension is truncated;
-   * a dimension below 1, or one that is not a number, returns the #VALUE! error.
+   * Returns the identity matrix of `Dimension` x `Dimension` cells. The dimension is coerced to a number, so a
+   * numeric text such as "3" is accepted, and a fractional dimension is truncated. A dimension below 1, text that is
+   * not a number, or a dimension above the row or column limit of a sheet returns the #VALUE! error.
    */
   public munit(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('MUNIT'), (argument: InternalScalarValue) => {
-      if (argument instanceof CellError) {
-        return argument
-      }
-      const dimension = typeof argument === 'boolean' ? Number(argument) : argument
-      if (typeof dimension !== 'number') {
-        return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
-      }
+    return this.runFunction(ast.args, state, this.metadata('MUNIT'), (dimension: number) => {
       const size = Math.trunc(dimension)
       if (!(size >= 1)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
