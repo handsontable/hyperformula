@@ -30,6 +30,8 @@ import {
 } from './3rdparty/jstat/jstat'
 import {covariance, regressionSums, RegressionSums, sumOfSquaredDeviations} from '../deviationSums'
 import {
+  addDoubleDouble,
+  DOUBLE_DOUBLE_ZERO,
   divideDoubleDoubles,
   multiplyByTwoToThe,
   roundDoubleDouble,
@@ -37,9 +39,9 @@ import {
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
- * PROB accepts its probabilities when their sum, rounded to this many significant digits, is exactly 1.
- * The rounding absorbs the error of the binary floating-point sum (0.1 added ten times is 0.9999999999999999),
- * while a sum that is off by 1e-14 or more is rejected.
+ * PROB accepts its probabilities when their sum is at least 1 and, rounded to this many significant digits, is 1.
+ * The sum is compensated (double-double), so 0.1 added ten times is exactly 1. A sum below 1 is rejected
+ * however close it is, and a sum above 1 is accepted while it is less than 1 + 5e-15.
  */
 const PROBABILITY_SUM_SIGNIFICANT_DIGITS = 15
 
@@ -328,8 +330,9 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
           return pairs
         }
         const [xs, ps] = pairs
-        const probabilitySum = ps.reduce((sum, p) => sum + p, 0)
-        if (ps.some(p => p <= 0 || p > 1) || Number(probabilitySum.toPrecision(PROBABILITY_SUM_SIGNIFICANT_DIGITS)) !== 1) {
+        const probabilitySum = roundDoubleDouble(ps.reduce((sum, p) => addDoubleDouble(sum, {hi: p, lo: 0}), DOUBLE_DOUBLE_ZERO))
+        const sumIsOne = probabilitySum >= 1 && Number(probabilitySum.toPrecision(PROBABILITY_SUM_SIGNIFICANT_DIGITS)) === 1
+        if (ps.some(p => p <= 0 || p > 1) || !sumIsOne) {
           return new CellError(ErrorType.NUM, ErrorMessage.ProbabilityBounds)
         }
         const upper = upperLimit ?? lowerLimit
