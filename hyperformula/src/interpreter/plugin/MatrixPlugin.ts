@@ -179,8 +179,7 @@ function determinant(matrix: number[][]): number {
 }
 
 /**
- * Reads a number written directly in a formula, with an optional sign, such as `3`, `+3` or `-3`, or as a text
- * literal that is a number, such as `"3"`.
+ * Reads a number written directly in a formula, with an optional sign, such as `3`, `+3` or `-3`.
  *
  * @param node - an argument of a function call
  * @returns the number, or undefined when the argument is anything else and its value is known only after evaluation
@@ -188,10 +187,6 @@ function determinant(matrix: number[][]): number {
 function numberLiteral(node: Ast): Maybe<number> {
   if (node.type === AstNodeType.NUMBER) {
     return node.value
-  }
-  if (node.type === AstNodeType.STRING) {
-    const value = Number(node.value)
-    return node.value.trim() !== '' && Number.isFinite(value) ? value : undefined
   }
   if ((node.type === AstNodeType.PLUS_UNARY_OP || node.type === AstNodeType.MINUS_UNARY_OP) && node.value.type === AstNodeType.NUMBER) {
     return node.type === AstNodeType.MINUS_UNARY_OP ? -node.value.value : node.value.value
@@ -359,12 +354,25 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     if (ast.args.length !== 1) {
       return ArraySize.error()
     }
-    const dimension = numberLiteral(ast.args[0])
+    const argument = ast.args[0]
+    const dimension = argument.type === AstNodeType.STRING ? this.textLiteralAsNumber(argument.value) : numberLiteral(argument)
     if (dimension === undefined) {
       return ArraySize.scalar()
     }
     const size = Math.trunc(dimension)
     return size >= 1 && size <= this.largestIdentityMatrix() ? new ArraySize(size, size) : ArraySize.error()
+  }
+
+  /**
+   * Coerces a text literal to a number the way a NUMBER argument is coerced at evaluation, so that the predicted
+   * result size agrees with the evaluated one, including the configured decimal separator.
+   *
+   * @param text - the text of the literal
+   * @returns the number, or undefined when the text is not a number
+   */
+  private textLiteralAsNumber(text: string): Maybe<number> {
+    const coerced = this.coerceScalarToNumberOrError(text)
+    return isExtendedNumber(coerced) ? getRawValue(coerced) : undefined
   }
 
   /**
