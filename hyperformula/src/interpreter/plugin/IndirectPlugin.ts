@@ -18,6 +18,8 @@ import {InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 const R1C1_CELL = /^R(\[-?\d+\]|\d+)?C(\[-?\d+\]|\d+)?$/i
+// Trailing spaces and line feeds are ignored, as in Excel; any other whitespace makes the text invalid.
+const TRAILING_SPACES_AND_LINE_FEEDS = /[ \n]+$/
 
 /**
  * Parses one R1C1 cell: R and C followed by an absolute 1-based number, a relative [offset], or nothing (offset 0).
@@ -69,13 +71,15 @@ export class IndirectPlugin extends FunctionPlugin implements FunctionPluginType
    *
    * Returns the value of the cell, or the range, whose address is given as text. Supports A1 addresses of single
    * cells and of ranges, optionally with a sheet name, and names of named expressions that refer to a cell or range.
-   * With a1 = FALSE, the text is an R1C1 reference to a cell or range, or a name.
+   * With a1 = FALSE, the text is an R1C1 reference to a cell or range, or a name. Trailing spaces and line feeds in
+   * the text are ignored.
    *
    * @param ast
    * @param state
    */
   public indirect(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('INDIRECT'), (refText: string, a1: boolean): InterpreterValue => {
+    return this.runFunction(ast.args, state, this.metadata('INDIRECT'), (text: string, a1: boolean): InterpreterValue => {
+      const refText = text.replace(TRAILING_SPACES_AND_LINE_FEEDS, '')
       const resolveSheet = (sheetName: string) => this.dependencyGraph.sheetMapping.getSheetId(sheetName)
 
       if (!a1) {
