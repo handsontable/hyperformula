@@ -134,7 +134,7 @@ describe("FormulaBuilder", () => {
       const scoped = new FormulaBuilder({ rootEl: rootEl2, adapter });
       const mount = document.createElement("div");
 
-      scoped.openEditor(mount, "=(D1-C1)*B1");
+      scoped.openEditor(mount, "=(D1-C1)*B1+");
 
       expect(adapter.refSelectionCalls).toHaveLength(1);
 

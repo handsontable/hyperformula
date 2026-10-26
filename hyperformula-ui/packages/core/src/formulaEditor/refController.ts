@@ -192,4 +192,16 @@ export class RefController {
 
     return { start: lr.start, end: lr.end };
   }
+
+  replacedRefRange(): { start: number; end: number } | null {
+    const pending = this.pendingRefRange();
+
+    if (pending) {
+      return pending;
+    }
+
+    const token = this.refTokenAtCaret();
+
+    return token ? { start: token.start, end: token.end } : null;
+  }
 }

@@ -395,7 +395,7 @@ export class FormulaEditor {
     append = false,
     wholeAxis?: HeaderAxis,
   ): string {
-    const replacingToken = append ? undefined : (this.refs.pendingRefRange() ?? undefined);
+    const replacingToken = append ? undefined : (this.refs.replacedRefRange() ?? undefined);
 
     if (wholeAxis && "start" in target) {
       const refStr = formatWholeRef({

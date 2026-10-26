@@ -766,7 +766,7 @@ describe("FormulaBar single-editor host switch", () => {
     const editor = makeEditor(adapter);
     const controller = makeFormulaBar(container, { adapter, editor, knownFunctions: new Set() });
 
-    fireInlineStart(mount, "=(D1-C1)*B1");
+    fireInlineStart(mount, "=(D1-C1)*B1+");
 
     const resolveColor = resolvers.at(-1);
 
