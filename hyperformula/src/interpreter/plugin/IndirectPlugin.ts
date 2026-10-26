@@ -3,14 +3,19 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange, SimpleCellRange, simpleCellRange} from '../../AbsoluteCellRange'
+import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange, SimpleCellRange, simpleCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
-import {Vertex} from '../../DependencyGraph'
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {AstNodeType, ProcedureAst} from '../../parser'
-import {simpleCellAddressFromString, simpleCellRangeFromString} from '../../parser/addressRepresentationConverters'
+import {
+  simpleCellAddressFromString,
+  simpleCellRangeFromString,
+  simpleColumnRangeFromString,
+  simpleRowRangeFromString,
+} from '../../parser/addressRepresentationConverters'
+import {RANGE_OPERATOR} from '../../parser/parser-consts'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {EVALUATION_DEFERRED} from '../EvaluationDeferred'
 import {InterpreterState} from '../InterpreterState'
@@ -18,27 +23,71 @@ import {InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 const R1C1_CELL = /^R(\[-?\d+\]|\d+)?C(\[-?\d+\]|\d+)?$/i
-// Trailing spaces and line feeds are ignored, as in Excel; any other whitespace makes the text invalid.
-const TRAILING_SPACES_AND_LINE_FEEDS = /[ \n]+$/
+const R1C1_ROW = /^R(\[-?\d+\]|\d+)?$/i
+const R1C1_COLUMN = /^C(\[-?\d+\]|\d+)?$/i
 
 /**
- * Parses one R1C1 cell: R and C followed by an absolute 1-based number, a relative [offset], or nothing (offset 0).
+ * Converts the number after R or C to a 0-based index: an absolute 1-based number, a relative [offset] from the base,
+ * or nothing (offset 0).
+ */
+function r1c1Coordinate(part: string | undefined, base: number): number {
+  if (part === undefined) {
+    return base
+  }
+  if (part.startsWith('[')) {
+    return base + Number(part.slice(1, -1))
+  }
+  return Number(part) - 1
+}
+
+/**
+ * Parses one R1C1 cell: R and C, each followed by a coordinate (see {@link r1c1Coordinate}).
  */
 function r1c1CellAddress(text: string, sheet: number, formulaAddress: SimpleCellAddress): Maybe<SimpleCellAddress> {
   const match = R1C1_CELL.exec(text)
   if (match === null) {
     return undefined
   }
-  const coordinate = (part: string | undefined, base: number): number => {
-    if (part === undefined) {
-      return base
-    }
-    if (part.startsWith('[')) {
-      return base + Number(part.slice(1, -1))
-    }
-    return Number(part) - 1
+  return simpleCellAddress(sheet, r1c1Coordinate(match[2], formulaAddress.col), r1c1Coordinate(match[1], formulaAddress.row))
+}
+
+/**
+ * Parses one R1C1 whole row (R2) or whole column (C2), matched by the given pattern, to a 0-based index.
+ */
+function r1c1Index(pattern: RegExp, text: string, base: number): Maybe<number> {
+  const match = pattern.exec(text)
+  return match === null ? undefined : r1c1Coordinate(match[1], base)
+}
+
+/**
+ * Returns the range with its corners in order, like Excel: "B2:A1" is A1:B2, "C:B" is B:C. Whole columns and rows stay
+ * whole columns and rows; any other range stays a range of cells, so a coordinate that overflowed to Infinity (a row
+ * number of 309 digits) exceeds the sheet limits instead of passing for a whole column or row.
+ */
+function sortedRange(range: SimpleCellRange): AbsoluteCellRange {
+  const {start, end} = range
+  if (range instanceof AbsoluteColumnRange) {
+    return new AbsoluteColumnRange(start.sheet, Math.min(start.col, end.col), Math.max(start.col, end.col))
   }
-  return simpleCellAddress(sheet, coordinate(match[2], formulaAddress.col), coordinate(match[1], formulaAddress.row))
+  if (range instanceof AbsoluteRowRange) {
+    return new AbsoluteRowRange(start.sheet, Math.min(start.row, end.row), Math.max(start.row, end.row))
+  }
+  return new AbsoluteCellRange(
+    simpleCellAddress(start.sheet, Math.min(start.col, end.col), Math.min(start.row, end.row)),
+    simpleCellAddress(start.sheet, Math.max(start.col, end.col), Math.max(start.row, end.row)),
+  )
+}
+
+/**
+ * Removes trailing spaces and line feeds, as Excel ignores them; any other whitespace makes the text invalid. A loop,
+ * not a regex: /[ \n]+$/ takes quadratic time on a long run of spaces followed by another character.
+ */
+function trimTrailingSpacesAndLineFeeds(text: string): string {
+  let end = text.length
+  while (end > 0 && (text[end - 1] === ' ' || text[end - 1] === '\n')) {
+    end--
+  }
+  return text.slice(0, end)
 }
 
 /**
@@ -70,16 +119,16 @@ export class IndirectPlugin extends FunctionPlugin implements FunctionPluginType
    * Corresponds to INDIRECT(ref_text, [a1])
    *
    * Returns the value of the cell, or the range, whose address is given as text. Supports A1 addresses of single
-   * cells and of ranges, optionally with a sheet name, and names of named expressions that refer to a cell or range.
-   * With a1 = FALSE, the text is an R1C1 reference to a cell or range, or a name. Trailing spaces and line feeds in
-   * the text are ignored.
+   * cells, of ranges and of whole columns and rows, optionally with a sheet name, and names of named expressions that
+   * refer to a cell or range. With a1 = FALSE, the text is an R1C1 reference to a cell, a range, or whole columns or
+   * rows, or a name. Trailing spaces and line feeds in the text are ignored.
    *
    * @param ast
    * @param state
    */
   public indirect(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('INDIRECT'), (text: string, a1: boolean): InterpreterValue => {
-      const refText = text.replace(TRAILING_SPACES_AND_LINE_FEEDS, '')
+      const refText = trimTrailingSpacesAndLineFeeds(text)
       const resolveSheet = (sheetName: string) => this.dependencyGraph.sheetMapping.getSheetId(sheetName)
 
       if (!a1) {
@@ -90,40 +139,47 @@ export class IndirectPlugin extends FunctionPlugin implements FunctionPluginType
       const address = simpleCellAddressFromString(resolveSheet, refText, state.formulaAddress.sheet)
 
       if (address !== undefined) {
-        if (!this.isExistingAddress(address)) {
-          return new CellError(ErrorType.REF, ErrorMessage.BadRef)
-        }
-        return this.readCell(address, state)
+        return this.readReference(simpleCellRange(address, address), state)
       }
 
       const range = simpleCellRangeFromString(resolveSheet, refText, state.formulaAddress.sheet)
+        ?? simpleColumnRangeFromString(resolveSheet, refText, state.formulaAddress.sheet)
+        ?? simpleRowRangeFromString(resolveSheet, refText, state.formulaAddress.sheet)
         ?? this.namedReference(refText, state.formulaAddress.sheet)
       return this.readReference(range, state)
     })
   }
 
   /**
-   * Reads a reference given by its two corners: a cell if they are the same, otherwise a range.
+   * Reads a reference given by its two corners: a cell if they are the same, otherwise a range. Whole columns and
+   * rows have an infinite end row or column, as in {@link AbsoluteColumnRange} and {@link AbsoluteRowRange}.
    * Returns #REF! if there is no reference or it leaves the existing sheets or the sheet limits.
+   *
+   * If the caller uses only the position or the size of the reference (see {@link InterpreterState.referenceExpected}),
+   * returns it as a range, even for one cell, without reading its cells or recording them as dependencies: the
+   * caller does not depend on their values, so a cell that refers back to the formula is no cycle.
    */
   private readReference(range: Maybe<SimpleCellRange>, state: InterpreterState): InterpreterValue {
-    if (range === undefined || !this.isExistingAddress(range.start) || !this.isExistingAddress(range.end)) {
+    if (range === undefined || !this.dependencyGraph.sheetMapping.hasSheetWithId(range.start.sheet)) {
       return new CellError(ErrorType.REF, ErrorMessage.BadRef)
+    }
+    const normalized = sortedRange(range)
+    if (normalized.start.col < 0 || normalized.start.row < 0 || normalized.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+      return new CellError(ErrorType.REF, ErrorMessage.BadRef)
+    }
+    if (state.referenceExpected) {
+      return SimpleRangeValue.onlyRange(normalized, this.dependencyGraph)
     }
     if (range.start.row === range.end.row && range.start.col === range.end.col) {
       return this.readCell(range.start, state)
     }
-    // corners in any order, like Excel: "B2:A1" is A1:B2
-    const normalized = AbsoluteCellRange.fromCoordinates(range.start.sheet,
-      Math.min(range.start.col, range.end.col), Math.min(range.start.row, range.end.row),
-      Math.max(range.start.col, range.end.col), Math.max(range.start.row, range.end.row))
     return this.readRange(normalized, state)
   }
 
   /**
-   * Parses an R1C1 reference to a cell or a range of cells, optionally with a sheet name: R2C3, R[-1]C[2]
-   * (relative to the formula's cell), RC (the formula's own cell), R1C1:R2C2. Whole rows and columns are not
-   * supported. Returns undefined if the text is not such a reference or names an unknown sheet.
+   * Parses an R1C1 reference to a cell, a range of cells, or whole rows or columns, optionally with a sheet name:
+   * R2C3, R[-1]C[2] (relative to the formula's cell), RC (the formula's own cell), R1C1:R2C2, R2, C[-1]:C2.
+   * Returns undefined if the text is not such a reference or names an unknown sheet.
    */
   private r1c1Reference(text: string, formulaAddress: SimpleCellAddress): Maybe<SimpleCellRange> {
     const sheetSeparator = text.lastIndexOf('!')
@@ -137,21 +193,33 @@ export class IndirectPlugin extends FunctionPlugin implements FunctionPluginType
       sheet = sheetId
       reference = text.slice(sheetSeparator + 1)
     }
-    const corners = reference.split(':')
+    const corners = reference.split(RANGE_OPERATOR)
     if (corners.length > 2) {
       return undefined
     }
-    const start = r1c1CellAddress(corners[0], sheet, formulaAddress)
-    const end = corners.length === 2 ? r1c1CellAddress(corners[1], sheet, formulaAddress) : start
-    if (start === undefined || end === undefined) {
-      return undefined
+    const [first, last = first] = corners
+
+    const start = r1c1CellAddress(first, sheet, formulaAddress)
+    const end = r1c1CellAddress(last, sheet, formulaAddress)
+    if (start !== undefined && end !== undefined) {
+      return simpleCellRange(start, end)
     }
-    return simpleCellRange(start, end)
+    const startRow = r1c1Index(R1C1_ROW, first, formulaAddress.row)
+    const endRow = r1c1Index(R1C1_ROW, last, formulaAddress.row)
+    if (startRow !== undefined && endRow !== undefined) {
+      return new AbsoluteRowRange(sheet, startRow, endRow)
+    }
+    const startColumn = r1c1Index(R1C1_COLUMN, first, formulaAddress.col)
+    const endColumn = r1c1Index(R1C1_COLUMN, last, formulaAddress.col)
+    if (startColumn !== undefined && endColumn !== undefined) {
+      return new AbsoluteColumnRange(sheet, startColumn, endColumn)
+    }
+    return undefined
   }
 
   /**
-   * Returns the cell or range a named expression refers to, as a range (a single cell is a one-cell range),
-   * or undefined if there is no such name in scope or it is not a reference (e.g., =5).
+   * Returns the cell, range, or whole columns or rows a named expression refers to, as a range (a single cell is a
+   * one-cell range), or undefined if there is no such name in scope or it is not a reference (e.g., =5).
    */
   private namedReference(name: string, sheet: number): Maybe<AbsoluteCellRange> {
     const namedExpression = this.dependencyGraph.namedExpressions.nearestNamedExpression(name, sheet)
@@ -168,23 +236,17 @@ export class IndirectPlugin extends FunctionPlugin implements FunctionPluginType
       const address = ast.reference.toSimpleCellAddress(baseAddress)
       return new AbsoluteCellRange(address, address)
     }
-    if (ast.type === AstNodeType.CELL_RANGE) {
+    if (ast.type === AstNodeType.CELL_RANGE || ast.type === AstNodeType.COLUMN_RANGE || ast.type === AstNodeType.ROW_RANGE) {
       return AbsoluteCellRange.fromAstOrUndef(ast, baseAddress)
     }
     return undefined
   }
 
   /**
-   * Returns true if the address is on an existing sheet and within the limits set by the maxRows and maxColumns options.
-   */
-  private isExistingAddress(address: SimpleCellAddress): boolean {
-    return this.dependencyGraph.sheetMapping.hasSheetWithId(address.sheet) && this.isWithinSheetLimits(address)
-  }
-
-  /**
-   * Returns the range as a reference. Its cells are read lazily: only when a function uses the values (SUM) or the
-   * address (lookups, criteria), not when it only needs the size (ROWS), so the range is recorded as a runtime
-   * dependency of the evaluated formula only then. Pending cells are requested and the evaluation is deferred.
+   * Returns the range as a reference. Its cells are read lazily, when their values or its `range` are first used (SUM,
+   * lookups, criteria, an operator, the whole formula), and the range is recorded as a runtime dependency of the
+   * evaluated formula only then. Pending cells are requested and the evaluation is deferred. Its size and
+   * `rangeWithoutReading`, which ROW, COLUMN, ROWS and COLUMNS use, record nothing.
    */
   private readRange(range: AbsoluteCellRange, state: InterpreterState): SimpleRangeValue {
     const pass = this.interpreter.evaluationPass
@@ -193,30 +255,12 @@ export class IndirectPlugin extends FunctionPlugin implements FunctionPluginType
       if (pass === undefined || dependent === undefined || pass.dependent !== dependent) {
         return
       }
-      const rangeVertex = pass.recordRangeDependency(range)
-      const pending: Vertex[] = []
-      if (pass.isPending(rangeVertex)) {
-        pending.push(rangeVertex)
-      } else {
-        for (const address of range.addresses(this.dependencyGraph)) {
-          const cell = this.dependencyGraph.addressMapping.getCell(address)
-          if (cell !== undefined && pass.isPending(cell)) {
-            pending.push(cell)
-          }
-        }
-      }
+      const pending = pass.pendingVerticesOfRange(pass.recordRangeDependency(range))
       if (pending.length > 0) {
         pending.forEach(vertex => pass.requestPull(vertex))
         throw EVALUATION_DEFERRED
       }
     })
-  }
-
-  /**
-   * Returns true if the address is within the limits set by the maxRows and maxColumns options.
-   */
-  private isWithinSheetLimits(address: SimpleCellAddress): boolean {
-    return address.row >= 0 && address.col >= 0 && address.row < this.config.maxRows && address.col < this.config.maxColumns
   }
 
   /**

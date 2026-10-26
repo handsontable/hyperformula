@@ -18,6 +18,11 @@ const NO_DEPENDENCIES: RuntimeDependency[] = []
 export class EvaluationPass {
   private currentDependent?: FormulaVertex
   private currentRecorded?: RuntimeDependency[]
+  /**
+   * Range vertices created in this pass, while some of their cells may still be pending. The sort of the pass started
+   * before they existed, so it does not know them: whether they are pending says nothing about their cells.
+   */
+  private readonly rangeVerticesWithUncheckedCells = new Set<RangeVertex>()
 
   constructor(
     private readonly dependencyGraph: DependencyGraph,
@@ -75,12 +80,42 @@ export class EvaluationPass {
     if (this.currentDependent === undefined) {
       throw new Error('No formula is being evaluated.')
     }
-    const vertex = this.dependencyGraph.addRuntimeRangeDependency(this.currentDependent, range)
+    const {rangeVertex: vertex, created} = this.dependencyGraph.addRuntimeRangeDependency(this.currentDependent, range)
+    if (created) {
+      this.rangeVerticesWithUncheckedCells.add(vertex)
+    }
     this.currentRecorded = this.currentRecorded ?? []
     if (!this.currentRecorded.some(dependency => dependency.vertex === vertex)) {
       this.currentRecorded.push({address: simpleCellRange(range.start, range.end), vertex})
     }
     return vertex
+  }
+
+  /**
+   * Returns the vertices that must be computed before the cells of a range recorded with {@link recordRangeDependency}
+   * are current: the range vertex if it is pending, or else, for a range vertex created in this pass, its pending
+   * cells. A range vertex that existed when the pass started is pending as long as any of its cells is, so its cells
+   * are not checked one by one.
+   */
+  public pendingVerticesOfRange(rangeVertex: RangeVertex): Vertex[] {
+    if (this.isPending(rangeVertex)) {
+      return [rangeVertex]
+    }
+    if (!this.rangeVerticesWithUncheckedCells.has(rangeVertex)) {
+      return []
+    }
+    const pendingCells: Vertex[] = []
+    for (const address of rangeVertex.range.addresses(this.dependencyGraph)) {
+      const cell = this.dependencyGraph.addressMapping.getCell(address)
+      if (cell !== undefined && this.isPending(cell)) {
+        pendingCells.push(cell)
+      }
+    }
+    if (pendingCells.length === 0) {
+      // a vertex that is not pending stays so for the rest of the pass
+      this.rangeVerticesWithUncheckedCells.delete(rangeVertex)
+    }
+    return pendingCells
   }
 
   /**

@@ -23,8 +23,8 @@ export class SimpleRangeValue {
   private readonly _range?: AbsoluteCellRange
 
   /**
-   * Runs before the range's cells are first read, e.g., to make sure they are computed. May throw to defer the
-   * evaluation that reads them; it runs again on the next read.
+   * Runs before the range's cells are first read or {@link range} is first used, e.g., to make sure the cells are
+   * computed. May throw to defer the evaluation that reads them; it runs again on the next read.
    */
   private beforeRead?: () => void
 
@@ -50,6 +50,26 @@ export class SimpleRangeValue {
   public get range(): AbsoluteCellRange | undefined {
     this.runBeforeRead()
     return this._range
+  }
+
+  /**
+   * Returns the address of the range without running the function given to {@link onlyRangeWithReadHook}. For
+   * functions that use only the position or the size of the range, not its cells, e.g., ROW and ROWS.
+   *
+   * @internal
+   */
+  public rangeWithoutReading(): AbsoluteCellRange | undefined {
+    return this._range
+  }
+
+  /**
+   * Returns `true` if the function given to {@link onlyRangeWithReadHook} has not run yet, i.e., the range's cells
+   * have not been read.
+   *
+   * @internal
+   */
+  public hasPendingReadHook(): boolean {
+    return this.beforeRead !== undefined
   }
 
   /**
@@ -89,8 +109,9 @@ export class SimpleRangeValue {
   }
 
   /**
-   * A factory method. Like {@link onlyRange}, but runs the given function before the range's cells or address are
-   * first used (its size can be read without it). Used for ranges that functions discover at runtime, e.g., INDIRECT.
+   * A factory method. Like {@link onlyRange}, but runs the given function before the range's cells are first read or
+   * {@link range} is first used. Its size and {@link rangeWithoutReading} do not run it. Used for ranges that functions
+   * discover at runtime, e.g., INDIRECT.
    *
    * @internal
    */

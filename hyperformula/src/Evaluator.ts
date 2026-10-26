@@ -220,15 +220,20 @@ export class Evaluator {
   }
 
   private evaluateAstToCellValue(ast: Ast, state: InterpreterState): InterpreterValue {
-    const interpreterValue = this.interpreter.evaluateAst(ast, state)
+    let interpreterValue = this.interpreter.evaluateAst(ast, state)
     if (interpreterValue instanceof SimpleRangeValue) {
       // Formulas that read this cell later read the range's cells, so they become dependencies of this formula now
       interpreterValue.runBeforeRead()
-      return interpreterValue
-    } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
-      return 0
-    } else {
-      return interpreterValue
+      if (interpreterValue.width() !== 1 || interpreterValue.height() !== 1) {
+        return interpreterValue
+      }
+      // a range of one cell from INDIRECT reaches here unreduced (see Interpreter.postprocess); as the whole formula,
+      // it is its cell's value, like a literal range of one cell
+      interpreterValue = interpreterValue.data[0][0]
     }
+    if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
+      return 0
+    }
+    return interpreterValue
   }
 }

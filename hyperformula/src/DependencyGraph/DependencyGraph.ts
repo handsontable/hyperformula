@@ -189,7 +189,7 @@ export class DependencyGraph {
 
     cellDependencies.forEach((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
-        const rangeVertex = this.ensureRangeVertex(dep)
+        const {rangeVertex} = this.ensureRangeVertex(dep)
         this.graph.addEdge(rangeVertex, endVertexId)
       } else if (dep instanceof NamedExpressionDependency) {
         const sheetOfVertex = (endVertex as ScalarFormulaVertex).getAddress(this.lazilyTransformingAstService).sheet
@@ -205,9 +205,12 @@ export class DependencyGraph {
   /**
    * Returns the range vertex of a range, creating it if needed, and makes sure it has its edges from its cells
    * (or from a smaller range vertex). Safe to call again for a range that already has a vertex.
+   *
+   * @returns {{rangeVertex: RangeVertex, created: boolean}} the range vertex, and whether this call created it
    */
-  public ensureRangeVertex(range: AbsoluteCellRange): RangeVertex {
+  public ensureRangeVertex(range: AbsoluteCellRange): { rangeVertex: RangeVertex, created: boolean } {
     let rangeVertex = this.getRange(range.start, range.end)
+    const created = rangeVertex === undefined
     if (rangeVertex === undefined) {
       rangeVertex = new RangeVertex(range)
       this.rangeMapping.addOrUpdateVertex(rangeVertex)
@@ -250,7 +253,7 @@ export class DependencyGraph {
     if (range.isFinite()) {
       this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
     }
-    return rangeVertex
+    return {rangeVertex, created}
   }
 
   public fetchNamedExpressionVertex(expressionName: string, sheetId: number): { vertex: CellVertex, id: Maybe<number>} {
@@ -298,15 +301,15 @@ export class DependencyGraph {
    * Adds an edge from the range vertex of a range to a formula that read the range during evaluation.
    * Creates the range vertex, with its edges from the cells, if the graph does not have it.
    *
-   * @returns the range vertex
+   * @returns {{rangeVertex: RangeVertex, created: boolean}} the range vertex, and whether this call created it
    */
-  public addRuntimeRangeDependency(dependent: FormulaVertex, range: AbsoluteCellRange): RangeVertex {
-    const rangeVertex = this.ensureRangeVertex(range)
-    if (!this.graph.existsEdge(rangeVertex, dependent)) {
-      this.graph.addEdge(rangeVertex, dependent)
+  public addRuntimeRangeDependency(dependent: FormulaVertex, range: AbsoluteCellRange): { rangeVertex: RangeVertex, created: boolean } {
+    const ensured = this.ensureRangeVertex(range)
+    if (!this.graph.existsEdge(ensured.rangeVertex, dependent)) {
+      this.graph.addEdge(ensured.rangeVertex, dependent)
       this.runtimeEdgesAdded++
     }
-    return rangeVertex
+    return ensured
   }
 
   /**
