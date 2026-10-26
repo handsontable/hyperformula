@@ -58,6 +58,7 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 ├── .github/                          # CI workflows, issue and PR templates
 ├── package.json                      # Private workspace root: fan-out scripts only
 ├── package-lock.json  .nvmrc  .worktreeinclude
+├── .fossa.yml                        # Keeps the private UI demo and e2e workspaces out of the FOSSA scan
 ├── AGENTS.md  CLAUDE.md  README.md  CONTRIBUTING.md  LICENSE.txt
 ├── CHANGELOG.md                      # the engine's history (the UI keeps its own until the versions join)
 └── CODE_OF_CONDUCT.md
