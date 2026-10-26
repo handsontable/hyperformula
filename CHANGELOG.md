@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added a message after `npm i hyperformula` that points AI assistants to the SKILLS file. The message needs `--foreground-scripts` to be visible in npm, and pnpm 10 needs the `postinstall` script to be approved first. [#1829](https://github.com/handsontable/hyperformula/pull/1829)
 
+### Changed
+
+- Changed the cell errors produced while evaluating a formula to carry a message describing their cause. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
