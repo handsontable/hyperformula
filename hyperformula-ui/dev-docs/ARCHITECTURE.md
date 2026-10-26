@@ -817,8 +817,9 @@ contract this relies on.
 
 While the editor is open, a mousedown on a grid cell either picks a reference or commits —
 decided by `FormulaEditor.isRefSelectionActive()` (ref insertion not disabled via
-`setRefActive(false)`, and caret after a ref opener or a pending ref at the caret — a
-deactivated editor treats every cell click as a commit, never a dead pick). `FormulaEditor.enterRefSelectionMode()` is the single wiring point: it
+`setRefActive(false)`, and caret after a ref opener, a pending ref at the caret, or the caret
+inside a cell or range reference, which the pick then replaces — a deactivated editor treats
+every cell click as a commit, never a dead pick). `FormulaEditor.enterRefSelectionMode()` is the single wiring point: it
 calls `adapter.enterRefSelectionMode(resolveColor, isPickEligible)` with both callbacks
 derived from the editor, and every entry path (`FormulaBuilder.openEditor`,
 `FormulaBar.handleInlineEditStart`) goes through it. When the predicate is false,

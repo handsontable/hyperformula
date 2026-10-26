@@ -295,15 +295,7 @@ export class KeyboardController {
   }
 
   private cycleRefAtCaret(): boolean {
-    const caret = this.ctx.input.getCaret();
-    const token = this.ctx.kernel
-      .getTokens()
-      .find(
-        (candidate) =>
-          (candidate.type === TokenType.CELL_REF || candidate.type === TokenType.RANGE_REF) &&
-          caret >= candidate.start &&
-          caret <= candidate.end,
-      );
+    const token = this.refs.refTokenAtCaret();
 
     if (!token) {
       return false;

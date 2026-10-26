@@ -340,7 +340,11 @@ export class FormulaEditor {
     this.keyboard.setHostToggleDelegate(delegate);
   }
 
-  /** Whether a picked ref would currently be inserted at the caret. */
+  /**
+   * Whether a picked ref would currently be inserted at the caret as a new reference: the
+   * caret follows a ref opener. A caret inside an existing reference reports `false` here,
+   * because a pick then replaces that reference (see {@link isRefSelectionActive}).
+   */
   canInsertRef(): boolean {
     return this.refs.canInsertRef();
   }
@@ -350,7 +354,11 @@ export class FormulaEditor {
     return this.focused;
   }
 
-  /** Whether ref-selection is currently eligible (grid picks would insert refs). */
+  /**
+   * Whether ref-selection is currently eligible: a grid pick would insert a reference at the
+   * caret, or replace the pending reference or the cell or range reference the caret sits in
+   * (at either end included).
+   */
   isRefSelectionActive(): boolean {
     return this.refs.isRefSelectionActive();
   }

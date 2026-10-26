@@ -19,7 +19,8 @@ sync with `keymap.ts`, `KeyboardController`, and their tests (unit matrix in
 - **Ref insertion:** `RefController.tryInsertRef(refStr, force?, append?)` — `force` bypasses
   only the `canInsertRef()` value-position guard (used by explicit point mode); the mouse-pick
   path never forces. `append` (set by a Cmd/Ctrl-modified pick, delivered via
-  `CellPick`/`RangePick.append`) joins the new ref after the pending one with the locale
+  `CellPick`/`RangePick.append`) joins the new ref after the pending one, or after the
+  reference the caret sits in (`RefController.refTokenAtCaret()`), with the locale
   `argSeparator` instead of replacing it.
 - **Tests:** unit — `packages/core/tests/formulaEditor/keyboard-controller.test.ts` (the key
   matrix), `point-mode-controller.test.ts`, `point-mode-keys.test.ts`, `shortcut-manager.test.ts`,
