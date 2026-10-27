@@ -3,7 +3,7 @@
  * Starlight Header component override, adapted from the Handsontable docs' Header.astro so both
  * portals share one header.
  *
- * Desktop: two rows — logo, search, GitHub and theme; then the Guides / API / Updates tabs.
+ * Desktop: two rows — logo, search, GitHub and theme; then the Guides / API / Updates tabs and the Support menu.
  * Mobile: a main bar, a sub-bar (sidebar toggle, breadcrumbs, table of contents) and a navigation
  * overlay opened by the hamburger.
  */
@@ -11,6 +11,8 @@ import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
 import Search from 'virtual:starlight/components/Search';
 import SiteTitle from 'virtual:starlight/components/SiteTitle';
 import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
+import SupportDropdown from './SupportDropdown.astro';
+import { SUPPORT_LINKS } from '../support-links.mjs';
 
 const base = import.meta.env.BASE_URL;
 // The page's path under the base: `guide/basic-usage.html`, `api.html`, `api/classes/hyperformula.html`.
@@ -104,6 +106,7 @@ const isGuidesPage = !isApiPage && !isUpdatesPage;
       <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8l0 4l2 2"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"/></svg>
       Updates
     </a>
+    <SupportDropdown />
     <div class="nav-spacer"></div>
   </nav>
 </div>
@@ -149,6 +152,17 @@ const isGuidesPage = !isApiPage && !isUpdatesPage;
         <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8l0 4l2 2"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"/></svg>
         Updates
       </a>
+    </div>
+    <!-- Styled as the Handsontable docs' framework picker: a label over a grid of cells. -->
+    <div class="mobile-nav-frameworks-section">
+      <span class="mobile-nav-frameworks-label">Support:</span>
+      <div class="mobile-nav-frameworks">
+        {SUPPORT_LINKS.map(({ label, href }) => (
+          <a href={href} class="mobile-nav-fw" target="_blank" rel="noopener noreferrer" aria-label={`${label} (opens in new window)`}>
+            {label}
+          </a>
+        ))}
+      </div>
     </div>
   </nav>
 </div>

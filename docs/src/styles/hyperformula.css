@@ -141,3 +141,9 @@ site-search button[data-open-modal] > kbd kbd {
   max-width: 100%;
   height: auto;
 }
+
+/* The copied `mobile/nav-overlay.css` reverses the overlay so the Handsontable docs' framework picker shows
+   on top; here the section after the links is Support, which belongs below them, in reading order too. */
+.mobile-nav-overlay > nav {
+  flex-direction: column;
+}
