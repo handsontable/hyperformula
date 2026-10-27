@@ -18,6 +18,7 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#VALORE!',
   },
   functions: {
+    CHOOSECOLS: 'SCEGLI.COL',
     FILTER: 'FILTER',
     VSTACK: 'STACK.VERT',
     HSTACK: 'STACK.ORIZ',
