@@ -15,8 +15,8 @@ module.exports = {
   extends: ['eslint:recommended'],
   overrides: [
     {
-      // The VuePress configuration, plugins and themes, the build configuration, and the typedoc theme, loaded by Node.
-      files: ['.vuepress/**/*.js', 'build.config.js', 'typedoc-theme/**/*.js'],
+      // The build configuration and the typedoc theme, loaded by Node.
+      files: ['build.config.js', 'typedoc-theme/**/*.js'],
       env: {
         worker: false,
         node: true,
@@ -39,21 +39,6 @@ module.exports = {
       env: {
         node: false,
         browser: true,
-      },
-    },
-    {
-      // Bundled into the client by webpack.
-      files: [
-        '.vuepress/enhanceApp.js',
-        '.vuepress/components/**/*.js',
-        '.vuepress/plugins/search-box/match-query.js',
-      ],
-      env: {
-        node: false,
-        browser: true,
-      },
-      parserOptions: {
-        sourceType: 'module',
       },
     },
   ],
