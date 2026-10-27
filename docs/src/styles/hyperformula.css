@@ -90,8 +90,54 @@ hf-coding-agent-wizard button {
   }
 }
 
-/* The diagrams are dark lines on a transparent background: give them a light backing in dark mode. */
-:root[data-theme='dark'] .sl-markdown-content img {
+/* The diagrams (the portal's own images) are dark lines on a transparent background: give them a light
+   backing in dark mode. Remote images, the logo and badges on the home page, are drawn for any background. */
+:root[data-theme='dark'] .sl-markdown-content img[src^='/docs/hyperformula/'] {
   background-color: #fff;
   border-radius: 0.25rem;
+}
+
+/* Images in a centred paragraph, the home page's logo and badges, sit in a line and wrap, as on GitHub:
+   Starlight displays content images as blocks. */
+.sl-markdown-content p[align='center'] img {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* The copied `base/typography.css` styles every <kbd> and exempts only the Handsontable docs' search
+   (DocSearch); restore Starlight's own search shortcut, aligned to the end of the search button. */
+site-search button[data-open-modal] > kbd {
+  margin: 0;
+  margin-inline-start: auto;
+  padding: 0 0.375rem;
+  border: 0;
+  box-shadow: none;
+  font-size: var(--sl-text-2xs);
+}
+
+site-search button[data-open-modal] > kbd kbd {
+  margin: 0;
+}
+
+@media (max-width: 49.99rem) {
+  site-search button[data-open-modal] > kbd {
+    display: none;
+  }
+}
+
+/* Hand-written pseudo-code blocks (`<div class="language-"><pre>`, on the dependency graph page) scroll
+   on narrow screens like the highlighted ones. */
+.sl-markdown-content div[class^='language-'] > pre {
+  overflow-x: auto;
+}
+
+/* The HyperFormula logotype is wider than the datagrid one the header was sized for: let it shrink to its
+   column just above the mobile breakpoint, where it would otherwise run into the search box. */
+.header .site-title {
+  min-width: 0;
+}
+
+.header .site-title img {
+  max-width: 100%;
+  height: auto;
 }

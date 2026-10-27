@@ -30,7 +30,7 @@ const isGuidesPage = !isApiPage && !isUpdatesPage;
     <div class="title-wrapper sl-flex">
       <SiteTitle />
     </div>
-    <div class="sl-hidden md:sl-flex print:hidden search-wrapper" transition:persist="docs-search">
+    <div class="print:hidden search-wrapper" transition:persist="docs-search">
       <Search />
     </div>
     <div class="sl-hidden md:sl-flex print:hidden right-group">
@@ -223,8 +223,10 @@ const isGuidesPage = !isApiPage && !isUpdatesPage;
     const mainFrame = document.querySelector('.main-frame') as HTMLElement | null;
     const mobileSearchBtn = document.querySelector('.mobile-search-btn') as HTMLButtonElement | null;
 
-    // --- Mobile search: open Starlight's search dialog ---
-    mobileSearchBtn?.addEventListener('click', () => {
+    // --- Mobile search: open Starlight's search dialog. The click must not reach the window, where the
+    //     dialog's outside-click listener would close it again at once. ---
+    mobileSearchBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
       document.querySelector<HTMLButtonElement>('site-search button[data-open-modal]')?.click();
     }, { signal });
 
@@ -490,6 +492,20 @@ const isGuidesPage = !isApiPage && !isUpdatesPage;
     justify-self: center;
     width: 100%;
     max-width: 36rem;
+  }
+
+  /* On mobile the search dialog still lives here, so the wrapper stays rendered (a dialog under a
+     display:none ancestor cannot open), out of the layout; the mobile controls' button opens it. */
+  @media (max-width: 49.99rem) {
+    .search-wrapper {
+      position: absolute;
+      width: 0;
+      height: 0;
+    }
+
+    .search-wrapper :global(button[data-open-modal]) {
+      display: none;
+    }
   }
 
   .right-group {

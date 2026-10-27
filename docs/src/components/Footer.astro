@@ -26,6 +26,7 @@ const year = new Date().getFullYear();
       <a href="https://handsontable.com/contact?category=technical_support">Contact</a>
       <a href="https://handsontable.com/blog/">Blog</a>
       <a href="https://handsontable.com/pricing">Pricing</a>
+      <a href="https://status.handsontable.com/" target="_blank" rel="noopener noreferrer" aria-label="Status (opens in new window)">Status</a>
     </nav>
 
     <!-- Row 2: 3 social icons + copyright spanning 3 columns -->
@@ -119,9 +120,6 @@ const year = new Date().getFullYear();
     color: var(--sl-color-white);
   }
 
-  /* ── Status link & dot ───────────────────────────────────────────────────── */
-
-
   /* ── Row 2: 3 social icons + copyright (spans 3 cols) ──────────────────── */
   .hot-footer__bottom {
     display: grid;
@@ -165,7 +163,9 @@ const year = new Date().getFullYear();
   }
 
   /* ── Responsive footer on mobile ──────────────────────────────────────── */
-  @media (max-width: 49.99rem) {
+  /* Three columns until the content column is wide enough for six: from 50rem to 72rem the sidebar takes
+     its share and six links overflow the page. */
+  @media (max-width: 71.99rem) {
     .hot-footer__nav {
       grid-template-columns: repeat(3, 1fr);
     }

@@ -52,6 +52,12 @@ const pageHref = Astro.url.pathname;
     color: var(--sl-color-white);
   }
 
+  /* A flex item keeps its content's width: let a long API name (AddNamedExpressionUndoEntry) wrap on phones. */
+  .hot-title-row h1 {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
   .hot-title-row {
     display: flex;
     flex-wrap: wrap;

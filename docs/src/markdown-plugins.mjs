@@ -57,6 +57,13 @@ export function docsMarkdownPlugin(base) {
       }
     },
 
+    // A table written as HTML gets the same scrolling wrapper as a Markdown one (see `tableWrapperPlugin`).
+    html(node, ctx) {
+      if (/^\s*<table[\s>]/.test(node.value)) {
+        ctx.setProperty(node, 'value', `<div class="table-container">${node.value}</div>`);
+      }
+    },
+
     containerDirective(node, ctx) {
       if (node.name !== 'example') {
         return;
