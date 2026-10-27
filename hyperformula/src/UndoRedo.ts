@@ -94,6 +94,8 @@ export class MoveCellsUndoEntry extends BaseUndoEntry {
 export class AddRowsUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly command: AddRowsCommand,
+    /** Per added span, the cells that arrays grown by the span overwrote, in the coordinates from before the span. */
+    public readonly overwrittenCells: [SimpleCellAddress, ClipboardCell][][] = [],
   ) {
     super()
   }
@@ -222,6 +224,8 @@ export class MoveColumnsUndoEntry extends BaseUndoEntry {
 export class AddColumnsUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly command: AddColumnsCommand,
+    /** Per added span, the cells that arrays grown by the span overwrote, in the coordinates from before the span. */
+    public readonly overwrittenCells: [SimpleCellAddress, ClipboardCell][][] = [],
   ) {
     super()
   }
@@ -350,6 +354,7 @@ export class SetCellContentsUndoEntry extends BaseUndoEntry {
       newContent: RawCellContent,
       oldContent: [SimpleCellAddress, ClipboardCell],
     }[],
+    public readonly overwrittenCells: [SimpleCellAddress, ClipboardCell][] = [],
   ) {
     super()
   }
@@ -620,6 +625,7 @@ export class UndoRedo {
     for (let i = addedRowsSpans.length - 1; i >= 0; --i) {
       const addedRows = addedRowsSpans[i]
       this.operations.removeRows(new RemoveRowsCommand(operation.command.sheet, [[addedRows.rowStart, addedRows.numberOfRows]]))
+      this.restoreCellsOverwrittenBySpan(operation.overwrittenCells[i])
     }
   }
 
@@ -628,17 +634,39 @@ export class UndoRedo {
     for (let i = addedColumnsSpans.length - 1; i >= 0; --i) {
       const addedColumns = addedColumnsSpans[i]
       this.operations.removeColumns(new RemoveColumnsCommand(operation.command.sheet, [[addedColumns.columnStart, addedColumns.numberOfColumns]]))
+      this.restoreCellsOverwrittenBySpan(operation.overwrittenCells[i])
+    }
+  }
+
+  /**
+   * Restores the cells that an array overwrote when an added span made it grow. Runs right after
+   * that span is removed again: the array has shrunk back by then, so the cells are free, and the
+   * coordinates are the ones the cells were snapshotted in.
+   */
+  private restoreCellsOverwrittenBySpan(overwrittenCells: [SimpleCellAddress, ClipboardCell][] = []) {
+    for (const [address, clipboardCell] of overwrittenCells) {
+      this.operations.restoreCell(address, clipboardCell)
     }
   }
 
   public undoSetCellContents(operation: SetCellContentsUndoEntry) {
-    for (const cellContentData of operation.cellContents) {
+    // Undo the writes in reverse order. A later write can land on a cell that an earlier write in
+    // the same call made part of an array; its old content then points at that array's anchor, and
+    // only once that write is undone may the earlier write restore the anchor's own old content.
+    for (let i = operation.cellContents.length - 1; i >= 0; --i) {
+      const cellContentData = operation.cellContents[i]
       const address = cellContentData.address
       const [oldContentAddress, oldContent] = cellContentData.oldContent
       if (!equalSimpleCellAddress(address, oldContentAddress)) {
         this.operations.setCellEmpty(address)
       }
       this.operations.restoreCell(oldContentAddress, oldContent)
+    }
+    // Restore any cells that an array formula overwrote while spilling. This must run after
+    // the anchor formulas above are undone, so the spill (and its array-internal cells) is
+    // gone and the overwritten addresses are free to restore.
+    for (const [address, clipboardCell] of operation.overwrittenCells) {
+      this.operations.restoreCell(address, clipboardCell)
     }
   }
 

@@ -162,7 +162,7 @@ If your specified output array size is larger or equal to the input array size, 
 When the [array arithmetic mode](#array-arithmetic-mode) is enabled, and you pass an array to a [scalar](#about-arrays) function, the following rules apply:
 * Array dimensions need to be consistent (e.g., every row needs to be of the same length).
 * If an input array value is missing (due to a difference in dimensions), the corresponding output array value is `#N/A`.
-* If a cell evaluates to an array, the array values are spilled into neighboring cells (unless the neighboring cells are already filled).<br>This behavior doesn't apply to ranges, which return the `#VALUE!` error in this case.
+* If a cell evaluates to an array, the array values are spilled into neighboring cells (unless the neighboring cells are already filled, see [Spilling onto occupied cells](#spilling-onto-occupied-cells)).<br>This behavior doesn't apply to ranges, which return the `#VALUE!` error in this case.
 * If one of input array dimensions is `1` (`1`x`n` or `n`x`1`), the array is repeated, to match the output array dimensions.
 
 ### With the array arithmetic mode disabled
@@ -175,3 +175,30 @@ When the [array arithmetic mode](#array-arithmetic-mode) is disabled, and you op
 |:--------------------------------------------------|:---------------------------------------|
 | In the same row as as one of the range's elements | Only that particular element is taken. |
 | Any other cell                                    | `#VALUE!` error                        |
+
+## Spilling onto occupied cells
+
+By default, an array that would spill onto cells that already hold data returns the `#SPILL!` error, and the cells keep their data.
+
+To let the array overwrite that data instead, set the [`arrayFunctionResultOverwritesData`](../api/interfaces/configparams.md#arrayfunctionresultoverwritesdata) option to `true`:
+
+```js
+const hfInstance = HyperFormula.buildFromArray([
+  [1, 2],
+  [],
+  ['old value'],
+], {
+  licenseKey: 'gpl-v3',
+  arrayFunctionResultOverwritesData: true,
+});
+
+// the result spills into A2:A3 and overwrites 'old value' in A3
+hfInstance.setCellContents({ sheet: 0, col: 0, row: 1 }, '=TRANSPOSE(A1:B1)');
+hfInstance.getCellValue({ sheet: 0, col: 0, row: 2 }); // 2
+
+// undo brings 'old value' back
+hfInstance.undo();
+hfInstance.getCellValue({ sheet: 0, col: 0, row: 2 }); // 'old value'
+```
+
+With the option enabled, an array overwrites cells when you enter it and when it grows because rows or columns were added inside the range it reads. It never overwrites another array: that spill still returns `#SPILL!`. Data declared in the same `buildFromArray` call as the array, and cells an array would reach while you move rows or columns, keep their content too.

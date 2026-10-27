@@ -391,6 +391,25 @@ export interface ConfigParams {
    */
   useArrayArithmetic: boolean,
   /**
+   * When set to `true`, an array whose result spills onto occupied cells overwrites them: their
+   * previous content is cleared, the array spills, and formulas that read those cells get the
+   * spilled values. When set to `false`, such an array returns the `#SPILL!` error and the cells
+   * keep their content (the default, Excel-compatible behavior).
+   *
+   * **Warning:** overwriting is destructive. Turn it on only when clearing the data in the spill
+   * range is the intended outcome. `undo()` restores the cleared cells.
+   *
+   * An array overwrites cells when it is entered (for example with `setCellContents`) and when it
+   * grows because rows or columns were added inside the range it reads. Even when set to `true`,
+   * an array does not overwrite:
+   * - another array: that spill still returns `#SPILL!` and leaves the other array intact,
+   * - data declared in the same `buildFromArray` call as the array,
+   * - cells it would reach while rows or columns are moved with `moveRows` or `moveColumns`.
+   * @default false
+   * @category Engine
+   */
+  arrayFunctionResultOverwritesData: boolean,
+  /**
    * When set to `true`, switches column search strategy from binary search to column index.
    *
    * Using column index improves efficiency of the `VLOOKUP` and `MATCH` functions, but increases memory usage.
