@@ -187,7 +187,7 @@ const dictionary: RawTranslationPackage = {
     ODD: 'ZAOKR.DO.NPARZ',
     OFFSET: 'PRZESUNIĘCIE',
     OR: 'LUB',
-    PDURATION: 'ROCZ.PRZYCH',
+    PDURATION: 'O.CZAS.TRWANIA',
     PI: 'PI',
     PMT: 'PMT',
     PRODUCT: 'ILOCZYN',

@@ -254,7 +254,7 @@ const dictionary: RawTranslationPackage = {
     UNICODE: 'UNICODE',
     UNIQUE: 'BENZERSİZ',
     UPPER: 'BÜYÜKHARF',
-    VALUE: 'DEĞER',
+    VALUE: 'SAYIYAÇEVİR',
     VARA: 'VARA',
     'VAR.P': 'VAR.P',
     VARPA: 'VARSA',
