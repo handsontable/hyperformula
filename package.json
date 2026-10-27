@@ -57,6 +57,7 @@
     "docs:preview:cf": "npm --prefix docs run preview:cf --",
     "audit": "npm audit --omit=dev",
     "check:licenses": "node script/check-licenses.mjs",
+    "check:citation-markers": "node script/check-citation-markers.mjs",
     "release": "bash script/release/release.sh"
   },
   "devDependencies": {
