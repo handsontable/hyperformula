@@ -9,6 +9,7 @@ import { satteri } from '@astrojs/markdown-satteri';
 import { DOCS_DATA } from './src/docs-data.mjs';
 import { docsMarkdownPlugin, tableWrapperPlugin } from './src/markdown-plugins.mjs';
 import { mdCompanions } from './src/md-companions/index.mjs';
+import { apiPageGroup } from './src/api-sidebar.mjs';
 
 // CommonJS, because the Worker and `script/prepare-cf-assets.js` read it too.
 const buildConfig = createRequire(import.meta.url)('./build.config.js');
@@ -57,6 +58,7 @@ export default defineConfig({
       // The pages live in `guide/` and `api/` and the home page at the root (see `src/content.config.mjs`), not in
       // `src/content/docs/`, so Starlight's asides and heading links have to be enabled for them.
       markdown: { processedDirs: ['.'] },
+      routeMiddleware: './src/route-data.mjs',
       customCss: ['./src/styles/custom.css'],
       expressiveCode: {
         plugins: [pluginLineNumbers(), pluginCollapsibleSections()],
@@ -240,9 +242,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           collapsed: true,
           items: [
             { label: 'API Reference Overview', slug: 'api' },
-            { label: 'HyperFormula', slug: 'api/classes/hyperformula' },
-            { label: 'ConfigParams', slug: 'api/interfaces/configparams' },
-            { label: 'Listeners', slug: 'api/interfaces/listeners' },
+            apiPageGroup('HyperFormula', 'api/classes/hyperformula'),
+            apiPageGroup('ConfigParams', 'api/interfaces/configparams'),
+            apiPageGroup('Listeners', 'api/interfaces/listeners'),
           ],
         },
       ],

@@ -371,7 +371,9 @@ const isGuidesPage = !isApiPage && !isUpdatesPage;
         }
         el = details?.parentElement?.closest('li') as HTMLElement | null;
       }
-      breadcrumbs.textContent = groupName ? `${groupName} / ${pageName}` : pageName;
+      // An API page's own `Overview` link (see `src/api-sidebar.mjs`) is named after its group.
+      if (activeLink.hasAttribute('data-page-overview')) breadcrumbs.textContent = groupName || pageName;
+      else breadcrumbs.textContent = groupName ? `${groupName} / ${pageName}` : pageName;
     }
 
     // --- Hamburger: toggle main nav overlay ---
@@ -404,6 +406,11 @@ const isGuidesPage = !isApiPage && !isUpdatesPage;
     // Sync the toggle's state with the sidebar popover (it also closes on Escape and outside clicks)
     sidebarPane?.addEventListener('toggle', () => {
       sidebarToggle?.setAttribute('aria-expanded', String(isSidebarOpen()));
+    }, { signal });
+
+    // A link in the popover closes it: the API pages' section links stay on the page, which would stay covered.
+    sidebarPane?.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) closeSidebar();
     }, { signal });
 
     // Also observe data-sidebar-collapsed for aria-hidden sync
