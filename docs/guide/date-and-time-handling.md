@@ -37,31 +37,9 @@ timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
 
 ## Dates in function arguments and `#VALUE!` errors
 
-HyperFormula treats a string as a date only if it matches one of the [`dateFormats`](../api/interfaces/configparams.md#dateformats). With the default settings, those are `DD/MM/YYYY` and `DD/MM/YY`. A string with a different layout, such as the ISO 8601 date `2026-01-01` (year first), stays plain text.
+Functions that expect a date, such as `XIRR`, `YEARFRAC`, `DATEDIF`, and `DATEVALUE`, need real date values. HyperFormula returns `#VALUE!` when you pass them text that only looks like a date, such as the ISO 8601 string `2026-01-01`.
 
-Functions that expect a date, such as `XIRR`, `YEARFRAC`, `DATEDIF`, and `DATEVALUE`, can't use that text. They return `#VALUE!` instead of a result.
-
-### Example: `XIRR` with ISO date strings
-
-In this example, the dates in column B are ISO strings, so HyperFormula's `XIRR` function returns `#VALUE!`:
-
-```javascript
-import { HyperFormula } from 'hyperformula';
-
-const hfInstance = HyperFormula.buildFromArray([
-  [-10000, '2026-01-01'],
-  [2750, '2026-03-01'],
-  [4250, '2026-06-01'],
-  [3250, '2026-09-01'],
-  [3000, '2026-12-01'],
-  ['=XIRR(A1:A5, B1:B5)'],
-], { licenseKey: 'gpl-v3' });
-
-// #VALUE!, because B1:B5 contains text, not dates
-const result = hfInstance.getCellValue({ sheet: 0, row: 5, col: 0 });
-```
-
-### Fix: turn the strings into date values
+### Use real date values
 
 Use one of the following options:
 
@@ -69,7 +47,7 @@ Use one of the following options:
 2. Write each date in a format listed in [`dateFormats`](../api/interfaces/configparams.md#dateformats), for example `'01/01/2026'` with the default settings.
 3. Add the format you use to [`dateFormats`](../api/interfaces/configparams.md#dateformats). Setting this option replaces the default list, so keep the default formats if you still need them.
 
-With any of these options, the `XIRR` formula above returns about `0.7222`. This example uses option 3:
+This example uses option 3. HyperFormula's `XIRR` function returns about `0.7222`:
 
 ```javascript
 import { HyperFormula } from 'hyperformula';
@@ -87,6 +65,28 @@ const hfInstance = HyperFormula.buildFromArray([
 });
 
 // about 0.7222
+const result = hfInstance.getCellValue({ sheet: 0, row: 5, col: 0 });
+```
+
+### Why ISO date strings return `#VALUE!`
+
+HyperFormula treats a string as a date only if it matches one of the [`dateFormats`](../api/interfaces/configparams.md#dateformats). With the default settings, those are `DD/MM/YYYY` and `DD/MM/YY`. A string with a different layout, such as an ISO 8601 date (year first), stays plain text. Functions that expect a date can't use that text, so they return `#VALUE!` instead of a result.
+
+In this example, the dates in column B are ISO strings and the `dateFormats` option is not set, so HyperFormula's `XIRR` function returns `#VALUE!`:
+
+```javascript
+import { HyperFormula } from 'hyperformula';
+
+const hfInstance = HyperFormula.buildFromArray([
+  [-10000, '2026-01-01'],
+  [2750, '2026-03-01'],
+  [4250, '2026-06-01'],
+  [3250, '2026-09-01'],
+  [3000, '2026-12-01'],
+  ['=XIRR(A1:A5, B1:B5)'],
+], { licenseKey: 'gpl-v3' });
+
+// #VALUE!, because B1:B5 contains text, not dates
 const result = hfInstance.getCellValue({ sheet: 0, row: 5, col: 0 });
 ```
 
