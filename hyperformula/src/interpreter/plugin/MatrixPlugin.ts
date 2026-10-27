@@ -6,9 +6,9 @@
 import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {Maybe} from '../../Maybe'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
@@ -79,6 +79,161 @@ function poolFunctionArgumentsError(matrix: SimpleRangeValue, windowSize: number
   return undefined
 }
 
+/**
+ * Reads the numbers of a matrix argument, treating typed numbers (percentages, dates, currency) as plain numbers.
+ *
+ * @param matrix - the matrix argument
+ * @returns the numbers of the matrix; the #VALUE! error when it holds any value that is neither a number nor an error, even
+ *   after an error; otherwise the first error found in it
+ */
+function numbersOrError(matrix: SimpleRangeValue): number[][] | CellError {
+  let hasNonNumericValue = false
+  let firstError: Maybe<CellError>
+  const numbers: number[][] = []
+
+  for (const row of matrix.rawData()) {
+    const numbersInRow: number[] = []
+    for (const value of row) {
+      if (value instanceof CellError) {
+        firstError = firstError ?? value
+      } else if (isExtendedNumber(value)) {
+        numbersInRow.push(getRawValue(value))
+      } else {
+        hasNonNumericValue = true
+      }
+    }
+    numbers.push(numbersInRow)
+  }
+
+  if (hasNonNumericValue) {
+    return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
+  }
+  return firstError ?? numbers
+}
+
+/**
+ * The LU decomposition of a square matrix with partial pivoting: the rows of the matrix, reordered by `permutation`,
+ * equal the product of a lower triangular matrix with ones on the diagonal and an upper triangular matrix.
+ */
+interface LuDecomposition {
+  /** The upper triangular factor on and above the diagonal, the multipliers of the lower one below it. */
+  factors: number[][],
+  /** For each row of `factors`, the index of the row of the original matrix it comes from. */
+  permutation: number[],
+  /** 1 or -1: the sign of the permutation, by which the product of the pivots is multiplied to give the determinant. */
+  sign: number,
+}
+
+/**
+ * Factorizes a square matrix with Gaussian elimination and partial pivoting: at each step, the row with the entry of
+ * the greatest magnitude in the pivot column becomes the pivot row.
+ *
+ * @param matrix - a square matrix, left unchanged
+ * @returns the decomposition, or undefined when a pivot is exactly 0, that is when the matrix is singular
+ */
+function luDecomposition(matrix: number[][]): Maybe<LuDecomposition> {
+  const size = matrix.length
+  const factors = matrix.map((row) => row.slice())
+  const permutation = factors.map((_, index) => index)
+  let sign = 1
+
+  for (let k = 0; k < size; k++) {
+    let pivotRow = k
+    for (let i = k + 1; i < size; i++) {
+      if (Math.abs(factors[i][k]) > Math.abs(factors[pivotRow][k])) {
+        pivotRow = i
+      }
+    }
+    if (factors[pivotRow][k] === 0) {
+      return undefined
+    }
+    if (pivotRow !== k) {
+      [factors[k], factors[pivotRow]] = [factors[pivotRow], factors[k]];
+      [permutation[k], permutation[pivotRow]] = [permutation[pivotRow], permutation[k]]
+      sign = -sign
+    }
+    for (let i = k + 1; i < size; i++) {
+      const multiplier = factors[i][k] / factors[k][k]
+      factors[i][k] = multiplier
+      for (let j = k + 1; j < size; j++) {
+        factors[i][j] -= multiplier * factors[k][j]
+      }
+    }
+  }
+
+  return {factors, permutation, sign}
+}
+
+/**
+ * Calculates the determinant as the product of the pivots of the LU decomposition. A singular matrix whose
+ * elimination meets an exact zero pivot gives 0; otherwise the result carries the rounding error of the elimination.
+ *
+ * @param matrix - a square matrix
+ */
+function determinant(matrix: number[][]): number {
+  const decomposition = luDecomposition(matrix)
+  if (decomposition === undefined) {
+    return 0
+  }
+  return decomposition.factors.reduce((product, row, index) => product * row[index], decomposition.sign)
+}
+
+/**
+ * Reads a number written directly in a formula, with an optional sign, such as `3`, `+3` or `-3`.
+ *
+ * @param node - an argument of a function call
+ * @returns the number, or undefined when the argument is anything else and its value is known only after evaluation
+ */
+function numberLiteral(node: Ast): Maybe<number> {
+  if (node.type === AstNodeType.NUMBER) {
+    return node.value
+  }
+  if ((node.type === AstNodeType.PLUS_UNARY_OP || node.type === AstNodeType.MINUS_UNARY_OP) && node.value.type === AstNodeType.NUMBER) {
+    return node.type === AstNodeType.MINUS_UNARY_OP ? -node.value.value : node.value.value
+  }
+  return undefined
+}
+
+/**
+ * Builds the identity matrix.
+ *
+ * @param size - the number of rows and columns
+ */
+function identityMatrix(size: number): number[][] {
+  return Array.from({length: size}, (_, row) => Array.from({length: size}, (_unused, column) => row === column ? 1 : 0))
+}
+
+/**
+ * Calculates the inverse from the LU decomposition, solving one triangular system pair per column of the identity matrix.
+ *
+ * @param decomposition - the LU decomposition of a non-singular matrix
+ */
+function inverse(decomposition: LuDecomposition): number[][] {
+  const {factors, permutation} = decomposition
+  const size = factors.length
+  const result = identityMatrix(size)
+
+  for (let column = 0; column < size; column++) {
+    const solution = permutation.map((originalRow) => originalRow === column ? 1 : 0)
+    for (let i = 0; i < size; i++) {
+      for (let j = 0; j < i; j++) {
+        solution[i] -= factors[i][j] * solution[j]
+      }
+    }
+    for (let i = size - 1; i >= 0; i--) {
+      for (let j = i + 1; j < size; j++) {
+        solution[i] -= factors[i][j] * solution[j]
+      }
+      solution[i] /= factors[i][i]
+    }
+    solution.forEach((value, row) => {
+      result[row][column] = value
+    })
+  }
+
+  return result
+}
+
 export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MatrixPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'MMULT': {
@@ -93,6 +248,29 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     'TRANSPOSE': {
       method: 'transpose',
       sizeOfResultArrayMethod: 'transposeArraySize',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+      vectorizationForbidden: true,
+    },
+    'MUNIT': {
+      method: 'munit',
+      sizeOfResultArrayMethod: 'munitArraySize',
+      parameters: [
+        {argumentType: FunctionArgumentType.NUMBER},
+      ],
+      vectorizationForbidden: true,
+    },
+    'MDETERM': {
+      method: 'mdeterm',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+      vectorizationForbidden: true,
+    },
+    'MINVERSE': {
+      method: 'minverse',
+      sizeOfResultArrayMethod: 'minverseArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
       ],
@@ -150,6 +328,115 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))))
     const [left, right] = subChecks
     return arraySizeForMultiplication(left, right)
+  }
+
+  /**
+   * Corresponds to MUNIT(Dimension).
+   *
+   * Returns the identity matrix of `Dimension` x `Dimension` cells. The dimension is coerced to a number, so a
+   * numeric text such as "3" is accepted, and a fractional dimension is truncated. A dimension below 1, text that is
+   * not a number, or a dimension above the row or column limit of a sheet returns the #VALUE! error.
+   */
+  public munit(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('MUNIT'), (dimension: number) => {
+      const size = Math.trunc(dimension)
+      if (!(size >= 1)) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+      }
+      if (size > this.largestIdentityMatrix()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
+      }
+      return SimpleRangeValue.onlyNumbers(identityMatrix(size))
+    })
+  }
+
+  public munitArraySize(ast: ProcedureAst): ArraySize {
+    if (ast.args.length !== 1) {
+      return ArraySize.error()
+    }
+    const argument = ast.args[0]
+    const dimension = argument.type === AstNodeType.STRING ? this.textLiteralAsNumber(argument.value) : numberLiteral(argument)
+    if (dimension === undefined) {
+      return ArraySize.scalar()
+    }
+    const size = Math.trunc(dimension)
+    return size >= 1 && size <= this.largestIdentityMatrix() ? new ArraySize(size, size) : ArraySize.error()
+  }
+
+  /**
+   * Coerces a text literal to a number the way a NUMBER argument is coerced at evaluation, so that the predicted
+   * result size agrees with the evaluated one, including the configured decimal separator.
+   *
+   * @param text - the text of the literal
+   * @returns the number, or undefined when the text is not a number
+   */
+  private textLiteralAsNumber(text: string): Maybe<number> {
+    const coerced = this.coerceScalarToNumberOrError(text)
+    return isExtendedNumber(coerced) ? getRawValue(coerced) : undefined
+  }
+
+  /**
+   * The largest dimension `MUNIT` accepts: the identity matrix must fit within both the row and the column limit of a sheet.
+   */
+  private largestIdentityMatrix(): number {
+    return Math.min(this.config.maxRows, this.config.maxColumns)
+  }
+
+  /**
+   * Corresponds to MDETERM(Array).
+   *
+   * Returns the determinant of a square matrix of numbers. A non-square matrix or a non-numeric value
+   * returns the #VALUE! error, and a determinant too large for a number returns the #NUM! error.
+   */
+  public mdeterm(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('MDETERM'), (matrix: SimpleRangeValue) => {
+      const numbers = numbersOrError(matrix)
+      if (numbers instanceof CellError) {
+        return numbers
+      }
+      if (matrix.width() !== matrix.height()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.ArrayDimensions)
+      }
+      const result = determinant(numbers)
+      return Number.isFinite(result) ? result : new CellError(ErrorType.NUM, ErrorMessage.NaN)
+    })
+  }
+
+  /**
+   * Corresponds to MINVERSE(Array).
+   *
+   * Returns the inverse of a square matrix of numbers. A non-square matrix or a non-numeric value returns
+   * the #VALUE! error. A matrix whose elimination meets a pivot that is exactly 0, or whose inverse has an element
+   * too large for a number, returns the #NUM! error.
+   */
+  public minverse(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('MINVERSE'), (matrix: SimpleRangeValue) => {
+      const numbers = numbersOrError(matrix)
+      if (numbers instanceof CellError) {
+        return numbers
+      }
+      if (matrix.width() !== matrix.height()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.ArrayDimensions)
+      }
+      const decomposition = luDecomposition(numbers)
+      if (decomposition === undefined) {
+        return new CellError(ErrorType.NUM, ErrorMessage.SingularMatrix)
+      }
+      const result = inverse(decomposition)
+      if (!result.every((row) => row.every(Number.isFinite))) {
+        return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+      }
+      return SimpleRangeValue.onlyNumbers(result)
+    })
+  }
+
+  public minverseArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length !== 1) {
+      return ArraySize.error()
+    }
+    const metadata = this.metadata('MINVERSE')
+    const size = this.arraySizeForAst(ast.args[0], new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)))
+    return size.width === size.height ? new ArraySize(size.width, size.height) : ArraySize.error()
   }
 
   /**
