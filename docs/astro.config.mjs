@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import sitemap from '@astrojs/sitemap';
 import { satteri } from '@astrojs/markdown-satteri';
 import buildConfig from './build.config.js';
 import { DOCS_DATA } from './src/docs-data.mjs';
@@ -200,6 +201,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           ],
         },
       ],
+    }),
+    // Registered here rather than left to Starlight, which then skips its own. Every page is an `.html` file, but
+    // Astro reports a page whose name has a dot without the extension (`guide/migration-from-2.x-to-3.0`), and the
+    // Worker answers that address with a 404, so the sitemap gets the file name back.
+    sitemap({
+      serialize(item) {
+        const { pathname } = new URL(item.url);
+
+        return pathname.endsWith('/') || pathname.endsWith('.html') ? item : { ...item, url: `${item.url}.html` };
+      },
     }),
     mdCompanions({ base, hostname }),
   ],
