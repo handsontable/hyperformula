@@ -17,7 +17,7 @@ Each of HyperFormula's [built-in functions](built-in-functions.md) and [errors](
 
 You can easily [switch between languages](localizing-functions.md) ([`language`](../api/interfaces/configparams.md#language)).
 
-When adding a [custom function](custom-functions.md), you can define the function's [name](custom-functions.md#_3-add-your-function-s-names) in every language that you support.
+When adding a [custom function](custom-functions.md), you can define the function's [name](custom-functions.md#3-add-your-functions-names) in every language that you support.
 
 To support more languages, add a [custom language pack](localizing-functions.md).
 

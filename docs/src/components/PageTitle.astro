@@ -1,0 +1,16 @@
+---
+import Default from '@astrojs/starlight/components/PageTitle.astro';
+
+// Every page built from a Markdown source also ships that source, cleaned up, next to it
+// (see `src/md-companions/`): `guide/basic-usage.md` beside `guide/basic-usage.html`,
+// and `index.md` for a `README.md` source.
+const { entry } = Astro.locals.starlightRoute;
+const markdownPath = entry.id !== '404' && entry.filePath?.endsWith('.md')
+  ? entry.filePath.replace(/(^|\/)README\.md$/, '$1index.md')
+  : undefined;
+---
+
+<Default />
+{markdownPath && (
+  <p class="hf-view-markdown"><a href={`${import.meta.env.BASE_URL}${markdownPath}`}>View as Markdown</a></p>
+)}

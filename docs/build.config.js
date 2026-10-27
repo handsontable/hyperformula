@@ -15,6 +15,6 @@ module.exports = {
   // (links, assets, sitemap, `.md` companions, llms-full.txt) carries the
   // full prefix.
   base: '/docs/hyperformula/',
-  dest: '.vuepress/dist/docs/hyperformula',
+  dest: 'dist/docs/hyperformula',
   hostname: 'https://handsontable.com',
 };

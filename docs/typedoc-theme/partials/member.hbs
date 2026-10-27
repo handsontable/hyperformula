@@ -1,7 +1,11 @@
 {{#if name}}
 
 {{!-- {{heading 3}} {{#ifNamedAnchors}}<a id="{{anchor}}" name="{{this.anchor}}"></a> {{/ifNamedAnchors}}{{{ memberTitle }}} --}}
-{{heading 3}} {{{ name }}} {{#each flags}}<Badge text="{{this}}" vertical="middle"/>{{/each}}
+{{heading 3}} {{{ name }}}
+{{#if flags}}
+
+{{#each flags}}<span class="hf-badge">{{this}}</span>{{/each}}
+{{/if}}
 
 {{/if}}
 

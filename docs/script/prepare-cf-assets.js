@@ -3,9 +3,9 @@
  * `_redirects`) into the root of the built documentation directory.
  *
  * These files must live at the root of the asset directory declared in
- * `wrangler.jsonc` (`.vuepress/dist`), while VuePress writes its output to
- * `.vuepress/dist/docs/hyperformula`. They therefore cannot be kept in
- * `docs/.vuepress/public` and are copied here instead.
+ * `wrangler.jsonc` (`dist`), while Astro writes its output to
+ * `dist/docs/hyperformula`. They therefore cannot be kept in `docs/public`
+ * and are copied here instead.
  *
  * It also stops a deploy whose base path disagrees with what the Worker serves.
  * `worker/index.js` reads the base from `docs/build.config.js`, and
@@ -18,7 +18,7 @@ const buildConfig = require('../build.config.js');
 
 const CONFIG_FILES = ['_headers', '_redirects'];
 const SOURCE_DIR = resolve(__dirname, '../cf');
-const TARGET_DIR = resolve(__dirname, '../.vuepress/dist');
+const TARGET_DIR = resolve(__dirname, '../dist');
 const BASE = buildConfig.base;
 
 if (!fs.existsSync(TARGET_DIR)) {

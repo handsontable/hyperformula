@@ -26,6 +26,22 @@ module.exports = {
       },
     },
     {
+      // The Astro configuration and its Markdown plugins and integrations, loaded by Node as ES modules.
+      files: ['astro.config.mjs', 'src/**/*.mjs'],
+      env: {
+        worker: false,
+        node: true,
+      },
+    },
+    {
+      // Bundled into the pages by Astro.
+      files: ['src/scripts/**/*.mjs'],
+      env: {
+        node: false,
+        browser: true,
+      },
+    },
+    {
       // Bundled into the client by webpack.
       files: [
         '.vuepress/enhanceApp.js',

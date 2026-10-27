@@ -1,1 +1,5 @@
-{{heading 1}} {{{model.name}}} {{#if model.kindString}}<Badge text="{{model.kindString}}"/>{{/if}}
+---
+title: "{{{model.name}}}"
+editUrl: false
+---
+{{#if model.kindString}}<span class="hf-badge">{{model.kindString}}</span>{{/if}}

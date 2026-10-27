@@ -4,6 +4,8 @@ node_modules
 # ESLint skips dot-folders by default; the portal's own code lives in this one.
 !/.vuepress/
 /.vuepress/dist/
+/dist/
+/.astro/
 # Formatted by code-examples-generator.sh with examples/eslintrc.examples.js.
 /examples/
 # Build scripts, not linted.

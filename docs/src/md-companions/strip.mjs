@@ -1,43 +1,21 @@
 /**
- * Neutralise inline Vue-only markup on a single prose line: `[[toc]]`,
- * Vue-bound `<a :href>` and `<img :src>`, and inline self-closing PascalCase
- * components (`<Badge …/>`; the `[A-Z]` guard leaves plain HTML like `<br/>`
- * alone). `{{ … }}` interpolations are left verbatim (resolved upstream against
- * the page data before stripping).
- *
- * For `:href` / `:src`, the bound value is a JS expression (e.g.
- * `$withBase('/x.zip')` or `'https://…?v=' + $page.buildDateURIEncoded`); we
- * extract its first string literal and emit a real Markdown link / image so the
- * destination survives into the companion, instead of dropping it. Bindings
- * with no string literal fall back to text (links) or are removed (images).
+ * Removes the API reference's member badges (`<span class="hf-badge">Static</span>`,
+ * written by `docs/typedoc-theme/`) from a single prose line. `{{ … }}` interpolations
+ * are left verbatim (resolved upstream against the page data before stripping).
  * @param {string} line
  * @returns {string}
  */
 function cleanInlineMarkup(line) {
-  const firstLiteral = expr => {
-    const m = expr.match(/'([^']*)'|"([^"]*)"/);
-    return m ? (m[1] !== undefined ? m[1] : m[2]) : null;
-  };
-  return line
-    .replace(/\[\[toc\]\]/gi, '')
-    .replace(/<a\b[^>]*?:href\s*=\s*"([^"]*)"[^>]*>(.*?)<\/a>/gi, (_m, expr, text) => {
-      const url = firstLiteral(expr);
-      return url ? `[${text}](${url})` : text;
-    })
-    .replace(/<img\b[^>]*?:src\s*=\s*"([^"]*)"[^>]*?\/?>/gi, (_m, expr) => {
-      const url = firstLiteral(expr);
-      return url ? `![](${url})` : '';
-    })
-    .replace(/\s*<[A-Z][A-Za-z0-9]*(?:\s[^>]*?)?\/>/g, '');
+  return line.replace(/\s*<span class="hf-badge">[^<]*<\/span>/g, '');
 }
 
 /**
- * Strips VuePress-specific markdown syntax, producing clean markdown
+ * Strips the markdown syntax only the site renders, producing clean markdown
  * suitable for LLM consumption. Fence-aware: never edits inside code blocks.
  * @param {string} src raw markdown (frontmatter already removed)
  * @returns {string} cleaned markdown
  */
-function stripVuePressSyntax(src) {
+export function stripSiteSyntax(src) {
   const lines = src.split('\n');
   const out = [];
   let inFence = false;
@@ -79,18 +57,15 @@ function stripVuePressSyntax(src) {
       continue;
     }
 
-    if (/^<[A-Z][A-Za-z0-9]*(\s[^>]*)?\/?>$/.test(trimmed)) continue;
+    // A whole-line custom element (e.g. `<hf-coding-agent-wizard></hf-coding-agent-wizard>`) is
+    // interactive UI with no text of its own.
+    if (/^<(hf-[a-z-]+)(\s[^>]*)?><\/\1>$/.test(trimmed)) continue;
 
-    // Whole-line closing tag of a paired block component (e.g. `</Collapse>`) — drop the
-    // tag but keep the inner content that sits between it and its opening tag.
-    if (/^<\/[A-Z][A-Za-z0-9]*>$/.test(trimmed)) continue;
-
-    if (/^\[\[toc\]\]$/i.test(trimmed)) continue;
-
-    const open = trimmed.match(/^:::\s*(\w+)\s*(.*)$/i);
+    // An aside (`:::tip`, `:::caution[Title]`) or an example (`:::example{#id}`).
+    const open = trimmed.match(/^:::(\w+)(?:\[(.*)\])?(?:\{[^}]*\})?$/);
     if (open) {
       const type = open[1].toLowerCase();
-      const title = open[2].trim();
+      const title = (open[2] || '').trim();
       const body = [];
       i++;
       const bodyStart = i;
@@ -120,9 +95,8 @@ function stripVuePressSyntax(src) {
       if (type === 'example') { continue; }
       if (title) { out.push(`> **${title}**`); out.push('>'); }
       // Container bodies run through the same inline cleanup as normal prose —
-      // EXCEPT inside fenced code blocks, where Vue-shaped samples are literal
-      // content and must survive verbatim (otherwise `<a :href>`, `<Badge/>` or
-      // `[[toc]]` shown in a tip/warning code sample get rewritten or dropped).
+      // EXCEPT inside fenced code blocks, where markup-shaped samples are literal
+      // content and must survive verbatim.
       // The body scan above already located these fences; re-derive that state
       // here so emit skips cleanInlineMarkup for code lines.
       let emitFence = false;
@@ -187,5 +161,3 @@ function stripVuePressSyntax(src) {
   }
   return collapsed.join('\n').trim();
 }
-
-module.exports = { stripVuePressSyntax };

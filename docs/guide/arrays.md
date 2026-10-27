@@ -86,7 +86,7 @@ Thanks to HyperFormula's built-in array features, you can:
 
 You can also:
 * Use the `FILTER` function to [filter an array](#filtering-an-array), based on boolean arrays
-* Use the `ARRAY_CONSTRAIN` function to [constrain an array's size](#constraining-an-array-s-size)
+* Use the `ARRAY_CONSTRAIN` function to [constrain an array's size](#constraining-an-arrays-size)
 
 ### Operating on arrays
 

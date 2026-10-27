@@ -12,3 +12,14 @@
 # would also match `/docs/hyperformula/*`, and redirects here apply even when
 # an asset matches.
 / /docs/hyperformula/ 302
+
+# The sitemap is split into `sitemap-index.xml` and its parts; keep the former
+# single-file address working for search consoles and robots.txt.
+/docs/hyperformula/sitemap.xml /docs/hyperformula/sitemap-index.xml 301
+
+# The API reference overview is built as `api.html`. Its former file name
+# (which `worker/index.js` also requests for `/api/`), and the TypeDoc readme
+# input that used to be published as a page of its own, lead there.
+/docs/hyperformula/api/index.html /docs/hyperformula/api.html 301
+/docs/hyperformula/api-ref-readme.html /docs/hyperformula/api.html 301
+/docs/hyperformula/api-ref-readme.md /docs/hyperformula/api/index.md 301
