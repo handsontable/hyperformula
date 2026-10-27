@@ -23,3 +23,8 @@
 /docs/hyperformula/api/index.html /docs/hyperformula/api.html 301
 /docs/hyperformula/api-ref-readme.html /docs/hyperformula/api.html 301
 /docs/hyperformula/api-ref-readme.md /docs/hyperformula/api/index.md 301
+
+# The guides have no index page of their own; their section address leads to
+# the documentation's home page.
+/docs/hyperformula/guide/ /docs/hyperformula/ 301
+/docs/hyperformula/guide /docs/hyperformula/ 301
