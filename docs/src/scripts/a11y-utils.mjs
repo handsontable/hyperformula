@@ -131,19 +131,34 @@ export function attachDropdownKeyboardNav(trigger, menu, options = {}) {
         onClose?.();
         trigger.focus();
         break;
+      // Enter activates on keydown: prevent the link's own activation, so it opens once.
       case 'Enter':
-      case ' ': {
-        if (e.key === ' ') e.preventDefault();
-        const active = /** @type {HTMLElement} */ (document.activeElement);
-        if (active?.tagName === 'A') {
-          active.click();
-        } else if (active?.tagName === 'LI') {
-          active.querySelector('a')?.click();
-        }
-        onClose?.();
-        trigger.focus();
+        e.preventDefault();
+        activateFocusedItem();
         break;
-      }
+      // Space activates on keyup, like a button, while focus is still on the item: activating on keydown
+      // would move focus to the trigger, and the keyup would then click the trigger and reopen the menu.
+      case ' ':
+        e.preventDefault();
+        break;
     }
   });
+
+  menu.addEventListener('keyup', (e) => {
+    if (e.key === ' ') {
+      e.preventDefault();
+      activateFocusedItem();
+    }
+  });
+
+  function activateFocusedItem() {
+    const active = /** @type {HTMLElement} */ (document.activeElement);
+    if (active?.tagName === 'A') {
+      active.click();
+    } else if (active?.tagName === 'LI') {
+      active.querySelector('a')?.click();
+    }
+    onClose?.();
+    trigger.focus();
+  }
 }
