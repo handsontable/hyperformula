@@ -230,8 +230,7 @@ the TypeScript.
 pages. Link files in `docs/public/` root-relative (`/hf_logo.png`).
 - `{{ $page.version }}`, `{{ $page.functionsCount }}` and `{{ $page.languagesCount }}` are
 filled in at build time — use them instead of writing a number that goes stale.
-- Leave the edit link and the previous/next links to the site — don't hand-write
-navigation.
+- Leave the previous/next links to the site — don't hand-write navigation.
 - Don't hand-edit `docs/api/**` — it's generated from TSDoc in the source.
 
 ---

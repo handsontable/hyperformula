@@ -54,7 +54,6 @@ export default defineConfig({
       },
       favicon: '/favicon/favicon-32x32.png',
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/handsontable/hyperformula' }],
-      editLink: { baseUrl: 'https://github.com/handsontable/hyperformula/edit/master/docs/' },
       // The pages live in `guide/` and `api/` and the home page at the root (see `src/content.config.mjs`), not in
       // `src/content/docs/`, so Starlight's asides and heading links have to be enabled for them.
       markdown: { processedDirs: ['.'] },

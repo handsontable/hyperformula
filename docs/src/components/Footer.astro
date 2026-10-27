@@ -1,17 +1,15 @@
 ---
 /**
- * Page footer override, from the Handsontable docs' Footer.astro: the edit link and prev/next
- * pagination, then a footer bar with site links, social icons and the copyright line.
+ * Page footer override, from the Handsontable docs' Footer.astro: prev/next pagination, then a
+ * footer bar with site links, social icons and the copyright line.
  */
-import EditLink from 'virtual:starlight/components/EditLink';
 import Pagination from 'virtual:starlight/components/Pagination';
 
 const year = new Date().getFullYear();
 ---
 
-<!-- Starlight built-ins: edit link, prev/next navigation -->
+<!-- Starlight built-in: prev/next navigation -->
 <div class="sl-footer-built-ins">
-  <EditLink {...Astro.props} />
   <Pagination {...Astro.props} />
 </div>
 
