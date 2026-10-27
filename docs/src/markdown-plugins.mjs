@@ -170,3 +170,17 @@ function collectLinks(node) {
 
   return (node.children || []).flatMap(collectLinks);
 }
+
+/**
+ * Wraps every table in `<div class="table-container">`, which the site's table styles (copied from the Handsontable
+ * docs, `src/styles/components/tables.css`) scroll horizontally on narrow screens.
+ */
+export const tableWrapperPlugin = {
+  name: 'hyperformula-docs-table-wrapper',
+  element: {
+    filter: ['table'],
+    visit(node, ctx) {
+      ctx.wrapNode(node, { type: 'element', tagName: 'div', properties: { className: ['table-container'] }, children: [] });
+    },
+  },
+};

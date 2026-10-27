@@ -1,0 +1,97 @@
+/* HyperFormula-specific rules on top of the Handsontable docs styles (`custom.css`). */
+
+/* A page with a `<div class="widePage"></div>` holds tables too wide for the reading column. */
+:root:has(.widePage) {
+  --sl-content-width: 75rem;
+}
+
+/* API reference: the flags of a member (Static, Readonly, ...) and the kind of a page (Class, Interface, ...). */
+.hf-badge {
+  display: inline-block;
+  margin-inline-end: 0.4em;
+  padding: 0 0.5em;
+  border-radius: 0.25rem;
+  background: var(--sl-color-accent-low);
+  color: var(--sl-color-accent-high);
+  font-size: var(--sl-text-xs);
+  font-weight: 600;
+  line-height: 1.6;
+  vertical-align: middle;
+}
+
+/* Live examples (`:::example{#id}`). The example's own stylesheet styles what is inside `.example`. */
+.hf-example {
+  margin-block: 1.5rem;
+}
+
+.hf-example__stackblitz {
+  margin-top: 0.75rem;
+}
+
+.hf-example__stackblitz button,
+.hf-agent-wizard__choice,
+.hf-agent-wizard__copy,
+.hf-agent-wizard__back {
+  cursor: pointer;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.25rem;
+  background: var(--sl-color-bg);
+  color: var(--sl-color-text);
+  font-size: var(--sl-text-sm);
+}
+
+.hf-example__stackblitz button:hover,
+.hf-agent-wizard__choice:hover,
+.hf-agent-wizard__copy:hover,
+.hf-agent-wizard__back:hover {
+  border-color: var(--sl-color-accent);
+  color: var(--sl-color-accent-high);
+}
+
+/* `<hf-coding-agent-wizard>` */
+hf-coding-agent-wizard {
+  display: block;
+  margin-block: 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+}
+
+hf-coding-agent-wizard button {
+  margin: 0 0.5rem 0.5rem 0;
+}
+
+.hf-agent-wizard__prompt {
+  margin: 0 0 0.75rem;
+  font-weight: 600;
+}
+
+.hf-agent-wizard__snippet {
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  background: var(--sl-color-gray-6);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--__sl-font-mono);
+  font-size: var(--sl-text-sm);
+}
+
+.hf-agent-wizard__note {
+  color: var(--sl-color-gray-2);
+  font-size: var(--sl-text-sm);
+}
+
+/* Starlight 0.42 renders its mobile menu button as `.sl-menu-button` (the copied `layout/page.css`
+   hides the 0.41 `starlight-menu-button`): the header's sub-bar replaces it. */
+@media (max-width: 49.99rem) {
+  .sl-menu-button {
+    display: none !important;
+  }
+}
+
+/* The diagrams are dark lines on a transparent background: give them a light backing in dark mode. */
+:root[data-theme='dark'] .sl-markdown-content img {
+  background-color: #fff;
+  border-radius: 0.25rem;
+}

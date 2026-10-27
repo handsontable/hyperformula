@@ -1,11 +1,17 @@
+import { createRequire } from 'node:module';
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import sitemap from '@astrojs/sitemap';
+import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
+import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
+import starlightThemeRapide from 'starlight-theme-rapide';
 import { satteri } from '@astrojs/markdown-satteri';
-import buildConfig from './build.config.js';
 import { DOCS_DATA } from './src/docs-data.mjs';
-import { docsMarkdownPlugin } from './src/markdown-plugins.mjs';
+import { docsMarkdownPlugin, tableWrapperPlugin } from './src/markdown-plugins.mjs';
 import { mdCompanions } from './src/md-companions/index.mjs';
+
+// CommonJS, because the Worker and `script/prepare-cf-assets.js` read it too.
+const buildConfig = createRequire(import.meta.url)('./build.config.js');
 
 /** A base path with exactly one leading and one trailing slash. */
 const normalizeBase = (base) => `/${base.replace(/^\/+|\/+$/g, '')}/`.replace(/^\/\/$/, '/');
@@ -24,14 +30,28 @@ export default defineConfig({
     // `cf/_headers` caches everything under `assets/` as immutable.
     assets: 'assets',
   },
+  vite: {
+    // Components get the engine's version from here: their code is bundled and moved by the build, so
+    // `src/docs-data.mjs`, which finds the engine relative to itself, cannot be imported from them.
+    define: {
+      'import.meta.env.PUBLIC_HF_VERSION': JSON.stringify(DOCS_DATA.version),
+    },
+  },
   markdown: {
-    processor: satteri({ mdastPlugins: [docsMarkdownPlugin(base)] }),
+    processor: satteri({ mdastPlugins: [docsMarkdownPlugin(base)], hastPlugins: [tableWrapperPlugin] }),
   },
   integrations: [
     starlight({
       title: `HyperFormula (v${DOCS_DATA.version})`,
       description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
-      logo: { src: './public/logo.png' },
+      // The header, sidebar, footer, code blocks and styles follow the Handsontable docs, so both portals look the same
+      // (see `src/styles/custom.css`).
+      logo: {
+        light: './src/assets/logo.svg',
+        dark: './src/assets/logo-dark.svg',
+        alt: 'HyperFormula',
+        replacesTitle: true,
+      },
       favicon: '/favicon/favicon-32x32.png',
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/handsontable/hyperformula' }],
       editLink: { baseUrl: 'https://github.com/handsontable/hyperformula/edit/master/docs/' },
@@ -39,10 +59,23 @@ export default defineConfig({
       // `src/content/docs/`, so Starlight's asides and heading links have to be enabled for them.
       markdown: { processedDirs: ['.'] },
       customCss: ['./src/styles/custom.css'],
-      components: {
-        MarkdownContent: './src/components/MarkdownContent.astro',
-        PageTitle: './src/components/PageTitle.astro',
+      expressiveCode: {
+        plugins: [pluginLineNumbers(), pluginCollapsibleSections()],
+        themes: ['github-dark', 'github-light'],
+        defaultProps: {
+          showLineNumbers: true,
+        },
       },
+      components: {
+        Footer: './src/components/Footer.astro',
+        Header: './src/components/Header.astro',
+        MarkdownContent: './src/components/MarkdownContent.astro',
+        PageSidebar: './src/components/PageSidebar.astro',
+        PageTitle: './src/components/PageTitle.astro',
+        Sidebar: './src/components/Sidebar.astro',
+        SiteTitle: './src/components/SiteTitle.astro',
+      },
+      plugins: [starlightThemeRapide()],
       head: [
         // The live examples use the published engine and these globals.
         { tag: 'script', attrs: { src: 'https://cdn.jsdelivr.net/npm/hyperformula/dist/hyperformula.full.min.js' } },
@@ -78,9 +111,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         { tag: 'link', attrs: { rel: 'manifest', href: `${base}favicon/site.webmanifest` } },
         { tag: 'link', attrs: { rel: 'mask-icon', color: '#ffffff', href: `${base}favicon/safari-pinned-tab.svg` } },
       ],
+      // Collapsed like the Handsontable docs' sidebar; the group with the current page opens on its own.
       sidebar: [
         {
           label: 'Introduction',
+          collapsed: true,
           items: [
             { label: 'Welcome', slug: 'index' },
             { label: 'Demo', slug: 'guide/demo' },
@@ -88,6 +123,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         {
           label: 'Getting started',
+          collapsed: true,
           items: [
             { label: 'Client-side installation', slug: 'guide/client-side-installation' },
             { label: 'Server-side installation', slug: 'guide/server-side-installation' },
@@ -100,6 +136,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         {
           label: 'Integrations',
+          collapsed: true,
           items: [
             { label: 'Integration with React', slug: 'guide/integration-with-react' },
             { label: 'Integration with Vue', slug: 'guide/integration-with-vue' },
@@ -112,6 +149,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         {
           label: 'Data operations',
+          collapsed: true,
           items: [
             { label: 'Basic operations', slug: 'guide/basic-operations' },
             { label: 'Batch operations', slug: 'guide/batch-operations' },
@@ -122,6 +160,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         {
           label: 'Formulas',
+          collapsed: true,
           items: [
             { label: 'Specifications and limits', slug: 'guide/specifications-and-limits' },
             { label: 'Cell references', slug: 'guide/cell-references' },
@@ -137,6 +176,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         {
           label: 'Internationalization',
+          collapsed: true,
           items: [
             { label: 'Internationalization features', slug: 'guide/i18n-features' },
             { label: 'Localizing functions', slug: 'guide/localizing-functions' },
@@ -146,6 +186,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         {
           label: 'Compatibility',
+          collapsed: true,
           items: [
             { label: 'Compatibility with Microsoft Excel', slug: 'guide/compatibility-with-microsoft-excel' },
             { label: 'Compatibility with Google Sheets', slug: 'guide/compatibility-with-google-sheets' },
@@ -154,6 +195,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         {
           label: 'Advanced topics',
+          collapsed: true,
           items: [
             { label: 'Key concepts', slug: 'guide/key-concepts' },
             { label: 'Dependency graph', slug: 'guide/dependency-graph' },
@@ -166,6 +208,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         {
           label: 'Upgrade and migration',
+          collapsed: true,
           items: [
             { label: 'Release notes', slug: 'guide/release-notes' },
             { label: 'Migrating from 0.6 to 1.0', slug: 'guide/migration-from-0.6-to-1.0' },
@@ -175,6 +218,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         {
           label: 'About',
+          collapsed: true,
           items: [
             { label: 'Quality & Security', slug: 'guide/quality' },
             { label: 'Supported browsers', slug: 'guide/supported-browsers' },
@@ -184,6 +228,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         {
           label: 'Miscellaneous',
+          collapsed: true,
           items: [
             { label: 'Contributing', slug: 'guide/contributing' },
             { label: 'Code of conduct', slug: 'guide/code-of-conduct' },
@@ -193,6 +238,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         {
           label: 'API Reference',
+          collapsed: true,
           items: [
             { label: 'API Reference Overview', slug: 'api' },
             { label: 'HyperFormula', slug: 'api/classes/hyperformula' },

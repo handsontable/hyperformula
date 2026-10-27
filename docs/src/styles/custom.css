@@ -1,99 +1,65 @@
-/* The HyperFormula accent on Starlight's default theme. */
-:root {
-  --sl-color-accent-low: #0b1d5c;
-  --sl-color-accent: #1147f1;
-  --sl-color-accent-high: #b8c8fb;
-}
+/*
+ * The Handsontable docs' styles, so both portals look the same. Every file this imports except
+ * `hyperformula.css` is a verbatim copy of `docs/src/styles/` in handsontable/handsontable (at e2726d5):
+ * update them by copying the files again, not by editing them here. Their rules for markup only the
+ * Handsontable docs have (example frames, the icon catalog) match nothing here, and stay so the copies
+ * stay identical. The stylesheets for features the HyperFormula portal does not have (dropdowns,
+ * option levels, the 404 game, example overrides) are not copied.
+ */
 
-:root[data-theme='light'] {
-  --sl-color-accent-low: #d5defc;
-  --sl-color-accent: #1147f1;
-  --sl-color-accent-high: #0b2e9e;
-}
+/*
+ * Cascade-layer order for Starlight's sublayers.
+ *
+ * Starlight declares this order in `@astrojs/starlight/style/layers.css`, but
+ * that file's statement never reaches the browser, and it does not order
+ * anything either. Astro runs each emitted stylesheet through lightningcss,
+ * which resolves a layer statement by physically reordering the layer blocks
+ * that follow it and then drops the redundant statement. A statement that
+ * lands after a block for a layer it names can no longer reorder that layer,
+ * so it is simply dropped - and `layers.css` lands late, because the
+ * `customCss` stylesheets (which write into `starlight.components` and
+ * `starlight.content`) are bundled ahead of Starlight's own styles.
+ *
+ * Order then fell back to first appearance in the bundle, which put
+ * `starlight.reset` (and its `* { margin: 0 }`) after `starlight.content`.
+ * Later layers beat earlier ones regardless of specificity, so every markdown
+ * gap (`--sl-content-gap-y`) collapsed to zero on every docs page, while
+ * unlayered heading margins kept working and hid the breakage.
+ *
+ * Declared here, the statement precedes every layer block in the bundle, so
+ * lightningcss reorders them and the built CSS carries Starlight's order. Keep
+ * it first in the file, and keep every layer any docs stylesheet writes into
+ * listed here. `rapide` stays last, matching starlight-theme-rapide's own
+ * `@layer starlight, rapide;`.
+ */
+@layer starlight.base, starlight.reset, starlight.core, starlight.content, starlight.components, starlight.utils, rapide;
 
-/* A page with a `<div class="widePage"></div>` holds tables too wide for the reading column. */
-:root:has(.widePage) {
-  --sl-content-width: 75rem;
-}
+/* Base */
+@import './base/variables.css';
+@import './base/typography.css';
+@import './base/scrollbars.css';
+@import './base/print.css';
 
-.hf-view-markdown {
-  margin-top: 0.5rem;
-  font-size: var(--sl-text-sm);
-}
+/* Layout */
+@import './layout/page.css';
+@import './layout/sidebar.css';
+@import './layout/responsive.css';
 
-/* API reference: the flags of a member (Static, Readonly, ...) and the kind of a page (Class, Interface, ...). */
-.hf-badge {
-  display: inline-block;
-  margin-inline-end: 0.4em;
-  padding: 0 0.5em;
-  border-radius: 0.25rem;
-  background: var(--sl-color-accent-low);
-  color: var(--sl-color-accent-high);
-  font-size: var(--sl-text-xs);
-  font-weight: 600;
-  line-height: 1.6;
-  vertical-align: middle;
-}
+/* Components */
+@import './components/cards.css';
+@import './components/tables.css';
+@import './components/code.css';
+@import './components/asides.css';
+@import './components/pagination.css';
 
-/* Live examples (`:::example{#id}`). The example's own stylesheet styles what is inside `.example`. */
-.hf-example {
-  margin-block: 1.5rem;
-}
+/* Mobile */
+@import './mobile/subbar.css';
+@import './mobile/nav-overlay.css';
+@import './mobile/toc-panel.css';
+@import './mobile/sidebar-pane.css';
 
-.hf-example__stackblitz {
-  margin-top: 0.75rem;
-}
+/* Utilities */
+@import './utilities.css';
 
-.hf-example__stackblitz button,
-.hf-agent-wizard__choice,
-.hf-agent-wizard__copy,
-.hf-agent-wizard__back {
-  cursor: pointer;
-  padding: 0.4rem 0.8rem;
-  border: 1px solid var(--sl-color-gray-5);
-  border-radius: 0.25rem;
-  background: var(--sl-color-bg);
-  color: var(--sl-color-text);
-  font-size: var(--sl-text-sm);
-}
-
-.hf-example__stackblitz button:hover,
-.hf-agent-wizard__choice:hover,
-.hf-agent-wizard__copy:hover,
-.hf-agent-wizard__back:hover {
-  border-color: var(--sl-color-accent);
-  color: var(--sl-color-accent-high);
-}
-
-/* `<hf-coding-agent-wizard>` */
-hf-coding-agent-wizard {
-  display: block;
-  margin-block: 1.5rem;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--sl-color-gray-5);
-  border-radius: 0.5rem;
-}
-
-hf-coding-agent-wizard button {
-  margin: 0 0.5rem 0.5rem 0;
-}
-
-.hf-agent-wizard__prompt {
-  margin: 0 0 0.75rem;
-  font-weight: 600;
-}
-
-.hf-agent-wizard__snippet {
-  padding: 0.75rem 1rem;
-  border-radius: 0.375rem;
-  background: var(--sl-color-gray-6);
-  white-space: pre-wrap;
-  word-break: break-word;
-  font-family: var(--__sl-font-mono);
-  font-size: var(--sl-text-sm);
-}
-
-.hf-agent-wizard__note {
-  color: var(--sl-color-gray-2);
-  font-size: var(--sl-text-sm);
-}
+/* HyperFormula */
+@import './hyperformula.css';
