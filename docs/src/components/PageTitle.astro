@@ -4,7 +4,13 @@
  * (home › page) above the page's <h1>. The <h1> keeps id="_top", which Starlight's skip link and
  * table of contents rely on.
  */
-const pageTitle = Astro.locals.starlightRoute.entry.data.title;
+import { markdownPath as markdownPathOf } from '../page-id.mjs';
+
+const { entry } = Astro.locals.starlightRoute;
+const pageTitle = entry.data.title;
+// The page's Markdown source. PageSidebar.astro links it below the table of contents on wide screens; this
+// copy covers narrower screens and pages without a table of contents.
+const markdownPath = markdownPathOf(entry);
 const homeLabel = `${import.meta.env.PUBLIC_HF_VERSION} HyperFormula`;
 const homeHref = import.meta.env.BASE_URL;
 const pageHref = Astro.url.pathname;
@@ -31,6 +37,9 @@ const pageHref = Astro.url.pathname;
       </li>
     </ol>
   </nav>
+  {markdownPath && (
+    <a class="hf-page-markdown" href={`${import.meta.env.BASE_URL}${markdownPath}`}>View as Markdown</a>
+  )}
 </div>
 
 <div class="hot-title-row">
@@ -104,6 +113,24 @@ const pageHref = Astro.url.pathname;
     text-decoration: none;
     cursor: default;
     pointer-events: none;
+  }
+
+  .hf-page-markdown {
+    margin-inline-start: auto;
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-xs);
+    text-decoration: none;
+  }
+
+  .hf-page-markdown:hover {
+    color: var(--sl-color-white);
+  }
+
+  /* On wide screens the contents sidebar carries the link, when the page has one. */
+  @media (min-width: 72rem) {
+    :global(html[data-has-toc]) .hf-page-markdown {
+      display: none;
+    }
   }
 
   /* Hide breadcrumbs on mobile/tablet — sub-header already shows this info */

@@ -6,12 +6,12 @@
  */
 import MobileTableOfContents from 'virtual:starlight/components/MobileTableOfContents';
 import TableOfContents from 'virtual:starlight/components/TableOfContents';
+import { markdownPath as markdownPathOf } from '../page-id.mjs';
 
-// `guide/basic-usage.md` beside `guide/basic-usage.html`, and `index.md` for a `README.md` source.
+// Shown here on wide screens; PageTitle.astro shows it where this sidebar is not (narrower screens, and
+// pages without a table of contents, which get no right sidebar at all).
 const { entry, toc } = Astro.locals.starlightRoute;
-const markdownPath = entry.id !== '404' && entry.filePath?.endsWith('.md')
-  ? entry.filePath.replace(/(^|\/)README\.md$/, '$1index.md')
-  : undefined;
+const markdownPath = markdownPathOf(entry);
 ---
 
 {toc && (

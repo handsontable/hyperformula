@@ -11,3 +11,16 @@
 export function pageId(path) {
   return path.replace(/\.md$/, '').replace(/(^|\/)(README|index)$/, '') || 'index';
 }
+
+/**
+ * The address of a page's Markdown source under the site base (see `src/md-companions/`):
+ * `guide/basic-usage.md` beside `guide/basic-usage.html`, and `index.md` for a `README.md` source.
+ *
+ * @param {{ id: string, filePath?: string }} entry The page's content entry.
+ * @returns {string | undefined} The path relative to the base, or undefined for a page with no source.
+ */
+export function markdownPath(entry) {
+  return entry.id !== '404' && entry.filePath?.endsWith('.md')
+    ? entry.filePath.replace(/(^|\/)README\.md$/, '$1index.md')
+    : undefined;
+}
