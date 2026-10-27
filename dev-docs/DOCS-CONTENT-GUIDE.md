@@ -27,8 +27,8 @@ the same team but is a **separate product** — do not blur the two.
 repo. Guide pages live at `docs/guide/<slug>.md`; the landing page is
 `docs/index.md`; API reference under `docs/api/` is **generated from source code
 TSDoc — do not hand-edit it**, improve the code comments instead.
-- **Toolchain:** VuePress 1.9.10 (static site generator). Pages support YAML
-frontmatter, `::: tip / warning / danger` containers, and fenced code blocks.
+- **Toolchain:** Astro with the Starlight documentation theme. Pages support YAML
+frontmatter, `:::tip / caution / danger` asides, and fenced code blocks.
 - **Runnable demos:** hosted on StackBlitz (`handsontable/hyperformula-demos`),
 linked per version branch (e.g. `3.3.x`).
 
@@ -203,28 +203,35 @@ and hallucinate the parts you omit.
 
 ---
 
-## VuePress conventions (so your output fits the site)
+## Site conventions (so your output fits the site)
 
-- Start each page with frontmatter:
+- Start each page with frontmatter. `title` is required and becomes the page's H1, so
+the body starts at `##` — a `#` heading in the body would be a second H1:
   ```yaml
   ---
   title: Custom functions
   description: Register and use your own functions in HyperFormula.
   ---
   ```
-- Add a `tags` frontmatter **list** to make a page findable by words it does not use in
-its title or its `##`/`###` headings — the search box matches those three things only,
-never the body text (see `docs/guide/setup-coding-agent.md`, tagged `skills`, `Cursor`,
-`MCP`). Keep it to at most 10 tags a page, each one a word a reader would really type, and
-leave a query to the page that answers it best — a tag ten pages claim is decided by file
-order, not relevance, once the 10-result limit bites. A plain string instead of a list breaks
-the search box site-wide.
-- Use containers for asides: `::: tip`, `::: warning`, `::: danger` … `:::`. Put
-essential steps in the body, not hidden inside a tip.
-- Use **relative links** between guide pages (`./named-expressions.md`) and link to
-API symbols under `/docs/api/`.
-- Leave the auto-generated "Help us improve this page" edit link and sidebar to
-VuePress — don't hand-write navigation.
+- Add a `tags` frontmatter **list** to make a page findable by words it does not use
+(see `docs/guide/setup-coding-agent.md`, tagged `skills`, `Cursor`, `MCP`). Search covers
+the whole text of every page and ranks a tag above a word in the body, so a tag is only
+worth adding for a word a reader would type that the page never says. Keep it to at most
+10 tags a page. A plain string instead of a list fails the build.
+- Use asides for side notes: `:::tip`, `:::caution`, `:::danger` or `:::note` … `:::`, with
+no space after the colons, and a title in brackets when it needs one (`:::tip[TypeScript]`).
+Put essential steps in the body, not hidden inside a tip.
+- Embed a live example with `:::example{#example1}` and its four files, each on its own
+line as `@[code](@/docs/examples/<guide>/example1.html)`, and the same for the `.css`,
+`.js` and `.ts`. The page runs the HTML, CSS and JavaScript; "Open in StackBlitz" opens
+the TypeScript.
+- Use **relative links** between guide pages (`./named-expressions.md`) and to API pages
+(`../api/classes/hyperformula.md#buildfromarray`); the build points them at the built
+pages. Link files in `docs/public/` root-relative (`/hf_logo.png`).
+- `{{ $page.version }}`, `{{ $page.functionsCount }}` and `{{ $page.languagesCount }}` are
+filled in at build time — use them instead of writing a number that goes stale.
+- Leave the edit link and the previous/next links to the site — don't hand-write
+navigation.
 - Don't hand-edit `docs/api/**` — it's generated from TSDoc in the source.
 
 ---
