@@ -164,6 +164,13 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=ISPMT(0.05/12, 1, 60, 20000)', '=ISPMT(0.04/12, 12, 360, 200000)'],
   },
+  MDURATION: {
+    category: 'Financial',
+    shortDescription: 'Returns the modified duration, in years, of a security that pays periodic interest, for a par value of $100: the Macaulay duration divided by 1 + yld / frequency.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'coupon', description: 'The annual coupon rate; must not be negative.'}, {name: 'yld', description: 'The annual yield; must not be negative.'}, {name: 'frequency', description: 'The number of coupon payments per year, truncated to an integer: 1 (annual), 2 (semiannual) or 4 (quarterly).'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=MDURATION(DATE(2008,1,1), DATE(2016,1,1), 0.08, 0.09, 2, 1)', '=MDURATION(A1, B1, 0.05, 0.06, 4)'],
+  },
   MIRR: {
     category: 'Financial',
     shortDescription: 'Returns the modified internal rate of return for a series of cash flows.',

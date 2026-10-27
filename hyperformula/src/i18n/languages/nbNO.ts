@@ -162,6 +162,7 @@ const dictionary: RawTranslationPackage = {
     MAXA: 'MAKSA',
     MAXIFS: 'MAKS.HVIS.SETT',
     MAXPOOL: 'MAXPOOL',
+    MDURATION: 'MVARIGHET',
     MEDIAN: 'MEDIAN',
     MEDIANPOOL: 'MEDIANPOOL',
     MID: 'DELTEKST',

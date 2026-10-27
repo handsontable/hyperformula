@@ -149,6 +149,17 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
       ],
     },
+    'MDURATION': {
+      method: 'mduration',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
     'PRICE': {
       method: 'price',
       parameters: [
@@ -400,6 +411,36 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    * Corresponds to DURATION(settlement, maturity, coupon, yld, frequency, [basis]).
    *
    * Returns the Macaulay duration, in years, of a security that pays periodic interest, for a par value of $100.
+   * See `couponBondDuration` for the validation order and the computation.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public duration(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponBondDuration(ast, state, 'DURATION',
+      (macaulayDuration: number) => macaulayDuration
+    )
+  }
+
+  /**
+   * Corresponds to MDURATION(settlement, maturity, coupon, yld, frequency, [basis]).
+   *
+   * Returns the modified duration, in years, of a security that pays periodic interest, for a par value of $100: the
+   * Macaulay duration (DURATION) divided by 1 + `yld` / `frequency`. Validates its arguments as DURATION does; see
+   * `couponBondDuration`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public mduration(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponBondDuration(ast, state, 'MDURATION',
+      (macaulayDuration: number, discountBase: number) => macaulayDuration / discountBase
+    )
+  }
+
+  /**
+   * Runs DURATION and MDURATION, which share the arguments (settlement, maturity, coupon, yld, frequency, [basis]).
+   *
    * Arguments are validated from left to right, as in Excel: settlement and maturity (error, #VALUE!, date range),
    * coupon and yld (error, #VALUE!), frequency (error, #VALUE!, 1, 2 or 4) and basis (error, #VALUE!, 0 to 4), each in
    * turn; then settlement before maturity and `coupon` and `yld` not negative (#NUM!). An empty argument other than
@@ -407,15 +448,22 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    *
    * With N coupons left, the coupon c = 100 * `coupon` / `frequency`, v = 1 + `yld` / `frequency`, and the exponent
    * of period k, x_k = (k + DSC / E) - 1 (see `settlementPeriod`), each coupon's present value is c / v^x_k, plus
-   * 100 / v^x_N for the redemption at maturity, and the duration is the sum of (x_k / `frequency`) times the present
-   * value of period k, divided by the sum of the present values. A discount factor v^x_k too large for a number is
-   * #NUM!.
+   * 100 / v^x_N for the redemption at maturity, and the Macaulay duration is the sum of (x_k / `frequency`) times the
+   * present value of period k, divided by the sum of the present values. A discount factor v^x_k too large for a
+   * number is #NUM!. Passes the Macaulay duration and v to `calculate`.
    *
    * @param {ProcedureAst} ast - the function's AST
    * @param {InterpreterState} state - the interpreter state
+   * @param {string} functionName - the function's id, used to look up its metadata
+   * @param {Function} calculate - computes the result from the Macaulay duration and v = 1 + `yld` / `frequency`
    */
-  public duration(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DURATION'),
+  private couponBondDuration(
+    ast: ProcedureAst,
+    state: InterpreterState,
+    functionName: string,
+    calculate: (macaulayDuration: number, discountBase: number) => number,
+  ): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata(functionName),
       (settlementArg: InternalScalarValue, maturityArg: InternalScalarValue, couponArg: InternalScalarValue, yldArg: InternalScalarValue, frequencyArg: InternalScalarValue, basisArg: InternalScalarValue) => {
         if (this.isArgumentEmpty(ast, 0)) {
           return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
@@ -483,7 +531,7 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
           weightedPresentValues += exponent / frequency * presentValue
           presentValues += presentValue
         }
-        return weightedPresentValues / presentValues
+        return calculate(weightedPresentValues / presentValues, discountBase)
       }
     )
   }

@@ -163,6 +163,7 @@ const dictionary: RawTranslationPackage = {
     MAXA: 'MAKSA',
     MAXIFS: 'MAKS.JIKAS',
     MAXPOOL: 'KOLOM.MAKS',
+    MDURATION: 'MDURATION',
     MEDIAN: 'MEDIAN',
     MEDIANPOOL: 'KOLOM.MEDIAN',
     MID: 'TENGAH',
