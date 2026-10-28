@@ -99,6 +99,74 @@ export function daysBeforeSettlement(dateTimeHelper: DateTimeHelper, schedule: C
 }
 
 /**
+ * The terms of the bond price and duration formulas, for the coupon period that contains settlement.
+ */
+export interface SettlementPeriod {
+  /** N: the number of coupon dates after settlement, up to and including maturity. */
+  couponCount: number,
+  /** A: the number of days from the previous coupon date to settlement, counted by the basis. */
+  daysFromPeriodStart: number,
+  /** E: the number of days in the coupon period, see `settlementPeriod`. */
+  periodDays: number,
+  /** DSC: the number of days from settlement to the next coupon date, E - A. */
+  daysToNextCoupon: number,
+}
+
+/**
+ * Builds the coupon schedule of a coupon function call from its validated arguments. A previous coupon date before
+ * the earliest supported date is #NUM!.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {number} settlement - the settlement date serial, truncated
+ * @param {number} maturity - the maturity date serial, truncated, later than `settlement`
+ * @param {number} frequency - the number of coupons per year: 1, 2 or 4
+ * @param {number} basis - the day-count basis: 0 to 4
+ */
+export function buildCouponSchedule(dateTimeHelper: DateTimeHelper, settlement: number, maturity: number, frequency: number, basis: number): CouponSchedule | CellError {
+  const maturityDate = dateTimeHelper.numberToSimpleDate(maturity)
+  const count = -couponPeriodIndex(dateTimeHelper, settlement, maturityDate, frequency)
+  const previous = couponDate(dateTimeHelper, maturityDate, -count, frequency)
+  if (dateTimeHelper.dateToNumber(previous) < 0) {
+    return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+  }
+  const next = couponDate(dateTimeHelper, maturityDate, 1 - count, frequency)
+  return {settlement, maturity: maturityDate, frequency, basis, count, previous, next}
+}
+
+/**
+ * Returns N, A, E and DSC, the terms of the bond price and duration formulas, for the coupon period that contains
+ * settlement. A is counted as COUPDAYBS counts it. E is 360 / `frequency` for bases 0, 2 and 4, 365 / `frequency` for
+ * basis 3, and the days from the previous to the next coupon date for basis 1 (not the length COUPDAYS gives for
+ * basis 1). DSC is E - A, which is not always what COUPDAYSNC gives.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {CouponSchedule} schedule - the coupon schedule
+ */
+export function settlementPeriod(dateTimeHelper: DateTimeHelper, schedule: CouponSchedule): SettlementPeriod {
+  const daysFromPeriodStart = daysBeforeSettlement(dateTimeHelper, schedule)
+  const periodDays = settlementPeriodDays(dateTimeHelper, schedule)
+  return {couponCount: schedule.count, daysFromPeriodStart, periodDays, daysToNextCoupon: periodDays - daysFromPeriodStart}
+}
+
+/**
+ * Returns E, the number of days in the coupon period that contains settlement, as the bond price and duration
+ * formulas count it: see `settlementPeriod`.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {CouponSchedule} schedule - the coupon schedule
+ */
+function settlementPeriodDays(dateTimeHelper: DateTimeHelper, schedule: CouponSchedule): number {
+  switch (schedule.basis) {
+    case 1:
+      return dateTimeHelper.dateToNumber(schedule.next) - dateTimeHelper.dateToNumber(schedule.previous)
+    case 3:
+      return 365 / schedule.frequency
+    default:
+      return 360 / schedule.frequency
+  }
+}
+
+/**
  * Returns the 30/360 length of the coupon period, from the previous to the next coupon date, as Excel counts it for
  * COUPDAYSNC with basis 0: day 31 and the last day of February count as day 30 at both ends. The two dates are
  * exactly 12 / `frequency` months apart, so only their days change the length (for example 179 days from

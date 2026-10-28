@@ -13,10 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added new functions: ACCRINTM, DISC, INTRATE, PRICEDISC, RECEIVED, YIELDDISC. [#1799](https://github.com/handsontable/hyperformula/pull/1799)
 - Added new functions: COUPDAYBS, COUPDAYS, COUPDAYSNC, COUPNCD, COUPNUM, COUPPCD. [#1804](https://github.com/handsontable/hyperformula/pull/1804)
 - Added a new function: ACCRINT. [#1812](https://github.com/handsontable/hyperformula/pull/1812)
+- Added new functions: DURATION, PRICE. [#1848](https://github.com/handsontable/hyperformula/pull/1848)
 - Added new functions: ODDFPRICE, ODDLPRICE. [#1850](https://github.com/handsontable/hyperformula/pull/1850)
 
 ### Fixed
 
+- Fixed the Polish name of `PDURATION` (now `O.CZAS.TRWANIA`) and the Turkish name of `VALUE` (now `SAYIYAÇEVİR`) to match Microsoft Excel, which uses the old names for `DURATION` and `PRICE`. [#1848](https://github.com/handsontable/hyperformula/pull/1848)
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
 
 ## [3.5.0] - 2026-10-09
