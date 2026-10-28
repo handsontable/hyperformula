@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added a new function: ACCRINT. [#1812](https://github.com/handsontable/hyperformula/pull/1812)
 - Added new functions: DURATION, PRICE. [#1848](https://github.com/handsontable/hyperformula/pull/1848)
 - Added new functions: ODDFPRICE, ODDLPRICE. [#1850](https://github.com/handsontable/hyperformula/pull/1850)
-- Added new functions: ODDFYIELD, ODDLYIELD, YIELD.
+- Added new functions: ODDFYIELD, ODDLYIELD, YIELD. [#1851](https://github.com/handsontable/hyperformula/pull/1851)
 
 ### Fixed
 
