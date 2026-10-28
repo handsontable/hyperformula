@@ -186,6 +186,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OCT.DECIMALE',
     OCT2HEX: 'OCT.HEX',
     ODD: 'DISPARI',
+    ODDFPRICE: 'PREZZO.PRIMO.IRR',
+    ODDLPRICE: 'PREZZO.ULTIMO.IRR',
     OFFSET: 'SCARTO',
     OR: 'O',
     PDURATION: 'DURATA.P',

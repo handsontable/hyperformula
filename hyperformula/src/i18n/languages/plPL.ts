@@ -186,6 +186,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'ÓSM.NA.DZIES',
     OCT2HEX: 'ÓSM.NA.SZESN',
     ODD: 'ZAOKR.DO.NPARZ',
+    ODDFPRICE: 'CENA.PIERW.OKR',
+    ODDLPRICE: 'CENA.OST.OKR',
     OFFSET: 'PRZESUNIĘCIE',
     OR: 'LUB',
     PDURATION: 'ROCZ.PRZYCH',

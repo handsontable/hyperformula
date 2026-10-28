@@ -186,6 +186,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OCT2DEC',
     OCT2HEX: 'OCT2HEX',
     ODD: 'TEK',
+    ODDFPRICE: 'TEKYDEĞER',
+    ODDLPRICE: 'TEKSDEĞER',
     OFFSET: 'KAYDIR',
     OR: 'VEYA',
     PDURATION: 'PSÜRE',

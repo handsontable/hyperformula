@@ -187,6 +187,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OKT.DEC',
     OCT2HEX: 'OKT.HEX',
     ODD: 'GANJIL',
+    ODDFPRICE: 'ODDFPRICE',
+    ODDLPRICE: 'ODDLPRICE',
     OFFSET: 'OFSET',
     OR: 'ATAU',
     PI: 'PI',

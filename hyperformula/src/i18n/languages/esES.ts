@@ -186,6 +186,8 @@ export const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OCT.A.DEC',
     OCT2HEX: 'OCT.A.HEX',
     ODD: 'REDONDEA.IMPAR',
+    ODDFPRICE: 'PRECIO.PER.IRREGULAR.1',
+    ODDLPRICE: 'PRECIO.PER.IRREGULAR.2',
     OFFSET: 'DESREF',
     OR: 'O',
     PDURATION: 'PDURATION',

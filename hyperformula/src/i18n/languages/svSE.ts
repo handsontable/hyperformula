@@ -186,6 +186,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OKT.TILL.DEC',
     OCT2HEX: 'OKT.TILL.HEX',
     ODD: 'UDDA',
+    ODDFPRICE: 'UDDAFPRIS',
+    ODDLPRICE: 'UDDASPRIS',
     OFFSET: 'FÖRSKJUTNING',
     OR: 'ELLER',
     PDURATION: 'PDURATION',

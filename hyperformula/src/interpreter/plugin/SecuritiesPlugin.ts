@@ -16,6 +16,8 @@ import {
   couponPeriodIndex,
   CouponSchedule,
   daysBeforeSettlement,
+  oddFirstPeriodPrice,
+  oddLastPeriodPrice,
   thirtyDayPeriodLength,
 } from './CouponSchedule'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
@@ -151,6 +153,33 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: true, emptyAsDefault: true},
+      ],
+    },
+    'ODDFPRICE': {
+      method: 'oddfprice',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'ODDLPRICE': {
+      method: 'oddlprice',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
       ],
     },
   }
@@ -465,6 +494,113 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
           return periods
         }
         return par * rate / frequency * periods
+      }
+    )
+  }
+
+  /**
+   * Corresponds to ODDFPRICE(settlement, maturity, issue, first_coupon, rate, yld, redemption, frequency, [basis]).
+   *
+   * Returns the price per $100 face value of a security with an odd (short or long) first coupon period, as
+   * `oddFirstPeriodPrice` computes it. Validates as `oddCouponPeriodBond`, then requires `issue` < `settlement` <
+   * `first_coupon` < `maturity`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public oddfprice(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.oddCouponPeriodBond(ast, state, 'ODDFPRICE', 4,
+      ([settlement, maturity, issue, firstCoupon], rate, yld, redemption, frequency, basis) => {
+        if (issue >= settlement || settlement >= firstCoupon || firstCoupon >= maturity) {
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
+        }
+        return oddFirstPeriodPrice(this.dateTimeHelper, {settlement, maturity, issue, firstCoupon, rate, yld, redemption, frequency, basis})
+      }
+    )
+  }
+
+  /**
+   * Corresponds to ODDLPRICE(settlement, maturity, last_interest, rate, yld, redemption, frequency, [basis]).
+   *
+   * Returns the price per $100 face value of a security with an odd (short or long) last coupon period, as
+   * `oddLastPeriodPrice` computes it. Validates as `oddCouponPeriodBond`, then requires `last_interest` <
+   * `settlement` < `maturity`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public oddlprice(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.oddCouponPeriodBond(ast, state, 'ODDLPRICE', 3,
+      ([settlement, maturity, lastInterest], rate, yld, redemption, frequency, basis) => {
+        if (lastInterest >= settlement || settlement >= maturity) {
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
+        }
+        return oddLastPeriodPrice(this.dateTimeHelper, {settlement, maturity, lastInterest, rate, yld, redemption, frequency, basis})
+      }
+    )
+  }
+
+  /**
+   * Runs ODDFPRICE and ODDLPRICE, which share the arguments (dates..., rate, yld, redemption, frequency, [basis]).
+   *
+   * Validates in Excel's order, each argument in full before the next: the `dateCount` dates, then `rate`, `yld`,
+   * `redemption`, `frequency` (1, 2 or 4) and `basis`; an empty required argument is #N/A in its own place. Then
+   * `rate` and `yld` not negative and `redemption` greater than 0 (#NUM!), and `calculate` checks the order of the
+   * dates.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   * @param {string} functionName - the function's id, used to look up its metadata
+   * @param {number} dateCount - the number of date arguments before `rate`
+   * @param {Function} calculate - computes the result from the validated arguments
+   */
+  private oddCouponPeriodBond(
+    ast: ProcedureAst,
+    state: InterpreterState,
+    functionName: string,
+    dateCount: number,
+    calculate: (dates: number[], rate: number, yld: number, redemption: number, frequency: number, basis: number) => number | CellError,
+  ): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata(functionName),
+      (...args: InternalScalarValue[]) => {
+        const dates: number[] = []
+        for (let index = 0; index < dateCount; index++) {
+          if (this.isArgumentEmpty(ast, index)) {
+            return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+          }
+          const date = this.coerceToSecurityDate(args[index])
+          if (date instanceof CellError) {
+            return date
+          }
+          dates.push(date)
+        }
+        const amounts: number[] = []
+        for (let index = dateCount; index < dateCount + 3; index++) {
+          if (this.isArgumentEmpty(ast, index)) {
+            return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+          }
+          const amount = this.strictNumber(args[index])
+          if (amount instanceof CellError) {
+            return amount
+          }
+          amounts.push(amount)
+        }
+        if (this.isArgumentEmpty(ast, dateCount + 3)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const frequency = this.coerceToCouponFrequency(args[dateCount + 3])
+        if (frequency instanceof CellError) {
+          return frequency
+        }
+        const basis = this.coerceToDayCountBasis(args[dateCount + 4])
+        if (basis instanceof CellError) {
+          return basis
+        }
+        const [rate, yld, redemption] = amounts
+        if (rate < 0 || yld < 0 || redemption <= 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+        return calculate(dates, rate, yld, redemption, frequency, basis)
       }
     )
   }

@@ -186,6 +186,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OKT.TIL.DEC',
     OCT2HEX: 'OKT.TIL.HEX',
     ODD: 'ULIGE',
+    ODDFPRICE: 'ULIGE.KURS.PÅLYDENDE',
+    ODDLPRICE: 'ULIGE.SIDSTE.KURS',
     OFFSET: 'FORSKYDNING',
     OR: 'ELLER',
     PDURATION: 'PVARIGHED',

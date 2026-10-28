@@ -119,8 +119,7 @@ export function thirtyDayPeriodLength(dateTimeHelper: DateTimeHelper, schedule: 
  * @param {SimpleDate} date - the date
  */
 function thirtyDayMonthDay(dateTimeHelper: DateTimeHelper, date: SimpleDate): number {
-  const isFebruaryEnd = date.month === 2 && date.day === dateTimeHelper.daysInMonth(date.year, 2)
-  return date.day === 31 || isFebruaryEnd ? 30 : date.day
+  return date.day === 31 || isFebruaryEnd(dateTimeHelper, date) ? 30 : date.day
 }
 
 /**
@@ -481,7 +480,7 @@ function days360(dateTimeHelper: DateTimeHelper, start: SimpleDate, end: SimpleD
  * @param {number} end - the end date serial
  */
 function accruedDays(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, start: number, end: number): number {
-  return dateTimeHelper.dayCountByBasis(start, end, schedule.basis).dayCount
+  return dayCount(dateTimeHelper, start, end, schedule.basis)
 }
 
 /**
@@ -503,4 +502,332 @@ function quasiCouponDate(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSc
  */
 function isMonthEnd(dateTimeHelper: DateTimeHelper, date: SimpleDate): boolean {
   return date.day === dateTimeHelper.daysInMonth(date.year, date.month)
+}
+
+/**
+ * The validated arguments of an ODDFPRICE call: dates as serials, `issue` < `settlement` < `firstCoupon` <
+ * `maturity`.
+ */
+export interface OddFirstPeriodBond {
+  /** The settlement date serial. */
+  settlement: number,
+  /** The maturity date serial. */
+  maturity: number,
+  /** The issue date serial. */
+  issue: number,
+  /** The first coupon date serial. */
+  firstCoupon: number,
+  /** The annual coupon rate, not negative. */
+  rate: number,
+  /** The annual yield, not negative. */
+  yld: number,
+  /** The redemption value per 100 face value, greater than 0. */
+  redemption: number,
+  /** The number of coupons per year: 1, 2 or 4. */
+  frequency: number,
+  /** The day-count basis: 0 to 4. */
+  basis: number,
+}
+
+/**
+ * The validated arguments of an ODDLPRICE call: dates as serials, `lastInterest` < `settlement` < `maturity`.
+ */
+export interface OddLastPeriodBond {
+  /** The settlement date serial. */
+  settlement: number,
+  /** The maturity date serial. */
+  maturity: number,
+  /** The last coupon date serial. */
+  lastInterest: number,
+  /** The annual coupon rate, not negative. */
+  rate: number,
+  /** The annual yield, not negative. */
+  yld: number,
+  /** The redemption value per 100 face value, greater than 0. */
+  redemption: number,
+  /** The number of coupons per year: 1, 2 or 4. */
+  frequency: number,
+  /** The day-count basis: 0 to 4. */
+  basis: number,
+}
+
+/**
+ * Returns the price per 100 face value of a bond with an odd first coupon period, as Excel's ODDFPRICE computes it.
+ *
+ * The regular coupons are those of `maturity`'s schedule (`couponDate`), and `firstCoupon` must be one of them. The
+ * quasi-coupon period that contains settlement is the period of `firstCoupon`'s schedule around it; E is its length:
+ * the days from its start to its end under basis 1, 365 / `frequency` under basis 3, 360 / `frequency` otherwise.
+ * DFC, the days from issue to the first coupon, decides the formula: shorter than E, the short first period of
+ * `shortFirstPeriodPrice`; longer, the long one of `longFirstPeriodPrice`; equal, #NUM!, as in Excel.
+ *
+ * Takes O(n) time in the number of coupons and quasi-coupon periods.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {OddFirstPeriodBond} bond - the validated arguments
+ */
+export function oddFirstPeriodPrice(dateTimeHelper: DateTimeHelper, bond: OddFirstPeriodBond): number | CellError {
+  const {settlement, maturity, issue, firstCoupon, frequency, basis} = bond
+  const maturityDate = dateTimeHelper.numberToSimpleDate(maturity)
+  const couponCount = -couponPeriodIndex(dateTimeHelper, firstCoupon, maturityDate, frequency)
+  if (dateTimeHelper.dateToNumber(couponDate(dateTimeHelper, maturityDate, -couponCount, frequency)) !== firstCoupon) {
+    return new CellError(ErrorType.NUM, ErrorMessage.FirstCouponDate)
+  }
+  const firstCouponDate = dateTimeHelper.numberToSimpleDate(firstCoupon)
+  const settlementPeriod = couponPeriodIndex(dateTimeHelper, settlement, firstCouponDate, frequency)
+  const periodStart = dateTimeHelper.dateToNumber(couponDate(dateTimeHelper, firstCouponDate, settlementPeriod, frequency))
+  if (periodStart < 0) {
+    return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+  }
+  const periodEnd = dateTimeHelper.dateToNumber(couponDate(dateTimeHelper, firstCouponDate, settlementPeriod + 1, frequency))
+  const periodDays = basis === 1 ? periodEnd - periodStart : (basis === 3 ? 365 : 360) / frequency
+  const firstPeriodDays = dayCount(dateTimeHelper, issue, firstCoupon, basis)
+  if (firstPeriodDays === periodDays) {
+    return new CellError(ErrorType.NUM, ErrorMessage.OddPeriodLength)
+  }
+  if (firstPeriodDays < periodDays) {
+    const settlementCoupons = -couponPeriodIndex(dateTimeHelper, settlement, maturityDate, frequency)
+    return shortFirstPeriodPrice(dateTimeHelper, bond, settlementCoupons, periodDays, firstPeriodDays)
+  }
+  return longFirstPeriodPrice(dateTimeHelper, bond, couponCount, periodDays, periodStart, periodEnd)
+}
+
+/**
+ * Returns ODDFPRICE's price for a short first period, with the terms of Microsoft's formula: A, the days from issue to
+ * settlement; DSC, from settlement to the first coupon; DFC, from issue to the first coupon; E, the quasi-coupon
+ * period length; N, the coupons of maturity's schedule after settlement. N is one more than the coupons from the
+ * first coupon to maturity when a quasi-coupon date falls between settlement and the first coupon, as Excel counts
+ * it. The terms are added in Excel's order: redemption,
+ * first coupon, the other coupons, then the accrued interest subtracted; that order gives Excel's last digit.
+ *
+ * #NUM! when a discount factor is not finite (a large `yld` over many periods).
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {OddFirstPeriodBond} bond - the validated arguments
+ * @param {number} settlementCoupons - N, the coupons of maturity's schedule after settlement
+ * @param {number} periodDays - E
+ * @param {number} firstPeriodDays - DFC
+ */
+function shortFirstPeriodPrice(dateTimeHelper: DateTimeHelper, bond: OddFirstPeriodBond, settlementCoupons: number, periodDays: number, firstPeriodDays: number): number | CellError {
+  const {settlement, issue, firstCoupon, rate, yld, redemption, frequency, basis} = bond
+  const payment = 100 * rate / frequency
+  const discountBase = yld / frequency + 1
+  const periodFraction = dayCount(dateTimeHelper, settlement, firstCoupon, basis) / periodDays
+  const redemptionFactor = Math.pow(discountBase, (settlementCoupons - 1) + periodFraction)
+  if (!Number.isFinite(redemptionFactor)) {
+    return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+  }
+  let coupons = 0
+  for (let coupon = 2; coupon <= settlementCoupons; coupon++) {
+    coupons = coupons + payment / Math.pow(discountBase, (coupon - 1) + periodFraction)
+  }
+  const accrued = dayCount(dateTimeHelper, issue, settlement, basis) / periodDays * (rate / frequency) * 100
+  return redemption / redemptionFactor + payment * firstPeriodDays / periodDays / Math.pow(discountBase, periodFraction) + coupons - accrued
+}
+
+/**
+ * Returns ODDFPRICE's price for a long first period, with the terms of Microsoft's formula. The quasi-coupon periods
+ * of the first period are stepped back from the first coupon by `stepMonths`, so their day can drift down (31
+ * August, 28 February, 28 August), and their number NC is the number of coupon dates of `firstCoupon`'s schedule
+ * after issue. For each, from the latest: NL, its length (its days under basis 1, E otherwise); DC, its coupon days
+ * (NL, or for the earliest the days from issue to its end, 0 if issue is after it); A, its accrued days (from issue
+ * or its start to settlement or its end, 0 if none). DSC is E minus the days from the start of settlement's
+ * quasi-coupon period to settlement (bases 0, 1 and 4) or the days from settlement to its end (bases 2 and 3). Nq is
+ * `quasiCouponsBeforeFirstCoupon`. The terms are added in Excel's order, as in `shortFirstPeriodPrice`.
+ *
+ * #NUM! when a quasi-coupon date stepped back is before the earliest supported date (Excel too: the stepped dates
+ * drift below the coupon dates), or a discount factor is not finite.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {OddFirstPeriodBond} bond - the validated arguments
+ * @param {number} couponCount - the regular coupons after the first coupon, up to and including maturity
+ * @param {number} periodDays - E
+ * @param {number} periodStart - the start of settlement's quasi-coupon period, a date serial
+ * @param {number} periodEnd - the end of settlement's quasi-coupon period, a date serial
+ */
+function longFirstPeriodPrice(dateTimeHelper: DateTimeHelper, bond: OddFirstPeriodBond, couponCount: number, periodDays: number, periodStart: number, periodEnd: number): number | CellError {
+  const {settlement, issue, firstCoupon, rate, yld, redemption, frequency, basis} = bond
+  const firstCouponDate = dateTimeHelper.numberToSimpleDate(firstCoupon)
+  const issuePeriod = couponPeriodIndex(dateTimeHelper, issue, firstCouponDate, frequency)
+  let couponPeriods = 0
+  let accruedPeriods = 0
+  let periodEndDate = firstCouponDate
+  for (let period = -issuePeriod; period >= 1; period--) {
+    const periodStartDate = stepMonths(dateTimeHelper, periodEndDate, -12 / frequency)
+    const start = dateTimeHelper.dateToNumber(periodStartDate)
+    if (start < 0) {
+      return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+    }
+    const end = dateTimeHelper.dateToNumber(periodEndDate)
+    const normalLength = basis === 1 ? end - start : periodDays
+    const couponDays = period > 1 ? normalLength : daysIfForward(dateTimeHelper, issue, end, basis)
+    couponPeriods += couponDays / normalLength
+    accruedPeriods += daysIfForward(dateTimeHelper, Math.max(issue, start), Math.min(settlement, end), basis) / normalLength
+    periodEndDate = periodStartDate
+  }
+  const daysToPeriodEnd = basis === 2 || basis === 3
+    ? dayCount(dateTimeHelper, settlement, periodEnd, basis)
+    : periodDays - dayCount(dateTimeHelper, periodStart, settlement, basis)
+  const quasiCoupons = quasiCouponsBeforeFirstCoupon(dateTimeHelper, dateTimeHelper.numberToSimpleDate(settlement), firstCouponDate, frequency)
+  const periodFraction = daysToPeriodEnd / periodDays
+  const discountBase = yld / frequency + 1
+  const redemptionFactor = Math.pow(discountBase, periodFraction + quasiCoupons + couponCount)
+  if (!Number.isFinite(redemptionFactor)) {
+    return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+  }
+  const payment = 100 * rate / frequency
+  let coupons = 0
+  for (let coupon = 1; coupon <= couponCount; coupon++) {
+    coupons = coupons + payment / Math.pow(discountBase, coupon + quasiCoupons + periodFraction)
+  }
+  return redemption / redemptionFactor + payment * couponPeriods / Math.pow(discountBase, quasiCoupons + periodFraction) + coupons - payment * accruedPeriods
+}
+
+/**
+ * Returns Nq, the number of quasi-coupon periods by which ODDFPRICE discounts the first coupon, counted as Excel
+ * counts it: from settlement, or from the last day of settlement's month when the dates step by month ends, step
+ * forward by the coupon period until `firstCoupon` is reached; each step counts, plus one when settlement was moved
+ * to its month end. The dates step by month ends when `firstCoupon` is the last day of its month, or is the 29th or
+ * 30th of a month other than February and settlement is the last day of its month. With a month-end first coupon and
+ * settlement in its last quasi-coupon period, not on a month end, Nq is one more than the whole periods between
+ * the two dates.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {SimpleDate} settlement - the settlement date
+ * @param {SimpleDate} firstCoupon - the first coupon date
+ * @param {number} frequency - the number of coupons per year: 1, 2 or 4
+ */
+function quasiCouponsBeforeFirstCoupon(dateTimeHelper: DateTimeHelper, settlement: SimpleDate, firstCoupon: SimpleDate, frequency: number): number {
+  const byMonthEnds = isMonthEnd(dateTimeHelper, firstCoupon)
+    || (firstCoupon.month !== 2 && firstCoupon.day > 28 && isMonthEnd(dateTimeHelper, settlement))
+  const step = (date: SimpleDate) => byMonthEnds
+    ? dateTimeHelper.endOfMonth(offsetMonth(date, 12 / frequency))
+    : stepMonths(dateTimeHelper, date, 12 / frequency)
+  const start = byMonthEnds ? dateTimeHelper.endOfMonth(settlement) : settlement
+  const end = dateTimeHelper.dateToNumber(firstCoupon)
+  let count = start.day === settlement.day ? 0 : 1
+  for (let date = step(start); dateTimeHelper.dateToNumber(date) < end; date = step(date)) {
+    count++
+  }
+  return count
+}
+
+/**
+ * Returns the price per 100 face value of a bond with an odd last coupon period, as Excel's ODDLPRICE computes it:
+ * (redemption + DC * payment) / (1 + DSC * yld / frequency) - A * payment, with payment = 100 * rate / frequency and
+ * DC, A and DSC summed over the quasi-coupon periods of the last period, each as days over the period's length NL.
+ *
+ * The quasi-coupon periods are stepped forward from `lastInterest` by `stepMonths`, so their day can drift down, and
+ * their number NC is the number of coupon dates of `maturity`'s schedule after `lastInterest`. For each: NL,
+ * `periodLength` from its start to its end; DC, NL, or for the last one NL minus `periodLength` from maturity to its
+ * end; A, DC for a period that ends before settlement, the days from its start to settlement for the one that
+ * contains settlement, 0 after it; DSC, the days from settlement or its start to maturity or its end, 0 if none.
+ * A, DSC and the other day counts follow `dayCountByBasis`.
+ *
+ * Takes O(NC) time. #NUM! when the coupon date of `maturity`'s schedule on or before `lastInterest` is before the
+ * earliest supported date, or a quasi-coupon date is after the latest one.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {OddLastPeriodBond} bond - the validated arguments
+ */
+export function oddLastPeriodPrice(dateTimeHelper: DateTimeHelper, bond: OddLastPeriodBond): number | CellError {
+  const {settlement, maturity, lastInterest, rate, yld, redemption, frequency, basis} = bond
+  const maturityDate = dateTimeHelper.numberToSimpleDate(maturity)
+  const lastInterestPeriod = couponPeriodIndex(dateTimeHelper, lastInterest, maturityDate, frequency)
+  if (dateTimeHelper.dateToNumber(couponDate(dateTimeHelper, maturityDate, lastInterestPeriod, frequency)) < 0) {
+    return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+  }
+  let couponPeriods = 0
+  let accruedPeriods = 0
+  let periodsToMaturity = 0
+  let periodStartDate = dateTimeHelper.numberToSimpleDate(lastInterest)
+  for (let period = 1; period <= -lastInterestPeriod; period++) {
+    const periodEndDate = stepMonths(dateTimeHelper, periodStartDate, 12 / frequency)
+    const start = dateTimeHelper.dateToNumber(periodStartDate)
+    const end = dateTimeHelper.dateToNumber(periodEndDate)
+    if (dateTimeHelper.getWithinBounds(end) === undefined) {
+      return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+    }
+    const normalLength = periodLength(dateTimeHelper, start, end, basis)
+    const couponDays = period < -lastInterestPeriod ? normalLength : normalLength - periodLength(dateTimeHelper, maturity, end, basis)
+    let accruedDays = 0
+    if (end < settlement) {
+      accruedDays = couponDays
+    } else if (start < settlement) {
+      accruedDays = dayCount(dateTimeHelper, start, settlement, basis)
+    }
+    couponPeriods += couponDays / normalLength
+    accruedPeriods += accruedDays / normalLength
+    periodsToMaturity += daysIfForward(dateTimeHelper, Math.max(settlement, start), Math.min(maturity, end), basis) / normalLength
+    periodStartDate = periodEndDate
+  }
+  const payment = 100 * rate / frequency
+  const price = (couponPeriods * payment + redemption) / (periodsToMaturity * yld / frequency + 1) - accruedPeriods * payment
+  return Number.isFinite(price) ? price : new CellError(ErrorType.NUM, ErrorMessage.NaN)
+}
+
+/**
+ * Returns the length in days of a quasi-coupon period of ODDLPRICE, from `start` to `end` (or, reversed, the days
+ * from maturity to the period's end): `dayCountByBasis`, except under basis 0, where Excel counts both dates with
+ * `thirtyDayMonthDay` (the 31st and the last day of February are day 30, at either end), as for COUPDAYSNC's period
+ * length.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {number} start - the start date serial
+ * @param {number} end - the end date serial
+ * @param {number} basis - the day-count basis: 0 to 4
+ */
+function periodLength(dateTimeHelper: DateTimeHelper, start: number, end: number, basis: number): number {
+  if (basis !== 0) {
+    return dayCount(dateTimeHelper, start, end, basis)
+  }
+  const startDate = dateTimeHelper.numberToSimpleDate(start)
+  const endDate = dateTimeHelper.numberToSimpleDate(end)
+  return daysIn30DayMonths({...startDate, day: thirtyDayMonthDay(dateTimeHelper, startDate)}, {...endDate, day: thirtyDayMonthDay(dateTimeHelper, endDate)})
+}
+
+/**
+ * Returns `date` moved by `months` months, its day clamped to the length of the month it lands in. Stepping from
+ * one date to the next this way, as Excel's odd-period functions do, the day can only drift down (31 August,
+ * 28 February, 28 August), unlike `couponDate`, which counts every date from its anchor.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {SimpleDate} date - the date to move
+ * @param {number} months - the number of months, negative to move back
+ */
+function stepMonths(dateTimeHelper: DateTimeHelper, date: SimpleDate, months: number): SimpleDate {
+  return dateTimeHelper.truncateDayInMonth(offsetMonth(date, months))
+}
+
+/**
+ * Returns the days from `start` to `end` counted by `basis` (`dayCountByBasis`).
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {number} start - the start date serial
+ * @param {number} end - the end date serial
+ * @param {number} basis - the day-count basis: 0 to 4
+ */
+function dayCount(dateTimeHelper: DateTimeHelper, start: number, end: number, basis: number): number {
+  return dateTimeHelper.dayCountByBasis(start, end, basis).dayCount
+}
+
+/**
+ * Returns the days from `start` to `end` counted by `basis`, or 0 when `end` is not after `start`.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {number} start - the start date serial
+ * @param {number} end - the end date serial
+ * @param {number} basis - the day-count basis: 0 to 4
+ */
+function daysIfForward(dateTimeHelper: DateTimeHelper, start: number, end: number, basis: number): number {
+  return end > start ? dayCount(dateTimeHelper, start, end, basis) : 0
+}
+
+/**
+ * Returns true when `date` is the last day of February.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {SimpleDate} date - the date
+ */
+function isFebruaryEnd(dateTimeHelper: DateTimeHelper, date: SimpleDate): boolean {
+  return date.month === 2 && isMonthEnd(dateTimeHelper, date)
 }

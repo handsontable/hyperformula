@@ -192,6 +192,20 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=NPV(0.1, -1000, 300, 400, 500)', '=NPV(0.08, A1:A5)'],
   },
+  ODDFPRICE: {
+    category: 'Financial',
+    shortDescription: 'Returns the price per $100 face value of a security with an odd (short or long) first coupon period.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer; must be later than `issue` and earlier than `first_coupon`.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `first_coupon`.'}, {name: 'issue', description: 'The issue date, as a date serial number, truncated to an integer. The first period must not have the length of a regular coupon period.'}, {name: 'first_coupon', description: 'The first coupon date, as a date serial number, truncated to an integer; must be a coupon date of the schedule counted back from `maturity`.'}, {name: 'rate', description: 'The annual coupon rate; must not be negative.'}, {name: 'yld', description: 'The annual yield; must not be negative.'}, {name: 'redemption', description: 'The redemption value per $100 face value; must be greater than 0.'}, {name: 'frequency', description: 'The number of coupon payments per year, truncated to an integer: 1 (annual), 2 (semiannual) or 4 (quarterly).'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=ODDFPRICE(DATE(2008,11,11), DATE(2021,3,1), DATE(2008,10,15), DATE(2009,3,1), 0.0785, 0.0625, 100, 2, 1)', '=ODDFPRICE(A1, B1, C1, D1, 0.05, 0.06, 100, 2)'],
+  },
+  ODDLPRICE: {
+    category: 'Financial',
+    shortDescription: 'Returns the price per $100 face value of a security with an odd (short or long) last coupon period.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer; must be later than `last_interest`.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'last_interest', description: 'The last coupon date, as a date serial number, truncated to an integer.'}, {name: 'rate', description: 'The annual coupon rate; must not be negative.'}, {name: 'yld', description: 'The annual yield; must not be negative.'}, {name: 'redemption', description: 'The redemption value per $100 face value; must be greater than 0.'}, {name: 'frequency', description: 'The number of coupon payments per year, truncated to an integer: 1 (annual), 2 (semiannual) or 4 (quarterly).'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=ODDLPRICE(DATE(2008,2,7), DATE(2008,6,15), DATE(2007,10,15), 0.0375, 0.0405, 100, 2, 0)', '=ODDLPRICE(A1, B1, C1, 0.05, 0.06, 100, 4)'],
+  },
   PDURATION: {
     category: 'Financial',
     shortDescription: 'Returns number of periods to reach specific value.',
