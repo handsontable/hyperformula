@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { CN } from "../../../src/theme/classNames";
+import { DEFAULT_PHRASES } from "../../../src/ui/phrases";
 import { orderSuggestionItems, SuggestionsPopup } from "../../../src/ui/popup/suggestionsPopup";
 import { sel } from "../../helpers";
 
@@ -162,6 +163,31 @@ describe("SuggestionsPopup", () => {
   it("renders kbd-row by default (showKeyboardHelp: true)", () => {
     popup.show([{ value: "SUM" }], { left: 0, top: 0, width: 0, height: 20, direction: "ltr" });
     expect(document.body.querySelector(sel(CN.suggestionsKbdRow))).toBeTruthy();
+  });
+
+  it("reads the kbd-row hints from the phrases and spaces them itself", () => {
+    popup.show([{ value: "SUM" }], { left: 0, top: 0, width: 0, height: 20, direction: "ltr" });
+    expect(document.body.querySelector(sel(CN.suggestionsKbdRow))?.textContent).toBe(
+      "Tab to accept. ↑↓ to navigate",
+    );
+
+    const german = new SuggestionsPopup(
+      { onSelect: () => {}, onExplicitClose: () => {} },
+      {},
+      undefined,
+      undefined,
+      {
+        ...DEFAULT_PHRASES,
+        acceptSuggestionHint: "zum Übernehmen.",
+        navigateSuggestionsHint: "zum Navigieren",
+      },
+    );
+
+    german.show([{ value: "SUM" }], { left: 0, top: 0, width: 0, height: 20, direction: "ltr" });
+    expect(document.body.querySelectorAll(sel(CN.suggestionsKbdRow))[1]?.textContent).toBe(
+      "Tab zum Übernehmen. ↑↓ zum Navigieren",
+    );
+    german.destroy();
   });
 
   it("omits kbd-row when showKeyboardHelp is false", () => {

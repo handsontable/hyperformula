@@ -136,7 +136,11 @@ export interface ErrorOptions {
  * @category Popups
  */
 export interface PopupHostOption {
-  /** Host element (or selector) the popup mounts into. Omit for floating behavior. */
+  /**
+   * Host element (or selector) the popup mounts into. Omit for floating behavior. Passed to
+   * the `FormulaBuilder` constructor, a selector that matches nothing logs a warning once and
+   * the popup floats.
+   */
   container?: HTMLElement | string;
 }
 
