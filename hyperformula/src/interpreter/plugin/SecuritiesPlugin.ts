@@ -12,11 +12,15 @@ import {getRawValue, InternalScalarValue, InterpreterValue} from '../Interpreter
 import {
   accruedCouponPeriods,
   actualCouponPeriodLength,
+  bondPrice,
+  bondYield,
   buildCouponSchedule,
   CouponSchedule,
   daysBeforeSettlement,
   oddFirstPeriodPrice,
+  oddFirstPeriodYield,
   oddLastPeriodPrice,
+  oddLastPeriodYield,
   settlementPeriod,
   thirtyDayPeriodLength,
 } from './CouponSchedule'
@@ -196,6 +200,45 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
     'PRICE': {
       method: 'price',
       parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'YIELD': {
+      method: 'yield',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'ODDFYIELD': {
+      method: 'oddfyield',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'ODDLYIELD': {
+      method: 'oddlyield',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR},
@@ -616,25 +659,123 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
   /**
    * Corresponds to PRICE(settlement, maturity, rate, yld, redemption, frequency, [basis]).
    *
-   * Returns the price per $100 face value of a security that pays periodic interest. Arguments are validated in
-   * Excel's order: basis (error, #VALUE!, 0 to 4) first, then settlement and maturity (error, #VALUE!, date range),
-   * rate, yld and redemption (error, #VALUE!) and frequency (error, #VALUE!, 1, 2 or 4), each in turn; then
-   * settlement before maturity, `rate` and `yld` not negative and `redemption` greater than 0 (#NUM!). An empty
-   * argument other than `basis` is #N/A in its own place of that order. A previous coupon date before the earliest
-   * supported date is #NUM!.
-   *
-   * With N coupons left, the coupon c = 100 * `rate` / `frequency`, v = 1 + `yld` / `frequency`, and the exponent of
-   * period k, x_k = (k + DSC / E) - 1 (see `settlementPeriod`), the price is the sum of c / v^x_k for k = 1 to N, plus
-   * `redemption` / v^x_N, minus the accrued interest c * A / E. With one coupon left (N = 1), it is
-   * (c + `redemption`) / (1 + DSC / E * `yld` / `frequency`) - c * A / E. A large `yld` can give a negative price; a
-   * discount factor v^x_k too large for a number is #NUM!.
+   * Returns the price per $100 face value of a security that pays periodic interest, as `bondPrice` computes it.
+   * Validates as `periodicCouponBond`, with `yld` not negative. A large `yld` can give a negative price.
    *
    * @param {ProcedureAst} ast - the function's AST
    * @param {InterpreterState} state - the interpreter state
    */
   public price(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('PRICE'),
-      (settlementArg: InternalScalarValue, maturityArg: InternalScalarValue, rateArg: InternalScalarValue, yldArg: InternalScalarValue, redemptionArg: InternalScalarValue, frequencyArg: InternalScalarValue, basisArg: InternalScalarValue) => {
+    return this.periodicCouponBond(ast, state, 'PRICE', false,
+      (schedule: CouponSchedule, rate: number, yld: number, redemption: number) => bondPrice(settlementPeriod(this.dateTimeHelper, schedule), rate, yld, redemption, schedule.frequency)
+    )
+  }
+
+  /**
+   * Corresponds to YIELD(settlement, maturity, rate, pr, redemption, frequency, [basis]).
+   *
+   * Returns the annual yield of a security that pays periodic interest, as `bondYield` computes it: the yield at which
+   * PRICE gives `pr`. Validates as `periodicCouponBond`, with `pr` greater than 0. The yield can be negative.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public yield(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.periodicCouponBond(ast, state, 'YIELD', true,
+      (schedule: CouponSchedule, rate: number, price: number, redemption: number) => bondYield(this.dateTimeHelper, schedule, rate, price, redemption)
+    )
+  }
+
+  /**
+   * Corresponds to ODDFPRICE(settlement, maturity, issue, first_coupon, rate, yld, redemption, frequency, [basis]).
+   *
+   * Returns the price per $100 face value of a security with an odd (short or long) first coupon period, as
+   * `oddFirstPeriodPrice` computes it. Validates as `oddCouponPeriodBond`, which requires `issue` < `settlement` <
+   * `first_coupon` < `maturity`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public oddfprice(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.oddCouponPeriodBond(ast, state, 'ODDFPRICE', 4, false,
+      ([settlement, maturity, issue, firstCoupon], rate, yld, redemption, frequency, basis) => oddFirstPeriodPrice(this.dateTimeHelper, {settlement, maturity, issue, firstCoupon, rate, yld, redemption, frequency, basis})
+    )
+  }
+
+  /**
+   * Corresponds to ODDLPRICE(settlement, maturity, last_interest, rate, yld, redemption, frequency, [basis]).
+   *
+   * Returns the price per $100 face value of a security with an odd (short or long) last coupon period, as
+   * `oddLastPeriodPrice` computes it. Validates as `oddCouponPeriodBond`, which requires `last_interest` <
+   * `settlement` < `maturity`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public oddlprice(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.oddCouponPeriodBond(ast, state, 'ODDLPRICE', 3, false,
+      ([settlement, maturity, lastInterest], rate, yld, redemption, frequency, basis) => oddLastPeriodPrice(this.dateTimeHelper, {settlement, maturity, lastInterest, rate, yld, redemption, frequency, basis})
+    )
+  }
+
+  /**
+   * Corresponds to ODDFYIELD(settlement, maturity, issue, first_coupon, rate, pr, redemption, frequency, [basis]).
+   *
+   * Returns the annual yield of a security with an odd (short or long) first coupon period, as `oddFirstPeriodYield`
+   * computes it: the yield at which ODDFPRICE gives `pr`. Validates as `oddCouponPeriodBond`, with `pr` greater than
+   * 0. The yield can be negative.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public oddfyield(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.oddCouponPeriodBond(ast, state, 'ODDFYIELD', 4, true,
+      ([settlement, maturity, issue, firstCoupon], rate, price, redemption, frequency, basis) => oddFirstPeriodYield(this.dateTimeHelper, {settlement, maturity, issue, firstCoupon, rate, price, redemption, frequency, basis})
+    )
+  }
+
+  /**
+   * Corresponds to ODDLYIELD(settlement, maturity, last_interest, rate, pr, redemption, frequency, [basis]).
+   *
+   * Returns the annual yield of a security with an odd (short or long) last coupon period, as `oddLastPeriodYield`
+   * computes it: the yield at which ODDLPRICE gives `pr`. Validates as `oddCouponPeriodBond`, with `pr` greater than
+   * 0. The yield can be negative.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public oddlyield(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.oddCouponPeriodBond(ast, state, 'ODDLYIELD', 3, true,
+      ([settlement, maturity, lastInterest], rate, price, redemption, frequency, basis) => oddLastPeriodYield(this.dateTimeHelper, {settlement, maturity, lastInterest, rate, price, redemption, frequency, basis})
+    )
+  }
+
+  /**
+   * Runs PRICE and YIELD, which share the arguments (settlement, maturity, rate, yld or pr, redemption, frequency,
+   * [basis]).
+   *
+   * Validates in Excel's order: basis (error, #VALUE!, 0 to 4) first, then settlement and maturity (error, #VALUE!,
+   * date range), rate, the second amount and redemption (error, #VALUE!) and frequency (error, #VALUE!, 1, 2 or 4),
+   * each in turn; then settlement before maturity, `rate` not negative, the second amount not negative (`yld`) or
+   * greater than 0 (`pr`, when `secondAmountIsPrice`) and `redemption` greater than 0 (#NUM!). An empty argument
+   * other than `basis` is #N/A in its own place of that order. Builds the coupon schedule (a previous coupon date
+   * before the earliest supported date is #NUM!) and passes it to `calculate`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   * @param {string} functionName - the function's id, used to look up its metadata
+   * @param {boolean} secondAmountIsPrice - whether the fourth argument is a price (`pr`) rather than a yield (`yld`)
+   * @param {Function} calculate - computes the result from the coupon schedule, rate, second amount and redemption
+   */
+  private periodicCouponBond(
+    ast: ProcedureAst,
+    state: InterpreterState,
+    functionName: string,
+    secondAmountIsPrice: boolean,
+    calculate: (schedule: CouponSchedule, rate: number, secondAmount: number, redemption: number) => number | CellError,
+  ): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata(functionName),
+      (settlementArg: InternalScalarValue, maturityArg: InternalScalarValue, rateArg: InternalScalarValue, secondAmountArg: InternalScalarValue, redemptionArg: InternalScalarValue, frequencyArg: InternalScalarValue, basisArg: InternalScalarValue) => {
         const basis = this.coerceToDayCountBasis(basisArg)
         if (basis instanceof CellError) {
           return basis
@@ -663,9 +804,9 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
         if (this.isArgumentEmpty(ast, 3)) {
           return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
         }
-        const yld = this.strictNumber(yldArg)
-        if (yld instanceof CellError) {
-          return yld
+        const secondAmount = this.strictNumber(secondAmountArg)
+        if (secondAmount instanceof CellError) {
+          return secondAmount
         }
         if (this.isArgumentEmpty(ast, 4)) {
           return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
@@ -684,89 +825,57 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
         if (settlement >= maturity) {
           return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
         }
-        if (rate < 0 || yld < 0 || redemption <= 0) {
+        if (rate < 0 || this.isSecondAmountTooSmall(secondAmount, secondAmountIsPrice) || redemption <= 0) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
         }
         const schedule = buildCouponSchedule(this.dateTimeHelper, settlement, maturity, frequency, basis)
         if (schedule instanceof CellError) {
           return schedule
         }
-        const {couponCount, daysFromPeriodStart, periodDays, daysToNextCoupon} = settlementPeriod(this.dateTimeHelper, schedule)
-        const payment = 100 * rate / frequency
-        const accruedInterest = payment * daysFromPeriodStart / periodDays
-        const periodFraction = daysToNextCoupon / periodDays
-        if (couponCount === 1) {
-          return (payment + redemption) / (1 + periodFraction * yld / frequency) - accruedInterest
-        }
-        const discountBase = 1 + yld / frequency
-        let price = 0
-        for (let period = 1; period <= couponCount; period++) {
-          const discountFactor = Math.pow(discountBase, (period + periodFraction) - 1)
-          if (!Number.isFinite(discountFactor)) {
-            return new CellError(ErrorType.NUM, ErrorMessage.NaN)
-          }
-          price += payment / discountFactor
-        }
-        price += redemption / Math.pow(discountBase, (couponCount + periodFraction) - 1)
-        return price - accruedInterest
+        return calculate(schedule, rate, secondAmount, redemption)
       }
     )
   }
 
   /**
-   * Corresponds to ODDFPRICE(settlement, maturity, issue, first_coupon, rate, yld, redemption, frequency, [basis]).
+   * Returns true when the dates of an odd-period bond function are in order: with four dates (settlement, maturity,
+   * issue, first_coupon), `issue` < `settlement` < `first_coupon` < `maturity`; with three (settlement, maturity,
+   * last_interest), `last_interest` < `settlement` < `maturity`.
    *
-   * Returns the price per $100 face value of a security with an odd (short or long) first coupon period, as
-   * `oddFirstPeriodPrice` computes it. Validates as `oddCouponPeriodBond`, then requires `issue` < `settlement` <
-   * `first_coupon` < `maturity`.
-   *
-   * @param {ProcedureAst} ast - the function's AST
-   * @param {InterpreterState} state - the interpreter state
+   * @param {number[]} dates - the validated dates, in argument order
    */
-  public oddfprice(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.oddCouponPeriodBond(ast, state, 'ODDFPRICE', 4,
-      ([settlement, maturity, issue, firstCoupon], rate, yld, redemption, frequency, basis) => {
-        if (issue >= settlement || settlement >= firstCoupon || firstCoupon >= maturity) {
-          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
-        }
-        return oddFirstPeriodPrice(this.dateTimeHelper, {settlement, maturity, issue, firstCoupon, rate, yld, redemption, frequency, basis})
-      }
-    )
+  private isOddPeriodOrder([settlement, maturity, issueOrLastInterest, firstCoupon]: number[]): boolean {
+    if (firstCoupon === undefined) {
+      return issueOrLastInterest < settlement && settlement < maturity
+    }
+    return issueOrLastInterest < settlement && settlement < firstCoupon && firstCoupon < maturity
   }
 
   /**
-   * Corresponds to ODDLPRICE(settlement, maturity, last_interest, rate, yld, redemption, frequency, [basis]).
+   * Returns true when the second amount of a bond function is out of range: a yield (`yld`) must not be negative and
+   * a price (`pr`) must be greater than 0.
    *
-   * Returns the price per $100 face value of a security with an odd (short or long) last coupon period, as
-   * `oddLastPeriodPrice` computes it. Validates as `oddCouponPeriodBond`, then requires `last_interest` <
-   * `settlement` < `maturity`.
-   *
-   * @param {ProcedureAst} ast - the function's AST
-   * @param {InterpreterState} state - the interpreter state
+   * @param {number} amount - the second amount
+   * @param {boolean} isPrice - whether the amount is a price
    */
-  public oddlprice(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.oddCouponPeriodBond(ast, state, 'ODDLPRICE', 3,
-      ([settlement, maturity, lastInterest], rate, yld, redemption, frequency, basis) => {
-        if (lastInterest >= settlement || settlement >= maturity) {
-          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
-        }
-        return oddLastPeriodPrice(this.dateTimeHelper, {settlement, maturity, lastInterest, rate, yld, redemption, frequency, basis})
-      }
-    )
+  private isSecondAmountTooSmall(amount: number, isPrice: boolean): boolean {
+    return isPrice ? amount <= 0 : amount < 0
   }
 
   /**
-   * Runs ODDFPRICE and ODDLPRICE, which share the arguments (dates..., rate, yld, redemption, frequency, [basis]).
+   * Runs ODDFPRICE, ODDLPRICE, ODDFYIELD and ODDLYIELD, which share the arguments (dates..., rate, yld or pr,
+   * redemption, frequency, [basis]).
    *
-   * Validates in Excel's order, each argument in full before the next: the `dateCount` dates, then `rate`, `yld`,
-   * `redemption`, `frequency` (1, 2 or 4) and `basis`; an empty required argument is #N/A in its own place. Then
-   * `rate` and `yld` not negative and `redemption` greater than 0 (#NUM!), and `calculate` checks the order of the
-   * dates.
+   * Validates in Excel's order, each argument in full before the next: the `dateCount` dates, then `rate`, the
+   * second amount, `redemption`, `frequency` (1, 2 or 4) and `basis`; an empty required argument is #N/A in its own
+   * place. Then `rate` not negative, the second amount not negative (`yld`) or greater than 0 (`pr`, when
+   * `secondAmountIsPrice`) and `redemption` greater than 0 (#NUM!), then the order of the dates (`isOddPeriodOrder`).
    *
    * @param {ProcedureAst} ast - the function's AST
    * @param {InterpreterState} state - the interpreter state
    * @param {string} functionName - the function's id, used to look up its metadata
    * @param {number} dateCount - the number of date arguments before `rate`
+   * @param {boolean} secondAmountIsPrice - whether the argument after `rate` is a price (`pr`) rather than a yield
    * @param {Function} calculate - computes the result from the validated arguments
    */
   private oddCouponPeriodBond(
@@ -774,7 +883,8 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
     state: InterpreterState,
     functionName: string,
     dateCount: number,
-    calculate: (dates: number[], rate: number, yld: number, redemption: number, frequency: number, basis: number) => number | CellError,
+    secondAmountIsPrice: boolean,
+    calculate: (dates: number[], rate: number, secondAmount: number, redemption: number, frequency: number, basis: number) => number | CellError,
   ): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata(functionName),
       (...args: InternalScalarValue[]) => {
@@ -811,11 +921,14 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
         if (basis instanceof CellError) {
           return basis
         }
-        const [rate, yld, redemption] = amounts
-        if (rate < 0 || yld < 0 || redemption <= 0) {
+        const [rate, secondAmount, redemption] = amounts
+        if (rate < 0 || this.isSecondAmountTooSmall(secondAmount, secondAmountIsPrice) || redemption <= 0) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
         }
-        return calculate(dates, rate, yld, redemption, frequency, basis)
+        if (!this.isOddPeriodOrder(dates)) {
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
+        }
+        return calculate(dates, rate, secondAmount, redemption, frequency, basis)
       }
     )
   }

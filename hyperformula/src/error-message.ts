@@ -29,6 +29,7 @@ export class ErrorMessage {
   public static CouponFrequency = 'Frequency must be 1, 2 or 4.'
   public static FirstCouponDate = 'First coupon date is not a coupon date of the maturity date.'
   public static OddPeriodLength = 'Odd first period has the length of a regular coupon period.'
+  public static NoDaysToMaturity = 'No days from settlement to maturity under the day-count basis.'
   public static OutOfSheet = 'Resulting reference is out of the sheet.'
   public static WrongType = 'Wrong type of argument.'
   public static NaN = 'NaN or infinite value encountered.'

@@ -149,6 +149,193 @@ export function settlementPeriod(dateTimeHelper: DateTimeHelper, schedule: Coupo
 }
 
 /**
+ * Returns the price per 100 face value of a bond that pays periodic interest, as Excel's PRICE computes it, from the
+ * terms of the coupon period that contains settlement.
+ *
+ * With N coupons left, the coupon c = 100 * `rate` / `frequency`, v = 1 + `yld` / `frequency`, and the exponent of
+ * period k, x_k = (k + DSC / E) - 1, the price is the sum of c / v^x_k for k = 1 to N, plus `redemption` / v^x_N,
+ * minus the accrued interest c * A / E. With one coupon left (N = 1), it is (c + `redemption`) / (1 + DSC / E *
+ * `yld` / `frequency`) - c * A / E. A discount factor v^x_k that is not finite (too large for a number, or v
+ * negative with a fractional exponent) is #NUM!. With whole exponents (settlement on a coupon date) a negative v
+ * gives a finite price, and YIELD can return a yield below -`frequency`, as Excel does.
+ *
+ * @param {SettlementPeriod} period - N, A, E and DSC, see `settlementPeriod`
+ * @param {number} rate - the annual coupon rate
+ * @param {number} yld - the annual yield
+ * @param {number} redemption - the redemption value per 100 face value
+ * @param {number} frequency - the number of coupons per year: 1, 2 or 4
+ */
+export function bondPrice(period: SettlementPeriod, rate: number, yld: number, redemption: number, frequency: number): number | CellError {
+  if (period.couponCount === 1) {
+    const payment = 100 * rate / frequency
+    return (payment + redemption) / (1 + period.daysToNextCoupon / period.periodDays * yld / frequency) - payment * period.daysFromPeriodStart / period.periodDays
+  }
+  const priceAndDerivative = bondPriceAndDerivative(period, rate, yld, redemption, frequency)
+  return priceAndDerivative instanceof CellError ? priceAndDerivative : priceAndDerivative.price
+}
+
+/**
+ * Returns `bondPrice` for more than one coupon left, and its derivative with respect to `yld`, in one pass over the
+ * coupons: the derivative is the sum of -(x_k / `frequency`) * c / v^(x_k + 1) for k = 1 to N, minus (x_N /
+ * `frequency`) * `redemption` / v^(x_N + 1), with the terms of `bondPrice`.
+ *
+ * @param {SettlementPeriod} period - N, A, E and DSC, see `settlementPeriod`
+ * @param {number} rate - the annual coupon rate
+ * @param {number} yld - the annual yield
+ * @param {number} redemption - the redemption value per 100 face value
+ * @param {number} frequency - the number of coupons per year: 1, 2 or 4
+ */
+function bondPriceAndDerivative(period: SettlementPeriod, rate: number, yld: number, redemption: number, frequency: number): {price: number, derivative: number} | CellError {
+  const {couponCount, daysFromPeriodStart, periodDays, daysToNextCoupon} = period
+  const payment = 100 * rate / frequency
+  const accruedInterest = payment * daysFromPeriodStart / periodDays
+  const periodFraction = daysToNextCoupon / periodDays
+  const discountBase = 1 + yld / frequency
+  let price = 0
+  let derivative = 0
+  for (let coupon = 1; coupon <= couponCount; coupon++) {
+    const exponent = (coupon + periodFraction) - 1
+    const discountFactor = Math.pow(discountBase, exponent)
+    if (!Number.isFinite(discountFactor)) {
+      return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+    }
+    price += payment / discountFactor
+    derivative -= exponent / frequency * payment / (discountFactor * discountBase)
+  }
+  const exponent = (couponCount + periodFraction) - 1
+  const redemptionFactor = Math.pow(discountBase, exponent)
+  price += redemption / redemptionFactor
+  derivative -= exponent / frequency * redemption / (redemptionFactor * discountBase)
+  return {price: price - accruedInterest, derivative}
+}
+
+/**
+ * Returns the annual yield of a bond that pays periodic interest, as Excel's YIELD computes it: the `yld` at which
+ * `bondPrice` gives `price`.
+ *
+ * With one coupon left (N = 1), the closed form that inverts `bondPrice`: (`redemption` / 100 + `rate` /
+ * `frequency` - (`price` / 100 + A / E * `rate` / `frequency`)) / (`price` / 100 + A / E * `rate` / `frequency`) *
+ * `frequency` * E / DSR, with DSR the days from settlement to maturity counted by the basis; under bases 2 and 3, E
+ * is the actual length of the coupon period there, as in Excel (bases 1, 2 and 3 give the same yield). DSR of 0 (a
+ * settlement on the 30th and a maturity on the 31st under 30/360) is #DIV/0!; Excel keeps a non-finite value that
+ * shows as 0. With more,
+ * `solveYield` with the derivative of `bondPriceAndDerivative`, from the guess of `yieldGuess` over the years from
+ * settlement to maturity counted by the basis.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {CouponSchedule} schedule - the coupon schedule
+ * @param {number} rate - the annual coupon rate
+ * @param {number} price - the price per 100 face value
+ * @param {number} redemption - the redemption value per 100 face value
+ */
+export function bondYield(dateTimeHelper: DateTimeHelper, schedule: CouponSchedule, rate: number, price: number, redemption: number): number | CellError {
+  const period = settlementPeriod(dateTimeHelper, schedule)
+  const {settlement, frequency, basis} = schedule
+  const maturity = dateTimeHelper.dateToNumber(schedule.maturity)
+  if (period.couponCount === 1) {
+    const periodDays = basis === 2 || basis === 3 ? daysFromPreviousToNextCoupon(dateTimeHelper, schedule) : period.periodDays
+    const daysToRedemption = dayCount(dateTimeHelper, settlement, maturity, basis)
+    if (daysToRedemption === 0) {
+      return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.NoDaysToMaturity)
+    }
+    const priceWithAccrued = price / 100 + period.daysFromPeriodStart / periodDays * rate / frequency
+    return (redemption / 100 + rate / frequency - priceWithAccrued) / priceWithAccrued * (frequency * periodDays / daysToRedemption)
+  }
+  return solveYield(
+    (yld: number) => bondPriceAndDerivative(period, rate, yld, redemption, frequency),
+    price,
+    yieldGuess(rate, price, yearsToMaturity(dateTimeHelper, settlement, maturity, basis)),
+  )
+}
+
+/**
+ * The Newton step below which `solveYield` stops, as Excel's YIELD and ODDFYIELD do. Measured: Excel returns the
+ * yield whose next step is below 9.6E-11 and steps on from one whose next step is 1.02E-10.
+ */
+const YIELD_TOLERANCE = 1e-10
+
+/**
+ * The most Newton steps `solveYield` takes, as in Excel.
+ */
+const YIELD_MAX_ITERATIONS = 100
+
+/**
+ * Returns the guess from which Excel's YIELD and ODDFYIELD start Newton's method: (100 * `rate` + (100 - `price`) /
+ * T) / (`price` + (100 - `price`) * (T - 1/2) / (2 * T)), with T the years from settlement to maturity. It does not
+ * depend on the redemption value.
+ *
+ * @param {number} rate - the annual coupon rate
+ * @param {number} price - the price per 100 face value
+ * @param {number} years - T, the years from settlement to maturity
+ */
+function yieldGuess(rate: number, price: number, years: number): number {
+  return (100 * rate + (100 - price) / years) / (price + (100 - price) * (years - 0.5) / (2 * years))
+}
+
+/**
+ * Returns T, the years from settlement to maturity of `yieldGuess`, as Excel counts them: the whole years from
+ * settlement to its last anniversary on or before maturity, plus the year fraction of `dayCountByBasis` from that
+ * anniversary to maturity. (Under bases 1, 2 and 3 this is not the year fraction from settlement to maturity.)
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {number} settlement - the settlement date serial
+ * @param {number} maturity - the maturity date serial, after `settlement`
+ * @param {number} basis - the day-count basis: 0 to 4
+ */
+function yearsToMaturity(dateTimeHelper: DateTimeHelper, settlement: number, maturity: number, basis: number): number {
+  const settlementDate = dateTimeHelper.numberToSimpleDate(settlement)
+  let years = dateTimeHelper.numberToSimpleDate(maturity).year - settlementDate.year
+  let anniversary = dateTimeHelper.dateToNumber(stepMonths(dateTimeHelper, settlementDate, 12 * years))
+  if (anniversary > maturity) {
+    years--
+    anniversary = dateTimeHelper.dateToNumber(stepMonths(dateTimeHelper, settlementDate, 12 * years))
+  }
+  const {dayCount: days, yearDays} = dateTimeHelper.dayCountByBasis(anniversary, maturity, basis)
+  return years + days / yearDays
+}
+
+/**
+ * A price per 100 face value at a yield, and its derivative with respect to the yield.
+ */
+interface PriceAndDerivative {
+  /** The price per 100 face value. */
+  price: number,
+  /** The derivative of the price with respect to the yield. */
+  derivative: number,
+}
+
+/**
+ * Returns the yield at which `priceAt` gives `price`, by Newton's method from `guess`, as Excel's YIELD and ODDFYIELD
+ * compute it: the Newton step at a yield is (the price there - `price`) / the derivative there; the method returns
+ * the first yield whose step is smaller than `YIELD_TOLERANCE`, and otherwise moves the yield by the step. After
+ * `YIELD_MAX_ITERATIONS` steps it returns the last yield, as Excel does, even when that is not yet a solution. The
+ * yield is not kept above -frequency (1 + yld / frequency > 0): Excel does not keep it there either. An error from
+ * `priceAt` is passed on; a step that is not finite is #NUM!.
+ *
+ * @param {Function} priceAt - the price and its derivative at a yield, or an error
+ * @param {number} price - the price to reach
+ * @param {number} guess - the yield to start from
+ */
+function solveYield(priceAt: (yld: number) => PriceAndDerivative | CellError, price: number, guess: number): number | CellError {
+  let yld = guess
+  for (let iteration = 0; iteration < YIELD_MAX_ITERATIONS; iteration++) {
+    const value = priceAt(yld)
+    if (value instanceof CellError) {
+      return value
+    }
+    const step = (value.price - price) / value.derivative
+    if (!Number.isFinite(step)) {
+      return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+    }
+    if (Math.abs(step) < YIELD_TOLERANCE) {
+      return yld
+    }
+    yld -= step
+  }
+  return yld
+}
+
+/**
  * Returns E, the number of days in the coupon period that contains settlement, as the bond price and duration
  * formulas count it: see `settlementPeriod`.
  *
@@ -158,12 +345,22 @@ export function settlementPeriod(dateTimeHelper: DateTimeHelper, schedule: Coupo
 function settlementPeriodDays(dateTimeHelper: DateTimeHelper, schedule: CouponSchedule): number {
   switch (schedule.basis) {
     case 1:
-      return dateTimeHelper.dateToNumber(schedule.next) - dateTimeHelper.dateToNumber(schedule.previous)
+      return daysFromPreviousToNextCoupon(dateTimeHelper, schedule)
     case 3:
       return 365 / schedule.frequency
     default:
       return 360 / schedule.frequency
   }
+}
+
+/**
+ * Returns the actual days from the previous to the next coupon date of the schedule.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {CouponSchedule} schedule - the coupon schedule
+ */
+function daysFromPreviousToNextCoupon(dateTimeHelper: DateTimeHelper, schedule: CouponSchedule): number {
+  return dateTimeHelper.dateToNumber(schedule.next) - dateTimeHelper.dateToNumber(schedule.previous)
 }
 
 /**
@@ -573,10 +770,10 @@ function isMonthEnd(dateTimeHelper: DateTimeHelper, date: SimpleDate): boolean {
 }
 
 /**
- * The validated arguments of an ODDFPRICE call: dates as serials, `issue` < `settlement` < `firstCoupon` <
- * `maturity`.
+ * The dates, frequency and basis of an ODDFPRICE or ODDFYIELD call: dates as serials, `issue` < `settlement` <
+ * `firstCoupon` < `maturity`.
  */
-export interface OddFirstPeriodBond {
+interface OddFirstPeriodDates {
   /** The settlement date serial. */
   settlement: number,
   /** The maturity date serial. */
@@ -585,12 +782,6 @@ export interface OddFirstPeriodBond {
   issue: number,
   /** The first coupon date serial. */
   firstCoupon: number,
-  /** The annual coupon rate, not negative. */
-  rate: number,
-  /** The annual yield, not negative. */
-  yld: number,
-  /** The redemption value per 100 face value, greater than 0. */
-  redemption: number,
   /** The number of coupons per year: 1, 2 or 4. */
   frequency: number,
   /** The day-count basis: 0 to 4. */
@@ -598,21 +789,40 @@ export interface OddFirstPeriodBond {
 }
 
 /**
- * The validated arguments of an ODDLPRICE call: dates as serials, `lastInterest` < `settlement` < `maturity`.
+ * The validated arguments of an ODDFPRICE call.
  */
-export interface OddLastPeriodBond {
+export interface OddFirstPeriodBond extends OddFirstPeriodDates {
+  /** The annual coupon rate, not negative. */
+  rate: number,
+  /** The annual yield, not negative. */
+  yld: number,
+  /** The redemption value per 100 face value, greater than 0. */
+  redemption: number,
+}
+
+/**
+ * The validated arguments of an ODDFYIELD call.
+ */
+export interface OddFirstPeriodYieldBond extends OddFirstPeriodDates {
+  /** The annual coupon rate, not negative. */
+  rate: number,
+  /** The price per 100 face value, greater than 0. */
+  price: number,
+  /** The redemption value per 100 face value, greater than 0. */
+  redemption: number,
+}
+
+/**
+ * The dates, frequency and basis of an ODDLPRICE or ODDLYIELD call: dates as serials, `lastInterest` < `settlement` <
+ * `maturity`.
+ */
+interface OddLastPeriodDates {
   /** The settlement date serial. */
   settlement: number,
   /** The maturity date serial. */
   maturity: number,
   /** The last coupon date serial. */
   lastInterest: number,
-  /** The annual coupon rate, not negative. */
-  rate: number,
-  /** The annual yield, not negative. */
-  yld: number,
-  /** The redemption value per 100 face value, greater than 0. */
-  redemption: number,
   /** The number of coupons per year: 1, 2 or 4. */
   frequency: number,
   /** The day-count basis: 0 to 4. */
@@ -620,21 +830,142 @@ export interface OddLastPeriodBond {
 }
 
 /**
- * Returns the price per 100 face value of a bond with an odd first coupon period, as Excel's ODDFPRICE computes it.
+ * The validated arguments of an ODDLPRICE call.
+ */
+export interface OddLastPeriodBond extends OddLastPeriodDates {
+  /** The annual coupon rate, not negative. */
+  rate: number,
+  /** The annual yield, not negative. */
+  yld: number,
+  /** The redemption value per 100 face value, greater than 0. */
+  redemption: number,
+}
+
+/**
+ * The validated arguments of an ODDLYIELD call.
+ */
+export interface OddLastPeriodYieldBond extends OddLastPeriodDates {
+  /** The annual coupon rate, not negative. */
+  rate: number,
+  /** The price per 100 face value, greater than 0. */
+  price: number,
+  /** The redemption value per 100 face value, greater than 0. */
+  redemption: number,
+}
+
+/**
+ * The terms of ODDFPRICE's formula that do not depend on the yield, from `oddFirstPeriodTerms`. With v = 1 + yld /
+ * frequency, the price is `redemption` / v^`redemptionExponent` + `firstCoupon` / v^(`firstCouponPeriods` +
+ * `periodFraction`) + the sum of `payment` / v^((`firstCouponPeriods` + k) + `periodFraction`) for k = 1 to
+ * `couponCount`, minus `accrued`.
+ */
+interface OddFirstPeriodTerms {
+  /** The exponent of the redemption's discount factor. */
+  redemptionExponent: number,
+  /** The first (odd) coupon: the coupon times its length in regular periods. */
+  firstCoupon: number,
+  /** The whole quasi-coupon periods by which the first coupon is discounted: 0 for a short first period, Nq for a long one. */
+  firstCouponPeriods: number,
+  /** DSC / E, the fraction of the period from settlement to the end of its quasi-coupon period. */
+  periodFraction: number,
+  /** The regular coupon, 100 * rate / frequency. */
+  payment: number,
+  /** The number of regular coupons after the first coupon. */
+  couponCount: number,
+  /** The accrued interest from issue to settlement. */
+  accrued: number,
+}
+
+/**
+ * Returns the price per 100 face value of a bond with an odd first coupon period, as Excel's ODDFPRICE computes it:
+ * the formula of `OddFirstPeriodTerms` over the terms of `oddFirstPeriodTerms` (`oddFirstPeriodPriceAndDerivative`), added in Excel's order (redemption,
+ * first coupon, the other coupons, then the accrued interest subtracted); that order gives Excel's last digit.
  *
- * The regular coupons are those of `maturity`'s schedule (`couponDate`), and `firstCoupon` must be one of them. The
- * quasi-coupon period that contains settlement is the period of `firstCoupon`'s schedule around it; E is its length:
- * the days from its start to its end under basis 1, 365 / `frequency` under basis 3, 360 / `frequency` otherwise.
- * DFC, the days from issue to the first coupon, decides the formula: shorter than E, the short first period of
- * `shortFirstPeriodPrice`; longer, the long one of `longFirstPeriodPrice`; equal, #NUM!, as in Excel.
- *
- * Takes O(n) time in the number of coupons and quasi-coupon periods.
+ * Takes O(n) time in the number of coupons and quasi-coupon periods. #NUM! when a discount factor is not finite (a
+ * large `yld` over many periods).
  *
  * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
  * @param {OddFirstPeriodBond} bond - the validated arguments
  */
 export function oddFirstPeriodPrice(dateTimeHelper: DateTimeHelper, bond: OddFirstPeriodBond): number | CellError {
-  const {settlement, maturity, issue, firstCoupon, frequency, basis} = bond
+  const terms = oddFirstPeriodTerms(dateTimeHelper, bond, bond.rate)
+  if (terms instanceof CellError) {
+    return terms
+  }
+  const priceAndDerivative = oddFirstPeriodPriceAndDerivative(terms, bond.yld, bond.redemption, bond.frequency)
+  return priceAndDerivative instanceof CellError ? priceAndDerivative : priceAndDerivative.price
+}
+
+/**
+ * Returns the annual yield of a bond with an odd first coupon period, as Excel's ODDFYIELD computes it: the `yld` at
+ * which `oddFirstPeriodPrice` gives `price`, by `solveYield` with the exact derivative of `oddFirstPeriodPriceAndDerivative`, from the
+ * guess of `yieldGuess` over the years from settlement to maturity counted by the basis. The terms that do not depend
+ * on the yield are computed once. Excel's ODDFYIELD steps with an approximate derivative, so its yield can differ
+ * from this one by up to about 1E-10.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {OddFirstPeriodYieldBond} bond - the validated arguments
+ */
+export function oddFirstPeriodYield(dateTimeHelper: DateTimeHelper, bond: OddFirstPeriodYieldBond): number | CellError {
+  const {settlement, maturity, rate, price, redemption, frequency, basis} = bond
+  const terms = oddFirstPeriodTerms(dateTimeHelper, bond, rate)
+  if (terms instanceof CellError) {
+    return terms
+  }
+  return solveYield(
+    (yld: number) => oddFirstPeriodPriceAndDerivative(terms, yld, redemption, frequency),
+    price,
+    yieldGuess(rate, price, yearsToMaturity(dateTimeHelper, settlement, maturity, basis)),
+  )
+}
+
+/**
+ * Returns the price of `OddFirstPeriodTerms` at `yld` and its derivative with respect to `yld`, in one pass: each
+ * term a / v^e contributes -(e / `frequency`) * a / v^(e + 1). #NUM! when the redemption's discount factor is not
+ * finite.
+ *
+ * @param {OddFirstPeriodTerms} terms - the terms that do not depend on the yield
+ * @param {number} yld - the annual yield
+ * @param {number} redemption - the redemption value per 100 face value
+ * @param {number} frequency - the number of coupons per year: 1, 2 or 4
+ */
+function oddFirstPeriodPriceAndDerivative(terms: OddFirstPeriodTerms, yld: number, redemption: number, frequency: number): PriceAndDerivative | CellError {
+  const {redemptionExponent, firstCoupon, firstCouponPeriods, periodFraction, payment, couponCount, accrued} = terms
+  const discountBase = yld / frequency + 1
+  const redemptionFactor = Math.pow(discountBase, redemptionExponent)
+  if (!Number.isFinite(redemptionFactor)) {
+    return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+  }
+  let coupons = 0
+  let derivative = 0
+  for (let coupon = 1; coupon <= couponCount; coupon++) {
+    const exponent = (firstCouponPeriods + coupon) + periodFraction
+    const discountFactor = Math.pow(discountBase, exponent)
+    coupons = coupons + payment / discountFactor
+    derivative -= exponent / frequency * payment / (discountFactor * discountBase)
+  }
+  const firstCouponExponent = firstCouponPeriods + periodFraction
+  const firstCouponFactor = Math.pow(discountBase, firstCouponExponent)
+  derivative -= firstCouponExponent / frequency * firstCoupon / (firstCouponFactor * discountBase)
+  derivative -= redemptionExponent / frequency * redemption / (redemptionFactor * discountBase)
+  return {price: redemption / redemptionFactor + firstCoupon / firstCouponFactor + coupons - accrued, derivative}
+}
+
+/**
+ * Returns the terms of ODDFPRICE's formula that do not depend on the yield (`OddFirstPeriodTerms`).
+ *
+ * The regular coupons are those of `maturity`'s schedule (`couponDate`), and `firstCoupon` must be one of them. The
+ * quasi-coupon period that contains settlement is the period of `firstCoupon`'s schedule around it; E is its length:
+ * the days from its start to its end under basis 1, 365 / `frequency` under basis 3, 360 / `frequency` otherwise.
+ * DFC, the days from issue to the first coupon, decides the formula: shorter than E, the short first period of
+ * `shortFirstPeriodTerms`; longer, the long one of `longFirstPeriodTerms`; equal, #NUM!, as in Excel.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {OddFirstPeriodDates} dates - the dates, frequency and basis
+ * @param {number} rate - the annual coupon rate
+ */
+function oddFirstPeriodTerms(dateTimeHelper: DateTimeHelper, dates: OddFirstPeriodDates, rate: number): OddFirstPeriodTerms | CellError {
+  const {settlement, maturity, issue, firstCoupon, frequency, basis} = dates
   const maturityDate = dateTimeHelper.numberToSimpleDate(maturity)
   const couponCount = -couponPeriodIndex(dateTimeHelper, firstCoupon, maturityDate, frequency)
   if (dateTimeHelper.dateToNumber(couponDate(dateTimeHelper, maturityDate, -couponCount, frequency)) !== firstCoupon) {
@@ -654,66 +985,64 @@ export function oddFirstPeriodPrice(dateTimeHelper: DateTimeHelper, bond: OddFir
   }
   if (firstPeriodDays < periodDays) {
     const settlementCoupons = -couponPeriodIndex(dateTimeHelper, settlement, maturityDate, frequency)
-    return shortFirstPeriodPrice(dateTimeHelper, bond, settlementCoupons, periodDays, firstPeriodDays)
+    return shortFirstPeriodTerms(dateTimeHelper, dates, rate, settlementCoupons, periodDays, firstPeriodDays)
   }
-  return longFirstPeriodPrice(dateTimeHelper, bond, couponCount, periodDays, periodStart, periodEnd)
+  return longFirstPeriodTerms(dateTimeHelper, dates, rate, couponCount, periodDays, periodStart, periodEnd)
 }
 
 /**
- * Returns ODDFPRICE's price for a short first period, with the terms of Microsoft's formula: A, the days from issue to
+ * Returns ODDFPRICE's terms for a short first period, with the terms of Microsoft's formula: A, the days from issue to
  * settlement; DSC, from settlement to the first coupon; DFC, from issue to the first coupon; E, the quasi-coupon
  * period length; N, the coupons of maturity's schedule after settlement. N is one more than the coupons from the
  * first coupon to maturity when a quasi-coupon date falls between settlement and the first coupon, as Excel counts
- * it. The terms are added in Excel's order: redemption,
- * first coupon, the other coupons, then the accrued interest subtracted; that order gives Excel's last digit.
- *
- * #NUM! when a discount factor is not finite (a large `yld` over many periods).
+ * it. The first coupon is the coupon times DFC / E, discounted by DSC / E; the redemption by (N - 1) + DSC / E.
  *
  * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {OddFirstPeriodBond} bond - the validated arguments
+ * @param {OddFirstPeriodDates} dates - the dates, frequency and basis
+ * @param {number} rate - the annual coupon rate
  * @param {number} settlementCoupons - N, the coupons of maturity's schedule after settlement
  * @param {number} periodDays - E
  * @param {number} firstPeriodDays - DFC
  */
-function shortFirstPeriodPrice(dateTimeHelper: DateTimeHelper, bond: OddFirstPeriodBond, settlementCoupons: number, periodDays: number, firstPeriodDays: number): number | CellError {
-  const {settlement, issue, firstCoupon, rate, yld, redemption, frequency, basis} = bond
+function shortFirstPeriodTerms(dateTimeHelper: DateTimeHelper, dates: OddFirstPeriodDates, rate: number, settlementCoupons: number, periodDays: number, firstPeriodDays: number): OddFirstPeriodTerms {
+  const {settlement, issue, firstCoupon, frequency, basis} = dates
   const payment = 100 * rate / frequency
-  const discountBase = yld / frequency + 1
   const periodFraction = dayCount(dateTimeHelper, settlement, firstCoupon, basis) / periodDays
-  const redemptionFactor = Math.pow(discountBase, (settlementCoupons - 1) + periodFraction)
-  if (!Number.isFinite(redemptionFactor)) {
-    return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+  return {
+    redemptionExponent: (settlementCoupons - 1) + periodFraction,
+    firstCoupon: payment * firstPeriodDays / periodDays,
+    firstCouponPeriods: 0,
+    periodFraction,
+    payment,
+    couponCount: settlementCoupons - 1,
+    accrued: dayCount(dateTimeHelper, issue, settlement, basis) / periodDays * (rate / frequency) * 100,
   }
-  let coupons = 0
-  for (let coupon = 2; coupon <= settlementCoupons; coupon++) {
-    coupons = coupons + payment / Math.pow(discountBase, (coupon - 1) + periodFraction)
-  }
-  const accrued = dayCount(dateTimeHelper, issue, settlement, basis) / periodDays * (rate / frequency) * 100
-  return redemption / redemptionFactor + payment * firstPeriodDays / periodDays / Math.pow(discountBase, periodFraction) + coupons - accrued
 }
 
 /**
- * Returns ODDFPRICE's price for a long first period, with the terms of Microsoft's formula. The quasi-coupon periods
+ * Returns ODDFPRICE's terms for a long first period, with the terms of Microsoft's formula. The quasi-coupon periods
  * of the first period are stepped back from the first coupon by `stepMonths`, so their day can drift down (31
  * August, 28 February, 28 August), and their number NC is the number of coupon dates of `firstCoupon`'s schedule
  * after issue. For each, from the latest: NL, its length (its days under basis 1, E otherwise); DC, its coupon days
  * (NL, or for the earliest the days from issue to its end, 0 if issue is after it); A, its accrued days (from issue
  * or its start to settlement or its end, 0 if none). DSC is E minus the days from the start of settlement's
  * quasi-coupon period to settlement (bases 0, 1 and 4) or the days from settlement to its end (bases 2 and 3). Nq is
- * `quasiCouponsBeforeFirstCoupon`. The terms are added in Excel's order, as in `shortFirstPeriodPrice`.
+ * `quasiCouponsBeforeFirstCoupon`. The first coupon is the coupon times the sum of DC / NL, discounted by Nq + DSC / E;
+ * the redemption by DSC / E + Nq + the regular coupons; the accrued interest is the coupon times the sum of A / NL.
  *
  * #NUM! when a quasi-coupon date stepped back is before the earliest supported date (Excel too: the stepped dates
- * drift below the coupon dates), or a discount factor is not finite.
+ * drift below the coupon dates).
  *
  * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {OddFirstPeriodBond} bond - the validated arguments
+ * @param {OddFirstPeriodDates} dates - the dates, frequency and basis
+ * @param {number} rate - the annual coupon rate
  * @param {number} couponCount - the regular coupons after the first coupon, up to and including maturity
  * @param {number} periodDays - E
  * @param {number} periodStart - the start of settlement's quasi-coupon period, a date serial
  * @param {number} periodEnd - the end of settlement's quasi-coupon period, a date serial
  */
-function longFirstPeriodPrice(dateTimeHelper: DateTimeHelper, bond: OddFirstPeriodBond, couponCount: number, periodDays: number, periodStart: number, periodEnd: number): number | CellError {
-  const {settlement, issue, firstCoupon, rate, yld, redemption, frequency, basis} = bond
+function longFirstPeriodTerms(dateTimeHelper: DateTimeHelper, dates: OddFirstPeriodDates, rate: number, couponCount: number, periodDays: number, periodStart: number, periodEnd: number): OddFirstPeriodTerms | CellError {
+  const {settlement, issue, firstCoupon, frequency, basis} = dates
   const firstCouponDate = dateTimeHelper.numberToSimpleDate(firstCoupon)
   const issuePeriod = couponPeriodIndex(dateTimeHelper, issue, firstCouponDate, frequency)
   let couponPeriods = 0
@@ -737,17 +1066,16 @@ function longFirstPeriodPrice(dateTimeHelper: DateTimeHelper, bond: OddFirstPeri
     : periodDays - dayCount(dateTimeHelper, periodStart, settlement, basis)
   const quasiCoupons = quasiCouponsBeforeFirstCoupon(dateTimeHelper, dateTimeHelper.numberToSimpleDate(settlement), firstCouponDate, frequency)
   const periodFraction = daysToPeriodEnd / periodDays
-  const discountBase = yld / frequency + 1
-  const redemptionFactor = Math.pow(discountBase, periodFraction + quasiCoupons + couponCount)
-  if (!Number.isFinite(redemptionFactor)) {
-    return new CellError(ErrorType.NUM, ErrorMessage.NaN)
-  }
   const payment = 100 * rate / frequency
-  let coupons = 0
-  for (let coupon = 1; coupon <= couponCount; coupon++) {
-    coupons = coupons + payment / Math.pow(discountBase, coupon + quasiCoupons + periodFraction)
+  return {
+    redemptionExponent: periodFraction + quasiCoupons + couponCount,
+    firstCoupon: payment * couponPeriods,
+    firstCouponPeriods: quasiCoupons,
+    periodFraction,
+    payment,
+    couponCount,
+    accrued: payment * accruedPeriods,
   }
-  return redemption / redemptionFactor + payment * couponPeriods / Math.pow(discountBase, quasiCoupons + periodFraction) + coupons - payment * accruedPeriods
 }
 
 /**
@@ -780,9 +1108,65 @@ function quasiCouponsBeforeFirstCoupon(dateTimeHelper: DateTimeHelper, settlemen
 }
 
 /**
+ * The sums over the quasi-coupon periods of an odd last period, each as days over the period's length NL: DC, the
+ * coupon days, A, the accrued days, and DSC, the days from settlement to maturity (see `oddLastPeriodTerms`).
+ */
+interface OddLastPeriodTerms {
+  /** The sum of DC / NL. */
+  couponPeriods: number,
+  /** The sum of A / NL. */
+  accruedPeriods: number,
+  /** The sum of DSC / NL. */
+  periodsToMaturity: number,
+}
+
+/**
  * Returns the price per 100 face value of a bond with an odd last coupon period, as Excel's ODDLPRICE computes it:
  * (redemption + DC * payment) / (1 + DSC * yld / frequency) - A * payment, with payment = 100 * rate / frequency and
- * DC, A and DSC summed over the quasi-coupon periods of the last period, each as days over the period's length NL.
+ * DC, A and DSC the sums of `oddLastPeriodTerms`.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {OddLastPeriodBond} bond - the validated arguments
+ */
+export function oddLastPeriodPrice(dateTimeHelper: DateTimeHelper, bond: OddLastPeriodBond): number | CellError {
+  const terms = oddLastPeriodTerms(dateTimeHelper, bond)
+  if (terms instanceof CellError) {
+    return terms
+  }
+  const {rate, yld, redemption, frequency} = bond
+  const payment = 100 * rate / frequency
+  const price = (terms.couponPeriods * payment + redemption) / (terms.periodsToMaturity * yld / frequency + 1) - terms.accruedPeriods * payment
+  return Number.isFinite(price) ? price : new CellError(ErrorType.NUM, ErrorMessage.NaN)
+}
+
+/**
+ * Returns the annual yield of a bond with an odd last coupon period, as Excel's ODDLYIELD computes it: the closed
+ * form that inverts `oddLastPeriodPrice`, ((redemption + DC * payment) - (price + A * payment)) / (price + A *
+ * payment) * frequency / DSC, with payment = 100 * rate / frequency and DC, A and DSC the sums of
+ * `oddLastPeriodTerms`. DSC of 0 (a settlement on the 30th and a maturity on the 31st under 30/360) is #DIV/0!;
+ * Excel keeps a non-finite value that shows as 0.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {OddLastPeriodYieldBond} bond - the validated arguments
+ */
+export function oddLastPeriodYield(dateTimeHelper: DateTimeHelper, bond: OddLastPeriodYieldBond): number | CellError {
+  const terms = oddLastPeriodTerms(dateTimeHelper, bond)
+  if (terms instanceof CellError) {
+    return terms
+  }
+  if (terms.periodsToMaturity === 0) {
+    return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.NoDaysToMaturity)
+  }
+  const {rate, price, redemption, frequency} = bond
+  const payment = 100 * rate / frequency
+  const priceWithAccrued = price + terms.accruedPeriods * payment
+  const yld = ((redemption + terms.couponPeriods * payment) - priceWithAccrued) / priceWithAccrued * frequency / terms.periodsToMaturity
+  return Number.isFinite(yld) ? yld : new CellError(ErrorType.NUM, ErrorMessage.NaN)
+}
+
+/**
+ * Returns DC, A and DSC, the sums over the quasi-coupon periods of an odd last period that ODDLPRICE and ODDLYIELD
+ * use, each as days over the period's length NL.
  *
  * The quasi-coupon periods are stepped forward from `lastInterest` by `stepMonths`, so their day can drift down, and
  * their number NC is the number of coupon dates of `maturity`'s schedule after `lastInterest`. For each: NL,
@@ -795,10 +1179,10 @@ function quasiCouponsBeforeFirstCoupon(dateTimeHelper: DateTimeHelper, settlemen
  * earliest supported date, or a quasi-coupon date is after the latest one.
  *
  * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {OddLastPeriodBond} bond - the validated arguments
+ * @param {OddLastPeriodDates} bond - the dates, frequency and basis
  */
-export function oddLastPeriodPrice(dateTimeHelper: DateTimeHelper, bond: OddLastPeriodBond): number | CellError {
-  const {settlement, maturity, lastInterest, rate, yld, redemption, frequency, basis} = bond
+function oddLastPeriodTerms(dateTimeHelper: DateTimeHelper, bond: OddLastPeriodDates): OddLastPeriodTerms | CellError {
+  const {settlement, maturity, lastInterest, frequency, basis} = bond
   const maturityDate = dateTimeHelper.numberToSimpleDate(maturity)
   const lastInterestPeriod = couponPeriodIndex(dateTimeHelper, lastInterest, maturityDate, frequency)
   if (dateTimeHelper.dateToNumber(couponDate(dateTimeHelper, maturityDate, lastInterestPeriod, frequency)) < 0) {
@@ -828,9 +1212,7 @@ export function oddLastPeriodPrice(dateTimeHelper: DateTimeHelper, bond: OddLast
     periodsToMaturity += daysIfForward(dateTimeHelper, Math.max(settlement, start), Math.min(maturity, end), basis) / normalLength
     periodStartDate = periodEndDate
   }
-  const payment = 100 * rate / frequency
-  const price = (couponPeriods * payment + redemption) / (periodsToMaturity * yld / frequency + 1) - accruedPeriods * payment
-  return Number.isFinite(price) ? price : new CellError(ErrorType.NUM, ErrorMessage.NaN)
+  return {couponPeriods, accruedPeriods, periodsToMaturity}
 }
 
 /**

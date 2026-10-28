@@ -80,6 +80,8 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | TBILLPRICE    | =TBILLPRICE(0, 180, 2)                                         |       0.0000 |           NUM |          0.0000 |
 | ACCRINTM      | =ACCRINTM(DATE(2008,4,1), DATE(2008,6,15), 0.1)                |      20.5556 |       20.5556 |    Wrong number |
 | ACCRINT       | =ACCRINT(DATE(2009,9,1), DATE(2010,8,29), DATE(2009,10,15), 0.1, 1000, 2, 0) |      10.8486 |       12.2222 |         11.1264 |
+| YIELD         | =YIELD(DATE(2008,1,30), DATE(2008,1,31), 0.05, 99, 100, 4) |        DIV/0 |             – |          0.0000 |
+| ODDLYIELD     | =ODDLYIELD(DATE(2008,3,30), DATE(2008,3,31), DATE(2007,12,24), 0.0375, 99.875, 100, 2) |        DIV/0 |             – |          0.0000 |
 | NPV           | =NPV(1, TRUE(), 1)                                             |       0.7500 |        0.5000 |          0.7500 |
 | NPV           | =NPV(1,B1) where B1 = true                                     |       0.5000 |        0.0000 |          0.0000 |
 | POISSON.DIST  | =POISSON.DIST(-0.01, 0, FALSE())                               |          NUM |        1.0000 |             NUM |
