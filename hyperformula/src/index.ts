@@ -16,6 +16,7 @@ import {
   DenseSparseChooseBasedOnThreshold
 } from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {
+  CellValueNotComputedError,
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
   EvaluationSuspendedError,
@@ -74,6 +75,7 @@ class HyperFormulaNS extends HyperFormula {
   public static DetailedCellError = DetailedCellError
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
+  public static CellValueNotComputedError = CellValueNotComputedError
   public static ConfigValueTooBigError = ConfigValueTooBigError
   public static ConfigValueTooSmallError = ConfigValueTooSmallError
   public static EvaluationSuspendedError = EvaluationSuspendedError
@@ -159,6 +161,7 @@ export {
   ExportedNamedExpressionChange,
   DetailedCellError,
   CellError,
+  CellValueNotComputedError,
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
   EvaluationSuspendedError,
