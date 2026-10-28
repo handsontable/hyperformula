@@ -81,6 +81,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=INDEX(A1:C10, 2, 3)', '=INDEX(A1:A10, 5)'],
   },
+  LOOKUP: {
+    category: 'Lookup and reference',
+    shortDescription: 'Finds the largest value that is not greater than lookup_value and returns the item at the same position of result_vector, or of the last row or column of lookup_vector when result_vector is omitted.',
+    parameters: [{name: 'lookup_value', description: 'The value to search for; only items of the same type (number, text or boolean) are considered.'}, {name: 'lookup_vector', description: 'The row or column to search, assumed to be sorted in ascending order. A two-dimensional range is searched along its first row when it is wider than it is tall, and along its first column otherwise.'}, {name: 'result_vector', description: 'The row or column that the result is returned from, starting at its first cell. When omitted, the result comes from the last row or column of lookup_vector.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=LOOKUP(5, A1:A10, B1:B10)', '=LOOKUP("apple", A1:B10)'],
+  },
   MATCH: {
     category: 'Lookup and reference',
     shortDescription: 'Returns the relative position of an item in an array that matches a specified value.',
@@ -121,6 +128,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=SORT(A1:A10)', '=SORT(A1:B10, 2, -1)'],
   },
+  SORTBY: {
+    category: 'Lookup and reference',
+    shortDescription: 'Sorts the rows or columns of an array by the values of one or more other arrays.',
+    parameters: [{name: 'array', description: 'The range or array whose rows (or columns) are reordered.'}, {name: 'by_array1', description: 'The single column (or row) of sort keys, with as many entries as array has rows (or columns). Ties keep their input order. Further pairs of by_array and sort_order can be passed as additional arguments; they break the ties of the preceding keys.'}, {name: 'sort_order1', description: '1 (default) sorts by_array1 in ascending order; -1 sorts in descending order. Empty cells and errors among the keys always stay last.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=SORTBY(A1:A10, B1:B10)', '=SORTBY(A1:B10, C1:C10, -1, D1:D10, 1)'],
+  },
   TRANSPOSE: {
     category: 'Lookup and reference',
     shortDescription: 'Transposes the rows and columns of an array.',
@@ -155,5 +169,12 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'lookup_value', description: 'The value to search for in lookup_array.'}, {name: 'lookup_array', description: 'The single row or column of cells to search.'}, {name: 'return_array', description: 'The range that values are returned from once a match is found; it must align in size with lookup_array.'}, {name: 'if_not_found', description: 'The value returned when no match is found. Defaults to the #N/A error.'}, {name: 'match_mode', description: '0 (default) for an exact match, -1 for an exact match or the next smaller item, 1 for an exact match or the next larger item, or 2 for a wildcard match.'}, {name: 'search_mode', description: '1 (default) searches from first to last, -1 searches from last to first, and 2 or -2 perform a binary search on ascending- or descending-sorted data respectively.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=XLOOKUP("apple", A1:A10, B1:B10)', '=XLOOKUP(5, A1:A10, B1:B10, "not found")'],
+  },
+  XMATCH: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns the relative position of an item in a single row or column that matches a specified value.',
+    parameters: [{name: 'lookup_value', description: 'The value to search for in lookup_array.'}, {name: 'lookup_array', description: 'The single row or column of cells to search.'}, {name: 'match_mode', description: '0 (default) for an exact match, -1 for an exact match or the next smaller item, 1 for an exact match or the next larger item, or 2 for a wildcard match.'}, {name: 'search_mode', description: '1 (default) searches from first to last, -1 searches from last to first, and 2 or -2 perform a binary search on ascending- or descending-sorted data respectively.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=XMATCH(5, A1:A10)', '=XMATCH("ap*", A1:A10, 2, -1)'],
   },
 }
