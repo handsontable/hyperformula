@@ -7,10 +7,12 @@
  *   root-relative URL (`/hf_logo.png`) gets the base.
  * - `:::example{#id}` blocks become live examples: the HTML, CSS and compiled JS they include render on the page,
  *   and the TypeScript opens in StackBlitz.
+ * - A heading whose VuePress anchor differs from its new one keeps the old anchor too (`legacyAnchorsPlugin`).
  */
 import { readFileSync } from 'node:fs';
 import { posix, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import GithubSlugger from 'github-slugger';
 import { substituteBuildConstants, substituteDocsData } from './docs-data.mjs';
 import { pageId } from './page-id.mjs';
 
@@ -191,3 +193,72 @@ export const tableWrapperPlugin = {
     },
   },
 };
+
+const HEADINGS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+/**
+ * The heading id the VuePress site gave a heading: `slugify` from `@vuepress/shared-utils` 1.9.
+ * @param {string} text The heading text.
+ * @returns {string} The id, before numbering a repeat.
+ */
+function vuepressSlug(text) {
+  return text
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036F]/g, '')
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\u0000-\u001f]/g, '')
+    .replace(/[\s~`!@#$%^&*()\-_+=[\]{}|\\;:"'“”‘’–—<>,.?/]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/^(\d)/, '_$1')
+    .toLowerCase();
+}
+
+/**
+ * Keeps the VuePress heading anchors working. Headings get their ids from `github-slugger` now, which turns
+ * `## 3.5.0` into `#350` where VuePress made `#_3-5-0`; deep links into the docs from elsewhere use the old form.
+ * A heading whose old id differs from its new one gets an empty `<span id="<old id>">` as its first child, so the
+ * old link scrolls to the same heading.
+ *
+ * Runs before Astro's heading-ids plugin, so it works out the new ids the same way: one slugger per page, over the
+ * same heading text, in page order. The spans go in once every heading is seen, and an old id that is some other
+ * heading's new id is left out: the new links win.
+ * @param {{ data: { astro?: { frontmatter?: { title?: string } } } }} factory What Sätteri tells a plugin factory.
+ * @returns {object} The Sätteri hast plugin.
+ */
+export function legacyAnchorsPlugin({ data }) {
+  const slugger = new GithubSlugger();
+  const newIds = new Set();
+  const legacy = [];
+  // markdown-it-anchor 5, which VuePress used, numbered a repeated id from 2 (`#added`, `#added-2`), and counted the
+  // `# Title` heading the pages began with, which is the frontmatter title now.
+  const oldCounts = new Map();
+  const oldId = (text) => {
+    const slug = vuepressSlug(text);
+    const count = (oldCounts.get(slug) ?? 0) + 1;
+    oldCounts.set(slug, count);
+    return count > 1 ? `${slug}-${count}` : slug;
+  };
+  const title = data.astro?.frontmatter?.title;
+  if (title) oldId(title);
+
+  return {
+    name: 'hyperformula-docs-legacy-anchors',
+    element: {
+      filter: HEADINGS,
+      visit(node, ctx) {
+        const text = ctx.textContent(node);
+        const id = typeof node.properties?.id === 'string' ? node.properties.id : slugger.slug(text);
+        newIds.add(id);
+        legacy.push({ node, id: oldId(text) });
+      },
+    },
+    after(root, ctx) {
+      for (const { node, id } of legacy) {
+        if (id && !newIds.has(id)) {
+          ctx.prependChild(node, { type: 'element', tagName: 'span', properties: { id }, children: [] });
+        }
+      }
+    },
+  };
+}

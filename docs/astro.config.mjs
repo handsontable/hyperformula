@@ -7,7 +7,7 @@ import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import starlightThemeRapide from 'starlight-theme-rapide';
 import { satteri } from '@astrojs/markdown-satteri';
 import { DOCS_DATA } from './src/docs-data.mjs';
-import { docsMarkdownPlugin, tableWrapperPlugin } from './src/markdown-plugins.mjs';
+import { docsMarkdownPlugin, legacyAnchorsPlugin, tableWrapperPlugin } from './src/markdown-plugins.mjs';
 import { mdCompanions } from './src/md-companions/index.mjs';
 import { apiPageGroup } from './src/api-sidebar.mjs';
 
@@ -39,7 +39,7 @@ export default defineConfig({
     },
   },
   markdown: {
-    processor: satteri({ mdastPlugins: [docsMarkdownPlugin(base)], hastPlugins: [tableWrapperPlugin] }),
+    processor: satteri({ mdastPlugins: [docsMarkdownPlugin(base)], hastPlugins: [tableWrapperPlugin, legacyAnchorsPlugin] }),
   },
   integrations: [
     starlight({

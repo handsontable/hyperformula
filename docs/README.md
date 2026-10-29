@@ -124,9 +124,11 @@ docs                            # All documentation files
 │   ├── scripts                 # Browser scripts, e.g. the coding-agent wizard
 │   ├── styles                  # The site's CSS on top of Starlight's
 │   ├── api-sidebar.mjs         # The API pages' sidebar groups, with a link to each section
-│   ├── content.config.mjs      # Which Markdown files are pages
+│   ├── content.config.mjs      # The content collection the pages are read into
 │   ├── docs-data.mjs           # The {{ $page.* }} values
-│   ├── markdown-plugins.mjs    # Links, values and live examples in the pages
+│   ├── markdown-plugins.mjs    # Links, values, live examples and the old VuePress heading anchors in the pages
+│   ├── page-id.mjs             # Which Markdown files are pages, and each page's id
+│   ├── page-section.mjs        # Which header tab (Guides, API, Updates) a page belongs to
 │   └── route-data.mjs          # Fixes the section links and keeps them out of prev/next
 ├── typedoc-theme               # The TypeDoc theme the API reference is generated with
 ├── worker                      # The Cloudflare Worker serving the site
