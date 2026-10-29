@@ -92,6 +92,13 @@ npm run docs:deploy:cf    # deploy to production
 
 When changing the asset routing, verify it with browser navigation headers, not plain requests: `curl -H "Sec-Fetch-Mode: navigate" -H "Sec-Fetch-Dest: document"`. The asset router treats navigation requests differently from other requests, so a plain `curl` check can pass while browsers get a 404.
 
+## Docs assistant
+
+The **Ask AI** button in the header opens the docs assistant, the same chat panel as the Handsontable docs. It answers from a knowledge base that includes the HyperFormula guides, and it is served by the same backend as the Handsontable docs' assistant.
+
+- `src/components/DocsAssistant/` is the React widget and `src/scripts/docs-assistant-bootstrap.ts` mounts it on every page (loaded from the `Header` override). Every file there except `constants.ts` is a copy of the Handsontable docs' (`docs/src/components/DocsAssistant/` in handsontable/handsontable); refresh them by copying them again. `constants.ts` holds the HyperFormula values: starter questions, storage keys and the backend fallback.
+- On handsontable.com the panel calls `/docs-assistant/api/chat` on its own origin, which the handsontable.com Worker relays to the backend. Anywhere else (Workers Builds previews, `npm run docs:dev`) it calls the backend directly at `PUBLIC_CHAT_API_URL`, falling back to the backend's workers.dev address. The backend only answers the origins it allowlists: `npm run docs:dev` on `http://localhost:4321` is one of them, a Workers Builds preview is not, so on a preview the panel opens but a question fails.
+
 ## Built-in functions guide page
 
 The built-in functions guide page `docs/guide/built-in-functions.md` is a **build product** and is
@@ -119,9 +126,10 @@ docs                            # All documentation files
 ├── public                      # Static files served as they are: images, downloads, favicons
 ├── script                      # The built-in functions page generator and the Worker asset step
 ├── src
-│   ├── components              # Overrides of Starlight components: page title, Markdown content
+│   ├── components              # Overrides of Starlight components, and the docs assistant (DocsAssistant/)
+│   ├── lib                     # Browser helpers the docs assistant imports
 │   ├── md-companions           # Writes the .md companions and llms-full.txt (see below)
-│   ├── scripts                 # Browser scripts, e.g. the coding-agent wizard
+│   ├── scripts                 # Browser scripts, e.g. the coding-agent wizard and the docs assistant's bootstrap
 │   ├── styles                  # The site's CSS on top of Starlight's
 │   ├── api-sidebar.mjs         # The API pages' sidebar groups, with a link to each section
 │   ├── content.config.mjs      # The content collection the pages are read into
@@ -145,5 +153,5 @@ docs                            # All documentation files
 
 * **HTML + Markdown per page** &mdash; every guide page is built as both an `.html` page and a companion `.md` file with the same content, via the `md-companions` integration (`src/md-companions/`). The API reference has companions too, and a `README.md` source gets `index.md` (`api/index.md`). The companion lives next to its HTML page, e.g. `guide/basic-usage.html` and `guide/basic-usage.md`.
 * **`llms-full.txt`** &mdash; all pages concatenated into one Markdown file at the docs root (`/docs/hyperformula/llms-full.txt`, served at https://handsontable.com/docs/hyperformula/llms-full.txt), so an agent can fetch the whole corpus in a single request instead of crawling page by page.
-* **"View as Markdown" link** &mdash; every guide page shows a small link near the top of its content that navigates to that page's `.md` companion (rendered by the `PageTitle` override in `src/components/`).
+* **Page actions** &mdash; below the table of contents (the `PageSidebar` override in `src/components/`), every page offers Copy Markdown and View as Markdown (its `.md` companion), Ask AI about this page, Print this page, and Open in ChatGPT or Claude (a new conversation that starts by reading the page). On narrower screens, where that sidebar is hidden, the `PageTitle` override shows View as Markdown near the top of the page.
 * **"Set up your coding agent" page** &mdash; [`guide/setup-coding-agent.md`](guide/setup-coding-agent.md) explains how to point Claude Code, Cursor, Copilot, and other agents at these machine-readable docs, and embeds the `<hf-coding-agent-wizard>` custom element (`src/scripts/coding-agent-wizard.mjs`): an interactive picker that shows the right setup instructions for the agent you choose.

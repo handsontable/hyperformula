@@ -181,3 +181,11 @@ site-search button[data-open-modal] > kbd kbd {
 .mobile-nav-overlay > nav {
   flex-direction: column;
 }
+
+/* Print: the docs assistant's panel is `position: fixed`, so an open one (it stays open across pages) would cover
+   the printed page. Its own stylesheet, a copy of the Handsontable docs', hides only the proactive bubble. */
+@media print {
+  #docs-assistant-root {
+    display: none;
+  }
+}

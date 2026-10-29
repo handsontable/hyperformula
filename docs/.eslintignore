@@ -7,3 +7,7 @@ node_modules
 /examples/
 # Build scripts, not linted.
 /script/
+# The docs assistant, copied from the Handsontable docs and linted there. TypeScript, which this
+# configuration does not parse.
+/src/components/DocsAssistant/
+/src/scripts/docs-assistant-bootstrap.ts
