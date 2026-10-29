@@ -3,12 +3,19 @@ permissions:
   contents: read
   pull-requests: write
 
+# Two measurements of the same scenarios, one report. The instruction count (callgrind) decides the verdict: it does
+# not depend on the load of the shared runner. Wall-clock times are measured too and shown for information. The
+# report is advisory: a regression is reported in the comment and never fails the pull request.
 on:
   pull_request:
     types:
       - opened
       - reopened
       - synchronize # the head branch is updated from the base branch, new commits are pushed to the head branch, or the base branch is changed
+
+env:
+  # The smallest change of the instruction count, in percent of the base count, that is reported. Set only here.
+  PERF_INSTRUCTIONS_THRESHOLD: '0.5'
 
 jobs:
   performance-test:
@@ -19,6 +26,8 @@ jobs:
     name: Test performance
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
+    outputs:
+      comparison: ${{ steps.export.outputs.comparison }}
     steps:
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
@@ -54,12 +63,10 @@ jobs:
         run: cp -r head/hyperformula/test/hyperformula-tests base/hyperformula/test/hyperformula-tests
 
       - name: Record the revisions under test
-        id: revisions
         run: |
           echo "base:  $(git -C base rev-parse HEAD)"
           echo "head:  $(git -C head rev-parse HEAD)"
           echo "tests: $(git -C head/hyperformula/test/hyperformula-tests rev-parse HEAD)"
-          echo "tests=$(git -C head/hyperformula/test/hyperformula-tests rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: (base) Install dependencies
         run: cd base && npm ci
@@ -79,14 +86,24 @@ jobs:
           run head 2; run base 2
 
       # Exits non-zero when a results file is unreadable or nothing is comparable, so a broken comparison is a
-      # red check instead of a stale report. A regression is reported in the comment but does not fail this step.
+      # red check instead of a stale report. A regression is reported but does not fail this step.
       # When the tests carry a noise history, each scenario is judged against the band of changes measured
       # earlier on identical code.
       - name: Compare the results
+        env:
+          PERF_COMPARISON_JSON: ${{ github.workspace }}/wall-clock-comparison.json
         run: |
           HISTORY="$GITHUB_WORKSPACE/head/hyperformula/test/hyperformula-tests/performance/noise-history.json"
           if [ -f "$HISTORY" ]; then export PERF_HISTORY_FILE="$HISTORY"; fi
           cd head && npm run benchmark:compare-benchmarks --workspace=hyperformula "$GITHUB_WORKSPACE/base-1.json,$GITHUB_WORKSPACE/base-2.json" "$GITHUB_WORKSPACE/head-1.json,$GITHUB_WORKSPACE/head-2.json" "$GITHUB_WORKSPACE/performance-report.md"
+
+      # The report job runs on another runner; the comparison travels as a job output (a few kilobytes).
+      - name: Export the comparison for the report
+        id: export
+        if: always()
+        run: |
+          f="$GITHUB_WORKSPACE/wall-clock-comparison.json"
+          if [ -s "$f" ]; then echo "comparison=$(base64 -w0 "$f")" >> "$GITHUB_OUTPUT"; else echo "No comparison to export"; fi
 
       # The runner is gone after the job; the raw samples in the log are what a later analysis can use.
       - name: Print the raw samples
@@ -99,16 +116,150 @@ jobs:
             echo "::endgroup::"
           done
 
-      - name: Publish a comment - header
-        uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
+  instruction-count:
+    name: Count instructions
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 60
+    outputs:
+      comparison: ${{ steps.export.outputs.comparison }}
+    steps:
+      # Counts depend on the exact Node.js build; base and head run in this job on the same one.
+      - name: Setup Node.js
+        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          message: |
-            ## Performance comparison of head (${{ github.event.pull_request.head.sha }}) vs base (${{ github.event.pull_request.base.sha }}) with the tests at ${{ steps.revisions.outputs.tests }}
+          node-version: '22'
 
-      - name: Publish a comment - performance comparison report
+      - name: Install valgrind
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends valgrind
+          valgrind --version
+
+      - name: (base) Checkout main repository
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # https://github.com/actions/checkout/releases/tag/v2.3.4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+
+      - name: (head) Checkout main repository
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # https://github.com/actions/checkout/releases/tag/v2.3.4
+        with:
+          path: head
+
+      - name: Checkout hyperformula-tests repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ssh-key: ${{ secrets.DEPLOY_TOKEN }}
+          repository: handsontable/hyperformula-tests
+          path: head/hyperformula/test/hyperformula-tests
+
+      - name: Fetch hyperformula-tests and sync branches
+        run: cd head/hyperformula/test && ./fetch-tests.sh
+
+      # Both sides run the same (head) copy of the suite; only the engine under test differs.
+      - name: Share the tests between base and head
+        run: cp -r head/hyperformula/test/hyperformula-tests base/hyperformula/test/hyperformula-tests
+
+      - name: Record the revisions under test
+        run: |
+          echo "base:  $(git -C base rev-parse HEAD)"
+          echo "head:  $(git -C head rev-parse HEAD)"
+          echo "tests: $(git -C head/hyperformula/test/hyperformula-tests rev-parse HEAD)"
+          node --version
+
+      - name: (base) Install dependencies
+        run: cd base && npm ci
+
+      - name: (head) Install dependencies
+        run: cd head && npm ci
+
+      # The runner comes with the shared tests and is started through the generic tsnode script of the engine's
+      # package.json, which every revision has. Each run compiles the engine of its own tree into the same build directory and measures it
+      # there, so the two runs must stay sequential: the count depends on the paths a process sees.
+      - name: (base) Count instructions
+        run: cd base && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json"
+
+      - name: (head) Count instructions
+        run: cd head && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/head-instructions.json"
+
+      - name: Compare the counts
+        env:
+          PERF_COMPARISON_JSON: ${{ github.workspace }}/instructions-comparison.json
+        run: cd head && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/compare-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json" "$GITHUB_WORKSPACE/head-instructions.json" "$GITHUB_WORKSPACE/instructions-report.md"
+
+      - name: Export the comparison for the report
+        id: export
+        if: always()
+        run: |
+          f="$GITHUB_WORKSPACE/instructions-comparison.json"
+          if [ -s "$f" ]; then echo "comparison=$(base64 -w0 "$f")" >> "$GITHUB_OUTPUT"; else echo "No comparison to export"; fi
+
+      - name: Print the raw counts
+        if: always()
+        run: |
+          for f in base-instructions head-instructions; do
+            echo "::group::$f.json"
+            cat "$GITHUB_WORKSPACE/$f.json" 2>/dev/null || echo "(missing)"
+            echo
+            echo "::endgroup::"
+          done
+
+  # One comment for both measurements, updated on every push. It runs even when a measurement failed, and then
+  # says which side is missing.
+  report:
+    name: Performance report
+    needs: [ performance-test, instruction-count ]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
+        with:
+          node-version: '22'
+
+      - name: Checkout main repository
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # https://github.com/actions/checkout/releases/tag/v2.3.4
+        with:
+          path: head
+
+      - name: Checkout hyperformula-tests repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ssh-key: ${{ secrets.DEPLOY_TOKEN }}
+          repository: handsontable/hyperformula-tests
+          path: head/hyperformula/test/hyperformula-tests
+
+      - name: Fetch hyperformula-tests and sync branches
+        run: cd head/hyperformula/test && ./fetch-tests.sh
+
+      - name: Install dependencies
+        run: cd head && npm ci
+
+      - name: Write the comparisons of both jobs
+        env:
+          WALL_CLOCK: ${{ needs.performance-test.outputs.comparison }}
+          WALL_CLOCK_RESULT: ${{ needs.performance-test.result }}
+          INSTRUCTIONS: ${{ needs.instruction-count.outputs.comparison }}
+          INSTRUCTIONS_RESULT: ${{ needs.instruction-count.result }}
+        run: |
+          if [ -n "$WALL_CLOCK" ]; then echo "$WALL_CLOCK" | base64 -d > "$GITHUB_WORKSPACE/wall-clock-comparison.json"; else echo "No wall-clock comparison (job: $WALL_CLOCK_RESULT)"; fi
+          if [ -n "$INSTRUCTIONS" ]; then echo "$INSTRUCTIONS" | base64 -d > "$GITHUB_WORKSPACE/instructions-comparison.json"; else echo "No instruction comparison (job: $INSTRUCTIONS_RESULT)"; fi
+
+      # Exits non-zero when neither comparison arrived or one of them is malformed.
+      - name: Render the report
+        env:
+          PERF_REPORT_HEAD: ${{ github.event.pull_request.head.sha }}
+          PERF_REPORT_BASE: ${{ github.event.pull_request.base.sha }}
+          PERF_REPORT_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          export PERF_REPORT_TESTS="$(git -C head/hyperformula/test/hyperformula-tests rev-parse HEAD)"
+          cd head && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/report.ts "$GITHUB_WORKSPACE/instructions-comparison.json" "$GITHUB_WORKSPACE/wall-clock-comparison.json" "$GITHUB_WORKSPACE/performance-comment.md"
+          cat "$GITHUB_WORKSPACE/performance-comment.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish the comment
         uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
         with:
-          append: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          path: performance-report.md
+          path: performance-comment.md
