@@ -37,7 +37,7 @@ timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
 
 ## Dates in function arguments and `#VALUE!` errors
 
-Functions that expect a date, such as `XIRR`, `YEARFRAC`, `DATEDIF`, and `DATEVALUE`, need real date values. HyperFormula returns `#VALUE!` when you pass them text that only looks like a date, such as the ISO 8601 string `2026-01-01`.
+Functions that expect a date, such as `XIRR`, `YEARFRAC`, and `DATEDIF`, need real date values. HyperFormula returns `#VALUE!` when you pass them text that only looks like a date, such as the ISO 8601 string `2026-01-01`.
 
 ### Use real date values
 
@@ -46,6 +46,10 @@ Use one of the following options:
 1. Build each date with the `DATE` function, for example `'=DATE(2026, 1, 1)'`.
 2. Write each date in a format listed in [`dateFormats`](../api/interfaces/configparams.md#dateformats), for example `'01/01/2026'` with the default settings.
 3. Add the format you use to [`dateFormats`](../api/interfaces/configparams.md#dateformats). Setting this option replaces the default list, so keep the default formats if you still need them.
+
+HyperFormula's `DATEVALUE` function takes text, not a date. Pass it a string in one of the `dateFormats` (option 2), or add your format to `dateFormats` (option 3). Passing it a `DATE` result returns `#VALUE!`.
+
+Option 3 covers date-only ISO strings such as `2026-01-01`. For full ISO timestamps such as `2026-01-01T00:00:00.000Z`, remove the time part before you pass the data (for example, `value.slice(0, 10)`), or parse the timestamps with a custom [`parseDateTime`](#custom-date-and-time-handling) function.
 
 This example uses option 3. HyperFormula's `XIRR` function returns about `0.7222`:
 
