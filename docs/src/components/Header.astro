@@ -174,18 +174,31 @@ const isGuidesPage = section === 'guides';
   </nav>
 </div>
 
-<!-- GitHub stars: fetch count client-side and inject into badge -->
+<!-- GitHub stars: fetch the count client-side, once per browser session, and inject it into the badge -->
 <script>
   (async () => {
+    // Every page is its own document, and GitHub allows 60 unauthenticated requests an hour per IP address, so a
+    // reader behind a shared NAT would soon get a 403 on every page. Storage can throw in some private modes.
+    const KEY = 'hf-github-stars';
     try {
-      const res = await fetch('https://api.github.com/repos/handsontable/hyperformula');
-      if (!res.ok) return;
-      const data = await res.json();
-      const count = data?.stargazers_count ?? 0;
+      let count: string | null = null;
+      try {
+        count = sessionStorage.getItem(KEY);
+      } catch {}
+      if (count === null) {
+        const res = await fetch('https://api.github.com/repos/handsontable/hyperformula');
+        if (!res.ok) return;
+        const data = await res.json();
+        count = String(data?.stargazers_count ?? 0);
+        try {
+          sessionStorage.setItem(KEY, count);
+        } catch {}
+      }
+      const stars = Number(count);
       const formatted =
-        Math.abs(count) > 999
-          ? `${(Math.sign(count) * (Math.abs(count) / 1000)).toFixed(1)}k`
-          : String(count);
+        Math.abs(stars) > 999
+          ? `${(Math.sign(stars) * (Math.abs(stars) / 1000)).toFixed(1)}k`
+          : String(stars);
       const el = document.getElementById('github-stars-count');
       if (el) el.textContent = formatted;
     } catch {
