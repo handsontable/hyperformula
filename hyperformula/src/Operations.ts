@@ -421,6 +421,7 @@ export class Operations {
     const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId, options)
     this.storeNamedExpressionInCell(namedExpression.address, expression)
     this.adjustNamedExpressionEdges(namedExpression, expressionName, sheetId)
+    this.resizeFormulasReferringTo(namedExpression.address)
   }
 
   public restoreNamedExpression(namedExpression: InternalNamedExpression, content: ClipboardCell, sheetId?: number) {
@@ -428,6 +429,7 @@ export class Operations {
     this.restoreCell(namedExpression.address, content)
     const restoredNamedExpression = this.namedExpressions.restoreNamedExpression(namedExpression, sheetId)
     this.adjustNamedExpressionEdges(restoredNamedExpression, expressionName, sheetId)
+    this.resizeFormulasReferringTo(restoredNamedExpression.address)
   }
 
   public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions): [InternalNamedExpression, ClipboardCell] {
@@ -441,6 +443,7 @@ export class Operations {
     namedExpression.options = options
     const content = this.getClipboardCell(namedExpression.address)
     this.storeNamedExpressionInCell(namedExpression.address, newExpression)
+    this.resizeFormulasReferringTo(namedExpression.address)
     return [oldNamedExpression, content]
   }
 
@@ -454,8 +457,10 @@ export class Operations {
     if (sheetId !== undefined) {
       const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
       this.dependencyGraph.exchangeNode(namedExpression.address, globalNamedExpression.address)
+      this.resizeFormulasReferringTo(globalNamedExpression.address)
     } else {
       this.dependencyGraph.setCellEmpty(namedExpression.address)
+      this.resizeFormulasReferringTo(namedExpression.address)
     }
     return [
       namedExpression,
@@ -835,6 +840,36 @@ export class Operations {
     this.rewriteAffectedArrays(affectedArrays)
   }
 
+  /**
+   * Predicts again the array size of the formulas that refer to a named expression, directly or
+   * through other named expressions, and sets again each one whose size can have changed.
+   *
+   * A formula's array size is predicted when the formula is parsed, from what its named expressions
+   * stand for at that moment. When a name is added, changed, removed or restored, it can start to
+   * stand for something of another size, and a formula sized for the old expression would then get
+   * a result that does not fit it. The same applies to the formulas parsed while an engine is built,
+   * before the named expressions passed to it are registered.
+   *
+   * A formula that stays a scalar is left as it is, so changing a name used by many scalar formulas
+   * costs one prediction per formula and no rebuild.
+   */
+  private resizeFormulasReferringTo(namedExpressionAddress: SimpleCellAddress) {
+    const namedExpressionVertex = this.dependencyGraph.getCell(namedExpressionAddress)
+
+    if (namedExpressionVertex === undefined) {
+      return
+    }
+
+    for (const formulaVertex of this.dependencyGraph.getCellFormulasDependingOn(namedExpressionVertex)) {
+      const ast = formulaVertex.getFormula(this.lazilyTransformingAstService)
+      const address = formulaVertex.getAddress(this.lazilyTransformingAstService)
+
+      if (formulaVertex instanceof ArrayFormulaVertex || !this.arraySizePredictor.checkArraySize(ast, address).isScalar()) {
+        this.setFormulaToCellFromCache(this.parser.computeHashFromAst(ast), address)
+      }
+    }
+  }
+
   private rewriteAffectedArrays(affectedArrays: Set<ArrayFormulaVertex>) {
     for (const arrayVertex of affectedArrays.values()) {
       if (arrayVertex.array.size.isRef) {
@@ -892,7 +927,7 @@ export class Operations {
     const globalVertexId = maybeGlobalVertexId ?? globalVertex.idInGraph
 
     for (const adjacentNode of this.dependencyGraph.graph.adjacentNodes(globalVertex)) {
-      if (adjacentNode instanceof ScalarFormulaVertex && adjacentNode.getAddress(this.lazilyTransformingAstService).sheet === sheetId) {
+      if (adjacentNode instanceof FormulaVertex && adjacentNode.getAddress(this.lazilyTransformingAstService).sheet === sheetId) {
         const ast = adjacentNode.getFormula(this.lazilyTransformingAstService)
         const formulaAddress = adjacentNode.getAddress(this.lazilyTransformingAstService)
         const { dependencies } = this.parser.fetchCachedResultForAst(ast)

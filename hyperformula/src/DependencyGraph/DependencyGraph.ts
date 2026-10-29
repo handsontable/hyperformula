@@ -607,6 +607,17 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address, { throwIfSheetNotExists: true })
   }
 
+  /**
+   * Gets the formula stored at the specified address.
+   *
+   * Returns `undefined` when the address holds anything other than a formula: a static value,
+   * an empty cell, a formula that failed to parse, or a cell of a sheet that does not exist.
+   */
+  public getFormulaAst(address: SimpleCellAddress): Maybe<Ast> {
+    const vertex = this.addressMapping.getCell(address)
+    return vertex instanceof FormulaVertex ? vertex.getFormula(this.lazilyTransformingAstService) : undefined
+  }
+
   public getCellValue(address: SimpleCellAddress): InterpreterValue {
     if (this.isPlaceholder(address.sheet)) {
       return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
@@ -926,17 +937,51 @@ export class DependencyGraph {
     }
   }
 
+  /**
+   * Returns the formulas in cells that depend on a vertex directly or through named expressions.
+   *
+   * A formula that refers to a named expression depends on the name's own vertex, not on what the
+   * name stands for, so the formulas a range or a name reaches through other names are collected by
+   * following every named expression on the way. The named expressions themselves are left out,
+   * and each is visited once, so a cycle of names that refer to one another terminates.
+   */
+  public getCellFormulasDependingOn(vertex: Vertex): FormulaVertex[] {
+    const formulas: FormulaVertex[] = []
+    const visited = new Set<Vertex>([vertex])
+    const queue: Vertex[] = [vertex]
+
+    while (queue.length > 0) {
+      const current = queue.pop() as Vertex
+
+      if (!this.graph.hasNode(current)) {
+        continue
+      }
+
+      for (const adjacentVertex of this.graph.adjacentNodes(current)) {
+        if (!(adjacentVertex instanceof FormulaVertex) || visited.has(adjacentVertex)) {
+          continue
+        }
+
+        visited.add(adjacentVertex)
+
+        if (adjacentVertex.getAddress(this.lazilyTransformingAstService).sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
+          queue.push(adjacentVertex)
+        } else {
+          formulas.push(adjacentVertex)
+        }
+      }
+    }
+
+    return formulas
+  }
+
   private getArrayVerticesRelatedToRanges(ranges: RangeVertex[]): Set<ArrayFormulaVertex> {
     const arrayVertices = new Set<ArrayFormulaVertex>()
 
     ranges.forEach(range => {
-      if (!this.graph.hasNode(range)) {
-        return
-      }
-
-      this.graph.adjacentNodes(range).forEach(adjacentVertex => {
-        if (adjacentVertex instanceof ArrayFormulaVertex) {
-          arrayVertices.add(adjacentVertex)
+      this.getCellFormulasDependingOn(range).forEach(formulaVertex => {
+        if (formulaVertex instanceof ArrayFormulaVertex) {
+          arrayVertices.add(formulaVertex)
         }
       })
     })
