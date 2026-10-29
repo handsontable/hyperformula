@@ -10,7 +10,7 @@ import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalNoErrorScalarValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionMetadata, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
  * Plugin implementing the SORT spreadsheet function.
@@ -33,6 +33,22 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1, emptyAsDefault: true},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1, emptyAsDefault: true},
         {argumentType: FunctionArgumentType.BOOLEAN, defaultValue: false, emptyAsDefault: true},
+      ],
+      vectorizationForbidden: true,
+    },
+    'SORTBY': {
+      method: 'sortby',
+      sizeOfResultArrayMethod: 'sortbyArraySize',
+      enableArrayArithmeticForArguments: true,
+      // by_array and sort_order repeat as a pair
+      repeatLastArgs: 2,
+      parameters: [
+        // array
+        {argumentType: FunctionArgumentType.RANGE},
+        // by_array1
+        {argumentType: FunctionArgumentType.RANGE},
+        // [sort_order1]
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1, emptyAsDefault: true},
       ],
       vectorizationForbidden: true,
     },
@@ -83,27 +99,8 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
         }
 
         const keyIndex = index - 1
-        const compare = (a: InternalNoErrorScalarValue, b: InternalNoErrorScalarValue): number => {
-          // Excel keeps empty cells at the end of the result regardless of
-          // sort_order, rather than coercing them to 0 and ordering by value.
-          // Force empties last (direction-independent) before delegating the
-          // rest to ArithmeticHelper.
-          const aEmpty = a === EmptyValue
-          const bEmpty = b === EmptyValue
-          if (aEmpty || bEmpty) {
-            if (aEmpty && bEmpty) {
-              return 0
-            }
-            return aEmpty ? 1 : -1
-          }
-          if (this.arithmeticHelper.lt(a, b)) {
-            return -sortOrder
-          }
-          if (this.arithmeticHelper.gt(a, b)) {
-            return sortOrder
-          }
-          return 0
-        }
+        const compare = (a: InternalNoErrorScalarValue, b: InternalNoErrorScalarValue): number =>
+          this.compareSortKeys(a, b, sortOrder)
 
         if (byCol) {
           // Reorder columns; the key of column c is data[keyIndex][c].
@@ -128,6 +125,70 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
   }
 
   /**
+   * Corresponds to SORTBY(array, by_array1, [sort_order1], [by_array2, sort_order2], ...).
+   *
+   * Returns `array` with its rows reordered by the keys of the `by_array` arguments (or its columns, when the keys
+   * are a row). Each `by_array` is a single column (or row) as long as `array` is tall (or wide); a single-cell
+   * `by_array` is a constant key and reorders nothing. Later keys only break the ties of the earlier ones and the
+   * sort is stable. `sort_order` is 1 or -1 after rounding down; any other value yields #VALUE!. Errors among the
+   * keys are not propagated: they sort after every other value, in input order, like empty cells.
+   *
+   * @param {ProcedureAst} ast - the parsed function-call AST node.
+   * @param {InterpreterState} state - current interpreter evaluation state.
+   */
+  public sortby(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('SORTBY'),
+      (array: SimpleRangeValue, ...criteria: (SimpleRangeValue | number)[]) => {
+        if (!SortPlugin.isSortbyArgumentCountValid(ast.args.length)) {
+          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+        }
+
+        const sortKeys = Array.from({length: criteria.length / 2}, (_, i) => ({
+          byArray: criteria[2 * i] as SimpleRangeValue,
+          sortOrder: Math.floor(criteria[2 * i + 1] as number),
+        }))
+
+        if (sortKeys.some(({sortOrder}) => sortOrder !== 1 && sortOrder !== -1)) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
+        }
+
+        // Same guard as in SORT: an empty array has no rows to reorder and cannot be built into a range.
+        if (array.data.length === 0 || array.data[0].length === 0) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+        }
+
+        const axes = sortKeys.map(({byArray}) => SortPlugin.sortAxis(array, byArray))
+        const sortedAxes = axes.filter((axis) => axis !== 'none')
+
+        if (axes.includes(undefined) || new Set(sortedAxes).size > 1) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.WrongDimension)
+        }
+
+        const sortsRows = sortedAxes[0] !== 'columns'
+        const data = array.data
+        const order = Array.from({length: sortsRows ? data.length : data[0].length}, (_, i) => i)
+        const keyColumns = sortKeys
+          .filter((_, i) => axes[i] !== 'none')
+          .map(({byArray, sortOrder}) => ({
+            keys: sortsRows ? byArray.data.map((row) => row[0]) : byArray.data[0],
+            sortOrder,
+          }))
+
+        order.sort((i, j) => {
+          const firstDifference = keyColumns
+            .map(({keys, sortOrder}) => this.compareSortKeys(keys[i], keys[j], sortOrder))
+            .find((difference) => difference !== 0)
+          return firstDifference ?? 0
+        })
+
+        return SimpleRangeValue.onlyValues(sortsRows
+          ? order.map((i) => data[i].slice())
+          : data.map((row) => order.map((i) => row[i])))
+      }
+    )
+  }
+
+  /**
    * Predicts the output array size for SORT at parse time.
    * The result is always the same shape as the input array.
    *
@@ -138,14 +199,87 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
     if (ast.args.length < 1 || ast.args.length > 4) {
       return ArraySize.error()
     }
-    const metadata = this.metadata('SORT')
+    return this.sizeOfFirstArgument(ast, state, this.metadata('SORT'))
+  }
+
+  /**
+   * Predicts the output array size for SORTBY at parse time.
+   * The result is always the same shape as the input array.
+   *
+   * @param {ProcedureAst} ast - the parsed function-call AST node.
+   * @param {InterpreterState} state - current interpreter evaluation state.
+   */
+  public sortbyArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 2 || !SortPlugin.isSortbyArgumentCountValid(ast.args.length)) {
+      return ArraySize.error()
+    }
+    return this.sizeOfFirstArgument(ast, state, this.metadata('SORTBY'))
+  }
+
+  /**
+   * SORTBY takes `array` and `by_array1`, optionally followed by `sort_order1` and then by further pairs of
+   * `by_array` and `sort_order`, so a `by_array` can't be the last argument once there are more than two.
+   */
+  private static isSortbyArgumentCountValid(argumentCount: number): boolean {
+    return argumentCount <= 2 || argumentCount % 2 === 1
+  }
+
+  /**
+   * Tells along which dimension the keys of `byArray` order `array`: its `rows` (a column of keys), its `columns`
+   * (a row of keys), or `none` for a single cell; `undefined` if the keys don't fit `array`.
+   */
+  private static sortAxis(array: SimpleRangeValue, byArray: SimpleRangeValue): 'rows' | 'columns' | 'none' | undefined {
+    if (byArray.width() === 1 && byArray.height() === 1) {
+      return 'none'
+    }
+    if (byArray.width() === 1 && byArray.height() === array.height()) {
+      return 'rows'
+    }
+    if (byArray.height() === 1 && byArray.width() === array.width()) {
+      return 'columns'
+    }
+    return undefined
+  }
+
+  private sizeOfFirstArgument(ast: ProcedureAst, state: InterpreterState, metadata: FunctionMetadata): ArraySize {
     const subChecks = ast.args.map((arg) =>
       this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))))
     // Return a fresh ArraySize (isRef defaults to false). Propagating the input's
     // ArraySize verbatim would carry its `isRef` flag, and ArraySize.isScalar()
     // treats a ref as scalar — which would collapse the spilled result into a
-    // single cell. SORT's output always matches the input shape.
+    // single cell. The output always matches the input shape.
     return new ArraySize(subChecks[0].width, subChecks[0].height)
+  }
+
+  /**
+   * Compares two sort keys for the given `sortOrder` (1 ascending, -1 descending). Empty cells and errors are
+   * kept at the end regardless of `sortOrder` (errors before empty cells), rather than coercing them to 0 and
+   * ordering by value, as Excel does; the rest is delegated to {@link ArithmeticHelper}.
+   */
+  private compareSortKeys(a: InternalScalarValue, b: InternalScalarValue, sortOrder: number): number {
+    const aRank = SortPlugin.trailingRank(a)
+    const bRank = SortPlugin.trailingRank(b)
+    if (aRank !== bRank) {
+      return aRank - bRank
+    }
+    if (aRank !== 0) {
+      return 0
+    }
+    if (this.arithmeticHelper.lt(a as InternalNoErrorScalarValue, b as InternalNoErrorScalarValue)) {
+      return -sortOrder
+    }
+    if (this.arithmeticHelper.gt(a as InternalNoErrorScalarValue, b as InternalNoErrorScalarValue)) {
+      return sortOrder
+    }
+    return 0
+  }
+
+  /** 0 for a value that is sorted by its value, 1 for an error and 2 for an empty cell: those come last. */
+  private static trailingRank(value: InternalScalarValue): number {
+    if (value === EmptyValue) {
+      return 2
+    }
+    return value instanceof CellError ? 1 : 0
   }
 
   /** Returns the first {@link CellError} found in a 2-D array, or undefined. */
