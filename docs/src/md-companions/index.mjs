@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { substituteDocsData } from '../docs-data.mjs';
-import { pageId } from '../page-id.mjs';
+import { PAGE_EXCLUDES, PAGE_SOURCES, pageId } from '../page-id.mjs';
 import { stripSiteSyntax } from './strip.mjs';
 
 const DOCS_ROOT = fileURLToPath(new URL('../..', import.meta.url));
@@ -74,12 +74,10 @@ function absolutizeLinks(md, pageUrl) {
  * @returns {string[]} paths relative to `docs/`, with forward slashes
  */
 function pageSources() {
-  const walk = dir => fs.readdirSync(path.join(DOCS_ROOT, dir), { withFileTypes: true })
-    .flatMap(entry => (entry.isDirectory() ? walk(`${dir}/${entry.name}`) : [`${dir}/${entry.name}`]))
-    .filter(file => file.endsWith('.md') && !file.endsWith('.tmpl.md'))
-    .sort();
-
-  return ['index.md', ...walk('guide'), ...walk('api')];
+  // The same files as the content collection, so every page has a companion and nothing else gets one.
+  return PAGE_SOURCES.flatMap(pattern => fs.globSync(pattern, { cwd: DOCS_ROOT, exclude: PAGE_EXCLUDES })
+    .map(file => file.split(path.sep).join('/'))
+    .sort());
 }
 
 /**

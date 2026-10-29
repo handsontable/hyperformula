@@ -1,4 +1,17 @@
 /**
+ * The Markdown files that are pages, relative to `docs/`: the home page, the guides and the generated API reference.
+ * The content collection (`src/content.config.mjs`) and the `.md` companions (`src/md-companions/`) both read these,
+ * so a file is published as both or as neither.
+ */
+export const PAGE_SOURCES = ['index.md', 'guide/*.md', 'api/**/*.md'];
+
+/**
+ * Files matched by `PAGE_SOURCES` that are not pages: the built-in functions template, and the `AGENTS.md` and
+ * `CLAUDE.md` files the repository puts in any directory that needs agent instructions.
+ */
+export const PAGE_EXCLUDES = ['guide/*.tmpl.md', '**/AGENTS.md', '**/CLAUDE.md'];
+
+/**
  * The id of the page built from a Markdown source, from its path relative to `docs/`: the path without `.md`, and a
  * `README` or `index` file names its directory (`api/README.md` is `api`). The home page is `index`.
  *

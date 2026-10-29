@@ -2,7 +2,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { docsSchema } from '@astrojs/starlight/schema';
-import { pageId } from './page-id.mjs';
+import { PAGE_EXCLUDES, PAGE_SOURCES, pageId } from './page-id.mjs';
 
 export const collections = {
   // The pages are read where they are, not from `src/content/docs/`: the guides in `guide/`, the generated API
@@ -11,7 +11,7 @@ export const collections = {
   docs: defineCollection({
     loader: glob({
       base: '.',
-      pattern: ['index.md', 'guide/*.md', 'api/**/*.md', '!guide/*.tmpl.md'],
+      pattern: [...PAGE_SOURCES, ...PAGE_EXCLUDES.map((pattern) => `!${pattern}`)],
       generateId: ({ entry }) => pageId(entry),
     }),
     schema: docsSchema({
