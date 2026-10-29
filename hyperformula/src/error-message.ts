@@ -29,6 +29,7 @@ export class ErrorMessage {
   public static OutOfSheet = 'Resulting reference is out of the sheet.'
   public static WrongType = 'Wrong type of argument.'
   public static NaN = 'NaN or infinite value encountered.'
+  public static ProbabilityBounds = 'Probabilities need to be greater than 0, at most 1, and sum up to 1.'
   public static EqualLength = 'Ranges need to be of equal length.'
   public static Negative = 'Value cannot be negative.'
   public static NotBinary = 'String does not represent a binary number.'
