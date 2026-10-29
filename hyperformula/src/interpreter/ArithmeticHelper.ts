@@ -197,7 +197,7 @@ export class ArithmeticHelper {
     const left = getRawValue(leftArg)
     const right = getRawValue(rightArg)
     if (right === 0) {
-      return new CellError(ErrorType.DIV_BY_ZERO)
+      return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     } else {
       const typeOfResult = inferExtendedNumberTypeMultiplicative(leftArg, rightArg)
       return this.ExtendedNumberFactory(left / right, typeOfResult)

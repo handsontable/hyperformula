@@ -146,6 +146,27 @@ module.exports = {
       }
     },
     {
+      files: ['**/src/**/*.ts'],
+      rules: {
+        // An engine-thrown cell error must always state its cause.
+        // The public `CellError` constructor keeps `message` optional for custom
+        // functions (docs/guide/custom-functions.md); this rule enforces the
+        // stricter contract on our own code only. It is a syntactic floor, not a
+        // proof of completeness — see the comment at CellContentParser.ts's
+        // `CellContent.Error` constructor for a call site it cannot catch.
+        'no-restricted-syntax': ['error',
+          {
+            selector: "NewExpression[callee.name='CellError'][arguments.length<2]",
+            message: 'Pass an ErrorMessage constant as the second argument — no cell error may be thrown without a cause.',
+          },
+          {
+            selector: "NewExpression[callee.name='CellError'] > Identifier.arguments:nth-child(2)[name='undefined']",
+            message: 'An explicit undefined message is not allowed — pass an ErrorMessage constant.',
+          },
+        ],
+      },
+    },
+    {
       files: ['**/*.spec.ts'],
       rules: {
         '@typescript-eslint/no-non-null-assertion': 'off',

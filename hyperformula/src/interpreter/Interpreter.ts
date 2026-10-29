@@ -69,13 +69,21 @@ export class Interpreter {
     let val = this.evaluateAstWithoutPostprocessing(ast, state)
     if (isExtendedNumber(val)) {
       if (isNumberOverflow(getRawValue(val))) {
-        return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+        // Assigned rather than returned, so an overflow error reaches the same postprocessing
+        // as every other result below and gets an origin and a root like anything else.
+        val = new CellError(ErrorType.NUM, ErrorMessage.NaN)
       } else {
         val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
       }
     }
     if (val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
       [[val]] = val.data
+    }
+    if (val instanceof CellError) {
+      val = stampOriginForAstNode(val, ast)
+    }
+    if (val instanceof SimpleRangeValue) {
+      val = stampOriginForArrayElements(val, ast)
     }
     return wrapperForRootVertex(val, state.formulaVertex)
   }
@@ -95,11 +103,11 @@ export class Interpreter {
         const address = ast.reference.toSimpleCellAddress(state.formulaAddress)
 
         if (isColOrRowInvalid(address)) {
-          return new CellError(ErrorType.REF, ErrorMessage.BadRef)
+          return new CellError(ErrorType.REF, ErrorMessage.BadRef).withOrigin('reference')
         }
 
         if (!this.isSheetValid(ast.reference)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
         }
 
         return this.dependencyGraph.getCellValue(address)
@@ -197,16 +205,16 @@ export class Interpreter {
         if (namedExpression) {
           return this.dependencyGraph.getCellValue(namedExpression.address)
         } else {
-          return new CellError(ErrorType.NAME, ErrorMessage.NamedExpressionName(ast.expressionName))
+          return new CellError(ErrorType.NAME, ErrorMessage.NamedExpressionName(ast.expressionName)).withOrigin('reference')
         }
       }
       case AstNodeType.CELL_RANGE: {
         if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
         }
 
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin('reference')
         }
 
         const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
@@ -229,22 +237,22 @@ export class Interpreter {
       }
       case AstNodeType.COLUMN_RANGE: {
         if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
         }
 
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin('reference')
         }
         const range = AbsoluteColumnRange.fromColumnRange(ast, state.formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.ROW_RANGE: {
         if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
         }
 
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin('reference')
         }
         const range = AbsoluteRowRange.fromRowRangeAst(ast, state.formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
@@ -467,7 +475,7 @@ export class Interpreter {
           if (i1 < arg1.height() && i2 < arg2.height() && j1 < arg1.width() && j2 < arg2.width()) {
             ret[i][j] = op(arg1.data[i1][j1], arg2.data[i2][j2])
           } else {
-            ret[i][j] = new CellError(ErrorType.NA)
+            ret[i][j] = new CellError(ErrorType.NA, ErrorMessage.NoBroadcastValue)
           }
         }
       }
@@ -498,7 +506,113 @@ function binaryErrorWrapper<T extends InterpreterValue>(op: (arg1: T, arg2: T) =
 
 function wrapperForRootVertex(val: InterpreterValue, vertex?: FormulaVertex): InterpreterValue {
   if (val instanceof CellError && vertex !== undefined) {
-    return val.attachRootVertex(vertex)
+    // A propagated error was read from another cell, so this cell is not its origin.
+    return val.propagated ? val : val.attachRootVertex(vertex)
   }
   return val
+}
+
+/**
+ * The name recorded as an error's `originFunction` when evaluating this AST node is what produced
+ * it: the function name for a call, or the `ArithmeticHelper` method the operator dispatches to.
+ *
+ * Every name below was read off this file's own operator definitions rather than guessed, which is
+ * why `PLUS_OP` maps to `addWithEpsilon` and `PERCENT_OP` to `unaryPercent`. Any other node type
+ * returns undefined and leaves whatever origin the value already carries untouched.
+ *
+ * @param {Ast} ast - the node being evaluated
+ */
+function originNameForAstNode(ast: Ast): Maybe<string> {
+  switch (ast.type) {
+    case AstNodeType.FUNCTION_CALL:
+      return ast.procedureName
+    case AstNodeType.ARRAY:
+      // An array literal with mismatched rows builds its own error before any call sees it.
+      return 'array literal'
+    case AstNodeType.CONCATENATE_OP:
+      return 'concat'
+    case AstNodeType.EQUALS_OP:
+      return 'eq'
+    case AstNodeType.NOT_EQUAL_OP:
+      return 'neq'
+    case AstNodeType.GREATER_THAN_OP:
+      return 'gt'
+    case AstNodeType.LESS_THAN_OP:
+      return 'lt'
+    case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
+      return 'geq'
+    case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+      return 'leq'
+    case AstNodeType.PLUS_OP:
+      return 'addWithEpsilon'
+    case AstNodeType.MINUS_OP:
+      return 'subtract'
+    case AstNodeType.TIMES_OP:
+      return 'multiply'
+    case AstNodeType.POWER_OP:
+      return 'pow'
+    case AstNodeType.DIV_OP:
+      return 'divide'
+    case AstNodeType.PLUS_UNARY_OP:
+      return 'unaryPlus'
+    case AstNodeType.MINUS_UNARY_OP:
+      return 'unaryMinus'
+    case AstNodeType.PERCENT_OP:
+      return 'unaryPercent'
+    default:
+      return undefined
+  }
+}
+
+/**
+ * Stamps the origin function on errors sitting inside an array this node produced.
+ *
+ * An error that is one element of a returned array never reaches the scalar branch above, so
+ * without this it would arrive at the enclosing call unclaimed and that call would take it: an
+ * `#N/A` left by a broadcast, or a per-element coercion failure, would be reported as produced by
+ * whichever function happened to read the array. The operation that built the array is the one
+ * that produced them, so it is the one that signs.
+ *
+ * `withOrigin` is first-wins, so an element that already carries an origin keeps it, and the array
+ * is rebuilt only if at least one element actually changed.
+ *
+ * @param {SimpleRangeValue} val - the array this node produced
+ * @param {Ast} ast - the node being evaluated
+ */
+function stampOriginForArrayElements(val: SimpleRangeValue, ast: Ast): SimpleRangeValue {
+  const originName = originNameForAstNode(ast)
+  if (originName === undefined || val.range !== undefined) {
+    // A range-backed value is a view over cells, and an error read out of a cell was already
+    // marked as propagated when it was read, so there is nothing here to claim. Skipping it also
+    // keeps this off the hot path: reading `data` on such a value materialises the whole range.
+    return val
+  }
+
+  let changed = false
+  const stamped = val.data.map(row => row.map(cell => {
+    if (!(cell instanceof CellError)) {
+      return cell
+    }
+    const withOrigin = cell.withOrigin(originName)
+    changed = changed || withOrigin !== cell
+    return withOrigin
+  }))
+
+  return changed ? SimpleRangeValue.onlyValues(stamped) : val
+}
+
+/**
+ * Stamps the origin function on an error, once per evaluation.
+ *
+ * Placed in `evaluateAst`'s single postprocessing tail rather than in each `switch` case, so it
+ * also catches the overflow guard's freshly-minted error, and so no case can be forgotten. Every
+ * nested sub-expression runs its own `evaluateAst` first, so an inner error is always stamped
+ * before an outer function could overwrite it — and `withOrigin` is a no-op once set anyway.
+ *
+ * @param {CellError} val - the error produced by this evaluation
+ * @param {Ast} ast - the node being evaluated
+ */
+function stampOriginForAstNode(val: CellError, ast: Ast): CellError {
+  const originName = originNameForAstNode(ast)
+  return originName === undefined ? val : val.withOrigin(originName)
 }

@@ -209,7 +209,7 @@ export class ComplexPlugin extends FunctionPlugin implements FunctionPluginTypec
     return this.runFunction(ast.args, state, this.metadata('IMARGUMENT'),
       ([re, im]: complex) => {
         if (re === 0 && im === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         return Math.atan2(im, re)
       }

@@ -825,7 +825,7 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
       (alpha: number, stddev: number, size: number) => {
         size = Math.trunc(size)
         if (size === 1) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         // eslint-disable-next-line
         // @ts-ignore

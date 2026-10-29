@@ -217,7 +217,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       }
 
       if (count === 0) {
-        return new CellError(ErrorType.DIV_BY_ZERO)
+        return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
       }
 
       return sum / count
@@ -338,7 +338,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return values
       }
 
-      return MomentsAggregate.of(values).stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return MomentsAggregate.of(values).stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     })
   }
 
@@ -357,7 +357,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return values
       }
 
-      return MomentsAggregate.of(values).stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return MomentsAggregate.of(values).stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     })
   }
 
@@ -375,7 +375,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return values
       }
 
-      return MomentsAggregate.of(values).varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return MomentsAggregate.of(values).varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     })
   }
 
@@ -394,7 +394,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         return values
       }
 
-      return MomentsAggregate.of(values).varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return MomentsAggregate.of(values).varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     })
   }
 

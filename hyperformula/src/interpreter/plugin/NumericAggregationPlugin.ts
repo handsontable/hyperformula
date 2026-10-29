@@ -273,7 +273,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -283,7 +283,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -301,7 +301,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -311,7 +311,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -411,7 +411,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     }
-    return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+    return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
   }
 
   private doVarS(args: Ast[], state: InterpreterState): InternalScalarValue {
@@ -420,7 +420,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -430,7 +430,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -440,7 +440,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -450,7 +450,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -587,14 +587,14 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       range = AbsoluteCellRange.fromAst(ast, state.formulaAddress)
     } catch (err) {
       if (err instanceof SheetsNotEqual) {
-        return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
+        return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin('reference')
       } else {
         throw err
       }
     }
 
     if (!this.isSheetValid(range)) {
-      return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+      return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
     }
 
     const rangeVertex = this.dependencyGraph.getRange(range.start, range.end)

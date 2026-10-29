@@ -26,7 +26,7 @@ export class ParsingErrorVertex extends CellVertex {
    */
   public getCellValue(): CellError {
     const firstNonemptyMessage = this.errors.map(error => error.message).find((msg) => msg)
-    return CellError.parsingError(firstNonemptyMessage)
+    return CellError.parsingError(firstNonemptyMessage).withOrigin('parser')
   }
 
   /**
