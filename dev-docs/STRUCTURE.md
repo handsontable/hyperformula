@@ -115,7 +115,7 @@ Each script lives with whatever invokes it, and every one has exactly one caller
 | Directory | Holds |
 |---|---|
 | `script/` | `release/` and `check-licenses.mjs` — both span the whole repository |
-| `hyperformula/script/` | `check-file.js`, `check-publish-package.js`, `if-ne-env.js` — called by the engine's build; `check-license-key-parser-drift.js` — called by `vendored-parser.yml`; `postinstall-skills-message.js` — shipped in the package and run by npm when a user installs it, silent inside this repository |
+| `hyperformula/script/` | `check-file.js`, `check-publish-package.js`, `if-ne-env.js` — called by the engine's build; `check-license-key-parser-drift.js` — called by `vendored-parser.yml` |
 | `docs/script/` | the built-in-functions generator and `prepare-cf-assets.js` — called by the portal |
 | `hyperformula-ui/scripts/` | `generateCssText.mjs` and `generateApiDocs.mjs` — called by the UI core's `build:styles` and `docs` |
 
