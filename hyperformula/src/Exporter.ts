@@ -52,6 +52,9 @@ export class ExportedNamedExpressionChange {
   }
 }
 
+/** The largest number of significant digits Number.prototype.toPrecision accepts. */
+const MAX_TO_PRECISION_DIGITS = 100
+
 export class Exporter implements ChangeExporter<ExportedChange> {
   constructor(
     private readonly config: Config,
@@ -132,6 +135,10 @@ export class Exporter implements ChangeExporter<ExportedChange> {
     }
     const magnitudeMultiplierExponent = Math.floor(Math.log10(Math.abs(value)))
     const placesMultiplier = Math.pow(10, this.config.precisionRounding - magnitudeMultiplierExponent)
+    if (placesMultiplier === Infinity) {
+      // For tiny values the multiplier overflows and the formula below would return Infinity / Infinity = NaN.
+      return Number(value.toPrecision(Math.min(this.config.precisionRounding + 1, MAX_TO_PRECISION_DIGITS)))
+    }
     if (value < 0) {
       return -Math.round(-value * placesMultiplier) / placesMultiplier
     } else {
