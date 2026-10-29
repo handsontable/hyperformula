@@ -1,6 +1,6 @@
 import type { EventScope } from "../events/eventManager";
 import { CN } from "../theme/classNames";
-import { findAncestor } from "../ui/dom";
+import { elementAt, eventOrigin, findAncestor, isElement, isShadowRoot, viewOf } from "../ui/dom";
 import { HeaderDragTracker } from "./headerDragTracker";
 import { PickEmitter } from "./pickEmitter";
 import { expandHeaderSpan } from "./range";
@@ -155,11 +155,18 @@ export class DomRangePicker {
       onDrop: (pick) => this.emitter.emitHeader(pick),
       onDragEnd: () => this.layer.setEphemeral(null),
     });
+    const ownerDocument = this.root.ownerDocument;
+    const rootNode = this.root.getRootNode();
+
     this.scope.listen(this.root, "mousedown", this.onMouseDown);
-    this.scope.listen(document, "mousemove", this.onMouseMove);
-    this.scope.listen(document, "mouseup", this.onMouseUp);
-    this.scope.listen(window, "blur", this.onWindowBlur);
-    this.scope.listen(document, "scroll", this.onScroll, { capture: true });
+    this.scope.listen(ownerDocument, "mousemove", this.onMouseMove);
+    this.scope.listen(ownerDocument, "mouseup", this.onMouseUp);
+    this.scope.listen(viewOf(this.root), "blur", this.onWindowBlur);
+    this.scope.listen(ownerDocument, "scroll", this.onScroll, { capture: true });
+
+    if (isShadowRoot(rootNode)) {
+      this.scope.listen(rootNode, "scroll", this.onScroll, { capture: true });
+    }
     this.scope.add({ dispose: () => this.tracker.cancel() });
     this.scope.add({ dispose: () => this.headerTracker.cancel() });
     this.scope.add({ dispose: () => this.disarmHeaderClickSwallow() });
@@ -168,8 +175,9 @@ export class DomRangePicker {
 
   private armHeaderClickSwallow(): void {
     this.disarmHeaderClickSwallow();
-    this.headerClickSwallowCleanup = armTrailingClickSwallow(document, (clickTarget) =>
-      Boolean(this.headerSelector && clickTarget.closest(this.headerSelector)),
+    this.headerClickSwallowCleanup = armTrailingClickSwallow(
+      this.root.ownerDocument,
+      (clickTarget) => Boolean(this.headerSelector && clickTarget.closest(this.headerSelector)),
     );
   }
 
@@ -185,7 +193,9 @@ export class DomRangePicker {
   }
 
   private handleDown(event: MouseEvent): void {
-    if (event.target instanceof Element && event.target.closest(`.${CN.editor}`)) {
+    const origin = eventOrigin(event);
+
+    if (isElement(origin) && origin.closest(`.${CN.editor}`)) {
       return;
     }
 
@@ -195,7 +205,7 @@ export class DomRangePicker {
       return;
     }
 
-    const address = this.cellFromTarget(event.target);
+    const address = this.cellFromTarget(eventOrigin(event));
 
     if (!address) {
       this.handleHeaderDown(event, hasModifier);
@@ -214,7 +224,7 @@ export class DomRangePicker {
   }
 
   private handleHeaderDown(event: MouseEvent, hasModifier: boolean): void {
-    const header = this.headerFromTarget(event.target);
+    const header = this.headerFromTarget(eventOrigin(event));
 
     if (!header) {
       return;
@@ -234,7 +244,7 @@ export class DomRangePicker {
       return null;
     }
 
-    if (!(target instanceof Element)) {
+    if (!isElement(target)) {
       return null;
     }
 
@@ -283,7 +293,7 @@ export class DomRangePicker {
 
     this.tracker.updateAutoScroll(event.clientX, event.clientY);
 
-    const address = this.cellFromTarget(event.target);
+    const address = this.cellFromTarget(eventOrigin(event));
 
     if (!address) {
       return;
@@ -299,7 +309,7 @@ export class DomRangePicker {
       return;
     }
 
-    const header = this.headerFromTarget(event.target);
+    const header = this.headerFromTarget(eventOrigin(event));
 
     if (header) {
       this.headerTracker.extendTo(header.axis, header.index);
@@ -308,7 +318,7 @@ export class DomRangePicker {
     }
 
     const axis = this.headerTracker.activeAxis();
-    const address = this.cellFromTarget(event.target);
+    const address = this.cellFromTarget(eventOrigin(event));
 
     if (!axis || !address) {
       return;
@@ -355,7 +365,7 @@ export class DomRangePicker {
 
   /** Resolves an event target to the address of the cell element containing it, if any. */
   cellFromTarget(target: EventTarget | null): CellAddress | null {
-    if (!(target instanceof Element)) {
+    if (!isElement(target)) {
       return null;
     }
 
@@ -383,7 +393,7 @@ export class DomRangePicker {
 
   /** Returns the cell under viewport coordinates, or `null` when none is there. */
   getCellAddressAt(x: number, y: number): CellAddress | null {
-    return this.cellFromTarget(document.elementFromPoint(x, y));
+    return this.cellFromTarget(elementAt(this.root, x, y));
   }
 
   /** Whether ref-selection mode is currently active. */
