@@ -49,6 +49,40 @@
   color: var(--sl-color-accent-high);
 }
 
+/* Live examples in dark mode. Each example's own stylesheet (`examples/<name>/example1.css`, which StackBlitz opens
+   too) is written for a light page; on a dark one its fixed colors turn the striped rows and the inputs into white
+   bars. These swap them for the theme's. `.hf-example` outranks the example's selectors, which load later. */
+:root[data-theme='dark'] .hf-example .example {
+  color: var(--sl-color-gray-2);
+}
+
+:root[data-theme='dark'] .hf-example .example table tr:nth-child(2n) {
+  background-color: var(--sl-color-gray-6);
+}
+
+:root[data-theme='dark'] .hf-example .example table tr :is(td, th) {
+  border-bottom-color: var(--sl-color-gray-5);
+}
+
+:root[data-theme='dark'] .hf-example .example :is(input:not([type='checkbox']), select, textarea, fieldset) {
+  border-color: var(--sl-color-gray-5);
+  background-color: var(--sl-color-black);
+  color: var(--sl-color-white);
+}
+
+:root[data-theme='dark'] .hf-example .example :is(input, select):focus {
+  border-color: var(--sl-color-accent);
+}
+
+/* The basic-operations form disables its inputs until an action is picked. */
+:root[data-theme='dark'] .hf-example .example #inputs input:disabled {
+  background-color: var(--sl-color-gray-6);
+}
+
+:root[data-theme='dark'] .hf-example .example button.outline {
+  color: var(--sl-color-accent-high);
+}
+
 /* `<hf-coding-agent-wizard>` */
 hf-coding-agent-wizard {
   display: block;
