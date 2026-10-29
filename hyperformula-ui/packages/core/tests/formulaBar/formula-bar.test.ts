@@ -766,7 +766,7 @@ describe("FormulaBar single-editor host switch", () => {
     const editor = makeEditor(adapter);
     const controller = makeFormulaBar(container, { adapter, editor, knownFunctions: new Set() });
 
-    fireInlineStart(mount, "=(D1-C1)*B1");
+    fireInlineStart(mount, "=(D1-C1)*B1+");
 
     const resolveColor = resolvers.at(-1);
 
@@ -1208,5 +1208,286 @@ describe("FormulaBar deferred inline-edit start", () => {
 
     controller.destroy();
     editor.destroy();
+  });
+});
+
+class TaxRateHF {
+  private names = ["TaxRate"];
+  private readonly listeners = new Map<string, Set<(name: string) => void>>();
+
+  private emit(event: string, name: string) {
+    for (const listener of this.listeners.get(event) ?? []) {
+      listener(name);
+    }
+  }
+
+  listNamedExpressions(scope?: number) {
+    return scope === undefined ? this.names : [];
+  }
+
+  getNamedExpressionFormula() {
+    return "=0.23";
+  }
+
+  simpleCellRangeFromString() {
+    return undefined;
+  }
+
+  simpleCellAddressFromString() {
+    return undefined;
+  }
+
+  getSheetName() {
+    return "";
+  }
+
+  on(event: string, listener: (name: string) => void) {
+    const set = this.listeners.get(event) ?? new Set();
+
+    set.add(listener);
+    this.listeners.set(event, set);
+  }
+
+  off(event: string, listener: (name: string) => void) {
+    this.listeners.get(event)?.delete(listener);
+  }
+
+  addNamedExpression(name: string) {
+    this.names = [...this.names, name];
+    this.emit("namedExpressionAdded", name);
+  }
+
+  undoNamedExpression(name: string, changes: unknown[]) {
+    this.names = this.names.filter((item) => item !== name);
+    this.emitValues(changes);
+  }
+
+  emitValues(changes: unknown[]) {
+    for (const listener of this.listeners.get("valuesUpdated") ?? []) {
+      (listener as unknown as (changes: unknown[]) => void)(changes);
+    }
+  }
+
+  removeSheetWithNames(names: string[]) {
+    this.names = this.names.filter((item) => !names.includes(item));
+    this.emit("sheetRemoved", "Sheet2");
+  }
+
+  removeNamedExpression(name: string) {
+    this.names = this.names.filter((item) => item !== name);
+    this.emit("namedExpressionRemoved", name);
+  }
+}
+
+function refIndexByText(root: Element | null): Record<string, string | null> {
+  const marks = root?.querySelectorAll("[data-ref-index]") ?? [];
+
+  return Object.fromEntries(
+    Array.from(marks, (mark) => [mark.textContent ?? "", mark.getAttribute("data-ref-index")]),
+  );
+}
+
+describe("FormulaBar named expressions", () => {
+  function makeNamedHarness(engine: TaxRateHF, formula: string) {
+    const container = document.createElement("div");
+    const { adapter } = makeBarAdapter({
+      getActiveCell: activeCellAtOrigin,
+      getCellFormula: () => formula,
+    });
+    const editor = new FormulaEditorImpl(document.createElement("div"), {
+      popupCtx: sharedPopupCtx,
+      adapter,
+      hyperformula: engine as never,
+      sheetId: 0,
+      onCommit: (value) => adapter.commit(value),
+      onCancel: () => adapter.cancel(),
+    });
+    const controller = makeFormulaBar(container, {
+      adapter,
+      editor,
+      knownFunctions: new Set(["SUM"]),
+    });
+
+    return { container, editor, controller };
+  }
+
+  it("assigns the idle view the same reference colors as the editor", () => {
+    const { container, editor, controller } = makeNamedHarness(
+      new TaxRateHF(),
+      "=B3*(1+TaxRate)+23+SUM(B2:B3)",
+    );
+
+    const idle = refIndexByText(placeholderEl(container));
+    const inEditor = refIndexByText(container.querySelector(".hfe-editor"));
+
+    expect(idle.TaxRate).not.toBeUndefined();
+    expect(idle).toEqual(inEditor);
+
+    controller.destroy();
+    editor.destroy();
+  });
+
+  it("recolors the idle view when a named expression is added or removed", () => {
+    const engine = new TaxRateHF();
+    const { container, editor, controller } = makeNamedHarness(engine, "=Rate+B2");
+
+    expect(refIndexByText(placeholderEl(container)).Rate).toBeUndefined();
+
+    engine.addNamedExpression("Rate");
+    expect(refIndexByText(placeholderEl(container)).Rate).toBe("0");
+    expect(refIndexByText(placeholderEl(container)).B2).toBe("1");
+
+    engine.removeNamedExpression("Rate");
+    expect(refIndexByText(placeholderEl(container)).Rate).toBeUndefined();
+    expect(refIndexByText(placeholderEl(container)).B2).toBe("0");
+
+    controller.destroy();
+    editor.destroy();
+  });
+
+  it("recolors the idle view when an undo removes a named expression without a named event", () => {
+    const engine = new TaxRateHF();
+    const { container, editor, controller } = makeNamedHarness(engine, "=TaxRate+B2");
+
+    expect(refIndexByText(placeholderEl(container)).TaxRate).toBe("0");
+
+    engine.undoNamedExpression("TaxRate", [{ address: { sheet: 0, col: 0, row: 0 } }]);
+
+    expect(refIndexByText(placeholderEl(container)).TaxRate).toBeUndefined();
+    expect(refIndexByText(placeholderEl(container)).B2).toBe("0");
+
+    controller.destroy();
+    editor.destroy();
+  });
+
+  it("recolors the idle view when removing a sheet takes its named expressions along", () => {
+    const engine = new TaxRateHF();
+    const { container, editor, controller } = makeNamedHarness(engine, "=TaxRate+B2");
+
+    engine.removeSheetWithNames(["TaxRate"]);
+
+    expect(refIndexByText(placeholderEl(container)).TaxRate).toBeUndefined();
+
+    controller.destroy();
+    editor.destroy();
+  });
+
+  it("resolves named expressions afresh each time a value is set", () => {
+    const engine = new TaxRateHF();
+    const { container, editor, controller } = makeNamedHarness(engine, "=TaxRate+B2");
+
+    engine.undoNamedExpression("TaxRate", []);
+    editor.setValue("=TaxRate+B2");
+
+    expect(refIndexByText(container.querySelector(".hfe-editor")).TaxRate).toBeUndefined();
+
+    controller.destroy();
+    editor.destroy();
+  });
+});
+
+describe("FormulaBar address box when the grid cannot select", () => {
+  function makeRefusingHarness(overrides: Partial<IGridAdapter>) {
+    const container = document.createElement("div");
+    const announce = vi.fn();
+    const scrollCellIntoView = vi.fn();
+    const { adapter, fireSelection } = makeBarAdapter({
+      getActiveCell: activeCellAtOrigin,
+      getGridSize: () => ({ rows: 10, cols: 10 }),
+      scrollCellIntoView,
+      ...overrides,
+    });
+    const editor = makeEditor(adapter);
+    const liveRegion = { announce, destroy: () => {} } as unknown as LiveRegion;
+    const controller = makeFormulaBar(container, {
+      adapter,
+      editor,
+      knownFunctions: new Set(),
+      liveRegion,
+    });
+
+    fireSelection(singleCellSelection({ sheet: "", col: 0, row: 0 }));
+
+    return { container, editor, controller, announce, scrollCellIntoView };
+  }
+
+  function submit(container: HTMLElement, text: string): HTMLInputElement {
+    const input = addressInput(container);
+
+    input.value = text;
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+
+    return input;
+  }
+
+  it("rejects a cell the grid could not select, and says it could not be selected", () => {
+    const harness = makeRefusingHarness({ setActiveCell: vi.fn(() => false) });
+    const input = submit(harness.container, "B3");
+
+    expect(input.value).toBe("A1");
+    expect(harness.announce).toHaveBeenCalledWith("Cannot select B3");
+    expect(harness.scrollCellIntoView).not.toHaveBeenCalled();
+
+    harness.controller.destroy();
+    harness.editor.destroy();
+  });
+
+  it("rejects a range the grid could not select, and says it could not be selected", () => {
+    const harness = makeRefusingHarness({ setSelection: vi.fn(() => false) });
+    const input = submit(harness.container, "B3:C4");
+
+    expect(input.value).toBe("A1");
+    expect(harness.announce).toHaveBeenCalledWith("Cannot select B3:C4");
+    expect(harness.scrollCellIntoView).not.toHaveBeenCalled();
+
+    harness.controller.destroy();
+    harness.editor.destroy();
+  });
+
+  it("announces a rejected address in the editor's phrases", () => {
+    const container = document.createElement("div");
+    const announce = vi.fn();
+    const { adapter } = makeBarAdapter({ getGridSize: () => ({ rows: 10, cols: 10 }) });
+    const editor = new FormulaEditorImpl(document.createElement("div"), {
+      popupCtx: sharedPopupCtx,
+      adapter,
+      phrases: { invalidCellAddress: (text) => `Ungültiger Zellbezug: ${text}` },
+    });
+    const liveRegion = { announce, destroy: () => {} } as unknown as LiveRegion;
+    const controller = makeFormulaBar(container, {
+      adapter,
+      editor,
+      knownFunctions: new Set(),
+      liveRegion,
+    });
+
+    submit(container, "ZZ99999");
+
+    expect(announce).toHaveBeenCalledWith("Ungültiger Zellbezug: ZZ99999");
+
+    controller.destroy();
+    editor.destroy();
+  });
+
+  it("still calls an address outside the grid invalid", () => {
+    const harness = makeRefusingHarness({ setActiveCell: vi.fn(() => false) });
+
+    submit(harness.container, "Z99");
+
+    expect(harness.announce).toHaveBeenCalledWith("Invalid cell address: Z99");
+
+    harness.controller.destroy();
+    harness.editor.destroy();
+  });
+
+  it("accepts a cell when the adapter returns nothing", () => {
+    const harness = makeRefusingHarness({ setActiveCell: vi.fn(() => undefined) });
+    const input = submit(harness.container, "B3");
+
+    expect(input.value).toBe("B3");
+    expect(harness.announce).not.toHaveBeenCalled();
+
+    harness.controller.destroy();
+    harness.editor.destroy();
   });
 });
