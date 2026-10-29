@@ -13,17 +13,17 @@ import SiteTitle from 'virtual:starlight/components/SiteTitle';
 import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
 import SupportDropdown from './SupportDropdown.astro';
 import { SUPPORT_LINKS } from '../support-links.mjs';
+import { pageSection } from '../page-section.mjs';
 
 const base = import.meta.env.BASE_URL;
-// The page's path under the base: `guide/basic-usage.html`, `api.html`, `api/classes/hyperformula.html`.
-const path = Astro.url.pathname.startsWith(base) ? Astro.url.pathname.slice(base.length) : Astro.url.pathname;
 
 const guidesUrl = base;
 const apiUrl = `${base}api.html`;
 const updatesUrl = `${base}guide/release-notes.html`;
-const isApiPage = /^api(\.html$|\/)/.test(path);
-const isUpdatesPage = /^guide\/(release-notes|migration-from-)/.test(path);
-const isGuidesPage = !isApiPage && !isUpdatesPage;
+const section = pageSection(Astro.url.pathname, base);
+const isApiPage = section === 'api';
+const isUpdatesPage = section === 'updates';
+const isGuidesPage = section === 'guides';
 ---
 
 <div class="header">
