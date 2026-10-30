@@ -103,6 +103,7 @@ const dictionary: RawTranslationPackage = {
     EOMONTH: 'FINE.MESE',
     ERF: 'FUNZ.ERRORE',
     ERFC: 'FUNZ.ERRORE.COMP',
+    'ERF.PRECISE': 'FUNZ.ERRORE.PRECISA',
     EVEN: 'PARI',
     EXACT: 'IDENTICO',
     EXP: 'EXP',
