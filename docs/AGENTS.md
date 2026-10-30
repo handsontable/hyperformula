@@ -1,6 +1,6 @@
 # `docs/`
 
-The public VuePress documentation portal.
+The public documentation portal, built with Astro Starlight.
 
 - What this directory contains, what is generated, and how to run and extend it: [`README.md`](README.md)
 - Documentation rules across the repository: [`dev-docs/DOC-STANDARDS.md`](../dev-docs/DOC-STANDARDS.md)

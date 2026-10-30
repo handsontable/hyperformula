@@ -135,10 +135,9 @@ For every release, the first one included.
    git tag "hyperformula-ui@$VERSION"
    ```
 
-7. Copy the licence into the package, then check the tarball. `prepack` copies the licence too, but npm skips it when `ignore-scripts` is set, so do not rely on it:
+7. Check the tarball:
 
    ```bash
-   npm run copy-root-files --workspace=hyperformula-ui/packages/core
    npm pack --dry-run --workspace=hyperformula-ui/packages/core
    npm run check:types --workspace=hyperformula-ui/packages/core
    ```
@@ -153,10 +152,9 @@ For every release, the first one included.
 
    A published version can never be published again, even after `npm unpublish`. Check step 7 before running this.
 
-9. Remove the copied licence, check the registry, and push:
+9. Check the registry, and push:
 
    ```bash
-   rm hyperformula-ui/packages/core/LICENSE.txt
    npm view hyperformula-ui dist-tags
    git push origin develop
    git push origin "hyperformula-ui@$VERSION"
