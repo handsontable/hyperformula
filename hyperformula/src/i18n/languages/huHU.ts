@@ -399,6 +399,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'MEGBÍZHATÓSÁG.T',
     DEVSQ: 'SQ',
     GEOMEAN: 'MÉRTANI.KÖZÉP',
+    GESTEP: 'KÜSZÖBNÉL.NAGYOBB',
     HARMEAN: 'HARM.KÖZÉP',
     CRITBINOM: 'KRITBINOM',
     PEARSON: 'PEARSON',
