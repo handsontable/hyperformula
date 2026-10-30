@@ -55,6 +55,8 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 
 `runFunctionWithReferenceArgument` is the variant for functions that take a reference rather than a value (`ROW`, `COLUMN`, `SHEET`, `ISFORMULA`). It takes a no-argument, a reference, and a non-reference callback.
 
+Its optional last argument, `referenceExpected`, gives the non-reference callback a reference that a function returned, such as INDIRECT's, as a range whose cells are not read and not recorded as dependencies. `ROW` and `COLUMN` set it; set it only when the callback uses the position or the size of the range, never its values. `ROWS` and `COLUMNS` get the same through `Interpreter.evaluateReference`.
+
 ### Argument metadata
 
 | Field | Meaning |
@@ -73,7 +75,7 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 | `repeatLastArgs` | The function is variadic — how many trailing arguments repeat |
 | `expandRanges` | Range arguments should be inlined into scalar arguments |
 | `isVolatile` | It must recalculate every time (`RAND`, `NOW`) |
-| `isDependentOnSheetStructureChange` | It must recalculate when rows or columns are added or removed |
+| `isDependentOnSheetStructureChange` | It must recalculate when the sheet structure changes: rows or columns added or removed, a sheet added, renamed, cleared or removed, a named expression added, changed or removed |
 | `doesNotNeedArgumentsToBeComputed` | Reference and range arguments create no dependency |
 | `vectorizationForbidden` | It returns an array, or is otherwise special |
 | `enableArrayArithmeticForArguments` | Array arithmetic mode should apply to its arguments and nested expressions |
@@ -88,6 +90,7 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 - **Never hand-roll coercion.** Declare the `argumentType` and let `runFunction` coerce, or use `ArithmeticHelper`.
 - **Never describe Excel's behaviour when HyperFormula deviates.** Implement what is specified, then record the deviation in [`docs/guide/list-of-differences.md`](../../docs/guide/list-of-differences.md). What the results must be, and how to check them against Excel, is in [`EXCEL-COMPATIBILITY.md`](EXCEL-COMPATIBILITY.md).
 - **Never allocate inside a per-cell loop** when the value can be hoisted.
+- **Never catch `EvaluationDeferred`.** A function that reads a cell found at evaluation time (INDIRECT) throws it when that cell is not current yet; the evaluator catches it, computes the cell, and retries the formula. A plugin that catches it, for example in a broad `try`/`catch`, stops the retry.
 
 ### The six places a function change must touch
 

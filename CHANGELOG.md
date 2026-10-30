@@ -7,9 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added the `INDIRECT` function. [#1843](https://github.com/handsontable/hyperformula/pull/1843)
+
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
+- Fixed the `ROW` and `COLUMN` functions returning a `#VALUE!` error for a named range or a range returned by `ARRAYFORMULA`, and throwing an error for a named whole column, and the `ROWS` and `COLUMNS` functions counting only the rows or columns that hold data for a named whole column or row. They now return what the same range typed into the formula returns (e.g. `=ROW(myRange)`, where `myRange` refers to `Sheet1!$B$2:$C$3`, now returns `2` instead of a `#VALUE!` error). [#1843](https://github.com/handsontable/hyperformula/pull/1843)
 
 ## [3.5.0] - 2026-10-09
 
