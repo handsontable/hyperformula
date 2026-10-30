@@ -15,7 +15,7 @@ on:
 
 env:
   # The smallest change of the instruction count, in percent of the base count, that is reported. Set only here.
-  PERF_INSTRUCTIONS_THRESHOLD: '0.5'
+  PERF_INSTRUCTIONS_THRESHOLD: '0.25'
 
 jobs:
   performance-test:
