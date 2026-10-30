@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
+- Fixed the parser rejecting formulas with the function-name prefixes that Excel writes into `.xlsx` files (e.g. `_xlfn.XLOOKUP`), which are now ignored and left out of `getCellFormula()`. [#1655](https://github.com/handsontable/hyperformula/issues/1655)
 
 ## [3.5.0] - 2026-10-09
 
