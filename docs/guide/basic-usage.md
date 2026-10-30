@@ -1,4 +1,5 @@
 ---
+title: "Basic usage"
 tags:
   - getting started
   - quickstart
@@ -7,9 +8,7 @@ tags:
   - buildFromSheets
 ---
 
-# Basic usage
-
-::: tip
+:::tip
 The instance can be created with three static methods:
 [`buildFromArray`](../api/classes/hyperformula.html#buildfromarray),
 `buildFromSheets` or `buildEmpty`. You can check all of their
@@ -73,7 +72,7 @@ works. It's time to move on to a more
 
 ## Demo
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/basic-usage/example1.html)
 
