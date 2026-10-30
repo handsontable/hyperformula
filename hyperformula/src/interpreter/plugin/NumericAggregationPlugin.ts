@@ -517,6 +517,12 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
         return acc
       }
 
+      // A parenthesized argument such as `(A1)` arrives as a PARENTHESIS node wrapping the reference.
+      // Unwrap it so that the checks below see the reference and ignore its non-numeric values.
+      while (arg.type === AstNodeType.PARENTHESIS) {
+        arg = arg.expression
+      }
+
       if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
         const val = this.evaluateRange(arg, state, initialAccValue, functionName, reducingFunction, mapFunction, coercionFunction)
         if (val instanceof CellError) {
