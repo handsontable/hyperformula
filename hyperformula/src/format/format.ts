@@ -8,7 +8,14 @@ import {TIME_FORMAT_SECONDS_ITEM_REGEXP} from '../DateTimeDefault'
 import {DateTimeHelper, numberToSimpleTime, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
 import {RawScalarValue} from '../interpreter/InterpreterValue'
 import {Maybe} from '../Maybe'
-import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
+import {
+  FormatToken,
+  parseForDateTimeFormat,
+  parseForNumberFormat,
+  quotedLiteralContent,
+  splitQuotedLiterals,
+  TokenType,
+} from './parser'
 
 /**
  * Detects Excel LCID-tagged currency tags (`[$SYMBOL-LCID]` with a non-empty
@@ -69,13 +76,16 @@ const COLOR_TAG_REGEX = /\[(black|blue|cyan|green|magenta|red|white|yellow|color
  * The whitelist is deliberately color-NAME-specific (flat alternation, no
  * nested quantifier) so it cannot clobber other bracketed tokens: duration
  * tags `[hh]`/`[mm]`, currency/locale tags `[$USD-409]`/`[$-409]`, and
- * condition tags `[>=100]` are all left untouched.
+ * condition tags `[>=100]` are all left untouched. A color name inside a quoted
+ * literal is text, not a tag, so `"[Red]"0` keeps it.
  *
  * @param formatArg the raw format string
  * @returns the format string with recognized color tags removed
  */
 function stripColorTags(formatArg: string): string {
-  return formatArg.replace(COLOR_TAG_REGEX, '')
+  return splitQuotedLiterals(formatArg)
+    .map((segment) => segment.quoted ? segment.text : segment.text.replace(COLOR_TAG_REGEX, ''))
+    .join('')
 }
 
 /**
@@ -121,18 +131,6 @@ function splitIntoSections(formatStr: string): string[] {
   sections.push(current)
 
   return sections
-}
-
-/**
- * Strips the delimiting double-quotes from quoted literals so `"zł"` renders as
- * `zł`. Quotes are removed from the whole section, so digit and placeholder
- * characters inside quotes still reach the number tokenizer.
- *
- * @param section a single format section
- * @returns the section with double-quote delimiters removed
- */
-function stripQuotes(section: string): string {
-  return section.replace(/"/g, '')
 }
 
 /**
@@ -185,7 +183,7 @@ function pickSection(sections: string[], value: number): { sectionStr: string, v
 function formatNumberWithSections(formatArg: string, value: number, config: Config): RawScalarValue {
   const sections = splitIntoSections(formatArg)
   const {sectionStr, valueForFormat} = pickSection(sections, value)
-  const expression = parseForNumberFormat(stripQuotes(sectionStr))
+  const expression = parseForNumberFormat(sectionStr)
   if (expression === undefined) {
     return renderLiteralSection(sectionStr)
   }
@@ -193,25 +191,38 @@ function formatNumberWithSections(formatArg: string, value: number, config: Conf
 }
 
 /**
- * Renders a placeholder-less format section as literal text: double-quote
- * delimiters are removed (`"z"` → `z`) and backslash escapes are resolved
- * (`\-` → `-`). Used when the section selected for a value's sign carries no
- * `#`/`0` placeholder, so the value is never spliced in — only the section's
- * own literal characters are emitted (an empty section renders `''`). Mirrors
- * Excel, where a literal-only section shows just its text.
+ * Renders a placeholder-less format section as literal text: a quoted literal
+ * renders its content as written (`"z"` → `z`, `"a\b"` → `a\b`), and outside
+ * quotes backslash escapes are resolved (`\-` → `-`). Used when the section
+ * selected for a value's sign carries no `#`/`0` placeholder, so the value is
+ * never spliced in — only the section's own literal characters are emitted (an
+ * empty section renders `''`). Mirrors Excel, where a literal-only section
+ * shows just its text.
  *
  * @param section the raw (unstripped) format section
  * @returns the section's literal text
  */
 function renderLiteralSection(section: string): string {
+  return splitQuotedLiterals(section)
+    .map((segment) => segment.quoted ? quotedLiteralContent(segment.text) : resolveEscapes(segment.text))
+    .join('')
+}
+
+/**
+ * Resolves backslash escapes in format code (`\-` → `-`). A trailing backslash
+ * with no following character is kept.
+ *
+ * @param code format code with no quoted literals in it
+ * @returns the code with each escape replaced by the character it escapes
+ */
+function resolveEscapes(code: string): string {
   let result = ''
-  for (let i = 0; i < section.length; i++) {
-    const ch = section[i]
-    if (ch === '\\' && i + 1 < section.length) {
-      result += section[i + 1]
+  for (let i = 0; i < code.length; i++) {
+    if (code[i] === '\\' && i + 1 < code.length) {
+      result += code[i + 1]
       i++
-    } else if (ch !== '"') {
-      result += ch
+    } else {
+      result += code[i]
     }
   }
   return result

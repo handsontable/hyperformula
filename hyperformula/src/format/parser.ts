@@ -56,6 +56,72 @@ export interface FormatExpression {
   tokens: FormatToken[],
 }
 
+/**
+ * A run of a format string: either format code or a quoted literal (`"…"`).
+ */
+export interface FormatSegment {
+  /** `true` for a quoted literal, `false` for format code. */
+  quoted: boolean,
+  /** The run as written in the format string, delimiting quotes included. */
+  text: string,
+}
+
+/**
+ * Splits a format string into format code and quoted literals.
+ *
+ * Text between double quotes is literal: it is never a digit placeholder, a
+ * grouping comma, or a date/time token, so `"a0b" 0` with 5 renders `a0b 5`.
+ * A quote with no closing quote runs to the end of the string, as in the
+ * section splitter in `format.ts`. A backslash escape stays in the code run as
+ * written, together with the character it escapes, so an escaped quote (`\"`)
+ * does not open a quoted literal.
+ *
+ * @param str the format string
+ * @returns the runs in order; empty runs are omitted
+ */
+export function splitQuotedLiterals(str: string): FormatSegment[] {
+  const segments: FormatSegment[] = []
+  let code = ''
+  let i = 0
+
+  while (i < str.length) {
+    const ch = str[i]
+    if (ch === '\\') {
+      code += str.substr(i, 2)
+      i += 2
+    } else if (ch === '"') {
+      if (code !== '') {
+        segments.push({quoted: false, text: code})
+        code = ''
+      }
+      const closingQuote = str.indexOf('"', i + 1)
+      const end = closingQuote === -1 ? str.length : closingQuote + 1
+      segments.push({quoted: true, text: str.substring(i, end)})
+      i = end
+    } else {
+      code += ch
+      i++
+    }
+  }
+  if (code !== '') {
+    segments.push({quoted: false, text: code})
+  }
+
+  return segments
+}
+
+/**
+ * Returns the text a quoted literal stands for: its content without the
+ * delimiting quotes (`"a0b"` → `a0b`). An unterminated literal (`"abc` at the
+ * end of a format) has no closing quote to remove.
+ *
+ * @param text a quoted literal as written, starting with `"`
+ * @returns the literal's content
+ */
+export function quotedLiteralContent(text: string): string {
+  return text.length > 1 && text.endsWith('"') ? text.slice(1, -1) : text.slice(1)
+}
+
 function matchDateFormat(str: string): RegExpExecArray[] {
   dateFormatRegex.lastIndex = 0
   const tokens: RegExpExecArray[] = []
@@ -122,29 +188,65 @@ function createTokens(regexTokens: RegExpExecArray[], str: string) {
   return tokens
 }
 
+/**
+ * Tokenizes a date/time format. Only format code is searched for date/time
+ * tokens; each quoted literal becomes free text with its quotes removed, so
+ * `dd"mm"` renders the day followed by the text `mm`.
+ *
+ * @param str the format string
+ * @returns the expression, or `undefined` when the format code holds no date/time token
+ */
 export function parseForDateTimeFormat(str: string): Maybe<FormatExpression> {
-  const dateFormatTokens = matchDateFormat(str)
+  const tokens: FormatToken[] = []
+  let hasDateTimeToken = false
 
-  if (dateFormatTokens.every((elem) => isEscapeToken(elem))) {
-    return undefined
-  } else {
-    return {
-      type: FormatExpressionType.DATE,
-      tokens: createTokens(dateFormatTokens, str),
+  for (const segment of splitQuotedLiterals(str)) {
+    if (segment.quoted) {
+      tokens.push(formatToken(TokenType.FREE_TEXT, quotedLiteralContent(segment.text)))
+      continue
     }
+    const dateFormatTokens = matchDateFormat(segment.text)
+    if (dateFormatTokens.length === 0) {
+      tokens.push(formatToken(TokenType.FREE_TEXT, segment.text))
+      continue
+    }
+    if (!dateFormatTokens.every((elem) => isEscapeToken(elem))) {
+      hasDateTimeToken = true
+    }
+    tokens.push(...createTokens(dateFormatTokens, segment.text))
   }
+
+  return hasDateTimeToken ? {type: FormatExpressionType.DATE, tokens} : undefined
 }
 
+/**
+ * Tokenizes a number format. The first placeholder run found in the format
+ * code is the number token; quoted literals are never searched, and each
+ * becomes free text with its quotes removed, so `"#"0` renders `#` followed by
+ * the value.
+ *
+ * @param str the format string (a single section)
+ * @returns the expression, or `undefined` when the format code holds no placeholder run
+ */
 export function parseForNumberFormat(str: string): Maybe<FormatExpression> {
-  const numberFormatTokens = matchNumberFormat(str)
-  if (numberFormatTokens.every((elem) => isEscapeToken(elem))) {
-    return undefined
-  } else {
-    return {
-      type: FormatExpressionType.NUMBER,
-      tokens: createTokens(numberFormatTokens, str),
+  const tokens: FormatToken[] = []
+  let hasNumberToken = false
+
+  for (const segment of splitQuotedLiterals(str)) {
+    if (segment.quoted) {
+      tokens.push(formatToken(TokenType.FREE_TEXT, quotedLiteralContent(segment.text)))
+      continue
     }
+    const numberFormatTokens = hasNumberToken ? [] : matchNumberFormat(segment.text)
+    if (numberFormatTokens.length === 0) {
+      tokens.push(formatToken(TokenType.FREE_TEXT, segment.text))
+      continue
+    }
+    hasNumberToken = true
+    tokens.push(...createTokens(numberFormatTokens, segment.text))
   }
+
+  return hasNumberToken ? {type: FormatExpressionType.NUMBER, tokens} : undefined
 }
 
 export function parse(str: string): FormatExpression {
