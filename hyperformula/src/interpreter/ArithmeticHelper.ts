@@ -814,6 +814,12 @@ export function coerceRangeToScalar(arg: SimpleRangeValue, state: InterpreterSta
   if (arg.isAdHoc()) {
     return arg.data[0]?.[0]
   }
+  // A range of one cell gives the value of that cell wherever the formula is, like a reference to that cell. A range
+  // written in the formula never gets here with one cell (Interpreter.evaluateAst reduces it); a whole column of a
+  // sheet with one row from INDIRECT does.
+  if (arg.width() === 1 && arg.height() === 1) {
+    return arg.data[0][0]
+  }
   const range = arg.range!
   if (state.formulaAddress.sheet === range.sheet) {
     if (range.width() === 1) {

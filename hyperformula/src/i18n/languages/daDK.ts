@@ -122,6 +122,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'HVISIT',
     IFS: 'HVISER',
     INDEX: 'INDEKS',
+    INDIRECT: 'INDIREKTE',
     INT: 'HELTAL',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'R.YDELSE',

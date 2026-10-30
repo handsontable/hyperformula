@@ -33,7 +33,7 @@ the volatile function, it may impact the engine's performance. Use them with cau
 ## Volatile functions
 
 Volatile functions are recalculated on every volatile action, regardless of the arguments passed in the function call.
-Functions that depend on the structure of the sheet act as if they were volatile but only on operations on the sheet structure, such as adding or removing rows or columns.
+Functions that depend on the structure of the sheet act as if they were volatile but only on operations on the sheet structure, such as adding or removing rows or columns, adding, renaming, clearing or removing a sheet, replacing a sheet's content, and adding, changing or removing a named expression.
 
 #### Built-in volatile functions:
  - RAND
@@ -47,6 +47,7 @@ Functions that depend on the structure of the sheet act as if they were volatile
 - COLUMNS
 - ROWS
 - FORMULATEXT
+- INDIRECT
 
 See the complete [list of functions](built-in-functions.md) available.
 

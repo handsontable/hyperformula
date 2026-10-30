@@ -6,6 +6,26 @@
 export interface TopSortResult<T> {
   sorted: T[],
   cycled: T[],
+  /**
+   * Nodes that still have to be recomputed in another pass. Always empty: a node that reads a pending node is
+   * retried in the same pass, after the pending node is computed.
+   */
+  deferred: T[],
+}
+
+/**
+ * Outcome of processing a single node during a top-sort pass.
+ */
+export enum NodeProcessingResult {
+  /** The node was recomputed and its value changed. */
+  CHANGED = 'CHANGED',
+  /** The node was recomputed and its value did not change. */
+  UNCHANGED = 'UNCHANGED',
+  /**
+   * The node read a value that is not current yet, and requested that node with {@link TopSort.requestPull}.
+   * It is recomputed again once the requested node is computed.
+   */
+  DEFERRED = 'DEFERRED',
 }
 
 // node status life cycle: undefined -> ON_STACK -> PROCESSED -> POPPED
@@ -26,11 +46,26 @@ export class TopSort<T> {
   private nodeStatus: NodeVisitStatus[] = []
   private order: number[] = []
   private sccNonSingletons: boolean[] = []
+  private finalized: boolean[] = []
+  private onPullPath: boolean[] = []
+  private pendingPrecedents: Map<number, number[]> = new Map()
+  private pullRequests: number[] = []
+  /** Nodes a deferred node requested, still to be computed before it is retried. */
+  private requested: Map<number, number[]> = new Map()
+  private shouldBeUpdatedMapping: boolean[] = []
+  private sorted: T[] = []
+  private cycled: T[] = []
   private timeCounter: number = 0
 
+  /**
+   * @param nodesSparseArray - nodes by id
+   * @param edgesSparseArray - ids of the dependents of each node, by id
+   * @param precedentIds - ids of the nodes a node reads; used only for nodes pulled out of order
+   */
   constructor(
     private nodesSparseArray: T[] = [],
     private edgesSparseArray: number[][] = [],
+    private precedentIds: (id: number) => number[] = () => [],
   ) {
   }
 
@@ -39,17 +74,34 @@ export class TopSort<T> {
    * Returns vertices in order of topological sort, but vertices that are on cycles are kept separate.
    *
    * @param modifiedNodes - seed for computation. During engine init run, all of the vertices of grap. In recomputation run, changed vertices.
-   * @param operatingFunction - recomputes value of a node, and returns whether a change occurred
+   * @param operatingFunction - recomputes value of a node, and returns the outcome
    * @param onCycle - action to be performed when node is on cycle
    */
   public getTopSortedWithSccSubgraphFrom(
     modifiedNodeIds: number[],
-    operatingFunction: (node: T) => boolean,
+    operatingFunction: (node: T) => NodeProcessingResult,
     onCycle: (node: T) => void
   ): TopSortResult<T> {
     const modifiedNodeIdsReversed = modifiedNodeIds.reverse()
     modifiedNodeIdsReversed.forEach((id: number) => this.runDFS(id))
     return this.postprocess(modifiedNodeIdsReversed, onCycle, operatingFunction)
+  }
+
+  /**
+   * Returns true if the node was reached by this pass and has not been finalized yet,
+   * i.e., its value may still change later in the pass.
+   */
+  public isPending(id: number): boolean {
+    return Boolean(this.inSCC[id]) && !this.finalized[id]
+  }
+
+  /**
+   * Requests that a pending node is computed before the node being processed is retried. Can be called several times
+   * for one evaluation, e.g., for every pending cell of a range. The operating function calls it right before it
+   * returns {@link NodeProcessingResult.DEFERRED}.
+   */
+  public requestPull(id: number): void {
+    this.pullRequests.push(id)
   }
 
   /**
@@ -153,37 +205,168 @@ export class TopSort<T> {
   }
 
   /**
-   * Postprocesses the result of Tarjan's algorithm.
+   * Postprocesses the result of Tarjan's algorithm: processes the nodes in topological order.
+   *
+   * A node whose operating function returns DEFERRED has read a pending node P. P is pulled: its pending precedents
+   * and then P itself are processed right away, from an explicit stack, and the node is retried. The main walk skips
+   * nodes that were already processed this way. A pull that reaches a node already on the pull path is a cycle.
    */
-  private postprocess(modifiedNodeIds: number[], onCycle: (node: T) => void, operatingFunction: (node: T) => boolean) {
-    const shouldBeUpdatedMapping: boolean[] = []
-
+  private postprocess(modifiedNodeIds: number[], onCycle: (node: T) => void, operatingFunction: (node: T) => NodeProcessingResult): TopSortResult<T> {
     modifiedNodeIds.forEach((t: number) => {
-      shouldBeUpdatedMapping[t] = true
+      this.shouldBeUpdatedMapping[t] = true
     })
 
-    const sorted: T[] = []
-    const cycled: T[] = []
     this.order.reverse()
 
-    this.order.forEach((t: number) => {
-      const adjacentNodes = this.getAdjacentNodeIds(t)
-
-      // The following line is a potential performance bottleneck.
-      // Array.includes() is O(n) operation, which makes the whole algorithm O(n^2).
-      // Idea for improvement: use Set<T>[] instead of number[][] for edgesSparseArray.
-      if (this.sccNonSingletons[t] || adjacentNodes.includes(t)) {
-        cycled.push(this.nodesSparseArray[t])
-        onCycle(this.nodesSparseArray[t])
-        adjacentNodes.forEach((s: number) => shouldBeUpdatedMapping[s] = true)
-      } else {
-        sorted.push(this.nodesSparseArray[t])
-        if (shouldBeUpdatedMapping[t] && operatingFunction(this.nodesSparseArray[t])) {
-          adjacentNodes.forEach((s: number) => shouldBeUpdatedMapping[s] = true)
-        }
+    for (const t of this.order) {
+      if (this.finalized[t] || this.nodesSparseArray[t] === undefined) {
+        continue
       }
-    })
+      this.pullRequests = []
+      if (this.processNode(t, onCycle, operatingFunction) === NodeProcessingResult.DEFERRED) {
+        this.pullFor(t, onCycle, operatingFunction)
+      }
+    }
 
-    return {sorted, cycled}
+    return {sorted: this.sorted, cycled: this.cycled, deferred: []}
+  }
+
+  /**
+   * Called after the root node was deferred: computes the pending nodes it requested and retries it until it is
+   * finalized. Nodes on the stack form a chain: each one waits for the one above it, so reaching a node already on
+   * the stack is a cycle.
+   */
+  private pullFor(root: number, onCycle: (node: T) => void, operatingFunction: (node: T) => NodeProcessingResult): void {
+    const stack: number[] = [root]
+    this.onPullPath[root] = true
+    this.recordRequests(root)
+
+    while (stack.length > 0) {
+      const t = stack[stack.length - 1]
+
+      if (this.finalized[t] || this.nodesSparseArray[t] === undefined) {
+        stack.pop()
+        this.onPullPath[t] = false
+        this.requested.delete(t)
+        continue
+      }
+
+      const next = this.nextRequested(t) ?? (t !== root ? this.nextPendingPrecedent(t) : undefined)
+      if (next !== undefined) {
+        if (this.onPullPath[next]) {
+          this.finalizeCycle(stack, next, onCycle)
+        } else {
+          stack.push(next)
+          this.onPullPath[next] = true
+        }
+        continue
+      }
+
+      this.pullRequests = []
+      if (this.processNode(t, onCycle, operatingFunction) === NodeProcessingResult.DEFERRED) {
+        this.recordRequests(t)
+      }
+    }
+  }
+
+  /**
+   * Stores the nodes a just-deferred node requested, to be computed one by one before it is retried.
+   */
+  private recordRequests(t: number): void {
+    const pending = [...new Set(this.pullRequests)].filter(id => this.isPending(id))
+    if (pending.length === 0) {
+      throw new Error('A node was deferred without requesting a pending node.')
+    }
+    this.requested.set(t, pending.reverse())
+  }
+
+  /**
+   * Returns a node the given node requested that is still pending, or undefined if there is none.
+   */
+  private nextRequested(t: number): number | undefined {
+    const requested = this.requested.get(t)
+    if (requested === undefined) {
+      return undefined
+    }
+    while (requested.length > 0 && !this.isPending(requested[requested.length - 1])) {
+      requested.pop()
+    }
+    if (requested.length === 0) {
+      this.requested.delete(t)
+      return undefined
+    }
+    return requested[requested.length - 1]
+  }
+
+  /**
+   * Returns a precedent of a pulled node that is still pending, or undefined if there is none.
+   * The pending precedents are collected once per node and consumed as they get finalized.
+   */
+  private nextPendingPrecedent(t: number): number | undefined {
+    let pending = this.pendingPrecedents.get(t)
+    if (pending === undefined) {
+      pending = this.precedentIds(t).filter(id => this.isPending(id))
+      this.pendingPrecedents.set(t, pending)
+    }
+    while (pending.length > 0 && !this.isPending(pending[pending.length - 1])) {
+      pending.pop()
+    }
+    return pending.length > 0 ? pending[pending.length - 1] : undefined
+  }
+
+  /**
+   * Gives every node on the pull path from the given node to the top of the stack the cycle treatment.
+   */
+  private finalizeCycle(stack: number[], from: number, onCycle: (node: T) => void): void {
+    for (let i = stack.indexOf(from); i < stack.length; i++) {
+      const t = stack[i]
+      if (this.finalized[t]) {
+        continue
+      }
+      const node = this.nodesSparseArray[t]
+      this.cycled.push(node)
+      onCycle(node)
+      this.getAdjacentNodeIds(t).forEach((s: number) => this.shouldBeUpdatedMapping[s] = true)
+      this.finalized[t] = true
+    }
+  }
+
+  /**
+   * Processes a single node: gives it the cycle treatment, skips it if it is current, or runs the operating function.
+   * Finalizes the node unless the operating function returns DEFERRED.
+   */
+  private processNode(t: number, onCycle: (node: T) => void, operatingFunction: (node: T) => NodeProcessingResult): NodeProcessingResult {
+    const node = this.nodesSparseArray[t]
+    const adjacentNodes = this.getAdjacentNodeIds(t)
+
+    // The following line is a potential performance bottleneck.
+    // Array.includes() is O(n) operation, which makes the whole algorithm O(n^2).
+    // Idea for improvement: use Set<T>[] instead of number[][] for edgesSparseArray.
+    if (this.sccNonSingletons[t] || adjacentNodes.includes(t)) {
+      this.cycled.push(node)
+      onCycle(node)
+      adjacentNodes.forEach((s: number) => this.shouldBeUpdatedMapping[s] = true)
+      this.finalized[t] = true
+      return NodeProcessingResult.CHANGED
+    }
+
+    if (!this.shouldBeUpdatedMapping[t]) {
+      this.sorted.push(node)
+      this.finalized[t] = true
+      return NodeProcessingResult.UNCHANGED
+    }
+
+    const result = operatingFunction(node)
+
+    if (result === NodeProcessingResult.DEFERRED) {
+      return result
+    }
+
+    this.sorted.push(node)
+    this.finalized[t] = true
+    if (result === NodeProcessingResult.CHANGED) {
+      adjacentNodes.forEach((s: number) => this.shouldBeUpdatedMapping[s] = true)
+    }
+    return result
   }
 }

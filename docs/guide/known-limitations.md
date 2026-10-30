@@ -93,3 +93,37 @@ HyperFormula resolves the OFFSET function at parse time rather than during evalu
   const hf = HyperFormula.buildFromArray([[1, 45, '=OFFSET(A1, 0, 1)']], { licenseKey: 'gpl-v3' });
   hf.getCellFormula({ sheet: 0, row: 0, col: 2 }); // '=B1'
   ```
+
+### INDIRECT function
+
+A reference that INDIRECT returns behaves like the same reference typed into the formula: the same cycle rules, and no spilling.
+
+* R1C1 text (with the second argument `FALSE`) is read only with the letters R and C, whatever the `language` option. Localized letters, such as W and K in Polish, return a `#REF!` error.
+
+  ```js
+  import { HyperFormula } from 'hyperformula';
+
+  const hf = HyperFormula.buildFromArray([
+    [null, null],
+    [null, 42],
+  ], { licenseKey: 'gpl-v3' });
+
+  hf.setCellContents({ sheet: 0, row: 0, col: 0 }, '=INDIRECT("R2C2", FALSE())');
+  console.log(hf.getCellValue({ sheet: 0, row: 0, col: 0 })); // 42, the value of B2
+  ```
+
+* Spill references (`"D1#"`) and references to other workbooks (`"[Book2.xlsx]Sheet1!B2"`) return a `#REF!` error.
+
+* A range alone in a cell returns a `#VALUE!` error instead of spilling, as `=A1:A2` does.
+
+* A formula that reads a range containing its own cell returns a `#CYCLE!` error, even when the function would read only other cells of the range. For details, see the cycle detection limitation above.
+
+  ```js
+  import { HyperFormula } from 'hyperformula';
+
+  const hf = HyperFormula.buildFromArray([[1], [2], [3]], { licenseKey: 'gpl-v3' });
+
+  // C2 reads A1:C3, which contains C2
+  hf.setCellContents({ sheet: 0, row: 1, col: 2 }, '=INDEX(INDIRECT("A1:C3"), 1, 1)');
+  console.log(hf.getCellValue({ sheet: 0, row: 1, col: 2 })); // a #CYCLE! error, as for =INDEX(A1:C3, 1, 1)
+  ```

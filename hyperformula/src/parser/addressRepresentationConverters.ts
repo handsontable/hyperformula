@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {simpleCellRange, SimpleCellRange} from '../AbsoluteCellRange'
+import {AbsoluteColumnRange, AbsoluteRowRange, simpleCellRange, SimpleCellRange} from '../AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
@@ -147,6 +147,71 @@ export const simpleCellRangeFromString = (resolveSheetReference: ResolveSheetRef
     return undefined
   }
   return simpleCellRange(start, end)
+}
+
+/**
+ * Computes the absolute range of whole columns from its string representation, e.g., 'B:C' or 'Sheet2!$B:C', with the
+ * ends in the order given. Absolute markers are ignored. The sheet works as in {@link simpleCellRangeFromString}.
+ *
+ * @param {ResolveSheetReferenceFn} resolveSheetReference - mapping function needed to change name of a sheet to index
+ * @param {string} stringAddress - string representation of the range
+ * @param {number} contextSheetId - sheet of the range if the string does not name one
+ * @returns {Maybe<SimpleCellRange>} the columns as an {@link AbsoluteColumnRange}, or `undefined` if the string is
+ * not a range of whole columns, names a sheet that does not exist, or names two different sheets
+ */
+export const simpleColumnRangeFromString = (resolveSheetReference: ResolveSheetReferenceFn, stringAddress: string, contextSheetId: number): Maybe<SimpleCellRange> => {
+  const ends = rangeEndsFromString(columnRegex, resolveSheetReference, stringAddress, contextSheetId)
+  if (ends === undefined) {
+    return undefined
+  }
+  return new AbsoluteColumnRange(ends.sheet, columnLabelToIndex(ends.start), columnLabelToIndex(ends.end))
+}
+
+/**
+ * Computes the absolute range of whole rows from its string representation, e.g., '2:3' or 'Sheet2!$2:3', with the
+ * ends in the order given. Absolute markers are ignored. The sheet works as in {@link simpleCellRangeFromString}.
+ *
+ * @param {ResolveSheetReferenceFn} resolveSheetReference - mapping function needed to change name of a sheet to index
+ * @param {string} stringAddress - string representation of the range
+ * @param {number} contextSheetId - sheet of the range if the string does not name one
+ * @returns {Maybe<SimpleCellRange>} the rows as an {@link AbsoluteRowRange}, or `undefined` if the string is not a
+ * range of whole rows, names a sheet that does not exist, or names two different sheets
+ */
+export const simpleRowRangeFromString = (resolveSheetReference: ResolveSheetReferenceFn, stringAddress: string, contextSheetId: number): Maybe<SimpleCellRange> => {
+  const ends = rangeEndsFromString(rowRegex, resolveSheetReference, stringAddress, contextSheetId)
+  if (ends === undefined) {
+    return undefined
+  }
+  return new AbsoluteRowRange(ends.sheet, Number(ends.start) - 1, Number(ends.end) - 1)
+}
+
+/**
+ * Splits a range of whole columns or whole rows into its two ends, each of which must match the given pattern
+ * (columnRegex or rowRegex), and resolves its sheet as {@link simpleCellRangeFromString} does: the sheet named at the
+ * start, or else the context sheet; the end may name only that sheet. Returns the sheet and the column labels or row
+ * numbers of the two ends as written, or `undefined` if the string is not such a range or a sheet in it does not exist.
+ */
+function rangeEndsFromString(pattern: RegExp, resolveSheetReference: ResolveSheetReferenceFn, stringAddress: string, contextSheetId: number): Maybe<{ sheet: number, start: string, end: string }> {
+  const split = stringAddress.split(RANGE_OPERATOR)
+  if (split.length !== 2) {
+    return undefined
+  }
+  const start = pattern.exec(split[0])
+  const end = pattern.exec(split[1])
+  if (start === null || end === null) {
+    return undefined
+  }
+  const startSheet = sheetNameToId(extractSheetName(start), resolveSheetReference)
+  const endSheet = sheetNameToId(extractSheetName(end), resolveSheetReference)
+  if (startSheet === null || endSheet === null) {
+    return undefined
+  }
+  const sheet = startSheet ?? contextSheetId
+  if ((endSheet ?? sheet) !== sheet) {
+    return undefined
+  }
+  // group 6 of columnRegex and rowRegex is the column label or the row number, after the sheet name and the '$'
+  return {sheet, start: start[6], end: end[6]}
 }
 
 /**

@@ -81,6 +81,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=INDEX(A1:C10, 2, 3)', '=INDEX(A1:A10, 5)'],
   },
+  INDIRECT: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns the value of the cell, or the range, that ref_text refers to.',
+    parameters: [{name: 'ref_text', description: 'A reference as text: a cell, a range, or whole columns or rows, optionally with a sheet name (e.g., "B1", "Sheet2!A1:B5", "C:C", "3:3"), or the name of a named expression that refers to one. Trailing spaces and line feeds are ignored; text that is not a reference, or a reference outside the sheet, returns #REF!.'}, {name: 'a1', description: 'TRUE (default) reads ref_text in A1 notation. FALSE reads it in R1C1 notation, e.g., "R2C3", "R[-1]C" (relative to the cell holding the formula), "R1C1:R2C2", "R2" or "C3". Names are read in both.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=INDIRECT("B1")', '=SUM(INDIRECT("A1:A10"))', '=INDIRECT("R2C3", FALSE())'],
+  },
   MATCH: {
     category: 'Lookup and reference',
     shortDescription: 'Returns the relative position of an item in an array that matches a specified value.',

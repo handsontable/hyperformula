@@ -8,6 +8,7 @@ import {ArraySizePredictor} from '../ArraySize'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
 import {CellError, ErrorType, isColOrRowInvalid} from '../Cell'
 import {Config} from '../Config'
+import {EvaluationPass} from '../EvaluationPass'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
 import {FormulaVertex} from '../DependencyGraph/FormulaVertex'
@@ -17,7 +18,7 @@ import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
 // noinspection TypeScriptPreferShortImport
-import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
+import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, ProcedureAst, RowRangeAst} from '../parser/Ast'
 import {Serialization} from '../Serialization'
 import {Statistics} from '../statistics/Statistics'
 import {
@@ -44,6 +45,11 @@ import { AddressWithSheet } from '../parser/Address'
 
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
+  /**
+   * Context of the formula evaluation in progress, set by the Evaluator. Undefined outside of evaluation passes
+   * (e.g., in calculateFormula).
+   */
+  public evaluationPass?: EvaluationPass
 
   /** Decides which function calls the license stops; see {@link FunctionCallLicenseGate}. */
   private readonly functionCallLicenseGate: FunctionCallLicenseGate
@@ -66,18 +72,21 @@ export class Interpreter {
   }
 
   public evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
-    let val = this.evaluateAstWithoutPostprocessing(ast, state)
-    if (isExtendedNumber(val)) {
-      if (isNumberOverflow(getRawValue(val))) {
-        return new CellError(ErrorType.NUM, ErrorMessage.NaN)
-      } else {
-        val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
-      }
+    return this.postprocess(this.evaluateAstWithoutPostprocessing(ast, state), state)
+  }
+
+  /**
+   * Evaluates the argument of a function that uses only the position or the size of a reference, not the values of
+   * its cells: ROW, COLUMN, ROWS and COLUMNS. A function in the argument is called with
+   * {@link InterpreterState.referenceExpected} set, and the reference it returns, e.g., from INDIRECT, is not reduced
+   * to the value of its cell even if it has one cell. Any other value is the same as from {@link evaluateAst}.
+   */
+  public evaluateReference(ast: Ast, state: InterpreterState): InterpreterValue {
+    if (ast.type !== AstNodeType.FUNCTION_CALL) {
+      return this.evaluateAst(ast, state)
     }
-    if (val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
-      [[val]] = val.data
-    }
-    return wrapperForRootVertex(val, state.formulaVertex)
+    const value = this.callFunction(ast, state, true)
+    return value instanceof SimpleRangeValue && !value.isAdHoc() ? value : this.postprocess(value, state)
   }
 
   /**
@@ -181,16 +190,7 @@ export class Interpreter {
         return this.unaryRangeWrapper(this.percentOp, result, state)
       }
       case AstNodeType.FUNCTION_CALL: {
-        const licenseError = this.functionCallLicenseGate.stoppedCallError(ast.procedureName)
-        if (licenseError !== undefined) {
-          return licenseError
-        }
-        const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
-        if (pluginFunction !== undefined) {
-          return pluginFunction(ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex))
-        } else {
-          return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
-        }
+        return this.callFunction(ast, state, false)
       }
       case AstNodeType.NAMED_EXPRESSION: {
         const namedExpression = this.namedExpressions.nearestNamedExpression(ast.expressionName, state.formulaAddress.sheet)
@@ -289,6 +289,51 @@ export class Interpreter {
         return ast.error
       }
     }
+  }
+
+  /**
+   * Applies to the value of an AST node the rules every value follows: a number that overflows becomes #NUM!, -0
+   * becomes 0, a range of one cell becomes the value of that cell (except a range from INDIRECT whose cells are not
+   * read yet; see below), and an error remembers the formula it comes from.
+   */
+  private postprocess(value: InterpreterValue, state: InterpreterState): InterpreterValue {
+    let val = value
+    if (isExtendedNumber(val)) {
+      if (isNumberOverflow(getRawValue(val))) {
+        return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+      } else {
+        val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
+      }
+    }
+    // A range of one cell from INDIRECT (a whole column of a sheet with one row) stays a range: a function that takes
+    // a range treats it like the literal range written in the formula, e.g., SUM skips its text. An operator or a
+    // function that takes a value gets the cell's value from coerceRangeToScalar, and the Evaluator reduces it when it
+    // is the whole formula.
+    if (val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1 && !val.hasPendingReadHook()) {
+      [[val]] = val.data
+    }
+    return wrapperForRootVertex(val, state.formulaVertex)
+  }
+
+  /**
+   * Calls the function of a function call node, unless the license stops it or no function has that name.
+   *
+   * @param {ProcedureAst} ast - the function call
+   * @param {InterpreterState} state - the state of the evaluation the call is part of
+   * @param {boolean} referenceExpected - whether the caller uses only the position or the size of the reference the
+   * function returns; see {@link InterpreterState.referenceExpected}
+   */
+  private callFunction(ast: ProcedureAst, state: InterpreterState, referenceExpected: boolean): InterpreterValue {
+    const licenseError = this.functionCallLicenseGate.stoppedCallError(ast.procedureName)
+    if (licenseError !== undefined) {
+      return licenseError
+    }
+    const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
+    if (pluginFunction === undefined) {
+      return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
+    }
+    const arraysFlag = state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName)
+    return pluginFunction(ast, new InterpreterState(state.formulaAddress, arraysFlag, state.formulaVertex, referenceExpected))
   }
 
   /**

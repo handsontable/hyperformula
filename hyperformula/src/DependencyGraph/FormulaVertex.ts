@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange, SimpleCellRange} from '../AbsoluteCellRange'
 import {ArraySize} from '../ArraySize'
 import {ArrayValue, ErroredArray, CellArray, NotComputedArray} from '../ArrayValue'
 import {CellError, equalSimpleCellAddress, ErrorType, SimpleCellAddress} from '../Cell'
@@ -15,7 +15,18 @@ import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {CellVertex} from './CellVertex'
+import {RangeVertex} from './RangeVertex'
 
+/**
+ * A dependency discovered while evaluating a formula (e.g., the target of INDIRECT), as opposed to one collected
+ * from the formula's AST.
+ */
+export interface RuntimeDependency {
+  /** Address or range read by the formula. Informational: the vertex is the source of truth. */
+  address: SimpleCellAddress | SimpleCellRange,
+  /** Vertex that was read: a cell, or the range vertex of a range. The graph has an edge from it to the formula vertex. */
+  vertex: CellVertex | RangeVertex,
+}
 
 /**
  * Abstract base class for vertices that contain formulas in the dependency graph.
@@ -25,6 +36,11 @@ import {CellVertex} from './CellVertex'
  * and {@link ArrayFormulaVertex} for array formulas that span multiple cells.
  */
 export abstract class FormulaVertex extends CellVertex {
+  /**
+   * Dependencies recorded during the last evaluation of the formula. Undefined for formulas that have none.
+   */
+  public runtimeDependencies?: RuntimeDependency[]
+
   protected constructor(
     protected formula: Ast,
     protected cellAddress: SimpleCellAddress,
@@ -87,6 +103,20 @@ export abstract class FormulaVertex extends CellVertex {
   public abstract valueOrUndef(): Maybe<InterpreterValue>
 
   public abstract isComputed(): boolean
+
+  /**
+   * Points runtime dependencies on oldVertex to newVertex, when a cell vertex is replaced by another one.
+   */
+  public replaceRuntimeDependencyVertex(oldVertex: CellVertex, newVertex: CellVertex): void {
+    if (this.runtimeDependencies === undefined) {
+      return
+    }
+    for (const dependency of this.runtimeDependencies) {
+      if (dependency.vertex === oldVertex) {
+        dependency.vertex = newVertex
+      }
+    }
+  }
 }
 
 /**

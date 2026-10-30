@@ -565,13 +565,23 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       && !([ FunctionArgumentType.RANGE, FunctionArgumentType.ANY ] as FunctionArgumentType[]).includes(argumentMetadata.argumentType)
   }
 
+  /**
+   * Runs a function whose argument is a reference: the formula's own cell without an argument, the top-left cell of a
+   * reference written in the formula, or any other value given to `nonReferenceCallback`.
+   *
+   * If `referenceExpected` is true, a function call in the argument is evaluated with
+   * {@link InterpreterState.referenceExpected} set, so a reference it returns, e.g., from INDIRECT, reaches
+   * `nonReferenceCallback` as a range whose cells are not read and not recorded as dependencies. Set it only if
+   * `nonReferenceCallback` uses the position or the size of a range, never its values.
+   */
   protected runFunctionWithReferenceArgument = (
     args: Ast[],
     state: InterpreterState,
     metadata: FunctionMetadata,
     noArgCallback: () => InternalScalarValue,
     referenceCallback: (reference: SimpleCellAddress) => InternalScalarValue,
-    nonReferenceCallback: (...arg: any) => InternalScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
+    nonReferenceCallback: (...arg: any) => InternalScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected),
+    referenceExpected = false,
   ) => {
     if (args.length === 0) {
       return this.returnNumberWrapper(noArgCallback(), metadata.returnNumberType)
@@ -598,6 +608,11 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
     if (cellReference !== undefined) {
       return this.returnNumberWrapper(referenceCallback(cellReference), metadata.returnNumberType)
+    }
+
+    if (referenceExpected && arg.type === AstNodeType.FUNCTION_CALL) {
+      const value = this.interpreter.evaluateReference(arg, state)
+      return value instanceof CellError ? value : this.returnNumberWrapper(nonReferenceCallback(value), metadata.returnNumberType)
     }
 
     return this.runFunction(args, state, metadata, nonReferenceCallback)

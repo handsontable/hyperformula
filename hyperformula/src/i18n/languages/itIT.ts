@@ -122,6 +122,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'SE.NON.DISP.',
     IFS: 'PIÙ.SE',
     INDEX: 'INDICE',
+    INDIRECT: 'INDIRETTO',
     INT: 'INT',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'INTERESSI',
