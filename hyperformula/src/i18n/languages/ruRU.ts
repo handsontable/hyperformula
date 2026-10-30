@@ -285,7 +285,7 @@ const dictionary: RawTranslationPackage = {
     COMBIN: 'ЧИСЛКОМБ',
     COMBINA: 'ЧИСЛКОМБА',
     PERMUT: 'ПЕРЕСТ',
-    PERMUTATIONA: 'PERMUTATIONA',
+    PERMUTATIONA: 'ПЕРЕСТА',
     GCD: 'НОД',
     LCM: 'НОК',
     MROUND: 'ОКРУГЛТ',
