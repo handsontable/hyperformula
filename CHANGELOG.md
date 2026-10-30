@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added a new function: RANK.AVG. [#1787](https://github.com/handsontable/hyperformula/pull/1787)
+- Added the `RANK.AVG` function. [#1787](https://github.com/handsontable/hyperformula/pull/1787)
 
 ### Fixed
 
