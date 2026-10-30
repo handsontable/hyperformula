@@ -3,9 +3,9 @@ permissions:
   contents: read
   pull-requests: write
 
-# Two measurements of the same scenarios, one report. The instruction count (callgrind) decides the verdict: it does
-# not depend on the load of the shared runner. Wall-clock times are measured too and shown for information. The
-# report is advisory: a regression is reported in the comment and never fails the pull request.
+# The instruction count (callgrind) of each scenario on base and head, and one report. It does not depend on the load
+# of the shared runner. Wall-clock times are not measured here; `npm run test:performance` still measures them
+# locally. The report is advisory: a regression is reported in the comment and never fails the pull request.
 on:
   pull_request:
     types:
@@ -18,104 +18,6 @@ env:
   PERF_INSTRUCTIONS_THRESHOLD: '0.5'
 
 jobs:
-  performance-test:
-    strategy:
-      matrix:
-        node-version: [ '22' ]
-        os: [ 'ubuntu-latest' ]
-    name: Test performance
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 45
-    outputs:
-      comparison: ${{ steps.export.outputs.comparison }}
-    steps:
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      # Base and head live side by side so their runs can alternate (base, head, base, head). Measuring one side
-      # in a single block and the other afterwards lets the drift of a shared runner show up as a "regression";
-      # alternating spreads that drift over both sides.
-      - name: (base) Checkout main repository
-        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # https://github.com/actions/checkout/releases/tag/v2.3.4
-        with:
-          ref: ${{ github.event.pull_request.base.sha }}
-          path: base
-
-      - name: (head) Checkout main repository
-        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # https://github.com/actions/checkout/releases/tag/v2.3.4
-        with:
-          path: head
-
-      - name: Checkout hyperformula-tests repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          ssh-key: ${{ secrets.DEPLOY_TOKEN }}
-          repository: handsontable/hyperformula-tests
-          path: head/hyperformula/test/hyperformula-tests
-
-      - name: Fetch hyperformula-tests and sync branches
-        run: cd head/hyperformula/test && ./fetch-tests.sh
-
-      # Both sides run the same (head) copy of the suite; only the engine under test differs.
-      - name: Share the tests between base and head
-        run: cp -r head/hyperformula/test/hyperformula-tests base/hyperformula/test/hyperformula-tests
-
-      - name: Record the revisions under test
-        run: |
-          echo "base:  $(git -C base rev-parse HEAD)"
-          echo "head:  $(git -C head rev-parse HEAD)"
-          echo "tests: $(git -C head/hyperformula/test/hyperformula-tests rev-parse HEAD)"
-
-      - name: (base) Install dependencies
-        run: cd base && npm ci
-
-      - name: (head) Install dependencies
-        run: cd head && npm ci
-
-      # Two rounds, each with half of the samples; the comparison merges the rounds of a side. The order is
-      # reversed in the second round (base, head, head, base) so that any effect of running first or second
-      # is shared by both sides.
-      - name: Run performance tests (alternating base and head)
-        env:
-          PERF_SAMPLE_SCALE: '0.5'
-        run: |
-          run() { (cd "$1" && npm run benchmark:write-to-file --workspace=hyperformula "$GITHUB_WORKSPACE/$1-$2.json"); }
-          run base 1; run head 1
-          run head 2; run base 2
-
-      # Exits non-zero when a results file is unreadable or nothing is comparable, so a broken comparison is a
-      # red check instead of a stale report. A regression is reported but does not fail this step.
-      # When the tests carry a noise history, each scenario is judged against the band of changes measured
-      # earlier on identical code.
-      - name: Compare the results
-        env:
-          PERF_COMPARISON_JSON: ${{ github.workspace }}/wall-clock-comparison.json
-        run: |
-          HISTORY="$GITHUB_WORKSPACE/head/hyperformula/test/hyperformula-tests/performance/noise-history.json"
-          if [ -f "$HISTORY" ]; then export PERF_HISTORY_FILE="$HISTORY"; fi
-          cd head && npm run benchmark:compare-benchmarks --workspace=hyperformula "$GITHUB_WORKSPACE/base-1.json,$GITHUB_WORKSPACE/base-2.json" "$GITHUB_WORKSPACE/head-1.json,$GITHUB_WORKSPACE/head-2.json" "$GITHUB_WORKSPACE/performance-report.md"
-
-      # The report job runs on another runner; the comparison travels as a job output (a few kilobytes).
-      - name: Export the comparison for the report
-        id: export
-        if: always()
-        run: |
-          f="$GITHUB_WORKSPACE/wall-clock-comparison.json"
-          if [ -s "$f" ]; then echo "comparison=$(base64 -w0 "$f")" >> "$GITHUB_OUTPUT"; else echo "No comparison to export"; fi
-
-      # The runner is gone after the job; the raw samples in the log are what a later analysis can use.
-      - name: Print the raw samples
-        if: always()
-        run: |
-          for f in base-1 head-1 head-2 base-2; do
-            echo "::group::$f.json"
-            cat "$GITHUB_WORKSPACE/$f.json" 2>/dev/null || echo "(missing)"
-            echo
-            echo "::endgroup::"
-          done
-
   instruction-count:
     name: Count instructions
     runs-on: ubuntu-latest
@@ -205,11 +107,11 @@ jobs:
             echo "::endgroup::"
           done
 
-  # One comment for both measurements, updated on every push. It runs even when a measurement failed, and then
-  # says which side is missing.
+  # One comment, updated on every push. When the instruction job produced no comparison there is nothing to report:
+  # this job fails, and an earlier comment stays as it was.
   report:
     name: Performance report
-    needs: [ performance-test, instruction-count ]
+    needs: [ instruction-count ]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -237,17 +139,15 @@ jobs:
       - name: Install dependencies
         run: cd head && npm ci
 
-      - name: Write the comparisons of both jobs
+      - name: Write the comparison of the instruction job
         env:
-          WALL_CLOCK: ${{ needs.performance-test.outputs.comparison }}
-          WALL_CLOCK_RESULT: ${{ needs.performance-test.result }}
           INSTRUCTIONS: ${{ needs.instruction-count.outputs.comparison }}
           INSTRUCTIONS_RESULT: ${{ needs.instruction-count.result }}
         run: |
-          if [ -n "$WALL_CLOCK" ]; then echo "$WALL_CLOCK" | base64 -d > "$GITHUB_WORKSPACE/wall-clock-comparison.json"; else echo "No wall-clock comparison (job: $WALL_CLOCK_RESULT)"; fi
           if [ -n "$INSTRUCTIONS" ]; then echo "$INSTRUCTIONS" | base64 -d > "$GITHUB_WORKSPACE/instructions-comparison.json"; else echo "No instruction comparison (job: $INSTRUCTIONS_RESULT)"; fi
 
-      # Exits non-zero when neither comparison arrived or one of them is malformed.
+      # With two arguments the report has no wall-clock part at all. Exits non-zero when the comparison is missing or
+      # malformed.
       - name: Render the report
         env:
           PERF_REPORT_HEAD: ${{ github.event.pull_request.head.sha }}
@@ -255,7 +155,7 @@ jobs:
           PERF_REPORT_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           export PERF_REPORT_TESTS="$(git -C head/hyperformula/test/hyperformula-tests rev-parse HEAD)"
-          cd head && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/report.ts "$GITHUB_WORKSPACE/instructions-comparison.json" "$GITHUB_WORKSPACE/wall-clock-comparison.json" "$GITHUB_WORKSPACE/performance-comment.md"
+          cd head && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/report.ts "$GITHUB_WORKSPACE/instructions-comparison.json" "$GITHUB_WORKSPACE/performance-comment.md"
           cat "$GITHUB_WORKSPACE/performance-comment.md" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish the comment
