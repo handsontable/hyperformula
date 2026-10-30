@@ -1,12 +1,11 @@
 ---
+title: "Branding"
 tags:
   - brand book
   - brand guidelines
   - brand assets
   - press kit
 ---
-
-# Branding
 
 ## Our logo
 
@@ -15,13 +14,13 @@ The logo is comprised of the word "HyperFormula" combined with the integral
 
 ## Logotype
 
-<img :src="$withBase('/hf_logo.png')">
+![](/hf_logo.png)
 
 ## Resources
 
-<a :href="$withBase('/hyperformula_logo.zip')">Download resources</a>
+[Download resources](/hyperformula_logo.zip)
 
-<a :href="$withBase('/hyperformula_brand_book.pdf')">Download brand book</a>
+[Download brand book](/hyperformula_brand_book.pdf)
 
 ## Terms of use
 

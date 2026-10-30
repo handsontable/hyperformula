@@ -1,4 +1,5 @@
 ---
+title: "Integration with React"
 tags:
   - SSR
   - React hooks
@@ -10,13 +11,11 @@ tags:
   - lifecycle
 ---
 
-# Integration with React
-
 The HyperFormula API is identical in a React app and in plain JavaScript. This guide demonstrates how HyperFormula is integrated with the React component tree and how its lifecycle maps to React hooks.
 
 Install with `npm install hyperformula`. For other options, see the [client-side installation](client-side-installation.md) section.
 
-::: tip TypeScript
+:::tip[TypeScript]
 All examples use TypeScript. Remove the type annotations to use plain JavaScript.
 :::
 
@@ -128,4 +127,4 @@ In the Pages Router, the same `dynamic(..., { ssr: false })` call works directly
 
 ## Demo
 
-For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/react-demo?v=' + $page.buildDateURIEncoded">React demo on Stackblitz</a>.
+For a more advanced example, check out the [React demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/react-demo?v={{$page.buildDateURIEncoded}}).

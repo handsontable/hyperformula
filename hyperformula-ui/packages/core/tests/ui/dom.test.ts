@@ -4,7 +4,10 @@ import {
   createEl,
   createIcon,
   createSvgIcon,
+  deepActiveElement,
   ensureRelativePosition,
+  eventOrigin,
+  isElement,
 } from "../../src/ui/dom";
 
 describe("ensureRelativePosition", () => {
@@ -183,5 +186,70 @@ describe("createIcon", () => {
     expect(first.tagName).toBe("I");
     expect(second).not.toBe(first);
     expect(factory).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("deepActiveElement", () => {
+  it("returns the focused element inside an open shadow root, not its host", () => {
+    const hostEl = document.createElement("div");
+
+    document.body.appendChild(hostEl);
+
+    const shadow = hostEl.attachShadow({ mode: "open" });
+    const input = document.createElement("input");
+
+    shadow.appendChild(input);
+    input.focus();
+
+    expect(document.activeElement).toBe(hostEl);
+    expect(deepActiveElement(document)).toBe(input);
+
+    hostEl.remove();
+  });
+
+  it("returns the document's active element outside shadow roots", () => {
+    const input = document.createElement("input");
+
+    document.body.appendChild(input);
+    input.focus();
+
+    expect(deepActiveElement(document)).toBe(input);
+
+    input.remove();
+  });
+});
+
+describe("eventOrigin", () => {
+  it("returns the innermost node of the composed path, not the retargeted shadow host", () => {
+    const cell = document.createElement("td");
+    const shadowHost = document.createElement("div");
+    const event = {
+      composedPath: () => [cell, shadowHost],
+      target: shadowHost,
+    } as unknown as Event;
+
+    expect(eventOrigin(event)).toBe(cell);
+  });
+
+  it("falls back to the target when the event has no composed path", () => {
+    const target = document.createElement("div");
+    const event = { composedPath: () => [], target } as unknown as Event;
+
+    expect(eventOrigin(event)).toBe(target);
+  });
+});
+
+describe("isElement", () => {
+  it("recognizes an element from another window by its node type", () => {
+    const foreignElement = { nodeType: Node.ELEMENT_NODE, closest: () => null };
+
+    expect(foreignElement instanceof Element).toBe(false);
+    expect(isElement(foreignElement)).toBe(true);
+  });
+
+  it("rejects text nodes and non-nodes", () => {
+    expect(isElement(document.createTextNode("x"))).toBe(false);
+    expect(isElement(null)).toBe(false);
+    expect(isElement({})).toBe(false);
   });
 });
