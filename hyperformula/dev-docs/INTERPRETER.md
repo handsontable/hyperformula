@@ -63,6 +63,7 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 | `optionalArg` | The argument may be omitted |
 | `defaultValue` | Value used when omitted |
 | `emptyAsDefault` | An empty argument falls back to `defaultValue` instead of the zero-value for its type; requires `defaultValue` |
+| `emptyAsAbsent` | An empty argument is passed as `undefined`, like an omitted one, instead of the zero-value for its type; applies only when `defaultValue` is unset |
 | `minValue`, `maxValue`, `lessThan`, `greaterThan` | Range constraints, enforced during coercion |
 | `passSubtype` | Keep the extended number subtype instead of unwrapping to a raw number |
 
