@@ -1,4 +1,5 @@
 ---
+title: "Volatile functions"
 tags:
   - recalculation triggers
   - recalculate
@@ -8,8 +9,6 @@ tags:
   - TODAY
   - dirty
 ---
-
-# Volatile functions
 
 If you work with spreadsheet software regularly, then you've probably
 heard about Volatile Functions. They are distinctive because they
