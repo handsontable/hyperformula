@@ -1,4 +1,5 @@
 ---
+title: "Types of operators"
 tags:
   - modulo
   - caseSensitive
@@ -11,8 +12,6 @@ tags:
   - intersection
   - union
 ---
-
-# Types of operators
 
 The operators specify what type of actions are performed on arguments
 (operands) in the formula. HyperFormula supports the operators that

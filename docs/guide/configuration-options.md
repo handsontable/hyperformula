@@ -1,12 +1,11 @@
 ---
+title: "Configuration options"
 tags:
   - settings
   - configure
   - ConfigParams
   - buildEmpty
 ---
-
-# Configuration options
 
 HyperFormula can be customized through easy-to-setup `options`.
 

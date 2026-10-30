@@ -1,7 +1,7 @@
 import { CN } from "../../theme/classNames";
 
 export interface PopupContextOptions {
-  parent?: HTMLElement;
+  parent?: HTMLElement | ShadowRoot;
   className?: string;
 }
 
@@ -9,7 +9,7 @@ export class PopupContext {
   readonly portal: HTMLElement;
 
   constructor({ parent = document.body, className }: PopupContextOptions = {}) {
-    this.portal = document.createElement("div");
+    this.portal = parent.ownerDocument.createElement("div");
     this.portal.classList.add(CN.popupPortal);
 
     if (className !== undefined) {

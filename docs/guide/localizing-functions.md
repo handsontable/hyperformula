@@ -1,12 +1,11 @@
 ---
+title: "Localizing functions"
 tags:
   - translations
   - translate
   - locales
   - registerLanguage
 ---
-
-# Localizing functions
 
 You can localize a function's ID and error
 messages. Currently, HyperFormula supports {{ $page.languagesCount }} languages, with British English
@@ -23,7 +22,7 @@ import frFR from 'hyperformula/i18n/languages/frFR';
 HyperFormula.registerLanguage('frFR', frFR);
 ```
 
-::: tip
+:::tip
 To import the language packs, use the module-system-specific dedicated bundles at:
 * **ES**: `hyperformula/i18n/languages/`
 * **CommonJS**: `hyperformula/i18n/languages/`
@@ -109,7 +108,7 @@ const hf = HyperFormula.buildEmpty({
 });
 ```
 
-::: tip
+:::tip
 You can use an existing language pack as a template. Check the [language files in the repository](https://github.com/handsontable/hyperformula/tree/master/hyperformula/src/i18n/languages) to see complete examples with all available functions.
 :::
 
@@ -141,7 +140,7 @@ You can localize your custom functions as well. For details, see the [Custom fun
 
 ## Demo
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/localizing-functions/example1.html)
 
