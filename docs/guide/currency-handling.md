@@ -1,4 +1,5 @@
 ---
+title: "Currency handling"
 tags:
   - stringifyCurrency
   - currencySymbol
@@ -8,8 +9,6 @@ tags:
   - LCID
   - NUMBER_CURRENCY
 ---
-
-# Currency handling
 
 HyperFormula treats currency through **two independent mechanisms**:
 

@@ -32,7 +32,9 @@ npm run lint
 npm run test:jest
 ```
 
-Add `npm run test` (which includes the browser run) when the change touches bundling, module format, or anything browser-specific. Add `npm run docs:generate-function-docs` when it touches a function or its catalogue entry — from the repository root, after `npm run docs:install`, because the generator runs in the portal's own install.
+Add `npm run test` (which includes the browser run) when the change touches bundling, module format, or anything browser-specific.
+
+A change in `hyperformula-ui/` runs its own gate instead, from the repository root: `npm run build:ui`, `npm run typecheck` and `npm run test:ui`, plus `npm run test:e2e` when it changes the demo or how the editor mounts in a page. See [`hyperformula-ui/dev-docs/TESTING.md`](../hyperformula-ui/dev-docs/TESTING.md). Add `npm run docs:generate-function-docs` when it touches a function or its catalogue entry — from the repository root, after `npm run docs:install`, because the generator runs in the portal's own install.
 
 Read the output. Do not open a pull request on a red run and describe it as ready. A green Jest run without the private suite covers only the smoke tests — see [Fetching the private suite](../hyperformula/dev-docs/TESTING.md#fetching-the-private-suite). A red CI job unrelated to the change is explained in the pull request and reported, not ignored.
 

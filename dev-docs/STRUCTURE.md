@@ -30,18 +30,23 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 │   ├── package.json  README.md
 │   └── AGENTS.md  CLAUDE.md
 │
-├── hyperformula-ui/                  # ── a group of packages: UI components (not imported yet; planned layout below)
-│   ├── packages/*/                   # one directory per published package
-│   ├── demo/*/                       # demo applications (private)
+├── hyperformula-ui/                  # ── a group of packages: UI components
+│   ├── packages/core/                # the hyperformula-ui package (published)
+│   ├── demo/js/  demo/shared/        # the editor-only demo (private)
 │   ├── e2e/                          # end-to-end suite (private)
+│   ├── scripts/                      # stylesheet and API docs generators, called by the core's build
 │   ├── dev-docs/                     # the UI's own internals reference
-│   └── AGENTS.md  CLAUDE.md  README.md, and its shared toolchain configuration
+│   ├── tsconfig.*.json  rspack.base.mjs  vitest.base.ts  biome.json   # shared toolchain configuration
+│   └── AGENTS.md  CLAUDE.md  README.md  CHANGELOG.md
 │
 ├── docs/                             # ── the documentation portal (NOT a workspace member)
 │   ├── guide/                        # Markdown guides
 │   ├── api/                          # API reference (generated; git-ignored)
 │   ├── examples/                     # Code examples embedded in guides
-│   ├── .vuepress/                    # VuePress configuration, theme, components, plugins
+│   ├── astro.config.mjs              # Astro + Starlight configuration and the sidebar
+│   ├── src/                          # Markdown plugins, component overrides, styles, the .md companions
+│   ├── public/                       # Static files: images, downloads, favicons
+│   ├── typedoc-theme/                # The theme the API reference is generated with
 │   ├── script/                       # Generates guide/built-in-functions.md; composes the Worker assets
 │   ├── worker/index.js               # Cloudflare Worker serving the built portal
 │   ├── wrangler.jsonc                # Its deploy configuration
@@ -56,6 +61,7 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 ├── .github/                          # CI workflows, issue and PR templates
 ├── package.json                      # Private workspace root: fan-out scripts only
 ├── package-lock.json  .nvmrc  .worktreeinclude
+├── .fossa.yml                        # Keeps the private UI demo and e2e workspaces out of the FOSSA scan
 ├── AGENTS.md  CLAUDE.md  README.md  CONTRIBUTING.md  LICENSE.txt
 ├── CHANGELOG.md                      # the engine's history (the UI keeps its own until the versions join)
 └── CODE_OF_CONDUCT.md
@@ -63,30 +69,35 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 
 ## Workspaces
 
-`workspaces` in the root `package.json` lists `hyperformula`. `npm ci` at the root installs it into a shared `node_modules`. `hyperformula-ui/` is a placeholder and is deliberately not listed yet — see [What the move still owes](#what-the-move-still-owes).
+`workspaces` in the root `package.json` lists `hyperformula` and the UI's members. `npm ci` at the root installs them into a shared `node_modules`.
 
-`hyperformula-ui/` will be a folder, not a package. npm does not support a workspace that declares workspaces of its own, so the root lists the UI's members directly: `hyperformula-ui/packages/*`, `hyperformula-ui/demo/*` and `hyperformula-ui/e2e`.
+`hyperformula-ui/` is a folder, not a package. npm does not support a workspace that declares workspaces of its own, so the root lists the UI's members directly: `hyperformula-ui/packages/*`, `hyperformula-ui/demo/*` and `hyperformula-ui/e2e`. Name a UI workspace by path, `--workspace=hyperformula-ui/packages/core`: a bare `--workspace=hyperformula-ui` also matches workspaces by folder.
 
-**`docs/` is deliberately outside the workspace.** The criterion is age, not size. The portal runs on VuePress 1.x, which is end-of-life, builds with webpack 4, and only runs on current Node with `--openssl-legacy-provider`. In a shared install its old packages are hoisted to the root, where anything else can start resolving them by accident — the engine's language build required `fs-extra` without declaring it, and resolved the copy that only the portal's tree supplied. So it has its own `package.json` and installs separately with `npm run docs:install`. The leak runs the other way too: everything the portal imports — `chevrotain` for the grammar diagram, and the engine's ESLint plugins that `examples/eslintrc.examples.js` extends — is declared in `docs/package.json`, rather than resolved from the engine's copies at the root. The one exception is `.vuepress/subtheme/`: it is a typedoc theme that the engine's `typedoc:build-api` loads, so its `typedoc-plugin-markdown` must be the engine's copy, which `hyperformula/package.json` declares.
+The UI's packages declare their own TypeScript 5 and Biome, because the version npm hoists to the root is the engine's TypeScript 4. The demo and the end-to-end suite depend on `hyperformula` and resolve it from this workspace, so they need the engine built (`npm run bundle-all`) before they typecheck or run. The core package does not import the engine.
 
-Size alone does not keep a package out. The UI's dependencies, its frameworks, grid libraries and browser test runner, are larger than the portal's but current, and the UI joins the workspace when it is imported. A root `npm ci` installs them too, so the contributor and CI install grows. What the published `hyperformula` package depends on does not change: those are the UI's own dependencies, not the engine's.
+**`docs/` is outside the workspace.** It was kept out because of its age: on VuePress 1.x, end-of-life and built with webpack 4, its old packages hoisted to the root, where anything else could start resolving them by accident — the engine's language build required `fs-extra` without declaring it, and resolved the copy that only the portal's tree supplied. The portal now builds with Astro, whose toolchain is current, so that reason has lapsed; joining the workspace is a change of its own. Until then it has its own `package.json` and installs separately with `npm run docs:install`. Everything the portal imports — the engine's ESLint plugins that `examples/eslintrc.examples.js` extends included — is declared in `docs/package.json`, rather than resolved from the engine's copies at the root. The leak still runs both ways: Node looks for a package in `docs/node_modules/` and then in the root's, so a dependency the portal's install nests rather than hoists can lose to an unrelated root copy. Astro's prerender step once resolved the root's `cookie` 0.7 instead of its own 2.x that way, and failed the build until a fresh `docs/package-lock.json` hoisted it. The one exception is `typedoc-theme/`: it is a typedoc theme that the engine's `typedoc:build-api` loads, so its `typedoc-plugin-markdown` must be the engine's copy, which `hyperformula/package.json` declares.
+
+Size alone does not keep a package out. The UI's toolchain, its bundler, test runners and browser test runner, is current, so the UI is in the workspace. A root `npm ci` installs it too, so the contributor and CI install grows. What the published `hyperformula` package depends on does not change: those are the UI's own dependencies, not the engine's.
 
 ## Where a command runs
 
 | Command | Runs in |
 |---|---|
-| `npm run lint` | Fanned out to every workspace that defines `lint`; each lints itself with its own configuration |
-| `npm run docs:lint` | The portal's code — `.vuepress/` and `worker/` — with its own configuration, separate because the portal installs separately. Not the Markdown content, and not `examples/`, which `code-examples-generator.sh` formats |
+| `npm run lint`, `npm run typecheck` | Fanned out to every workspace that defines the script; each uses its own configuration |
+| `npm run docs:lint` | The portal's code — `astro.config.mjs`, `src/`, `typedoc-theme/` and `worker/` — with its own configuration, separate because the portal installs separately. Not the Markdown content, and not `examples/`, which `code-examples-generator.sh` formats |
 | `npm run test:jest`, `bundle-all`, `compile` | Fanned out to `hyperformula` |
+| `npm run build:ui`, `test:ui`, `test:e2e`, `dev:ui` | Fanned out to the UI's core package, its end-to-end suite, and its demo |
 | `npm run docs:*` | Orchestrated from the root across both `hyperformula` and `docs` |
 
 Run a package's own scripts from its directory, or with `--workspace=hyperformula`. See [`BUILD.md`](BUILD.md).
 
 ## Build outputs
 
-All git-ignored, all under `hyperformula/`: `lib/` (`tsc` output, the input to every bundle), `es/`, `commonjs/`, `dist/`, `languages/`, `typings/`. The portal's output is `docs/.vuepress/dist/`, and `docs/api/` plus `docs/guide/built-in-functions.md` are generated.
+All git-ignored. Under `hyperformula/`: `lib/` (`tsc` output, the input to every bundle), `es/`, `commonjs/`, `dist/`, `languages/`, `typings/`. The UI's is `hyperformula-ui/packages/core/dist/`. The portal's output is `docs/dist/`, and `docs/api/` plus `docs/guide/built-in-functions.md` are generated.
 
-Never edit any of them. Never read the **build artifacts** — `lib/`, `es/`, `commonjs/`, `dist/`, `languages/`, `typings/`, `docs/.vuepress/dist/` — to answer a question about behaviour; read `hyperformula/src/` instead, and the agent deny list in `.claude/settings.json` enforces that.
+Two generated files in the UI are committed, not ignored: `hyperformula-ui/packages/core/src/theme/cssText.ts` and `hyperformula-ui/packages/core/DOCS.md`. Regenerate them with the change that affects them; CI fails when the stylesheet is stale.
+
+Never edit any of them. Never read the **build artifacts** — `lib/`, `es/`, `commonjs/`, `dist/`, `languages/`, `typings/`, `docs/dist/` — to answer a question about behaviour; read `hyperformula/src/` or `hyperformula-ui/packages/core/src/` instead, and the agent deny list in `.claude/settings.json` enforces that.
 
 `docs/api/` and `docs/guide/built-in-functions.md` are the exception. They are generated, so editing them is pointless, but they *are* the API reference and the function reference and reading them is often exactly right.
 
@@ -96,53 +107,41 @@ This directory holds what applies to the whole repository: the definition of don
 
 [`hyperformula/dev-docs/`](../hyperformula/dev-docs/README.md) holds the engine's internals: architecture, the parser, the interpreter, the dependency graph, the function catalogue, translations, performance, its test suites, and its own build steps.
 
-The split is by ownership. A fact lives in exactly one of them, and `hyperformula-ui` gets its own, `hyperformula-ui/dev-docs/`, when it lands.
+[`hyperformula-ui/dev-docs/`](../hyperformula-ui/dev-docs/README.md) holds the UI's: its architecture and design, its code style, its suites, and its release procedure.
 
-## Scripts at three levels
+The split is by ownership. A fact lives in exactly one of them.
+
+## Scripts at each level
 
 Each script lives with whatever invokes it, and every one has exactly one caller:
 
 | Directory | Holds |
 |---|---|
 | `script/` | `release/` and `check-licenses.mjs` — both span the whole repository |
-| `hyperformula/script/` | `check-file.js`, `check-publish-package.js`, `if-ne-env.js` — called by the engine's build; `check-license-key-parser-drift.js` — called by `vendored-parser.yml`; `postinstall-skills-message.js` — shipped in the package and run by npm when a user installs it, silent inside this repository |
+| `hyperformula/script/` | `check-file.js`, `check-publish-package.js`, `if-ne-env.js` — called by the engine's build; `check-license-key-parser-drift.js` — called by `vendored-parser.yml` |
 | `docs/script/` | the built-in-functions generator and `prepare-cf-assets.js` — called by the portal |
+| `hyperformula-ui/scripts/` | `generateCssText.mjs` and `generateApiDocs.mjs` — called by the UI core's `build:styles` and `docs` |
 
 ## Directories with their own `AGENTS.md`
 
-`hyperformula/`, `hyperformula/src/`, `hyperformula/src/parser/`, `hyperformula/src/interpreter/`, `hyperformula/src/interpreter/plugin/`, `hyperformula/src/interpreter/functionMetadata/`, `hyperformula/src/DependencyGraph/`, `hyperformula/src/i18n/`, `hyperformula/test/`, `docs/`, and `script/`.
+`hyperformula/`, `hyperformula/src/`, `hyperformula/src/parser/`, `hyperformula/src/interpreter/`, `hyperformula/src/interpreter/plugin/`, `hyperformula/src/interpreter/functionMetadata/`, `hyperformula/src/DependencyGraph/`, `hyperformula/src/i18n/`, `hyperformula/test/`, `hyperformula-ui/`, `hyperformula-ui/packages/core/`, `docs/`, and `script/`.
 
 Each is a pointer of a few lines — what the directory is, and which `dev-docs/` page or local `README.md` holds the detail. They load automatically when an agent reads a file in that subtree, so they stay small on purpose.
 
 ## What the move still owes
 
-1. **Import `hyperformula-ui`, nested.** The directory is a placeholder. The UI is imported from the formula-builder repository in a separate change, as a whole: its repository moves under `hyperformula-ui/` with its own layout intact (`git filter-repo --to-subdirectory-filter hyperformula-ui`), so its history survives and the relative paths in its shared configuration keep working. Its packages keep the names they have today.
-
-   **Before the import**, in the formula-builder repository itself, convert it from pnpm to npm. The UI adjusts to this repository, not the other way round, and it arrives already working under npm:
-     - `catalog:` specifications become plain version ranges, and `pnpm-workspace.yaml` goes;
-     - `workspace:*` specifications, between its own packages and in their `peerDependencies`, become the shared version range, which the release script bumps — npm rejects the `workspace:` protocol outright;
-     - `pnpm -r`, `pnpm --filter` and `pnpm exec` in its scripts, its CI workflow and its Playwright `webServer` commands become `npm run --workspace=…`, `--workspaces --if-present` and `npm exec`;
-     - `pnpm-lock.yaml` and the `packageManager` field go, replaced by a `package-lock.json` there. The import drops that lockfile: the root `package-lock.json` covers the UI from then on;
-     - every package that runs `tsc` declares its own `typescript`: npm hoists one version to the root, which is the engine's 4.x, so a package needing 5.x must declare it to get its own copy.
-
-   **The import change itself** then has to:
-   - add `hyperformula-ui/packages/*`, `hyperformula-ui/demo/*` and `hyperformula-ui/e2e` to the root `workspaces` array — not before: npm silently ignores an entry with no `package.json`, so listing them early buys nothing, and the lockfile is regenerated when the packages land either way;
-   - give each UI package a `lint` script running its own linter, so the root `npm run lint` picks it up;
-   - license each published UI package like the engine: `"license": "GPL-3.0-only"` in its `package.json`, the root `LICENSE.txt` in its tarball through the same `prepack` copy the engine uses, and an entry, by package name, in `WORKSPACES` in `script/check-licenses.mjs`, so its production dependencies pass the same allowlist;
-   - point the root fan-out scripts, which today target `--workspace=hyperformula` only, at the UI's packages too;
-   - delete the UI's own `.nvmrc`, if it has one — the root `.nvmrc` covers the whole repository — and add an `AGENTS.md` with a `CLAUDE.md` symlink, and `hyperformula-ui/dev-docs/`;
-   - keep the UI's own version and history: its packages stay on their `0.x` line, with `hyperformula-ui/CHANGELOG.md` and a release path of their own, tagged with a prefix such as `hyperformula-ui@0.3.0` so the tags cannot collide with the engine's bare `3.5.0`. `script/release/release.sh` keeps releasing the engine only. The UI's `peerDependencies` on `hyperformula` say which engine versions it works with.
-2. **Path-filter CI.** Each package's jobs should run only when its own paths change, with full runs on `develop`, `master`, and release branches. Not done here on purpose: a naive `paths:` filter on a workflow that branch protection lists as a required check leaves the check permanently pending, and pull requests become unmergeable. Doing it safely needs the required-checks list, which lives in repository settings rather than in the tree, and the `dorny/paths-filter`-plus-single-gate shape that the Handsontable monorepo uses.
-3. **Before this merges, switch the Workers Builds deploy commands.** The Cloudflare dashboard still runs `npx wrangler deploy` and `npx wrangler versions upload` at the repository root, which find no configuration and no `wrangler` there now that `wrangler.jsonc` lives in `docs/`. Set the deploy command to `npm run docs:deploy:cf` and the non-production branch deploy command to `npm run docs:preview:cf`, as [`docs/README.md`](../docs/README.md#deployment) describes. Do it first: every branch with the old layout already defines both scripts at its root, so the switch breaks nothing. Until it is made, every preview build fails, and production stops updating once the move reaches `master`.
+1. **Path-filter CI.** Each package's jobs should run only when its own paths change, with full runs on `develop`, `master`, and release branches. Not done here on purpose: a naive `paths:` filter on a workflow that branch protection lists as a required check leaves the check permanently pending, and pull requests become unmergeable. Doing it safely needs the required-checks list, which lives in repository settings rather than in the tree, and the `dorny/paths-filter`-plus-single-gate shape that the Handsontable monorepo uses.
+2. **Before this merges, switch the Workers Builds deploy commands.** The Cloudflare dashboard still runs `npx wrangler deploy` and `npx wrangler versions upload` at the repository root, which find no configuration and no `wrangler` there now that `wrangler.jsonc` lives in `docs/`. Set the deploy command to `npm run docs:deploy:cf` and the non-production branch deploy command to `npm run docs:preview:cf`, as [`docs/README.md`](../docs/README.md#deployment) describes. Do it first: every branch with the old layout already defines both scripts at its root, so the switch breaks nothing. Until it is made, every preview build fails, and production stops updating once the move reaches `master`.
 
 ## What the move decided
 
-- **npm workspaces, not pnpm.** A package-manager migration is a risk the move did not need to carry at the same time. The same holds for the UI, which uses pnpm today: it converts to npm in its own repository before it is imported, so this repository runs one package manager.
-- **`docs/` is not a workspace member, because its toolchain is legacy, not because it is large.** VuePress 1.x, webpack 4 and `--openssl-legacy-provider` must never be hoisted into the shared install. The UI, larger but current, does join the workspace — see [Workspaces](#workspaces). It installs on its own with `npm run docs:install`, and CI installs it before building the portal.
-- **`hyperformula-ui/` is nested, not flat.** The UI keeps its own layout under one directory, rather than each of its packages getting a top-level directory of its own. The import is then one move with the history intact, the UI's toolchain stays separable from the engine's, and each package's internals still travel with it. The cost: `hyperformula-ui/` is a folder rather than a package, and the root lists its members by glob.
-- **`dev-docs/` at two levels, not one at the root.** One directory at the root was the original plan; it was dropped in favour of splitting by ownership, so that each package's internals travel with the package and `hyperformula-ui` gets its own when it lands. Repository-wide standards stay here, and a fact lives in exactly one level — see [`dev-docs/` at two levels](#dev-docs-at-two-levels).
-- **The UI packages are GPL-3.0-only, like the engine** — the working assumption until a licensing decision says otherwise. It sets what the import does with their manifests, their tarballs and the licence gate; see [What the move still owes](#what-the-move-still-owes).
-- **The UI versions on its own until it is mature, then joins the engine's version.** While its API is still moving, the UI releases on its own `0.x` line, where every minor release may break, with its own changelog — rather than starting at `3.x` and forcing an engine major, or a break smuggled into a minor, whenever the UI changes incompatibly. Once the team judges the UI ready, the versions join — there is no fixed trigger — and from then on the packages release together, on one version, from one changelog. A release then cuts every published package at the same version, whether or not each one changed, and `CHANGELOG.md` at the repository root is the single history for all of them; the UI's changelog is folded into it. That keeps one number to reason about — the version a user reports a bug against identifies the state of the whole repository — at the cost of publishing a package whose code did not move. This order is the safe one: joining separate versions only needs version numbers to go up, while splitting a shared version after users depend on it is hard.
+- **npm workspaces, not pnpm.** A package-manager migration is a risk the move did not need to carry at the same time. The UI, which used pnpm, was converted to npm when it was imported, so this repository runs one package manager.
+- **`docs/` is not a workspace member, because its toolchain is legacy, not because it is large.** VuePress 1.x, webpack 4 and `--openssl-legacy-provider` must never be hoisted into the shared install. The UI, larger but current, does join the workspace — see [Workspaces](#workspaces). The portal has since moved to Astro, so the reason no longer holds; see the same section. It installs on its own with `npm run docs:install`, and CI installs it before building the portal.
+- **`hyperformula-ui/` is nested, not flat.** The UI keeps its own layout under one directory, rather than each of its packages getting a top-level directory of its own. Its shared configuration keeps working at the same relative paths, its toolchain stays separable from the engine's, and each package's internals still travel with it. The cost: `hyperformula-ui/` is a folder rather than a package, and the root lists its members by glob.
+- **Only the formula builder's core was imported, without its history.** It came from the formula-builder repository at commit `e85b52b` as one snapshot, with the shared configuration it needs, the editor-only demo and its end-to-end check, and was renamed from `@hfe/core` to `hyperformula-ui`. Grid adapters are not part of the product: Handsontable ships its own as a built-in plugin, and adapters for other grids are examples maintained outside this repository. The formula-builder repository keeps the full history.
+- **`dev-docs/` at two levels, not one at the root.** One directory at the root was the original plan; it was dropped in favour of splitting by ownership, so that each package's internals travel with the package and `hyperformula-ui` has its own. Repository-wide standards stay here, and a fact lives in exactly one level — see [`dev-docs/` at two levels](#dev-docs-at-two-levels).
+- **The UI packages are MIT, unlike the engine.** Each published one declares the licence in its `package.json`, keeps its own `LICENSE.txt` under version control in the package directory, where npm picks it up without a `prepack` copy, and is listed in `WORKSPACES` in `script/check-licenses.mjs`, so its production dependencies pass the same allowlist.
+- **The UI versions on its own until it is mature, then joins the engine's version.** While its API is still moving, the UI releases on its own `0.x` line, where every minor release may break, with its own changelog and its own manual release procedure, [`hyperformula-ui/dev-docs/RELEASE.md`](../hyperformula-ui/dev-docs/RELEASE.md), with tags prefixed `hyperformula-ui@` so they cannot collide with the engine's bare `3.5.0` — rather than starting at `3.x` and forcing an engine major, or a break smuggled into a minor, whenever the UI changes incompatibly. Once the team judges the UI ready, the versions join — there is no fixed trigger — and from then on the packages release together, on one version, from one changelog. A release then cuts every published package at the same version, whether or not each one changed, and `CHANGELOG.md` at the repository root is the single history for all of them; the UI's changelog is folded into it. That keeps one number to reason about — the version a user reports a bug against identifies the state of the whole repository — at the cost of publishing a package whose code did not move. This order is the safe one: joining separate versions only needs version numbers to go up, while splitting a shared version after users depend on it is hard.
 - **The published tarball still carries a changelog and a licence.** `hyperformula`'s `prepack` copies the root `CHANGELOG.md` and `LICENSE.txt` into the package and `postpack` removes them again, so each is one file under version control and npm consumers still get both. The webpack banner reads the root `LICENSE.txt` directly.
 - **One `.nvmrc`, at the root.** The whole repository runs on one Node version; `nvm` finds the root file from any subdirectory, and Workers Builds, which starts at the root, reads it too.
 - **Each directory lints itself.** `hyperformula/` and `docs/` each carry their own `.eslintrc.js` and `.eslintignore`, and each package declares the lint tooling it uses. The root `npm run lint` only fans out with `--workspaces --if-present`, so a package with a different linter or TypeScript version — the UI — brings its own, and the engine's rules, licence header included, never reach it. `docs/` is not a workspace, so its lint is `npm run docs:lint`, run by the documentation CI job, which installs the portal anyway.
@@ -153,4 +152,4 @@ Each is a pointer of a few lines — what the directory is, and which `dev-docs/
 Both were pre-existing, and both are recorded here because the next person will otherwise rediscover them the hard way.
 
 - **The source language packs were never linted.** The old ignore list carried a bare `languages` entry meant for the build output. An unanchored pattern matches a directory of that name at any depth, so it also excluded `src/i18n/languages/`, and the `sort-keys` override targeting those files never ran. Anchoring the build-output entry exposed 881 violations. They are excluded again, deliberately and with a comment, in [`hyperformula/.eslintignore`](../hyperformula/.eslintignore); sorting 19 translation files is a change of its own.
-- **`@vuepress/shared-utils` only works inside a full VuePress dependency tree.** It requires `markdown-it-emoji` and a `lru-cache` major it does not declare, and relied on `vuepress` hoisting them. That is why the built-in-functions generator moved into `docs/script/`, where that tree exists, rather than staying beside the engine build scripts.
+- **`@vuepress/shared-utils` only works inside a full VuePress dependency tree.** It requires `markdown-it-emoji` and a `lru-cache` major it does not declare, and relied on `vuepress` hoisting them. That is why the built-in-functions generator moved into `docs/script/`, where that tree exists, rather than staying beside the engine build scripts. The portal has since moved to Astro and the generator slugifies with `github-slugger` instead.
