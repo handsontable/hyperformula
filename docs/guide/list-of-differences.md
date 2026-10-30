@@ -102,6 +102,8 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
 | CEILING.MATH  | =CEILING.MATH(-4.3, 2, 2)                                      |           -4 |            -6 |              -6 |
 | FLOOR.MATH    | =FLOOR.MATH(-4.7, 2, 2)                                        |           -6 |            -4 |              -4 |
+| RANK.EQ       | =RANK.EQ(2, {1, 2, 3})                                         |            2 |   Not checked |    Not accepted |
+| RANK          | =RANK(2, {1, 2, 3})                                            |            2 |   Not checked |    Not accepted |
 
 A few of the rows above share a root cause worth stating once:
 
