@@ -1,4 +1,5 @@
 ---
+title: "Undo-redo"
 tags:
   - undoLimit
   - undo history
@@ -6,8 +7,6 @@ tags:
   - revert changes
   - Ctrl+Z
 ---
-
-# Undo-redo
 
 HyperFormula supports undo-redo for CRUD and move operations.
 By default, you can **undo 20 actions.** The `undoLimit` can be changed
@@ -34,7 +33,7 @@ that undo-redo will recognize them as a single cumulative operation.
 
 ## Demo
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/undo-redo/example1.html)
 

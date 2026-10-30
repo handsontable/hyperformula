@@ -1,4 +1,5 @@
 ---
+title: "Performance"
 tags:
   - speed
   - slow
@@ -11,8 +12,6 @@ tags:
   - chooseAddressMappingPolicy
   - maxPendingLazyTransformations
 ---
-
-# Performance
 
 We implemented various techniques to boost the performance of
 HyperFormula. In some cases, turning them on or off might increase
