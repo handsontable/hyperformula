@@ -99,7 +99,7 @@ Where Excel evaluates an argument as an **array containing only text**, it ignor
 | `=SUM(IF(A1:A3>0,"",A1:A3))` | `0` | `0` | `#VALUE!` |
 | `=COUNT(IF({1,0},"",5))` | `1` | `1` | `0` |
 
-That agreement was a coincidence rather than support for the idiom: HyperFormula's `IF` is not array-aware, so it collapses such an argument to a single value regardless. `=SUM(IF(A1:A3>5,"",A1:A3))` over `1, 2, 3` is `6` in Excel and `1` in HyperFormula — in 3.x as much as in 4.0. What changes is only that the collapsed value is no longer silently read as `0`. Ranges and array literals with more than one element are unaffected: `=SUM({1,"",2})` is `3` and `=COUNT({1,"",2})` is `2`, before and after.
+That agreement was a coincidence rather than support for the idiom: with the [array arithmetic mode](arrays.md#array-arithmetic-mode) disabled (the default), HyperFormula's `IF` collapses such an argument to a single value regardless. `=SUM(IF(A1:A3>5,"",A1:A3))` entered in `B1`, with `1, 2, 3` in `A1:A3`, is `6` in Excel and `1` in HyperFormula — in 3.x as much as in 4.0. What changes is only that the collapsed value is no longer silently read as `0`. With the array arithmetic mode enabled, `IF` returns an array, and all three formulas in this section give the same results as in Excel. Ranges and array literals with more than one element are unaffected: `=SUM({1,"",2})` is `3` and `=COUNT({1,"",2})` is `2`, before and after.
 
 ### Blank cells are not affected
 
