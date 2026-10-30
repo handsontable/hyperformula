@@ -1523,9 +1523,6 @@ export class DependencyGraph {
   }
 
   /**
-   * Removes the edge of a runtime dependency. Removes the read cell's vertex too if it is an empty cell nothing else depends on.
-   */
-  /**
    * Removes the edge of a runtime dependency. A range vertex or empty cell vertex left without dependents is removed
    * later, by {@link removeUnusedRuntimeVertices}: the edge is removed during evaluation, while the sort may still hold the vertex.
    */
