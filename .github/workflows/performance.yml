@@ -6,19 +6,66 @@ permissions:
 # Two measurements of the same scenarios, one report. The instruction count (callgrind) decides the verdict: it does
 # not depend on the load of the shared runner. Wall-clock times are measured too and shown for information. The
 # report is advisory: a regression is reported in the comment and never fails the pull request.
+# The measurements run only when the pull request can change what they measure (see the `changes` job) or carries the
+# `Performance` label; otherwise every job after `changes` is skipped and an earlier comment stays as it was.
 on:
   pull_request:
     types:
       - opened
       - reopened
       - synchronize # the head branch is updated from the base branch, new commits are pushed to the head branch, or the base branch is changed
+      - labeled # adding the `Performance` label starts a run; any other label is ignored
 
 env:
   # The smallest change of the instruction count, in percent of the base count, that is reported. Set only here.
   PERF_INSTRUCTIONS_THRESHOLD: '0.5'
 
 jobs:
+  # Decides once for the run. A path filter under `on:` cannot do it: it would apply to the `labeled` event as well,
+  # so a label could never start a run on a pull request that changes none of the paths.
+  changes:
+    name: Decide whether to measure
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      measure: ${{ steps.decide.outputs.measure }}
+    steps:
+      - name: Decide
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_ACTION: ${{ github.event.action }}
+          ADDED_LABEL: ${{ github.event.label.name }}
+          HAS_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'Performance') }}
+          FILES_API: repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files
+          # The engine's source, the dependencies and Node.js version it is built and measured with, and this workflow.
+          PATHS: '^(hyperformula/src/|package\.json$|package-lock\.json$|hyperformula/package\.json$|\.nvmrc$|\.github/workflows/performance\.yml$)'
+        # File names come from the pull request, so they go to the job summary only, never to the log, where a line
+        # can be read as a workflow command.
+        run: |
+          if [ "$EVENT_ACTION" = labeled ]; then
+            if [ "${ADDED_LABEL,,}" = performance ]; then measure=true; reason="the Performance label was added"
+            else measure=false; reason="another label was added; only the Performance label starts a run"; fi
+          elif [ "$HAS_LABEL" = true ]; then
+            measure=true; reason="the pull request carries the Performance label"
+          else
+            gh api --paginate "$FILES_API" --jq '.[].filename' > "$RUNNER_TEMP/changed-files.txt"
+            if grep -E "$PATHS" "$RUNNER_TEMP/changed-files.txt" > "$RUNNER_TEMP/matched-files.txt"; then
+              measure=true; reason="it changes measured paths ($(wc -l < "$RUNNER_TEMP/matched-files.txt") of $(wc -l < "$RUNNER_TEMP/changed-files.txt") changed files)"
+            else
+              measure=false; reason="it changes no measured path ($(wc -l < "$RUNNER_TEMP/changed-files.txt") changed files)"
+            fi
+          fi
+          echo "measure=$measure" >> "$GITHUB_OUTPUT"
+          echo "Measure: $measure, because $reason."
+          {
+            echo "Performance measured: $measure, because $reason."
+            if [ -s "$RUNNER_TEMP/matched-files.txt" ]; then echo; head -n 20 "$RUNNER_TEMP/matched-files.txt" | sed 's/.*/- `&`/'; fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
   performance-test:
+    needs: changes
+    if: needs.changes.outputs.measure == 'true'
     strategy:
       matrix:
         node-version: [ '22' ]
@@ -117,6 +164,8 @@ jobs:
           done
 
   instruction-count:
+    needs: changes
+    if: needs.changes.outputs.measure == 'true'
     name: Count instructions
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -209,8 +258,8 @@ jobs:
   # says which side is missing.
   report:
     name: Performance report
-    needs: [ performance-test, instruction-count ]
-    if: always()
+    needs: [ changes, performance-test, instruction-count ]
+    if: always() && needs.changes.outputs.measure == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
