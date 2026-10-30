@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added new functions: RANK.EQ and its alias RANK. [#1786](https://github.com/handsontable/hyperformula/pull/1786)
+- Added the `RANK.EQ` function and its alias `RANK`. [#1786](https://github.com/handsontable/hyperformula/pull/1786)
 
 ### Fixed
 
