@@ -1,4 +1,5 @@
 ---
+title: "Migrating from 1.x to 2.0"
 tags:
   - migration
   - migrate
@@ -8,8 +9,6 @@ tags:
   - GPU acceleration
   - v2.0
 ---
-
-# Migrating from 1.x to 2.0
 
 To upgrade your HyperFormula version from 1.x.x to 2.0.0, follow this guide.
 
@@ -33,6 +32,6 @@ const engine = HyperFormula.buildFromArray([[]], {
 });
 ```
 
-::: tip
+:::tip
 Functions that used GPU acceleration before (MMULT, MAXPOOL, MEDIANPOOL, and TRANSPOSE), still work. Their performance remains largely the same, except for very large data sets.
 :::
