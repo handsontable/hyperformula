@@ -7,7 +7,7 @@ description: Use when creating or editing a page in the HyperFormula documentati
 
 | File | Why |
 |---|---|
-| [`DOCS-CONTENT-GUIDE.md`](../../../dev-docs/DOCS-CONTENT-GUIDE.md) | How to write the page: structure, chunking, language, code examples, VuePress conventions, and the self-review checklist to run before finishing |
+| [`DOCS-CONTENT-GUIDE.md`](../../../dev-docs/DOCS-CONTENT-GUIDE.md) | How to write the page: structure, chunking, language, code examples, site conventions, and the self-review checklist to run before finishing |
 | [`DOC-STANDARDS.md`](../../../dev-docs/DOC-STANDARDS.md) | When documentation is required, which files are generated, describing HyperFormula rather than Excel, and the portal's rules |
 | [`FUNCTION-CATALOGUE.md`](../../../hyperformula/dev-docs/FUNCTION-CATALOGUE.md) | Only when the change concerns the built-in functions page, which is generated from the catalogue |
 

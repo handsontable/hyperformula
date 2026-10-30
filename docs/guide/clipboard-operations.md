@@ -1,11 +1,10 @@
 ---
+title: "Clipboard operations"
 tags:
   - clearClipboard
   - isClipboardEmpty
   - system clipboard
 ---
-
-# Clipboard operations
 
 Through a set of dedicated methods, HyperFormula supports clipboard operations, such as copying, cutting,
 and pasting. This lets you integrate the functionality
@@ -33,7 +32,7 @@ const clipboardContent = hfInstance.copy({
 
 To cut the contents of a cell or range, use the [`cut()`](../api/classes/hyperformula.md#cut) method. Pass arguments of type [`SimpleCellRange`](../api/interfaces/simplecellrange).
 
-::: tip
+:::tip
 Any CRUD operation called after the [`cut()`](../api/classes/hyperformula.md#cut) method aborts the cut operation.
 :::
 
@@ -78,7 +77,7 @@ When called after [`copy()`](../api/classes/hyperformula.md#copy), the [`paste()
 - Pastes the copied data into the target range.
 - Triggers a recalculation of all affected formulas.
 
-::: tip
+:::tip
 If a formula `=A1` is copied from cell B1 into B2, the B2 formula becomes `=A2`.
 :::
 
@@ -89,7 +88,7 @@ When called after [`cut()`](../api/classes/hyperformula.md#cut), the [`paste()`]
 - Removes the cut data from the source range.
 - Triggers a recalculation of all affected formulas.
 
-::: tip
+:::tip
 If a formula `=A1` is cut from cell B1 into B2, the B2 formula becomes `=A1`.
 :::
 
@@ -119,7 +118,7 @@ Depending on what was cut, the data is stored as:
 
 ## Demo
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/clipboard-operations/example1.html)
 
