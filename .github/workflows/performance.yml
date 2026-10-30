@@ -4,8 +4,9 @@ permissions:
   pull-requests: write
 
 # Two measurements of the same scenarios, one report. The instruction count (callgrind) decides the verdict: it does
-# not depend on the load of the shared runner. Wall-clock times are measured too and shown for information. The
-# report is advisory: a regression is reported in the comment and never fails the pull request.
+# not depend on the load of the shared runner. A regression of the instruction count fails the `Count instructions`
+# check and is named in the report. Wall-clock times are measured too and shown for information; they never fail the
+# pull request.
 on:
   pull_request:
     types:
@@ -16,6 +17,8 @@ on:
 env:
   # The smallest change of the instruction count, in percent of the base count, that is reported. Set only here.
   PERF_INSTRUCTIONS_THRESHOLD: '0.5'
+  # '1': a regression above that threshold fails the `Count instructions` job, and the report says that it does.
+  PERF_INSTRUCTIONS_GATE: '1'
 
 jobs:
   performance-test:
@@ -119,7 +122,6 @@ jobs:
   instruction-count:
     name: Count instructions
     runs-on: ubuntu-latest
-    continue-on-error: true
     timeout-minutes: 60
     outputs:
       comparison: ${{ steps.export.outputs.comparison }}
@@ -183,10 +185,29 @@ jobs:
       - name: (head) Count instructions
         run: cd head && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/head-instructions.json"
 
+      # Exits 2 when the gate is on and a scenario regressed (the comparison is written first), 1 when the comparison
+      # itself failed (nothing is written).
       - name: Compare the counts
         env:
           PERF_COMPARISON_JSON: ${{ github.workspace }}/instructions-comparison.json
+          PERF_GATE: ${{ env.PERF_INSTRUCTIONS_GATE }}
         run: cd head && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/compare-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json" "$GITHUB_WORKSPACE/head-instructions.json" "$GITHUB_WORKSPACE/instructions-report.md"
+
+      # A red check has two causes, kept apart here and in the report: a comparison that found a regression, or a
+      # measurement that broke before there was a comparison.
+      - name: Explain the failure
+        if: failure()
+        run: |
+          f="$GITHUB_WORKSPACE/instructions-comparison.json"
+          regressions=""
+          if [ -s "$f" ]; then
+            regressions=$(node -e 'const c = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).comparison; if (c.hasRegression) console.log(c.rows.filter(r => r.verdict === "regression").map(r => r.name).join("; "))' "$f")
+          fi
+          if [ -n "$regressions" ]; then
+            echo "::error title=Instruction count regression::Above +${PERF_INSTRUCTIONS_THRESHOLD}% in: $regressions"
+          else
+            echo "::error title=Instruction count not measured::The measurement or the comparison failed, so this check says nothing about a regression; see the failed step above."
+          fi
 
       - name: Export the comparison for the report
         id: export
@@ -205,8 +226,9 @@ jobs:
             echo "::endgroup::"
           done
 
-  # One comment for both measurements, updated on every push. It runs even when a measurement failed, and then
-  # says which side is missing.
+  # One comment for both measurements, updated on every push. It runs even when a measurement job failed: a side that
+  # produced nothing is reported as missing, and an instruction check that failed on a regression still exports its
+  # comparison, so the report names the regressions.
   report:
     name: Performance report
     needs: [ performance-test, instruction-count ]
@@ -253,6 +275,7 @@ jobs:
           PERF_REPORT_HEAD: ${{ github.event.pull_request.head.sha }}
           PERF_REPORT_BASE: ${{ github.event.pull_request.base.sha }}
           PERF_REPORT_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PERF_REPORT_GATE: ${{ env.PERF_INSTRUCTIONS_GATE }}
         run: |
           export PERF_REPORT_TESTS="$(git -C head/hyperformula/test/hyperformula-tests rev-parse HEAD)"
           cd head && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/report.ts "$GITHUB_WORKSPACE/instructions-comparison.json" "$GITHUB_WORKSPACE/wall-clock-comparison.json" "$GITHUB_WORKSPACE/performance-comment.md"
