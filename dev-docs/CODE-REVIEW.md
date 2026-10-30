@@ -9,7 +9,7 @@ Every pull request is reviewed by a teammate before it is merged. This page says
 - **Questions, not a pass/fail form.** Many points below are judgement calls. If you accept a trade-off, say so in the review, with the reason.
 - **Skip consciously.** Not every section applies to every pull request. Know which ones you skipped, and why.
 - **Behaviour and tests first.** Review them at least as carefully as the code. Running the change — a formula in a cell, a small demo — often says more than reading the diff.
-- **Review against a source of truth:** the task and its spec, Excel's documentation, the upstream README, or the process the change follows. Without one, a review only checks whether the code looks good.
+- **Review against a source of truth:** the task and its spec, Excel's documentation, the upstream README, or the process the change follows. Without one, a review only checks whether the code looks good. Excel's documentation tells you what to check, not what the result is: where it states a result, measure it in Excel before relying on it.
 - **Fix the tooling.** When a linter or CI could catch a problem, change the tooling instead of commenting on the same problem in every pull request.
 
 ## The questions to ask
@@ -108,3 +108,4 @@ Each line names the page that owns the rules and when it applies. Where reviews 
 - **Comments stand on their own.** The author should not need to open the spec to understand them. Explain why, so the author — human or agent — learns the rule, not only the fix.
 - **Use `suggestion` blocks** for small textual changes: changelog, docs, naming.
 - **Every comment you post is yours.** Verify each finding yourself, including the ones an AI review produced. Never paste raw AI output into a pull request.
+- **Expected values come from Excel.** A finding that proposes a test case states its expected value only if that value was measured in Excel ([Verifying expected values](../hyperformula/dev-docs/EXCEL-COMPATIBILITY.md#verifying-expected-values)). HyperFormula's own result shows what the code does, not what it should do. If the value has not been measured, ask for the case to be measured and tested, without stating the value.
