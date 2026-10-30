@@ -1478,6 +1478,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
+    let seeded = 0; for (let i = 0; i < 200000; i++) { seeded += i & 7 } if (seeded < 0) { throw new Error('unreachable') } // SEEDED SLOWDOWN (throwaway control)
     this.ensureCapability(FeatureId.Crud)
     this._crudOperations.setCellContents(topLeftCornerAddress, cellContents)
     return this.recomputeIfDependencyGraphNeedsIt()
