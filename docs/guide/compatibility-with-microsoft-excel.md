@@ -1,4 +1,5 @@
 ---
+title: "Compatibility with Microsoft Excel"
 tags:
   - MS Excel
   - missing Excel functions
@@ -10,12 +11,7 @@ tags:
   - interoperability
 ---
 
-# Compatibility with Microsoft Excel
-
 Achieve nearly full compatibility with Microsoft Excel, using the right HyperFormula configuration.
-
-**Contents:**
-[[toc]]
 
 ## Overview
 
