@@ -18,6 +18,7 @@ const NO_DEPENDENCIES: RuntimeDependency[] = []
 export class EvaluationPass {
   private currentDependent?: FormulaVertex
   private currentRecorded?: RuntimeDependency[]
+  private currentPullRequested = false
   /**
    * Range vertices created in this pass, while some of their cells may still be pending. The sort of the pass started
    * before they existed, so it does not know them: whether they are pending says nothing about their cells.
@@ -43,6 +44,15 @@ export class EvaluationPass {
   public begin(dependent: FormulaVertex): void {
     this.currentDependent = dependent
     this.currentRecorded = undefined
+    this.currentPullRequested = false
+  }
+
+  /**
+   * True if the current evaluation requested a pull. Its result must not be stored even if it completes, e.g., when a
+   * custom function caught {@link EVALUATION_DEFERRED}: the requested cell is not current yet.
+   */
+  public get pullRequested(): boolean {
+    return this.currentPullRequested
   }
 
   /**
@@ -52,6 +62,7 @@ export class EvaluationPass {
     const recorded = this.currentRecorded ?? NO_DEPENDENCIES
     this.currentDependent = undefined
     this.currentRecorded = undefined
+    this.currentPullRequested = false
     return recorded
   }
 
@@ -68,6 +79,7 @@ export class EvaluationPass {
    */
   public requestPull(vertex: Vertex): void {
     this.topSortPass.requestPull(vertex)
+    this.currentPullRequested = true
   }
 
   /**

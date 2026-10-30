@@ -90,7 +90,6 @@ Its optional last argument, `referenceExpected`, gives the non-reference callbac
 - **Never hand-roll coercion.** Declare the `argumentType` and let `runFunction` coerce, or use `ArithmeticHelper`.
 - **Never describe Excel's behaviour when HyperFormula deviates.** Implement what is specified, then record the deviation in [`docs/guide/list-of-differences.md`](../../docs/guide/list-of-differences.md). What the results must be, and how to check them against Excel, is in [`EXCEL-COMPATIBILITY.md`](EXCEL-COMPATIBILITY.md).
 - **Never allocate inside a per-cell loop** when the value can be hoisted.
-- **Never catch `EvaluationDeferred`.** A function that reads a cell found at evaluation time (INDIRECT) throws it when that cell is not current yet; the evaluator catches it, computes the cell, and retries the formula. A plugin that catches it, for example in a broad `try`/`catch`, stops the retry.
 
 ### The six places a function change must touch
 

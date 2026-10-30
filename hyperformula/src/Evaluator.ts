@@ -191,7 +191,8 @@ export class Evaluator {
   /**
    * Evaluates a formula vertex and stores its value and runtime dependencies.
    *
-   * @returns the new value, or undefined if the evaluation was deferred to a later pass
+   * @returns the new value, or undefined if the evaluation requested a cell that is not current yet, so the formula is
+   * retried once that cell is computed
    */
   private recomputeFormulaVertexValue(vertex: FormulaVertex, address: SimpleCellAddress, evaluationPass: EvaluationPass): Maybe<InterpreterValue> {
     if (vertex instanceof ArrayFormulaVertex && (vertex.array.size.isRef || !this.dependencyGraph.isThereSpaceForArray(vertex))) {
@@ -213,6 +214,13 @@ export class Evaluator {
       throw e
     } finally {
       this.interpreter.evaluationPass = undefined
+    }
+
+    if (evaluationPass.pullRequested) {
+      // a function caught EVALUATION_DEFERRED, e.g., a custom function with a try/catch: the cell it requested is not
+      // current yet, so neither is the value it returned
+      this.dependencyGraph.keepRuntimeDependencies(vertex, evaluationPass.end())
+      return undefined
     }
 
     this.dependencyGraph.commitRuntimeDependencies(vertex, evaluationPass.end())
