@@ -1,5 +1,5 @@
 export { CN, TOKEN_CN } from "./classNames";
-export type { StyleInjector } from "./injectStyles";
+export type { StyleInjector, StyleRoot } from "./injectStyles";
 export { createStyleInjector } from "./injectStyles";
 export type { RefIndexMap } from "./refPalette";
 export {
