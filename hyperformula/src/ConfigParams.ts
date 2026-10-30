@@ -119,6 +119,10 @@ export interface ConfigParams {
   decimalSeparator: '.' | ',',
   /**
    * When set to `true`, formulas evaluating to `null` evaluate to `0` instead.
+   *
+   * The same applies to an empty cell read through the API: `getCellValue()`, `getSheetValues()` and the
+   * other methods that return cell values, as well as the changes passed to the `valuesUpdated` event,
+   * give `0` for it instead of `null`. `ISBLANK` still treats the cell as blank.
    * @default false
    * @category Engine
    */
