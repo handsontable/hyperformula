@@ -22,7 +22,7 @@ Root scripts fan out to the packages. `npm run lint` fans out to every workspace
 | `docs/api/` | `npm run typedoc:build-api` — TypeDoc runs inside `hyperformula/`, where the `tsconfig.json` is, and writes across into the portal | Never edit. Change the JSDoc in `hyperformula/src/`. |
 | `docs/guide/built-in-functions.md` | `npm run docs:generate-function-docs`, which runs `docs/script/generate-builtin-functions-doc.ts` against the metadata catalogue | Never edit, never commit. Needs the portal installed. |
 
-The generator lives in `docs/script/` rather than beside the engine build scripts because it uses `@vuepress/shared-utils` for slugs, and that package only resolves inside a full VuePress dependency tree.
+The generator lives in `docs/script/` rather than beside the engine build scripts because it slugifies the category headings with the portal's own `github-slugger`, the one the site gives every heading its id with, so the page's links and its headings always agree.
 
 Both are git-ignored, and both are regenerated as the first step of `docs:dev` and `docs:build`. `docs:generate-function-docs` is a gate, not a formatter: it fails the build on a missing catalogue entry or a `'Custom'` category. See [`FUNCTION-CATALOGUE.md`](../hyperformula/dev-docs/FUNCTION-CATALOGUE.md).
 
