@@ -107,7 +107,10 @@ export abstract class AdvancedFind {
         continue
       }
       
-      if (compareFn(bestValue, value) < 0) {
+      // the numeric initial bound ranks below every string, so the first candidate of a text key is taken explicitly
+      const isFirstCandidate = bestIndex === NOT_FOUND && typeof value === typeof searchKey
+
+      if (isFirstCandidate || compareFn(bestValue, value) < 0) {
         bestValue = value
         bestIndex = i
       }
