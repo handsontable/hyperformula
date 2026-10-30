@@ -1,4 +1,5 @@
 ---
+title: "Array formulas"
 tags:
   - ARRAYFORMULA
   - useArrayArithmetic
@@ -7,8 +8,6 @@ tags:
   - arrayRowSeparator
   - arrayColumnSeparator
 ---
-
-# Array formulas
 
 Use array formulas to perform an operation (or call a function) on multiple cells at a time.
 
@@ -32,7 +31,7 @@ An inline array is defined by curly braces: `{ }`. It can contain one or more ro
   
 Every row must be of equal length.
 
-::: tip
+:::tip
 **Inline arrays are not recomputed after initialization.**
 
 If an inline array contains a cell reference, and the cell's value changes, the array is not updated.
@@ -87,7 +86,7 @@ Thanks to HyperFormula's built-in array features, you can:
 
 You can also:
 * Use the `FILTER` function to [filter an array](#filtering-an-array), based on boolean arrays
-* Use the `ARRAY_CONSTRAIN` function to [constrain an array's size](#constraining-an-array-s-size)
+* Use the `ARRAY_CONSTRAIN` function to [constrain an array's size](#constraining-an-arrays-size)
 
 ### Operating on arrays
 
