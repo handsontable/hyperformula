@@ -101,6 +101,11 @@ Each line names the page that owns the rules and when it applies. Where reviews 
 - [ ] Every accepted trade-off and every accepted risk is written down — in the review, and in JSDoc where it matters for the code. No silent open threads.
 - [ ] I would co-own this pull request — see [Approval means co-ownership](#principles).
 
+### Recurring errors no page names
+
+- [ ] **A change to one sibling reaches all of them.** A guard, fix, `@category` tag or guide section added to one of several siblings (related functions, the undo entries, the `stringify*` callbacks in `ConfigParams`, guides built on one pattern) is added to the others, or the description says why not. [Consistency](../hyperformula/dev-docs/EXCEL-COMPATIBILITY.md#consistency) covers what related functions return; this covers their code and docs.
+- [ ] **Links and anchors in changed docs resolve.** Nothing in the docs build checks them yet. When a check does, remove this line (see [Fix the tooling](#principles)).
+
 ## Reporting findings
 
 - **One line per finding:** what is wrong, where, and what to do instead. No praise, no summary of what the pull request does.
