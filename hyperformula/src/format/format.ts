@@ -91,7 +91,8 @@ function stripColorTags(formatArg: string): string {
 /**
  * Splits an Excel number-format string into its sign-selected sections on
  * unescaped `;`, honoring `\;` escapes and `"…"` quoted literals so a semicolon
- * inside a quoted literal does not split. Excel uses up to four sections
+ * inside a quoted literal does not split. Inside a quoted literal a backslash is
+ * literal text, so `"x\";"neg"` has two sections. Excel uses up to four sections
  * (`positive;negative;zero;text`); only the first three are ever selected for a
  * numeric value, so no cap is enforced here — surplus sections are simply never
  * read.
@@ -107,7 +108,7 @@ function splitIntoSections(formatStr: string): string[] {
   for (let i = 0; i < formatStr.length; i++) {
     const ch = formatStr[i]
 
-    if (ch === '\\') {
+    if (ch === '\\' && !inQuotes) {
       // Keep the backslash and the escaped character together, verbatim.
       current += ch
       if (i + 1 < formatStr.length) {

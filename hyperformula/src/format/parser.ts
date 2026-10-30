@@ -111,6 +111,31 @@ export function splitQuotedLiterals(str: string): FormatSegment[] {
 }
 
 /**
+ * Splits a format string the way the tokenizers read it: as
+ * {@link splitQuotedLiterals}, except that an empty quoted literal (`""`)
+ * stands for no text, so it is dropped and the format code on both sides of it
+ * is joined. `0""0` is read as `00`, and `mm"":ss` as `mm:ss`.
+ *
+ * @param str the format string
+ * @returns the runs in order, with no empty quoted literal
+ */
+function splitForTokenizing(str: string): FormatSegment[] {
+  const segments: FormatSegment[] = []
+  for (const segment of splitQuotedLiterals(str)) {
+    if (segment.quoted && quotedLiteralContent(segment.text) === '') {
+      continue
+    }
+    const previous = segments[segments.length - 1]
+    if (!segment.quoted && previous !== undefined && !previous.quoted) {
+      previous.text += segment.text
+    } else {
+      segments.push({...segment})
+    }
+  }
+  return segments
+}
+
+/**
  * Returns the text a quoted literal stands for: its content without the
  * delimiting quotes (`"a0b"` → `a0b`). An unterminated literal (`"abc` at the
  * end of a format) has no closing quote to remove.
@@ -200,7 +225,7 @@ export function parseForDateTimeFormat(str: string): Maybe<FormatExpression> {
   const tokens: FormatToken[] = []
   let hasDateTimeToken = false
 
-  for (const segment of splitQuotedLiterals(str)) {
+  for (const segment of splitForTokenizing(str)) {
     if (segment.quoted) {
       tokens.push(formatToken(TokenType.FREE_TEXT, quotedLiteralContent(segment.text)))
       continue
@@ -232,7 +257,7 @@ export function parseForNumberFormat(str: string): Maybe<FormatExpression> {
   const tokens: FormatToken[] = []
   let hasNumberToken = false
 
-  for (const segment of splitQuotedLiterals(str)) {
+  for (const segment of splitForTokenizing(str)) {
     if (segment.quoted) {
       tokens.push(formatToken(TokenType.FREE_TEXT, quotedLiteralContent(segment.text)))
       continue
