@@ -97,6 +97,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | NORMSDIST     | =NORMSDIST(0, TRUE())                                          |          0.5 |  Wrong number |    Wrong number |
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
+| TEXTSPLIT     | =TEXTSPLIT(",,", ",", , TRUE())                               |          N/A |   Not checked |           CALC  |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
@@ -108,5 +109,3 @@ A few of the rows above share a root cause worth stating once:
 - **Rounding toward zero, not down.** `INT` discards the fractional part rather than rounding toward negative infinity, so it differs from Excel and Google Sheets for negative input only. `ROUNDDOWN`/`ROUNDUP` are unaffected — they are defined in terms of zero in all three.
 - **`ISEVEN`/`ISODD` do not truncate.** They test the remainder of the value as given, so a value with a fractional part returns `FALSE` from *both*. Excel and Google Sheets truncate to an integer first, so exactly one of the two is always `TRUE`.
 - **`CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1.** Excel and Google Sheets switch the negative-number rounding direction for any non-zero `mode`.
-- **`TEXTSPLIT` returns `#N/A` where Excel returns `#CALC!`** when `ignore_empty` is on and nothing is left after the split (`=TEXTSPLIT(",,", ",", , TRUE())`), because HyperFormula has no `#CALC!` error.
-- **`TEXTSPLIT` needs literal arguments to size its result.** The size of the spilled array depends on the text and the delimiters, and HyperFormula predicts it only when the text, the delimiters, `ignore_empty` and `match_mode` are literals (a number may carry a sign). With anything else, such as `=TEXTSPLIT(1+1, ",")` or a cell reference, the formula is treated as returning one value and a longer result is `#VALUE!`, the same limitation as `SEQUENCE` with non-literal dimensions (`=SEQUENCE(1+1)`). Wrapped in another function, for example `=INDEX(TEXTSPLIT(A1, ","), 1, 2)`, it works for any argument.
