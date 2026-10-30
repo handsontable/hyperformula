@@ -1,13 +1,19 @@
 import { singleCellSelection } from "../adapter/range";
 import type { GridSelection, IGridAdapter } from "../adapter/types";
+import { annotateNamedExprs } from "../engine/namedExpr";
 import { EventManager } from "../events/eventManager";
 import type { Disposable } from "../events/types";
 import type { FormulaEditor } from "../formulaEditor/formulaEditor";
 import { CN } from "../theme/classNames";
+import { deepActiveElement } from "../ui/dom";
 import type { LiveRegion } from "../ui/liveRegion";
 import type { LayoutDirection } from "../ui/popup/types";
 import type { IconsOptions } from "../ui/types";
-import type { AddressBoxRange, AddressBoxTarget } from "./formulaBarAddressBox";
+import type {
+  AddressBoxNavigation,
+  AddressBoxRange,
+  AddressBoxTarget,
+} from "./formulaBarAddressBox";
 import { FormulaBarAddressBox } from "./formulaBarAddressBox";
 import { FormulaBarCell } from "./formulaBarCell";
 
@@ -93,12 +99,19 @@ export class FormulaBar {
     this.addressBox = new FormulaBarAddressBox({
       onNavigate: (target) => this.navigateTo(target),
       onNavigateRange: (range) => this.navigateToRange(range),
-      onInvalidInput: (text) => options.liveRegion.announce(`Invalid cell address: ${text}`),
+      onInvalidInput: (text) =>
+        options.liveRegion.announce(options.editor.phrases.invalidCellAddress(text)),
+      onUnavailableTarget: (text) =>
+        options.liveRegion.announce(options.editor.phrases.cellUnavailable(text)),
+      phrases: options.editor.phrases,
     });
     this.formulaCell = new FormulaBarCell({
       knownFunctions: options.knownFunctions,
       separators: options.editor.engine.getSeparators(),
+      tokenPostProcess: (tokens) =>
+        annotateNamedExprs(tokens, (name) => options.editor.engine.resolveNamedExpression(name)),
       onActivate: () => this.activateFromIdle(),
+      phrases: options.editor.phrases,
       ...(options.icons !== undefined && { icons: options.icons }),
     });
     this.container.append(this.addressBox.root, this.formulaCell.root);
@@ -137,6 +150,10 @@ export class FormulaBar {
           }
         }),
       ),
+    );
+
+    subsScope.add(
+      asDisposable(this.editor.engine.onNamedExpressionsChange(() => this.formulaCell.refresh())),
     );
 
     subsScope.add(
@@ -179,7 +196,7 @@ export class FormulaBar {
     }
   }
 
-  private navigateTo(target: AddressBoxTarget): boolean {
+  private navigateTo(target: AddressBoxTarget): AddressBoxNavigation {
     const { rows, cols } = this.adapter.getGridSize();
 
     if (target.row < 0 || target.row >= rows || target.col < 0 || target.col >= cols) {
@@ -189,13 +206,16 @@ export class FormulaBar {
     const sheet = this.adapter.getActiveCell()?.sheet ?? "";
     const address = { sheet, col: target.col, row: target.row };
 
-    this.adapter.setActiveCell(address);
+    if (this.adapter.setActiveCell(address) === false) {
+      return "unavailable";
+    }
+
     this.adapter.scrollCellIntoView(address);
 
     return true;
   }
 
-  private navigateToRange(range: AddressBoxRange): boolean {
+  private navigateToRange(range: AddressBoxRange): AddressBoxNavigation {
     const { rows, cols } = this.adapter.getGridSize();
 
     if (
@@ -213,7 +233,10 @@ export class FormulaBar {
       end: { sheet, col: range.end.col, row: range.end.row },
     };
 
-    this.adapter.setSelection(cellRange);
+    if (this.adapter.setSelection(cellRange) === false) {
+      return "unavailable";
+    }
+
     this.adapter.scrollCellIntoView(cellRange.start);
 
     return true;
@@ -241,7 +264,9 @@ export class FormulaBar {
 
     this.editing = true;
     this.barInitiated = true;
-    this.barInitiatedWithFocus = this.formulaCell.root.contains(document.activeElement);
+    this.barInitiatedWithFocus = this.formulaCell.root.contains(
+      deepActiveElement(this.container.ownerDocument),
+    );
     this.pristineValue = this.editor.normalizeFormula(formula);
 
     const started = this.adapter.beginEdit(address, formula);
@@ -264,7 +289,7 @@ export class FormulaBar {
     if (
       this.barInitiated &&
       this.barInitiatedWithFocus &&
-      !this.formulaCell.root.contains(document.activeElement)
+      !this.formulaCell.root.contains(deepActiveElement(this.container.ownerDocument))
     ) {
       this.editing = false;
       this.barInitiated = false;

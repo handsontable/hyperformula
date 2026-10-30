@@ -1,4 +1,5 @@
 ---
+title: "Migrating from 3.x to 4.0"
 tags:
   - migration
   - migrate
@@ -6,8 +7,6 @@ tags:
   - breaking changes
   - v4.0
 ---
-
-# Migrating from 3.x to 4.0
 
 To upgrade your HyperFormula version from 3.x.x to 4.0.0, follow this guide.
 

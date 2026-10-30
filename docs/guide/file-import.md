@@ -1,4 +1,5 @@
 ---
+title: "File import"
 tags:
   - ExcelJS
   - SheetJS
@@ -6,8 +7,6 @@ tags:
   - CSV parser
   - read Excel file
 ---
-
-# File import
 
 Import XLSX and CSV files into HyperFormula.
 

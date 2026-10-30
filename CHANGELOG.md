@@ -7,10 +7,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-### Added
-
-- Added a message after `npm i hyperformula` that points AI assistants to the SKILLS file. The message needs `--foreground-scripts` to be visible in npm, and pnpm 10 needs the `postinstall` script to be approved first. [#1829](https://github.com/handsontable/hyperformula/pull/1829)
-
 ### Changed
 
 - **Breaking change**: Changed numeric contexts to read `""` as text, not `0` (`=""+0` returns `#VALUE!`), and `(A1)` as a reference; see the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html#changes-to-empty-string-coercion). [#1768](https://github.com/handsontable/hyperformula/pull/1768)
