@@ -145,18 +145,15 @@ export const buildLexerConfig = (config: ParserConfig): LexerConfig => {
   const ArrayRowSeparator = createToken({name: 'ArrayRowSep', pattern: config.arrayRowSeparator})
   const ArrayColSeparator = createToken({name: 'ArrayColSep', pattern: config.arrayColumnSeparator})
   const NumberLiteral = createToken({ name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`) })
-  // OFFSET has its own token because it has its own grammar rule, so it needs the prefix handling of
-  // ProcedureName repeated here. The 'i' flag exists for the translated OFFSET name (pre-dates this
-  // prefix support) and applies to the whole pattern, so unlike ProcedureName it also makes the prefix
-  // case-insensitive: `_XLFN.OFFSET(...)` is accepted here where `_XLFN.SUM(...)` is a parsing error.
-  // Left as-is rather than given a dedicated case-sensitive-prefix matcher: OFFSET predates the OOXML
-  // cutoff this whole prefix scheme exists for, so Excel can never actually emit a prefixed OFFSET call
-  // in any case — the asymmetry has no reachable real input, only hand-typed formulas (see the
-  // "an upper-cased prefix is accepted on OFFSET, unlike everywhere else" test).
-  // Unlike ProcedureName, this token does not include the '(' itself, so the prefixed form must look
-  // ahead for one: otherwise it would claim the start of a named expression such as `_xlfn.OFFSET_RATE`,
-  // which lexes as a single NamedExpression without prefix support. The unprefixed form keeps its
-  // pre-existing pattern unchanged.
+  // OFFSET has its own token because it has its own grammar rule, so it repeats the prefix handling of
+  // ProcedureName. The 'i' flag, there for the translated OFFSET name, applies to the whole pattern, so
+  // unlike ProcedureName it also accepts an upper-cased prefix: `_XLFN.OFFSET(...)` is accepted here
+  // where `_XLFN.SUM(...)` is a parsing error. No case-sensitive prefix matcher is needed for that:
+  // OFFSET predates the functions the prefixes mark, so a saved workbook never holds a prefixed OFFSET
+  // call, and the difference shows only in hand-typed formulas.
+  // Unlike ProcedureName, this token does not include the '(' itself, so the prefixed form looks ahead
+  // for one: otherwise it would claim the start of a named expression such as `_xlfn.OFFSET_RATE`,
+  // which lexes as a single NamedExpression.
   const OffsetProcedureName = createToken({
     name: 'OffsetProcedureName',
     pattern: new RegExp(`(?:${EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN})${offsetProcedureNameLiteral}(?=(?:${whitespaceTokenRegexp.source})?\\()|${offsetProcedureNameLiteral}`, 'i'),
