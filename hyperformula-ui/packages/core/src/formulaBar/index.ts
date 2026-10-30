@@ -1,6 +1,7 @@
 export type { FormulaBarOptions } from "./formulaBar";
 export { FormulaBar } from "./formulaBar";
 export type {
+  AddressBoxNavigation,
   AddressBoxRange,
   AddressBoxTarget,
   FormulaBarAddressBoxOptions,
