@@ -24,10 +24,10 @@
  * bypasses this script and turns every directory and extensionless URL into a 404.
  */
 
-import buildConfig from '../.vuepress/build.config.js'
+import buildConfig from '../build.config.js'
 
 /**
- * The documentation's base path, read from `docs/.vuepress/build.config.js` (the file the build takes it from), so
+ * The documentation's base path, read from `docs/build.config.js` (the file the build takes it from), so
  * the Worker cannot drift from the paths the build writes. `docs/script/prepare-cf-assets.js` stops a deploy build whose
  * base differs from it.
  */

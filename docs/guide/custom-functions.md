@@ -1,4 +1,5 @@
 ---
+title: "Custom functions"
 tags:
   - registerFunctionPlugin
   - implementedFunctions
@@ -10,11 +11,7 @@ tags:
   - user-defined function
 ---
 
-# Custom functions
-
 Expand the function library of your application by adding custom functions.
-
-**Contents:** [[toc]]
 
 ## Add a simple custom function
 
@@ -63,7 +60,7 @@ MyCustomPlugin.implementedFunctions = {
 };
 ```
 
-::: tip
+:::tip
 To define multiple functions in a single function plugin, add them all
 to the `implementedFunctions` object.
 
@@ -84,7 +81,7 @@ MyCustomPlugin.implementedFunctions = {
 In a separate object, define your function's names in every
 [language](#function-name-translations) that you want to support.
 
-::: tip
+:::tip
 Even if you support just a single language, you still need to define a translation for it.
 :::
 
@@ -274,7 +271,7 @@ declare a companion method for the array size. To do that, provide the
 function arguments and returns an instance of the
 [`ArraySize` class](../api/classes/arraysize.md).
 
-::: tip
+:::tip
 When you use your custom function in a formula, `sizeOfResultArrayMethod` is triggered every time the formula changes, but not when the dependencies of the formula change.
 This can cause unexpected behavior if the size of the result array depends on the values in the referenced cells.
 :::
@@ -320,7 +317,7 @@ if (rangeData.some((row) => row.some((val) => typeof rawValue !== 'number'))) {
 }
 ```
 
-::: tip
+:::tip
 All HyperFormula [error types](types-of-errors.md) support optional
 custom error messages. Put them to good use: let your users know what caused the
 error and how to avoid it in the future.
@@ -370,7 +367,7 @@ it('returns a VALUE error if the range argument contains a string', () => {
 
 ## Working demo
 
-Explore the full working example on <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/custom-functions?v=' + $page.buildDateURIEncoded">Stackblitz</a>.
+Explore the full working example on [Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/custom-functions?v={{$page.buildDateURIEncoded}}).
 
 This demo contains the implementation of both the
 [`GREET`](#add-a-simple-custom-function) and
@@ -498,7 +495,7 @@ In a separate object, define the translations of your custom functions' names in
 every language you want to support. Function names are case-insensitive, as they
 are all normalized to uppercase.
 
-::: tip
+:::tip
 Even if you support just a single language, you still need to define a translation for it.
 :::
 
@@ -519,7 +516,7 @@ export const MyCustomPluginTranslations = {
 HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 ```
 
-::: tip
+:::tip
 Before using a translated function name, remember to
 [register and set the language](localizing-functions.md).
 :::
@@ -538,7 +535,7 @@ MyCustomPlugin.aliases = {
 };
 ```
 
-::: tip
+:::tip
 For each alias of your function, define a translation, even if you want
 to support only one language.
 

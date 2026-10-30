@@ -1,4 +1,5 @@
 ---
+title: "Known limitations"
 tags:
   - unsupported features
   - multiple workbooks
@@ -7,8 +8,6 @@ tags:
   - asynchronous functions
   - structured references
 ---
-
-# Known limitations
 
 This page lists the known limitations of HyperFormula at its current development stage:
 

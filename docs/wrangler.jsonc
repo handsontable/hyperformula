@@ -1,9 +1,9 @@
 /**
  * Cloudflare Workers configuration for the HyperFormula documentation site.
  *
- * The asset directory is the VuePress `dist` root, not `dist/docs/hyperformula`, so
+ * The asset directory is the build's `dist` root, not `dist/docs/hyperformula`, so
  * that every document keeps the `/docs/hyperformula/` prefix it is built with (see
- * `docs/.vuepress/build.config.js`): handsontable.com proxies that path here
+ * `docs/build.config.js`): handsontable.com proxies that path here
  * unchanged. `worker/index.js` resolves directory and extensionless URLs and
  * redirects the documentation's former addresses; see the comment there.
  *
@@ -20,7 +20,7 @@
   "preview_urls": true,
   "main": "./worker/index.js",
   "assets": {
-    "directory": "./.vuepress/dist",
+    "directory": "./dist",
     "binding": "ASSETS",
     // Both left at their defaults on purpose:
     // - `html_handling: "none"` keeps `.html` URLs from being redirected to extensionless ones,
