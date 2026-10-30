@@ -11,10 +11,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added the `SORTBY`, `XMATCH` and `LOOKUP` functions. [#1806](https://github.com/handsontable/hyperformula/pull/1806)
 
+### Changed
+
+- Changed `XLOOKUP` with `search_mode` 2 or -2 to find more exact matches in a range that is not sorted, e.g. 3 in 5, 1, 3, 2, 4, where it returned no match before. The result on unsorted data is still not guaranteed. [#1806](https://github.com/handsontable/hyperformula/pull/1806)
+
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
 - Fixed approximate `MATCH`, `VLOOKUP`, `HLOOKUP` and `XLOOKUP` returning the wrong position on text whose letter case differs from the sorted order, e.g. `MATCH("banana", A1:A4, 1)` over `Apple`, `banana`, `Cherry`, `date`. [#1806](https://github.com/handsontable/hyperformula/pull/1806)
+- Fixed `XLOOKUP` with `match_mode` 1 returning no match for a text or logical `lookup_value` that has a next larger item, e.g. `=XLOOKUP("b", A1:C1, A2:C2, "NF", 1)` over `a`, `c`, `d` returned `NF` instead of the value under `c`. [#1806](https://github.com/handsontable/hyperformula/pull/1806)
 
 ## [3.5.0] - 2026-10-09
 

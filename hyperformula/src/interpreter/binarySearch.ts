@@ -187,9 +187,10 @@ export function findLastOccurrenceInOrderedRange(
 
   while (low <= high) {
     const middle = Math.floor((low + high) / 2)
-    const comparison = compareFn(searchKey, getValueFromIndexFn(middle))
+    const middleValue = getValueFromIndexFn(middle)
+    const comparison = compareFn(searchKey, middleValue)
 
-    if (comparison === 0 && getValueFromIndexFn(middle) === searchKey) {
+    if (comparison === 0 && middleValue === searchKey) {
       return middle - start
     }
 
