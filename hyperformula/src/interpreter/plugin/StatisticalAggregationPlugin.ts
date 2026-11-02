@@ -122,6 +122,23 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         {argumentType: FunctionArgumentType.RANGE},
       ],
     },
+    'INTERCEPT': {
+      method: 'intercept',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
+    'FORECAST.LINEAR': {
+      method: 'forecastLinear',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
     'CHISQ.TEST': {
       method: 'chisqtest',
       parameters: [
@@ -163,6 +180,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
     COVARIANCEP: 'COVARIANCE.P',
     COVARIANCES: 'COVARIANCE.S',
     SKEWP: 'SKEW.P',
+    FORECAST: 'FORECAST.LINEAR',
   }
 
   public avedev(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
@@ -407,6 +425,37 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
       })
   }
 
+  /**
+   * Corresponds to INTERCEPT(known_y, known_x).
+   *
+   * Returns the intercept of the least-squares line through the numeric pairs of `known_y` and `known_x`.
+   */
+  public intercept(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('INTERCEPT'),
+      (knownY: SimpleRangeValue, knownX: SimpleRangeValue) => {
+        const fit = simpleLinearFit(knownY, knownX)
+        return fit instanceof CellError ? fit : fit.intercept
+      })
+  }
+
+  /**
+   * Corresponds to FORECAST.LINEAR(x, known_y, known_x), also available as FORECAST.
+   *
+   * Returns the value at `x` of the least-squares line through the numeric pairs of `known_y` and `known_x`.
+   */
+  public forecastLinear(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('FORECAST.LINEAR'),
+      (x: InternalScalarValue, knownY: SimpleRangeValue, knownX: SimpleRangeValue) => {
+        // Excel coerces a blank cell, a boolean and numeric text in x, but not an empty string.
+        const coercedX = x === '' ? new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion) : this.coerceScalarToNumberOrError(x)
+        if (coercedX instanceof CellError) {
+          return coercedX
+        }
+        const fit = simpleLinearFit(knownY, knownX)
+        return fit instanceof CellError ? fit : fit.intercept + fit.slope * getRawValue(coercedX)
+      })
+  }
+
   public chisqtest(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHISQ.TEST'),
       (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
@@ -570,4 +619,35 @@ function parseTwoArrays(dataX: SimpleRangeValue, dataY: SimpleRangeValue): CellE
     }
   }
   return [arrX, arrY]
+}
+
+/**
+ * Fits the least-squares line y = intercept + slope·x through the pairs of `knownY` and `knownX` in which both
+ * values are numbers. The ranges need the same number of cells; the first error met in a pair is returned.
+ *
+ * The means and sums are plain two-pass sums, which reproduce Excel's last digits more closely than jStat's
+ * `covariance` and `sumsqerr`. O(n).
+ */
+function simpleLinearFit(knownY: SimpleRangeValue, knownX: SimpleRangeValue): CellError | { slope: number, intercept: number } {
+  if (knownY.numberOfElements() !== knownX.numberOfElements()) {
+    return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
+  }
+  const pairs = parseTwoArrays(knownY, knownX)
+  if (pairs instanceof CellError) {
+    return pairs
+  }
+  const [ys, xs] = pairs
+  const n = xs.length
+  if (n <= 1) {
+    return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
+  }
+  const meanX = xs.reduce((sum, x) => sum + x, 0) / n
+  const meanY = ys.reduce((sum, y) => sum + y, 0) / n
+  const sumSquaresX = xs.reduce((sum, x) => sum + (x - meanX) * (x - meanX), 0)
+  if (sumSquaresX === 0) {
+    return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.ZeroVariance)
+  }
+  const sumProducts = xs.reduce((sum, x, i) => sum + (x - meanX) * (ys[i] - meanY), 0)
+  const slope = sumProducts / sumSquaresX
+  return {slope, intercept: meanY - slope * meanX}
 }
