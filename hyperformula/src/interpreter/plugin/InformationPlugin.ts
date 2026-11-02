@@ -33,6 +33,46 @@ const ERROR_TYPE_CODES: Partial<Record<ErrorType, number>> = {
 }
 
 /**
+ * Functions whose result is an array even when it holds a single value, whatever their arguments.
+ * XLOOKUP and INDEX are not listed: for a single value they return a reference or a plain value, not an array.
+ */
+const FUNCTIONS_RETURNING_ARRAYS = new Set(['FILTER', 'HSTACK', 'MMULT', 'SEQUENCE', 'SORT', 'UNIQUE', 'VSTACK'])
+
+/**
+ * Returns the expression inside any number of enclosing parentheses.
+ *
+ * @param {Ast} ast - the expression, possibly in parentheses
+ */
+function withoutParentheses(ast: Ast): Ast {
+  while (ast.type === AstNodeType.PARENTHESIS) {
+    ast = ast.expression
+  }
+  return ast
+}
+
+/**
+ * Whether the expression gives an array even when the array holds a single value. The interpreter turns
+ * a one-by-one array into its only value before TYPE receives it, so `{1}` and `SEQUENCE(1)` arrive as the
+ * number 1, and TYPE tells them apart from a plain 1 by the formula. TRANSPOSE keeps the kind of its argument:
+ * an array stays an array, while a single cell or a scalar stays a value.
+ *
+ * @param {Ast} ast - the argument of TYPE
+ */
+function isArrayExpression(ast: Ast): boolean {
+  ast = withoutParentheses(ast)
+  if (ast.type === AstNodeType.ARRAY) {
+    return true
+  }
+  if (ast.type !== AstNodeType.FUNCTION_CALL) {
+    return false
+  }
+  if (ast.procedureName === 'TRANSPOSE') {
+    return ast.args.length === 1 && isArrayExpression(ast.args[0])
+  }
+  return FUNCTIONS_RETURNING_ARRAYS.has(ast.procedureName)
+}
+
+/**
  * Returns the TYPE code of a single (non-array) value.
  *
  * @param value
@@ -224,7 +264,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * Corresponds to TYPE(value)
    *
    * Returns the type of a value: 1 for numbers and empty cells, 2 for text, 4 for booleans, 16 for errors
-   * and 64 for arrays and multi-cell ranges. Errors are classified, not propagated.
+   * and 64 for arrays of any size and multi-cell ranges. Errors are classified, not propagated.
    *
    * @param ast
    * @param state
@@ -236,8 +276,15 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     if (this.isRowOrColumnOfMultiCellRange(ast.args[0], state)) {
       return TYPE_CODE_ARRAY
     }
+    if (withoutParentheses(ast.args[0]).type === AstNodeType.ARRAY) {
+      // An array constant is an array whatever it holds, a single error included.
+      return TYPE_CODE_ARRAY
+    }
     const value = this.evaluateAst(ast.args[0], state)
     if (value instanceof SimpleRangeValue) {
+      return TYPE_CODE_ARRAY
+    }
+    if (!(value instanceof CellError) && isArrayExpression(ast.args[0])) {
       return TYPE_CODE_ARRAY
     }
     return valueTypeCode(value)
@@ -251,19 +298,14 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param state
    */
   private isRowOrColumnOfMultiCellRange(ast: Ast, state: InterpreterState): boolean {
-    while (ast.type === AstNodeType.PARENTHESIS) {
-      ast = ast.expression
-    }
+    ast = withoutParentheses(ast)
     if (ast.type !== AstNodeType.FUNCTION_CALL || (ast.procedureName !== 'ROW' && ast.procedureName !== 'COLUMN')) {
       return false
     }
-    let arg = ast.args[0]
-    while (arg !== undefined && arg.type === AstNodeType.PARENTHESIS) {
-      arg = arg.expression
-    }
-    if (arg === undefined) {
+    if (ast.args[0] === undefined) {
       return false
     }
+    const arg = withoutParentheses(ast.args[0])
     if (arg.type !== AstNodeType.CELL_RANGE && arg.type !== AstNodeType.COLUMN_RANGE && arg.type !== AstNodeType.ROW_RANGE) {
       return false
     }
