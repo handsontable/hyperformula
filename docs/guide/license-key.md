@@ -1,4 +1,5 @@
 ---
+title: "License key"
 tags:
   - licenseKey
   - gpl-v3
@@ -8,8 +9,6 @@ tags:
   - console warning
   - offline validation
 ---
-
-# License key
 
 To use HyperFormula, you need to specify which [license type](licensing.md#available-licenses) you use, by entering a license key in your [configuration options](configuration-options.md).
 
@@ -47,7 +46,7 @@ line break saved as `\n` in a `.env` file, but keeping the key on one line is th
 
 ### Proprietary license key validation
 
-::: tip
+:::tip
 HyperFormula doesn't use an internet connection to validate your proprietary license key.
 :::
 
