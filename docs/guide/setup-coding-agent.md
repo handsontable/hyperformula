@@ -1,4 +1,5 @@
 ---
+title: "Set up your coding agent"
 description: Install the official HyperFormula skill for Claude Code, or point any other AI coding agent at HyperFormula's machine-readable docs.
 tags:
   - skills
@@ -13,11 +14,9 @@ tags:
   - Markdown docs
 ---
 
-# Set up your coding agent
-
 HyperFormula ships an official Claude skill and machine-readable docs so your AI coding agent can scaffold, configure, and debug HyperFormula correctly. Pick your tool below, or use the interactive wizard.
 
-<CodingAgentWizard />
+<hf-coding-agent-wizard></hf-coding-agent-wizard>
 
 ## Claude Code
 

@@ -1,4 +1,5 @@
 ---
+title: "Building"
 tags:
   - UMD
   - ESM
@@ -8,8 +9,6 @@ tags:
   - Karma
   - ESLint
 ---
-
-# Building
 
 The build process uses Webpack and Babel, as well as npm tasks
 listed in package.json. During this process, the source located in
@@ -99,7 +98,7 @@ Most likely, you will want to document the code. You can use the following comma
 
 ## Run the tests
 
-::: tip
+:::tip
 HyperFormula main test suite is maintained outside of this repository. You can find more information [here](https://github.com/handsontable/hyperformula/blob/master/hyperformula/test/README.md).
 :::
 
