@@ -1,4 +1,5 @@
 ---
+title: "Server-side installation"
 tags:
   - Node.js version
   - full-icu
@@ -6,9 +7,7 @@ tags:
   - backend
 ---
 
-# Server-side installation
-
-::: tip
+:::tip
 For full compatibility, the minimum required version of **Node is 13**.
 It is related to the support for ICU. There is a possibility to use
 lower versions of Node but you need to install an additional package
