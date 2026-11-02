@@ -259,13 +259,6 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         )
 
         const sourceRange = range.range
-        const startsBelowFirstRow = sourceRange !== undefined
-          && !Number.isFinite(sourceRange.height())
-          && state.formulaAddress.row !== 0
-
-        if (startsBelowFirstRow) {
-          return new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult)
-        }
 
         if (sourceRange !== undefined) {
           const selectedColumns = zeroBasedColumnIndexes.map(columnIndex => {
@@ -294,8 +287,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * Predicts the CHOOSECOLS spill size from the source height and index count.
    *
    * Invalid literals are rejected before spill allocation. A whole-column
-   * result is valid only in the first output row, then its source range
-   * supplies the materialized spill height.
+   * result spills only from the first output row, where its source range
+   * supplies the materialized spill height. Below the first row it keeps its
+   * unbounded height, so array-space validation returns a spill error while
+   * the formula still evaluates inside another function.
    *
    * @param {ProcedureAst} ast - The parsed function-call AST node.
    * @param {InterpreterState} state - The current interpreter evaluation state.
@@ -324,10 +319,6 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       ? sourceRange.effectiveHeight(this.dependencyGraph)
       : sourceSize.height
 
-    if (startsBelowFirstRow || effectiveHeight < 1) {
-      return ArraySize.error()
-    }
-
     for (const argument of ast.args.slice(1)) {
       const index = this.parseChooseColsLiteralIndex(argument)
       if (
@@ -340,6 +331,14 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       ) {
         return ArraySize.error()
       }
+    }
+
+    if (startsBelowFirstRow) {
+      return new ArraySize(ast.args.length - 1, sourceSize.height)
+    }
+
+    if (effectiveHeight < 1) {
+      return ArraySize.error()
     }
 
     return new ArraySize(ast.args.length - 1, effectiveHeight)
