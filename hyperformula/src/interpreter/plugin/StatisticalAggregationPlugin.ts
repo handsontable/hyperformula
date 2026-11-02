@@ -238,6 +238,8 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
   /**
    * Predicts the output size of MODE.MULT at parse time. The number of modes depends on the data, so the
    * upper bound is used: every mode needs at least two occurrences. The actual result is smaller or equal.
+   * When an argument has no size before evaluation (see `ArraySizePredictor.isSizeKnownBeforeEvaluation`),
+   * the size is `ArraySize.error()`: the formula takes one cell, and a result of more than one cell gives #VALUE!.
    *
    * @param ast - procedure AST node
    * @param state - interpreter state
@@ -247,6 +249,9 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
       return ArraySize.error()
     }
     const argumentState = new InterpreterState(state.formulaAddress, true)
+    if (!ast.args.every(arg => this.arraySizePredictor.isSizeKnownBeforeEvaluation(arg, argumentState))) {
+      return ArraySize.error()
+    }
     const numberOfValues = ast.args
       .map(arg => this.arraySizeForAst(arg, argumentState))
       .reduce((sum, size) => sum + size.width * size.height, 0)
@@ -296,7 +301,9 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
 
   /**
    * Predicts the output size of FREQUENCY at parse time: one row per cell of `bins_array` plus one. The cells
-   * that are not numbers are skipped at runtime, so the actual result may be shorter.
+   * that are not numbers are skipped at runtime, so the actual result may be shorter. When `bins_array` has no
+   * size before evaluation (see `ArraySizePredictor.isSizeKnownBeforeEvaluation`), the size is `ArraySize.error()`:
+   * the formula takes one cell, and a result of more than one cell gives #VALUE!.
    *
    * @param ast - procedure AST node
    * @param state - interpreter state
@@ -305,7 +312,12 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
     if (ast.args.length !== 2) {
       return ArraySize.error()
     }
-    const binsSize = this.arraySizeForAst(ast.args[1], new InterpreterState(state.formulaAddress, true))
+    const argumentState = new InterpreterState(state.formulaAddress, true)
+    const binsArray = ast.args[1]
+    if (!this.arraySizePredictor.isSizeKnownBeforeEvaluation(binsArray, argumentState)) {
+      return ArraySize.error()
+    }
+    const binsSize = this.arraySizeForAst(binsArray, argumentState)
     return new ArraySize(1, binsSize.width * binsSize.height + 1)
   }
 
