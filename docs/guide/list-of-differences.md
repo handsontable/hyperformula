@@ -102,6 +102,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
 | CEILING.MATH  | =CEILING.MATH(-4.3, 2, 2)                                      |           -4 |            -6 |              -6 |
 | FLOOR.MATH    | =FLOOR.MATH(-4.7, 2, 2)                                        |           -6 |            -4 |              -4 |
+| ERF.PRECISE   | =ERF.PRECISE(A1:B1) in A5<br>where A1 = 0.5, B1 = 1            |       0.5205 |  Not measured |           VALUE |
 
 A few of the rows above share a root cause worth stating once:
 
