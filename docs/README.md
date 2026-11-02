@@ -96,7 +96,13 @@ When changing the asset routing, verify it with browser navigation headers, not 
 
 The **Ask AI** button in the header opens the docs assistant, the same chat panel as the Handsontable docs. It answers from a knowledge base that includes the HyperFormula guides, and it is served by the same backend as the Handsontable docs' assistant.
 
-- `src/components/DocsAssistant/` is the React widget and `src/scripts/docs-assistant-bootstrap.ts` mounts it on every page (loaded from the `Header` override). Every file there except `constants.ts` is a copy of the Handsontable docs' (`docs/src/components/DocsAssistant/` in handsontable/handsontable); refresh them by copying them again. `constants.ts` holds the HyperFormula values: starter questions, storage keys and the backend fallback.
+- `src/components/DocsAssistant/` is the React widget and `src/scripts/docs-assistant-bootstrap.ts` mounts it on every page (loaded from the `Header` override). `constants.ts` holds the HyperFormula values: starter questions, storage keys and the backend fallback.
+- Everything else is copied from the Handsontable docs (`docs/src/` in handsontable/handsontable). To refresh it, copy all of these again, not just the widget folder:
+  - `components/DocsAssistant/`, except `constants.ts`;
+  - `scripts/docs-assistant-bootstrap.ts`;
+  - `lib/supports-modern-regex.mjs`, which `MarkdownRenderer.tsx` imports;
+  - the inline `vite:preloadError` guard, which is in their `Head.astro` and in our `Header.astro`.
+- The copied files' comments name the Handsontable docs' files. Their `Head.astro` is our `Header.astro`: we have no `Head` override, so the bootstrap and the preload guard are loaded from the header.
 - On handsontable.com the panel calls `/docs-assistant/api/chat` on its own origin, which the handsontable.com Worker relays to the backend. Anywhere else (Workers Builds previews, `npm run docs:dev`) it calls the backend directly at `PUBLIC_CHAT_API_URL`, falling back to the backend's workers.dev address. The backend only answers the origins it allowlists: `npm run docs:dev` on `http://localhost:4321` is one of them, a Workers Builds preview is not, so on a preview the panel opens but a question fails.
 
 ## Built-in functions guide page
