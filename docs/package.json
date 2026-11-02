@@ -1,0 +1,48 @@
+{
+  "name": "hyperformula-docs",
+  "private": true,
+  "description": "The HyperFormula documentation portal.",
+  "license": "GPL-3.0-only",
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "scripts": {
+    "generate-function-docs": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"} script/generate-builtin-functions-doc.ts",
+    "dev": "astro dev",
+    "build": "astro build && node script/prepare-cf-assets.js",
+    "build:cf": "rimraf dist && npm run build",
+    "dev:cf": "wrangler dev",
+    "deploy:cf": "wrangler deploy",
+    "lint": "eslint . --ext .js,.mjs,.ts",
+    "preview:cf": "wrangler versions upload",
+    "code-examples:generate-js": "bash code-examples-generator.sh",
+    "code-examples:generate-all-js": "bash code-examples-generator.sh --generateAll",
+    "code-examples:format-all-ts": "bash code-examples-generator.sh --formatAllTsExamples"
+  },
+  "devDependencies": {
+    "@astrojs/markdown-satteri": "^0.4.4",
+    "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/starlight": "^0.42.6",
+    "@expressive-code/plugin-collapsible-sections": "^0.44.3",
+    "@expressive-code/plugin-line-numbers": "^0.44.3",
+    "@types/node": "^17.0.45",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "astro": "^7.4.1",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jasmine": "^4.2.2",
+    "eslint-plugin-jest": "^27.9.0",
+    "eslint-plugin-jsdoc": "^50.5.0",
+    "eslint-plugin-license-header": "^0.6.1",
+    "eslint-plugin-prettier": "^5.2.1",
+    "github-slugger": "^2.0.0",
+    "moment": "^2.30.1",
+    "prettier": "^3.9.6",
+    "rimraf": "^6.0.1",
+    "starlight-theme-rapide": "^0.6.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^4.0.8",
+    "wrangler": "^4.118.0"
+  }
+}

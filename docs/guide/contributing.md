@@ -1,4 +1,5 @@
 ---
+title: "Contributing"
 tags:
   - CLA
   - Contributor License Agreement
@@ -7,8 +8,6 @@ tags:
   - feature request
   - develop branch
 ---
-
-# Contributing
 
 You are welcome to contribute to HyperFormula's development. Your help
 is much appreciated in any of the following topics:
@@ -47,7 +46,7 @@ to allow us to use and publish your changes.
 the merging process.
 3. Always make the target of your pull request the `develop` branch,
 not `master`.
-4. For any change you make, add test specs to the `test` folder.
+4. For any change you make, add test specs to the `hyperformula/test` folder.
 5. Please lint the code. See the section about using linter.
 6. Add a comprehensive description of all the changes.
 

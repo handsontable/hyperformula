@@ -1,4 +1,5 @@
 ---
+title: "Compatibility with Google Sheets"
 tags:
   - GSheets
   - Google Spreadsheets
@@ -7,12 +8,7 @@ tags:
   - interoperability
 ---
 
-# Compatibility with Google Sheets
-
 Achieve nearly full compatibility wih Google Sheets, using the right HyperFormula configuration.
-
-**Contents:**
-[[toc]]
 
 ## Overview
 
@@ -107,6 +103,7 @@ This configuration aligns HyperFormula with the default behavior of Google Sheet
 ```js
 // define options
 const options = {
+  licenseKey: 'gpl-v3',
   dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
   timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
   currencySymbol: ['$', 'USD'],

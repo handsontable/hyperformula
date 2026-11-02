@@ -1,4 +1,5 @@
 ---
+title: "Migrating from 0.6 to 1.0"
 tags:
   - migration
   - migrate
@@ -7,8 +8,6 @@ tags:
   - agpl-v3
   - v1.0
 ---
-
-# Migrating from 0.6 to 1.0
 
 To upgrade your HyperFormula version from 0.6.x to 1.0.x, follow this guide.
 
@@ -54,7 +53,7 @@ Before:
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 const changes = hfInstance.clearSheet('MySheet2');
 ```
@@ -64,7 +63,7 @@ After:
 const hfInstance = HyperFormula.buildFromSheets({
  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
  MySheet2: [ ['10'] ],
-});
+}, { licenseKey: 'gpl-v3' });
 
 // use `sheetId` instead of `sheetName`
 const changes = hfInstance.clearSheet(1);
@@ -170,7 +169,7 @@ Before:
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // takes `simpleCellAddress`, `width`, and `height`
 // returns: [ [ 2 ] ]
@@ -181,7 +180,7 @@ After:
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
-]);
+], { licenseKey: 'gpl-v3' });
 
 // takes `simpleCellRange`
 // returns: [ [ 2 ] ]
