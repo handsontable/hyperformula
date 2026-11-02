@@ -1,4 +1,5 @@
 ---
+title: "Types of errors"
 tags:
   - "#REF!"
   - "#VALUE!"
@@ -11,8 +12,6 @@ tags:
   - "#LIC!"
   - division by zero
 ---
-
-# Types of errors
 
 HyperFormula returns an error when a formula cannot be processed
 properly. To make it easier for a user, each kind of error has its
@@ -37,4 +36,4 @@ according to the language settings.
 | #VALUE! | Wrong type of argument | It occurs when a formula tries to improperly use different types of data. For example, you will see this error when you will try to add a string to a number. |
 | #CYCLE! | Circular reference | It occurs when a formula refers to its own cell, both directly and indirectly. |
 | #ERROR! | An error occurred | It indicates that there is an unknown error in a formula. |
-| #LIC! | Invalid license key | It occurs when the license key is invalid, expired, or missing. |
+| #LIC! | License key problem | It occurs when the license key is missing or invalid, when it has expired and your [license terms](license-key.md#license-key-notifications) stop it from working after that, or when the function is not included in the [feature package](license-key.md#feature-packages-and-add-ons) your license key grants. |
