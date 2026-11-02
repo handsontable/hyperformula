@@ -1,4 +1,5 @@
 ---
+title: "Internationalization features"
 tags:
   - i18n
   - localization
@@ -8,12 +9,7 @@ tags:
   - Intl.Collator
 ---
 
-# Internationalization features
-
 Configure HyperFormula to match the languages and regions of your users.
-
-**Contents:**
-[[toc]]
 
 ## Function names and errors
 
@@ -21,7 +17,7 @@ Each of HyperFormula's [built-in functions](built-in-functions.md) and [errors](
 
 You can easily [switch between languages](localizing-functions.md) ([`language`](../api/interfaces/configparams.md#language)).
 
-When adding a [custom function](custom-functions.md), you can define the function's [name](custom-functions.md#_3-add-your-function-s-names) in every language that you support.
+When adding a [custom function](custom-functions.md), you can define the function's [name](custom-functions.md#3-add-your-functions-names) in every language that you support.
 
 To support more languages, add a [custom language pack](localizing-functions.md).
 
@@ -51,7 +47,7 @@ decimalSeparator: '.', // set by default
 thousandSeparator: ',',
 ```
 
-::: tip
+:::tip
   In HyperFormula, both [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) and [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator) must be different from [`functionArgSeparator`](../api/interfaces/configparams.md#functionargseparator).
   In some cases it might cause compatibility issues with other spreadsheets, e.g., [Microsoft Excel](compatibility-with-microsoft-excel.md#separators) or [Google Sheets](compatibility-with-google-sheets.md#separators).
 :::
@@ -109,7 +105,7 @@ localeLang: 'en-US',
 
 This demo shows HyperFormula configured for the `en-US` locale.
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/i18n/example1.html)
 

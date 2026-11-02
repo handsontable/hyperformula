@@ -6,8 +6,11 @@
 #   ./code-examples-generator.sh --generateAll - generates all examples in the content/guides directory
 #   ./code-examples-generator.sh --formatAllTsExamples - runs the autoformatter on all TS and TSX example files in the content/guides directory
 
-ALL_EXAMPLES_DIR="docs/examples"
-ESLINT_CONFIG="docs/examples/eslintrc.examples.js"
+# Anchored at this script rather than the working directory: the script used to
+# be invoked from the repository root and is now invoked from docs/.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ALL_EXAMPLES_DIR="$SCRIPT_DIR/examples"
+ESLINT_CONFIG="$SCRIPT_DIR/examples/eslintrc.examples.js"
 
 format() {
   eslint --fix --no-ignore -c "$ESLINT_CONFIG" "$1" > /dev/null
@@ -103,6 +106,13 @@ elif [ "$1" == "--formatAllTsExamples" ]; then
   echo "Formatting all TS/TSX example files..."
   go_through_all_examples_concurrently "formatAllTsExamples"
 else
+  # A relative path is taken from where npm was invoked (INIT_CWD), not from
+  # docs/, where npm runs this script: the root's docs:code-examples:generate-js
+  # passes a path written from the repository root.
+  input_path="$1"
+  if [[ "$input_path" != /* ]]; then
+    input_path="${INIT_CWD:-$PWD}/$input_path"
+  fi
   echo "Generating single example..."
-  generate_single_example "$1"
+  generate_single_example "$input_path"
 fi

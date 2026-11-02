@@ -1,4 +1,5 @@
 ---
+title: "Date and time handling"
 tags:
   - dates
   - dateFormats
@@ -9,8 +10,6 @@ tags:
   - nullYear
   - date parsing
 ---
-
-# Date and time handling
 
 The formats for the default date and time parsing functions can be set using configuration options:
 - [`dateFormats`](../api/interfaces/configparams.md#dateformats),
@@ -112,7 +111,7 @@ For currency formatting in the `TEXT` function (locale-aware grouping, non-`$` s
 
 ## Demo
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/date-time/example1.html)
 

@@ -1,6 +1,6 @@
 name: Vendored parser
 
-# The entitlement-key reader under src/license/handsontable-license-key-parser/ is a verbatim
+# The entitlement-key reader under hyperformula/src/license/handsontable-license-key-parser/ is a verbatim
 # copy of a private upstream directory. This job is the drift check that copy's integration guide
 # asks for: it fails when any byte differs from the pinned tag, when a file shadows the copy, or
 # when upstream has released a newer tag. See PROVENANCE.md in that directory.
@@ -13,8 +13,8 @@ on:
   pull_request:
     types: [ opened, reopened, synchronize ]
     paths:
-      - 'src/license/handsontable-license-key-parser/**'
-      - 'script/check-license-key-parser-drift.js'
+      - 'hyperformula/src/license/handsontable-license-key-parser/**'
+      - 'hyperformula/script/check-license-key-parser-drift.js'
       - '.github/workflows/vendored-parser.yml'
   push:
     branches: [ master, develop ]
@@ -37,6 +37,6 @@ jobs:
         with:
           node-version: '22'
       - name: Compare the vendored reader with upstream
-        run: node script/check-license-key-parser-drift.js
+        run: node hyperformula/script/check-license-key-parser-drift.js
         env:
           LICENSE_KEY_REPO_TOKEN: ${{ secrets.LICENSE_KEY_REPO_TOKEN }}

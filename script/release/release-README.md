@@ -24,11 +24,11 @@ and `hyperformula-demos`. Before making any change — including during a dry
 run — each command checks that all three are usable, and refuses to start if
 they are not.
 
-- **This repository** must be a git work tree with `package.json` present, the
+- **This repository** must be a git work tree with `hyperformula/package.json` present, the
   branches the command will move, and a clean working tree. `code-freeze` relaxes
   the last one for a dry run and for a resume: see [its preflight](#preflight).
-- **`hyperformula-tests`** always lives at `test/hyperformula-tests`. This is not
-  configurable, because `test/fetch-tests.sh` and the CI workflows all hardcode
+- **`hyperformula-tests`** always lives at `hyperformula/test/hyperformula-tests`. This is not
+  configurable, because `hyperformula/test/fetch-tests.sh` and the CI workflows all hardcode
   it — if the script let you point it elsewhere, a freeze would validate one
   clone and mutate another. If you have never had a private test clone, run
   `npm run test:setup-private` first; it creates the clone for you. `code-freeze`
@@ -77,7 +77,7 @@ Arguments are `<version>` (e.g. `2.1.0`) and `<release-date>` in `YYYY-MM-DD`.
 Before changing anything, and in a dry run too, `code-freeze` fetches `origin`
 (see below — the checks depend on it) and then checks that:
 
-1. This is a git work tree with `package.json` and a `develop` branch, and that
+1. This is a git work tree with `hyperformula/package.json` and a `develop` branch, and that
    `npm`, `node` and `perl` are all on `PATH` — `node` makes the version, date
    and release-notes edits, `perl` rewrites the demo URLs.
 2. `<version>` is not already tagged. A tag means the version is released, so
@@ -85,7 +85,7 @@ Before changing anything, and in a dry run too, `code-freeze` fetches `origin`
    comes first: a tag a colleague pushed is invisible until it is fetched, which
    is exactly the case worth catching.
 3. `<release-date>` is a date that exists. The `YYYY-MM-DD` shape is not enough:
-   `2026-02-30` would otherwise reach `ht.config.js` verbatim while the release
+   `2026-02-30` would otherwise reach `hyperformula/ht.config.js` verbatim while the release
    notes silently said March 2 and the changelog said February 30.
 4. Both sibling clones are usable (see [Before you start](#before-you-start)).
 5. The working tree is clean. Two cases stop short of refusing: a dry run
@@ -120,23 +120,24 @@ describe decisions made from stale refs. The script marks these fetches
 2. **Gives the freeze a branch in `hyperformula-tests` and syncs the suite.**
    Creates and pushes `release/<version>` there, then points the private test
    suite at it via `npm run test:setup-private`. The push comes first on purpose:
-   `test/fetch-tests.sh` pulls the matching branch *from origin*, so a branch
+   `hyperformula/test/fetch-tests.sh` pulls the matching branch *from origin*, so a branch
    that existed only locally used to make every resume fail here. Pushing it now
    also publishes it for CI and for the other developers who add tests during
    the freeze.
-3. **Sets the version and the release date** — `version` in `package.json`, the
-   `hyperformula@<version>` exclusion in its `check:licenses` script, and
-   `HT_RELEASE_DATE` in `ht.config.js`. The exclusion has to follow the version
-   because `license-checker` matches it by exact `name@version`; a stale one makes
-   `npm run check:licenses` fail on the package itself. Each is skipped when it
-   already matches, so a re-run does not rewrite files it already wrote.
+3. **Sets the version and the release date** — `version` in `hyperformula/package.json` and
+   `HT_RELEASE_DATE` in `hyperformula/ht.config.js`. Each is skipped when it already matches,
+   so a re-run does not rewrite files it already wrote.
 4. **Reinstalls dependencies** and regenerates the lock file — skipped when
-   `package-lock.json` already names the new version *and* `node_modules` exists.
+   the root `package-lock.json` already records the new version for the
+   `hyperformula` workspace *and* `node_modules` exists.
    Both are required: an interrupted install can leave the lock file written and
    `node_modules` missing, and skipping then would carry a broken install
-   straight into the build.
-5. **Builds, then lints and runs the whole test suite** — the unit tests and the
-   browser suite, which needs headless Chrome and Firefox on this machine.
+   straight into the build. A reinstall deletes every workspace's `node_modules`
+   (`hyperformula/` and the `hyperformula-ui/` ones) as well as the root one,
+   because npm resolves a lock-free install from what is already on disk.
+5. **Builds, then lints and runs the whole test suite** — the engine's unit
+   tests, the browser suite, which needs headless Chrome and Firefox on this
+   machine, and the `hyperformula-ui` unit tests.
    These always run, even when resuming a freeze that got this far before.
 6. **Adds the version section to `CHANGELOG.md`**, directly under
    `## [Unreleased]` so that the bullets accumulated during development become
@@ -150,7 +151,7 @@ describe decisions made from stale refs. The script marks these fetches
    `develop`, commits and pushes, then gets onto the `M.m.x` branch (creating it
    if needed, fast-forwarding it first if it already exists) and makes sure the
    version bump is on it. Then, in this repository, repoints every CodeSandbox
-   and StackBlitz demo URL in `docs/guide/`, `docs/index.md` and `README.md` —
+   and StackBlitz demo URL in `docs/guide/`, `docs/index.md` and `hyperformula/README.md` —
    the tracked files that carry them, so the rewrite never descends into
    generated output like `docs/api/` — at `tree/<M.m.x>`, whatever branch it
    names today; old releases left several behind. URLs for demos that no longer
@@ -159,10 +160,10 @@ describe decisions made from stale refs. The script marks these fetches
    retire a demo, add it to that list in the script. Skipped entirely for a patch
    release, where `M.m.x` already names the right branch.
 9. **Commits and pushes the release branch.** Commits only if there is something
-   to commit. Stages **named paths, not `git add .`** — `package.json`,
-   `CHANGELOG.md`, and whichever of `package-lock.json`, `ht.config.js`,
-   `docs/` and `README.md` exist — so unrelated work elsewhere in your tree
-   cannot ride along.
+   to commit. Stages **named paths, not `git add .`** — `hyperformula/package.json`,
+   `CHANGELOG.md`, and whichever of `package-lock.json`, `hyperformula/ht.config.js`,
+   `docs/` and `hyperformula/README.md` exist — so unrelated work elsewhere in your
+   tree cannot ride along.
    These are whole paths, though, not a list of files the run wrote, which is why
    the preflight refuses to start a fresh freeze on a dirty tree. If you add a
    step that writes somewhere new, add its path to that list too.
@@ -226,10 +227,10 @@ AND in `hyperformula-tests`; run `code-freeze` first if it doesn't.
 Before changing anything, `publish` checks every hard requirement and exits
 with an error — in a dry run too — if one is not met:
 
-1. This repo is a usable git work tree: `package.json` present, both `master`
+1. This repo is a usable git work tree: `hyperformula/package.json` present, both `master`
    and `develop` branches exist, and the working tree is clean — unconditionally
    here, unlike `code-freeze`, because `publish` never leaves work uncommitted.
-   `npm` and `node` must both be on `PATH`; `node` reads `package.json` off the
+   `npm` and `node` must both be on `PATH`; `node` reads `hyperformula/package.json` off the
    release ref in check 5.
 2. Both sibling clones are usable, including the demos script this run will
    execute (see [Before you start](#before-you-start)).
@@ -241,7 +242,7 @@ with an error — in a dry run too — if one is not met:
    branch would be silently dropped. The error names the commits and how to
    reconcile them. Checked in both repositories, by the same code, so the two
    guards cannot drift apart.
-5. `package.json` on `release/<version>` has `version` equal to the version
+5. `hyperformula/package.json` on `release/<version>` has `version` equal to the version
    you passed.
 6. `npm whoami` succeeds. In a dry run, a failure here doesn't stop the
    preview — it just shows `<not logged in>` in the plan.
@@ -297,7 +298,7 @@ refreshes the refs.
    `develop`, whose commits from during the freeze are not part of this release.
    Then, unless `hyperformula@<version>` is already on npm, prints the registry
    and the `npm whoami` user and asks you to type the version back (anything
-   else aborts), then publishes and waits up to 60s for the new version to
+   else aborts), then publishes and waits up to 10 minutes for the new version to
    become visible on the registry. A plain `x.y.z` publishes under npm's
    `latest` tag; a version carrying a prerelease suffix (an rc, e.g.
    `3.5.0-rc.1`) publishes under `next` instead, so `npm install hyperformula`
@@ -316,7 +317,8 @@ they are hard to miss in the output:
 ```
   [ ] Create the GitHub release for <version> (body = the <version> section of CHANGELOG.md):
         https://github.com/handsontable/hyperformula/releases/new?tag=<version>&title=<version>
-  [ ] Check that the docs workflow deployed the documentation to gh-pages
+  [ ] Check that Workers Builds deployed the docs from master (the "Workers Builds:
+      hyperformula-docs" check on the master commit) to https://handsontable.com/docs/hyperformula/
   [ ] Announce the release in #hyperformula and #release
   [ ] Close the GitHub and ClickUp tasks in this release, announcing <version>,
       notify everyone involved in the discussions, and check linked issues
@@ -404,3 +406,8 @@ the script, and a `usage_<name>` help function. To add, say, `post-release`: wri
 and list it in `usage_top`. (`cmd_code_freeze` and `cmd_publish` already follow
 this shape — use either as a reference.) Call `start_warning_register` first if
 the command has any step that can fail softly.
+
+Check a change to the script, or to a checklist it prints, with a dry run of
+every command it affects, and confirm in the preview that the version bumps, the
+rewritten demo URLs, the changelog section and the release notes still come out
+right.
