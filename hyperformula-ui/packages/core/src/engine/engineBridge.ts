@@ -2,6 +2,7 @@ import { expandWholeRange } from "../adapter/range";
 import type { CellRange } from "../adapter/types";
 import type { LexerOptions, RangeRefMeta } from "../lexer/types";
 import { FunctionCatalog } from "./functionCatalog";
+import { sheetDimensions } from "./namedExpr";
 import { NamedExpressions } from "./namedExpressions";
 import type {
   EngineCellAddress,
@@ -126,7 +127,7 @@ export class EngineBridge {
       return null;
     }
 
-    const dimensions = this.engine.getSheetDimensions(sheetId);
+    const dimensions = sheetDimensions(this.engine, sheetId);
 
     if (!dimensions || dimensions.width <= 0 || dimensions.height <= 0) {
       return null;
@@ -169,6 +170,10 @@ export class EngineBridge {
 
   invalidateNamedExpressionCache(): void {
     this.namedExprs.invalidate();
+  }
+
+  onNamedExpressionsChange(listener: () => void): () => void {
+    return this.namedExprs.onChange(listener);
   }
 
   destroy(): void {
