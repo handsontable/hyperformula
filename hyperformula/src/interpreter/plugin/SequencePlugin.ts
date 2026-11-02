@@ -33,24 +33,18 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
 
   /**
    * Parses a literal dimension from an AST node at parse time.
-   * Handles NUMBER nodes directly, STRING nodes via numeric coercion,
-   * PLUS/MINUS_UNARY_OP wrapping a NUMBER (e.g. `+3`, `-2`),
-   * and TRUE()/FALSE() function calls (returning 1/0).
+   * Handles a NUMBER node with an optional sign (e.g. `3`, `+3`, `-2`) via `signedNumberLiteral`,
+   * STRING nodes via numeric coercion, and TRUE()/FALSE() function calls (returning 1/0).
    * Returns undefined for non-literal nodes (cell refs, formulas, binary ops).
    */
-  private static parseLiteralDimension(node: Ast): number | undefined {
-    if (node.type === AstNodeType.NUMBER) {
-      return Math.trunc(node.value)
+  private parseLiteralDimension(node: Ast): number | undefined {
+    const signedNumber = this.signedNumberLiteral(node)
+    if (signedNumber !== undefined) {
+      return Math.trunc(signedNumber)
     }
     if (node.type === AstNodeType.STRING) {
       const parsed = Number(node.value)
       return Number.isFinite(parsed) ? Math.trunc(parsed) : undefined
-    }
-    if (node.type === AstNodeType.PLUS_UNARY_OP && node.value.type === AstNodeType.NUMBER) {
-      return Math.trunc(node.value.value)
-    }
-    if (node.type === AstNodeType.MINUS_UNARY_OP && node.value.type === AstNodeType.NUMBER) {
-      return Math.trunc(-node.value.value)
     }
     if (node.type === AstNodeType.FUNCTION_CALL) {
       if (node.procedureName === 'TRUE' && node.args.length === 0) {
@@ -151,14 +145,14 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
     if (rowsArg.type === AstNodeType.EMPTY) {
       return ArraySize.error()
     }
-    const rows = SequencePlugin.parseLiteralDimension(rowsArg)
+    const rows = this.parseLiteralDimension(rowsArg)
     if (rows === undefined) {
       return ArraySize.error()
     }
 
     const cols = (colsArg === undefined || colsArg.type === AstNodeType.EMPTY)
       ? 1
-      : SequencePlugin.parseLiteralDimension(colsArg)
+      : this.parseLiteralDimension(colsArg)
     if (cols === undefined) {
       return ArraySize.error()
     }
