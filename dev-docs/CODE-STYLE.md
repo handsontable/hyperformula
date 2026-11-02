@@ -2,6 +2,8 @@
 
 ESLint is the source of truth for formatting and code rules — run `npm run lint` before submitting changes (see [the linter section of the building guide](../docs/guide/building.md#run-the-linter)). Some of what follows it enforces, the `jsdoc` rules among them; the rest is what no linter can check for you.
 
+Code in `hyperformula-ui/` follows its own conventions instead — Biome rather than ESLint, among others: [`hyperformula-ui/dev-docs/CODE-STYLE.md`](../hyperformula-ui/dev-docs/CODE-STYLE.md).
+
 ## Style
 
 - Prefer a functional approach where possible (`filter`, `map`, `reduce`).

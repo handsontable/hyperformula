@@ -18,7 +18,7 @@ In every directory, `CLAUDE.md` is a symlink to its sibling `AGENTS.md`. Edit `A
 
 ## Where to look
 
-Repository-wide standards and process live here. Each package documents its own internals: the engine's are in [`hyperformula/dev-docs/`](../hyperformula/dev-docs/README.md).
+Repository-wide standards and process live here. Each package documents its own internals: the engine's are in [`hyperformula/dev-docs/`](../hyperformula/dev-docs/README.md), the UI's in [`hyperformula-ui/dev-docs/`](../hyperformula-ui/dev-docs/README.md).
 
 | You are working on | Read |
 |---|---|
@@ -41,6 +41,12 @@ Inside the engine — architecture, the parser, the interpreter, the dependency 
 | You are working on | Read |
 |---|---|
 | Anything in `hyperformula/src/` | [`hyperformula/dev-docs/README.md`](../hyperformula/dev-docs/README.md) |
+
+Inside the UI — the formula editor's architecture, its code style, its suites and its release:
+
+| You are working on | Read |
+|---|---|
+| Anything in `hyperformula-ui/` | [`hyperformula-ui/dev-docs/README.md`](../hyperformula-ui/dev-docs/README.md) |
 
 Outside both: [`README.md`](../README.md) for what the repository holds, [`hyperformula/README.md`](../hyperformula/README.md) for what the engine is and how to install and use it, [`docs/README.md`](../docs/README.md) for running the documentation portal, [`hyperformula/test/README.md`](../hyperformula/test/README.md) for attaching the private test suite, and [`CONTRIBUTING.md`](../CONTRIBUTING.md) for external contributors.
 

@@ -22,7 +22,7 @@ Root scripts fan out to the packages. `npm run lint` fans out to every workspace
 | `docs/api/` | `npm run typedoc:build-api` — TypeDoc runs inside `hyperformula/`, where the `tsconfig.json` is, and writes across into the portal | Never edit. Change the JSDoc in `hyperformula/src/`. |
 | `docs/guide/built-in-functions.md` | `npm run docs:generate-function-docs`, which runs `docs/script/generate-builtin-functions-doc.ts` against the metadata catalogue | Never edit, never commit. Needs the portal installed. |
 
-The generator lives in `docs/script/` rather than beside the engine build scripts because it uses `@vuepress/shared-utils` for slugs, and that package only resolves inside a full VuePress dependency tree.
+The generator lives in `docs/script/` rather than beside the engine build scripts because it slugifies the category headings with the portal's own `github-slugger`, the one the site gives every heading its id with, so the page's links and its headings always agree.
 
 Both are git-ignored, and both are regenerated as the first step of `docs:dev` and `docs:build`. `docs:generate-function-docs` is a gate, not a formatter: it fails the build on a missing catalogue entry or a `'Custom'` category. See [`FUNCTION-CATALOGUE.md`](../hyperformula/dev-docs/FUNCTION-CATALOGUE.md).
 
@@ -40,13 +40,15 @@ Config is [`docs/wrangler.jsonc`](../docs/wrangler.jsonc); the Worker entry poin
 
 ## Release and licences
 
-`npm run release` runs `script/release/release.sh`. Releasing is maintainer-owned — do not invent steps around it, and do not run it as part of another task.
+`npm run release` runs `script/release/release.sh`, which releases the engine only. Releasing is maintainer-owned — do not invent steps around it, and do not run it as part of another task.
+
+The `hyperformula-ui` package is released by hand, on its own version line: [`hyperformula-ui/dev-docs/RELEASE.md`](../hyperformula-ui/dev-docs/RELEASE.md).
 
 `npm run check:licenses` asserts that every production dependency carries a permissive licence.
 
 ## Scripts and CI
 
-Where each script lives and what calls it is in [`STRUCTURE.md`](STRUCTURE.md#scripts-at-three-levels). The release script keeps its own rules in [`script/release/release-README.md`](../script/release/release-README.md).
+Where each script lives and what calls it is in [`STRUCTURE.md`](STRUCTURE.md#scripts-at-each-level). The release script keeps its own rules in [`script/release/release-README.md`](../script/release/release-README.md).
 
 - **A step runs in the workflow that needs it.** A step only the tests need belongs to the test workflows, not to `lint`.
 - **`pre*` and `post*` scripts run the way the scripts are actually called** — by CI, and on a maintainer's machine. npm skips them when `ignore-scripts` is set, which is why `script/release/release.sh` copies the root files itself before `npm publish` instead of trusting `prepack` alone.

@@ -41,7 +41,7 @@ Review in this order, and report the first serious finding rather than burying i
 5. **Scope** — the pull request holds [one change](DEFINITION-OF-DONE.md#one-pull-request-one-change). Say so when unrelated changes have been folded in, rather than approving them through.
 6. **Style, last and briefly** — ESLint owns formatting. Comment only on what it cannot check: a misleading name, a function doing two things, duplicated logic an existing helper already covers.
 
-What to look for in each category in an engine change: [`hyperformula/dev-docs/REVIEWING.md`](../hyperformula/dev-docs/REVIEWING.md).
+What to look for in each category in an engine change: [`hyperformula/dev-docs/REVIEWING.md`](../hyperformula/dev-docs/REVIEWING.md). In a `hyperformula-ui` change: [`hyperformula-ui/dev-docs/REVIEWING.md`](../hyperformula-ui/dev-docs/REVIEWING.md).
 
 ## The change follows our guidelines
 
