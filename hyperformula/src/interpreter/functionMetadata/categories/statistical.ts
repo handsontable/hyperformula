@@ -454,7 +454,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   PROB: {
     category: 'Statistical',
     shortDescription: 'Returns the probability that a value falls within the given limits, from a range of values and their probabilities.',
-    parameters: [{name: 'x_range', description: 'The range of numeric values.'}, {name: 'prob_range', description: 'The range of probabilities of the values in x_range, of the same size; each must be greater than 0 and at most 1, and together they must sum up to 1.'}, {name: 'lower_limit', description: 'The lower limit of the values, or the single value whose probability is returned when upper_limit is omitted.'}, {name: 'upper_limit', description: 'The upper limit of the values; the limits are inclusive.'}],
+    parameters: [{name: 'x_range', description: 'The range of numeric values.'}, {name: 'prob_range', description: 'The range of probabilities of the values in x_range, of the same size; together they must sum up to 1.'}, {name: 'lower_limit', description: 'The lower limit of the values, or the single value whose probability is returned when upper_limit is omitted.'}, {name: 'upper_limit', description: 'The upper limit of the values; the limits are inclusive.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=PROB(A1:A4, B1:B4, 2)', '=PROB(A1:A4, B1:B4, 2, 3)'],
   },

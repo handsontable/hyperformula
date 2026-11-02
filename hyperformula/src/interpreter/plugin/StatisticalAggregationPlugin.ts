@@ -41,9 +41,14 @@ import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, Implement
 /**
  * PROB accepts its probabilities when their sum is at least 1 and, rounded to this many significant digits, is 1.
  * The sum is compensated (double-double), so 0.1 added ten times is exactly 1. A sum below 1 is rejected
- * however close it is, and a sum above 1 is accepted while it is less than 1 + 5e-15.
+ * however close it is, and a sum above 1 is accepted while it is less than 1 + 5e-15. The plain floating-point
+ * sum, in the order of the cells, must also round to 1, so probabilities that cancel out, such as
+ * {1, 1E+20, -1E+20}, are rejected.
  */
 const PROBABILITY_SUM_SIGNIFICANT_DIGITS = 15
+
+const isOneAtSignificantDigits = (value: number): boolean =>
+  Number(value.toPrecision(PROBABILITY_SUM_SIGNIFICANT_DIGITS)) === 1
 
 export class StatisticalAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<StatisticalAggregationPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
@@ -333,8 +338,9 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
    * Corresponds to PROB(x_range, prob_range, lower_limit, [upper_limit]).
    *
    * Returns the probability that a value of `x_range` equals `lower_limit`, or lies between `lower_limit`
-   * and `upper_limit` inclusive. Returns #N/A when the ranges differ in size, and #NUM! when a probability
-   * is not in (0, 1] or the probabilities do not sum up to 1. Pairs in which either cell is not a number are skipped.
+   * and `upper_limit` inclusive. Returns #N/A when the ranges differ in size, and #NUM! when the probabilities
+   * do not sum up to 1. A single probability is not checked, so one can be 0, negative or above 1 as long as
+   * the sum is 1. Pairs in which either cell is not a number are skipped, and their probability is not added.
    *
    * @param ast - procedure AST node
    * @param state - interpreter state
@@ -350,10 +356,11 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
           return pairs
         }
         const [xs, ps] = pairs
-        const probabilitySum = roundDoubleDouble(ps.reduce((sum, p) => addDoubleDouble(sum, {hi: p, lo: 0}), DOUBLE_DOUBLE_ZERO))
-        const sumIsOne = probabilitySum >= 1 && Number(probabilitySum.toPrecision(PROBABILITY_SUM_SIGNIFICANT_DIGITS)) === 1
-        if (ps.some(p => p <= 0 || p > 1) || !sumIsOne) {
-          return new CellError(ErrorType.NUM, ErrorMessage.ProbabilityBounds)
+        const compensatedSum = roundDoubleDouble(ps.reduce((sum, p) => addDoubleDouble(sum, {hi: p, lo: 0}), DOUBLE_DOUBLE_ZERO))
+        const floatingPointSum = ps.reduce((sum, p) => sum + p, 0)
+        const sumIsOne = compensatedSum >= 1 && isOneAtSignificantDigits(compensatedSum) && isOneAtSignificantDigits(floatingPointSum)
+        if (!sumIsOne) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ProbabilitySum)
         }
         const upper = upperLimit ?? lowerLimit
         return ps.reduce((sum, p, i) => xs[i] >= lowerLimit && xs[i] <= upper ? sum + p : sum, 0)
