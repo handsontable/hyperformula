@@ -127,6 +127,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | DROP          | =DROP(A1:A3, 3)                                                |          N/A | No such function. |           CALC  |
 | DROP          | =DROP(Data!A:A, 1)                                             | Spills to the source sheet's current height minus one row; returns SPILL below row 2. | No such function. | Spills all 1,048,575 remaining rows, with blank source cells as 0; returns SPILL below row 2. |
 | DROP          | =DROP(Data!A:A, B1)                                            | Spills from row 1 only; returns SPILL below row 1, because the count is read after the result size is set. | No such function. | Spills 1,048,576 minus B1 rows when entered in row B1+1 or above; returns SPILL below. |
+| DROP          | =SUM(DROP(A:A, -1))<br>where A1:A5: 1, 2, 3, 4, 5              | 10 (drops the last used row) | No such function. | 15 (drops the last row of the sheet) |
 | DROP          | =DROP(A1:C3, {1,2})                                            | Uses the first count and drops one row. | No such function. | Returns a 1x2 array of VALUE errors. |
 | DROP          | =ISREF(DROP(Data!A1:C3, 1))                                    | FALSE (returns values, not a reference) | No such function. | TRUE |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
