@@ -29,6 +29,7 @@ class PopupStub {
 
 interface ScrollAnchorHarness {
   anchor: ScrollAnchor;
+  attach: (shadowRoot?: ShadowRoot) => void;
   textarea: HTMLTextAreaElement;
   overlayRoot: HTMLDivElement;
   suggestions: PopupStub;
@@ -57,6 +58,13 @@ function createScrollAnchorHarness(): ScrollAnchorHarness {
 
   return {
     anchor,
+    attach: (shadowRoot?: ShadowRoot) => {
+      const viewScope = events.createScope("scroll-anchor-view-test");
+
+      anchor.attach();
+      anchor.listenToView(viewScope, window, shadowRoot ?? null);
+      viewScope.activate();
+    },
     textarea,
     overlayRoot,
     suggestions,
@@ -87,7 +95,7 @@ describe("ScrollAnchor", () => {
   it("mirrors textarea scroll offsets onto the overlay root", () => {
     const harness = createScrollAnchorHarness();
 
-    harness.anchor.attach();
+    harness.attach();
     harness.textarea.scrollTop = 42;
     harness.textarea.scrollLeft = 17;
     harness.textarea.dispatchEvent(new Event("scroll"));
@@ -114,7 +122,7 @@ describe("ScrollAnchor", () => {
 
     harness.suggestions.visible = true;
     stubVisibleTextareaRects(harness.textarea);
-    harness.anchor.attach();
+    harness.attach();
 
     dispatchAncestorScroll();
     await nextFrame();
@@ -126,12 +134,37 @@ describe("ScrollAnchor", () => {
     harness.destroy();
   });
 
+  it("reanchors after a scroll inside the editor's shadow root, which never reaches the window", async () => {
+    const harness = createScrollAnchorHarness();
+    const shadowHost = document.createElement("div");
+    const shadowRoot = shadowHost.attachShadow({ mode: "open" });
+    const scroller = document.createElement("div");
+    const windowScrolls = vi.fn();
+
+    document.body.appendChild(shadowHost);
+    shadowRoot.appendChild(scroller);
+    window.addEventListener("scroll", windowScrolls, true);
+    harness.suggestions.visible = true;
+    stubVisibleTextareaRects(harness.textarea);
+    harness.attach(shadowRoot);
+
+    scroller.dispatchEvent(new Event("scroll"));
+    await nextFrame();
+
+    expect(windowScrolls).not.toHaveBeenCalled();
+    expect(harness.reanchor).toHaveBeenCalledTimes(1);
+
+    window.removeEventListener("scroll", windowScrolls, true);
+    shadowHost.remove();
+    harness.destroy();
+  });
+
   it("coalesces ancestor scrolls into a single reanchor per frame", async () => {
     const harness = createScrollAnchorHarness();
 
     harness.suggestions.visible = true;
     stubVisibleTextareaRects(harness.textarea);
-    harness.anchor.attach();
+    harness.attach();
 
     dispatchAncestorScroll();
     dispatchAncestorScroll();
@@ -148,7 +181,7 @@ describe("ScrollAnchor", () => {
 
     harness.suggestions.visible = true;
     stubVisibleTextareaRects(harness.textarea);
-    harness.anchor.attach();
+    harness.attach();
 
     dispatchAncestorScroll();
     await nextFrame();
@@ -171,7 +204,7 @@ describe("ScrollAnchor", () => {
 
     harness.suggestions.visible = true;
     stubVisibleTextareaRects(harness.textarea);
-    harness.anchor.attach();
+    harness.attach();
 
     dispatchAncestorScroll();
     dispatchAncestorScroll();
@@ -194,7 +227,7 @@ describe("ScrollAnchor", () => {
       harness.suggestions.visible = false;
       harness.fnHelp.visible = false;
     });
-    harness.anchor.attach();
+    harness.attach();
 
     dispatchAncestorScroll();
     await nextFrame();
@@ -209,7 +242,7 @@ describe("ScrollAnchor", () => {
     const harness = createScrollAnchorHarness();
 
     stubVisibleTextareaRects(harness.textarea);
-    harness.anchor.attach();
+    harness.attach();
 
     dispatchAncestorScroll();
     await nextFrame();
@@ -230,7 +263,7 @@ describe("ScrollAnchor", () => {
     harness.suggestions.visible = true;
     harness.fnHelp.visible = true;
     stubVisibleTextareaRects(harness.textarea);
-    harness.anchor.attach();
+    harness.attach();
 
     suggestionsInner.dispatchEvent(new Event("scroll"));
     fnHelpInner.dispatchEvent(new Event("scroll"));
@@ -248,7 +281,7 @@ describe("ScrollAnchor", () => {
 
     harness.suggestions.visible = true;
     stubHiddenTextareaRects(harness.textarea);
-    harness.anchor.attach();
+    harness.attach();
 
     dispatchAncestorScroll();
     await nextFrame();
@@ -265,7 +298,7 @@ describe("ScrollAnchor", () => {
 
     harness.suggestions.visible = true;
     stubVisibleTextareaRects(harness.textarea);
-    harness.anchor.attach();
+    harness.attach();
 
     dispatchAncestorScroll();
     harness.anchor.detach();
@@ -279,7 +312,7 @@ describe("ScrollAnchor", () => {
   it("stops mirroring textarea scrolls after detach", () => {
     const harness = createScrollAnchorHarness();
 
-    harness.anchor.attach();
+    harness.attach();
     harness.anchor.detach();
     harness.textarea.scrollTop = 42;
     harness.textarea.dispatchEvent(new Event("scroll"));
