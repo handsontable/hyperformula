@@ -64,6 +64,7 @@ export type {
 export { readCellText } from "./engine";
 export * from "./events";
 export type {
+  AddressBoxNavigation,
   AddressBoxRange,
   AddressBoxTarget,
   FormulaBarAddressBoxOptions,
@@ -81,7 +82,7 @@ export type {
   HostToggleDelegate,
 } from "./formulaEditor";
 export { indexToColLetters } from "./lexer";
-export type { StyleInjector } from "./theme";
+export type { StyleInjector, StyleRoot } from "./theme";
 export { CN, createStyleInjector } from "./theme";
 export type {
   CellRect,
@@ -94,6 +95,7 @@ export type {
   IconName,
   IconsOptions,
   LayoutDirection,
+  Phrases,
   PopupHostOption,
   PopupsOptions,
   SuggestionItem,
@@ -104,6 +106,7 @@ export type {
 export {
   cellErrorMessage,
   classifyCellLayer,
+  DEFAULT_PHRASES,
   EPHEMERAL_COLOR,
   ensureRelativePosition,
   fillColor,
