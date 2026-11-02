@@ -39,6 +39,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=COLUMNS(A1:C5)', '=COLUMNS(A1:F1)'],
   },
+  DROP: {
+    category: 'Lookup and reference',
+    shortDescription: 'Removes specified rows or columns from the beginning or end of an array.',
+    parameters: [{name: 'array', description: 'The array or range from which to remove rows or columns.'}, {name: 'rows', description: 'The number of rows to remove; a negative value removes rows from the end. Zero or an empty argument removes no rows.'}, {name: 'columns', description: 'The number of columns to remove; a negative value removes columns from the end. When omitted, empty, or zero, no columns are removed.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=DROP(A1:C5, 2)', '=DROP(A1:C5, -1, -1)', '=DROP(A1:C5, , 1)'],
+  },
   FILTER: {
     category: 'Lookup and reference',
     shortDescription: 'Filters an array, based on multiple conditions (boolean arrays).',
@@ -121,12 +128,26 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=SORT(A1:A10)', '=SORT(A1:B10, 2, -1)'],
   },
+  TAKE: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns specified rows or columns from the beginning or end of an array.',
+    parameters: [{name: 'array', description: 'The array or range from which to take rows or columns.'}, {name: 'rows', description: 'The number of rows to take; a negative value takes rows from the end. An empty argument keeps all rows.'}, {name: 'columns', description: 'The number of columns to take; a negative value takes columns from the end. When omitted or empty, all columns are kept.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TAKE(A1:C5, 2)', '=TAKE(A1:C5, -2, -1)', '=TAKE(A1:C5, , 2)'],
+  },
   TRANSPOSE: {
     category: 'Lookup and reference',
     shortDescription: 'Transposes the rows and columns of an array.',
     parameters: [{name: 'array', description: 'The range of cells whose rows and columns are swapped in the returned array.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=TRANSPOSE(A1:C2)', '=TRANSPOSE(A1:A5)'],
+  },
+  TRIMRANGE: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns a range without the blank rows and columns at its edges. The result takes up the size of the range, or of its sheet\'s used area for a whole column or row; the cells the result does not fill stay blank.',
+    parameters: [{name: 'range', description: 'The range or array to trim. In a range, a cell is blank only when it is empty, so a formula is kept even when its value is blank; in an array, an element is blank when it has no value. When every row or column is trimmed away, the result is a REF error.'}, {name: 'trim_rows', description: 'Which blank rows to remove: 0 none, 1 leading, 2 trailing, 3 both. Any other value is a VALUE error. When omitted or empty, 3.'}, {name: 'trim_cols', description: 'Which blank columns to remove, with the same codes as trim_rows. When omitted or empty, 3.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TRIMRANGE(A1:C10)', '=TRIMRANGE(A1:C10, 2, 0)', '=TRIMRANGE(A1:C10, , 1)'],
   },
   UNIQUE: {
     category: 'Lookup and reference',
