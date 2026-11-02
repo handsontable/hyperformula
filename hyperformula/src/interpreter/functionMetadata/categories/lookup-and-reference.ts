@@ -39,6 +39,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=COLUMNS(A1:C5)', '=COLUMNS(A1:F1)'],
   },
+  DROP: {
+    category: 'Lookup and reference',
+    shortDescription: 'Removes specified rows or columns from the beginning or end of an array.',
+    parameters: [{name: 'array', description: 'The array or range from which to remove rows or columns.'}, {name: 'rows', description: 'The number of rows to remove; a negative value removes rows from the end. Zero or an empty argument removes no rows.'}, {name: 'columns', description: 'The number of columns to remove; a negative value removes columns from the end. When omitted, empty, or zero, no columns are removed.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=DROP(A1:C5, 2)', '=DROP(A1:C5, -1, -1)', '=DROP(A1:C5, , 1)'],
+  },
   FILTER: {
     category: 'Lookup and reference',
     shortDescription: 'Filters an array, based on multiple conditions (boolean arrays).',
@@ -120,6 +127,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'array', description: 'The range or array whose rows (or columns) are sorted.'}, {name: 'sort_index', description: 'The 1-based row or column index within array to sort by. Defaults to 1 (the first row or column).'}, {name: 'sort_order', description: '1 (default) sorts in ascending order; -1 sorts in descending order.'}, {name: 'by_col', description: 'FALSE (default) sorts the rows of array; TRUE sorts its columns.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=SORT(A1:A10)', '=SORT(A1:B10, 2, -1)'],
+  },
+  TAKE: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns specified rows or columns from the beginning or end of an array.',
+    parameters: [{name: 'array', description: 'The array or range from which to take rows or columns.'}, {name: 'rows', description: 'The number of rows to take; a negative value takes rows from the end. An empty argument keeps all rows.'}, {name: 'columns', description: 'The number of columns to take; a negative value takes columns from the end. When omitted or empty, all columns are kept.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TAKE(A1:C5, 2)', '=TAKE(A1:C5, -2, -1)', '=TAKE(A1:C5, , 2)'],
   },
   TRANSPOSE: {
     category: 'Lookup and reference',
