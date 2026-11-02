@@ -395,7 +395,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
         return numbers
       }
       if (matrix.width() !== matrix.height()) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.ArrayDimensions)
+        return new CellError(ErrorType.VALUE, ErrorMessage.SquareMatrix)
       }
       const result = determinant(numbers)
       return Number.isFinite(result) ? result : new CellError(ErrorType.NUM, ErrorMessage.NaN)
@@ -416,7 +416,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
         return numbers
       }
       if (matrix.width() !== matrix.height()) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.ArrayDimensions)
+        return new CellError(ErrorType.VALUE, ErrorMessage.SquareMatrix)
       }
       const decomposition = luDecomposition(numbers)
       if (decomposition === undefined) {
