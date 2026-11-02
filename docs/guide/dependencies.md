@@ -1,4 +1,5 @@
 ---
+title: "Dependencies"
 tags:
   - bessel
   - Chevrotain
@@ -8,8 +9,6 @@ tags:
   - third-party libraries
   - dependency licenses
 ---
-
-# Dependencies
 
 HyperFormula depends on a few external libraries, as listed below.
 These dependencies are used to support some of the library's core

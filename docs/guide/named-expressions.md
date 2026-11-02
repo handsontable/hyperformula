@@ -1,4 +1,5 @@
 ---
+title: "Named expressions"
 tags:
   - defined names
   - global scope
@@ -10,8 +11,6 @@ tags:
   - removeNamedExpression
   - listNamedExpressions
 ---
-
-# Named expressions
 
 An expression can be assigned a human-friendly name. Thanks to this you can
 refer to that name anywhere across the workbook. Names are especially useful
@@ -57,7 +56,7 @@ Expression names are case-insensitive, and they:
   `R4C5`, `RC` or `R0C`).
 - Must be unique within a given scope.
 
-::: tip
+:::tip
 Expression names must be unique within a given scope, but you can override a
 global named-expression with a local one. For example:
 
@@ -236,7 +235,7 @@ described in [that section](basic-operations.md#isitpossibleto-methods).
 
 ## Demo
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/named-expressions/example1.html)
 
