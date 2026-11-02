@@ -80,6 +80,8 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 | `sizeOfResultArrayMethod` | **Required** for any function that can return an array |
 | `returnNumberType` | The result is a percent, currency, date, or time |
 
+A `sizeOfResultArrayMethod` that computes the size from its arguments returns `ArraySize.error()` when `this.arraySizePredictor.isSizeKnownBeforeEvaluation(arg, state)` is false for one of them, or when the size it computes is not finite, as for a whole-column or whole-row range. A named expression and a call such as `SEQUENCE(A1)` are sized as one cell, so the reserved area could be smaller than the result, and storing that result throws `Resizing to smaller array`. `MODE.MULT` and `FREQUENCY` in `StatisticalAggregationPlugin` follow this rule.
+
 `arrayFunction` and `arraySizeMethod` are still declared on the interface but are **deprecated since 3.1.0**, superseded by `enableArrayArithmeticForArguments` and `sizeOfResultArrayMethod`. Do not carry them forward from an older plugin.
 
 ### Never
