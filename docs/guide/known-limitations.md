@@ -1,4 +1,5 @@
 ---
+title: "Known limitations"
 tags:
   - unsupported features
   - multiple workbooks
@@ -7,8 +8,6 @@ tags:
   - asynchronous functions
   - structured references
 ---
-
-# Known limitations
 
 This page lists the known limitations of HyperFormula at its current development stage:
 
@@ -91,6 +90,6 @@ HyperFormula resolves the OFFSET function at parse time rather than during evalu
 * OFFSET is resolved at parse time, so `getCellFormula` returns the computed reference, not the original `OFFSET` call.
 
   ```js
-  const hf = HyperFormula.buildFromArray([[1, 45, '=OFFSET(A1, 0, 1)']]);
+  const hf = HyperFormula.buildFromArray([[1, 45, '=OFFSET(A1, 0, 1)']], { licenseKey: 'gpl-v3' });
   hf.getCellFormula({ sheet: 0, row: 0, col: 2 }); // '=B1'
   ```

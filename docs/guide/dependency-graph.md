@@ -1,4 +1,5 @@
 ---
+title: "Dependency graph"
 tags:
   - getCellPrecedents
   - getCellDependents
@@ -8,8 +9,6 @@ tags:
   - dependency tree
   - BFS
 ---
-
-# Dependency graph
 
 For accuracy and performance, HyperFormula needs to process cells in a correct and optimal order. For example: in formula `C1=A1+B1`, cells `A1` and `B1` need to be evaluated before `C1`.
 
@@ -28,7 +27,7 @@ The dependency graph may also contain ranges that are not used by any formula, f
 
 Range nodes can be connected to cell nodes and to other range nodes.
 
-<img :src="$withBase('/ranges.png')">
+![](/ranges.png)
 
 ### Optimizations for large ranges
 
@@ -74,7 +73,7 @@ range which is one row shorter. In this example, it would be `B5:D19`.
 If so, then it represents `B5:D20` as the composition of a range
 `B5:D19` and three cells in the last row: `B20`,`C20` and `D20`.
 
-<img :src="$withBase('/ranges.png')">
+![](/ranges.png)
 
 More generally, the result of any associative operation is obtained
 as the result of operations for these small rows. There are many
@@ -87,7 +86,7 @@ node and avoid duplicating the work during computation.
 To get the immediate precedents of a cell or a range (the in-neighbors of the cell node or the range node), use the [`getCellPrecedents()`](../api/classes/hyperformula.html#getcellprecedents) method:
 
 ```js
-const hfInstance = HyperFormula.buildFromArray([[ '1', '2', '=A1', '=B1+C1' ]]);
+const hfInstance = HyperFormula.buildFromArray([[ '1', '2', '=A1', '=B1+C1' ]], { licenseKey: 'gpl-v3' });
 
 hfInstance.getCellPrecedents({ sheet: 0, col: 3, row: 0 });
 // returns [{ sheet: 0, col: 1, row: 0 }, { sheet: 0, col: 2, row: 0 }]
@@ -98,7 +97,7 @@ hfInstance.getCellPrecedents({ sheet: 0, col: 3, row: 0 });
 To get the immediate dependents of a cell or a range (the out-neighbors of the cell node or the range node), use the [`getCellDependents()`](../api/classes/hyperformula.html#getcelldependents) method:
 
 ```js
-const hfInstance = HyperFormula.buildFromArray([[ '1', '=A1', '=A1+B1', '=B1+C1' ]])
+const hfInstance = HyperFormula.buildFromArray([[ '1', '=A1', '=A1+B1', '=B1+C1' ]], { licenseKey: 'gpl-v3' })
 
 hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0 })
 // returns [{ sheet: 0, col: 1, row: 0 }, { sheet: 0, col: 2, row: 0 }]
