@@ -1,6 +1,7 @@
 import { isAdditiveCloser, isAdditiveOpener, nonTrivialAt } from "./additiveContext";
 import {
   buildNumberPattern,
+  buildQuotedSheetEnds,
   type CellMatch,
   matchCell,
   matchSheetPrefix,
@@ -156,6 +157,7 @@ export class Lexer {
     let pos = 0;
     let unterminatedStringFound = false;
     const textLength = text.length;
+    const quotedSheetEnds = text.includes("'") ? buildQuotedSheetEnds(text) : undefined;
 
     while (pos < textLength) {
       const start = pos;
@@ -237,7 +239,7 @@ export class Lexer {
         continue;
       }
 
-      const sheet = matchSheetPrefix(text, pos);
+      const sheet = matchSheetPrefix(text, pos, quotedSheetEnds);
 
       if (sheet) {
         const afterSheet = pos + sheet.length;
