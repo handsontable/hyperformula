@@ -1,0 +1,5141 @@
+/**
+ * @license
+ * Copyright (c) 2025 Handsoncode. All rights reserved.
+ */
+
+import {AbsoluteCellRange, isSimpleCellRange, SimpleCellRange} from './AbsoluteCellRange'
+import {validateArgToType} from './ArgumentSanitization'
+import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
+import {
+  CellType,
+  CellValueDetailedType,
+  CellValueType,
+  getCellType,
+  getCellValueDetailedType,
+  getCellValueFormat,
+  getCellValueType,
+  isSimpleCellAddress,
+  SimpleCellAddress
+} from './Cell'
+import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
+import {CellValue} from './CellValue'
+import {Config, getDefaultConfig} from './Config'
+import {ColumnRowIndex, CrudOperations} from './CrudOperations'
+import {DateTime, numberToSimpleTime} from './DateTimeHelper'
+import {
+  AddressMapping,
+  ArrayMapping,
+  DependencyGraph,
+  Graph,
+  RangeMapping,
+  SheetMapping,
+  Vertex,
+} from './DependencyGraph'
+import {objectDestroy} from './Destroy'
+import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
+import {
+  EvaluationSuspendedError,
+  ExpectedValueOfTypeError,
+  LanguageAlreadyRegisteredError,
+  LanguageNotRegisteredError,
+  NotAFormulaError,
+} from './errors'
+import {Evaluator} from './Evaluator'
+import {ExportedChange, Exporter} from './Exporter'
+import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {licenseAllowsFunction} from './license/CapabilityRegistry'
+import {ensureFeatureAllowed, isFeatureAllowed} from './license/ensureFeatureAllowed'
+import {FeatureId} from './license/LicenseEntitlement'
+import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
+import {FunctionPluginDefinition} from './interpreter'
+import {FUNCTION_DOCS} from './interpreter/functionMetadata'
+import {buildCustomFunctionDetails, buildCustomFunctionListEntry, buildFunctionDetails, buildFunctionListEntry, StructuralMetadata} from './interpreter/functionMetadata/buildFunctionDescriptions'
+import {FunctionDetails, FunctionDoc, FunctionListEntry} from './interpreter/functionMetadata/FunctionDescription'
+import {PROTECTED_FUNCTION_METADATA} from './interpreter/functionMetadata/protectedFunctionMetadata'
+import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/FunctionRegistry'
+import {FormatInfo} from './interpreter/InterpreterValue'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
+import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
+import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
+import {
+  Ast,
+  NamedExpressionDependency,
+  ParserWithCaching,
+  RelativeDependency,
+  simpleCellAddressFromString,
+  simpleCellAddressToString,
+  simpleCellRangeFromString,
+  simpleCellRangeToString,
+  Unparser,
+} from './parser'
+import {Serialization, SerializedNamedExpression} from './Serialization'
+import {Sheet, SheetDimensions, Sheets} from './Sheet'
+import {Statistics, StatType} from './statistics'
+import {ConfigParams} from './ConfigParams'
+
+/**
+ * This is a class for creating HyperFormula instance, all the following public methods
+ * are related to this class.
+ *
+ * The instance can be created only by calling one of the static methods
+ * `buildFromArray`, `buildFromSheets` or `buildEmpty` and should be disposed of with the
+ * `destroy` method when it's no longer needed to free the resources.
+ *
+ * The instance can be seen as a workbook where worksheets can be created and
+ * manipulated. They are organized within a widely known structure of columns and rows
+ * which can be manipulated as well. The smallest possible data unit are the cells, which
+ * may contain simple values or formulas to be calculated.
+ *
+ * All CRUD methods are called directly on HyperFormula instance and will trigger
+ * corresponding lifecycle events. The events are marked accordingly, as well as thrown
+ * errors, so they can be correctly handled.
+ */
+export class HyperFormula implements TypedEmitter {
+
+  /**
+   * Version of the HyperFormula.
+   *
+   * @category Static Properties
+   */
+  public static version = process.env.HT_VERSION as string
+
+  /**
+   * Latest build date.
+   *
+   * @category Static Properties
+   */
+  public static buildDate = process.env.HT_BUILD_DATE as string
+
+  /**
+   * A release date.
+   *
+   * @category Static Properties
+   */
+  public static releaseDate = process.env.HT_RELEASE_DATE as string
+
+  /**
+   * When using the UMD build, this property contains all available languages to use with the [registerLanguage](#registerlanguage) method.
+   *
+   * For more information, see the [Localizing functions](/guide/localizing-functions.md) guide.
+   *
+   * @category Static Properties
+   */
+  public static languages: Record<string, RawTranslationPackage> = {}
+  private static registeredLanguages: Map<string, TranslationPackage> = new Map()
+  private readonly _emitter: Emitter = new Emitter()
+  private _evaluationSuspended: boolean = false
+
+  /**
+   * Constructor
+   *
+   * @internal
+   */
+  protected constructor(
+    private _config: Config,
+    private _stats: Statistics,
+    private _dependencyGraph: DependencyGraph,
+    private _columnSearch: ColumnSearchStrategy,
+    private _parser: ParserWithCaching,
+    private _unparser: Unparser,
+    private _cellContentParser: CellContentParser,
+    private _evaluator: Evaluator,
+    private _lazilyTransformingAstService: LazilyTransformingAstService,
+    private _crudOperations: CrudOperations,
+    private _exporter: Exporter,
+    private _namedExpressions: NamedExpressions,
+    private _serialization: Serialization,
+    private _functionRegistry: FunctionRegistry,
+  ) {
+  }
+
+  /**
+   * Returns all of HyperFormula's default [configuration options](/guide/configuration-options.md).
+   *
+   * @example
+   * ```js
+   * // returns all default configuration options
+   * const defaultConfig = HyperFormula.defaultConfig;
+   * ```
+   *
+   * @category Static Accessors
+   */
+  public static get defaultConfig(): ConfigParams {
+    return getDefaultConfig()
+  }
+
+  /**
+   * Calls the `graph` method on the dependency graph.
+   * Allows for executing `graph` directly, without a need to refer to `dependencyGraph`.
+   *
+   * @internal
+   */
+  public get graph(): Graph<Vertex> {
+    return this.dependencyGraph.graph
+  }
+
+  /**
+   * Calls the `rangeMapping` method on the dependency graph.
+   * Allows for executing `rangeMapping` directly, without a need to refer to `dependencyGraph`.
+   *
+   * @internal
+   */
+  public get rangeMapping(): RangeMapping {
+    return this.dependencyGraph.rangeMapping
+  }
+
+  /**
+   * Calls the `arrayMapping` method on the dependency graph.
+   * Allows for executing `arrayMapping` directly, without a need to refer to `dependencyGraph`.
+   *
+   * @internal
+   */
+  public get arrayMapping(): ArrayMapping {
+    return this.dependencyGraph.arrayMapping
+  }
+
+  /**
+   * Calls the `sheetMapping` method on the dependency graph.
+   * Allows for executing `sheetMapping` directly, without a need to refer to `dependencyGraph`.
+   *
+   * @internal
+   */
+  public get sheetMapping(): SheetMapping {
+    return this.dependencyGraph.sheetMapping
+  }
+
+  /**
+   * Calls the `addressMapping` method on the dependency graph.
+   * Allows for executing `addressMapping` directly, without a need to refer to `dependencyGraph`.
+   *
+   * @internal
+   */
+  public get addressMapping(): AddressMapping {
+    return this.dependencyGraph.addressMapping
+  }
+
+  /** @internal */
+  public get dependencyGraph(): DependencyGraph {
+    return this._dependencyGraph
+  }
+
+  /** @internal */
+  public get evaluator(): Evaluator {
+    return this._evaluator
+  }
+
+  /** @internal */
+  public get columnSearch(): ColumnSearchStrategy {
+    return this._columnSearch
+  }
+
+  /** @internal */
+  public get lazilyTransformingAstService(): LazilyTransformingAstService {
+    return this._lazilyTransformingAstService
+  }
+
+  /**
+   * Returns state of the validity of the license key.
+   *
+   * @internal
+   */
+  public get licenseKeyValidityState(): LicenseKeyValidityState {
+    return this._config.licenseKeyValidityState
+  }
+
+  /**
+   * Builds the engine for a sheet from a two-dimensional array representation.
+   * The engine is created with a single sheet.
+   * Can be configured with the optional second parameter that represents a [[ConfigParams]].
+   * If not specified, the engine will be built with the default configuration.
+   *
+   * @param {Sheet} sheet - two-dimensional array representation of sheet
+   * @param {Partial<ConfigParams>} configInput - engine configuration
+   * @param {SerializedNamedExpression[]} namedExpressions - starting named expressions
+   *
+   * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
+   * @throws [[InvalidArgumentsError]] when sheet is not an array of arrays
+   * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
+   *
+   * @example
+   * ```js
+   * // data represented as an array
+   * const sheetData = [
+   *  ['0', '=SUM(1, 2, 3)', '52'],
+   *  ['=SUM(A1:C1)', '', '=A1'],
+   *  ['2', '=SUM(A1:C1)', '=theUltimateQuestionOfLife'],
+   * ];
+   *
+   * const namedExpressions = [
+   *  {
+   *    name: 'theUltimateQuestionOfLife',
+   *    expression: '=42',
+   *  },
+   * ];
+   *
+   * // method with optional config parameter maxColumns
+   * const hfInstance = HyperFormula.buildFromArray(sheetData, { licenseKey: 'gpl-v3', maxColumns: 1000 }, namedExpressions);
+   * ```
+   *
+   * @category Factories
+   */
+  public static buildFromArray(sheet: Sheet, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
+    return this.buildFromEngineState(BuildEngineFactory.buildFromSheet(sheet, configInput, namedExpressions))
+  }
+
+  /**
+   * Builds the engine from an object containing multiple sheets with names.
+   * The engine is created with one or more sheets.
+   * Can be configured with the optional second parameter that represents a [[ConfigParams]].
+   * If not specified the engine will be built with the default configuration.
+   *
+   * @param {Sheet} sheets - object with sheets definition
+   * @param {Partial<ConfigParams>} configInput - engine configuration
+   * @param {SerializedNamedExpression[]} namedExpressions - starting named expressions
+   *
+   * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
+   * @throws [[InvalidArgumentsError]] when any sheet is not an array of arrays
+   * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
+   *
+   * @example
+   * ```js
+   * // data represented as an object with sheets: Sheet1 and Sheet2
+   * const sheetData = {
+   *  'Sheet1': [
+   *    ['1', '', '=Sheet2!$A1'],
+   *    ['', '2', '=SUM(1, 2, 3)'],
+   *    ['=Sheet2!$A2', '2', ''],
+   *   ],
+   *  'Sheet2': [
+   *    ['', '4', '=Sheet1!$B1'],
+   *    ['', '8', '=SUM(9, 3, 3)'],
+   *    ['=Sheet1!$B1', '2', '=theUltimateQuestionOfLife'],
+   *   ],
+   * };
+   *
+   * const namedExpressions = [
+   *  {
+   *    name: 'theUltimateQuestionOfLife',
+   *    expression: '=42',
+   *  },
+   * ];
+   *
+   * // method with optional config parameter useColumnIndex
+   * const hfInstance = HyperFormula.buildFromSheets(sheetData, { licenseKey: 'gpl-v3', useColumnIndex: true }, namedExpressions);
+   * ```
+   *
+   * @category Factories
+   */
+  public static buildFromSheets(sheets: Sheets, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
+    return this.buildFromEngineState(BuildEngineFactory.buildFromSheets(sheets, configInput, namedExpressions))
+  }
+
+  /**
+   * Builds an empty engine instance.
+   * Can be configured with the optional parameter that represents a [[ConfigParams]].
+   * If not specified the engine will be built with the default configuration.
+   *
+   * @param {Partial<ConfigParams>} configInput - engine configuration
+   * @param {SerializedNamedExpression[]} namedExpressions - starting named expressions
+   *
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
+   *
+   * @example
+   * ```js
+   * const namedExpressions = [
+   *  {
+   *    name: 'theUltimateQuestionOfLife',
+   *    expression: '=42',
+   *  },
+   * ];
+   *
+   * // build with no initial data and with optional config parameter maxColumns
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3', maxColumns: 1000 }, namedExpressions);
+   * ```
+   *
+   * @category Factories
+   */
+  public static buildEmpty(configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
+    return this.buildFromEngineState(BuildEngineFactory.buildEmpty(configInput, namedExpressions))
+  }
+
+  /**
+   * Returns registered language from its code string.
+   *
+   * For more information, see the [Localizing functions guide](/guide/localizing-functions.md).
+   *
+   * @param {string} languageCode - code string of the translation package
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[LanguageNotRegisteredError]] when trying to retrieve not registered language
+   *
+   * @example
+   * ```js
+   * // return registered language
+   * const language = HyperFormula.getLanguage('enGB');
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static getLanguage(languageCode: string): TranslationPackage {
+    validateArgToType(languageCode, 'string', 'languageCode')
+    const val = this.registeredLanguages.get(languageCode)
+    if (val === undefined) {
+      throw new LanguageNotRegisteredError()
+    } else {
+      return val
+    }
+  }
+
+  /**
+   * Registers language under given code string.
+   *
+   * For more information, see the [Localizing functions guide](/guide/localizing-functions.md).
+   *
+   * @param {string} languageCode - code string of the translation package
+   * @param {RawTranslationPackage} languagePackage - translation package to be registered
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
+   * @throws [[LanguageAlreadyRegisteredError]] when given language is already registered
+   *
+   * @example
+   * ```js
+   * // return registered language
+   * HyperFormula.registerLanguage('enUS', enUS);
+   * const engine = HyperFormula.buildEmpty({licenseKey: 'gpl-v3', language: 'enUS'});
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static registerLanguage(languageCode: string, languagePackage: RawTranslationPackage): void {
+    validateArgToType(languageCode, 'string', 'languageCode')
+    if (this.registeredLanguages.has(languageCode)) {
+      throw new LanguageAlreadyRegisteredError()
+    } else {
+      this.registeredLanguages.set(languageCode, buildTranslationPackage(languagePackage))
+    }
+  }
+
+  /**
+   * Unregisters language that is registered under given code string.
+   *
+   * For more information, see the [Localizing functions guide](/guide/localizing-functions.md).
+   *
+   * @param {string} languageCode - code string of the translation package
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[LanguageNotRegisteredError]] when given language is not registered
+   *
+   * @example
+   * ```js
+   * // register the language for the instance
+   * HyperFormula.registerLanguage('plPL', plPL);
+   *
+   * // unregister plPL
+   * HyperFormula.unregisterLanguage('plPL');
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static unregisterLanguage(languageCode: string): void {
+    validateArgToType(languageCode, 'string', 'languageCode')
+    if (this.registeredLanguages.has(languageCode)) {
+      this.registeredLanguages.delete(languageCode)
+    } else {
+      throw new LanguageNotRegisteredError()
+    }
+  }
+
+  /**
+   * Returns all registered languages codes.
+   *
+   * @example
+   * ```js
+   * // should return all registered language codes: ['enGB', 'plPL']
+   * const registeredLanguages = HyperFormula.getRegisteredLanguagesCodes();
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static getRegisteredLanguagesCodes(): string[] {
+    return Array.from(this.registeredLanguages.keys())
+  }
+
+  /**
+   * Registers all functions in a given plugin with optional translations.
+   *
+   * For more information, see the [Custom functions guide](/guide/custom-functions.md).
+   *
+   * Note: FunctionPlugins must be registered prior to the creation of HyperFormula instances in which they are used.
+   * HyperFormula instances created prior to the registration of a FunctionPlugin are unable to access the FunctionPlugin.
+   * Registering a FunctionPlugin with [[custom-functions]] requires the translations parameter.
+   *
+   * @param {FunctionPluginDefinition} plugin - plugin class
+   * @param {FunctionTranslationsPackage} translations - optional package of function names translations
+   *
+   * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
+   *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register the plugin
+   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
+    FunctionRegistry.registerFunctionPlugin(plugin, translations)
+  }
+
+  /**
+   * Unregisters all functions defined in given plugin.
+   *
+   * For more information, see the [Custom functions guide](/guide/custom-functions.md).
+   *
+   * Note: This method does not affect the existing HyperFormula instances.
+   *
+   * @param {FunctionPluginDefinition} plugin - plugin class
+   *
+   * @example
+   * ```js
+   * // get the class of a plugin
+   * const registeredPluginClass = HyperFormula.getFunctionPlugin('EXAMPLE');
+   *
+   * // unregister all functions defined in a plugin of ID 'EXAMPLE'
+   * HyperFormula.unregisterFunctionPlugin(registeredPluginClass);
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static unregisterFunctionPlugin(plugin: FunctionPluginDefinition): void {
+    FunctionRegistry.unregisterFunctionPlugin(plugin)
+  }
+
+  /**
+   * Registers a function with a given id if such exists in a plugin.
+   *
+   * For more information, see the [Custom functions guide](/guide/custom-functions.md).
+   *
+   * Note: This method does not affect the existing HyperFormula instances.
+   *
+   * @param {string} functionId - function id, e.g., 'SUMIF'
+   * @param {FunctionPluginDefinition} plugin - plugin class
+   * @param {FunctionTranslationsPackage} translations - translations for the function name
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[FunctionPluginValidationError]] when function with a given id does not exist in plugin or plugin class definition is not consistent with metadata
+   * @throws [[ProtectedFunctionTranslationError]] when trying to register translation for protected function
+   *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register a function
+   * HyperFormula.registerFunction('EXAMPLE', MyExamplePlugin);
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
+    validateArgToType(functionId, 'string', 'functionId')
+    FunctionRegistry.registerFunction(functionId, plugin, translations)
+  }
+
+  /**
+   * Unregisters a function with a given id.
+   *
+   * For more information, see the [Custom functions guide](/guide/custom-functions.md).
+   *
+   * Note: This method does not affect the existing HyperFormula instances.
+   *
+   * @param {string} functionId - function id, e.g., 'SUMIF'
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register a function
+   * HyperFormula.registerFunction('EXAMPLE', MyExamplePlugin);
+   *
+   * // unregister a function
+   * HyperFormula.unregisterFunction('EXAMPLE');
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static unregisterFunction(functionId: string): void {
+    validateArgToType(functionId, 'string', 'functionId')
+    FunctionRegistry.unregisterFunction(functionId)
+  }
+
+  /**
+   * Clears function registry.
+   *
+   * Note: This method does not affect the existing HyperFormula instances.
+   *
+   * @example
+   * ```js
+   * HyperFormula.unregisterAllFunctions();
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static unregisterAllFunctions(): void {
+    FunctionRegistry.unregisterAll()
+  }
+
+  /**
+   * Returns translated names of all registered functions for a given language.
+   *
+   * Answers for the GLOBAL function registry, because a static method has no engine, and therefore
+   * no configuration, in scope. An engine configured with its own `functionPlugins` registers only
+   * those, so this method can list functions that engine cannot evaluate at all.
+   *
+   * The two forms answer different questions and neither replaces the other: this one translates
+   * into any registered language without building an engine, while the instance method of the same
+   * name answers for the engine you actually hold, in that instance's own language. Neither form
+   * looks at the license key: to list only the functions an instance can evaluate, use
+   * [[getAvailableFunctions]].
+   *
+   * @param {string} code - language code
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * // return a list of function names registered for enGB
+   * const allNames = HyperFormula.getRegisteredFunctionNames('enGB');
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static getRegisteredFunctionNames(code: string): string[] {
+    validateArgToType(code, 'string', 'code')
+    const functionIds = FunctionRegistry.getRegisteredFunctionIds()
+    const language = this.getLanguage(code)
+    return language.getFunctionTranslations(functionIds)
+  }
+
+  /**
+   * Returns class of a plugin used by function with given id
+   *
+   * For more information, see the [Custom functions guide](/guide/custom-functions.md).
+   *
+   * @param {string} functionId - id of a function, e.g., 'SUMIF'
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * // register a plugin
+   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
+   *
+   * // return the class of a given plugin
+   * const myFunctionClass = HyperFormula.getFunctionPlugin('EXAMPLE');
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static getFunctionPlugin(functionId: string): FunctionPluginDefinition | undefined {
+    validateArgToType(functionId, 'string', 'functionId')
+    return FunctionRegistry.getFunctionPlugin(functionId)
+  }
+
+  /**
+   * Returns classes of all plugins registered in HyperFormula.
+   *
+   * @example
+   * ```js
+   * // return classes of all plugins
+   * const allClasses = HyperFormula.getAllFunctionPlugins();
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static getAllFunctionPlugins(): FunctionPluginDefinition[] {
+    return FunctionRegistry.getPlugins()
+  }
+
+  /**
+   * Resolves the structural metadata and catalogue doc for a registered function id, following aliases to their
+   * target. Returns `undefined` only when the id is not registered. The catalogue doc is attached whenever the
+   * catalogue holds an entry for the resolved id, whichever plugin currently provides it: the catalogue is keyed by
+   * id, not by implementation, so a user-registered plugin that shadows a built-in id inherits that built-in's
+   * authored metadata. When the catalogue has no entry for the id, `doc` is `undefined`, only the structural
+   * metadata is available, and the function is described as custom. Shared by the list and the details builders so
+   * they always agree.
+   *
+   * A catalogue doc whose parameter count disagrees with the implementation is still returned, not withheld:
+   * [[buildFunctionDetails]] resolves the disagreement in the implementation's favour, reporting its arguments
+   * positionally and warning. Every function a user can call is therefore described, and catalogue drift costs the
+   * parameter prose rather than the whole entry.
+   *
+   * The returned `aliasOf` is the target's id when `functionId` is an alias, else `undefined`. It is derived here
+   * rather than at each call site so the list and the details report the alias relation identically.
+   *
+   * @param {string} functionId - the language-independent function id (canonical id or alias)
+   * @param {FunctionPluginDefinition | undefined} plugin - the plugin registered for `functionId`, or `undefined`
+   */
+  private static resolveFunctionMetadata(functionId: string, plugin: FunctionPluginDefinition | undefined): { doc: FunctionDoc | undefined, metadata: StructuralMetadata, aliasOf: string | undefined } | undefined {
+    // Protected ids (VERSION, OFFSET) are excluded from the plugin registry by design (`getFunctionPlugin` always
+    // returns `undefined` for them), so they would otherwise fall straight into the `plugin === undefined` case
+    // below and disappear from the metadata API. They must still be described, because a user can call them from a
+    // formula: resolve them here from the authored catalogue doc and structural metadata instead of from a plugin.
+    // A protected id stays unlisted unless BOTH are authored — requiring the structural metadata keeps
+    // `buildFunctionDetails` from reading `repeatLastArgs`/`parameters` off `undefined` if a protected id is ever
+    // added to one map only (fail-safe: the function is omitted rather than crashing the metadata API).
+    if (FunctionRegistry.functionIsProtected(functionId) && FUNCTION_DOCS[functionId] !== undefined && PROTECTED_FUNCTION_METADATA[functionId] !== undefined) {
+      // A protected id is never an alias, so it resolves to itself.
+      return {doc: FUNCTION_DOCS[functionId], metadata: PROTECTED_FUNCTION_METADATA[functionId], aliasOf: undefined}
+    }
+    if (plugin === undefined) {
+      return undefined
+    }
+    // An alias shares its target's implementation metadata and catalogue doc, but keeps its own (alias) name.
+    const metadataKey = plugin.aliases?.[functionId] ?? functionId
+    const metadata = plugin.implementedFunctions[metadataKey]
+    if (metadata === undefined) {
+      return undefined
+    }
+    // Use the catalogue doc only if one exists for this function id.
+    const doc = FUNCTION_DOCS[metadataKey]
+    return {doc, metadata, aliasOf: metadataKey !== functionId ? metadataKey : undefined}
+  }
+
+  /**
+   * Whether an instance's license lets it evaluate the given function id, and therefore whether the
+   * metadata API may describe it. Mirrors the gate-B branch the interpreter runs per function call
+   * (`Interpreter.evaluateAstWithoutPostprocessing`, the `FUNCTION_CALL` case), through the same
+   * [[licenseAllowsFunction]] rule and the same alias canonicalization, so a listed function is
+   * always one that actually evaluates.
+   *
+   * Gate B only, deliberately — never the license key's validity state. A key that blocks
+   * evaluation (a missing or invalid key, an expired classic key, or a trial past its grace period)
+   * resolves to an unrestricted entitlement (the invariant `resolveLicense` documents), so it
+   * reaches this method with both `licenseCapabilities` axes set to `'all'` and every function
+   * stays listed.
+   * That is the intended answer: a key problem is reported on the console and by `#LIC!` in cells,
+   * and narrowing the catalog to the two protected built-ins would leave an integrator who has not
+   * wired up their key yet with an empty function picker and no clue why. The list narrows only for
+   * a key that evaluates (a valid one, or an expired one that keeps working with its own grants) and
+   * genuinely does not include a function — the case where the answer is useful.
+   *
+   * @param {string} functionId - the id as registered, which may be an alias
+   * @param {FunctionRegistry} functionRegistry - the engine's registry, which resolves the alias map
+   * @param {Config} config - the instance's config, holding its resolved entitlement
+   */
+  private static licenseListsFunction(functionId: string, functionRegistry: FunctionRegistry, config: Config): boolean {
+    if (FunctionRegistry.functionIsProtected(functionId)) {
+      return true
+    }
+    return licenseAllowsFunction(config.capabilityRegistry, config.licenseCapabilities, functionRegistry.getCanonicalFunctionId(functionId))
+  }
+
+  /**
+   * Builds the function list for every id registered in an engine's own registry. Documented functions use their
+   * catalogue entry; custom functions are listed with their name only. Sorted by localized name with
+   * `localeCompare`, so the order follows the host's collation rules, with the language-independent canonical name
+   * as a stable tiebreaker for entries that share a localized name.
+   *
+   * Takes the instance's whole [[Config]] rather than a language code: an instance must describe its functions
+   * under the translation package its own evaluator uses (`Config.translationPackage`), which is a snapshot taken
+   * when the instance was built and can differ from whatever is registered globally for the same code today.
+   * Deriving it here instead would let this method report a localized name the instance refuses to evaluate. The
+   * config also carries the resolved entitlement, for the same reason — see [[licenseListsFunction]].
+   *
+   * @param {FunctionRegistry} functionRegistry - the engine's registry, the source of both the ids and their plugins
+   * @param {Config} config - the instance's config: the translation package and the resolved license entitlement
+   */
+  private static buildAvailableFunctions(functionRegistry: FunctionRegistry, config: Config): FunctionListEntry[] {
+    const language = config.translationPackage
+    const translate = (id: string) => language.getMaybeFunctionTranslation(id)
+    return functionRegistry.getListableFunctionIds()
+      // The interpreter refuses to evaluate ids the active language has no translation entry for
+      // (FunctionRegistry.getFunction), so an untranslated function would be advertised but uncallable.
+      .filter(id => language.isFunctionTranslated(id))
+      .filter(id => HyperFormula.licenseListsFunction(id, functionRegistry, config))
+      .map(id => {
+        const resolved = HyperFormula.resolveFunctionMetadata(id, functionRegistry.getFunctionPlugin(id))
+        if (resolved === undefined) {
+          return undefined
+        }
+        // An alias borrows its target's category and description, so the alias->target relation is surfaced as
+        // `aliasOf` here too — a picker can group or annotate the aliases straight from the list, without one
+        // getFunctionDetails call per entry.
+        return resolved.doc !== undefined
+          ? buildFunctionListEntry(id, resolved.doc, translate, resolved.aliasOf)
+          : buildCustomFunctionListEntry(id, translate, resolved.aliasOf)
+      })
+      .filter((entry): entry is FunctionListEntry => entry !== undefined)
+      .sort((a, b) => a.localizedName.localeCompare(b.localizedName) || a.canonicalName.localeCompare(b.canonicalName))
+  }
+
+  /**
+   * Builds the full details for a single id registered in an engine's own registry, or `undefined` when it is
+   * unknown/not registered. Documented functions use their catalogue entry; custom functions report their
+   * structural metadata only.
+   *
+   * @param {string} functionId - the language-independent function id (canonical id or alias)
+   * @param {FunctionRegistry} functionRegistry - the engine's registry, which resolves the id to its plugin
+   * @param {Config} config - the instance's config: the translation package and the resolved license entitlement
+   */
+  private static buildFunctionDetailsFor(functionId: string, functionRegistry: FunctionRegistry, config: Config): FunctionDetails | undefined {
+    const language = config.translationPackage
+    // Mirrors the filters in buildAvailableFunctions: an id the active language cannot evaluate
+    // (no translation entry), or one this instance's license does not grant, gets no details
+    // either, so the list and the details always agree.
+    if (!language.isFunctionTranslated(functionId)) {
+      return undefined
+    }
+    if (!HyperFormula.licenseListsFunction(functionId, functionRegistry, config)) {
+      return undefined
+    }
+    const resolved = HyperFormula.resolveFunctionMetadata(functionId, functionRegistry.getFunctionPlugin(functionId))
+    if (resolved === undefined) {
+      return undefined
+    }
+    const translate = (id: string) => language.getMaybeFunctionTranslation(id)
+    // An alias borrows the target's metadata (including examples, which spell the target's name), so the
+    // alias->target relation is surfaced as `aliasOf` for consumers to detect and explain the difference.
+    return resolved.doc !== undefined
+      ? buildFunctionDetails(functionId, resolved.doc, resolved.metadata, translate, resolved.aliasOf)
+      : buildCustomFunctionDetails(functionId, resolved.metadata, translate, resolved.aliasOf)
+  }
+
+  /**
+   * @internal
+   */
+  private static buildFromEngineState(engine: EngineState): HyperFormula {
+    return new HyperFormula(
+      engine.config,
+      engine.stats,
+      engine.dependencyGraph,
+      engine.columnSearch,
+      engine.parser,
+      engine.unparser,
+      engine.cellContentParser,
+      engine.evaluator,
+      engine.lazilyTransformingAstService,
+      engine.crudOperations,
+      engine.exporter,
+      engine.namedExpressions,
+      engine.serialization,
+      engine.functionRegistry,
+    )
+  }
+
+  /**
+   * Returns the cell value of a given address.
+   * Applies rounding and post-processing.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[ExpectedValueOfTypeError]] when cellAddress is of incorrect type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1, 2, 3)', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // get value of A1 cell, should be '6'
+   * const A1Value = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
+   *
+   * // get value of B1 cell, should be '2'
+   * const B1Value = hfInstance.getCellValue({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellValue(cellAddress: SimpleCellAddress): CellValue {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    this.ensureEvaluationIsNotSuspended()
+    return this._serialization.getCellValue(cellAddress)
+  }
+
+  /**
+   * Returns a normalized formula string from the cell of a given address or `undefined` for an address that does not exist and empty values.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] when cellAddress is of incorrect type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1, 2, 3)', '0'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return a normalized A1 cell formula: '=SUM(1, 2, 3)'
+   * const A1Formula = hfInstance.getCellFormula({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return a normalized B1 cell formula: 'undefined'
+   * const B1Formula = hfInstance.getCellFormula({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellFormula(cellAddress: SimpleCellAddress): string | undefined {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    return this._serialization.getCellFormula(cellAddress)
+  }
+
+  /**
+   * Returns the `HYPERLINK` url for a cell of a given address or `undefined` for an address that does not exist or a cell that is not `HYPERLINK`
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] when cellAddress is of incorrect type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=HYPERLINK("https://hyperformula.handsontable.com/", "HyperFormula")', '0'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return url of 'HYPERLINK': https://hyperformula.handsontable.com/
+   * const A1Hyperlink = hfInstance.getCellHyperlink({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'undefined' for a cell that is not 'HYPERLINK'
+   * const B1Hyperlink = hfInstance.getCellHyperlink({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellHyperlink(cellAddress: SimpleCellAddress): string | undefined {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    this.ensureEvaluationIsNotSuspended()
+    return this._serialization.getCellHyperlink(cellAddress)
+  }
+
+  /**
+   * Returns [[RawCellContent]] with a serialized content of the cell of a given address: either a cell formula, an explicit value, or an error.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[ExpectedValueOfTypeError]] when cellAddress is of incorrect type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1, 2, 3)', '0'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return serialized content of A1 cell: '=SUM(1, 2, 3)'
+   * const cellA1Serialized = hfInstance.getCellSerialized({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return serialized content of B1 cell: '0'
+   * const cellB1Serialized = hfInstance.getCellSerialized({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellSerialized(cellAddress: SimpleCellAddress): RawCellContent {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    this.ensureEvaluationIsNotSuspended()
+    return this._serialization.getCellSerialized(cellAddress)
+  }
+
+  /**
+   * Returns an array of arrays of [[CellValue]] with values of all cells from [[Sheet]].
+   * Applies rounding and post-processing.
+   *
+   * @param {number} sheetId - sheet ID number
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['0', '=SUM(1, 2, 3)', '=A1'],
+   *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
+   *  ['2', '=SUM(A1:C1)', '=C1'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return all values of a sheet: [[0, 6, 0], [1, '1.0%', 0], [2, 6, 0]]
+   * const sheetValues = hfInstance.getSheetValues(0);
+   * ```
+   *
+   * @category Sheets
+   */
+  public getSheetValues(sheetId: number): CellValue[][] {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this.ensureEvaluationIsNotSuspended()
+    return this._serialization.getSheetValues(sheetId)
+  }
+
+  /**
+   * Returns an array with normalized formula strings from [[Sheet]] or `undefined` for a cells that have no value.
+   *
+   * @param {SimpleCellAddress} sheetId - sheet ID number
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['0', '=SUM(1, 2, 3)', '=A1'],
+   *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
+   *  ['2', '=SUM(A1:C1)', '=C1'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return all formulas of a sheet:
+   * // [
+   * //  [undefined, '=SUM(1, 2, 3)', '=A1'],
+   * //  [undefined, '=TEXT(A2, "0.0%")', '=C1'],
+   * //  [undefined, '=SUM(A1:C1)', '=C1'],
+   * // ];
+   * const sheetFormulas = hfInstance.getSheetFormulas(0);
+   * ```
+   *
+   * @category Sheets
+   */
+  public getSheetFormulas(sheetId: number): (string | undefined)[][] {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    return this._serialization.getSheetFormulas(sheetId)
+  }
+
+  /**
+   * Returns an array of arrays of [[RawCellContent]] with serialized content of cells from [[Sheet]], either a cell formula or an explicit value.
+   *
+   * @param {SimpleCellAddress} sheetId - sheet ID number
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['0', '=SUM(1, 2, 3)', '=A1'],
+   *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
+   *  ['2', '=SUM(A1:C1)', '=C1'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return:
+   * // [
+   * //  ['0', '=SUM(1, 2, 3)', '=A1'],
+   * //  ['1', '=TEXT(A2, "0.0%")', '=C1'],
+   * //  ['2', '=SUM(A1:C1)', '=C1'],
+   * // ];
+   * const serializedContent = hfInstance.getSheetSerialized(0);
+   * ```
+   *
+   * @category Sheets
+   */
+  public getSheetSerialized(sheetId: number): RawCellContent[][] {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this.ensureEvaluationIsNotSuspended()
+    return this._serialization.getSheetSerialized(sheetId)
+  }
+
+  /**
+   * Returns a map containing dimensions of all sheets for the engine instance represented as a key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   Sheet1: [
+   *    ['1', '2', '=Sheet2!$A1'],
+   *   ],
+   *   Sheet2: [
+   *    ['3'],
+   *    ['4'],
+   *   ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return the dimensions of all sheets:
+   * // { Sheet1: { width: 3, height: 1 }, Sheet2: { width: 1, height: 2 } }
+   * const allSheetsDimensions = hfInstance.getAllSheetsDimensions();
+   * ```
+   *
+   * @category Sheets
+   */
+  public getAllSheetsDimensions(): Record<string, SheetDimensions> {
+    return this._serialization.genericAllSheetsGetter((arg) => this.getSheetDimensions(arg))
+  }
+
+  /**
+   * Returns dimensions of a specified sheet.
+   * The sheet dimensions is represented with numbers: width and height.
+   *
+   * Note: Due to the memory optimizations, some of the empty bottom rows and rightmost columns are not counted to the dimensions.
+   *
+   * @param {number} sheetId - sheet ID number
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *    ['1', '2', '=Sheet2!$A1'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return provided sheet's dimensions: { width: 3, height: 1 }
+   * const sheetDimensions = hfInstance.getSheetDimensions(0);
+   * ```
+   *
+   * @category Sheets
+   */
+  public getSheetDimensions(sheetId: number): SheetDimensions {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    return {
+      width: this.dependencyGraph.getSheetWidth(sheetId),
+      height: this.dependencyGraph.getSheetHeight(sheetId),
+    }
+  }
+
+  /**
+   * Returns values of all sheets in a form of an object which property keys are strings and values are 2D arrays of [[CellValue]].
+   *
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '=A1+10', '3'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return all sheets values: { Sheet1: [ [ 1, 11, 3 ] ] }
+   * const allSheetsValues = hfInstance.getAllSheetsValues();
+   * ```
+   *
+   * @category Sheets
+   */
+  public getAllSheetsValues(): Record<string, CellValue[][]> {
+    this.ensureEvaluationIsNotSuspended()
+    return this._serialization.getAllSheetsValues()
+  }
+
+  /**
+   * Returns formulas of all sheets in a form of an object which property keys are strings and values are 2D arrays of strings or possibly `undefined` when the call does not contain a formula.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2', '=A1+10'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return only formulas: { Sheet1: [ [ undefined, undefined, '=A1+10' ] ] }
+   * const allSheetsFormulas = hfInstance.getAllSheetsFormulas();
+   * ```
+   * @category Sheets
+   */
+  public getAllSheetsFormulas(): Record<string, (string | undefined)[][]> {
+    return this._serialization.getAllSheetsFormulas()
+  }
+
+  /**
+   * Returns formulas or values of all sheets in a form of an object which property keys are strings and values are 2D arrays of [[RawCellContent]].
+   *
+   * Each non-formula cell is serialized to the exact value it was set with, preserving its type.
+   * For example, a cell set with the string `'1'` is serialized as the string `'1'`, while a cell set with the number `1` is serialized as the number `1`.
+   *
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', 2, '=A1+10'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return all sheets serialized content: { Sheet1: [ [ '1', 2, '=A1+10' ] ] }
+   * // note: the string '1' stays a string and the number 2 stays a number
+   * const allSheetsSerialized = hfInstance.getAllSheetsSerialized();
+   * ```
+   *
+   * @category Sheets
+   */
+  public getAllSheetsSerialized(): Record<string, RawCellContent[][]> {
+    this.ensureEvaluationIsNotSuspended()
+    return this._serialization.getAllSheetsSerialized()
+  }
+
+  /**
+   * Updates the config with given new metadata. It is an expensive operation, as it might trigger rebuilding the engine and recalculation of all formulas.
+   *
+   * For more information, see the [Configuration options guide](/guide/configuration-options.md).
+   *
+   * @param {Partial<ConfigParams>} newParams configuration options to be updated or added
+   *
+   * @throws [[ExpectedValueOfTypeError]] when some parameters of config are of wrong type (e.g., currencySymbol)
+   * @throws [[ConfigValueEmpty]] when some parameters of config are of invalid value (e.g., currencySymbol)
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // add a config param, for example maxColumns,
+   * // you can check the configuration with getConfig method
+   * hfInstance.updateConfig({ maxColumns: 1000 });
+   * ```
+   *
+   * @category Instance
+   */
+  public updateConfig(newParams: Partial<ConfigParams>): void {
+    const isNewConfigTheSame = Object.entries(newParams).every(([key, value]) => this._config[key as keyof ConfigParams] === value)
+
+    if (isNewConfigTheSame) {
+      return
+    }
+
+    this.rebuildWithConfig(newParams)
+  }
+
+  /**
+   * Returns current configuration of the engine instance.
+   *
+   * For more information, see the [Configuration options guide](/guide/configuration-options.md).
+   *
+   * @example
+   * ```js
+   * // should return all config metadata including default and those which were added
+   * const hfConfig = hfInstance.getConfig();
+   * ```
+   *
+   * @category Instance
+   */
+  public getConfig(): ConfigParams {
+    return this._config.getConfig()
+  }
+
+  /**
+   * Rebuilds the HyperFormula instance preserving the current sheets data.
+   *
+   * @example
+   * ```js
+   * hfInstance.rebuildAndRecalculate();
+   * ```
+   *
+   * @category Instance
+   */
+  public rebuildAndRecalculate(): void {
+    this.rebuildWithConfig({})
+  }
+
+  /**
+   * Returns a snapshot of computation time statistics.
+   * It returns a map with key-value pairs where keys are enums for stat type and time (number).
+   *
+   * @internal
+   *
+   * @category Instance
+   */
+  public getStats(): Map<StatType, number> {
+    return this._stats.snapshot()
+  }
+
+  /**
+   * Undo the previous operation.
+   *
+   * For more information, see the [Undo-Redo guide](/guide/undo-redo.md).
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoOperationToUndoError]] when there is no operation running that can be undone
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the UndoRedo feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   *  ['3', ''],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // perform CRUD operation, for example remove the second row
+   * hfInstance.removeRows(0, [1, 1]);
+   *
+   * // undo the operation, it should return the changes
+   * const changes = hfInstance.undo();
+   * ```
+   *
+   * @category Undo and Redo
+   */
+  public undo(): ExportedChange[] {
+    this.ensureCapability(FeatureId.UndoRedo)
+    this._crudOperations.undo()
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Re-do recently undone operation.
+   *
+   * For more information, see the [Undo-Redo guide](/guide/undo-redo.md).
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoOperationToRedoError]] when there is no operation running that can be re-done
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the UndoRedo feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   *  ['3'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // perform CRUD operation, for example remove the second row
+   * hfInstance.removeRows(0, [1, 1]);
+   *
+   * // undo the operation, it should return previous values: [['1'], ['2'], ['3']]
+   * hfInstance.undo();
+   *
+   * // do a redo, it should return the values after removing the second row: [['1'], ['3']]
+   * const changes = hfInstance.redo();
+   * ```
+   *
+   * @category Undo and Redo
+   */
+  public redo(): ExportedChange[] {
+    this.ensureCapability(FeatureId.UndoRedo)
+    this._crudOperations.redo()
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Checks if there is at least one operation that can be undone.
+   * Returns `false` also when the license key does not allow the UndoRedo feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * For more information, see the [Undo-Redo guide](/guide/undo-redo.md).
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   *  ['3'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // perform CRUD operation, for example remove the second row
+   * hfInstance.removeRows(0, [1, 1]);
+   *
+   * // should return 'true', it is possible to undo last operation
+   * // which is removing rows in this example
+   * const isSomethingToUndo = hfInstance.isThereSomethingToUndo();
+   * ```
+   *
+   * @category Undo and Redo
+   */
+  public isThereSomethingToUndo(): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.UndoRedo)) {
+      return false
+    }
+    return this._crudOperations.isThereSomethingToUndo()
+  }
+
+  /**
+   * Checks if there is at least one operation that can be re-done.
+   * Returns `false` also when the license key does not allow the UndoRedo feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * For more information, see the [Undo-Redo guide](/guide/undo-redo.md).
+   *
+   * @example
+   * ```js
+   * hfInstance.undo();
+   *
+   * // when there is an action to redo, this returns 'true'
+   * const isSomethingToRedo = hfInstance.isThereSomethingToRedo();
+   * ```
+   *
+   * @category Undo and Redo
+   */
+  public isThereSomethingToRedo(): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.UndoRedo)) {
+      return false
+    }
+    return this._crudOperations.isThereSomethingToRedo()
+  }
+
+  /**
+   * Returns information whether it is possible to change the content in a rectangular area bounded by the box.
+   * If returns `true`, doing [[setCellContents]] operation won't throw any errors.
+   * Returns `false` if the address is invalid or the sheet does not exist.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {SimpleCellAddress | SimpleCellRange} address - single cell or block of cells to check
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // top left corner
+   * const address1 = { col: 0, row: 0, sheet: 0 };
+   * // bottom right corner
+   * const address2 = { col: 1, row: 0, sheet: 0 };
+   *
+   * // should return 'true' for this example, it is possible to set content of
+   * // width 2, height 1 in the first row and column of sheet 0
+   * const isSettable = hfInstance.isItPossibleToSetCellContents({ start: address1, end: address2 });
+   * ```
+   *
+   * @category Cells
+   */
+  public isItPossibleToSetCellContents(address: SimpleCellAddress | SimpleCellRange): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    let range
+    if (isSimpleCellAddress(address)) {
+      range = new AbsoluteCellRange(address, address)
+    } else if (isSimpleCellRange(address)) {
+      range = new AbsoluteCellRange(address.start, address.end)
+    } else {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', 'address')
+    }
+    try {
+      this._crudOperations.ensureRangeInSizeLimits(range)
+      for (const it of range.addresses(this._dependencyGraph)) {
+        this._crudOperations.ensureItIsPossibleToChangeContent(it)
+      }
+    } catch (e) {
+      return false
+    }
+    return true
+  }
+
+  /**
+   * Sets the content for a block of cells of a given coordinates.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {SimpleCellAddress} topLeftCornerAddress - top left corner of block of cells
+   * @param {(RawCellContent[][]|RawCellContent)} cellContents - array with content
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a raw cell value
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[ExpectedValueOfTypeError]] if topLeftCornerAddress argument is of wrong type
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2', '=A1'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should set the content, returns:
+   * // [{
+   * //   address: { sheet: 0, col: 3, row: 0 },
+   * //   newValue: 2,
+   * // }]
+   * const changes = hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
+   * ```
+   *
+   * @category Cells
+   */
+  public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    this._crudOperations.setCellContents(topLeftCornerAddress, cellContents)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Reorders rows of a sheet according to a source-target mapping.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {[number, number][]} rowMapping - array mapping original positions to final positions of rows
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
+   * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1],
+   *  [2],
+   *  [4, 5],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should set swap rows 0 and 2 in place, returns:
+   * // [{
+   * //   address: { sheet: 0, col: 0, row: 2 },
+   * //   newValue: 1,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 1, row: 2 },
+   * //   newValue: null,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 4,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 1, row: 0 },
+   * //   newValue: 5,
+   * // }]
+   * const changes = hfInstance.swapRowIndexes(0, [[0, 2], [2, 0]]);
+   * ```
+   *
+   * @category Rows
+   */
+  public swapRowIndexes(sheetId: number, rowMapping: [number, number][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this._crudOperations.setRowOrder(sheetId, rowMapping)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Checks if it is possible to reorder rows of a sheet according to a source-target mapping.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {[number, number][]} rowMapping - array mapping original positions to final positions of rows
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1],
+   *  [2],
+   *  [4, 5],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // returns true
+   * const isSwappable = hfInstance.isItPossibleToSwapRowIndexes(0, [[0, 2], [2, 0]]);
+   *
+   * // returns false
+   * const isSwappable = hfInstance.isItPossibleToSwapRowIndexes(0, [[0, 1]]);
+   * ```
+   *
+   * @category Rows
+   */
+  public isItPossibleToSwapRowIndexes(sheetId: number, rowMapping: [number, number][]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    try {
+      this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
+      this._crudOperations.testRowOrderForArrays(sheetId, rowMapping)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Reorders rows of a sheet according to a permutation of 0-based indexes.
+   *
+   * Parameter `newRowOrder` should have the form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`.
+   * In other words, the value at index `i` is the new position for the row that is currently at index `i`.
+   * Note that this is the opposite of `[ previousPositionForRow0, previousPositionForRow1, ... ]`.
+   *
+   * This method might be used to [sort the rows of a sheet](../../guide/sorting-data.md).
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note: This method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {number[]} newRowOrder - permutation of rows; array length must match the number of rows returned by [getSheetDimensions()](#getsheetdimensions)
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
+   * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['A'],
+   *  ['B'],
+   *  ['C']
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // Move 'A' to index 1, 'B' to index 2, and 'C' to index 0.
+   * const newRowOrder = [1, 2, 0]; // [ newPosForA, newPosForB, newPosForC ]
+   *
+   * const changes = hfInstance.setRowOrder(0, newRowOrder);
+   *
+   * // Sheet after this operation: [['C'], ['A'], ['B']]
+   * ```
+   *
+   * @category Rows
+   */
+  public setRowOrder(sheetId: number, newRowOrder: number[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    const mapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
+    return this.swapRowIndexes(sheetId, mapping)
+  }
+
+  /**
+   * Checks if it is possible to reorder rows of a sheet according to a permutation.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * Parameter `newRowOrder` should have the form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`,
+   * i.e. the value at index `i` is the new position for the row that is currently at index `i`.
+   * See [[setRowOrder]] for details.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {number[]} newRowOrder - permutation of rows
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['A'],
+   *  ['B'],
+   *  ['C']
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // returns true
+   * hfInstance.isItPossibleToSetRowOrder(0, [1, 2, 0]);
+   *
+   * // returns false (array length must match the number of rows)
+   * hfInstance.isItPossibleToSetRowOrder(0, [2]);
+   * ```
+   *
+   * @category Rows
+   */
+  public isItPossibleToSetRowOrder(sheetId: number, newRowOrder: number[]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    try {
+      const rowMapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
+      this._crudOperations.validateSwapRowIndexes(sheetId, rowMapping)
+      this._crudOperations.testRowOrderForArrays(sheetId, rowMapping)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Reorders columns of a sheet according to a source-target mapping.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {[number, number][]} columnMapping - array mapping original positions to final positions of columns
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
+   * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1, 2, 4],
+   *  [5]
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should set swap columns 0 and 2 in place, returns:
+   * // [{
+   * //   address: { sheet: 0, col: 2, row: 0 },
+   * //   newValue: 1,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 2, row: 1 },
+   * //   newValue: 5,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 4,
+   * // },
+   * // {
+   * //   address: { sheet: 0, col: 0, row: 1 },
+   * //   newValue: null,
+   * // }]
+   * const changes = hfInstance.swapColumnIndexes(0, [[0, 2], [2, 0]]);
+   * ```
+   *
+   * @category Columns
+   */
+  public swapColumnIndexes(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this._crudOperations.setColumnOrder(sheetId, columnMapping)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Checks if it is possible to reorder columns of a sheet according to a source-target mapping.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  [1, 2, 4],
+   *  [5]
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // returns true
+   * hfInstance.isItPossibleToSwapColumnIndexes(0, [[0, 2], [2, 0]]);
+   *
+   * // returns false
+   * hfInstance.isItPossibleToSwapColumnIndexes(0, [[0, 1]]);
+   * ```
+   *
+   * @category Columns
+   */
+  public isItPossibleToSwapColumnIndexes(sheetId: number, columnMapping: [number, number][]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    try {
+      this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
+      this._crudOperations.testColumnOrderForArrays(sheetId, columnMapping)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Reorders columns of a sheet according to a permutation of 0-based indexes.
+   *
+   * Parameter `newColumnOrder` should have the form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`.
+   * In other words, the value at index `i` is the new position for the column that is currently at index `i`.
+   * Note that this is the opposite of `[ previousPositionForColumn0, previousPositionForColumn1, ... ]`.
+   *
+   * This method might be used to [sort the columns of a sheet](../../guide/sorting-data.md).
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note: This method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {number[]} newColumnOrder - permutation of columns; array length must match the number of columns returned by [getSheetDimensions()](#getsheetdimensions)
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
+   * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *   ['A', 'B', 'C']
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // Move 'A' to index 1, 'B' to index 2, and 'C' to index 0.
+   * const newColumnOrder = [1, 2, 0]; // [ newPosForA, newPosForB, newPosForC ]
+   *
+   * const changes = hfInstance.setColumnOrder(0, newColumnOrder);
+   *
+   * // Sheet after this operation: [['C', 'A', 'B']]
+   * ```
+   *
+   * @category Columns
+   */
+  public setColumnOrder(sheetId: number, newColumnOrder: number[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    const mapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
+    return this.swapColumnIndexes(sheetId, mapping)
+  }
+
+  /**
+   * Checks if it is possible to reorder columns of a sheet according to a permutation.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * Parameter `newColumnOrder` should have the form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`,
+   * i.e. the value at index `i` is the new position for the column that is currently at index `i`.
+   * See [[setColumnOrder]] for details.
+   *
+   * @param {number} sheetId - ID of a sheet to operate on
+   * @param {number[]} newColumnOrder - permutation of columns
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['A', 'B', 'C']
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // returns true
+   * hfInstance.isItPossibleToSetColumnOrder(0, [1, 2, 0]);
+   *
+   * // returns false (array length must match the number of columns)
+   * hfInstance.isItPossibleToSetColumnOrder(0, [1]);
+   * ```
+   *
+   * @category Columns
+   */
+  public isItPossibleToSetColumnOrder(sheetId: number, newColumnOrder: number[]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    try {
+      const columnMapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
+      this._crudOperations.validateSwapColumnIndexes(sheetId, columnMapping)
+      this._crudOperations.testColumnOrderForArrays(sheetId, columnMapping)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Returns information whether it is possible to add rows into a specified position in a given sheet.
+   * Checks against particular rules to ascertain that addRows can be called.
+   * If returns `true`, doing [[addRows]] operation won't throw any errors.
+   * Returns `false` if adding rows would exceed the sheet size limit or given arguments are invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {number} sheetId - sheet ID in which rows will be added
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2', '3'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' for this example,
+   * // it is possible to add one row in the second row of sheet 0
+   * const isAddable = hfInstance.isItPossibleToAddRows(0, [1, 1]);
+   * ```
+   *
+   * @category Rows
+   */
+  public isItPossibleToAddRows(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    const normalizedIndexes = normalizeAddedIndexes(indexes)
+    try {
+      this._crudOperations.ensureItIsPossibleToAddRows(sheetId, ...normalizedIndexes)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Adds multiple rows into a specified position in a given sheet.
+   * Does nothing if rows are outside effective sheet size.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - sheet ID in which rows will be added
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values
+   * const changes = hfInstance.addRows(0, [0, 1]);
+   * ```
+   *
+   * @category Rows
+   */
+  public addRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this._crudOperations.addRows(sheetId, ...indexes)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Returns information whether it is possible to remove rows from a specified position in a given sheet.
+   * Checks against particular rules to ascertain that removeRows can be called.
+   * If returns `true`, doing [[removeRows]] operation won't throw any errors.
+   * Returns `false` if given arguments are invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {number} sheetId - sheet ID from which rows will be removed
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [row, amount]
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' for this example
+   * // it is possible to remove one row from row 1 of sheet 0
+   * const isRemovable = hfInstance.isItPossibleToRemoveRows(0, [1, 1]);
+   * ```
+   *
+   * @category Rows
+   */
+  public isItPossibleToRemoveRows(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    const normalizedIndexes = normalizeRemovedIndexes(indexes)
+    try {
+      this._crudOperations.ensureItIsPossibleToRemoveRows(sheetId, ...normalizedIndexes)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Removes multiple rows from a specified position in a given sheet.
+   * Does nothing if rows are outside the effective sheet size.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - sheet ID from which rows will be removed
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [row, amount]
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return: [{ sheet: 0, col: 1, row: 2, value: null }] for this example
+   * const changes = hfInstance.removeRows(0, [1, 1]);
+   * ```
+   *
+   * @category Rows
+   */
+  public removeRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this._crudOperations.removeRows(sheetId, ...indexes)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Returns information whether it is possible to add columns into a specified position in a given sheet.
+   * Checks against particular rules to ascertain that addColumns can be called.
+   * If returns `true`, doing [[addColumns]] operation won't throw any errors.
+   * Returns `false` if adding columns would exceed the sheet size limit or given arguments are invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {number} sheetId - sheet ID in which columns will be added
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' for this example,
+   * // it is possible to add 1 column in sheet 0, at column 1
+   * const isAddable = hfInstance.isItPossibleToAddColumns(0, [1, 1]);
+   * ```
+   *
+   * @category Columns
+   */
+  public isItPossibleToAddColumns(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    const normalizedIndexes = normalizeAddedIndexes(indexes)
+    try {
+      this._crudOperations.ensureItIsPossibleToAddColumns(sheetId, ...normalizedIndexes)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Adds multiple columns into a specified position in a given sheet.
+   * Does nothing if the columns are outside the effective sheet size.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - sheet ID in which columns will be added
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=RAND()', '42'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, for this example:
+   * // [{
+   * //   address: { sheet: 0, col: 1, row: 0 },
+   * //   newValue: 0.92754862796338,
+   * // }]
+   * const changes = hfInstance.addColumns(0, [0, 1]);
+   * ```
+   *
+   * @category Columns
+   */
+  public addColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this._crudOperations.addColumns(sheetId, ...indexes)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Returns information whether it is possible to remove columns from a specified position in a given sheet.
+   * Checks against particular rules to ascertain that removeColumns can be called.
+   * If returns `true`, doing [[removeColumns]] operation won't throw any errors.
+   * Returns `false` if given arguments are invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {number} sheetId - sheet ID from which columns will be removed
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format [column, amount]
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' for this example
+   * // it is possible to remove one column, in place of the second column of sheet 0
+   * const isRemovable = hfInstance.isItPossibleToRemoveColumns(0, [1, 1]);
+   * ```
+   *
+   * @category Columns
+   */
+  public isItPossibleToRemoveColumns(sheetId: number, ...indexes: ColumnRowIndex[]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    const normalizedIndexes = normalizeRemovedIndexes(indexes)
+    try {
+      this._crudOperations.ensureItIsPossibleToRemoveColumns(sheetId, ...normalizedIndexes)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Removes multiple columns from a specified position in a given sheet.
+   * Does nothing if columns are outside the effective sheet size.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - sheet ID from which columns will be removed
+   * @param {ColumnRowIndex[]} indexes - non-contiguous indexes with format: [column, amount]
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['0', '=SUM(1, 2, 3)', '=A1'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, in this example it will return:
+   * // [{
+   * //   address: { sheet: 0, col: 1, row: 0 },
+   * //   newValue: { error: [CellError], value: '#REF!' },
+   * // }]
+   * const changes = hfInstance.removeColumns(0, [0, 1]);
+   * ```
+   *
+   * @category Columns
+   */
+  public removeColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this._crudOperations.removeColumns(sheetId, ...indexes)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Returns information whether it is possible to move cells to a specified position in a given sheet.
+   * Checks against particular rules to ascertain that moveCells can be called.
+   * If returns `true`, doing [[moveCells]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted and causes side effects by the fact that there is an array inside the selected columns, the target location includes an array or the provided address is invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {SimpleCellRange} source - range for a moved block
+   * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
+   *
+   * @throws [[ExpectedValueOfTypeError]] if destinationLeftCorner, source, or any of basic type arguments are of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // choose the coordinates and assign them to variables
+   * const source = { sheet: 0, col: 1, row: 0 };
+   * const destination = { sheet: 0, col: 3, row: 0 };
+   *
+   * // should return 'true' for this example
+   * // it is possible to move a block of width 1 and height 1
+   * // from the corner: column 1 and row 0 of sheet 0
+   * // into destination corner: column 3, row 0 of sheet 0
+   * const isMovable = hfInstance.isItPossibleToMoveCells({ start: source, end: source }, destination);
+   * ```
+   * @category Cells
+   */
+  public isItPossibleToMoveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    if (!isSimpleCellAddress(destinationLeftCorner)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner')
+    }
+    if (!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
+    try {
+      const range = new AbsoluteCellRange(source.start, source.end)
+      this._crudOperations.operations.ensureItIsPossibleToMoveCells(range.start, range.width(), range.height(), destinationLeftCorner)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Moves the content of a cell block from source to the target location.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {SimpleCellRange} source - range for a moved block
+   * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] if destinationLeftCorner or source are of wrong type
+   * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
+   * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=RAND()', '42'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // choose the coordinates and assign them to variables
+   * const source = { sheet: 0, col: 1, row: 0 };
+   * const destination = { sheet: 0, col: 3, row: 0 };
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, for this example:
+   * // [{
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 0.93524248002062,
+   * // }]
+   * const changes = hfInstance.moveCells({ start: source, end: source }, destination);
+   * ```
+   *
+   * @category Cells
+   */
+  public moveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    if (!isSimpleCellAddress(destinationLeftCorner)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner')
+    }
+    if (!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
+    const range = new AbsoluteCellRange(source.start, source.end)
+    this._crudOperations.moveCells(range.start, range.width(), range.height(), destinationLeftCorner)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Returns information whether it is possible to move a particular number of rows to a specified position in a given sheet.
+   * Checks against particular rules to ascertain that moveRows can be called.
+   * If returns `true`, doing [[moveRows]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted and causes side effects by the fact that there is an array inside the selected rows, the target location includes an array or the provided address is invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {number} sheetId - a sheet number in which the operation will be performed
+   * @param {number} startRow - number of the first row to move
+   * @param {number} numberOfRows - number of rows to move
+   * @param {number} targetRow - row number before which rows will be moved
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' for this example
+   * // it is possible to move one row from row 0 into row 2
+   * const isMovable = hfInstance.isItPossibleToMoveRows(0, 0, 1, 2);
+   * ```
+   *
+   * @category Rows
+   */
+  public isItPossibleToMoveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    validateArgToType(startRow, 'number', 'startRow')
+    validateArgToType(numberOfRows, 'number', 'numberOfRows')
+    validateArgToType(targetRow, 'number', 'targetRow')
+    try {
+      this._crudOperations.ensureItIsPossibleToMoveRows(sheetId, startRow, numberOfRows, targetRow)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Moves a particular number of rows to a specified position in a given sheet.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - a sheet number in which the operation will be performed
+   * @param {number} startRow - number of the first row to move
+   * @param {number} numberOfRows - number of rows to move
+   * @param {number} targetRow - row number before which rows will be moved
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
+   * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1'],
+   *  ['2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values
+   * const changes = hfInstance.moveRows(0, 0, 1, 2);
+   * ```
+   *
+   * @category Rows
+   */
+  public moveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    validateArgToType(startRow, 'number', 'startRow')
+    validateArgToType(numberOfRows, 'number', 'numberOfRows')
+    validateArgToType(targetRow, 'number', 'targetRow')
+    this._crudOperations.moveRows(sheetId, startRow, numberOfRows, targetRow)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Returns information whether it is possible to move a particular number of columns to a specified position in a given sheet.
+   * Checks against particular rules to ascertain that moveColumns can be called.
+   * If returns `true`, doing [[moveColumns]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted and causes side effects by the fact that there is an array inside the selected columns, the target location includes an array or the provided address is invalid.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {number} sheetId - a sheet number in which the operation will be performed
+   * @param {number} startColumn - number of the first column to move
+   * @param {number} numberOfColumns - number of columns to move
+   * @param {number} targetColumn - column number before which columns will be moved
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' for this example
+   * // it is possible to move one column from column 1 into column 2 of sheet 0
+   * const isMovable = hfInstance.isItPossibleToMoveColumns(0, 1, 1, 2);
+   * ```
+   *
+   * @category Columns
+   */
+  public isItPossibleToMoveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    validateArgToType(startColumn, 'number', 'startColumn')
+    validateArgToType(numberOfColumns, 'number', 'numberOfColumns')
+    validateArgToType(targetColumn, 'number', 'targetColumn')
+    try {
+      this._crudOperations.ensureItIsPossibleToMoveColumns(sheetId, startColumn, numberOfColumns, targetColumn)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Moves a particular number of columns to a specified position in a given sheet.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - a sheet number in which the operation will be performed
+   * @param {number} startColumn - number of the first column to move
+   * @param {number} numberOfColumns - number of columns to move
+   * @param {number} targetColumn - column number before which columns will be moved
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
+   * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2', '3', '=RAND()', '=SUM(A1:C1)'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // move column B before column D; the SUM range follows its cells and becomes A1:B1
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, for this example:
+   * // [{
+   * //   address: { sheet: 0, col: 4, row: 0 },
+   * //   newValue: 4,
+   * //  }, {
+   * //   address: { sheet: 0, col: 3, row: 0 },
+   * //   newValue: 0.16210054671639,
+   * // }]
+   * const changes = hfInstance.moveColumns(0, 1, 1, 3);
+   * ```
+   *
+   * @category Columns
+   */
+  public moveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    validateArgToType(startColumn, 'number', 'startColumn')
+    validateArgToType(numberOfColumns, 'number', 'numberOfColumns')
+    validateArgToType(targetColumn, 'number', 'targetColumn')
+    this._crudOperations.moveColumns(sheetId, startColumn, numberOfColumns, targetColumn)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Stores a copy of the cell block in internal clipboard for the further paste.
+   * Returns the copied values for use in external clipboard.
+   *
+   * For more information, see the [Clipboard Operations guide](/guide/clipboard-operations.md).
+   *
+   * @param {SimpleCellRange} source - rectangle range to copy
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Clipboard feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *   ['1', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // it copies [ [ 2 ] ]
+   * const clipboardContent = hfInstance.copy({
+   *   start: { sheet: 0, col: 1, row: 0 },
+   *   end: { sheet: 0, col: 1, row: 0 },
+   * });
+   * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
+   *
+   * @category Clipboard
+   */
+  public copy(source: SimpleCellRange): CellValue[][] {
+    this.ensureCapability(FeatureId.Clipboard)
+    if (!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
+    const range = new AbsoluteCellRange(source.start, source.end)
+    this._crudOperations.copy(range.start, range.width(), range.height())
+    return this.getRangeValues(source)
+  }
+
+  /**
+   * Stores information of the cell block in internal clipboard for further paste.
+   * Calling [[paste]] right after this method is equivalent to call [[moveCells]].
+   * Almost any CRUD operation called after this method will abort the cut operation.
+   * Returns the cut values for use in external clipboard.
+   *
+   * For more information, see the [Clipboard Operations guide](/guide/clipboard-operations.md).
+   *
+   * @param {SimpleCellRange} source - rectangle range to cut
+   *
+   * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Clipboard feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *   ['1', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // returns the values that were cut: [ [ 1 ] ]
+   * const clipboardContent = hfInstance.cut({
+   *   start: { sheet: 0, col: 0, row: 0 },
+   *   end: { sheet: 0, col: 0, row: 0 },
+   * });
+   * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
+   *
+   * @category Clipboard
+   */
+  public cut(source: SimpleCellRange): CellValue[][] {
+    this.ensureCapability(FeatureId.Clipboard)
+    if (!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
+    const range = new AbsoluteCellRange(source.start, source.end)
+    this._crudOperations.cut(range.start, range.width(), range.height())
+    return this.getRangeValues(source)
+  }
+
+  /**
+   * When called after [[copy]] it pastes copied values and formulas into a cell block.
+   * When called after [[cut]] it performs [[moveCells]] operation into the cell block.
+   * Does nothing if the clipboard is empty.
+   *
+   * For more information, see the [Clipboard Operations guide](/guide/clipboard-operations.md).
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {SimpleCellAddress} targetLeftCorner - upper left address of the target cell block
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[NothingToPasteError]] when clipboard is empty
+   * @throws [[TargetLocationHasArrayError]] when the selected target area has array inside
+   * @throws [[ExpectedValueOfTypeError]] if targetLeftCorner is of wrong type
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Clipboard feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *   ['1', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // [ [ 2 ] ] was copied
+   * const clipboardContent = hfInstance.copy({
+   *   start: { sheet: 0, col: 1, row: 0 },
+   *   end: { sheet: 0, col: 1, row: 0 },
+   * });
+   *
+   * // returns a list of modified cells: their absolute addresses and new values
+   * const changes = hfInstance.paste({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
+   *
+   * @category Clipboard
+   */
+  public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
+    // Clipboard alone is enough, including for pasting a CUT - which relocates cells, the same
+    // mutation the public moveCells() requires Crud for. Granting the clipboard is taken to grant
+    // what the clipboard does, so this route is deliberately not gated on Crud as well.
+    this.ensureCapability(FeatureId.Clipboard)
+    if (!isSimpleCellAddress(targetLeftCorner)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'targetLeftCorner')
+    }
+    this.ensureEvaluationIsNotSuspended()
+    this._crudOperations.paste(targetLeftCorner)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Returns information whether there is something in the clipboard.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // copy desired content
+   * const clipboardContent = hfInstance.copy({
+   *   start: { sheet: 0, col: 1, row: 0 },
+   *   end: { sheet: 0, col: 1, row: 0 },
+   * });
+   *
+   * // returns 'false', there is content in the clipboard
+   * const isClipboardEmpty = hfInstance.isClipboardEmpty();
+   * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
+   *
+   * @category Clipboard
+   */
+  public isClipboardEmpty(): boolean {
+    return this._crudOperations.isClipboardEmpty()
+  }
+
+  /**
+   * Clears the clipboard content.
+   *
+   * @example
+   * ```js
+   * // clears the clipboard, isClipboardEmpty() should return true if called afterwards
+   * hfInstance.clearClipboard();
+   * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
+   *
+   * @category Clipboard
+   */
+  public clearClipboard(): void {
+    this._crudOperations.clearClipboard()
+  }
+
+  /**
+   * Clears the redo stack in undoRedo history.
+   *
+   * For more information, see the [Undo-Redo guide](/guide/undo-redo.md).
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *   ['1', '2', '3'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // do an operation, for example remove columns
+   * hfInstance.removeColumns(0, [0, 1]);
+   *
+   * // undo the operation
+   * hfInstance.undo();
+   *
+   * // redo the operation
+   * hfInstance.redo();
+   *
+   * // clear the redo stack
+   * hfInstance.clearRedoStack();
+   * ```
+   *
+   * @category Undo and Redo
+   */
+  public clearRedoStack(): void {
+    this._crudOperations.undoRedo.clearRedoStack()
+  }
+
+  /**
+   * Clears the undo stack in undoRedo history.
+   *
+   * For more information, see the [Undo-Redo guide](/guide/undo-redo.md).
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *   ['1', '2', '3'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // do an operation, for example remove columns
+   * hfInstance.removeColumns(0, [0, 1]);
+   *
+   * // undo the operation
+   * hfInstance.undo();
+   *
+   * // clear the undo stack
+   * hfInstance.clearUndoStack();
+   * ```
+   *
+   * @category Undo and Redo
+   */
+  public clearUndoStack(): void {
+    this._crudOperations.undoRedo.clearUndoStack()
+  }
+
+  /**
+   * Returns the cell content of a given range in a [[CellValue]][][] format.
+   *
+   * @param {SimpleCellRange} source - rectangular range
+   *
+   * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1, 2)', '2', '10'],
+   *  ['5', '6', '7'],
+   *  ['40', '30', '20'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   *
+   * // returns calculated cells content: [ [ 3, 2 ], [ 5, 6 ] ]
+   * const rangeValues = hfInstance.getRangeValues({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 } });
+   * ```
+   *
+   * @category Ranges
+   */
+  public getRangeValues(source: SimpleCellRange): CellValue[][] {
+    if (!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
+    const cellRange = new AbsoluteCellRange(source.start, source.end)
+    return cellRange.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => this.getCellValue(address)
+      )
+    )
+  }
+
+  /**
+   * Returns cell formulas in given range.
+   *
+   * @param {SimpleCellRange} source - rectangular range
+   *
+   * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1, 2)', '2', '10'],
+   *  ['5', '6', '7'],
+   *  ['40', '30', '20'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // returns cell formulas of a given range only:
+   * // [ [ '=SUM(1, 2)', undefined ], [ undefined, undefined ] ]
+   * const rangeFormulas = hfInstance.getRangeFormulas({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 } });
+   * ```
+   *
+   * @category Ranges
+   */
+  public getRangeFormulas(source: SimpleCellRange): (string | undefined)[][] {
+    if (!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
+    const cellRange = new AbsoluteCellRange(source.start, source.end)
+    return cellRange.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => this.getCellFormula(address)
+      )
+    )
+  }
+
+  /**
+   * Returns serialized cells in given range.
+   *
+   * Each non-formula cell is serialized to the exact value it was set with, preserving its type
+   * (e.g., a cell set with the string `'2'` is serialized as the string `'2'`, while a cell set with the number `2` is serialized as the number `2`).
+   *
+   * @param {SimpleCellRange} source - rectangular range
+   *
+   * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1, 2)', 2, 10],
+   *  [5, 6, 7],
+   *  [40, 30, 20],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return serialized cell content for the given range:
+   * // [ [ '=SUM(1, 2)', 2 ], [ 5, 6 ] ]
+   * const rangeSerialized = hfInstance.getRangeSerialized({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 1 } });
+   * ```
+   *
+   * @category Ranges
+   */
+  public getRangeSerialized(source: SimpleCellRange): RawCellContent[][] {
+    if (!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
+    const cellRange = new AbsoluteCellRange(source.start, source.end)
+    return cellRange.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => this.getCellSerialized(address)
+      )
+    )
+  }
+
+  /**
+   * Returns values to fill target range using source range, with properly extending the range using wrap-around heuristic.
+   *
+   * @param {SimpleCellRange} source of data
+   * @param {SimpleCellRange} target range where data is intended to be put
+   * @param {boolean} offsetsFromTarget if true, offsets are computed from target corner, otherwise from source corner
+   *
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[ExpectedValueOfTypeError]] if source or target are of wrong type
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([[1, '=A1'], ['=$A$1', '2']], { licenseKey: 'gpl-v3' });
+   *
+   * // should return [['2', '=$A$1', '2'], ['=A3', 1, '=C3'], ['2', '=$A$1', '2']]
+   * hfInstance.getFillRangeData( {start: {sheet: 0, row: 0, col: 0}, end: {sheet: 0, row: 1, col: 1}},
+   * {start: {sheet: 0, row: 1, col: 1}, end: {sheet: 0, row: 3, col: 3}});
+   * ```
+   *
+   * @category Ranges
+   */
+  public getFillRangeData(source: SimpleCellRange, target: SimpleCellRange, offsetsFromTarget: boolean = false): RawCellContent[][] {
+    if (!isSimpleCellRange(source)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
+    }
+    if (!isSimpleCellRange(target)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'target')
+    }
+    const sourceRange = new AbsoluteCellRange(source.start, source.end)
+    const targetRange = new AbsoluteCellRange(target.start, target.end)
+    this.ensureEvaluationIsNotSuspended()
+    return targetRange.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => {
+          const row = ((address.row - (offsetsFromTarget ? target : source).start.row) % sourceRange.height() + sourceRange.height()) % sourceRange.height() + source.start.row
+          const col = ((address.col - (offsetsFromTarget ? target : source).start.col) % sourceRange.width() + sourceRange.width()) % sourceRange.width() + source.start.col
+          return this._serialization.getCellSerialized({row, col, sheet: sourceRange.sheet}, address)
+        }
+      )
+    )
+  }
+
+  /**
+   * Returns information whether it is possible to add a sheet to the engine.
+   * Checks against particular rules to ascertain that addSheet can be called.
+   * If returns `true`, doing [[addSheet]] operation won't throw any errors, and it is possible to add sheet with provided name.
+   * Returns `false` if the chosen name is already used.
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {string} sheetName - sheet name, case-insensitive
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'false' because 'MySheet2' already exists
+   * const isAddable = hfInstance.isItPossibleToAddSheet('MySheet2');
+   * ```
+   *
+   * @category Sheets
+   */
+  public isItPossibleToAddSheet(sheetName: string): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetName, 'string', 'sheetName')
+    try {
+      this._crudOperations.ensureItIsPossibleToAddSheet(sheetName)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Adds a new sheet to the HyperFormula instance. Returns given or autogenerated name of a new sheet.
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {string} [sheetName] - if not specified, name is autogenerated
+   *
+   * @fires [[sheetAdded]] after the sheet was added
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[SheetNameAlreadyTakenError]] when sheet with a given name already exists
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'MySheet3'
+   * const nameProvided = hfInstance.addSheet('MySheet3');
+   *
+   * // should return autogenerated 'Sheet4'
+   * // because no name was provided and 3 other ones already exist
+   * const generatedName = hfInstance.addSheet();
+   * ```
+   *
+   * @category Sheets
+   */
+  public addSheet(sheetName?: string): string {
+    this.ensureCapability(FeatureId.Crud)
+    if (sheetName !== undefined) {
+      validateArgToType(sheetName, 'string', 'sheetName')
+    }
+    const addedSheetName = this._crudOperations.addSheet(sheetName)
+    this.recomputeIfDependencyGraphNeedsIt()
+    this._emitter.emit(Events.SheetAdded, addedSheetName)
+    return addedSheetName
+  }
+
+  /**
+   * Returns information whether it is possible to remove sheet for the engine.
+   * Returns `true` if the provided sheet exists, and therefore it can be removed, doing [[removeSheet]] operation won't throw any errors.
+   * Returns `false` otherwise
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {number} sheetId - sheet ID.
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' because sheet with ID 1 exists and is removable
+   * const isRemovable = hfInstance.isItPossibleToRemoveSheet(1);
+   * ```
+   *
+   * @category Sheets
+   */
+  public isItPossibleToRemoveSheet(sheetId: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    try {
+      this._crudOperations.ensureScopeIdIsValid(sheetId)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Removes a sheet
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - sheet ID.
+   *
+   * @fires [[sheetRemoved]] after the sheet was removed
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
+   *  MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, in this example it will return:
+   * // [{
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: { error: [CellError], value: '#REF!' },
+   * // }]
+   * const changes = hfInstance.removeSheet(1);
+   * ```
+   *
+   * @category Sheets
+   */
+  public removeSheet(sheetId: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    const displayName = this.sheetMapping.getSheetName(sheetId) as string
+    this._crudOperations.removeSheet(sheetId)
+    const changes = this.recomputeIfDependencyGraphNeedsIt()
+    this._emitter.emit(Events.SheetRemoved, displayName, changes)
+    return changes
+  }
+
+  /**
+   * Returns information whether it is possible to clear a specified sheet.
+   * If returns `true`, doing [[clearSheet]] operation won't throw any errors, provided sheet exists and its content can be cleared.
+   * Returns `false` otherwise
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {number} sheetId - sheet ID.
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' because 'MySheet2' exists and can be cleared
+   * const isClearable = hfInstance.isItPossibleToClearSheet(1);
+   * ```
+   *
+   * @category Sheets
+   */
+  public isItPossibleToClearSheet(sheetId: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    try {
+      this._crudOperations.ensureScopeIdIsValid(sheetId)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Clears the sheet content. Double-checks if the sheet exists.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - sheet ID.
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
+   *  MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values, in this example it will return:
+   * // [{
+   * //   address: { sheet: 0, col: 0, row: 0 },
+   * //   newValue: 0,
+   * // }]
+   * const changes = hfInstance.clearSheet(0);
+   * ```
+   *
+   * @category Sheets
+   */
+  public clearSheet(sheetId: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this._crudOperations.clearSheet(sheetId)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Returns information whether it is possible to replace the sheet content.
+   * If returns `true`, doing [[setSheetContent]] operation won't throw any errors, the provided sheet exists and then its content can be replaced.
+   * Returns `false` otherwise
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {number} sheetId - sheet ID.
+   * @param {RawCellContent[][]} values - array of new values
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' because sheet of ID 0 exists
+   * // and the provided content can be placed in this sheet
+   * const isReplaceable = hfInstance.isItPossibleToReplaceSheetContent(0, [['50'], ['60']]);
+   * ```
+   *
+   * @category Sheets
+   */
+  public isItPossibleToReplaceSheetContent(sheetId: number, values: RawCellContent[][]): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    try {
+      this._crudOperations.ensureScopeIdIsValid(sheetId)
+      this._crudOperations.ensureItIsPossibleToChangeSheetContents(sheetId, values)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Replaces the sheet content with new values.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * @param {number} sheetId - sheet ID.
+   * @param {RawCellContent[][]} values - array of new values
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[InvalidArgumentsError]] when values argument is not an array of arrays
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return a list of cells which values changed after the operation,
+   * // their absolute addresses and new values
+   * const changes = hfInstance.setSheetContent(0, [['50'], ['60']]);
+   * ```
+   *
+   * @category Sheets
+   */
+  public setSheetContent(sheetId: number, values: RawCellContent[][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this._crudOperations.setSheetContent(sheetId, values)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Computes the simple (absolute) address of a cell address, based on its string representation.
+   * - If a sheet name is present in the string representation but is not present in the engine, returns `undefined`.
+   * - If no sheet name is present in the string representation, uses `contextSheetId` as a sheet id in the returned address.
+   *
+   * For more information, see the [Cell references guide](/guide/cell-references.md).
+   *
+   * @param {string} cellAddress - string representation of cell address in A1 notation
+   * @param {number} contextSheetId - sheet id used to construct the simple address in case of missing sheet name in `cellAddress` argument
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * hfInstance.addSheet('Sheet0'); //sheetId = 0
+   *
+   * // returns { sheet: 42, col: 0, row: 0 }
+   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('A1', 42);
+   *
+   * // returns { sheet: 0, col: 0, row: 5 }
+   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('Sheet0!A6', 42);
+   *
+   * // returns { sheet: 0, col: 0, row: 5 }
+   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('Sheet0!$A$6', 42);
+   *
+   * // returns 'undefined', as there's no 'Sheet 2' in the HyperFormula instance
+   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('Sheet2!A6', 42);
+   * ```
+   *
+   * @category Helpers
+   */
+  public simpleCellAddressFromString(cellAddress: string, contextSheetId: number): SimpleCellAddress | undefined {
+    validateArgToType(cellAddress, 'string', 'cellAddress')
+    validateArgToType(contextSheetId, 'number', 'sheetId')
+    return simpleCellAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), cellAddress, contextSheetId)
+  }
+
+  /**
+   * Computes simple (absolute) address of a cell range based on its string representation.
+   * If sheet name is present in string representation but not present in the engine, returns `undefined`.
+   *
+   * For more information, see the [Cell references guide](/guide/cell-references.md).
+   *
+   * @param {string} cellRange - string representation of cell range in A1 notation
+   * @param {number} contextSheetId - sheet id used to construct the simple address in case of missing sheet name in `cellRange` argument
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * hfInstance.addSheet('Sheet0'); //sheetId = 0
+   *
+   * // should return { start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 0 } }
+   * const simpleCellAddress = hfInstance.simpleCellRangeFromString('A1:A2', 0);
+   * ```
+   *
+   * @category Helpers
+   */
+  public simpleCellRangeFromString(cellRange: string, contextSheetId: number): SimpleCellRange | undefined {
+    validateArgToType(cellRange, 'string', 'cellRange')
+    validateArgToType(contextSheetId, 'number', 'sheetId')
+    return simpleCellRangeFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), cellRange, contextSheetId)
+  }
+
+  /**
+   * Computes string representation of an absolute address in A1 notation. If `cellAddress.sheet` is not present in the engine, returns `undefined`.
+   *
+   * For more information, see the [Cell references guide](/guide/cell-references.md).
+   *
+   * @param {SimpleCellAddress} cellAddress - object representation of an absolute address
+   * @param {object | number} optionsOrContextSheetId - options object or number used as context sheet id to construct the string address (see examples)
+   *
+   * @throws [[ExpectedValueOfTypeError]] if its arguments are of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * hfInstance.addSheet('Sheet0'); //sheetId = 0
+   * const addr = { sheet: 0, col: 1, row: 1 };
+   *
+   * // should return 'B2'
+   * const A1Notation = hfInstance.simpleCellAddressToString(addr);
+   *
+   * // should return 'B2'
+   * const A1Notation = hfInstance.simpleCellAddressToString(addr, { includeSheetName: false });
+   *
+   * // should return 'Sheet0!B2'
+   * const A1Notation = hfInstance.simpleCellAddressToString(addr, { includeSheetName: true });
+   *
+   * // should return 'B2' as context sheet id is the same as addr.sheet
+   * const A1Notation = hfInstance.simpleCellAddressToString(addr, 0);
+   *
+   * // should return 'Sheet0!B2' as context sheet id is different from addr.sheet
+   * const A1Notation = hfInstance.simpleCellAddressToString(addr, 42);
+   * ```
+   *
+   * @category Helpers
+   */
+  public simpleCellAddressToString(cellAddress: SimpleCellAddress, optionsOrContextSheetId: { includeSheetName?: boolean } | number = {}) {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+
+    const contextSheetId = typeof optionsOrContextSheetId === 'number'
+      ? optionsOrContextSheetId
+      : optionsOrContextSheetId.includeSheetName ? cellAddress.sheet+1 : cellAddress.sheet
+
+    return simpleCellAddressToString(this.sheetMapping.getSheetNameOrThrowError.bind(this.sheetMapping), cellAddress, contextSheetId)
+  }
+
+  /**
+   * Computes string representation of an absolute range in A1 notation.
+   * Returns `undefined` if:
+   * - `cellRange` is not a valid range,
+   * - `cellRange.start.sheet` and `cellRange.start.end` are different,
+   * - `cellRange.start.sheet` is not present in the engine,
+   * - `cellRange.start.end` is not present in the engine.
+   *
+   * Note: This method is useful only for cell ranges; does not work with column ranges and row ranges.
+   *
+   * For more information, see the [Cell references guide](/guide/cell-references.md).
+   *
+   * @param {SimpleCellRange} cellRange - object representation of an absolute range
+   * @param {object | number} optionsOrContextSheetId - options object or number used as context sheet id to construct the string address (see examples)
+   *
+   * @throws [[ExpectedValueOfTypeError]] if its arguments are of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * hfInstance.addSheet('Sheet0'); //sheetId = 0
+   * const range = { start: { sheet: 0, col: 1, row: 1 }, end: { sheet: 0, col: 2, row: 1 } };
+   *
+   * // should return 'B2:C2'
+   * const A1Notation = hfInstance.simpleCellRangeToString(range);
+   *
+   * // should return 'B2:C2'
+   * const A1Notation = hfInstance.simpleCellRangeToString(range, { includeSheetName: false });
+   *
+   * // should return 'Sheet0!B2:C2'
+   * const A1Notation = hfInstance.simpleCellRangeToString(range, { includeSheetName: true });
+   *
+   * // should return 'B2:C2' as context sheet id is the same as range.start.sheet and range.end.sheet
+   * const A1Notation = hfInstance.simpleCellRangeToString(range, 0);
+   *
+   * // should return 'Sheet0!B2:C2' as context sheet id is different from range.start.sheet and range.end.sheet
+   * const A1Notation = hfInstance.simpleCellRangeToString(range, 42);
+   * ```
+   *
+   * @category Helpers
+   */
+  public simpleCellRangeToString(cellRange: SimpleCellRange, optionsOrContextSheetId: { includeSheetName?: boolean } | number = {}): string | undefined {
+    if (!isSimpleCellRange(cellRange)) {
+      throw new ExpectedValueOfTypeError('SimpleCellRange', 'cellRange')
+    }
+
+    const contextSheetId = typeof optionsOrContextSheetId === 'number'
+      ? optionsOrContextSheetId
+      : optionsOrContextSheetId.includeSheetName ? cellRange.start.sheet+cellRange.end.sheet+1 : cellRange.start.sheet
+
+    return simpleCellRangeToString(this.sheetMapping.getSheetNameOrThrowError.bind(this.sheetMapping), cellRange, contextSheetId)
+  }
+
+  /**
+   * Returns all the out-neighbors in the [dependency graph](../../guide/dependency-graph.md) for a given cell address or range. Including:
+   * - All cells with formulas that contain the given cell address or range
+   * - Some of the ranges that contain the given cell address or range
+   *
+   * The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](../../guide/dependency-graph.md#optimizations-for-large-ranges).
+   *
+   * The returned array includes also named expression dependents. They are represented as cell references with sheet ID `-1`.
+   *
+   * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
+   *
+   * @throws [[ExpectedValueOfTypeError]] if address is not [[SimpleCellAddress]] or [[SimpleCellRange]]
+   * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] , { licenseKey: 'gpl-v3' });
+   *
+   * hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0});
+   * // returns [{ sheet: 0, col: 1, row: 0}, { sheet: 0, col: 2, row: 0}]
+   * ```
+   *
+   * @category Helpers
+   */
+  public getCellDependents(address: SimpleCellAddress | SimpleCellRange): (SimpleCellRange | SimpleCellAddress)[] {
+    let vertex
+    if (isSimpleCellAddress(address)) {
+      vertex = this._dependencyGraph.addressMapping.getCell(address)
+    } else if (isSimpleCellRange(address)) {
+      vertex = this._dependencyGraph.rangeMapping.getRangeVertex(address.start, address.end)
+    } else {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', address)
+    }
+    if (vertex === undefined) {
+      return []
+    }
+    return this._dependencyGraph.getAdjacentNodesAddresses(vertex)
+  }
+
+  /**
+   * Returns all the in-neighbors in the [dependency graph](../../guide/dependency-graph.md) for a given cell address or range. In particular:
+   * - If the argument is a single cell, `getCellPrecedents()` returns all cells and ranges contained in that cell's formula.
+   * - If the argument is a range of cells, `getCellPrecedents()` returns some of the cell addresses and smaller ranges contained in that range (but not all of them). The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](../../guide/dependency-graph.md#optimizations-for-large-ranges).
+   *
+   * The returned array includes also named expression precedents. They are represented as cell references with sheet ID `-1`.
+   *
+   * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
+   *
+   * @throws [[ExpectedValueOfTypeError]] if address is of wrong type
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] , { licenseKey: 'gpl-v3' });
+   *
+   * hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0});
+   * // returns [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
+   * ```
+   *
+   * @category Helpers
+   */
+  public getCellPrecedents(address: SimpleCellAddress | SimpleCellRange): (SimpleCellRange | SimpleCellAddress)[] {
+    let vertex
+    if (isSimpleCellAddress(address)) {
+      vertex = this._dependencyGraph.addressMapping.getCell(address)
+    } else if (isSimpleCellRange(address)) {
+      vertex = this._dependencyGraph.rangeMapping.getRangeVertex(address.start, address.end)
+    } else {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', address)
+    }
+    if (vertex === undefined) {
+      return []
+    }
+    return this._dependencyGraph.dependencyQueryAddresses(vertex)
+  }
+
+  /**
+   * Returns a unique sheet name assigned to the sheet of a given ID or `undefined` if the there is no sheet with a given ID.
+   *
+   * @param {number} sheetId - ID of the sheet, for which we want to retrieve name
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'MySheet2' as this sheet is the second one
+   * const sheetName = hfInstance.getSheetName(1);
+   * ```
+   *
+   * @category Sheets
+   */
+  public getSheetName(sheetId: number): string | undefined {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    return this.sheetMapping.getSheetName(sheetId)
+  }
+
+  /**
+   * List all sheet names.
+   * Returns an array of sheet names as strings.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return all sheets names: ['MySheet1', 'MySheet2']
+   * const sheetNames = hfInstance.getSheetNames();
+   * ```
+   *
+   * @category Sheets
+   */
+  public getSheetNames(): string[] {
+    return this.sheetMapping.getSheetNames()
+  }
+
+  /**
+   * Returns a unique sheet ID assigned to the sheet with a given name or `undefined` if the sheet does not exist.
+   *
+   * @param {string} sheetName - name of the sheet, for which we want to retrieve ID, case-insensitive.
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return '0' because 'MySheet1' is of ID '0'
+   * const sheetID = hfInstance.getSheetId('MySheet1');
+   * ```
+   *
+   * @category Sheets
+   */
+  public getSheetId(sheetName: string): number | undefined {
+    validateArgToType(sheetName, 'string', 'sheetName')
+    return this.sheetMapping.getSheetId(sheetName)
+  }
+
+  /**
+   * Returns `true` whether sheet with a given name exists. The method accepts sheet name to be checked.
+   *
+   * @param {string} sheetName - name of the sheet, case-insensitive.
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' since 'MySheet1' exists
+   * const sheetExist = hfInstance.doesSheetExist('MySheet1');
+   * ```
+   *
+   * @category Sheets
+   */
+  public doesSheetExist(sheetName: string): boolean {
+    validateArgToType(sheetName, 'string', 'sheetName')
+    return this.sheetMapping.hasSheetWithName(sheetName)
+  }
+
+  /**
+   * Returns the type of a cell at a given address.
+   * The method accepts cell coordinates as object with column, row and sheet numbers.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(A2:A3)', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'FORMULA', the cell of given coordinates is of this type
+   * const cellA1Type = hfInstance.getCellType({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'VALUE', the cell of given coordinates is of this type
+   * const cellB1Type = hfInstance.getCellType({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellType(cellAddress: SimpleCellAddress): CellType {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    const vertex = this.dependencyGraph.getCell(cellAddress)
+    return getCellType(vertex, cellAddress)
+  }
+
+  /**
+   * Returns `true` if the specified cell contains a simple value.
+   * The method accepts cell coordinates as object with column, row and sheet numbers.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(A2:A3)', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' since the selected cell contains a simple value
+   * const isA1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'false' since the selected cell does not contain a simple value
+   * const isB1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public doesCellHaveSimpleValue(cellAddress: SimpleCellAddress): boolean {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    return this.getCellType(cellAddress) === CellType.VALUE
+  }
+
+  /**
+   * Returns `true` if the specified cell contains a formula.
+   * The method accepts cell coordinates as object with column, row and sheet numbers.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(A2:A3)', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' since the A1 cell contains a formula
+   * const A1Formula = hfInstance.doesCellHaveFormula({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'false' since the B1 cell does not contain a formula
+   * const B1NoFormula = hfInstance.doesCellHaveFormula({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public doesCellHaveFormula(cellAddress: SimpleCellAddress): boolean {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    const cellType = this.getCellType(cellAddress)
+    return cellType === CellType.FORMULA || cellType === CellType.ARRAYFORMULA
+  }
+
+  /**
+   * Returns`true` if the specified cell is empty.
+   * The method accepts cell coordinates as object with column, row and sheet numbers.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *   [null, '1'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true', cell of provided coordinates is empty
+   * const isEmpty = hfInstance.isCellEmpty({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'false', cell of provided coordinates is not empty
+   * const isNotEmpty = hfInstance.isCellEmpty({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public isCellEmpty(cellAddress: SimpleCellAddress): boolean {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    return this.getCellType(cellAddress) === CellType.EMPTY
+  }
+
+  /**
+   * Returns `true` if a given cell is a part of an array.
+   * The method accepts cell coordinates as object with column, row and sheet numbers.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *    ['{=TRANSPOSE(B1:B1)}'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true', cell of provided coordinates is a part of an array
+   * const isPartOfArray = hfInstance.isCellPartOfArray({ sheet: 0, col: 0, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public isCellPartOfArray(cellAddress: SimpleCellAddress): boolean {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    const cellType = this.getCellType(cellAddress)
+    return cellType === CellType.ARRAY || cellType === CellType.ARRAYFORMULA
+  }
+
+  /**
+   * Returns type of the cell value of a given address.
+   * The method accepts cell coordinates as object with column, row and sheet numbers.
+   *
+   * For more information, see the [Types of values guide](/guide/types-of-values.md).
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=SUM(1, 2, 3)', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'NUMBER', cell value type of provided coordinates is a number
+   * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
+   *
+   * // should return 'NUMBER', cell value type of provided coordinates is a number
+   * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 0, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellValueType(cellAddress: SimpleCellAddress): CellValueType {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    this.ensureEvaluationIsNotSuspended()
+    const value = this.dependencyGraph.getCellValue(cellAddress)
+    return getCellValueType(value)
+  }
+
+  /**
+   * Returns detailed type of the cell value of a given address.
+   * The method accepts cell coordinates as object with column, row and sheet numbers.
+   *
+   * For more information, see the [Types of values guide](/guide/types-of-values.md).
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1%', '1$'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'NUMBER_PERCENT', cell value type of provided coordinates is a number with a format inference percent.
+   * const cellType = hfInstance.getCellValueDetailedType({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'NUMBER_CURRENCY', cell value type of provided coordinates is a number with a format inference currency.
+   * const cellType = hfInstance.getCellValueDetailedType({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellValueDetailedType(cellAddress: SimpleCellAddress): CellValueDetailedType {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    this.ensureEvaluationIsNotSuspended()
+    const value = this.dependencyGraph.getCellValue(cellAddress)
+    return getCellValueDetailedType(value)
+  }
+
+  /**
+   * Returns auxiliary format information of the cell value of a given address.
+   * The method accepts cell coordinates as object with column, row and sheet numbers.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   * @throws [[ExpectedValueOfTypeError]] if cellAddress is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1$', '1'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return '$', cell value type of provided coordinates is a number with a format inference currency, parsed as using '$' as currency.
+   * const cellFormat = hfInstance.getCellValueFormat({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return undefined, cell value type of provided coordinates is a number with no format information.
+   * const cellFormat = hfInstance.getCellValueFormat({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellValueFormat(cellAddress: SimpleCellAddress): FormatInfo {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    this.ensureEvaluationIsNotSuspended()
+    const value = this.dependencyGraph.getCellValue(cellAddress)
+    return getCellValueFormat(value)
+  }
+
+  /**
+   * Returns the number of existing sheets.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return the number of sheets which is '1'
+   * const sheetsCount = hfInstance.countSheets();
+   * ```
+   *
+   * @category Sheets
+   */
+  public countSheets(): number {
+    return this.sheetMapping.numberOfSheets()
+  }
+
+  /**
+   * Returns information whether it is possible to rename sheet.
+   * Returns `true` if the sheet with provided id exists and new name is available
+   * Returns `false` if sheet cannot be renamed
+   * Returns `false` also when the license key does not allow the Crud feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {number} sheetId - a sheet number
+   * @param {string} newName - a name of the sheet to be given
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // returns true
+   * hfInstance.isItPossibleToRenameSheet(0, 'MySheet0');
+   * ```
+   *
+   * @category Sheets
+   */
+  public isItPossibleToRenameSheet(sheetId: number, newName: string): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.Crud)) {
+      return false
+    }
+    validateArgToType(sheetId, 'number', 'sheetId')
+    validateArgToType(newName, 'string', 'newName')
+    try {
+      this._crudOperations.ensureItIsPossibleToRenameSheet(sheetId, newName)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Renames a specified sheet.
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {number} sheetId - a sheet ID
+   * @param {string} newName - a name of the sheet to be given, if is the same as the old one the method does nothing
+   *
+   * @fires [[sheetRenamed]] after the sheet was renamed
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[SheetNameAlreadyTakenError]] when the provided sheet name already exists
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Crud feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *   MySheet1: [ ['1'] ],
+   *   MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // renames the sheet 'MySheet1'
+   * hfInstance.renameSheet(0, 'MySheet0');
+   * ```
+   *
+   * @category Sheets
+   */
+  public renameSheet(sheetId: number, newName: string): void {
+    this.ensureCapability(FeatureId.Crud)
+    validateArgToType(sheetId, 'number', 'sheetId')
+    validateArgToType(newName, 'string', 'newName')
+    const oldName = this._crudOperations.renameSheet(sheetId, newName)
+    this.recomputeIfDependencyGraphNeedsIt()
+    if (oldName !== undefined) {
+      this._emitter.emit(Events.SheetRenamed, oldName, newName)
+    }
+  }
+
+  /**
+   * Runs the provided callback as a single [batch operation](../../guide/batch-operations.md) and returns the changed cells.
+   *
+   * Returns [an array of cells whose values changed as a result of all batched operations](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {() => void} batchOperations - a function with operations to be performed
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   * @fires [[evaluationSuspended]] always
+   * @fires [[evaluationResumed]] after the recomputation of necessary values
+   *
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Batching feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // multiple operations in a single callback will trigger evaluation only once
+   * // and only one set of changes is returned as a combined result of all
+   * // the operations that were triggered within the callback
+   * const changes = hfInstance.batch(() => {
+   *  hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
+   *  hfInstance.setCellContents({ col: 4, row: 0, sheet: 0 }, [['=A1']]);
+   * });
+   * ```
+   *
+   * @category Batch
+   */
+  public batch(batchOperations: () => void): ExportedChange[] {
+    this.ensureCapability(FeatureId.Batching)
+    this.suspendEvaluation()
+    this._crudOperations.beginUndoRedoBatchMode()
+    try {
+      batchOperations()
+    } catch (e) {
+      this._crudOperations.commitUndoRedoBatchMode()
+      this.resumeEvaluation()
+      throw (e)
+    }
+    this._crudOperations.commitUndoRedoBatchMode()
+    return this.resumeEvaluation()
+  }
+
+  /**
+   * Suspends the dependency graph recalculation to start a [batch operation](../../guide/batch-operations.md).
+   * It allows optimizing the performance.
+   * With this method, multiple CRUD operations can be done without triggering recalculation after every operation.
+   * Suspending evaluation should result in an overall faster calculation compared to recalculating after each operation separately.
+   * To resume the evaluation use [[resumeEvaluation]].
+   *
+   * @fires [[evaluationSuspended]] always
+   *
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the Batching feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // similar to batch() but operations are not within a callback,
+   * // one method suspends the recalculation
+   * // the second will resume calculations and return the changes
+   *
+   * // suspend the evaluation with this method
+   * hfInstance.suspendEvaluation();
+   *
+   * // perform operations
+   * hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
+   * hfInstance.setSheetContent(1, [['50'], ['60']]);
+   *
+   * // use resumeEvaluation to resume
+   * const changes = hfInstance.resumeEvaluation();
+   * ```
+   *
+   * @category Batch
+   */
+  public suspendEvaluation(): void {
+    this.ensureCapability(FeatureId.Batching)
+    this._evaluationSuspended = true
+    this._emitter.emit(Events.EvaluationSuspended)
+  }
+
+  /**
+   * Resumes the dependency graph recalculation that was [suspended](../../guide/batch-operations.md) with [[suspendEvaluation]].
+   * It also triggers the recalculation and returns [an array of cells whose values changed as a result of all batched operations](/guide/basic-operations.md#changes-array).
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   * @fires [[evaluationResumed]] after the recomputation of necessary values
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  MySheet1: [ ['1'] ],
+   *  MySheet2: [ ['10'] ],
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // similar to batch() but operations are not within a callback,
+   * // one method suspends the recalculation
+   * // the second will resume calculations and return the changes
+   *
+   * // first, suspend the evaluation
+   * hfInstance.suspendEvaluation();
+   *
+   * // perform operations
+   * hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
+   * hfInstance.setSheetContent(1, [['50'], ['60']]);
+   *
+   * // resume the evaluation
+   * const changes = hfInstance.resumeEvaluation();
+   * ```
+   *
+   * @category Batch
+   */
+  public resumeEvaluation(): ExportedChange[] {
+    // Deliberately NOT gated, unlike suspendEvaluation and batch. This is the only exit from
+    // a suspended engine, and _evaluationSuspended survives rebuildWithConfig: an instance
+    // suspended while Batching was granted, whose entitlement then loses Batching via
+    // updateConfig, would be stuck suspended forever - every read throws
+    // EvaluationSuspendedError and the sole recovery path would throw
+    // LicenseCapabilityMissingError. Gating the two entry points is what makes the feature
+    // licensable; gating the release valve only strands the caller, which is the same reason
+    // teardown (clearClipboard, clearUndoStack, clearRedoStack) is ungated. See the note on
+    // ensureCapability.
+    this._evaluationSuspended = false
+    const changes = this.recomputeIfDependencyGraphNeedsIt()
+    this._emitter.emit(Events.EvaluationResumed, changes)
+    return changes
+  }
+
+  /**
+   * Checks if the dependency graph recalculation process is [suspended](../../guide/batch-operations.md) or not.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // suspend the evaluation
+   * hfInstance.suspendEvaluation();
+   *
+   * // between suspendEvaluation() and resumeEvaluation()
+   * // or inside batch() callback it will return 'true', otherwise 'false'
+   * const isEvaluationSuspended = hfInstance.isEvaluationSuspended();
+   *
+   * const changes = hfInstance.resumeEvaluation();
+   * ```
+   *
+   * @category Batch
+   */
+  public isEvaluationSuspended(): boolean {
+    return this._evaluationSuspended
+  }
+
+  /**
+   * Returns information whether it is possible to add named expression into a specific scope.
+   * Checks against particular rules to ascertain that addNamedExpression can be called.
+   * If returns `true`, doing [[addNamedExpression]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted.
+   * Returns `false` also when the license key does not allow the NamedExpressions feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {string} expressionName - a name of the expression to be added
+   * @param {RawCellContent} expression - the expression
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // should return 'true' for this example,
+   * // it is possible to add named expression to global scope
+   * const isAddable = hfInstance.isItPossibleToAddNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public isItPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, scope?: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.NamedExpressions)) {
+      return false
+    }
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if (scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
+    }
+    try {
+      this._crudOperations.ensureItIsPossibleToAddNamedExpression(expressionName, expression, scope)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Adds a specified named expression.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {string} expressionName - a name of the expression to be added
+   * @param {RawCellContent} expression - the expression
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {NamedExpressionOptions?} options - additional metadata related to named expression
+   *
+   * @fires [[namedExpressionAdded]] always, unless [[batch]] mode is used
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NamedExpressionNameIsAlreadyTakenError]] when the named-expression name is not available.
+   * @throws [[NamedExpressionNameIsInvalidError]] when the named-expression name is not valid
+   * @throws [[NoRelativeAddressesAllowedError]] when the named-expression formula contains relative references
+   * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // add own expression, scope limited to 'Sheet1' (sheetId=0), the method should return a list of cells which values
+   * // changed after the operation, their absolute addresses and new values
+   * // for this example:
+   * // [{
+   * //   name: 'prettyName',
+   * //   newValue: 142,
+   * // }]
+   * const changes = hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public addNamedExpression(expressionName: string, expression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if (scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
+    }
+    this._crudOperations.addNamedExpression(expressionName, expression, scope, options)
+    const changes = this.recomputeIfDependencyGraphNeedsIt()
+    this._emitter.emit(Events.NamedExpressionAdded, expressionName, changes)
+    return changes
+  }
+
+  /**
+   * Gets specified named expression value.
+   * Returns a [[CellValue]] or undefined if the given named expression does not exist.
+   *
+   * For more information, see the [Named expressions guide](/guide/named-expressions.md).
+   *
+   * @param {string} expressionName - expression name, case-insensitive.
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // add a named expression, only 'Sheet1' (sheetId=0) considered as it is the scope
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
+   *
+   * // returns the calculated value of a passed named expression, 142 for this example
+   * const myFormula = hfInstance.getNamedExpressionValue('prettyName', 0);
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public getNamedExpressionValue(expressionName: string, scope?: number): CellValue | undefined {
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if (scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
+    }
+    this.ensureEvaluationIsNotSuspended()
+    this._crudOperations.ensureScopeIdIsValid(scope)
+    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, scope)
+    if (namedExpression) {
+      return this._serialization.getCellValue(namedExpression.address)
+    } else {
+      return undefined
+    }
+  }
+
+  /**
+   * Returns a normalized formula string for given named expression, or `undefined` for a named expression that does not exist or does not hold a formula.
+   *
+   * For more information, see the [Named expressions guide](/guide/named-expressions.md).
+   *
+   * @param {string} expressionName - expression name, case-insensitive.
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // add a named expression in 'Sheet1' (sheetId=0)
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
+   *
+   * // returns a normalized formula string corresponding to the passed name from 'Sheet1' (sheetId=0),
+   * // '=Sheet1!A1+100' for this example
+   * const myFormula = hfInstance.getNamedExpressionFormula('prettyName', 0);
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public getNamedExpressionFormula(expressionName: string, scope?: number): string | undefined {
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if (scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
+    }
+    this._crudOperations.ensureScopeIdIsValid(scope)
+    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, scope)
+    if (namedExpression === undefined) {
+      return undefined
+    } else {
+      return this._serialization.getCellFormula(namedExpression.address)
+    }
+  }
+
+  /**
+   * Returns a named expression, or `undefined` for a named expression that does not exist or does not hold a formula.
+   *
+   * For more information, see the [Named expressions guide](/guide/named-expressions.md).
+   *
+   * @param {string} expressionName - expression name, case-insensitive.
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // add a named expression in 'Sheet1' (sheetId=0)
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
+   *
+   * // returns a named expression that corresponds to the passed name from 'Sheet1' (sheetId=0)
+   * // for this example, returns:
+   * // {name: 'prettyName', expression: '=Sheet1!$A$1+100', options: undefined, scope: 0}
+   * const myFormula = hfInstance.getNamedExpression('prettyName', 0);
+   *
+   * // for a named expression that doesn't exist, returns 'undefined':
+   * const myFormulaTwo = hfInstance.getNamedExpression('uglyName', 0);
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public getNamedExpression(expressionName: string, scope?: number): NamedExpression | undefined {
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if (scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
+    }
+    const namedExpression = this._namedExpressions.namedExpressionForScope(expressionName, scope)
+
+    if (namedExpression === undefined) {
+      return undefined
+    }
+
+    const expression = this._serialization.getCellFormula(namedExpression.address)
+
+    return {
+      name: expressionName,
+      scope: scope,
+      expression: expression,
+      options: namedExpression.options
+    }
+  }
+
+  /**
+   * Returns information whether it is possible to change named expression in a specific scope.
+   * Checks against particular rules to ascertain that changeNamedExpression can be called.
+   * If returns `true`, doing [[changeNamedExpression]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted.
+   * Returns `false` also when the license key does not allow the NamedExpressions feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {string} expressionName - an expression name, case-insensitive.
+   * @param {RawCellContent} newExpression - a new expression
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // add a named expression
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   *
+   * // should return 'true' for this example,
+   * // it is possible to change named expression
+   * const isAddable = hfInstance.isItPossibleToChangeNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public isItPossibleToChangeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.NamedExpressions)) {
+      return false
+    }
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if (scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
+    }
+    try {
+      this._crudOperations.ensureItIsPossibleToChangeNamedExpression(expressionName, newExpression, scope)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Changes a given named expression to a specified formula.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {string} expressionName - an expression name, case-insensitive.
+   * @param {RawCellContent} newExpression - a new expression
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {NamedExpressionOptions?} options - additional metadata related to named expression
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NamedExpressionDoesNotExistError]] when the given expression does not exist.
+   * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   * @throws [[ArrayFormulasNotSupportedError]] when the named expression formula is an array formula
+   * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // add a named expression, scope limited to 'Sheet1' (sheetId=0)
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
+   *
+   * // change the named expression in the same scope
+   * const changes = hfInstance.changeNamedExpression('prettyName', '=Sheet1!$A$1+200', 0);
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public changeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if (scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
+    }
+    this._crudOperations.changeNamedExpressionExpression(expressionName, scope, newExpression, options)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Returns information whether it is possible to remove named expression from a specific scope.
+   * Checks against particular rules to ascertain that removeNamedExpression can be called.
+   * If returns `true`, doing [[removeNamedExpression]] operation won't throw any errors.
+   * Returns `false` if the operation might be disrupted.
+   * Returns `false` also when the license key does not allow the NamedExpressions feature (see [[LicenseCapabilityMissingError]]).
+   *
+   * @param {string} expressionName - an expression name, case-insensitive.
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // add a named expression
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   *
+   * // should return 'true' for this example,
+   * // it is possible to change named expression
+   * const isAddable = hfInstance.isItPossibleToRemoveNamedExpression('prettyName');
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public isItPossibleToRemoveNamedExpression(expressionName: string, scope?: number): boolean {
+    if (!this.isCapabilityAllowed(FeatureId.NamedExpressions)) {
+      return false
+    }
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if (scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
+    }
+    try {
+      this._crudOperations.isItPossibleToRemoveNamedExpression(expressionName, scope)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Removes a named expression.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @param {string} expressionName - expression name, case-insensitive.
+   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
+   *
+   * @fires [[namedExpressionRemoved]] after the expression was removed
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NamedExpressionDoesNotExistError]] when the given expression does not exist.
+   * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   * @throws [[LicenseCapabilityMissingError]] if the license key is missing or invalid, has expired and blocks evaluation, or does not grant the NamedExpressions feature
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // add a named expression
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
+   *
+   * // remove the named expression
+   * const changes = hfInstance.removeNamedExpression('prettyName', 0);
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public removeNamedExpression(expressionName: string, scope?: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
+    validateArgToType(expressionName, 'string', 'expressionName')
+    if (scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
+    }
+    const removedNamedExpression = this._crudOperations.removeNamedExpression(expressionName, scope)
+    if (removedNamedExpression) {
+      const changes = this.recomputeIfDependencyGraphNeedsIt()
+      this._emitter.emit(Events.NamedExpressionRemoved, removedNamedExpression.displayName, changes)
+      return changes
+    } else {
+      return [] // codecov note: this does not look possible - removeNamedExpression() will throw if the named expression cannot be found
+    }
+  }
+
+  /**
+   * Lists named expressions.
+   * - If scope parameter is provided, returns an array of expression names defined for this scope.
+   * - If scope parameter is undefined, returns an array of global expression names.
+   *
+   * For more information, see the [Named expressions guide](/guide/named-expressions.md).
+   *
+   * @param {number?} scope - scope of the named expressions, `sheetId` for local scope or `undefined` for global scope
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   *  ['50'],
+   *  ['60'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // add two named expressions and one scoped
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   * hfInstance.addNamedExpression('anotherPrettyName', '=Sheet1!$A$2+100');
+   * hfInstance.addNamedExpression('alsoPrettyName', '=Sheet1!$A$3+100', 0);
+   *
+   * // list the expressions, should return: ['prettyName', 'anotherPrettyName'] for this example
+   * const listOfExpressions = hfInstance.listNamedExpressions();
+   *
+   *  // list the expressions, should return: ['alsoPrettyName'] for this example
+   * const listOfExpressions = hfInstance.listNamedExpressions(0);
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public listNamedExpressions(scope?: number): string[] {
+    if (scope !== undefined) {
+      validateArgToType(scope, 'number', 'scope')
+    }
+    this._crudOperations.ensureScopeIdIsValid(scope)
+    return this._namedExpressions.getAllNamedExpressionsNamesInScope(scope)
+  }
+
+  /**
+   * Returns all named expressions serialized.
+   *
+   * For more information, see the [Named expressions guide](/guide/named-expressions.md).
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   *  ['50'],
+   *  ['60'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // add two named expressions and one scoped
+   * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
+   * hfInstance.addNamedExpression('anotherPrettyName', '=Sheet1!$A$2+100');
+   * hfInstance.addNamedExpression('alsoPrettyName', '=Sheet1!$A$3+100', 0);
+   *
+   * // get all expressions serialized
+   * // should return:
+   * // [
+   * // {name: 'prettyName', expression: '=Sheet1!$A$1+100', options: undefined, scope: undefined},
+   * // {name: 'anotherPrettyName', expression: '=Sheet1!$A$2+100', options: undefined, scope: undefined},
+   * // {name: 'alsoPrettyName', expression: '=Sheet1!$A$3+100', options: undefined, scope: 0}
+   * // ]
+   * const allExpressions = hfInstance.getAllNamedExpressionsSerialized();
+   * ```
+   *
+   * @category Named Expressions
+   */
+  public getAllNamedExpressionsSerialized(): SerializedNamedExpression[] {
+    return this._serialization.getAllNamedExpressionsSerialized()
+  }
+
+  /**
+   * Parses and then unparses a formula.
+   * Returns a normalized formula (e.g., restores the original capitalization of sheet names, function names, cell addresses, and named expressions).
+   *
+   * @param {string} formulaString - a formula in a proper format - it must start with "="
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e., does not start with "="
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['42'],
+   *  ['50'],
+   * ], { licenseKey: 'gpl-v3' });
+   *
+   * // returns '=Sheet1!$A$1+10'
+   * const normalizedFormula = hfInstance.normalizeFormula('=SHEET1!$A$1+10');
+   *
+   * // returns '=3*$A$1'
+   * const normalizedFormula = hfInstance.normalizeFormula('=3*$a$1');
+   * ```
+   *
+   * @category Helpers
+   */
+  public normalizeFormula(formulaString: string): string {
+    validateArgToType(formulaString, 'string', 'formulaString')
+    const {ast, address} = this.extractTemporaryFormula(formulaString)
+    if (ast === undefined) {
+      throw new NotAFormulaError()
+    }
+    return this._unparser.unparse(ast, address)
+  }
+
+  /**
+   * Calculates fire-and-forget formula, returns the calculated value.
+   *
+   * @param {string} formulaString - A formula in a proper format, starting with `=`.
+   * @param {number} sheetId - The ID of a sheet in context of which the formula gets evaluated.
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type arguments is of wrong type.
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula (i.e., doesn't start with `=`).
+   * @throws [[NoSheetWithIdError]] when the provided `sheetID` doesn't exist.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromSheets({
+   *  Sheet1: [['58']],
+   *  Sheet2: [['1', '2', '3'], ['4', '5', '6']]
+   * }, { licenseKey: 'gpl-v3' });
+   *
+   * // returns the calculated formula's value
+   * // for this example, returns `68`
+   * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 0);
+   *
+   * // for this example, returns [['11', '12', '13'], ['14', '15', '16']]
+   * const calculatedFormula = hfInstance.calculateFormula('=A1:B3+10', 1);
+   * ```
+   *
+   * @category Helpers
+   */
+  public calculateFormula(formulaString: string, sheetId: number): CellValue | CellValue[][] {
+    validateArgToType(formulaString, 'string', 'formulaString')
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this._crudOperations.ensureScopeIdIsValid(sheetId)
+    const {ast, address, dependencies} = this.extractTemporaryFormula(formulaString, sheetId)
+    if (ast === undefined) {
+      throw new NotAFormulaError()
+    }
+    const internalCellValue = this.evaluator.runAndForget(ast, address, dependencies)
+    return this._exporter.exportScalarOrRange(internalCellValue)
+  }
+
+  /**
+   * Return a list of named expressions used by a formula.
+   *
+   * @param {string} formulaString - A formula in a proper format, starting with `=`.
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type arguments is of wrong type.
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula (i.e., doesn't start with `=`).
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // returns a list of named expressions used by a formula
+   * // for this example, returns ['foo', 'bar']
+   * const namedExpressions = hfInstance.getNamedExpressionsFromFormula('=foo+bar*2');
+   * ```
+   *
+   * @category Helpers
+   */
+  public getNamedExpressionsFromFormula(formulaString: string): string[] {
+    validateArgToType(formulaString, 'string', 'formulaString')
+    const { ast, dependencies } = this.extractTemporaryFormula(formulaString)
+
+    if (ast === undefined) {
+      throw new NotAFormulaError()
+    }
+
+    const namedExpressionDependencies = dependencies
+      .filter((dep): dep is NamedExpressionDependency => dep instanceof NamedExpressionDependency)
+      .map(namedExpr => namedExpr.name)
+
+    const uniqueNamedExpressionDependencies = [ ...new Set(namedExpressionDependencies) ]
+
+    return uniqueNamedExpressionDependencies
+  }
+
+  /**
+   * Validates the formula.
+   * If the provided string starts with "=" and is a parsable formula, the method returns `true`.
+   * The validation is purely grammatical: the method doesn't verify if the formula can be calculated or not.
+   *
+   * @param {string} formulaString -  a formula in a proper format - it must start with "="
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * // checks if the given string is a valid formula, should return 'true' for this example
+   * const isFormula = hfInstance.validateFormula('=SUM(1, 2)');
+   * ```
+   *
+   * @category Helpers
+   */
+  public validateFormula(formulaString: string): boolean {
+    validateArgToType(formulaString, 'string', 'formulaString')
+    const { ast } = this.extractTemporaryFormula(formulaString)
+
+    return ast !== undefined
+  }
+
+  /**
+   * Returns translated names of all functions registered in this instance of HyperFormula
+   * according to the language set in the configuration
+   *
+   * Answers for the instance's function REGISTRY — what is registered, not what the license key
+   * lets it evaluate — so it lists every registered function whatever the key grants. To build a
+   * function picker that never offers a function evaluating to `#LIC!`, use
+   * [[getAvailableFunctions]], which answers about availability.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // return translated names of all functions, assign to a variable
+   * const allNames = hfInstance.getRegisteredFunctionNames();
+   * ```
+   *
+   * @category Custom Functions
+   */
+  public getRegisteredFunctionNames(): string[] {
+    const language = HyperFormula.getLanguage(this._config.language)
+    return language.getFunctionTranslations(this._functionRegistry.getRegisteredFunctionIds())
+  }
+
+  /**
+   * Returns class of a plugin used by function with given id
+   *
+   * For more information, see the [Custom functions guide](/guide/custom-functions.md).
+   *
+   * @param {string} functionId - id of a function, e.g., 'SUMIF'
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * // import your own plugin
+   * import { MyExamplePlugin } from './file_with_your_plugin';
+   *
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // register a plugin
+   * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
+   *
+   * // get the plugin
+   * const myPlugin = hfInstance.getFunctionPlugin('EXAMPLE');
+   * ```
+   *
+   * @category Custom Functions
+   */
+  public getFunctionPlugin(functionId: string): FunctionPluginDefinition | undefined {
+    validateArgToType(functionId, 'string', 'functionId')
+    return this._functionRegistry.getFunctionPlugin(functionId)
+  }
+
+  /**
+   * Returns classes of all plugins registered in this instance of HyperFormula
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // return classes of all plugins registered, assign to a variable
+   * const allNames = hfInstance.getAllFunctionPlugins();
+   * ```
+   *
+   * @category Custom Functions
+   */
+  public getAllFunctionPlugins(): FunctionPluginDefinition[] {
+    return this._functionRegistry.getPlugins()
+  }
+
+  /**
+   * Returns metadata of all functions available in this instance for a function picker, with names translated
+   * according to the language set in this instance's configuration. Each entry contains the translated name, the
+   * language-independent canonical name, the category, and a short description. Entries are sorted alphabetically by
+   * their localized name, using the collation rules of the host environment, so the exact order of names that differ
+   * only by case or diacritics may vary between hosts.
+   *
+   * The list reflects this instance's own registry: the built-in functions and any custom (user-registered)
+   * functions, plus their aliases. An alias is listed under its own id, borrowing its target's category and
+   * description, with the target id exposed as `aliasOf`. Custom functions ship no catalogue entry, so their
+   * `category` is `'Custom'` and they carry no `shortDescription` — with one exception: the catalogue is keyed by
+   * function id, so a custom plugin registered *over* a built-in id inherits that id's entry and is listed with the
+   * built-in's category and description.
+   *
+   * That registry is a snapshot taken when the instance was built, not a live view of the global one: a function
+   * registered with [[registerFunctionPlugin]] or [[registerFunction]] afterwards reaches only the engines built
+   * later, so an engine kept across a late registration keeps reporting the set it was built with.
+   *
+   * A function with no translation entry for the configured language is omitted: the interpreter refuses to evaluate
+   * an untranslated id, so listing it would advertise a function that cannot be called — in practice, a custom
+   * plugin registered without translations for that language. A translation set to an empty string is not a missing
+   * entry: it falls back to the canonical id, so the function stays listed under its canonical name.
+   *
+   * A function the instance's license key does not include is omitted for the same reason: it would evaluate to a
+   * `#LIC!` error. The list therefore answers "what can this engine compute", not "what does this package contain".
+   * Two consequences worth knowing:
+   * - A key that blocks evaluation (a missing or invalid key, an expired classic key, or a trial past its grace
+   *   period) does **not** shorten the list. Such a key restricts nothing by entitlement — it is reported on the
+   *   console, and every license-gated function call evaluates to `#LIC!` — so the full catalog is still described.
+   *   `VERSION()` and `OFFSET()` are protected built-ins outside the license system, so they keep evaluating. Use it to
+   *   build a function picker before a key is configured. An expired key that keeps evaluating (a subscription past
+   *   its grace period, or a perpetual key whose maintenance doesn't cover this build) keeps its own grants, so the
+   *   list stays exactly what it was while the key was current.
+   * - A custom (user-registered) function is omitted only if it took a built-in id the key excludes. The rule is
+   *   "not covered by the capability table", not "not user-registered", so a plugin registered under an id the
+   *   built-in catalog already uses is treated as that built-in. Registered under an id of its own, a custom
+   *   function is never omitted. See {@link getFunctionDetails}, which states the same exception.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // get the list of available functions, translated for the configured language
+   * const functions = hfInstance.getAvailableFunctions();
+   * ```
+   *
+   * @category Helpers
+   */
+  public getAvailableFunctions(): FunctionListEntry[] {
+    return HyperFormula.buildAvailableFunctions(
+      this._functionRegistry,
+      // The instance's own config: its translation package (not a fresh global lookup, which could describe the
+      // functions under a package this instance never adopted) and its resolved license entitlement.
+      this._config,
+    )
+  }
+
+  /**
+   * Returns the full metadata of a single function registered in this instance, with names translated according to
+   * the language set in this instance's configuration: the parameter list (with per-parameter optionality), the
+   * number of trailing parameters that repeat (`repeatLastArgs`), the category, a short description, and the
+   * documentation link (`documentationUrl`) and usage examples (`examples`) — every built-in authors both.
+   * Resolves both built-in and custom (user-registered) functions, as well as aliases. An alias reports its
+   * target's metadata (including examples, which spell the target's name) under the alias id, with the target id
+   * exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, has
+   * no translation entry for the configured language, or is not included in this instance's license key (neither an
+   * untranslated nor an unlicensed id can be evaluated, so neither is described — which keeps this method consistent
+   * with [[getAvailableFunctions]], including its behavior for a key that blocks evaluation).
+   * For a custom function, `category` is `'Custom'`, there is no `shortDescription`, `documentationUrl` or
+   * `examples`, and parameters are reported positionally (`Arg1`, `Arg2`, ...). A custom plugin registered over a
+   * built-in id is the exception: the catalogue is keyed by function id, so it reports that built-in's authored
+   * metadata alongside the parameter list of the implementation actually registered.
+   *
+   * `canonicalName` is matched exactly, in two ways worth knowing:
+   * - It is **case-sensitive**, unlike formula syntax. `'SUMIF'` resolves; `'sumif'` and `'SumIf'` return
+   *   `undefined`, even though `=sumif(...)` evaluates.
+   * - It must be the **canonical (English) id, never a localized name**. `localizedName` is output only: under
+   *   `plPL` this method reports `localizedName: 'SUMA.JEŻELI'` for `'SUMIF'`, but passing `'SUMA.JEŻELI'` back in
+   *   returns `undefined`. To look up an entry from [[getAvailableFunctions]], pass its `canonicalName`.
+   *
+   * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // get the details of the SUMIF function, translated for the configured language
+   * const details = hfInstance.getFunctionDetails('SUMIF');
+   * ```
+   *
+   * @category Helpers
+   */
+  public getFunctionDetails(canonicalName: string): FunctionDetails | undefined {
+    validateArgToType(canonicalName, 'string', 'canonicalName')
+    // The instance's own config, for the same reasons as getAvailableFunctions.
+    return HyperFormula.buildFunctionDetailsFor(canonicalName, this._functionRegistry, this._config)
+  }
+
+  /**
+   * Interprets number as a date + time.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
+   *
+   * @param {number} inputNumber - number of days since nullDate, should be non-negative, fractions are interpreted as hours/minutes/seconds.
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // pass the number of days since nullDate
+   * // the method should return formatted date and time, for this example:
+   * // {year: 2020, month: 1, day: 15, hours: 2, minutes: 24, seconds: 0}
+   * const dateTimeFromNumber = hfInstance.numberToDateTime(43845.1);
+   *
+   * ```
+   *
+   * @category Helpers
+   */
+  public numberToDateTime(inputNumber: number): DateTime {
+    validateArgToType(inputNumber, 'number', 'val')
+    return this._evaluator.interpreter.dateTimeHelper.numberToSimpleDateTime(inputNumber)
+  }
+
+  /**
+   * Interprets number as a date.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
+   *
+   * @param {number} inputNumber - number of days since nullDate, should be non-negative, fractions are ignored.
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // pass the number of days since nullDate
+   * // the method should return formatted date, for this example:
+   * // {year: 2020, month: 1, day: 15}
+   * const dateFromNumber = hfInstance.numberToDate(43845);
+   * ```
+   *
+   * @category Helpers
+   */
+  public numberToDate(inputNumber: number): DateTime {
+    validateArgToType(inputNumber, 'number', 'val')
+    return this._evaluator.interpreter.dateTimeHelper.numberToSimpleDate(inputNumber)
+  }
+
+  /**
+   * Interprets number as a time (hours/minutes/seconds).
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
+   *
+   * @param {number} inputNumber - time in 24h units.
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // pass a number to be interpreted as a time
+   * // should return {hours: 26, minutes: 24} for this example
+   * const timeFromNumber = hfInstance.numberToTime(1.1);
+   * ```
+   *
+   * @category Helpers
+   */
+  public numberToTime(inputNumber: number): DateTime {
+    validateArgToType(inputNumber, 'number', 'val')
+    return numberToSimpleTime(inputNumber)
+  }
+
+  /**
+   * Subscribes to an event.
+   * For the list of all available events, see [[Listeners]].
+   *
+   * @param {Event} event the name of the event to subscribe to
+   * @param {Listener} listener to be called when event is emitted
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // subscribe to a 'sheetAdded', pass a simple handler
+   * hfInstance.on('sheetAdded', ( ) => { console.log('foo') });
+   *
+   * // add a sheet to trigger an event,
+   * // console should print 'foo' after each time sheet is added in this example
+   * hfInstance.addSheet('FooBar');
+   * ```
+   *
+   * @category Events
+   */
+  public on<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
+    this._emitter.on(event, listener)
+  }
+
+  /**
+   * Subscribes to an event once.
+   * For the list of all available events, see [[Listeners]].
+   *
+   * @param {Event} event the name of the event to subscribe to
+   * @param {Listener} listener to be called when event is emitted
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // subscribe to a 'sheetAdded', pass a simple handler
+   * hfInstance.once('sheetAdded', ( ) => { console.log('foo') });
+   *
+   * // call addSheet twice,
+   * // console should print 'foo' only once when the sheet is added in this example
+   * hfInstance.addSheet('FooBar');
+   * hfInstance.addSheet('FooBaz');
+   * ```
+   *
+   * @category Events
+   */
+  public once<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
+    this._emitter.once(event, listener)
+  }
+
+  /**
+   * Unsubscribes from an event or from all events.
+   * For the list of all available events, see [[Listeners]].
+   *
+   * @param {Event} event the name of the event to subscribe to
+   * @param {Listener} listener to be called when event is emitted
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   *
+   * // define a simple function to be called upon emitting an event
+   * const handler = ( ) => { console.log('baz') }
+   *
+   * // subscribe to a 'sheetAdded', pass the handler
+   * hfInstance.on('sheetAdded', handler);
+   *
+   * // add a sheet to trigger an event,
+   * // console should print 'baz' each time a sheet is added
+   * hfInstance.addSheet('FooBar');
+   *
+   * // unsubscribe from a 'sheetAdded'
+   * hfInstance.off('sheetAdded', handler);
+   *
+   * // add a sheet, the console should not print anything
+   * hfInstance.addSheet('FooBaz');
+   * ```
+   *
+   * @category Events
+   */
+  public off<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
+    this._emitter.off(event, listener)
+  }
+
+  /**
+   * Destroys instance of HyperFormula.
+   *
+   * @example
+   * ```js
+   * // destroys the instance
+   * hfInstance.destroy();
+   * ```
+   *
+   * @category Instance
+   */
+  public destroy(): void {
+    objectDestroy(this)
+  }
+
+  /**
+   * Throws an error if evaluation is suspended.
+   *
+   * @internal
+   */
+  private ensureEvaluationIsNotSuspended() {
+    if (this._evaluationSuspended) {
+      throw new EvaluationSuspendedError()
+    }
+  }
+
+  /**
+   * Throws an error if the current license does not allow the given feature: either the key's
+   * state blocks every gated feature (a missing or invalid key, an expired classic key, or a trial
+   * past its grace period), or the key does not grant it.
+   *
+   * Where the line is drawn, so a later change does not move it by accident:
+   * - **Gated:** methods that create value by mutating the sheet, the clipboard, the undo
+   *   history, or the named-expression set.
+   * - **Not gated:** reads (`getCellValue`, `listNamedExpressions`,
+   *   `getAllNamedExpressionsSerialized`, the `isItPossibleTo*` predicates and
+   *   `isThereSomethingToUndo`/`isThereSomethingToRedo`, which answer `false` instead of throwing
+   *   when the method they ask about is not allowed) and teardown or
+   *   cleanup that only ever removes state (`clearClipboard`, `clearUndoStack`,
+   *   `clearRedoStack`, `destroy`). Gating cleanup would let a restricted entitlement strand
+   *   an integration mid-teardown while giving a licensee nothing, and mirrors gate B, which
+   *   blocks *calling* a function rather than *reading* an already-computed value.
+   * - **Not gated, for the same reason:** `resumeEvaluation`, the sole exit from a suspended
+   *   engine. Gate the entry points (`suspendEvaluation`, `batch`) and the feature is
+   *   licensable; gate the release valve too and an entitlement change mid-suspension leaves
+   *   the instance permanently unusable. A capability check must never be reachable only on
+   *   the way out of a state it let the caller into.
+   *
+   * Must stay the first statement of every gated method, so a blocking key is reported before
+   * any argument validation.
+   *
+   * @internal
+   */
+  private ensureCapability(feature: FeatureId): void {
+    ensureFeatureAllowed(this._config, feature)
+  }
+
+  /**
+   * Whether the current license allows the given feature: the answer [[ensureCapability]] acts on,
+   * for the `isItPossibleTo*` predicates and `isThereSomethingToUndo`/`isThereSomethingToRedo`,
+   * which answer `false` instead of throwing.
+   *
+   * @internal
+   */
+  private isCapabilityAllowed(feature: FeatureId): boolean {
+    return isFeatureAllowed(this._config, feature)
+  }
+
+  /**
+   * Parses a formula string and extracts its AST and dependencies.
+   *
+   * @internal
+   */
+  private extractTemporaryFormula(formulaString: string, sheetId: number = 1): { ast?: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[] } {
+    const parsedCellContent = this._cellContentParser.parse(formulaString)
+    const address = {sheet: sheetId, col: 0, row: 0}
+    if (!(parsedCellContent instanceof CellContent.Formula)) {
+      return {address, dependencies: []}
+    }
+
+    const {ast, errors, dependencies} = this._parser.parse(parsedCellContent.formula, address)
+
+    if (errors.length > 0) {
+      return {address, dependencies: []}
+    }
+
+    return {ast, address, dependencies}
+  }
+
+  /**
+   * Rebuilds the engine with new configuration.
+   */
+  private rebuildWithConfig(newParams: Partial<ConfigParams>): void {
+    const newConfig = this._config.mergeConfig(newParams)
+    // The second argument silences license console messages for this transient Config: it is
+    // built from the OUTGOING config purely to reserialize sheets, and must not print an expiry
+    // notice for the key the caller may be replacing in this very call.
+    const configNewLanguage = this._config.mergeConfig({language: newParams.language}, false)
+    const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
+    const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
+
+    const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, serializedNamedExpressions, this._stats)
+
+    this._config = newEngine.config
+    this._stats = newEngine.stats
+    this._dependencyGraph = newEngine.dependencyGraph
+    this._columnSearch = newEngine.columnSearch
+    this._parser = newEngine.parser
+    this._unparser = newEngine.unparser
+    this._cellContentParser = newEngine.cellContentParser
+    this._evaluator = newEngine.evaluator
+    this._lazilyTransformingAstService = newEngine.lazilyTransformingAstService
+    this._crudOperations = newEngine.crudOperations
+    this._exporter = newEngine.exporter
+    this._namedExpressions = newEngine.namedExpressions
+    this._serialization = newEngine.serialization
+    this._functionRegistry = newEngine.functionRegistry
+  }
+
+  /**
+   * When enough transformations have accumulated, forces all formula vertices and
+   * column index entries to apply pending lazy transformations, then compacts the
+   * transformation history and cleans up orphaned undo oldData entries.
+   */
+  private compactLazyTransformationsIfNeeded(): void {
+    if (this._lazilyTransformingAstService.needsCompaction()) {
+      this._dependencyGraph.forceApplyPostponedTransformations()
+      this._columnSearch.forceApplyPostponedTransformations()
+      this._lazilyTransformingAstService.compact()
+      this._lazilyTransformingAstService.undoRedo?.cleanupOrphanedOldData()
+    }
+  }
+
+  /**
+   * Runs a recomputation starting from recently changed vertices.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   */
+  private recomputeIfDependencyGraphNeedsIt(): ExportedChange[] {
+    if (!this._evaluationSuspended) {
+      const changes = this._crudOperations.getAndClearContentChanges()
+      const verticesToRecomputeFrom = this.dependencyGraph.verticesToRecompute()
+      this.dependencyGraph.clearDirtyVertices()
+
+      this.compactLazyTransformationsIfNeeded()
+
+      if (verticesToRecomputeFrom.length > 0) {
+        changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
+      }
+
+      const exportedChanges = changes.exportChanges(this._exporter)
+
+      if (!changes.isEmpty()) {
+        this._emitter.emit(Events.ValuesUpdated, exportedChanges)
+      }
+
+      return exportedChanges
+    } else {
+      return []
+    }
+  }
+}

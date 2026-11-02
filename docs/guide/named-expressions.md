@@ -1,4 +1,5 @@
 ---
+title: "Named expressions"
 tags:
   - defined names
   - global scope
@@ -10,8 +11,6 @@ tags:
   - removeNamedExpression
   - listNamedExpressions
 ---
-
-# Named expressions
 
 An expression can be assigned a human-friendly name. Thanks to this you can
 refer to that name anywhere across the workbook. Names are especially useful
@@ -57,7 +56,7 @@ Expression names are case-insensitive, and they:
   `R4C5`, `RC` or `R0C`).
 - Must be unique within a given scope.
 
-::: tip
+:::tip
 Expression names must be unique within a given scope, but you can override a
 global named-expression with a local one. For example:
 
@@ -166,11 +165,11 @@ const namedExpressions = [
 ];
 
 // Create engine with named expressions
-const hfInstance = HyperFormula.buildEmpty({}, namedExpressions);
+const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' }, namedExpressions);
 // or
-const hfInstance = HyperFormula.buildFromArray(sheetData, {}, namedExpressions);
+const hfInstance = HyperFormula.buildFromArray(sheetData, { licenseKey: 'gpl-v3' }, namedExpressions);
 // or  
-const hfInstance = HyperFormula.buildFromSheets(sheetsData, {}, namedExpressions);
+const hfInstance = HyperFormula.buildFromSheets(sheetsData, { licenseKey: 'gpl-v3' }, namedExpressions);
 ```
 
 **After engine creation**: You can add a named expression by using the `addNamedExpression` method. It accepts name for the expression, the expression as a raw cell content, and optionally the scope. If you do not define the scope it will be set to global, meaning the expression name will be valid for the whole workbook. If you want to add many of them, it is advised to do so in a [batch](batch-operations.md). This method returns [an array of changed cells](basic-operations.md#changes-array).
@@ -236,7 +235,7 @@ described in [that section](basic-operations.md#isitpossibleto-methods).
 
 ## Demo
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/named-expressions/example1.html)
 

@@ -1,4 +1,5 @@
 ---
+title: "Migrating from 2.x to 3.0"
 tags:
   - migration
   - migrate
@@ -11,8 +12,6 @@ tags:
   - moduleResolution
   - bundlers
 ---
-
-# Migrating from 2.x to 3.0
 
 To upgrade your HyperFormula version from 2.x.x to 3.0.0, follow this guide.
 
@@ -104,6 +103,7 @@ HyperFormula 3.0.0 introduces a change in the default value of the `precisionRou
 
 ```javascript
 const hf = HyperFormula.buildEmpty({
+  licenseKey: 'gpl-v3',
   precisionRounding: 14
 });
 ``` 

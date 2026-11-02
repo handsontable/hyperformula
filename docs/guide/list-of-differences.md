@@ -1,4 +1,5 @@
 ---
+title: "List of differences with other spreadsheets"
 tags:
   - Microsoft Excel
   - Google Sheets
@@ -8,31 +9,10 @@ tags:
   - rounding
 ---
 
-# List of differences with other spreadsheets
-
-<!--
-The below dummy div uses a CSS class to alter the .page layout for the current page without any additional customization of VuePress.
-It makes the page wider to accommodate large tables
--->
+<!-- Widens the page for its large tables: see `.widePage` in `docs/src/styles/custom.css`. -->
 <div class="widePage"></div>
-<style>
-.page:has(.widePage) .theme-default-content:not(.custom), /* markdown content */
-.page:has(.widePage) .page-edit, /* footer containing the "Help us improve the page" link */
-.page:has(.widePage) .page-nav /* footer links to the next and prev page */ {
-  max-width: 1200px !important; /* override default max-width of 740px for this page */
-}
-/* Make wide tables horizontally scrollable on narrow screens */
-.page:has(.widePage) table {
-  display: block !important;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-</style>
 
 See a full list of differences between HyperFormula, Microsoft Excel, and Google Sheets.
-
-**Contents:**
-[[toc]]
 
 ## General functionalities
 
@@ -51,6 +31,7 @@ See a full list of differences between HyperFormula, Microsoft Excel, and Google
 | TIMEVALUE function                                 | =TIMEVALUE("14:31")                                                       | Type of the returned value: `CellValueDetailedType.NUMBER_TIME` (compliant with the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard)                                                                                                                                  | Cell auto-formatted as **regular number**                                                                                      | Cell auto-formatted as **regular number**                                                                                      |
 | EDATE function                                     | =EDATE(DATE(2019, 7, 31), 1)                                              | Type of the returned value: `CellValueDetailedType.NUMBER_DATE`. This is non-compliant with the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard, which defines the return type as a Number, while describing it as a Date serial number through the function summary. | Cell auto-formatted as **date**                                                                                                | Cell auto-formatted as **regular number**                                                                                      |
 | EOMONTH function                                   | =EOMONTH(DATE(2019, 7, 31), 1)                                            | Type of the returned value: `CellValueDetailedType.NUMBER_DATE`. This is non-compliant with the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard, which defines the return type as a Number, while describing it as a Date serial number through the function summary. | Cell auto-formatted as **date**                                                                                                | Cell auto-formatted as **regular number**                                                                                      |
+| EDATE and EOMONTH results in February 1900        | =EDATE(DATE(1900, 1, 31), 1)<br><br>=EOMONTH(DATE(1900, 1, 31), 1)       | With the [`leapYear1900`](/api/interfaces/configparams.md#leapyear1900) option set to `true`, February 1900 has 29 days, so both examples return 29 February 1900 (serial `60` with `nullDate` set to 1899-12-31). With the default `false`, both return 28 February 1900.                                                                                                                              | 28 February 1900 for both examples. Google Sheets does not treat 1900 as a leap year.                                          | 28 February 1900 (serial `59`) for both examples. Excel keeps the 1900 leap day only in the serial-to-date mapping (`DAY(60)` is `29`); its month arithmetic treats February 1900 as having 28 days, so no `EDATE` or `EOMONTH` result is ever serial `60`. |
 | Empty cells in lookup search                      | =XLOOKUP(3, A1:A4, A1:A4, "NF", 0, 2)<br>where A1:A4 = 1, 2, (empty), 3   | Empty cells are skipped during the search. A value that is present is found even when it sits past an interspersed empty cell (exact match is gap-independent), and approximate `MATCH`/`VLOOKUP`/`HLOOKUP`/`XLOOKUP` skip empty cells — but not empty strings — when finding the lower/upper bound. Returns `3`. On an all-empty range in a binary search mode, HyperFormula returns the `if_not_found` result (never row 1). | Skips empty cells in approximate search (parity with HyperFormula). | With binary search modes (`search_mode` ±2), a range with interspersed empty cells is not strictly sorted; per Excel's documentation the result may be invalid, so a value past an empty cell is not reliably found. On an all-empty range in a binary mode, Excel returns the first row's value. |
 
 ## Built-in functions
@@ -116,7 +97,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | NORMSDIST     | =NORMSDIST(0, TRUE())                                          |          0.5 |  Wrong number |    Wrong number |
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
-| CHOOSECOLS    | =CHOOSECOLS(Data!A:A, 1)                                      | Spills the whole column from row 1; returns SPILL below row 1. | Spills the whole column when space is available. | Spills the whole column from row 1; returns SPILL below row 1. |
+| CHOOSECOLS    | =CHOOSECOLS(Data!A:A, 1)                                      | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | Spills the whole column when space is available. | Spills all 1,048,576 rows from row 1, with blank source cells as 0; returns SPILL below row 1. |
 | CHOOSEROWS    | =CHOOSEROWS(Data!1:1, 1)                                      | Spills the source sheet's used columns from column A; returns SPILL outside column A. | Returns every column of the source sheet's row. | Returns all 16,384 columns of the row. |
 | CHOOSEROWS    | =CHOOSEROWS(Data!A:A, -1)                                     | Returns the source sheet's last used row. | Returns the source sheet's last row. | Returns row 1,048,576. |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |

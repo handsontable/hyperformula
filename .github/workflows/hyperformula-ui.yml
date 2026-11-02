@@ -1,0 +1,95 @@
+name: HyperFormula UI
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize # the head branch is updated from the base branch, new commits are pushed to the head branch, or the base branch is changed
+  push:
+    branches:
+      - 'master'
+      - 'develop'
+      - 'release/**'
+
+jobs:
+  verify:
+    strategy:
+      matrix:
+        node-version: [ '22' ]
+        os: [ 'ubuntu-latest' ]
+    name: verify
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Checkout main repository
+        uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build:ui
+
+      - name: Check the generated stylesheet is committed
+        run: git diff --exit-code -- 'hyperformula-ui/**/cssText.ts'
+
+      - name: Check the generated API docs are committed
+        run: |
+          npm run docs --workspace=hyperformula-ui/packages/core
+          git diff --exit-code -- hyperformula-ui/packages/core/DOCS.md
+
+      - name: Lint
+        run: npm run lint --workspace=hyperformula-ui/packages/core
+
+      - name: Typecheck
+        run: npm run typecheck --workspace=hyperformula-ui/packages/core
+
+      - name: Run unit tests
+        run: npm run test:ui
+
+      - name: Check the package contents
+        run: npm pack --dry-run --workspace=hyperformula-ui/packages/core
+
+      - name: Check the published types resolve under every module setting
+        run: npm run check:types --workspace=hyperformula-ui/packages/core
+
+  e2e:
+    strategy:
+      matrix:
+        node-version: [ '22' ]
+        os: [ 'ubuntu-latest' ]
+    name: e2e
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Checkout main repository
+        uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The demo resolves hyperformula from this workspace, so the engine's bundles and typings must exist.
+      - name: Build the engine
+        run: npm run bundle-all
+
+      - name: Lint and typecheck the demo and the suite
+        run: |
+          npm run lint --workspace=demo-js --workspace=@hfe-demo/shared --workspace=e2e
+          npm run typecheck --workspace=demo-js --workspace=@hfe-demo/shared --workspace=e2e
+
+      - name: Install Chromium
+        run: npm exec --workspace=e2e -- playwright install --with-deps chromium
+
+      - name: Run end-to-end tests
+        run: npm run test:e2e

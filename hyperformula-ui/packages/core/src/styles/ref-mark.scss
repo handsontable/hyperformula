@@ -1,0 +1,25 @@
+.hfe-ref-mark {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: var(--hfe-ref-1);
+  pointer-events: none;
+  font: inherit;
+  white-space: inherit;
+
+  &[data-ref-index="0"] { color: var(--hfe-ref-1); }
+  &[data-ref-index="1"] { color: var(--hfe-ref-2); }
+  &[data-ref-index="2"] { color: var(--hfe-ref-3); }
+  &[data-ref-index="3"] { color: var(--hfe-ref-4); }
+  &[data-ref-index="4"] { color: var(--hfe-ref-5); }
+  &[data-ref-index="5"] { color: var(--hfe-ref-6); }
+  &[data-ref-index="6"] { color: var(--hfe-ref-7); }
+  &[data-ref-index="7"] { color: var(--hfe-ref-8); }
+
+  &--named {
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+  }
+}

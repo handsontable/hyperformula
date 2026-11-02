@@ -1,4 +1,5 @@
 ---
+title: "Known limitations"
 tags:
   - unsupported features
   - multiple workbooks
@@ -7,8 +8,6 @@ tags:
   - asynchronous functions
   - structured references
 ---
-
-# Known limitations
 
 This page lists the known limitations of HyperFormula at its current development stage:
 
@@ -63,9 +62,9 @@ a circular reference.
 
 ### CHOOSECOLS function
 
-* Column indexes must be supplied as separate scalar arguments. Passing multiple indexes through an array or range argument is not supported.
+* Column indexes must be supplied as separate scalar arguments. When an array of indexes is passed, only its first index is used: `=CHOOSECOLS(A1:C3, {1,2})` returns column A only. A range of indexes returns `#VALUE!`.
 
-* A whole-column source can spill when the formula is in the first row, regardless of whether the source is on the same sheet. A formula below the first row returns `#SPILL!` because its result would extend beyond the worksheet edge. An empty source returns `#N/A` because its effective range is empty. Finite-height sources are supported.
+* A whole-column source can spill when the formula is in the first row, regardless of whether the source is on the same sheet. Below the first row, the formula returns `#SPILL!` because its result would extend beyond the worksheet edge; inside another function, such as `=SUM(CHOOSECOLS(A:A, 1))`, it is computed. In the first row, or inside another function, an empty source returns `#N/A` because its effective range is empty. Finite-height sources are supported.
 
 * HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal column-index expression can therefore be reported as `#SPILL!`. Errors in literal column indexes are detected before spill allocation.
 
@@ -109,6 +108,6 @@ HyperFormula resolves the OFFSET function at parse time rather than during evalu
 * OFFSET is resolved at parse time, so `getCellFormula` returns the computed reference, not the original `OFFSET` call.
 
   ```js
-  const hf = HyperFormula.buildFromArray([[1, 45, '=OFFSET(A1, 0, 1)']]);
+  const hf = HyperFormula.buildFromArray([[1, 45, '=OFFSET(A1, 0, 1)']], { licenseKey: 'gpl-v3' });
   hf.getCellFormula({ sheet: 0, row: 0, col: 2 }); // '=B1'
   ```
