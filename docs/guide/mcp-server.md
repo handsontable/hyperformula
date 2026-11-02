@@ -1,4 +1,5 @@
 ---
+title: "HyperFormula MCP Server"
 tags:
   - Model Context Protocol
   - Claude Desktop
@@ -8,11 +9,9 @@ tags:
   - deterministic
 ---
 
-# HyperFormula MCP Server
-
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server that exposes HyperFormula as a tool for any MCP-compatible AI client (Claude Desktop, Cursor, VS Code, and others) — giving LLMs deterministic spreadsheet and formula computation.
 
-::: warning Not available yet — coming soon
+:::caution[Not available yet — coming soon]
 This integration is on our roadmap and **cannot be installed or used today**. The API shown below is a preview and may still change before the first release.
 
 If you'd like to try it, [join the early access list](https://2fmjvg.share-eu1.hsforms.com/2e6drCkuLTn-1RuiYB91eJA) — we'll ping you the moment the first beta is ready, and your sign-up directly tells us how strongly to prioritize this integration.
@@ -58,7 +57,7 @@ The client now sees tools like `evaluate`, `getCellValue`, and `setCellContents`
 
 ## Get early access
 
-::: tip Be the first to try it
+:::tip[Be the first to try it]
 We're actively building this integration. Drop your email and we'll notify you the moment the first beta lands — so you can try it before the public release.
 
 [Join the early access list →](https://2fmjvg.share-eu1.hsforms.com/2e6drCkuLTn-1RuiYB91eJA)
