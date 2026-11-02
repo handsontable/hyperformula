@@ -39,7 +39,7 @@
 #                         and the bundle checks pass or fail against the other
 #                         branch's build. Run `npm run bundle-all`.
 #
-#   docs/api/  docs/guide/built-in-functions.md  docs/.vuepress/dist/
+#   docs/api/  docs/guide/built-in-functions.md  docs/dist/
 #                         Generated from source. A copy goes stale the moment the
 #                         JSDoc or the metadata catalogue changes.
 #

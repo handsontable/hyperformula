@@ -1,0 +1,5 @@
+version: 3
+paths:
+  exclude:
+    - ./hyperformula-ui/demo
+    - ./hyperformula-ui/e2e
