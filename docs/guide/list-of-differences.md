@@ -1,4 +1,5 @@
 ---
+title: "List of differences with other spreadsheets"
 tags:
   - Microsoft Excel
   - Google Sheets
@@ -8,31 +9,10 @@ tags:
   - rounding
 ---
 
-# List of differences with other spreadsheets
-
-<!--
-The below dummy div uses a CSS class to alter the .page layout for the current page without any additional customization of VuePress.
-It makes the page wider to accommodate large tables
--->
+<!-- Widens the page for its large tables: see `.widePage` in `docs/src/styles/custom.css`. -->
 <div class="widePage"></div>
-<style>
-.page:has(.widePage) .theme-default-content:not(.custom), /* markdown content */
-.page:has(.widePage) .page-edit, /* footer containing the "Help us improve the page" link */
-.page:has(.widePage) .page-nav /* footer links to the next and prev page */ {
-  max-width: 1200px !important; /* override default max-width of 740px for this page */
-}
-/* Make wide tables horizontally scrollable on narrow screens */
-.page:has(.widePage) table {
-  display: block !important;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-</style>
 
 See a full list of differences between HyperFormula, Microsoft Excel, and Google Sheets.
-
-**Contents:**
-[[toc]]
 
 ## General functionalities
 
@@ -121,9 +101,13 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
 | TAKE          | =TAKE(A1:A3, 0)                                                |          N/A | No such function. |           CALC  |
 | TAKE          | =TAKE(Data!A:A, , 1)                                           | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | No such function. | Spills all 1,048,576 rows from row 1, with blank source cells as 0; returns SPILL below row 1. |
+| TAKE          | =SUM(TAKE(A:A, -2))<br>where A1:A5: 1, 2, 3, 4, 5              | 9 (counts back from the last used row) | No such function. | 0 (counts back from the last row of the sheet) |
+| TAKE          | =TAKE(A:A, B1) in C5,<br>where A1:A5: 1, 2, 3, 4, 5 and B1 = 6 | Returns SPILL: below row 1, a count read from a cell can't size a whole-column result on the source's own sheet. Row 1 works. | No such function. | Spills 1, 2, 3, 4, 5, 0 into C5:C10. |
+| TAKE          | =TAKE(A1:C3, NA())                                             | Fills the whole area reserved for the array (here 3x3) with N/A. | No such function. | A single N/A error. |
 | DROP          | =DROP(A1:A3, 3)                                                |          N/A | No such function. |           CALC  |
 | DROP          | =DROP(Data!A:A, 1)                                             | Spills to the source sheet's current height minus one row; returns SPILL below row 2. | No such function. | Spills all 1,048,575 remaining rows, with blank source cells as 0; returns SPILL below row 2. |
 | DROP          | =DROP(Data!A:A, B1)                                            | Spills from row 1 only; returns SPILL below row 1, because the count is read after the result size is set. | No such function. | Spills 1,048,576 minus B1 rows when entered in row B1+1 or above; returns SPILL below. |
+| DROP          | =SUM(DROP(A:A, -1))<br>where A1:A5: 1, 2, 3, 4, 5              | 10 (drops the last used row) | No such function. | 15 (drops the last row of the sheet) |
 | DROP          | =DROP(A1:C3, {1,2})                                            | Uses the first count and drops one row. | No such function. | Returns a 1x2 array of VALUE errors. |
 | DROP          | =ISREF(DROP(Data!A1:C3, 1))                                    | FALSE (returns values, not a reference) | No such function. | TRUE |
 | TRIMRANGE     | =TRIMRANGE(A1:C10)                                             | Reserves the whole range (10x3): the trimmed values fill its top-left corner, the other cells stay blank, and a value in one of them makes the formula return SPILL. | No such function. | Spills only the trimmed rows and columns, and follows the data. |

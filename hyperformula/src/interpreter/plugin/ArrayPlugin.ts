@@ -591,7 +591,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    *
    * An unbounded result anchored away from the required sheet edge retains its
    * unbounded predicted dimension so array-space validation returns a spill
-   * error without evaluating TAKE as a scalar formula.
+   * error without evaluating TAKE as a scalar formula. A count that depends on
+   * other cells is treated the same way when the whole-column or whole-row
+   * source is on the formula's own sheet: the result can make that sheet
+   * larger than the size reserved for it.
    *
    * @param {ProcedureAst} ast - The parsed TAKE call.
    * @param {InterpreterState} state - The formula state whose address anchors the spill.
@@ -624,9 +627,13 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const width = columnDimension.kind === 'value'
       ? Math.min(sourceSize.width, columnDimension.value, this.config.maxColumns)
       : sourceSize.width
+    const sourceRange = this.directSourceRange(ast.args[0], state)
+    const isSameSheetSource = sourceRange?.sheet === state.formulaAddress.sheet
+    const mustStartAtSheetEdge = (dimension: TakeLiteralDimension) =>
+      dimension.kind === 'unbounded' || (dimension.kind === 'unresolved' && isSameSheetSource)
 
     return this.sizeAtSheetEdge(
-      ast.args[0], state, width, height, columnDimension.kind === 'unbounded', rowDimension.kind === 'unbounded',
+      ast.args[0], state, width, height, mustStartAtSheetEdge(columnDimension), mustStartAtSheetEdge(rowDimension),
     )
   }
 
