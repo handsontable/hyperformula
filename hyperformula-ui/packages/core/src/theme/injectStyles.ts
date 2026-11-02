@@ -2,7 +2,14 @@ import { CSS_TEXT } from "./cssText";
 
 const CORE_STYLE_MARKER = "data-hfe-styles";
 
-const refCounts = new Map<string, number>();
+const refCountsByRoot = new WeakMap<Document | ShadowRoot, Map<string, number>>();
+
+/**
+ * Where an injected stylesheet lives: a document (its `<head>`) or a shadow root.
+ *
+ * @category Theming
+ */
+export type StyleRoot = Document | ShadowRoot;
 
 /**
  * Ref-counted style handle returned by {@link createStyleInjector}.
@@ -10,49 +17,71 @@ const refCounts = new Map<string, number>();
  * @category Theming
  */
 export interface StyleInjector {
-  /** Increments the ref count; appends the `<style>` tag on first injection. */
-  inject(): void;
+  /**
+   * Increments the ref count for `root` (default: the global `document`); appends the
+   * `<style>` tag on first injection.
+   */
+  inject(root?: StyleRoot): void;
 
-  /** Decrements the ref count; removes the tag when the last holder releases. */
-  release(): void;
+  /** Decrements the ref count for `root`; removes the tag when its last holder releases. */
+  release(root?: StyleRoot): void;
+}
+
+function defaultRoot(): StyleRoot | undefined {
+  return typeof document === "undefined" ? undefined : document;
+}
+
+function styleContainer(root: StyleRoot): ParentNode {
+  return "head" in root ? root.head : root;
+}
+
+function ownerDocumentOf(root: StyleRoot): Document {
+  return "head" in root ? root : root.ownerDocument;
 }
 
 /**
- * Creates a ref-counted, SSR-guarded injector that maintains one `<style [marker]>` tag in
- * `document.head`. Adapters reuse it to auto-inject their own generated `cssText`.
+ * Creates a ref-counted, SSR-guarded injector that maintains one `<style [marker]>` tag per
+ * document (in its `<head>`) or shadow root. Adapters reuse it to auto-inject their own
+ * generated `cssText`.
  *
  * @category Theming
  */
 export function createStyleInjector(marker: string, cssText: string): StyleInjector {
   return {
-    inject(): void {
-      if (typeof document === "undefined") {
+    inject(root: StyleRoot | undefined = defaultRoot()): void {
+      if (root === undefined) {
         return;
       }
 
+      const refCounts = refCountsByRoot.get(root) ?? new Map<string, number>();
+
+      refCountsByRoot.set(root, refCounts);
       refCounts.set(marker, (refCounts.get(marker) ?? 0) + 1);
 
-      if (document.head.querySelector(`style[${marker}]`)) {
+      const container = styleContainer(root);
+
+      if (container.querySelector(`style[${marker}]`)) {
         return;
       }
 
-      const styleEl = document.createElement("style");
+      const styleEl = ownerDocumentOf(root).createElement("style");
 
       styleEl.setAttribute(marker, "");
       styleEl.textContent = cssText;
-      document.head.appendChild(styleEl);
+      container.appendChild(styleEl);
     },
-    release(): void {
-      if (typeof document === "undefined") {
+    release(root: StyleRoot | undefined = defaultRoot()): void {
+      if (root === undefined) {
         return;
       }
 
-      const remaining = Math.max(0, (refCounts.get(marker) ?? 0) - 1);
+      const refCounts = refCountsByRoot.get(root);
+      const remaining = Math.max(0, (refCounts?.get(marker) ?? 0) - 1);
 
-      refCounts.set(marker, remaining);
+      refCounts?.set(marker, remaining);
 
       if (remaining === 0) {
-        document.head.querySelector(`style[${marker}]`)?.remove();
+        styleContainer(root).querySelector(`style[${marker}]`)?.remove();
       }
     },
   };
@@ -60,10 +89,10 @@ export function createStyleInjector(marker: string, cssText: string): StyleInjec
 
 const coreInjector = createStyleInjector(CORE_STYLE_MARKER, CSS_TEXT);
 
-export function injectStyles(): void {
-  coreInjector.inject();
+export function injectStyles(root?: StyleRoot): void {
+  coreInjector.inject(root);
 }
 
-export function releaseStyles(): void {
-  coreInjector.release();
+export function releaseStyles(root?: StyleRoot): void {
+  coreInjector.release(root);
 }

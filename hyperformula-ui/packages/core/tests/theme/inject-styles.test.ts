@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { NullAdapter } from "../../src/adapter/nullAdapter";
 import { FormulaBuilder } from "../../src/formulaBuilder";
 import { FormulaEditor } from "../../src/formulaEditor/formulaEditor";
+import { createStyleInjector } from "../../src/theme/injectStyles";
 import { PopupContext } from "../../src/ui/popup/popupContext";
 
 const STYLE_SELECTOR = "style[data-hfe-styles]";
@@ -99,5 +100,30 @@ describe("style auto-injection", () => {
     expect(styleTagCount()).toBe(1);
     second.destroy();
     rootEl.remove();
+  });
+});
+
+describe("createStyleInjector with a shadow root", () => {
+  it("keeps one tag per shadow root, separate from the document's", () => {
+    const injector = createStyleInjector("data-test-shadow-styles", ".x{}");
+    const hostEl = document.createElement("div");
+
+    document.body.appendChild(hostEl);
+
+    const shadow = hostEl.attachShadow({ mode: "open" });
+
+    injector.inject(shadow);
+    injector.inject(shadow);
+
+    expect(shadow.querySelectorAll("style[data-test-shadow-styles]")).toHaveLength(1);
+    expect(document.head.querySelector("style[data-test-shadow-styles]")).toBeNull();
+
+    injector.release(shadow);
+    expect(shadow.querySelector("style[data-test-shadow-styles]")).not.toBeNull();
+
+    injector.release(shadow);
+    expect(shadow.querySelector("style[data-test-shadow-styles]")).toBeNull();
+
+    hostEl.remove();
   });
 });

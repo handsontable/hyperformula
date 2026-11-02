@@ -1,4 +1,5 @@
 ---
+title: "Key concepts"
 tags:
   - architecture
   - internals
@@ -8,11 +9,9 @@ tags:
   - topological order
 ---
 
-# Key concepts
-
 ## High-level design diagram
 
-<img :src="$withBase('/hf-high-lvl-diagram.svg')">
+![](/hf-high-lvl-diagram.svg)
 
 Data processing consists of three phases.
 
@@ -24,7 +23,7 @@ so-called
 (AST). For example, the AST for `7*3-SIN(A5)` will look
 similar to this graph:
 
-<img :src="$withBase('/ast.png')">
+![](/ast.png)
 
 ## Phase 2. Construction of the dependency graph
 
@@ -37,7 +36,7 @@ exists if and only if there is no cycle in the dependency graph.
 
 There can be many such orders, like so:
 
-<img :src="$withBase('/topsort.png')">
+![](/topsort.png)
 
 Read more about the [dependency graph](/guide/dependency-graph.md).
 
@@ -47,7 +46,7 @@ It is crucial to evaluate cells efficiently. For simple expressions,
 there is not much room for maneuver, but spreadsheet-like data sets
 definitely need more attention.
 
-<img :src="$withBase('/sample-sheet.png')">
+![](/sample-sheet.png)
 
 ## Grammar
 
@@ -107,7 +106,7 @@ cells, references inside formulas may need to be changed. For example,
 after adding a row, we need to shift all references in the formulas
 below like so:
 
-<img :src="$withBase('/crud-operations.png')">
+![](/crud-operations.png)
 
 In more complex sheets this can lead to similar transformations in
 many formulas at once. On the other hand, such operations do not
