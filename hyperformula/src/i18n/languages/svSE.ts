@@ -234,7 +234,7 @@ const dictionary: RawTranslationPackage = {
     TEXTAFTER: 'TEXTAFTER',
     TEXTBEFORE: 'TEXTBEFORE',
     TEXTJOIN: 'TEXTJOIN',
-    TEXTSPLIT: 'TEXTSPLIT',
+    TEXTSPLIT: 'DELATEXT',
     TIME: 'KLOCKSLAG',
     TIMEVALUE: 'TIDVÄRDE',
     TODAY: 'IDAG',

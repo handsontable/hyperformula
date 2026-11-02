@@ -231,7 +231,7 @@ const dictionary: RawTranslationPackage = {
     TBILLPRICE: 'CENA.BS',
     TBILLYIELD: 'RENT.BS',
     TEXT: 'TEKST',
-    TEXTAFTER: 'TEXTAFTER',
+    TEXTAFTER: 'TEKST.PO',
     TEXTBEFORE: 'TEKST.PRZED',
     TEXTJOIN: 'POŁĄCZ.TEKSTY',
     TEXTSPLIT: 'TEXTSPLIT',
