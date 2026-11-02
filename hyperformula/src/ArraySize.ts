@@ -199,13 +199,9 @@ export class ArraySizePredictor {
    * Says whether the size predicted for a function call is the size of its value, following the branches of
    * {@link checkArraySizeForFunction}: a call sized by its own size method depends on that method and on every
    * argument, a call sized from its arguments depends on the arguments that are neither RANGE nor ANY, and any
-   * other call is one cell.
+   * other call is one cell. A call the license stops is not treated apart: it evaluates to a single error.
    */
   private isFunctionSizeKnownBeforeEvaluation(ast: ProcedureAst, state: InterpreterState): boolean {
-    if (this.functionCallLicenseGate.stopsCall(ast.procedureName)) {
-      return true
-    }
-
     const metadata = this.functionRegistry.getMetadata(ast.procedureName)
     const argumentState = new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))
 
