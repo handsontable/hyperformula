@@ -7,9 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added `LINEST` for simple and multiple linear regression, with optional intercept and regression statistics. The `stats` argument must be constant because result dimensions are determined before evaluation. [#1769](https://github.com/handsontable/hyperformula/pull/1769)
+
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
+- Fixed `getCellValue()`, `getSheetValues()` and the other methods that export cell values ignoring the `evaluateNullToZero` option: with the option on, they now return `0` for empty cells instead of `null`. [#1738](https://github.com/handsontable/hyperformula/pull/1738)
 - Fixed numeric contexts reading an empty string (`""`) as `0` instead of as text (e.g. `=""+0` now returns `#VALUE!` instead of `0`), and numeric aggregations treating a parenthesized reference such as `(A1)` differently from `A1`. [#1768](https://github.com/handsontable/hyperformula/pull/1768)
 
 ## [3.5.0] - 2026-10-09
