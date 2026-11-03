@@ -145,6 +145,7 @@ const dictionary: RawTranslationPackage = {
     ISTEXT: 'ISTEXT',
     LEFT: 'LEFT',
     LEN: 'LEN',
+    LINEST: 'LINEST',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
