@@ -3,9 +3,11 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {CellError, ErrorType} from '../Cell'
 import {Config} from '../Config'
 import {TIME_FORMAT_SECONDS_ITEM_REGEXP} from '../DateTimeDefault'
 import {DateTimeHelper, numberToSimpleTime, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
+import {ErrorMessage} from '../error-message'
 import {RawScalarValue} from '../interpreter/InterpreterValue'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
@@ -40,6 +42,9 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   if (tryCurrency !== undefined) {
     return tryCurrency
   }
+  if (hasUnclosedBracket(formatArg)) {
+    return new CellError(ErrorType.VALUE, ErrorMessage.BadFormat)
+  }
   // Strip presentational color tags AFTER the (user-pluggable) currency callback
   // — which may inspect the raw formatArg — and BEFORE date/time dispatch. Doing
   // it here (not inside the number path) means a colored date like
@@ -58,7 +63,33 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   return formatNumberWithSections(cleanedFormatArg, value, config)
 }
 
-const COLOR_TAG_REGEX = /\[(black|blue|cyan|green|magenta|red|white|yellow|color\s?(?:[1-9]|[1-4]\d|5[0-6]))\]/gi
+/**
+ * Tells whether a format string opens a `[` that no later `]` closes, as in
+ * `[Red` or `0[`. Such a format is invalid, so `TEXT` returns `#VALUE!`.
+ * A `[` inside quoted text or after a backslash is literal text and does not
+ * count.
+ *
+ * @param formatArg the raw format string
+ * @returns `true` when an opening bracket is never closed
+ */
+function hasUnclosedBracket(formatArg: string): boolean {
+  let inQuotes = false
+  for (let i = 0; i < formatArg.length; i++) {
+    const ch = formatArg[i]
+    if (ch === '"') {
+      inQuotes = !inQuotes
+    } else if (inQuotes) {
+      continue
+    } else if (ch === '\\') {
+      i++
+    } else if (ch === '[' && !formatArg.includes(']', i + 1)) {
+      return true
+    }
+  }
+  return false
+}
+
+const COLOR_TAG_REGEX =/\[(black|blue|cyan|green|magenta|red|white|yellow|color\s?(?:[1-9]|[1-4]\d|5[0-6]))\]/gi
 
 /**
  * Removes Excel color tags (`[Red]`, `[Blue]`, …, `[Color56]`) from a format
@@ -204,14 +235,25 @@ function formatNumberWithSections(formatArg: string, value: number, config: Conf
  * @returns the section's literal text
  */
 function renderLiteralSection(section: string): string {
+  // drop the quote delimiters, but keep an escaped quote (`\"`) for resolveEscapes
+  return resolveEscapes(section.replace(/(\\[\s\S])|"/g, (_match, escape?: string) => escape ?? ''))
+}
+
+/**
+ * Resolves backslash escapes in format code (`\-` → `-`). A trailing backslash
+ * with no following character is kept.
+ *
+ * @param code format code with no quoted literals in it
+ * @returns the code with each escape replaced by the character it escapes
+ */
+function resolveEscapes(code: string): string {
   let result = ''
-  for (let i = 0; i < section.length; i++) {
-    const ch = section[i]
-    if (ch === '\\' && i + 1 < section.length) {
-      result += section[i + 1]
+  for (let i = 0; i < code.length; i++) {
+    if (code[i] === '\\' && i + 1 < code.length) {
+      result += code[i + 1]
       i++
-    } else if (ch !== '"') {
-      result += ch
+    } else {
+      result += code[i]
     }
   }
   return result
@@ -268,7 +310,8 @@ function countChars(text: string, char: string) {
  * flows through the FREE_TEXT path and still prints. Callers pass `abs` for an
  * explicit negative section (whose own literals carry the sign) and the signed
  * value for a single-section mask (so the `-` is re-added here) — see
- * `pickSection`.
+ * `pickSection`. Free text around the placeholders has its backslash escapes
+ * resolved, as in a literal section (`0\x` with 5 → `5x`).
  *
  * Per integer-format token:
  * - a *trailing* comma run (Excel's scaler) is peeled off
@@ -293,7 +336,7 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
   for (let i = 0; i < tokens.length; ++i) {
     const token = tokens[i]
     if (token.type === TokenType.FREE_TEXT) {
-      result += token.value
+      result += resolveEscapes(token.value)
       continue
     }
 
