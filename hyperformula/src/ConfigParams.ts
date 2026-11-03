@@ -106,6 +106,8 @@ export interface ConfigParams {
   /**
    * Sets a decimal separator used for parsing numerical literals.
    *
+   * Also sets the decimal point that the `TEXT` function writes for masks such as `0.00`. See [`TEXT` function formats](/guide/compatibility-with-microsoft-excel.md#text-function-formats).
+   *
    * Can be one of the following:
    * - `.` (period)
    * - `,` (comma)
@@ -340,6 +342,8 @@ export interface ConfigParams {
   smartRounding: boolean,
   /**
    * Sets the thousands' separator symbol for parsing numerical literals.
+   *
+   * Also sets the grouping character that the `TEXT` function writes for masks such as `#,##0`. See [`TEXT` function formats](/guide/compatibility-with-microsoft-excel.md#text-function-formats).
    *
    * Can be one of the following:
    * - empty
