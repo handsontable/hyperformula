@@ -242,18 +242,16 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    */
   public valuetotext(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('VALUETOTEXT'), (value: InternalScalarValue, formatArg: InternalScalarValue) => {
-      if (formatArg instanceof CellError) {
-        return formatArg
-      }
-
-      const format = formatArg === '' ? undefined : this.coerceScalarToNumberOrError(formatArg)
-      if (format === undefined || !isExtendedNumber(format)) {
-        return new CellError(ErrorType.VALUE)
+      const format = formatArg === ''
+        ? new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+        : this.coerceScalarToNumberOrError(formatArg)
+      if (format instanceof CellError) {
+        return format
       }
 
       const formatCode = Math.floor(getRawValue(format))
       if (formatCode !== 0 && formatCode !== 1) {
-        return new CellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
 
       if (value instanceof CellError) {
