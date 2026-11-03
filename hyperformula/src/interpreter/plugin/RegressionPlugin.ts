@@ -113,14 +113,14 @@ function regressionOutput(fit: LinearRegressionResult, statistics: boolean, fitI
   const variance = fit.degreesOfFreedom === 0 ? 0 : fit.residualSumSquares / fit.degreesOfFreedom
   const rSquared = fit.totalSumSquares === 0 ? 1 : regressionSumSquares / fit.totalSumSquares
   const f = finiteValue((regressionSumSquares / fit.retainedPredictorCount) / variance)
-  const interceptError = fitIntercept ? finiteValue(fit.interceptError) : new CellError(ErrorType.NA)
+  const interceptError = fitIntercept ? finiteValue(fit.interceptError) : new CellError(ErrorType.NA, ErrorMessage.LinestNoInterceptError)
   result.push([...fit.standardErrors].reverse().map(finiteValue).concat(interceptError))
   result.push([finiteValue(rSquared), finiteValue(Math.sqrt(variance))])
   result.push([f, fit.degreesOfFreedom])
   result.push([finiteValue(regressionSumSquares), finiteValue(fit.residualSumSquares)])
   for (const row of result) {
     while (row.length < fit.coefficients.length + 1) {
-      row.push(new CellError(ErrorType.NA))
+      row.push(new CellError(ErrorType.NA, ErrorMessage.LinestNoStatistic))
     }
   }
   return SimpleRangeValue.onlyValues(result)
