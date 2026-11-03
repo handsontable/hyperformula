@@ -348,14 +348,16 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
  * Stringifies the integer and fractional digits of a magnitude for rendering:
  * the value is rounded to `decimalPlaces` and split on the dot, with the
  * trailing zeros of the fraction dropped (the placeholder padding re-adds
- * them).
+ * them). The digits are those of the shortest representation of the rounded
+ * value, so `0.1` with 20 decimal places gives `1`, not the binary expansion
+ * `10000000000000000555`.
  *
- * Doubles `>= 1e21` stringify in scientific notation (`1e+21`), which would
- * defeat placeholder padding and grouping, so they are expanded to their exact
- * decimal digits via `BigInt` instead — every such double is integer-valued.
- * NOTE: beyond 15 significant digits Excel displays zeros while the double's
- * exact expansion may carry non-zero tail digits; HyperFormula renders the
- * double's exact value (measured equal to Excel for the round `1e21` case).
+ * `Number#toString` switches to exponent notation at `1e21` and below `1e-6`,
+ * which would defeat placeholder padding and grouping:
+ * - a double `>= 1e21` is written with 15 significant digits and padded with
+ *   zeros (`1234567890123460000000`);
+ * - a value below `1e-6` keeps its digits, written after the leading zeros
+ *   (`0.0000001`).
  *
  * @param absValue the non-negative magnitude to stringify
  * @param decimalPlaces the number of decimal places requested by the format
@@ -363,10 +365,30 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
  */
 function stringifyMagnitude(absValue: number, decimalPlaces: number): { integerPart: string, decimalPart: string } {
   if (absValue >= 1e21 && Number.isFinite(absValue)) {
-    return {integerPart: BigInt(absValue).toString(), decimalPart: ''}
+    const [mantissa, exponent] = absValue.toPrecision(15).split('e+')
+    return {integerPart: mantissa.replace('.', '').padEnd(Number(exponent) + 1, '0'), decimalPart: ''}
   }
-  const valueParts = Number(absValue.toFixed(decimalPlaces)).toString().split('.')
+  const valueParts = toPlainNotation(Number(absValue.toFixed(decimalPlaces))).split('.')
   return {integerPart: valueParts[0] || '', decimalPart: valueParts[1] || ''}
+}
+
+/**
+ * Writes a non-negative number below `1e21` without exponent notation.
+ * `Number#toString` uses exponent notation below `1e-6` (`1.2e-7`); the same
+ * digits are written after the decimal point and the leading zeros
+ * (`0.00000012`).
+ *
+ * @param value a non-negative number below `1e21`
+ * @returns the number in plain decimal notation
+ */
+function toPlainNotation(value: number): string {
+  const text = value.toString()
+  const exponentForm = /^(\d)(?:\.(\d+))?e-(\d+)$/.exec(text)
+  if (exponentForm === null) {
+    return text
+  }
+  const [, leadingDigit, fraction = '', exponent] = exponentForm
+  return '0.' + '0'.repeat(Number(exponent) - 1) + leadingDigit + fraction
 }
 
 /**
