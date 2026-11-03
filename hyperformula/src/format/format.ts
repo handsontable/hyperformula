@@ -97,7 +97,7 @@ function hasUnclosedBracket(formatArg: string): boolean {
   return false
 }
 
-const COLOR_TAG_REGEX =/\[(black|blue|cyan|green|magenta|red|white|yellow|color\s?(?:[1-9]|[1-4]\d|5[0-6]))\]/gi
+const COLOR_TAG_REGEX = /\[(black|blue|cyan|green|magenta|red|white|yellow|color\s?(?:[1-9]|[1-4]\d|5[0-6]))\]/gi
 
 /**
  * Removes Excel color tags (`[Red]`, `[Blue]`, …, `[Color56]`) from a format
