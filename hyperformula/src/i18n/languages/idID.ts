@@ -145,6 +145,7 @@ const dictionary: RawTranslationPackage = {
     ISTEXT: 'ADALAH.TEKS',
     LEFT: 'KIRI',
     LEN: 'PANJANG',
+    LINEST: 'LINEST',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
