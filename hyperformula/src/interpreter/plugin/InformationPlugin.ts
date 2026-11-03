@@ -240,6 +240,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
         {argumentType: FunctionArgumentType.ANY}
       ],
       vectorizationForbidden: true,
+      enableArrayArithmeticForArguments: true,
     }
   }
 
