@@ -1,4 +1,5 @@
 ---
+title: "Contact"
 tags:
   - pricing
   - get a quote
@@ -8,8 +9,6 @@ tags:
   - invoice
   - Handsoncode
 ---
-
-# Contact
 
 HyperFormula is a product of Handsoncode, the company that stands behind
 [Handsontable](https://handsontable.com/). We are here to answer all
@@ -29,6 +28,13 @@ or submit your inquiry through the
 * Aleja Zwycięstwa 96/98
 * 81-451 Gdynia, Poland
 * VAT EU: PL5862294002
+
+## Community
+
+Ask questions and share what you build with other HyperFormula developers on the
+[HyperFormula forum](https://forum.handsontable.com/c/hyperformula/) or in the
+[Handsontable Slack Community](https://handsontable-public.slack.com/). Report bugs on
+[GitHub](https://github.com/handsontable/hyperformula/issues).
 
 ## Looking for technical support?
 

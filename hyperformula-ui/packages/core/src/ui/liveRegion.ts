@@ -10,17 +10,25 @@ const ANNOUNCE_DELAY_MS = 30;
  * @category Utilities
  */
 export class LiveRegion {
-  /** The hidden live-region element, appended to `container` (default `document.body`). */
+  /**
+   * The hidden live-region element, created in `container`'s document and appended to
+   * `container` (default `document.body`).
+   */
   readonly root: HTMLElement;
   private announceTimer: number | null = null;
 
-  constructor(container: HTMLElement = document.body) {
-    this.root = createEl("div", {
-      class: CN.liveRegion,
-      role: "status",
-      "aria-live": "polite",
-      "aria-atomic": "true",
-    });
+  constructor(container: HTMLElement | ShadowRoot = document.body) {
+    this.root = createEl(
+      "div",
+      {
+        class: CN.liveRegion,
+        role: "status",
+        "aria-live": "polite",
+        "aria-atomic": "true",
+      },
+      undefined,
+      container.ownerDocument,
+    );
     container.appendChild(this.root);
   }
 

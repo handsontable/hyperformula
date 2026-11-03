@@ -1,4 +1,5 @@
 ---
+title: "List of differences with other spreadsheets"
 tags:
   - Microsoft Excel
   - Google Sheets
@@ -8,31 +9,18 @@ tags:
   - rounding
 ---
 
-# List of differences with other spreadsheets
-
-<!--
-The below dummy div uses a CSS class to alter the .page layout for the current page without any additional customization of VuePress.
-It makes the page wider to accommodate large tables
--->
+<!-- Widens the page for its large tables: see `.widePage` in `docs/src/styles/custom.css`. -->
 <div class="widePage"></div>
-<style>
-.page:has(.widePage) .theme-default-content:not(.custom), /* markdown content */
-.page:has(.widePage) .page-edit, /* footer containing the "Help us improve the page" link */
-.page:has(.widePage) .page-nav /* footer links to the next and prev page */ {
-  max-width: 1200px !important; /* override default max-width of 740px for this page */
-}
-/* Make wide tables horizontally scrollable on narrow screens */
-.page:has(.widePage) table {
-  display: block !important;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-</style>
 
 See a full list of differences between HyperFormula, Microsoft Excel, and Google Sheets.
 
-**Contents:**
-[[toc]]
+## LINEST
+
+Unlike Excel, HyperFormula requires a constant `stats` argument because the output dimensions are determined before evaluation. For example, `=LINEST(A1:A10,B1:B10,TRUE(),D1)` returns `#VALUE!`; use `TRUE()` or `FALSE()` directly for `stats`. See [LINEST limitations](known-limitations.md#linest-function) for supported constants and input-sizing requirements.
+
+Numerical results can differ for nearly dependent predictors and nearly perfect fits. Coefficient standard errors are sensitive to conditioning, and the F statistic is sensitive to residuals close to machine precision. For an effectively perfect multiple regression, Excel and HyperFormula can return different large finite F values even when the coefficients agree.
+
+Very large or very small input scales can also cause substantial differences in coefficients and statistics, including for a single predictor with a non-perfect fit. HyperFormula does not reproduce Excel's loss of predictors or zero standard errors observed at extreme scales. Rescaling inputs to more moderate units can reduce numerical errors in both engines.
 
 ## General functionalities
 

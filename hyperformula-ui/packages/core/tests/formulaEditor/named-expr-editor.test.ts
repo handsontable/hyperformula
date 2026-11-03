@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { CellRange } from "../../src/adapter/types";
-import { createEditorHarness } from "../helpers";
+import { createEditorHarness, typeInto } from "../helpers";
 
 class NamedHF {
   listNamedExpressions(scope?: number) {
@@ -91,6 +91,51 @@ describe("FormulaEditor named expressions", () => {
 
     expect(adapter.highlights).toHaveLength(0);
 
+    destroy();
+  });
+});
+
+class MissingSheetHF extends NamedHF {
+  override listNamedExpressions(scope?: number) {
+    if (scope !== undefined) {
+      throw new Error(`There's no sheet with id = ${scope}`);
+    }
+
+    return ["TaxRate"];
+  }
+
+  getSheetDimensions(sheetId: number): { width: number; height: number } {
+    throw new Error(`There's no sheet with id = ${sheetId}`);
+  }
+}
+
+describe("FormulaEditor named expressions without the configured sheet", () => {
+  it("keeps editing and coloring global names when the engine has no sheet with the editor's id", () => {
+    const { host, editor, destroy } = createEditorHarness({
+      hyperformula: new MissingSheetHF() as never,
+      sheetId: 3,
+    });
+
+    expect(() => typeInto(host, "=TaxRate+1")).not.toThrow();
+    expect(editor.getValue()).toBe("=TaxRate+1");
+    expect(host.querySelector(".hfe-ref-mark--named")?.textContent).toBe("TaxRate");
+
+    destroy();
+  });
+
+  it("keeps editing a whole-column reference without logging an error", () => {
+    const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { host, editor, destroy } = createEditorHarness({
+      hyperformula: new MissingSheetHF() as never,
+      sheetId: 3,
+    });
+
+    typeInto(host, "=SUM(A:A)");
+
+    expect(editor.getValue()).toBe("=SUM(A:A)");
+    expect(errors).not.toHaveBeenCalled();
+
+    errors.mockRestore();
     destroy();
   });
 });
