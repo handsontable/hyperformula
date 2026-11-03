@@ -69,16 +69,29 @@ jobs:
       - name: (head) Install dependencies
         run: cd head && npm ci
 
+      # A tests branch that predates the runner skips the counts with a notice instead of failing.
+      - name: Check for the instruction-count runner
+        id: runner
+        run: |
+          if [ -f head/hyperformula/test/hyperformula-tests/performance/run-instructions.ts ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::The paired hyperformula-tests branch predates the instruction-count runner; skipping."
+          fi
+
       # The runner comes with the shared tests and is started through the generic tsnode script of the engine's
       # package.json, which every revision has. Each run compiles the engine of its own tree into the same build directory and measures it
       # there, so the two runs must stay sequential: the count depends on the paths a process sees.
       - name: (base) Count instructions
+        if: steps.runner.outputs.present == 'true'
         run: cd base && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json"
 
       - name: (head) Count instructions
+        if: steps.runner.outputs.present == 'true'
         run: cd head && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/run-instructions.ts "$GITHUB_WORKSPACE/head-instructions.json"
 
       - name: Compare the counts
+        if: steps.runner.outputs.present == 'true'
         run: |
           cd head && npm run tsnode --workspace=hyperformula test/hyperformula-tests/performance/compare-instructions.ts "$GITHUB_WORKSPACE/base-instructions.json" "$GITHUB_WORKSPACE/head-instructions.json" "$GITHUB_WORKSPACE/instructions-report.md"
           cat "$GITHUB_WORKSPACE/instructions-report.md" >> "$GITHUB_STEP_SUMMARY"
