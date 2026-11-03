@@ -7,6 +7,8 @@
  * This is a class for detailed error messages across HyperFormula.
  */
 export class ErrorMessage {
+  public static LinestStaticSize = 'LINEST requires input dimensions that determine a fixed result size.'
+  public static LinestStaticStats = 'LINEST requires a constant stats argument to determine its result size.'
   public static DistinctSigns = 'Distinct signs.'
   public static WrongArgNumber = 'Wrong number of arguments.'
   public static EmptyArg = 'Empty function argument.'
@@ -25,6 +27,7 @@ export class ErrorMessage {
   public static NumberExpected = 'Number argument expected.'
   public static IntegerExpected = 'Value needs to be an integer.'
   public static BadMode = 'Mode not recognized.'
+  public static BadFormat = 'Format not recognized.'
   public static DateBounds = 'Date outside of bounds.'
   public static OutOfSheet = 'Resulting reference is out of the sheet.'
   public static WrongType = 'Wrong type of argument.'

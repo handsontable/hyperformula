@@ -147,6 +147,26 @@ export function quotedLiteralContent(text: string): string {
   return text.length > 1 && text.endsWith('"') ? text.slice(1, -1) : text.slice(1)
 }
 
+/**
+ * Resolves backslash escapes in format code (`\-` → `-`). A trailing backslash
+ * with no following character is kept.
+ *
+ * @param code format code with no quoted literals in it
+ * @returns the code with each escape replaced by the character it escapes
+ */
+export function resolveEscapes(code: string): string {
+  let result = ''
+  for (let i = 0; i < code.length; i++) {
+    if (code[i] === '\\' && i + 1 < code.length) {
+      result += code[i + 1]
+      i++
+    } else {
+      result += code[i]
+    }
+  }
+  return result
+}
+
 function matchDateFormat(str: string): RegExpExecArray[] {
   dateFormatRegex.lastIndex = 0
   const tokens: RegExpExecArray[] = []
@@ -248,7 +268,8 @@ export function parseForDateTimeFormat(str: string): Maybe<FormatExpression> {
  * Tokenizes a number format. The first placeholder run found in the format
  * code is the number token; quoted literals are never searched, and each
  * becomes free text with its quotes removed, so `"#"0` renders `#` followed by
- * the value.
+ * the value. Free text from the format code has its backslash escapes resolved
+ * (`0\x` → `x` after the value); quoted text keeps its backslashes.
  *
  * @param str the format string (a single section)
  * @returns the expression, or `undefined` when the format code holds no placeholder run
@@ -264,11 +285,13 @@ export function parseForNumberFormat(str: string): Maybe<FormatExpression> {
     }
     const numberFormatTokens = hasNumberToken ? [] : matchNumberFormat(segment.text)
     if (numberFormatTokens.length === 0) {
-      tokens.push(formatToken(TokenType.FREE_TEXT, segment.text))
+      tokens.push(formatToken(TokenType.FREE_TEXT, resolveEscapes(segment.text)))
       continue
     }
     hasNumberToken = true
-    tokens.push(...createTokens(numberFormatTokens, segment.text))
+    tokens.push(...createTokens(numberFormatTokens, segment.text).map((token) =>
+      token.type === TokenType.FREE_TEXT ? formatToken(TokenType.FREE_TEXT, resolveEscapes(token.value)) : token
+    ))
   }
 
   return hasNumberToken ? {type: FormatExpressionType.NUMBER, tokens} : undefined

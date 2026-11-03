@@ -106,6 +106,8 @@ export interface ConfigParams {
   /**
    * Sets a decimal separator used for parsing numerical literals.
    *
+   * Also sets the decimal point that the `TEXT` function writes for masks such as `0.00`. See [`TEXT` function formats](/guide/compatibility-with-microsoft-excel.md#text-function-formats).
+   *
    * Can be one of the following:
    * - `.` (period)
    * - `,` (comma)
@@ -119,6 +121,10 @@ export interface ConfigParams {
   decimalSeparator: '.' | ',',
   /**
    * When set to `true`, formulas evaluating to `null` evaluate to `0` instead.
+   *
+   * The same applies to an empty cell read through the API: `getCellValue()`, `getSheetValues()` and the
+   * other methods that return cell values, as well as the changes passed to the `valuesUpdated` event,
+   * give `0` for it instead of `null`. `ISBLANK` still treats the cell as blank.
    * @default false
    * @category Engine
    */
@@ -336,6 +342,8 @@ export interface ConfigParams {
   smartRounding: boolean,
   /**
    * Sets the thousands' separator symbol for parsing numerical literals.
+   *
+   * Also sets the grouping character that the `TEXT` function writes for masks such as `#,##0`. See [`TEXT` function formats](/guide/compatibility-with-microsoft-excel.md#text-function-formats).
    *
    * Can be one of the following:
    * - empty

@@ -3,9 +3,11 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {CellError, ErrorType} from '../Cell'
 import {Config} from '../Config'
 import {TIME_FORMAT_SECONDS_ITEM_REGEXP} from '../DateTimeDefault'
 import {DateTimeHelper, numberToSimpleTime, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
+import {ErrorMessage} from '../error-message'
 import {RawScalarValue} from '../interpreter/InterpreterValue'
 import {Maybe} from '../Maybe'
 import {
@@ -13,6 +15,7 @@ import {
   parseForDateTimeFormat,
   parseForNumberFormat,
   quotedLiteralContent,
+  resolveEscapes,
   splitQuotedLiterals,
   TokenType,
 } from './parser'
@@ -47,6 +50,9 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   if (tryCurrency !== undefined) {
     return tryCurrency
   }
+  if (hasUnclosedBracket(formatArg)) {
+    return new CellError(ErrorType.VALUE, ErrorMessage.BadFormat)
+  }
   // Strip presentational color tags AFTER the (user-pluggable) currency callback
   // — which may inspect the raw formatArg — and BEFORE date/time dispatch. Doing
   // it here (not inside the number path) means a colored date like
@@ -65,7 +71,33 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   return formatNumberWithSections(cleanedFormatArg, value, config)
 }
 
-const COLOR_TAG_REGEX = /\[(black|blue|cyan|green|magenta|red|white|yellow|color\s?(?:[1-9]|[1-4]\d|5[0-6]))\]/gi
+/**
+ * Tells whether a format string opens a `[` that no later `]` closes, as in
+ * `[Red` or `0[`. Such a format is invalid, so `TEXT` returns `#VALUE!`.
+ * A `[` inside quoted text or after a backslash is literal text and does not
+ * count.
+ *
+ * @param formatArg the raw format string
+ * @returns `true` when an opening bracket is never closed
+ */
+function hasUnclosedBracket(formatArg: string): boolean {
+  let inQuotes = false
+  for (let i = 0; i < formatArg.length; i++) {
+    const ch = formatArg[i]
+    if (ch === '"') {
+      inQuotes = !inQuotes
+    } else if (inQuotes) {
+      continue
+    } else if (ch === '\\') {
+      i++
+    } else if (ch === '[' && !formatArg.includes(']', i + 1)) {
+      return true
+    }
+  }
+  return false
+}
+
+const COLOR_TAG_REGEX =/\[(black|blue|cyan|green|magenta|red|white|yellow|color\s?(?:[1-9]|[1-4]\d|5[0-6]))\]/gi
 
 /**
  * Removes Excel color tags (`[Red]`, `[Blue]`, …, `[Color56]`) from a format
@@ -210,26 +242,6 @@ function renderLiteralSection(section: string): string {
 }
 
 /**
- * Resolves backslash escapes in format code (`\-` → `-`). A trailing backslash
- * with no following character is kept.
- *
- * @param code format code with no quoted literals in it
- * @returns the code with each escape replaced by the character it escapes
- */
-function resolveEscapes(code: string): string {
-  let result = ''
-  for (let i = 0; i < code.length; i++) {
-    if (code[i] === '\\' && i + 1 < code.length) {
-      result += code[i + 1]
-      i++
-    } else {
-      result += code[i]
-    }
-  }
-  return result
-}
-
-/**
  * Inserts a grouping separator every three digits from the right of a run of
  * digits (e.g. `1234567` → `1,234,567`). The caller guarantees `digits` is a
  * pure-digit string and `separator` is non-empty.
@@ -280,7 +292,9 @@ function countChars(text: string, char: string) {
  * flows through the FREE_TEXT path and still prints. Callers pass `abs` for an
  * explicit negative section (whose own literals carry the sign) and the signed
  * value for a single-section mask (so the `-` is re-added here) — see
- * `pickSection`.
+ * `pickSection`. The tokenizer has already resolved the backslash escapes in
+ * the free text around the placeholders (`0\x` with 5 → `5x`), as in a literal
+ * section; quoted text keeps its backslashes.
  *
  * Per integer-format token:
  * - a *trailing* comma run (Excel's scaler) is peeled off
@@ -360,14 +374,16 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
  * Stringifies the integer and fractional digits of a magnitude for rendering:
  * the value is rounded to `decimalPlaces` and split on the dot, with the
  * trailing zeros of the fraction dropped (the placeholder padding re-adds
- * them).
+ * them). The digits are those of the shortest representation of the rounded
+ * value, so `0.1` with 20 decimal places gives `1`, not the binary expansion
+ * `10000000000000000555`.
  *
- * Doubles `>= 1e21` stringify in scientific notation (`1e+21`), which would
- * defeat placeholder padding and grouping, so they are expanded to their exact
- * decimal digits via `BigInt` instead — every such double is integer-valued.
- * NOTE: beyond 15 significant digits Excel displays zeros while the double's
- * exact expansion may carry non-zero tail digits; HyperFormula renders the
- * double's exact value (measured equal to Excel for the round `1e21` case).
+ * `Number#toString` switches to exponent notation at `1e21` and below `1e-6`,
+ * which would defeat placeholder padding and grouping:
+ * - a double `>= 1e21` is written with 15 significant digits and padded with
+ *   zeros (`1234567890123460000000`);
+ * - a value below `1e-6` keeps its digits, written after the leading zeros
+ *   (`0.0000001`).
  *
  * @param absValue the non-negative magnitude to stringify
  * @param decimalPlaces the number of decimal places requested by the format
@@ -375,10 +391,30 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
  */
 function stringifyMagnitude(absValue: number, decimalPlaces: number): { integerPart: string, decimalPart: string } {
   if (absValue >= 1e21 && Number.isFinite(absValue)) {
-    return {integerPart: BigInt(absValue).toString(), decimalPart: ''}
+    const [mantissa, exponent] = absValue.toPrecision(15).split('e+')
+    return {integerPart: mantissa.replace('.', '').padEnd(Number(exponent) + 1, '0'), decimalPart: ''}
   }
-  const valueParts = Number(absValue.toFixed(decimalPlaces)).toString().split('.')
+  const valueParts = toPlainNotation(Number(absValue.toFixed(decimalPlaces))).split('.')
   return {integerPart: valueParts[0] || '', decimalPart: valueParts[1] || ''}
+}
+
+/**
+ * Writes a non-negative number below `1e21` without exponent notation.
+ * `Number#toString` uses exponent notation below `1e-6` (`1.2e-7`); the same
+ * digits are written after the decimal point and the leading zeros
+ * (`0.00000012`).
+ *
+ * @param value a non-negative number below `1e21`
+ * @returns the number in plain decimal notation
+ */
+function toPlainNotation(value: number): string {
+  const text = value.toString()
+  const exponentForm = /^(\d)(?:\.(\d+))?e-(\d+)$/.exec(text)
+  if (exponentForm === null) {
+    return text
+  }
+  const [, leadingDigit, fraction = '', exponent] = exponentForm
+  return '0.' + '0'.repeat(Number(exponent) - 1) + leadingDigit + fraction
 }
 
 /**
