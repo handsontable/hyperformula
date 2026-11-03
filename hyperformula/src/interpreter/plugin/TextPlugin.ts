@@ -537,9 +537,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * @param {InterpreterState} state - The interpreter state
    */
   public textbefore(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const ifNotFoundSlotIsEmpty = TextPlugin.isEmptySlot(ast.args[5])
     return this.runFunction(ast.args, state, this.metadata('TEXTBEFORE'),
       (text: string, delimiterArg: InternalScalarValue | SimpleRangeValue, instanceNum: number, matchMode: number, matchEnd: number, ifNotFound: Maybe<InternalScalarValue>) =>
-        this.textAroundDelimiter(text, delimiterArg, instanceNum, matchMode, matchEnd, ifNotFound, (match) => text.substring(0, match.start))
+        this.textAroundDelimiter(text, delimiterArg, instanceNum, matchMode, matchEnd, TextPlugin.ifNotFoundValue(ifNotFound, ifNotFoundSlotIsEmpty), (match) => text.substring(0, match.start))
     )
   }
 
@@ -553,9 +554,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * @param {InterpreterState} state - The interpreter state
    */
   public textafter(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const ifNotFoundSlotIsEmpty = TextPlugin.isEmptySlot(ast.args[5])
     return this.runFunction(ast.args, state, this.metadata('TEXTAFTER'),
       (text: string, delimiterArg: InternalScalarValue | SimpleRangeValue, instanceNum: number, matchMode: number, matchEnd: number, ifNotFound: Maybe<InternalScalarValue>) =>
-        this.textAroundDelimiter(text, delimiterArg, instanceNum, matchMode, matchEnd, ifNotFound, (match) => text.substring(match.end))
+        this.textAroundDelimiter(text, delimiterArg, instanceNum, matchMode, matchEnd, TextPlugin.ifNotFoundValue(ifNotFound, ifNotFoundSlotIsEmpty), (match) => text.substring(match.end))
     )
   }
 
@@ -599,7 +601,8 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
           return rows
         }
 
-        const padValue = (padWith === undefined || padWith === EmptyValue)
+        // An empty pad_with, an empty slot or an empty cell, pads with an empty value, as in Excel.
+        const padValue = padWith === undefined
           ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
           : padWith
         const width = rows.reduce((max, row) => Math.max(max, row.length), 0)
@@ -711,9 +714,32 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       return extractText(match)
     }
 
-    return (ifNotFound === undefined || ifNotFound === EmptyValue)
+    return ifNotFound === undefined
       ? new CellError(ErrorType.NA, ErrorMessage.PatternNotFound)
       : ifNotFound
+  }
+
+  /**
+   * Resolves the if_not_found argument of TEXTBEFORE and TEXTAFTER as Excel does: an empty argument slot counts
+   * as omitted, so the result is #N/A, while a reference to an empty cell gives an empty text.
+   *
+   * @param {Maybe<InternalScalarValue>} ifNotFound - The evaluated argument, undefined when omitted
+   * @param {boolean} slotIsEmpty - Whether the argument is an empty slot, as in TEXTBEFORE("abc","x",,,,)
+   */
+  private static ifNotFoundValue(ifNotFound: Maybe<InternalScalarValue>, slotIsEmpty: boolean): Maybe<InternalScalarValue> {
+    if (ifNotFound !== EmptyValue) {
+      return ifNotFound
+    }
+    return slotIsEmpty ? undefined : ''
+  }
+
+  /**
+   * Checks whether a function argument is an empty slot, such as the last argument of FUNC(1,).
+   *
+   * @param {Ast | undefined} arg - The argument's AST node, undefined when the argument is omitted
+   */
+  private static isEmptySlot(arg: Ast | undefined): boolean {
+    return arg !== undefined && arg.type === AstNodeType.EMPTY
   }
 
   /**
