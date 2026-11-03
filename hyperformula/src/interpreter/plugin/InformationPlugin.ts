@@ -303,7 +303,8 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     if (ast.type !== AstNodeType.FUNCTION_CALL || (ast.procedureName !== 'ROW' && ast.procedureName !== 'COLUMN')) {
       return false
     }
-    if (ast.args[0] === undefined) {
+    if (ast.args.length !== 1) {
+      // With no argument ROW and COLUMN return a number; with more than one they return #N/A.
       return false
     }
     const arg = withoutParentheses(ast.args[0])
