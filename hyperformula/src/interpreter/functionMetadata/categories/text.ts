@@ -195,7 +195,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
   VALUETOTEXT: {
     category: 'Text',
     shortDescription: 'Returns a value as text. Errors are returned as text instead of being propagated.',
-    parameters: [{name: 'value', description: 'The value to convert to text.'}, {name: 'format', description: 'The output format: 0 (default) returns concise text, 1 returns strict text, in which text is wrapped in double quotes. The value is truncated to an integer; any other result gives #VALUE!.'}],
+    parameters: [{name: 'value', description: 'The value to convert to text.'}, {name: 'format', description: 'The output format: 0 (default) returns concise text, 1 returns strict text, in which text is wrapped in double quotes. The value is rounded down to an integer; any other result gives #VALUE!.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=VALUETOTEXT(A1)', '=VALUETOTEXT("Hello", 1)'],
   },
