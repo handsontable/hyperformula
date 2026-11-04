@@ -66,6 +66,26 @@ describe("ErrorPopup DOM rendering", () => {
     cancelSpy.mockRestore();
   });
 
+  it("follows a scroll inside the grid's shadow root, which never reaches the window", () => {
+    const rafSpy = vi.spyOn(globalThis, "requestAnimationFrame").mockReturnValue(7);
+    const shadowHost = document.createElement("div");
+    const shadowRoot = shadowHost.attachShadow({ mode: "open" });
+    const grid = document.createElement("div");
+    const scroller = document.createElement("div");
+
+    document.body.appendChild(shadowHost);
+    grid.appendChild(scroller);
+    shadowRoot.appendChild(grid);
+    popup.attach(grid);
+    scroller.dispatchEvent(new Event("scroll"));
+
+    expect(rafSpy).toHaveBeenCalled();
+
+    popup.detach();
+    rafSpy.mockRestore();
+    shadowHost.remove();
+  });
+
   it("renders only a title element when there is no separator", () => {
     popup.attach(document.body);
     const cell = document.createElement("div");

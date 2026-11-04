@@ -10,7 +10,7 @@ import {
 
 describe("FormulaEditor highlights track the active editor", () => {
   it("clears grid highlights when the editor blurs and no ref is being selected", () => {
-    const { host, adapter, editor, destroy } = createEditorHarness({ initialValue: "=A1" });
+    const { host, adapter, editor, destroy } = createEditorHarness({ initialValue: "=A1+1" });
 
     editor.focus();
     expect(adapter.highlights.length).toBe(1);
