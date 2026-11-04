@@ -1,4 +1,5 @@
 ---
+title: "Release notes"
 tags:
   - changelog
   - version history
@@ -6,8 +7,6 @@ tags:
   - bug fixes
   - new features
 ---
-
-# Release notes
 
 This page lists HyperFormula release notes. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
