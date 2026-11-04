@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {slugify as vuepressSlugify} from '@vuepress/shared-utils'
+import {slug as githubSlug} from 'github-slugger'
 import {CUSTOM_FUNCTION_CATEGORY, DocumentedFunctionCategory, FUNCTION_CATEGORIES, FunctionDetails, FunctionListEntry} from '../../hyperformula/src/interpreter/functionMetadata/FunctionDescription'
 import {formatFunctionSyntax} from './formatFunctionSyntax'
 
@@ -32,17 +32,12 @@ const FUNCTIONS_TABLE_MARKERS: RegionMarkers = {
 }
 
 /**
- * The very slugifier VuePress feeds to `markdown-it-anchor`, so a table-of-contents link can never disagree with the
- * id of the heading it points at: `@vuepress/markdown` passes this function as the anchor plugin's `slugify` unless
- * `markdown.slugify` is overridden, and `docs/.vuepress/config.js` does not override it. Hand-rolling a
+ * The slugifier the site gives its headings their ids with (`github-slugger`, used by Astro's Markdown processor), so a
+ * table-of-contents link can never disagree with the id of the heading it points at. Hand-rolling a
  * lowercase-and-hyphenate transform instead would drift for the first category label containing punctuation, an
  * ampersand or a non-ASCII letter, and drift silently — the page would still build, only its links would lead nowhere.
- *
- * The cast supplies the types the package fails to: `@vuepress/shared-utils` 1.9 ships its declarations under `types/`
- * while its `package.json` points `types` at a `lib/index.d.ts` it does not publish, so the import resolves to `any`.
- * Only this dev script depends on VuePress, never the shipped bundle (`tsconfig.json` `include` is `["src"]`).
  */
-const slugifyHeading = vuepressSlugify as (heading: string) => string
+const slugifyHeading = (heading: string): string => githubSlug(heading)
 
 /** The generated regions of the built-in functions guide page, both produced by one pass over the categories. */
 export interface BuiltinFunctionsMarkdown {
@@ -83,7 +78,7 @@ function escapeCell(text: string): string {
  * Only the documented categories get a section, so every entry passed in must declare one: the page is generated from
  * the built-in catalogue, where `category` is a [[DocumentedFunctionCategory]] by type. A `'Custom'` entry is rejected
  * rather than skipped — silently dropping it would leave the page short of a row while the printed function total,
- * which `docs/.vuepress/config.js` computes from its own engine, still claimed it.
+ * which `docs/src/docs-data.mjs` computes from its own engine, still claimed it.
  *
  * @param {FunctionListEntry[]} entries - the function set to document (e.g. an engine's `getAvailableFunctions`)
  * @param {(canonicalName: string) => FunctionDetails | undefined} detailsFor - resolves a function's details
