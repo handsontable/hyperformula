@@ -1,6 +1,6 @@
 import { CN } from "../../theme/classNames";
 import { clear, createEl, createIcon } from "../dom";
-import type { IconsOptions } from "../types";
+import type { IconsOptions, Phrases } from "../types";
 import { BasePopup } from "./basePopup";
 import type { AnchorRect, SuggestionItem, SuggestionsHandlers, SuggestionsOptions } from "./types";
 
@@ -84,6 +84,7 @@ export class SuggestionsPopup extends BasePopup {
     options: SuggestionsOptions = {},
     container?: HTMLElement,
     icons?: IconsOptions,
+    phrases?: Phrases,
   ) {
     const resolvedOptions: Required<SuggestionsOptions> = {
       showKeyboardHelp: options.showKeyboardHelp ?? true,
@@ -95,6 +96,7 @@ export class SuggestionsPopup extends BasePopup {
       showClose: resolvedOptions.showClose,
       onExplicitClose: handlers.onExplicitClose,
       ...(icons !== undefined && { icons }),
+      ...(phrases !== undefined && { phrases }),
     });
     listboxIdCounter += 1;
     this.listboxId = `${CN.suggestions}-${listboxIdCounter}`;
@@ -125,7 +127,7 @@ export class SuggestionsPopup extends BasePopup {
       class: CN.suggestionsList,
       id: this.listboxId,
       role: "listbox",
-      "aria-label": "Formula suggestions",
+      "aria-label": this.phrases.formulaSuggestions,
     });
     this.rowPool = [];
     this.rowMeta = [];
@@ -310,10 +312,10 @@ export class SuggestionsPopup extends BasePopup {
 
     return createEl("div", { class: CN.suggestionsKbdRow }, [
       tabChip,
-      " to accept. ",
+      ` ${this.phrases.acceptSuggestionHint} `,
       upChip,
       downChip,
-      " to navigate",
+      ` ${this.phrases.navigateSuggestionsHint}`,
     ]);
   }
 

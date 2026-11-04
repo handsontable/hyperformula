@@ -1,4 +1,5 @@
 ---
+title: "Integration with LangChain/LangGraph"
 tags:
   - AI agents
   - LLM
@@ -7,11 +8,9 @@ tags:
   - createSpreadsheetTools
 ---
 
-# Integration with LangChain/LangGraph
-
 A [LangChain.js](https://js.langchain.com/) / [LangGraph](https://langchain-ai.github.io/langgraphjs/) tool that gives your agents deterministic spreadsheet and formula computation — backed by HyperFormula's Excel-compatible engine.
 
-::: warning Not available yet — coming soon
+:::caution[Not available yet — coming soon]
 This integration is on our roadmap and **cannot be installed or used today**. The API shown below is a preview and may still change before the first release.
 
 If you'd like to try it, [join the early access list](https://2fmjvg.share-eu1.hsforms.com/2e6drCkuLTn-1RuiYB91eJA) — we'll ping you the moment the first beta is ready, and your sign-up directly tells us how strongly to prioritize this integration.
@@ -64,7 +63,7 @@ A single import, one entry in `tools`, and the agent can evaluate formulas, read
 
 ## Get early access
 
-::: tip Be the first to try it
+:::tip[Be the first to try it]
 We're actively building this integration. Drop your email and we'll notify you the moment the first beta lands — so you can try it before the public release.
 
 [Join the early access list →](https://2fmjvg.share-eu1.hsforms.com/2e6drCkuLTn-1RuiYB91eJA)

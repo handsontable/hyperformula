@@ -1,8 +1,8 @@
 import type { FunctionSignature } from "../../engine/types";
 import { CN } from "../../theme/classNames";
-import { createEl, createIcon } from "../dom";
+import { createEl, createIcon, isNode } from "../dom";
 import { FocusTrap } from "../focusTrap";
-import type { IconsOptions } from "../types";
+import type { IconsOptions, Phrases } from "../types";
 import { BasePopup } from "./basePopup";
 import type { AnchorRect, FunctionHelpOptions } from "./types";
 
@@ -14,6 +14,7 @@ export interface FunctionHelpPopupOptions {
   container?: HTMLElement;
   options?: FunctionHelpOptions;
   icons?: IconsOptions;
+  phrases?: Phrases;
 }
 
 let tooltipIdCounter = 0;
@@ -56,17 +57,18 @@ function paramListLabel(
   index: number,
   total: number,
   repeatLast: number,
+  phrases: Pick<Phrases, "optionalArgument" | "repeatableArgument">,
 ): string {
   const isRepeating = repeatLast > 0 && index >= total - repeatLast;
   const base = isRepeating ? `${param.label}...` : param.label;
   const annotations: string[] = [];
 
   if (param.optional) {
-    annotations.push("[optional]");
+    annotations.push(`[${phrases.optionalArgument}]`);
   }
 
   if (isRepeating) {
-    annotations.push("repeatable");
+    annotations.push(phrases.repeatableArgument);
   }
 
   return annotations.length > 0 ? `${base} - ${annotations.join(" ")}` : base;
@@ -88,12 +90,14 @@ export class FunctionHelpPopup extends BasePopup {
     container,
     options,
     icons,
+    phrases,
   }: FunctionHelpPopupOptions = {}) {
     super({
       ...(container !== undefined && { container }),
       ...(options?.showClose !== undefined && { showClose: options.showClose }),
       ...(onExplicitClose !== undefined && { onExplicitClose }),
       ...(icons !== undefined && { icons }),
+      ...(phrases !== undefined && { phrases }),
     });
     tooltipIdCounter += 1;
     this.root.id = `${CN.fnHelp}-${tooltipIdCounter}`;
@@ -128,7 +132,7 @@ export class FunctionHelpPopup extends BasePopup {
         return;
       }
 
-      const nextTarget = event.relatedTarget instanceof Node ? event.relatedTarget : null;
+      const nextTarget = isNode(event.relatedTarget) ? event.relatedTarget : null;
 
       if (nextTarget && this.root.contains(nextTarget)) {
         return;
@@ -143,7 +147,7 @@ export class FunctionHelpPopup extends BasePopup {
     return createEl("div", {
       class: CN.fnHelp,
       role: "dialog",
-      "aria-label": "Function help",
+      "aria-label": this.phrases.functionHelp,
       "aria-keyshortcuts": "F6",
       hidden: true,
     });
@@ -165,11 +169,23 @@ export class FunctionHelpPopup extends BasePopup {
     this.root.appendChild(this.renderSignatureRow(signature, activeArg));
 
     if (signature.example) {
-      body.appendChild(this.renderLabeledSection("Example", signature.example, CN.fnHelpExample));
+      body.appendChild(
+        this.renderLabeledSection(
+          this.phrases.functionExample,
+          signature.example,
+          CN.fnHelpExample,
+        ),
+      );
     }
 
     if (signature.description) {
-      body.appendChild(this.renderLabeledSection("About", signature.description, CN.fnHelpAbout));
+      body.appendChild(
+        this.renderLabeledSection(
+          this.phrases.functionDescription,
+          signature.description,
+          CN.fnHelpAbout,
+        ),
+      );
     }
 
     if (signature.params.length > 0) {
@@ -261,7 +277,13 @@ export class FunctionHelpPopup extends BasePopup {
       index === activeArg
         ? `${CN.fnHelpParamName} ${CN.fnHelpParamNameActive}`
         : CN.fnHelpParamName;
-    const label = paramListLabel(param, index, signature.params.length, signature.repeatLast);
+    const label = paramListLabel(
+      param,
+      index,
+      signature.params.length,
+      signature.repeatLast,
+      this.phrases,
+    );
 
     section.appendChild(createEl("span", { class: nameClass }, [label]));
 
@@ -283,7 +305,7 @@ export class FunctionHelpPopup extends BasePopup {
     this.renderListen(link, "mousedown", (event) => {
       event.preventDefault();
     });
-    link.appendChild(document.createTextNode("Learn more"));
+    link.appendChild(document.createTextNode(this.phrases.learnMore));
     link.appendChild(createIcon("externalLink", this.icons));
 
     return link;
@@ -303,7 +325,7 @@ export class FunctionHelpPopup extends BasePopup {
 
     this.signature = signature;
     this.activeIndex = activeIndex;
-    this.root.setAttribute("aria-label", `${signature.name} function help`);
+    this.root.setAttribute("aria-label", this.phrases.functionHelpFor(signature.name));
     this.open(anchor);
   }
 
