@@ -1,0 +1,33 @@
+---
+/**
+ * Sidebar override, following the Handsontable docs' Sidebar.astro: the sidebar shows the section of
+ * the header tab the page belongs to (see `src/page-section.mjs`).
+ *
+ * - API pages: the API Reference entries only.
+ * - Updates pages (release notes, migration guides): the Upgrade and migration entries only.
+ * - Every other page: the guides, without those two groups.
+ */
+import Default from '@astrojs/starlight/components/Sidebar.astro';
+import { pageSection } from '../page-section.mjs';
+
+const API_GROUP = 'API Reference';
+const UPDATES_GROUP = 'Upgrade and migration';
+
+const section = pageSection(Astro.url.pathname, import.meta.env.BASE_URL);
+
+const route = Astro.locals.starlightRoute;
+const groupEntries = (label: string) =>
+  route.sidebar.find((entry) => entry.type === 'group' && entry.label === label)?.entries ?? [];
+
+if (section === 'api') {
+  route.sidebar = groupEntries(API_GROUP);
+} else if (section === 'updates') {
+  route.sidebar = groupEntries(UPDATES_GROUP);
+} else {
+  route.sidebar = route.sidebar.filter(
+    (entry) => !(entry.type === 'group' && (entry.label === API_GROUP || entry.label === UPDATES_GROUP)),
+  );
+}
+---
+
+<Default {...Astro.props} />
