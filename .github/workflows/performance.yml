@@ -176,3 +176,12 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           path: performance-comment.md
+
+      # Replaces the previous push's table, so a failed run never leaves an older report standing for this head.
+      - name: Publish a comment - failure
+        if: failure()
+        uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: |
+            ## Performance comparison of head (${{ github.event.pull_request.head.sha }}) failed; see the job log.
