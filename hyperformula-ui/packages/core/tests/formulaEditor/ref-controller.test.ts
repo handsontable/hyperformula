@@ -72,13 +72,90 @@ describe("FormulaEditor pending-ref lifecycle (RefController)", () => {
     destroy();
   });
 
-  it("ignores picks when the character before the caret is not a ref opener", () => {
+  it("ignores picks when the caret follows neither a ref opener nor a ref", () => {
+    const { host, adapter, editor, destroy } = createRefHarness();
+
+    typeInto(host, "=SUM(A1)+1");
+    adapter.pickCell(FIRST_CELL);
+
+    expect(editor.getValue()).toBe("=SUM(A1)+1");
+    destroy();
+  });
+
+  it("replaces the typed ref the caret sits at the end of", () => {
     const { host, adapter, editor, destroy } = createRefHarness();
 
     typeInto(host, "=SUM(A1");
     adapter.pickCell(FIRST_CELL);
 
-    expect(editor.getValue()).toBe("=SUM(A1");
+    expect(editor.getValue()).toBe("=SUM(R0C0");
+    destroy();
+  });
+
+  it("replaces the ref the caret sits inside with a picked cell", () => {
+    const { host, adapter, editor, destroy } = createRefHarness();
+
+    typeInto(host, "=SUM(C1:C2)");
+    editor.setCaretOffset(6);
+    adapter.pickCell(SECOND_CELL);
+
+    expect(editor.getValue()).toBe("=SUM(R1C2)");
+    destroy();
+  });
+
+  it("replaces the whole range when the caret sits after its colon", () => {
+    const { host, adapter, editor, destroy } = createRefHarness();
+
+    typeInto(host, "=SUM(C1:C2)");
+    editor.setCaretOffset(8);
+    adapter.pickRange(SAMPLE_RANGE);
+
+    expect(editor.getValue()).toBe("=SUM(R0C0:R2C1)");
+    destroy();
+  });
+
+  it("replaces the ref the caret sits before", () => {
+    const { host, adapter, editor, destroy } = createRefHarness();
+
+    typeInto(host, "=A1+B1");
+    editor.setCaretOffset(4);
+    adapter.pickCell(SECOND_CELL);
+
+    expect(editor.getValue()).toBe("=A1+R1C2");
+    destroy();
+  });
+
+  it("reports ref selection active while the caret sits inside a ref", () => {
+    const { host, editor, destroy } = createRefHarness();
+
+    typeInto(host, "=SUM(A1)");
+    editor.setCaretOffset(6);
+
+    expect(editor.canInsertRef()).toBe(false);
+    expect(editor.isRefSelectionActive()).toBe(true);
+    destroy();
+  });
+
+  it("appends a mod+click pick after the ref the caret sits inside", () => {
+    const { host, adapter, editor, destroy } = createRefHarness();
+
+    typeInto(host, "=SUM(A1)");
+    editor.setCaretOffset(6);
+    adapter.pickCell(SECOND_CELL, true);
+
+    expect(editor.getValue()).toBe("=SUM(A1,R1C2)");
+    destroy();
+  });
+
+  it("does not replace a function name the caret sits inside", () => {
+    const { host, adapter, editor, destroy } = createRefHarness();
+
+    typeInto(host, "=SUM(A1)");
+    editor.setCaretOffset(2);
+    adapter.pickCell(SECOND_CELL);
+
+    expect(editor.getValue()).toBe("=SUM(A1)");
+    expect(editor.isRefSelectionActive()).toBe(false);
     destroy();
   });
 
@@ -207,7 +284,7 @@ describe("FormulaEditor pending-ref lifecycle (RefController)", () => {
     destroy();
   });
 
-  it("does not append after setValue re-seeds the editor with identical text", () => {
+  it("appends a mod+click after the ref the caret ends on once setValue re-seeds the editor", () => {
     const { host, adapter, editor, destroy } = createRefHarness();
 
     typeInto(host, "=SUM(");
@@ -215,7 +292,7 @@ describe("FormulaEditor pending-ref lifecycle (RefController)", () => {
     editor.setValue("=SUM(R0C0");
     adapter.pickCell(SECOND_CELL, true);
 
-    expect(editor.getValue()).toBe("=SUM(R0C0");
+    expect(editor.getValue()).toBe("=SUM(R0C0,R1C2");
     destroy();
   });
 

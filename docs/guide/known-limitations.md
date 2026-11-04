@@ -1,4 +1,5 @@
 ---
+title: "Known limitations"
 tags:
   - unsupported features
   - multiple workbooks
@@ -7,8 +8,6 @@ tags:
   - asynchronous functions
   - structured references
 ---
-
-# Known limitations
 
 This page lists the known limitations of HyperFormula at its current development stage:
 
@@ -60,6 +59,16 @@ a circular reference.
 * The `SortOrder` argument must be exactly `1` (ascending) or `-1` (descending). Any other value returns a `#VALUE!` error.
 
 * Ordering (including mixed types, empty cells, and text collation) follows HyperFormula's own comparison rules, which honor the `caseSensitive` and `accentSensitive` configuration options. Numbers sort before text, and text before logical values.
+
+### LINEST function
+
+* The `stats` argument controls whether the result has one or five rows. It must be omitted or supplied as a constant: `TRUE()`, `FALSE()`, a number, or the text `"TRUE"` or `"FALSE"`. Parentheses and numeric unary signs are supported. Cell references, named expressions, and calculated expressions such as `1=1` return `#VALUE!`, including when `LINEST` is nested inside another function.
+
+* Result width is determined from the predictor dimensions before evaluation. Changes to values within fixed input ranges and to a referenced `const` argument recalculate normally. Changes to dependency values do not resize the result automatically; this is the existing array-sizing limitation.
+
+* If an input expression returns a different predictor count than predicted, `LINEST` returns `#VALUE!`. For example, filtering predictor columns can change the required result width.
+
+* Very large or very small input magnitudes can reduce numerical accuracy. Intermediate calculations, such as residual sums of squares, can still overflow or underflow, producing `#NUM!` or inaccurate statistics. Rescale inputs to more moderate units where possible. See [LINEST numerical differences](list-of-differences.md#linest) for compatibility considerations.
 
 ### OFFSET function
 

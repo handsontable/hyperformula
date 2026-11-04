@@ -1,3 +1,4 @@
+import { ListenerSet } from "../events/listenerSet";
 import { indexToColLetters, quoteSheetName } from "../lexer/tokens";
 import { expandWholeSpan } from "./namedExpr";
 import type { HyperFormulaLike, NamedExprResolution } from "./types";
@@ -18,13 +19,24 @@ export class NamedExpressions {
   private readonly sheetId: number;
   private scopeByUpperName: Map<string, number | "global"> | null = null;
   private resolveCache = new Map<string, NamedExprResolution | null>();
-  private readonly onNamedExpressionChanged = (): void => this.invalidate();
+  private readonly changeListeners = new ListenerSet();
+  private readonly onNamedExpressionChanged = (): void => this.handleNamedExpressionChanged();
 
   constructor(engine: HyperFormulaLike | undefined, sheetId: number) {
     this.engine = engine;
     this.sheetId = sheetId;
     this.engine?.on?.("namedExpressionAdded", this.onNamedExpressionChanged);
     this.engine?.on?.("namedExpressionRemoved", this.onNamedExpressionChanged);
+    this.engine?.on?.("valuesUpdated", this.onNamedExpressionChanged);
+    this.engine?.on?.("sheetRemoved", this.onNamedExpressionChanged);
+  }
+
+  private localNames(): string[] {
+    try {
+      return this.engine?.listNamedExpressions?.(this.sheetId) ?? [];
+    } catch {
+      return [];
+    }
   }
 
   private buildScopeByUpperName(): Map<string, number | "global"> {
@@ -35,9 +47,7 @@ export class NamedExpressions {
       scopeByUpperName.set(name.toUpperCase(), "global");
     }
 
-    const local = this.engine?.listNamedExpressions?.(this.sheetId) ?? [];
-
-    for (const name of local) {
+    for (const name of this.localNames()) {
       scopeByUpperName.set(name.toUpperCase(), this.sheetId);
     }
 
@@ -54,6 +64,11 @@ export class NamedExpressions {
 
   private sheetNameFor(sheetId: number): string {
     return this.engine?.getSheetName?.(sheetId) ?? "";
+  }
+
+  private handleNamedExpressionChanged(): void {
+    this.invalidate();
+    this.changeListeners.emit();
   }
 
   private resolveUncached(name: string): NamedExprResolution | null {
@@ -108,9 +123,8 @@ export class NamedExpressions {
   }
 
   filter(prefix: string): string[] {
-    const local = this.engine?.listNamedExpressions?.(this.sheetId) ?? [];
     const global = this.engine?.listNamedExpressions?.() ?? [];
-    const all = [...new Set([...local, ...global])];
+    const all = [...new Set([...this.localNames(), ...global])];
 
     if (!prefix) {
       return all.slice(0, 20);
@@ -162,8 +176,18 @@ export class NamedExpressions {
     this.resolveCache.clear();
   }
 
+  onChange(listener: () => void): () => void {
+    return this.changeListeners.add(listener);
+  }
+
   destroy(): void {
-    this.engine?.off?.("namedExpressionAdded", this.onNamedExpressionChanged);
-    this.engine?.off?.("namedExpressionRemoved", this.onNamedExpressionChanged);
+    this.changeListeners.clear();
+
+    try {
+      this.engine?.off?.("namedExpressionAdded", this.onNamedExpressionChanged);
+      this.engine?.off?.("namedExpressionRemoved", this.onNamedExpressionChanged);
+      this.engine?.off?.("valuesUpdated", this.onNamedExpressionChanged);
+      this.engine?.off?.("sheetRemoved", this.onNamedExpressionChanged);
+    } catch {}
   }
 }

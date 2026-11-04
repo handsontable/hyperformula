@@ -1,4 +1,5 @@
 ---
+title: "Welcome"
 description: HyperFormula® - An open-source headless spreadsheet for business web apps
 ---
 
