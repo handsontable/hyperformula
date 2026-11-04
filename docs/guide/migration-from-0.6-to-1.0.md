@@ -1,4 +1,5 @@
 ---
+title: "Migrating from 0.6 to 1.0"
 tags:
   - migration
   - migrate
@@ -7,8 +8,6 @@ tags:
   - agpl-v3
   - v1.0
 ---
-
-# Migrating from 0.6 to 1.0
 
 To upgrade your HyperFormula version from 0.6.x to 1.0.x, follow this guide.
 
