@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -29,18 +29,18 @@ jobs:
       # in a single block and the other afterwards lets the drift of a shared runner show up as a "regression";
       # alternating spreads that drift over both sides.
       - name: (base) Checkout main repository
-        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # https://github.com/actions/checkout/releases/tag/v2.3.4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           path: base
 
       - name: (head) Checkout main repository
-        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # https://github.com/actions/checkout/releases/tag/v2.3.4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           path: head
 
       - name: Checkout hyperformula-tests repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ssh-key: ${{ secrets.DEPLOY_TOKEN }}
           repository: handsontable/hyperformula-tests
@@ -103,14 +103,14 @@ jobs:
           done
 
       - name: Publish a comment - header
-        uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
+        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           message: |
             ## Performance comparison of head (${{ github.event.pull_request.head.sha }}) vs base (${{ github.event.pull_request.base.sha }}) with the tests at ${{ steps.revisions.outputs.tests }}
 
       - name: Publish a comment - performance comparison report
-        uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
+        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
         with:
           append: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -119,7 +119,7 @@ jobs:
       # Replaces the previous push's table, so a failed run never leaves an older report standing for this head.
       - name: Publish a comment - failure
         if: failure()
-        uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
+        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           message: |
