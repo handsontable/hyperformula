@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Added `LINEST` for simple and multiple linear regression, with optional intercept and regression statistics. The `stats` argument must be constant because result dimensions are determined before evaluation. [#1769](https://github.com/handsontable/hyperformula/pull/1769)
+- Added the `CONCAT` function, which joins text from values, ranges, and arrays, and the `VALUETOTEXT` function, which returns a value as text in a concise or a strict format. [#1816](https://github.com/handsontable/hyperformula/pull/1816)
 - Added the `MUNIT`, `MDETERM` and `MINVERSE` matrix functions: the identity matrix, the determinant and the inverse of a square matrix. [#1817](https://github.com/handsontable/hyperformula/pull/1817)
 
 ### Fixed
