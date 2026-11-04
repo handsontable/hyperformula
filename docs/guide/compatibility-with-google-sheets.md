@@ -1,4 +1,5 @@
 ---
+title: "Compatibility with Google Sheets"
 tags:
   - GSheets
   - Google Spreadsheets
@@ -7,12 +8,7 @@ tags:
   - interoperability
 ---
 
-# Compatibility with Google Sheets
-
 Achieve nearly full compatibility wih Google Sheets, using the right HyperFormula configuration.
-
-**Contents:**
-[[toc]]
 
 ## Overview
 

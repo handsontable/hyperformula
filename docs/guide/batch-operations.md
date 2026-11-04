@@ -1,4 +1,5 @@
 ---
+title: "Batch operations"
 tags:
   - batching
   - isEvaluationSuspended
@@ -6,8 +7,6 @@ tags:
   - bulk updates
   - recalculation
 ---
-
-# Batch operations
 
 HyperFormula offers a built-in feature for doing batch operations.
 It allows you to combine multiple data modification actions into a single operation.
@@ -132,7 +131,7 @@ The [paste](../api/classes/hyperformula.md#paste) method also can't be called wh
 
 ## Demo
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/batch-operations/example1.html)
 
