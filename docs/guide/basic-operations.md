@@ -1,4 +1,5 @@
 ---
+title: "Basic operations"
 tags:
   - CRUD
   - insert rows
@@ -10,8 +11,6 @@ tags:
   - sheet tabs
   - NoSheetWithIdError
 ---
-
-# Basic operations
 
 HyperFormula can perform efficient **CRUD** operations on the workbook.
 You can apply these operations to various workbook elements, such as:
@@ -238,7 +237,7 @@ const changes = hfInstance.setColumnOrder(0, [1, 2, 0]);
 
 ## Cells
 
-::: tip
+:::tip
 By default, cells are identified using a [`SimpleCellAddress`](../api/interfaces/simplecelladdress) which
 consists of a sheet ID, column ID, and row ID, like this:
 `{ sheet: 0, col: 0, row: 0 }`
@@ -422,7 +421,7 @@ console.log(changes);
 
 This demo presents several basic operations integrated with a sample UI.
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/basic-operations/example1.html)
 

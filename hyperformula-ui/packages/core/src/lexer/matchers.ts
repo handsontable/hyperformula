@@ -1,4 +1,4 @@
-import { RE_CELL, RE_SHEET_BARE, RE_SHEET_QUOTED } from "./patterns";
+import { RE_CELL, RE_SHEET_BARE } from "./patterns";
 import { colLettersToIndex } from "./tokens";
 
 export interface CellMatch {
@@ -44,16 +44,42 @@ export function matchCell(text: string, pos: number): CellMatch | null {
   };
 }
 
+const NO_CLOSING_QUOTE = -1;
+
+export function buildQuotedSheetEnds(text: string): Int32Array {
+  const ends = new Int32Array(text.length + 2).fill(NO_CLOSING_QUOTE);
+
+  for (let i = text.length - 1; i >= 0; i--) {
+    const next = text.charAt(i + 1);
+
+    if (text.charAt(i) !== "'") {
+      ends[i] = ends[i + 1] ?? NO_CLOSING_QUOTE;
+    } else if (next === "'") {
+      ends[i] = ends[i + 2] ?? NO_CLOSING_QUOTE;
+    } else if (next === "!") {
+      ends[i] = i;
+    }
+  }
+
+  return ends;
+}
+
 export function matchSheetPrefix(
   text: string,
   pos: number,
+  quotedSheetEnds?: Int32Array,
 ): { sheet: string; length: number } | null {
-  const quotedMatch = matchSticky(RE_SHEET_QUOTED, text, pos);
+  if (text.charAt(pos) === "'") {
+    const ends = quotedSheetEnds ?? buildQuotedSheetEnds(text);
+    const closingQuote = ends[pos + 1] ?? NO_CLOSING_QUOTE;
 
-  if (quotedMatch && quotedMatch.index === pos) {
+    if (closingQuote === NO_CLOSING_QUOTE) {
+      return null;
+    }
+
     return {
-      sheet: (quotedMatch[1] ?? "").replace(/''/g, "'"),
-      length: quotedMatch[0].length,
+      sheet: text.slice(pos + 1, closingQuote).replace(/''/g, "'"),
+      length: closingQuote + 2 - pos,
     };
   }
 
