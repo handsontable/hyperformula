@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Base and head live side by side so their runs can alternate (base, head, base, head). Measuring one side
+      # Base and head live side by side so their runs can alternate. Measuring one side
       # in a single block and the other afterwards lets the drift of a shared runner show up as a "regression";
       # alternating spreads that drift over both sides.
       - name: (base) Checkout main repository
@@ -87,6 +87,9 @@ jobs:
           HISTORY="$GITHUB_WORKSPACE/head/hyperformula/test/hyperformula-tests/performance/noise-history.json"
           if [ -f "$HISTORY" ]; then export PERF_HISTORY_FILE="$HISTORY"; fi
           cd head && npm run benchmark:compare-benchmarks --workspace=hyperformula "$GITHUB_WORKSPACE/base-1.json,$GITHUB_WORKSPACE/base-2.json" "$GITHUB_WORKSPACE/head-1.json,$GITHUB_WORKSPACE/head-2.json" "$GITHUB_WORKSPACE/performance-report.md"
+          # A tests branch older than the two-round comparison reads the comma-separated list as one file name,
+          # logs the error, exits 0 and writes no report. Fail here instead, so the failure comment below says so.
+          test -s "$GITHUB_WORKSPACE/performance-report.md" || { echo "No performance report: merge develop of hyperformula-tests into the paired tests branch." >&2; exit 1; }
 
       # The runner is gone after the job; the raw samples in the log are what a later analysis can use.
       - name: Print the raw samples
@@ -112,3 +115,12 @@ jobs:
           append: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           path: performance-report.md
+
+      # Replaces the previous push's table, so a failed run never leaves an older report standing for this head.
+      - name: Publish a comment - failure
+        if: failure()
+        uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: |
+            ## Performance comparison of head (${{ github.event.pull_request.head.sha }}) failed; see the job log.
