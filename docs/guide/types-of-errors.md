@@ -1,4 +1,5 @@
 ---
+title: "Types of errors"
 tags:
   - "#REF!"
   - "#VALUE!"
@@ -11,8 +12,6 @@ tags:
   - "#LIC!"
   - "#SPILL!"
 ---
-
-# Types of errors
 
 HyperFormula returns an error when a formula cannot be processed
 properly. To make it easier for a user, each kind of error has its

@@ -21,7 +21,8 @@ export class EditorSizeController {
   private cachedClip: HTMLElement | null | undefined;
   private cachedLineMetrics: LineMetrics | undefined;
 
-  private readonly handleAmbientResize = (): void => this.requestUpdateFrame();
+  private attached = false;
+  private readonly handleAmbientResize = (): void => this.handleViewChange();
 
   constructor(
     private readonly rootEl: HTMLElement,
@@ -326,10 +327,14 @@ export class EditorSizeController {
     });
   }
 
-  attach(): void {
-    this.scope.listen(window, "scroll", this.handleAmbientResize, { capture: true });
-    this.scope.listen(window, "resize", this.handleAmbientResize);
+  private handleViewChange(): void {
+    if (this.attached) {
+      this.requestUpdateFrame();
+    }
+  }
 
+  attach(): void {
+    this.attached = true;
     if (typeof ResizeObserver === "function") {
       this.resizeObserver = new ResizeObserver(() => {
         this.requestUpdateFrame();
@@ -341,7 +346,17 @@ export class EditorSizeController {
     this.scope.activate();
   }
 
+  listenToView(viewScope: EventScope, view: Window, shadowRoot: ShadowRoot | null): void {
+    viewScope.listen(view, "scroll", this.handleAmbientResize, { capture: true });
+    viewScope.listen(view, "resize", this.handleAmbientResize);
+
+    if (shadowRoot !== null) {
+      viewScope.listen(shadowRoot, "scroll", this.handleAmbientResize, { capture: true });
+    }
+  }
+
   detach(): void {
+    this.attached = false;
     this.resizeObserver?.disconnect();
     this.resizeObserver = null;
     if (this.deferredFrame) {

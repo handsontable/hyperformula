@@ -90,7 +90,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
       const searchOptions: SearchOptions = {
         ordering: sorted ? 'asc' : 'none',
-        ifNoMatch: sorted ? 'returnLowerBound' : 'returnNotFound'
+        ifNoMatch: sorted ? 'returnLowerBound' : 'returnNotFound',
+        approximateMatchPolicy: 'sameType'
       }
 
       return this.doVlookup(zeroIfEmpty(key), rangeValue, index - 1, searchOptions)
@@ -120,7 +121,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
       const searchOptions: SearchOptions = {
         ordering: sorted ? 'asc' : 'none',
-        ifNoMatch: sorted ? 'returnLowerBound' : 'returnNotFound'
+        ifNoMatch: sorted ? 'returnLowerBound' : 'returnNotFound',
+        approximateMatchPolicy: 'sameType'
       }
 
       return this.doHlookup(zeroIfEmpty(key), rangeValue, index - 1, searchOptions)
@@ -149,6 +151,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       const searchOptions: SearchOptions = {
         ordering: searchMode === 2 ? 'asc' : searchMode === -2 ? 'desc' : 'none',
         returnOccurrence: searchMode === -1 ? 'last' : 'first',
+        approximateMatchPolicy: 'totalOrder',
         ifNoMatch: matchMode === -1
           ? 'returnLowerBound'
           : matchMode === 1
@@ -310,8 +313,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
     const searchStrategy = rangeValue.width() === 1 ? this.columnSearch : this.rowSearch
     const searchOptions: SearchOptions = type === 0
-      ? { ordering: 'none', ifNoMatch: 'returnNotFound' }
-      : { ordering: type === -1 ? 'desc' : 'asc', ifNoMatch: type === -1 ? 'returnUpperBound' : 'returnLowerBound' }
+      ? { ordering: 'none', ifNoMatch: 'returnNotFound', approximateMatchPolicy: 'sameType' }
+      : { ordering: type === -1 ? 'desc' : 'asc', ifNoMatch: type === -1 ? 'returnUpperBound' : 'returnLowerBound', approximateMatchPolicy: 'sameType' }
     const index = searchStrategy.find(key, rangeValue, searchOptions)
 
     if (index === -1) {
