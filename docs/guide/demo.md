@@ -1,13 +1,12 @@
 ---
+title: "Demo"
 tags:
   - live demo
   - playground
   - calculateFormula
 ---
 
-# Demo
-
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/demo/example1.html)
 
