@@ -29,7 +29,6 @@ Repository-wide standards and process live here. Each package documents its own 
 | Writing a documentation page | [`DOCS-CONTENT-GUIDE.md`](DOCS-CONTENT-GUIDE.md) |
 | Installing the workspace, deploying the portal, cutting a release, scripts and CI, dependencies | [`BUILD.md`](BUILD.md) |
 | Opening a pull request | [`DEFINITION-OF-DONE.md`](DEFINITION-OF-DONE.md#opening-the-pull-request) |
-| A change an AI tool helped write | [`DEFINITION-OF-DONE.md`](DEFINITION-OF-DONE.md#ai-assisted-changes) |
 | Reviewing a pull request | [`CODE-REVIEW.md`](CODE-REVIEW.md) |
 | What must never appear in code, commits, pull requests, or docs | [`SENSITIVE-INFORMATION.md`](SENSITIVE-INFORMATION.md) |
 | Which package holds what, and what the monorepo move still owes | [`STRUCTURE.md`](STRUCTURE.md) |
