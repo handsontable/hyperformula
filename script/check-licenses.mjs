@@ -142,7 +142,7 @@ for (const workspace of WORKSPACES) {
   collect(json('npm', ['ls', `--workspace=${workspace}`, '--omit=dev', '--all', '--json']), production)
 }
 
-// The workspace packages themselves are GPL and are not their own dependencies.
+// The workspace packages themselves are not their own dependencies.
 for (const workspace of WORKSPACES) {
   const { name } = JSON.parse(readFileSync(path.join(REPO_ROOT, workspace, 'package.json'), 'utf8'))
 

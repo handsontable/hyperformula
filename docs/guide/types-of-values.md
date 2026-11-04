@@ -1,4 +1,5 @@
 ---
+title: "Types of values"
 tags:
   - boolean
   - logical
@@ -11,8 +12,6 @@ tags:
   - type detection
   - serial number
 ---
-
-# Types of values
 
 In HyperFormula, values can be of type Number, Text, Logical, Date, Time, DateTime, Error, Currency, or Percentage depending on the data.
 Functions may work differently based on the types of arguments.
