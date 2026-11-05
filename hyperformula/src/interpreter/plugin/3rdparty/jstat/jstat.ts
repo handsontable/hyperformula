@@ -24,6 +24,11 @@
 const SQRT_PI = Math.sqrt(Math.PI)
 
 /**
+ * 2^-1022, the smallest positive double with full precision; smaller ones are subnormal.
+ */
+const SMALLEST_NORMAL_DOUBLE = 2.2250738585072014e-308
+
+/**
  * erf(x) for 0 <= x < 2 from its series exp(-x^2) * 2 / sqrt(pi) * sum(2^n * x^(2n + 1) / (2n + 1)!!).
  * All terms are positive, so there is no cancellation, and the relative error stays below about 1.1e-15 down to the
  * smallest numbers (the earlier 1 - exp(...) form lost every digit below about 1e-16).
@@ -83,7 +88,9 @@ export function erfc(x: number): number {
     return 1 - erfSeries(x)
   }
   // erfc(27.3) is below the smallest double
-  return x < 27.3 ? erfcFraction(x) : 0
+  const result = x < 27.3 ? erfcFraction(x) : 0
+  // A result below the smallest normal double (from about x = 26.55) is returned as 0
+  return result < SMALLEST_NORMAL_DOUBLE ? 0 : result
 }
 
 function erfcinv(p: number): number {
