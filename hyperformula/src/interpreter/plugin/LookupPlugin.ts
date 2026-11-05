@@ -217,7 +217,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    * other along its first column; for a cell range the shape is the range's own, so a whole-column range is
    * searched down its first column. Without `result_vector` the result is read from the last row (or column) of
    * `lookup_vector`; a `result_vector` is read from its first cell onwards and a position past its end is #N/A, so
-   * that the result depends only on the cells the formula refers to.
+   * that the result depends only on the cells the formula refers to. A two-dimensional `result_vector` is #N/A.
    *
    * @param ast
    * @param state
@@ -226,6 +226,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return this.runFunction(ast.args, state, this.metadata('LOOKUP'), (key: RawNoErrorScalarValue, lookupVector: SimpleRangeValue, resultVector?: SimpleRangeValue) => {
       if (key === EmptyValue) {
         return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+      }
+
+      if (resultVector !== undefined && this.isTwoDimensional(resultVector)) {
+        return new CellError(ErrorType.NA, ErrorMessage.WrongDimension)
       }
 
       const range = lookupVector.range
@@ -361,6 +365,17 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
 
     return this.dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col + col, range.start.row + row))
+  }
+
+  /**
+   * Whether the range value has more than one row and more than one column; for a cell range, by the range's own
+   * shape, so that a whole-column range of two columns counts.
+   */
+  private isTwoDimensional(rangeValue: SimpleRangeValue): boolean {
+    const range = rangeValue.range
+    return range === undefined
+      ? rangeValue.width() > 1 && rangeValue.height() > 1
+      : range.width() > 1 && range.height() > 1
   }
 
   /**
