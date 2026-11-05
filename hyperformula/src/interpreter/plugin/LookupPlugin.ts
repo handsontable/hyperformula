@@ -206,26 +206,43 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   /**
    * Corresponds to LOOKUP(lookup_value, lookup_vector, [result_vector])
    *
-   * Only the items of the `lookup_value` type take part in the search, so numbers, text and booleans of mixed
-   * data are never compared with each other. A `lookup_vector` that is wider than it is tall is searched along
-   * its first row, any other along its first column. Without `result_vector` the result is read from the last
-   * row (or column) of `lookup_vector`; a `result_vector` is read from its first cell onwards and a position past
-   * its end is #N/A, so that the result depends only on the cells the formula refers to.
+   * Finds the last item not greater than `lookup_value` with the binary search of `MATCH(lookup_value, ..., 1)`:
+   * only the items of the `lookup_value` type take part in it, so numbers, text and booleans of mixed data are never
+   * compared with each other. A `lookup_vector` that is wider than it is tall is searched along its first row, any
+   * other along its first column; for a cell range the shape is the range's own, so a whole-column range is
+   * searched down its first column. Without `result_vector` the result is read from the last row (or column) of
+   * `lookup_vector`; a `result_vector` is read from its first cell onwards and a position past its end is #N/A, so
+   * that the result depends only on the cells the formula refers to.
    *
    * @param ast
    * @param state
    */
   public lookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LOOKUP'), (key: RawNoErrorScalarValue, lookupVector: SimpleRangeValue, resultVector?: SimpleRangeValue) => {
-      const isSearchedAlongRow = lookupVector.width() > lookupVector.height()
-      const position = this.findLastNotGreaterOfSameType(key, this.lineOf(lookupVector, isSearchedAlongRow, 0))
+      if (key === EmptyValue) {
+        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+      }
+
+      const range = lookupVector.range
+      const width = range === undefined ? lookupVector.width() : range.width()
+      const height = range === undefined ? lookupVector.height() : range.height()
+      const isSearchedAlongRow = width > height
+      const position = range === undefined
+        ? this.findLastNotGreaterOfSameType(key, isSearchedAlongRow ? lookupVector.data[0] : lookupVector.data.map((row) => row[0]))
+        : this.searchInRange(
+          key,
+          SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, isSearchedAlongRow ? width : 1, isSearchedAlongRow ? 1 : height), this.dependencyGraph),
+          false,
+          { ordering: 'asc', ifNoMatch: 'returnLowerBound', approximateMatchPolicy: 'sameType' },
+          isSearchedAlongRow ? this.rowSearch : this.columnSearch,
+        )
 
       if (position === -1) {
         return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
       }
 
       const value = resultVector === undefined
-        ? (isSearchedAlongRow ? this.cellAt(lookupVector, lookupVector.height() - 1, position) : this.cellAt(lookupVector, position, lookupVector.width() - 1))
+        ? (isSearchedAlongRow ? this.cellAt(lookupVector, height - 1, position) : this.cellAt(lookupVector, position, width - 1))
         : (this.isColumnVector(resultVector, isSearchedAlongRow) ? this.cellAt(resultVector, position, 0) : this.cellAt(resultVector, 0, position))
 
       if (value === undefined) {
@@ -303,14 +320,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   /**
-   * Returns the position (in `values`) of the last item of the `key` type that is not greater than `key`,
-   * assuming that the items of that type are sorted ascending; -1 if there is none. An empty `key` matches nothing.
+   * Returns the position (in `values`, an in-memory array) of the last item of the `key` type that is not greater
+   * than `key`, assuming that the items of that type are sorted ascending; -1 if there is none.
    */
   private findLastNotGreaterOfSameType(key: RawNoErrorScalarValue, values: InternalScalarValue[]): number {
-    if (key === EmptyValue) {
-      return -1
-    }
-
     const normalize = (value: RawNoErrorScalarValue) => typeof value === 'string' ? forceNormalizeString(value) : value
     const positions: number[] = []
     const comparableValues: RawNoErrorScalarValue[] = []
@@ -325,20 +338,6 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
     const found = findLastOccurrenceInOrderedArray(normalize(key), comparableValues)
     return found === -1 ? -1 : positions[found]
-  }
-
-  /**
-   * Returns the cells of the row (`isRow`) or the column number `index` of the range value.
-   */
-  private lineOf(rangeValue: SimpleRangeValue, isRow: boolean, index: number): InternalScalarValue[] {
-    const range = rangeValue.range
-
-    if (range === undefined) {
-      return isRow ? rangeValue.data[index] : rangeValue.data.map((row) => row[index])
-    }
-
-    const start = simpleCellAddress(range.sheet, range.start.col + (isRow ? 0 : index), range.start.row + (isRow ? index : 0))
-    return this.dependencyGraph.computeListOfValuesInRange(AbsoluteCellRange.spanFrom(start, isRow ? range.width() : 1, isRow ? 1 : range.height()))
   }
 
   /**
@@ -360,10 +359,14 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   /**
-   * A single cell takes the orientation of the searched vector; any other range, its own.
+   * A single cell takes the orientation of the searched vector; any other range, its own (for a cell range, the
+   * range's own shape, so that a whole column is a column however much of it is in use).
    */
   private isColumnVector(rangeValue: SimpleRangeValue, isSearchedAlongRow: boolean): boolean {
-    return rangeValue.width() === 1 && (rangeValue.height() > 1 || !isSearchedAlongRow)
+    const range = rangeValue.range
+    const width = range === undefined ? rangeValue.width() : range.width()
+    const height = range === undefined ? rangeValue.height() : range.height()
+    return width === 1 && (height > 1 || !isSearchedAlongRow)
   }
 
   private doVlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, searchOptions: SearchOptions): InternalScalarValue {
