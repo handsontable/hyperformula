@@ -253,8 +253,8 @@ export interface FunctionArgument {
    * as if the argument had not been provided at all: the function implementation receives `undefined`.
    *
    * This differs from {@link emptyAsDefault}, which substitutes `defaultValue`. It is the
-   * only way to tell "no argument was given" apart from "an argument was given and its
-   * value is empty". `ADDRESS` uses it for `sheetName`: `=ADDRESS(2,3,1,FALSE(),)` returns
+   * only way to tell an empty argument slot (`=F(1,)`) apart from an argument whose value
+   * is empty (`=F(1,"")`). `ADDRESS` uses it for `sheetName`: `=ADDRESS(2,3,1,FALSE(),)` returns
    * `R2C3`, while `=ADDRESS(2,3,1,FALSE(),"")` returns `!R2C3`.
    *
    * | Formula                      | `emptyAsAbsent: false` (default) | `emptyAsAbsent: true`   |
