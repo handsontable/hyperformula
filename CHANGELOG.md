@@ -22,7 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
 - Fixed `getCellValue()`, `getSheetValues()` and the other methods that export cell values ignoring the `evaluateNullToZero` option: with the option on, they now return `0` for empty cells instead of `null`. [#1738](https://github.com/handsontable/hyperformula/pull/1738)
 - Fixed approximate `XLOOKUP` ignoring values of a different type in some search modes, and approximate `MATCH`, `VLOOKUP`, and `HLOOKUP` taking such values into account for non-range arrays, single-cell ranges, and binary search over sorted cell ranges; both now behave the same in linear and binary search, consistent with Microsoft Excel. [#1755](https://github.com/handsontable/hyperformula/pull/1755)
-- Fixed approximate `MATCH`, `VLOOKUP`, `HLOOKUP` and `XLOOKUP` returning the wrong position on text whose letter case differs from the sorted order, e.g. `MATCH("banana", A1:A4, 1)` over `Apple`, `banana`, `Cherry`, `date`. [#1806](https://github.com/handsontable/hyperformula/pull/1806)
+- Fixed approximate `MATCH`, `VLOOKUP` and `HLOOKUP`, and `XLOOKUP` with `search_mode` 2 or -2, returning the wrong result on text whose letter case differs from the sorted order (e.g. `=MATCH("banana", A1:A4, 1)` over Apple, banana, Cherry, date now returns `2` instead of `3`). [#1806](https://github.com/handsontable/hyperformula/pull/1806)
 
 ## [3.5.0] - 2026-10-09
 
