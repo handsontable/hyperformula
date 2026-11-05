@@ -131,7 +131,7 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
   SORTBY: {
     category: 'Lookup and reference',
     shortDescription: 'Sorts the rows or columns of an array by the values of one or more other arrays.',
-    parameters: [{name: 'array', description: 'The range or array whose rows (or columns) are reordered.'}, {name: 'by_array1', description: 'The single column (or row) of sort keys, with as many entries as array has rows (or columns). Ties keep their input order. Further pairs of by_array and sort_order can be passed as additional arguments; they break the ties of the preceding keys.'}, {name: 'sort_order1', description: '1 (default) sorts by_array1 in ascending order; -1 sorts in descending order. Empty cells and errors among the keys always stay last.'}],
+    parameters: [{name: 'array', description: 'The range or array whose rows (or columns) are reordered.'}, {name: 'by_array1', description: 'The single column (or row) of sort keys, with as many entries as array has rows (or columns). Ties keep their input order. Further pairs of by_array and sort_order can be passed as additional arguments; they break the ties of the preceding keys.'}, {name: 'sort_order1', description: '1 (default) sorts by_array1 in ascending order; -1 sorts in descending order. Errors among the keys come after every value in ascending order and before every value in descending order. Empty cells among the keys always stay last.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=SORTBY(A1:A10, B1:B10)', '=SORTBY(A1:B10, C1:C10, -1, D1:D10, 1)'],
   },

@@ -12,6 +12,20 @@ import {EmptyValue, InternalNoErrorScalarValue, InternalScalarValue, Interpreter
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionMetadata, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/** Rank of each error type among sort keys: Excel's `ERROR.TYPE` number, then the errors only HyperFormula has. */
+const SORT_ERROR_RANK: Record<ErrorType, number> = {
+  [ErrorType.DIV_BY_ZERO]: 2,
+  [ErrorType.VALUE]: 3,
+  [ErrorType.REF]: 4,
+  [ErrorType.NAME]: 5,
+  [ErrorType.NUM]: 6,
+  [ErrorType.NA]: 7,
+  [ErrorType.SPILL]: 9,
+  [ErrorType.CYCLE]: 10,
+  [ErrorType.LIC]: 11,
+  [ErrorType.ERROR]: 12,
+}
+
 /**
  * Plugin implementing the SORT spreadsheet function.
  *
@@ -131,7 +145,8 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * are a row). Each `by_array` is a single column (or row) as long as `array` is tall (or wide); a single-cell
    * `by_array` is a constant key and reorders nothing. Later keys only break the ties of the earlier ones and the
    * sort is stable. `sort_order` is 1 or -1 after rounding down; any other value yields #VALUE!. Errors among the
-   * keys are not propagated: they sort after every other value, in input order, like empty cells.
+   * keys are not propagated: they sort after every value in ascending order and before every value in descending
+   * order, ordered among themselves by their `ERROR.TYPE` number. Empty keys stay last in both orders.
    *
    * @param {ProcedureAst} ast - the parsed function-call AST node.
    * @param {InterpreterState} state - current interpreter evaluation state.
@@ -252,34 +267,38 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
   }
 
   /**
-   * Compares two sort keys for the given `sortOrder` (1 ascending, -1 descending). Empty cells and errors are
-   * kept at the end regardless of `sortOrder` (errors before empty cells), rather than coercing them to 0 and
-   * ordering by value, as Excel does; the rest is delegated to {@link ArithmeticHelper}.
+   * Compares two sort keys for the given `sortOrder` (1 ascending, -1 descending). In ascending order numbers come
+   * first, then text, then logical values (as {@link ArithmeticHelper} orders them), then errors, ordered among
+   * themselves by their `ERROR.TYPE` number; `sortOrder` -1 reverses all of that. Empty cells stay at the end in both
+   * orders, rather than being coerced to 0. Keys that compare equal keep their input order.
    */
   private compareSortKeys(a: InternalScalarValue, b: InternalScalarValue, sortOrder: number): number {
-    const aRank = SortPlugin.trailingRank(a)
-    const bRank = SortPlugin.trailingRank(b)
-    if (aRank !== bRank) {
-      return aRank - bRank
+    if (a === EmptyValue || b === EmptyValue) {
+      return (a === EmptyValue ? 1 : 0) - (b === EmptyValue ? 1 : 0)
     }
-    if (aRank !== 0) {
-      return 0
+    return sortOrder * this.compareNonEmptyKeys(a, b)
+  }
+
+  /** Ascending comparison of two non-empty sort keys: values before errors, errors by their `ERROR.TYPE` number. */
+  private compareNonEmptyKeys(a: InternalScalarValue, b: InternalScalarValue): number {
+    if (a instanceof CellError || b instanceof CellError) {
+      return SortPlugin.errorRank(a) - SortPlugin.errorRank(b)
     }
-    if (this.arithmeticHelper.lt(a as InternalNoErrorScalarValue, b as InternalNoErrorScalarValue)) {
-      return -sortOrder
+    if (this.arithmeticHelper.lt(a, b)) {
+      return -1
     }
-    if (this.arithmeticHelper.gt(a as InternalNoErrorScalarValue, b as InternalNoErrorScalarValue)) {
-      return sortOrder
+    if (this.arithmeticHelper.gt(a, b)) {
+      return 1
     }
     return 0
   }
 
-  /** 0 for a value that is sorted by its value, 1 for an error and 2 for an empty cell: those come last. */
-  private static trailingRank(value: InternalScalarValue): number {
-    if (value === EmptyValue) {
-      return 2
-    }
-    return value instanceof CellError ? 1 : 0
+  /**
+   * 0 for a value; for an error, its `ERROR.TYPE` number (#DIV/0! 2, #VALUE! 3, #REF! 4, #NAME? 5, #NUM! 6, #N/A 7,
+   * #SPILL! 9), and for the errors that only HyperFormula has, numbers after those.
+   */
+  private static errorRank(value: InternalScalarValue): number {
+    return value instanceof CellError ? SORT_ERROR_RANK[value.type] : 0
   }
 
   /** Returns the first {@link CellError} found in a 2-D array, or undefined. */
