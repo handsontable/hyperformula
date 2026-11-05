@@ -108,7 +108,7 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
           return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
         }
 
-        if (new ArraySize(numCols, numRows).exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+        if (numRows > this.config.maxRows || numCols > this.config.maxColumns) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
         }
 
@@ -167,11 +167,10 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
       return ArraySize.error()
     }
 
-    const size = new ArraySize(cols, rows)
-    if (size.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+    if (rows > this.config.maxRows || cols > this.config.maxColumns) {
       return ArraySize.error()
     }
 
-    return size
+    return new ArraySize(cols, rows)
   }
 }

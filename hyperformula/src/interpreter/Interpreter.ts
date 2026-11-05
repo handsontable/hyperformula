@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
-import {ArraySize, ArraySizePredictor} from '../ArraySize'
+import {ArraySizePredictor} from '../ArraySize'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
 import {CellError, ErrorType, isColOrRowInvalid} from '../Cell'
 import {Config} from '../Config'
@@ -261,35 +261,25 @@ export class Interpreter {
           for (const astIt of astRow) {
             const arr = coerceToRange(this.evaluateAst(astIt, state))
             const height = arr.height()
-            if (rowHeight !== undefined && rowHeight !== height) {
-              return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
-            }
-            const size = new ArraySize((rowRet[0]?.length ?? 0) + arr.width(), ret.length + height)
-            if (size.exceedsComputedArrayLimit()) {
-              return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
-            }
             if (rowHeight === undefined) {
               rowHeight = height
-              for (const row of arr.data) {
-                rowRet.push(row)
+              rowRet.push(...arr.data)
+            } else if (rowHeight === height) {
+              for (let i = 0; i < height; i++) {
+                rowRet[i].push(...arr.data[i])
               }
             } else {
-              for (let i = 0; i < height; i++) {
-                for (const value of arr.data[i]) {
-                  rowRet[i].push(value)
-                }
-              }
+              return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
             }
           }
           const width = rowRet[0].length
           if (totalWidth === undefined) {
             totalWidth = width
-          } else if (totalWidth !== width) {
+            ret.push(...rowRet)
+          } else if (totalWidth === width) {
+            ret.push(...rowRet)
+          } else {
             return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
-          }
-          // Spreading a large array into push() overflows the call stack, so rows are appended one by one.
-          for (const row of rowRet) {
-            ret.push(row)
           }
         }
         return SimpleRangeValue.onlyValues(ret)

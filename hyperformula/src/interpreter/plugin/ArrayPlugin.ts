@@ -180,10 +180,6 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   public vstack(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('VSTACK'), (...ranges: SimpleRangeValue[]) => {
       const width = Math.max(...ranges.map(range => range.width()))
-      const height = ranges.reduce((total, range) => total + range.height(), 0)
-      if (new ArraySize(width, height).exceedsComputedArrayLimit()) {
-        return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
-      }
       const result: InternalScalarValue[][] = []
 
       for (const range of ranges) {
@@ -228,10 +224,6 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   public hstack(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HSTACK'), (...ranges: SimpleRangeValue[]) => {
       const height = Math.max(...ranges.map(range => range.height()))
-      const width = ranges.reduce((total, range) => total + range.width(), 0)
-      if (new ArraySize(width, height).exceedsComputedArrayLimit()) {
-        return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
-      }
       const result: InternalScalarValue[][] = [...Array(height).keys()].map(() => [])
 
       for (const range of ranges) {

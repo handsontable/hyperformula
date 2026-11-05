@@ -302,11 +302,8 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
 
   public transpose(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TRANSPOSE'), (matrix: SimpleRangeValue) => {
-      const inputSize = matrix.size
-      if (new ArraySize(inputSize.height, inputSize.width).exceedsComputedArrayLimit()) {
-        return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
-      }
       const input = matrix.rawData()
+      const inputSize = matrix.size
       const result: InternalScalarValue[][] = []
       for (let i = 0; i < inputSize.width; ++i) {
         result[i] = []

@@ -12,12 +12,6 @@ import {FunctionArgumentType} from './interpreter'
 import {FunctionCallLicenseGate} from './license/FunctionCallLicenseGate'
 import {Ast, AstNodeType, ProcedureAst} from './parser'
 
-/**
- * The largest number of rows or columns of an array computed inside a formula, as in Microsoft Excel.
- * It does not depend on `maxRows` and `maxColumns`, which limit only the arrays that spill.
- */
-export const MAX_COMPUTED_ARRAY_DIMENSION = 1048576
-
 export class ArraySize {
   constructor(
     public width: number,
@@ -35,22 +29,6 @@ export class ArraySize {
 
   isScalar(): boolean {
     return (this.width === 1 && this.height === 1) || this.isRef
-  }
-
-  /**
-   * Checks result dimensions against the configured sheet limits, independently
-   * of the formula's position. Call before allocating a result array.
-   */
-  exceedsSheetSizeLimits(maxColumns: number, maxRows: number): boolean {
-    return this.width > maxColumns || this.height > maxRows
-  }
-
-  /**
-   * Checks an array computed inside a formula against {@link MAX_COMPUTED_ARRAY_DIMENSION}.
-   * Call before allocating the array.
-   */
-  exceedsComputedArrayLimit(): boolean {
-    return this.width > MAX_COMPUTED_ARRAY_DIMENSION || this.height > MAX_COMPUTED_ARRAY_DIMENSION
   }
 }
 
@@ -72,12 +50,6 @@ export class ArraySizePredictor {
     this.functionCallLicenseGate = new FunctionCallLicenseGate(config, functionRegistry)
   }
 
-  /**
-   * Predicts the size of a formula's result before it is evaluated. The dependency graph
-   * returns `#SPILL!` when the predicted area extends beyond the sheet edge.
-   * Infinite dimensions represent whole-row or whole-column references, whose
-   * effective size is resolved by the dependency graph.
-   */
   public checkArraySize(ast: Ast, formulaAddress: SimpleCellAddress): ArraySize {
     return this.checkArraySizeForAst(ast, {formulaAddress, arraysFlag: this.config.useArrayArithmetic})
   }
