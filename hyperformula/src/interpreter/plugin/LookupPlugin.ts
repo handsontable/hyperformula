@@ -10,9 +10,10 @@ import { RowSearchStrategy } from '../../Lookup/RowSearchStrategy'
 import { SearchOptions, SearchStrategy } from '../../Lookup/SearchStrategy'
 import { ProcedureAst } from '../../parser'
 import { StatType } from '../../statistics'
-import { zeroIfEmpty } from '../ArithmeticHelper'
+import { forceNormalizeString, zeroIfEmpty } from '../ArithmeticHelper'
+import { findLastOccurrenceInOrderedArray } from '../binarySearch'
 import { InterpreterState } from '../InterpreterState'
-import { EmptyValue, InternalScalarValue, InterpreterValue, RawNoErrorScalarValue } from '../InterpreterValue'
+import { EmptyValue, getRawValue, InternalScalarValue, InterpreterValue, RawNoErrorScalarValue } from '../InterpreterValue'
 import { SimpleRangeValue } from '../../SimpleRangeValue'
 import { FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions } from './FunctionPlugin'
 import { ArraySize } from '../../ArraySize'
@@ -53,6 +54,32 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         { argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 0 },
         // [search_mode]
         { argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 1 },
+      ]
+    },
+    'XMATCH': {
+      method: 'xmatch',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        // lookup_value
+        { argumentType: FunctionArgumentType.NOERROR },
+        // lookup_array
+        { argumentType: FunctionArgumentType.RANGE },
+        // [match_mode]
+        { argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 0 },
+        // [search_mode]
+        { argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 1, emptyAsDefault: true },
+      ]
+    },
+    'LOOKUP': {
+      method: 'lookup',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        // lookup_value
+        { argumentType: FunctionArgumentType.NOERROR },
+        // lookup_vector
+        { argumentType: FunctionArgumentType.RANGE },
+        // [result_vector]
+        { argumentType: FunctionArgumentType.RANGE, optionalArg: true },
       ]
     },
     'MATCH': {
@@ -148,18 +175,94 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       const lookupRange = lookupRangeValue instanceof SimpleRangeValue ? lookupRangeValue : SimpleRangeValue.fromScalar(lookupRangeValue)
       const returnRange = returnRangeValue instanceof SimpleRangeValue ? returnRangeValue : SimpleRangeValue.fromScalar(returnRangeValue)
       const isWildcardMatchMode = matchMode === 2
-      const searchOptions: SearchOptions = {
-        ordering: searchMode === 2 ? 'asc' : searchMode === -2 ? 'desc' : 'none',
-        returnOccurrence: searchMode === -1 ? 'last' : 'first',
-        approximateMatchPolicy: 'totalOrder',
-        ifNoMatch: matchMode === -1
-          ? 'returnLowerBound'
-          : matchMode === 1
-            ? 'returnUpperBound'
-            : 'returnNotFound'
+
+      return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, notFoundFlag, isWildcardMatchMode, this.buildSearchOptions(matchMode, searchMode))
+    })
+  }
+
+  /**
+   * Corresponds to XMATCH(lookup_value, lookup_array, [match_mode], [search_mode])
+   *
+   * `match_mode` and `search_mode` are rounded down to an integer first.
+   *
+   * @param ast
+   * @param state
+   */
+  public xmatch(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('XMATCH'), (key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, rawMatchMode: number, rawSearchMode: number) => {
+      const matchMode = Math.floor(rawMatchMode)
+      const searchMode = Math.floor(rawSearchMode)
+
+      if (![0, -1, 1, 2].includes(matchMode) || ![1, -1, 2, -2].includes(searchMode)) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
 
-      return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, notFoundFlag, isWildcardMatchMode, searchOptions)
+      if (this.isTwoDimensional(lookupRange)) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongDimension)
+      }
+
+      const searchStrategy = (lookupRange.range === undefined ? lookupRange.width() : lookupRange.range.width()) === 1 ? this.columnSearch : this.rowSearch
+      const indexFound = this.searchInRange(key, lookupRange, matchMode === 2, this.buildSearchOptions(matchMode, searchMode), searchStrategy)
+
+      return indexFound === -1 ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound) : indexFound + 1
+    })
+  }
+
+  /**
+   * Corresponds to LOOKUP(lookup_value, lookup_vector, [result_vector])
+   *
+   * Finds the last item not greater than `lookup_value` with the binary search of `MATCH(lookup_value, ..., 1)`:
+   * only the items of the `lookup_value` type take part in it, so numbers, text and booleans of mixed data are never
+   * compared with each other. A `lookup_vector` that is wider than it is tall is searched along its first row, any
+   * other along its first column; for a cell range the shape is the range's own, so a whole-column range is
+   * searched down its first column. Without `result_vector` the result is read from the last row (or column) of
+   * `lookup_vector`; a `result_vector` is read from its first cell onwards and a position past its end is #N/A, so
+   * that the result depends only on the cells the formula refers to. A two-dimensional `result_vector` is #N/A.
+   *
+   * @param ast
+   * @param state
+   */
+  public lookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('LOOKUP'), (key: RawNoErrorScalarValue, lookupVector: SimpleRangeValue, resultVector?: SimpleRangeValue) => {
+      if (key === EmptyValue) {
+        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+      }
+
+      if (resultVector !== undefined && this.isTwoDimensional(resultVector)) {
+        return new CellError(ErrorType.NA, ErrorMessage.WrongDimension)
+      }
+
+      const range = lookupVector.range
+      const width = range === undefined ? lookupVector.width() : range.width()
+      const height = range === undefined ? lookupVector.height() : range.height()
+      const isSearchedAlongRow = width > height
+      const position = range === undefined
+        ? this.findLastNotGreaterOfSameType(key, isSearchedAlongRow ? lookupVector.data[0] : lookupVector.data.map((row) => row[0]))
+        : this.searchInRange(
+          key,
+          SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, isSearchedAlongRow ? width : 1, isSearchedAlongRow ? 1 : height), this.dependencyGraph),
+          false,
+          { ordering: 'asc', ifNoMatch: 'returnLowerBound', approximateMatchPolicy: 'sameType' },
+          isSearchedAlongRow ? this.rowSearch : this.columnSearch,
+        )
+
+      if (position === -1) {
+        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+      }
+
+      const value = resultVector === undefined
+        ? (isSearchedAlongRow ? this.cellAt(lookupVector, height - 1, position) : this.cellAt(lookupVector, position, width - 1))
+        : (this.isColumnVector(resultVector, isSearchedAlongRow) ? this.cellAt(resultVector, position, 0) : this.cellAt(resultVector, 0, position))
+
+      if (value === undefined) {
+        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+      }
+
+      if (value instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+      }
+
+      return this.zeroIfEmptyResult(value)
     })
   }
 
@@ -210,6 +313,80 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
 
     return searchStrategy.find(key, range, searchOptions)
+  }
+
+  private buildSearchOptions(matchMode: number, searchMode: number): SearchOptions {
+    return {
+      ordering: searchMode === 2 ? 'asc' : searchMode === -2 ? 'desc' : 'none',
+      returnOccurrence: searchMode === -1 ? 'last' : 'first',
+      approximateMatchPolicy: 'totalOrder',
+      ifNoMatch: matchMode === -1
+        ? 'returnLowerBound'
+        : matchMode === 1
+          ? 'returnUpperBound'
+          : 'returnNotFound'
+    }
+  }
+
+  /**
+   * Returns the position (in `values`, an in-memory array) of the last item of the `key` type that is not greater
+   * than `key`, assuming that the items of that type are sorted ascending; -1 if there is none.
+   */
+  private findLastNotGreaterOfSameType(key: RawNoErrorScalarValue, values: InternalScalarValue[]): number {
+    const normalize = (value: RawNoErrorScalarValue) => typeof value === 'string' ? forceNormalizeString(value) : value
+    const positions: number[] = []
+    const comparableValues: RawNoErrorScalarValue[] = []
+
+    values.forEach((cell, position) => {
+      const value = getRawValue(cell)
+      if (typeof value === typeof key) {
+        positions.push(position)
+        comparableValues.push(normalize(value as RawNoErrorScalarValue))
+      }
+    })
+
+    const found = findLastOccurrenceInOrderedArray(normalize(key), comparableValues)
+    return found === -1 ? -1 : positions[found]
+  }
+
+  /**
+   * Returns the value at the given offset from the top-left corner of the range value, or `undefined` when the
+   * offset lies outside of it, so that only cells the formula refers to are read.
+   */
+  private cellAt(rangeValue: SimpleRangeValue, row: number, col: number): InterpreterValue | undefined {
+    const range = rangeValue.range
+
+    if (range === undefined) {
+      return rangeValue.data[row]?.[col]
+    }
+
+    if (row >= range.height() || col >= range.width()) {
+      return undefined
+    }
+
+    return this.dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col + col, range.start.row + row))
+  }
+
+  /**
+   * Whether the range value has more than one row and more than one column; for a cell range, by the range's own
+   * shape, so that a whole-column range of two columns counts.
+   */
+  private isTwoDimensional(rangeValue: SimpleRangeValue): boolean {
+    const range = rangeValue.range
+    return range === undefined
+      ? rangeValue.width() > 1 && rangeValue.height() > 1
+      : range.width() > 1 && range.height() > 1
+  }
+
+  /**
+   * A single cell takes the orientation of the searched vector; any other range, its own (for a cell range, the
+   * range's own shape, so that a whole column is a column however much of it is in use).
+   */
+  private isColumnVector(rangeValue: SimpleRangeValue, isSearchedAlongRow: boolean): boolean {
+    const range = rangeValue.range
+    const width = range === undefined ? rangeValue.width() : range.width()
+    const height = range === undefined ? rangeValue.height() : range.height()
+    return width === 1 && (height > 1 || !isSearchedAlongRow)
   }
 
   private doVlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, searchOptions: SearchOptions): InternalScalarValue {

@@ -11,12 +11,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added `LINEST` for simple and multiple linear regression, with optional intercept and regression statistics. The `stats` argument must be constant because result dimensions are determined before evaluation. [#1769](https://github.com/handsontable/hyperformula/pull/1769)
 - Added the `CONCAT` function, which joins text from values, ranges, and arrays, and the `VALUETOTEXT` function, which returns a value as text in a concise or a strict format. [#1816](https://github.com/handsontable/hyperformula/pull/1816)
+- Added the `SORTBY`, `XMATCH` and `LOOKUP` functions. [#1806](https://github.com/handsontable/hyperformula/pull/1806)
+
+### Changed
+
+- Changed `XLOOKUP` with `search_mode` 2 or -2 to find more exact matches in a range that is not sorted, e.g. 3 in 5, 1, 3, 2, 4, where it returned no match before. The result on unsorted data is still not guaranteed. [#1806](https://github.com/handsontable/hyperformula/pull/1806)
 
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
 - Fixed `getCellValue()`, `getSheetValues()` and the other methods that export cell values ignoring the `evaluateNullToZero` option: with the option on, they now return `0` for empty cells instead of `null`. [#1738](https://github.com/handsontable/hyperformula/pull/1738)
 - Fixed approximate `XLOOKUP` ignoring values of a different type in some search modes, and approximate `MATCH`, `VLOOKUP`, and `HLOOKUP` taking such values into account for non-range arrays, single-cell ranges, and binary search over sorted cell ranges; both now behave the same in linear and binary search, consistent with Microsoft Excel. [#1755](https://github.com/handsontable/hyperformula/pull/1755)
+- Fixed approximate `MATCH`, `VLOOKUP` and `HLOOKUP`, and `XLOOKUP` with `search_mode` 2 or -2, returning the wrong result on text whose letter case differs from the sorted order (e.g. `=MATCH("banana", A1:A4, 1)` over Apple, banana, Cherry, date now returns `2` instead of `3`). [#1806](https://github.com/handsontable/hyperformula/pull/1806)
 
 ## [3.5.0] - 2026-10-09
 
