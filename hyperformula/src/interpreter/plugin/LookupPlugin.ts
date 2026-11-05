@@ -183,14 +183,12 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   /**
    * Corresponds to XMATCH(lookup_value, lookup_array, [match_mode], [search_mode])
    *
-   * `match_mode` 3 is accepted and behaves like an exact match, as in Excel.
-   *
    * @param ast
    * @param state
    */
   public xmatch(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('XMATCH'), (key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, matchMode: number, searchMode: number) => {
-      if (![0, -1, 1, 2, 3].includes(matchMode) || ![1, -1, 2, -2].includes(searchMode)) {
+      if (![0, -1, 1, 2].includes(matchMode) || ![1, -1, 2, -2].includes(searchMode)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
 
