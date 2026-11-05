@@ -285,7 +285,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   MINVERSE: {
     category: 'Math and trigonometry',
-    shortDescription: 'Calculates the inverse of a square array. A non-square array or an array with a non-numeric value returns the #VALUE! error; a singular array returns the #NUM! error.',
+    shortDescription: 'Calculates the inverse of a square array. A non-square array or an array with a non-numeric value returns the #VALUE! error. An array whose elimination meets a pivot that is exactly 0 returns the #NUM! error; other singular arrays return large values caused by rounding.',
     parameters: [{name: 'array', description: 'The square range or array of numbers to invert.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=MINVERSE(A1:B2)', '=MINVERSE({1,2;3,4})'],
