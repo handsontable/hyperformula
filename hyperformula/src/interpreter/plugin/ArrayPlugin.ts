@@ -181,8 +181,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     return this.runFunction(ast.args, state, this.metadata('VSTACK'), (...ranges: SimpleRangeValue[]) => {
       const width = Math.max(...ranges.map(range => range.width()))
       const height = ranges.reduce((total, range) => total + range.height(), 0)
-      if (new ArraySize(width, height).exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
+      if (new ArraySize(width, height).exceedsComputedArrayLimit()) {
+        return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
       }
       const result: InternalScalarValue[][] = []
 
@@ -229,8 +229,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     return this.runFunction(ast.args, state, this.metadata('HSTACK'), (...ranges: SimpleRangeValue[]) => {
       const height = Math.max(...ranges.map(range => range.height()))
       const width = ranges.reduce((total, range) => total + range.width(), 0)
-      if (new ArraySize(width, height).exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
+      if (new ArraySize(width, height).exceedsComputedArrayLimit()) {
+        return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
       }
       const result: InternalScalarValue[][] = [...Array(height).keys()].map(() => [])
 

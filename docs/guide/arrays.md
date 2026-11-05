@@ -158,13 +158,13 @@ If your specified output array size is larger or equal to the input array size, 
 
 ### Array size limits
 
-HyperFormula limits array dimensions using the [`maxRows`](../api/interfaces/configparams.md#maxrows) and [`maxColumns`](../api/interfaces/configparams.md#maxcolumns) configuration options. An array result that exceeds either limit returns `#VALUE!` (`Value too large.`). This also applies to intermediate arrays: wrapping an oversized `VSTACK` result in `SUM` or `ARRAY_CONSTRAIN` does not bypass the limits. Reduce the dimensions of the intermediate array to resolve the error.
+An array result that spills must fit the sheet, whose size is set by the [`maxRows`](../api/interfaces/configparams.md#maxrows) and [`maxColumns`](../api/interfaces/configparams.md#maxcolumns) configuration options. If its spill area extends beyond the sheet edge, HyperFormula returns `#SPILL!` (`No space for array result.`). Move the formula to a position with enough space or reduce its output dimensions. For example, with `maxRows` set to `4`, `=SEQUENCE(4)` fits at `A1` but returns `#SPILL!` at `A2`, and `=VSTACK(SEQUENCE(3), SEQUENCE(2))` returns `#SPILL!` wherever it is placed. A scalar formula such as `=SUM(SEQUENCE(4))` can be placed at `A2` because its result occupies only one cell.
 
-An array whose dimensions fit within these limits can still extend beyond the sheet edge because of its formula's position. In that case, HyperFormula returns `#SPILL!` (`No space for array result.`). Move the formula to a position with enough space or reduce its output dimensions. For example, with `maxRows` set to `4`, `=SEQUENCE(4)` fits at `A1` but returns `#SPILL!` at `A2`. A scalar formula such as `=SUM(SEQUENCE(4))` can be placed at `A2` because its result occupies only one cell.
+An array computed inside a formula and not spilled, for example a `VSTACK` result passed to `SUM`, is not limited by the sheet size. As in Microsoft Excel, it can have up to 1,048,576 rows and 1,048,576 columns, and a larger one returns `#NUM!` (`Value too large.`). `SEQUENCE` is limited by `maxRows` and `maxColumns` instead, and returns `#VALUE!` (`Value too large.`) beyond them.
 
 An array formula that returns `#SPILL!` does not spill again on its own when space becomes available, for example after the rows above it are removed or a blocking value is cleared. Re-enter the formula to recalculate it. See [#1785](https://github.com/handsontable/hyperformula/issues/1785).
 
-These options limit each dimension separately. They do not impose a separate limit on the total number of cells in an array, so an array within both limits can still be very large: at the default limits, `=SEQUENCE(40000, 18278)` has over 731 million cells and can exhaust the available memory.
+These limits apply to each dimension separately. They do not impose a separate limit on the total number of cells in an array, so an array within both limits can still be very large: at the default limits, `=SEQUENCE(40000, 18278)` has over 731 million cells and can exhaust the available memory.
 
 ### With the array arithmetic mode enabled
 

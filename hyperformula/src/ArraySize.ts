@@ -12,6 +12,12 @@ import {FunctionArgumentType} from './interpreter'
 import {FunctionCallLicenseGate} from './license/FunctionCallLicenseGate'
 import {Ast, AstNodeType, ProcedureAst} from './parser'
 
+/**
+ * The largest number of rows or columns of an array computed inside a formula, as in Microsoft Excel.
+ * It does not depend on `maxRows` and `maxColumns`, which limit only the arrays that spill.
+ */
+export const MAX_COMPUTED_ARRAY_DIMENSION = 1048576
+
 export class ArraySize {
   constructor(
     public width: number,
@@ -38,6 +44,14 @@ export class ArraySize {
   exceedsSheetSizeLimits(maxColumns: number, maxRows: number): boolean {
     return this.width > maxColumns || this.height > maxRows
   }
+
+  /**
+   * Checks an array computed inside a formula against {@link MAX_COMPUTED_ARRAY_DIMENSION}.
+   * Call before allocating the array.
+   */
+  exceedsComputedArrayLimit(): boolean {
+    return this.width > MAX_COMPUTED_ARRAY_DIMENSION || this.height > MAX_COMPUTED_ARRAY_DIMENSION
+  }
 }
 
 function arraySizeForBinaryOp(leftArraySize: ArraySize, rightArraySize: ArraySize): ArraySize {
@@ -59,17 +73,13 @@ export class ArraySizePredictor {
   }
 
   /**
-   * Limits the predicted spill area before the dependency graph maps its cells.
-   * A scalar fallback still evaluates the formula, so runtime allocation guards
-   * determine the error and also protect intermediate arrays.
+   * Predicts the size of a formula's result before it is evaluated. The dependency graph
+   * returns `#SPILL!` when the predicted area extends beyond the sheet edge.
    * Infinite dimensions represent whole-row or whole-column references, whose
    * effective size is resolved by the dependency graph.
    */
   public checkArraySize(ast: Ast, formulaAddress: SimpleCellAddress): ArraySize {
-    const size = this.checkArraySizeForAst(ast, {formulaAddress, arraysFlag: this.config.useArrayArithmetic})
-    const maxColumns = size.width === Infinity ? Infinity : this.config.maxColumns
-    const maxRows = size.height === Infinity ? Infinity : this.config.maxRows
-    return size.exceedsSheetSizeLimits(maxColumns, maxRows) ? ArraySize.error() : size
+    return this.checkArraySizeForAst(ast, {formulaAddress, arraysFlag: this.config.useArrayArithmetic})
   }
 
   public checkArraySizeForAst(ast: Ast, state: InterpreterState): ArraySize {

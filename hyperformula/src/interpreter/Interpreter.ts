@@ -265,26 +265,31 @@ export class Interpreter {
               return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
             }
             const size = new ArraySize((rowRet[0]?.length ?? 0) + arr.width(), ret.length + height)
-            if (size.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
-              return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
+            if (size.exceedsComputedArrayLimit()) {
+              return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
             }
             if (rowHeight === undefined) {
               rowHeight = height
-              rowRet.push(...arr.data)
+              for (const row of arr.data) {
+                rowRet.push(row)
+              }
             } else {
               for (let i = 0; i < height; i++) {
-                rowRet[i].push(...arr.data[i])
+                for (const value of arr.data[i]) {
+                  rowRet[i].push(value)
+                }
               }
             }
           }
           const width = rowRet[0].length
           if (totalWidth === undefined) {
             totalWidth = width
-            ret.push(...rowRet)
-          } else if (totalWidth === width) {
-            ret.push(...rowRet)
-          } else {
+          } else if (totalWidth !== width) {
             return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
+          }
+          // Spreading a large array into push() overflows the call stack, so rows are appended one by one.
+          for (const row of rowRet) {
+            ret.push(row)
           }
         }
         return SimpleRangeValue.onlyValues(ret)
