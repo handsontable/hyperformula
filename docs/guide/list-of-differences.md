@@ -115,6 +115,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | TAKE          | =TAKE(A1:A3, 0)                                                |          N/A | No such function. |           CALC  |
 | TAKE          | =TAKE(Data!A:A, , 1)                                           | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | No such function. | Spills all 1,048,576 rows from row 1, with blank source cells as 0; returns SPILL below row 1. |
 | TAKE          | =SUM(TAKE(A:A, -2))<br>where A1:A5: 1, 2, 3, 4, 5              | 9 (counts back from the last used row) | No such function. | 0 (counts back from the last row of the sheet) |
+| TAKE          | =SUM(TAKE(1:1, , -2))<br>where A1:C1: 1, 2, 3                  | 5 (counts back from the last used column) | No such function. | 0 (counts back from the last column of the sheet) |
 | TAKE          | =TAKE(A:A, B1) in C5,<br>where A1:A5: 1, 2, 3, 4, 5 and B1 = 6 | Returns SPILL: below row 1, a count read from a cell can't size a whole-column result on the source's own sheet. Row 1 works. | No such function. | Spills 1, 2, 3, 4, 5, 0 into C5:C10. |
 | TAKE          | =TAKE(A1:C3, NA())                                             | Fills the whole area reserved for the array (here 3x3) with N/A. | No such function. | A single N/A error. |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
