@@ -247,6 +247,27 @@ export interface FunctionArgument {
    * Requires `defaultValue` to be set.
    */
   emptyAsDefault?: boolean,
+
+  /**
+   * If set to `true` on an optional argument (`optionalArg: true`), a syntactically empty argument is treated
+   * as if the argument had not been provided at all: the function implementation receives `undefined`.
+   *
+   * This differs from {@link emptyAsDefault}, which substitutes `defaultValue`. It is the
+   * only way to tell an empty argument slot (`=F(1,)`) apart from an argument whose value
+   * is empty (`=F(1,"")`). `ADDRESS` uses it for `sheetName`: `=ADDRESS(2,3,1,FALSE(),)` returns
+   * `R2C3`, while `=ADDRESS(2,3,1,FALSE(),"")` returns `!R2C3`.
+   *
+   * | Formula                      | `emptyAsAbsent: false` (default) | `emptyAsAbsent: true`   |
+   * |------------------------------|----------------------------------|-------------------------|
+   * | `ADDRESS(2,3,1,FALSE())`     | `undefined` for 5th arg          | `undefined` for 5th arg |
+   * | `ADDRESS(2,3,1,FALSE(),)`     | `""` for 5th arg                 | `undefined` for 5th arg |
+   * | `ADDRESS(2,3,1,FALSE(),"")`   | `""` for 5th arg                 | `""` for 5th arg        |
+   *
+   * Does not require `defaultValue`; it applies only when `defaultValue` is unset, so it
+   * never competes with {@link emptyAsDefault}. On a required argument it has no effect: an
+   * empty argument there is the zero value of its type, as without this option.
+   */
+  emptyAsAbsent?: boolean,
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
@@ -471,7 +492,11 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     for (let i = 0; i < argumentsMetadata.length; i++) {
       const argumentMetadata = argumentsMetadata[i]
       const rawArg = vectorizedArguments[i]
-      const argumentValue = rawArg === undefined
+      const emptySlotIsAbsent = syntacticallyEmptyFlags[i]
+        && argumentMetadata?.emptyAsAbsent === true
+        && argumentMetadata?.optionalArg === true
+        && argumentMetadata?.defaultValue === undefined
+      const argumentValue = rawArg === undefined || emptySlotIsAbsent
         ? argumentMetadata?.defaultValue
         : (syntacticallyEmptyFlags[i] && argumentMetadata?.emptyAsDefault && argumentMetadata?.defaultValue !== undefined)
           ? argumentMetadata.defaultValue
