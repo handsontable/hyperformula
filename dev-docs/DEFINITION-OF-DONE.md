@@ -87,6 +87,19 @@ A pull request contains a single atomic, self-contained functional change: one b
 
 **Keep the description current.** A description written once and never revisited is the most common failure in this repository. When the branch changes scope, update it in the same push.
 
+## AI-assisted changes
+
+When an AI tool wrote a substantial part of a change, the pull request says so in the template's [AI assistance](../.github/pull_request_template.md#ai-assistance) section: which tool, and which parts it wrote. Substantial means code, tests or docs you did not write yourself; a one-line completion does not count.
+
+An AI-assisted change gets the same review, CI and tests as any other, and you answer for every line of it. Before you request a review:
+
+- **Approved tools only.** Use only AI tools the company has approved, signed in with a company account, never a personal one.
+- **Nothing sensitive in the prompt.** No credentials, tokens, production data or client data. What else must stay out is in [`SENSITIVE-INFORMATION.md`](SENSITIVE-INFORMATION.md).
+- **Licence checked.** Generated code must not copy code under a licence incompatible with HyperFormula's, copyleft above all.
+- **Understood.** You can explain every generated line in review, and you have checked it against the mistakes in [Common ways agents fail](../AGENTS.md#common-ways-agents-fail).
+
+A vulnerability introduced by AI-generated code is reported like any other security issue, as [`SECURITY.md`](../SECURITY.md) describes.
+
 ## Changes that implement a spec
 
 This applies to tasks that come with a spec: a document with numbered decisions. How a spec is written and approved belongs to the internal delivery process, not this page.
