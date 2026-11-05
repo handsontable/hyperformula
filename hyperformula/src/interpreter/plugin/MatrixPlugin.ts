@@ -81,34 +81,27 @@ function poolFunctionArgumentsError(matrix: SimpleRangeValue, windowSize: number
 
 /**
  * Reads the numbers of a matrix argument, treating typed numbers (percentages, dates, currency) as plain numbers.
+ * The first value, row by row, that is not a number decides the result: an error is returned as it is, and any
+ * other value (text, a boolean, an empty cell) gives the #VALUE! error.
  *
  * @param matrix - the matrix argument
- * @returns the numbers of the matrix; the #VALUE! error when it holds any value that is neither a number nor an error, even
- *   after an error; otherwise the first error found in it
+ * @returns the numbers of the matrix, or the error decided by its first value that is not a number
  */
 function numbersOrError(matrix: SimpleRangeValue): number[][] | CellError {
-  let hasNonNumericValue = false
-  let firstError: Maybe<CellError>
   const numbers: number[][] = []
 
   for (const row of matrix.rawData()) {
     const numbersInRow: number[] = []
     for (const value of row) {
-      if (value instanceof CellError) {
-        firstError = firstError ?? value
-      } else if (isExtendedNumber(value)) {
-        numbersInRow.push(getRawValue(value))
-      } else {
-        hasNonNumericValue = true
+      if (!isExtendedNumber(value)) {
+        return value instanceof CellError ? value : new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
+      numbersInRow.push(getRawValue(value))
     }
     numbers.push(numbersInRow)
   }
 
-  if (hasNonNumericValue) {
-    return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
-  }
-  return firstError ?? numbers
+  return numbers
 }
 
 /**
