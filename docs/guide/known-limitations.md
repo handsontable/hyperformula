@@ -76,7 +76,7 @@ a circular reference.
 
 * A whole-column source can spill when the formula is in the first row, regardless of whether the source is on the same sheet. Below the first row, the formula returns `#SPILL!` because its result would extend beyond the worksheet edge; inside another function, such as `=SUM(CHOOSECOLS(A:A, 1))`, it is computed. In the first row, or inside another function, an empty source returns `#N/A` because its effective range is empty. Finite-height sources are supported.
 
-* HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal column-index expression can therefore be reported as `#SPILL!`. Errors in literal column indexes are detected before spill allocation.
+* HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal column-index expression can therefore be reported as `#SPILL!`. For a source of finite width, errors in literal column indexes are detected before spill allocation.
 
 ### OFFSET function
 
