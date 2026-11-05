@@ -60,6 +60,8 @@ reference that cannot be resolved, `removed reference` for one destroyed by
 removing rows or columns, `parser` for a formula that could not be parsed, `user
 input` for an error value typed into a cell, `literal` for one written into a
 formula, or `array literal` for an array literal whose rows differ in length.
+A `#SPILL!` or `#CYCLE!` that the engine raises has no `originFunction`, because
+it follows from the layout of the sheet rather than from evaluating a value.
 `argumentIndex` is zero-based.
 
 ```javascript
