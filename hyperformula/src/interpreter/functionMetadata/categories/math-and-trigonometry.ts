@@ -278,14 +278,14 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   MDETERM: {
     category: 'Math and trigonometry',
-    shortDescription: 'Calculates the determinant of a square array. A non-square array or an array with a non-numeric value returns the #VALUE! error.',
+    shortDescription: 'Calculates the determinant of a square array. If the array holds a value that is not a number, the first one, row by row, decides the result: an error is returned as it is, and text, a boolean or an empty cell returns the #VALUE! error. A non-square array of numbers also returns the #VALUE! error. A determinant too large for a number returns the #NUM! error.',
     parameters: [{name: 'array', description: 'The square range or array of numbers whose determinant is calculated.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=MDETERM(A1:B2)', '=MDETERM({1,2;3,4})'],
   },
   MINVERSE: {
     category: 'Math and trigonometry',
-    shortDescription: 'Calculates the inverse of a square array. A non-square array or an array with a non-numeric value returns the #VALUE! error. An array whose elimination meets a pivot that is exactly 0 returns the #NUM! error; other singular arrays return large values caused by rounding.',
+    shortDescription: 'Calculates the inverse of a square array. If the array holds a value that is not a number, the first one, row by row, decides the result: an error is returned as it is, and text, a boolean or an empty cell returns the #VALUE! error. A non-square array of numbers also returns the #VALUE! error. An array whose elimination meets a pivot that is exactly 0 returns the #NUM! error; other singular arrays return large values caused by rounding.',
     parameters: [{name: 'array', description: 'The square range or array of numbers to invert.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=MINVERSE(A1:B2)', '=MINVERSE({1,2;3,4})'],

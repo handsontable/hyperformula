@@ -362,8 +362,10 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
   /**
    * Corresponds to MDETERM(Array).
    *
-   * Returns the determinant of a square matrix of numbers. A non-square matrix or a non-numeric value
-   * returns the #VALUE! error, and a determinant too large for a number returns the #NUM! error.
+   * Returns the determinant of a square matrix of numbers. If the matrix holds a value that is not a number,
+   * the first one, row by row, decides the result: an error is returned as it is, and any other value gives the
+   * #VALUE! error. A non-square matrix of numbers also gives the #VALUE! error. A determinant too large for a
+   * number returns the #NUM! error.
    */
   public mdeterm(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MDETERM'), (matrix: SimpleRangeValue) => {
@@ -382,9 +384,10 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
   /**
    * Corresponds to MINVERSE(Array).
    *
-   * Returns the inverse of a square matrix of numbers. A non-square matrix or a non-numeric value returns
-   * the #VALUE! error. A matrix whose elimination meets a pivot that is exactly 0, or whose inverse has an element
-   * too large for a number, returns the #NUM! error.
+   * Returns the inverse of a square matrix of numbers. If the matrix holds a value that is not a number,
+   * the first one, row by row, decides the result: an error is returned as it is, and any other value gives the
+   * #VALUE! error. A non-square matrix of numbers also gives the #VALUE! error. A matrix whose elimination meets
+   * a pivot that is exactly 0, or whose inverse has an element too large for a number, returns the #NUM! error.
    */
   public minverse(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MINVERSE'), (matrix: SimpleRangeValue) => {
