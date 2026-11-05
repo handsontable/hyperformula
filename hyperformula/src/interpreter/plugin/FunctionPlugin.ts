@@ -254,8 +254,8 @@ export interface FunctionArgument {
    *
    * This differs from {@link emptyAsDefault}, which substitutes `defaultValue`. It is the
    * only way to tell "no argument was given" apart from "an argument was given and its
-   * value is empty" — a distinction Microsoft Excel makes for `ADDRESS`, where an absent
-   * sheet name omits the `!` separator while an explicitly empty one keeps it.
+   * value is empty". `ADDRESS` uses it for `sheetName`: `=ADDRESS(2,3,1,FALSE(),)` returns
+   * `R2C3`, while `=ADDRESS(2,3,1,FALSE(),"")` returns `!R2C3`.
    *
    * | Formula                      | `emptyAsAbsent: false` (default) | `emptyAsAbsent: true`   |
    * |------------------------------|----------------------------------|-------------------------|
