@@ -276,6 +276,20 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=LOG10(100)', '=LOG10(1000)'],
   },
+  MDETERM: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Calculates the determinant of a square array. A non-square array or an array with a non-numeric value returns the #VALUE! error.',
+    parameters: [{name: 'array', description: 'The square range or array of numbers whose determinant is calculated.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=MDETERM(A1:B2)', '=MDETERM({1,2;3,4})'],
+  },
+  MINVERSE: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Calculates the inverse of a square array. A non-square array or an array with a non-numeric value returns the #VALUE! error; a singular array returns the #NUM! error.',
+    parameters: [{name: 'array', description: 'The square range or array of numbers to invert.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=MINVERSE(A1:B2)', '=MINVERSE({1,2;3,4})'],
+  },
   MOD: {
     category: 'Math and trigonometry',
     shortDescription: 'Returns the remainder when one number is divided by another. The result has the same sign as divisor.',
@@ -296,6 +310,13 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'number1', description: 'A non-negative number, cell reference, or range; each value is truncated to an integer. Further numbers or ranges can be passed as additional arguments.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=MULTINOMIAL(2, 3, 4)', '=MULTINOMIAL(A1:A3)'],
+  },
+  MUNIT: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the identity matrix of the given dimension. A fractional dimension is truncated; a dimension below 1 or a non-numeric one returns the #VALUE! error.',
+    parameters: [{name: 'dimension', description: 'The number of rows and columns of the returned matrix.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=MUNIT(3)', '=MMULT(A1:C3, MUNIT(3))'],
   },
   ODD: {
     category: 'Math and trigonometry',
