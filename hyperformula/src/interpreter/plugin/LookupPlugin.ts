@@ -4,11 +4,11 @@
  */
 
 import { AbsoluteCellRange } from '../../AbsoluteCellRange'
-import { CellError, CellRange, ErrorType, SimpleCellAddress, simpleCellAddress } from '../../Cell'
+import { CellError, CellRange, ErrorType, simpleCellAddress } from '../../Cell'
 import { ErrorMessage } from '../../error-message'
 import { RowSearchStrategy } from '../../Lookup/RowSearchStrategy'
 import { SearchOptions, SearchStrategy } from '../../Lookup/SearchStrategy'
-import { AstNodeType, ProcedureAst } from '../../parser'
+import { ProcedureAst } from '../../parser'
 import { StatType } from '../../statistics'
 import { forceNormalizeString, zeroIfEmpty } from '../ArithmeticHelper'
 import { findLastOccurrenceInOrderedArray } from '../binarySearch'
