@@ -182,12 +182,14 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
         const sortsRows = sortedAxes[0] !== 'columns'
         const data = array.data
         const order = Array.from({length: sortsRows ? data.length : data[0].length}, (_, i) => i)
+        // A whole-column (or whole-row) by_array holds only the cells in use, which can be fewer than those of
+        // `array` on another sheet; the cells past them are empty keys.
         const keyColumns = sortKeys
           .filter((_, i) => axes[i] !== 'none')
-          .map(({byArray, sortOrder}) => ({
-            keys: sortsRows ? byArray.data.map((row) => row[0]) : byArray.data[0],
-            sortOrder,
-          }))
+          .map(({byArray, sortOrder}) => {
+            const keys: InternalScalarValue[] = sortsRows ? byArray.data.map((row) => row[0]) : byArray.data[0]
+            return {keys: order.map((i) => keys[i] ?? EmptyValue), sortOrder}
+          })
 
         order.sort((i, j) => {
           const firstDifference = keyColumns
