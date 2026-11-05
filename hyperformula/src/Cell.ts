@@ -180,10 +180,16 @@ export class CellError {
    * propagated error never acquires one: the reading function's own argument slot is not the
    * offending argument.
    *
+   * Also a no-op once `originFunction` is set, even for a non-propagated error: a nested call's
+   * own error (e.g. `SQRT(-1)` inside `=DATE(1,1,SQRT(-1))`) stamps its origin before the outer
+   * call's coercion loop ever sees it, and that loop's own argument slot is not the one that
+   * actually produced the error — attaching an index here would pair someone else's origin with
+   * this call's argument position, which is incoherent.
+   *
    * @param {number} index - zero-based index of the offending argument
    */
   public withArgumentIndex(index: number): CellError {
-    if (this.propagated || this.argumentIndex !== undefined) {
+    if (this.propagated || this.originFunction !== undefined || this.argumentIndex !== undefined) {
       return this
     }
     return new CellError(this.type, this.message, this.root, this.originFunction, index, this.propagated, this.originAddress, this.originAddressVersion)
