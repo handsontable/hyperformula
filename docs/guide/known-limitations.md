@@ -25,6 +25,7 @@ returns a cycle error regardless of whether TRUE or FALSE causes
 a circular reference.
 * Named ranges behave differently depending on where they are used in a formula. For details, see [Using named ranges in formulas](named-expressions.md#using-named-ranges-in-formulas).
 * [Custom functions](custom-functions.md) don't automatically recalculate the size of their [result arrays](custom-functions.md#return-an-array-of-data) when the formula dependencies change.
+* An array formula over a whole column or row (e.g., `=SORT(A:A)`) keeps the size it had when it was first calculated. If its source grows past that size, the formula returns the `#SPILL!` error instead of spilling more values. Clearing the extra cells is not enough to bring the spill back, because the sheet keeps its size; removing the extra rows or columns is.
 * There is no relative referencing in named ranges.
 * The library doesn't offer (at least not yet) the following features:
   * 3D references
