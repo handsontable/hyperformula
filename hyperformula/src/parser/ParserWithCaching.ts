@@ -4,7 +4,8 @@
  */
 
 import {IToken, tokenMatcher, ILexingResult} from 'chevrotain'
-import {ErrorType, SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {ErrorMessage} from '../error-message'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {AstNodeType, buildParsingErrorAst, CellAddress, collectDependencies, RelativeDependency} from './'
 import {
@@ -226,6 +227,20 @@ export class ParserWithCaching {
     }
   }
 
+  /**
+   * Error nodes that print the same, such as `#REF!`, can stand for different errors: one typed into
+   * the formula, another left where a removed row or column was referenced. The suffix keeps their
+   * cache entries apart, so a cache hit never gives a formula the message of another formula's error.
+   * It is empty for an error typed into the formula, whose hash then equals the hash computed from
+   * the formula's tokens.
+   */
+  private static errorMessageHashSuffix(error?: CellError): string {
+    if (error === undefined || error.message === ErrorMessage.ErrorLiteral) {
+      return ''
+    }
+    return `\u0000${error.message ?? ''}`
+  }
+
   public computeHashFromTokens(tokens: IToken[], baseAddress: SimpleCellAddress): string {
     let hash = ''
     let idx = 0
@@ -319,7 +334,7 @@ export class ParserWithCaching {
         const image = this.config.translationPackage.getErrorTranslation(
           ast.error ? ast.error.type : ErrorType.ERROR
         )
-        return imageWithWhitespace(image, ast.leadingWhitespace)
+        return imageWithWhitespace(image, ast.leadingWhitespace) + ParserWithCaching.errorMessageHashSuffix(ast.error)
       }
       case AstNodeType.ERROR_WITH_RAW_INPUT: {
         return imageWithWhitespace(ast.rawInput, ast.leadingWhitespace)
