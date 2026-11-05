@@ -249,8 +249,8 @@ export interface FunctionArgument {
   emptyAsDefault?: boolean,
 
   /**
-   * If set to `true`, a syntactically empty argument is treated as if the argument had
-   * not been provided at all: the function implementation receives `undefined`.
+   * If set to `true` on an optional argument (`optionalArg: true`), a syntactically empty argument is treated
+   * as if the argument had not been provided at all: the function implementation receives `undefined`.
    *
    * This differs from {@link emptyAsDefault}, which substitutes `defaultValue`. It is the
    * only way to tell "no argument was given" apart from "an argument was given and its
@@ -264,7 +264,8 @@ export interface FunctionArgument {
    * | `ADDRESS(2,3,1,FALSE(),"")`   | `""` for 5th arg                 | `""` for 5th arg        |
    *
    * Does not require `defaultValue`; it applies only when `defaultValue` is unset, so it
-   * never competes with {@link emptyAsDefault}.
+   * never competes with {@link emptyAsDefault}. On a required argument it has no effect: an
+   * empty argument there is the zero value of its type, as without this option.
    */
   emptyAsAbsent?: boolean,
 }
@@ -493,6 +494,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       const rawArg = vectorizedArguments[i]
       const emptySlotIsAbsent = syntacticallyEmptyFlags[i]
         && argumentMetadata?.emptyAsAbsent === true
+        && argumentMetadata?.optionalArg === true
         && argumentMetadata?.defaultValue === undefined
       const argumentValue = rawArg === undefined || emptySlotIsAbsent
         ? argumentMetadata?.defaultValue
