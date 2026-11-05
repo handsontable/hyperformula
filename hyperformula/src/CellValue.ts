@@ -39,8 +39,8 @@ export class DetailedCellError {
    * `=SUM(SQRT(-1))` reports `'SQRT'`, and `=SUM(A2:A99999999999)` reports `'reference'`.
    * An error inside an array result names the operation that built the array.
    *
-   * `undefined` for `#SPILL!` and `#CYCLE!`, which arise from the layout of a sheet rather
-   * than from evaluating a value.
+   * `undefined` for a `#SPILL!` or `#CYCLE!` that the engine raises, which arises from the
+   * layout of a sheet rather than from evaluating a value.
    */
   public readonly originFunction?: string
 
