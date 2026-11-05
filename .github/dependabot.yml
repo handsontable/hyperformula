@@ -1,0 +1,18 @@
+# Keeps the GitHub Actions and npm dependencies up to date.
+# Actions stay pinned to a full commit SHA; Dependabot updates the SHA and
+# the version comment together.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5

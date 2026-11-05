@@ -561,18 +561,18 @@ export class FormulaParser extends EmbeddedActionsParser {
     ])) as Ast
   })
 
+  /**
+   * Rule for atomic expressions followed by zero or more percent operators.
+   */
   private rightUnaryOpAtomicExpression: AstRule = this.RULE('rightUnaryOpAtomicExpression', () => {
-    const positiveAtomicExpression = this.SUBRULE(this.positiveAtomicExpression)
+    const operand = this.SUBRULE(this.positiveAtomicExpression)
+    const percentOps: ExtendedToken[] = []
 
-    const percentage = this.OPTION(() => {
-      return this.CONSUME(PercentOp)
-    }) as Maybe<ExtendedToken>
+    this.MANY(() => {
+      percentOps.push(this.CONSUME(PercentOp) as ExtendedToken)
+    })
 
-    if (percentage) {
-      return buildPercentOpAst(positiveAtomicExpression, percentage.leadingWhitespace)
-    }
-
-    return positiveAtomicExpression
+    return percentOps.reduce<Ast>((ast, op) => buildPercentOpAst(ast, op.leadingWhitespace), operand)
   })
 
   /**
