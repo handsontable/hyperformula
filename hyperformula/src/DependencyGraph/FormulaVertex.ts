@@ -9,6 +9,7 @@ import {ArrayValue, ErroredArray, CellArray, NotComputedArray} from '../ArrayVal
 import {CellError, equalSimpleCellAddress, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {ErrorMessage} from '../error-message'
+import {CellValueNotComputedError} from '../errors'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
@@ -136,7 +137,7 @@ export class ArrayFormulaVertex extends FormulaVertex {
 
   getCellValue(): InterpreterValue {
     if (this.array instanceof NotComputedArray) {
-      throw Error('Array not computed yet.')
+      throw new CellValueNotComputedError(this.cellAddress)
     }
     return this.array.simpleRangeValue()
   }
@@ -275,7 +276,7 @@ export class ScalarFormulaVertex extends FormulaVertex {
     if (this.cachedCellValue !== undefined) {
       return this.cachedCellValue
     } else {
-      throw Error('Value of the formula cell is not computed.')
+      throw new CellValueNotComputedError(this.cellAddress)
     }
   }
 

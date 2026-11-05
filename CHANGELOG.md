@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed approximate `XLOOKUP` ignoring values of a different type in some search modes, and approximate `MATCH`, `VLOOKUP`, and `HLOOKUP` taking such values into account for non-range arrays, single-cell ranges, and binary search over sorted cell ranges; both now behave the same in linear and binary search, consistent with Microsoft Excel. [#1755](https://github.com/handsontable/hyperformula/pull/1755)
 - Fixed a cell holding a static error value, such as a rejected formula or a typed-in error, being reported under the address of the cell that read it first instead of its own address. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 - Fixed `#SPILL!` errors reporting no address; their `address` is now the cell whose array result could not spill. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Fixed reading a formula cell's value before it was computed throwing a plain `Error` that did not say which cell it was; it now throws `CellValueNotComputedError`, which carries the cell's address. [#444](https://github.com/handsontable/hyperformula/issues/444)
 
 ## [3.5.0] - 2026-10-09
 
