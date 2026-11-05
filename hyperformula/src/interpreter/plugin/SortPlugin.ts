@@ -241,19 +241,28 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
 
   /**
    * Tells along which dimension the keys of `byArray` order `array`: its `rows` (a column of keys), its `columns`
-   * (a row of keys), or `none` for a single cell; `undefined` if the keys don't fit `array`.
+   * (a row of keys), or `none` for a single cell; `undefined` if the keys don't fit `array`. A cell range is
+   * measured by its own shape, so a whole column fits only another whole column.
    */
   private static sortAxis(array: SimpleRangeValue, byArray: SimpleRangeValue): 'rows' | 'columns' | 'none' | undefined {
-    if (byArray.width() === 1 && byArray.height() === 1) {
+    const [arrayWidth, arrayHeight] = SortPlugin.shapeOf(array)
+    const [keysWidth, keysHeight] = SortPlugin.shapeOf(byArray)
+    if (keysWidth === 1 && keysHeight === 1) {
       return 'none'
     }
-    if (byArray.width() === 1 && byArray.height() === array.height()) {
+    if (keysWidth === 1 && keysHeight === arrayHeight) {
       return 'rows'
     }
-    if (byArray.height() === 1 && byArray.width() === array.width()) {
+    if (keysHeight === 1 && keysWidth === arrayWidth) {
       return 'columns'
     }
     return undefined
+  }
+
+  /** Width and height of a range value: a cell range's own (infinite for a whole column or row), else the data's. */
+  private static shapeOf(rangeValue: SimpleRangeValue): [number, number] {
+    const range = rangeValue.range
+    return range === undefined ? [rangeValue.width(), rangeValue.height()] : [range.width(), range.height()]
   }
 
   private sizeOfFirstArgument(ast: ProcedureAst, state: InterpreterState, metadata: FunctionMetadata): ArraySize {

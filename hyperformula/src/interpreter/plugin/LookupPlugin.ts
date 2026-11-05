@@ -197,11 +197,11 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
 
-      if (lookupRange.width() > 1 && lookupRange.height() > 1) {
+      if (this.isTwoDimensional(lookupRange)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongDimension)
       }
 
-      const searchStrategy = lookupRange.width() === 1 ? this.columnSearch : this.rowSearch
+      const searchStrategy = (lookupRange.range === undefined ? lookupRange.width() : lookupRange.range.width()) === 1 ? this.columnSearch : this.rowSearch
       const indexFound = this.searchInRange(key, lookupRange, matchMode === 2, this.buildSearchOptions(matchMode, searchMode), searchStrategy)
 
       return indexFound === -1 ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound) : indexFound + 1
