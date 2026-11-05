@@ -11,7 +11,10 @@ import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import {ArrayPlugin} from './ArrayPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginDefinition, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import {LookupPlugin} from './LookupPlugin'
+import {MatrixPlugin} from './MatrixPlugin'
 
 const TYPE_CODE_NUMBER = 1
 const TYPE_CODE_TEXT = 2
@@ -288,13 +291,30 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     if (ast.type !== AstNodeType.FUNCTION_CALL) {
       return false
     }
-    if (FUNCTIONS_KEEPING_ARGUMENT_KIND.has(ast.procedureName)) {
+    if (FUNCTIONS_KEEPING_ARGUMENT_KIND.has(ast.procedureName) && this.isBuiltIn(ast.procedureName)) {
       return ast.args.length === 1 && this.isArrayExpression(ast.args[0])
     }
-    if (FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS.has(ast.procedureName)) {
+    if (FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS.has(ast.procedureName) && this.isBuiltIn(ast.procedureName)) {
       return false
     }
     return this.interpreter.functionRegistry.getMetadata(ast.procedureName)?.sizeOfResultArrayMethod !== undefined
+  }
+
+  /**
+   * Whether the function registered under the name is the built-in one that a name-based rule of TYPE describes.
+   * A function registered over it is classified by its value and its metadata only.
+   *
+   * @param {string} functionId - the name of a function that a rule of TYPE names
+   */
+  private isBuiltIn(functionId: string): boolean {
+    const builtIn: Record<string, FunctionPluginDefinition> = {
+      ARRAYFORMULA: ArrayPlugin,
+      COLUMN: InformationPlugin,
+      ROW: InformationPlugin,
+      TRANSPOSE: MatrixPlugin,
+      XLOOKUP: LookupPlugin,
+    }
+    return builtIn[functionId] !== undefined && this.interpreter.functionRegistry.getFunctionPlugin(functionId) === builtIn[functionId]
   }
 
   /**
@@ -306,7 +326,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    */
   private isRowOrColumnOfSeveralRowsOrColumns(ast: Ast, state: InterpreterState): boolean {
     ast = withoutParentheses(ast)
-    if (ast.type !== AstNodeType.FUNCTION_CALL || (ast.procedureName !== 'ROW' && ast.procedureName !== 'COLUMN') || ast.args.length !== 1) {
+    if (ast.type !== AstNodeType.FUNCTION_CALL || (ast.procedureName !== 'ROW' && ast.procedureName !== 'COLUMN') || ast.args.length !== 1 || !this.isBuiltIn(ast.procedureName)) {
       return false
     }
     const arg = withoutParentheses(ast.args[0])

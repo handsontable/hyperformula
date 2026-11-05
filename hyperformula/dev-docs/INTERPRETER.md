@@ -82,7 +82,7 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 
 `arrayFunction` and `arraySizeMethod` are still declared on the interface but are **deprecated since 3.1.0**, superseded by `enableArrayArithmeticForArguments` and `sizeOfResultArrayMethod`. Do not carry them forward from an older plugin.
 
-`TYPE` reads a call to any function registered with `sizeOfResultArrayMethod` as an array, even when the result has a single value. A function that declares it but returns a plain value or a reference for a single match, as `XLOOKUP` does, goes in `FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS` in `InformationPlugin.ts`.
+`TYPE` reads a call to any function registered with `sizeOfResultArrayMethod` as an array, even when the result has a single value, unless the call evaluates to an error. `InformationPlugin.ts` has its own rule for three names, applied only while the built-in plugin is the one registered under the name: `TRANSPOSE` and `ARRAYFORMULA` keep the kind of their argument, and `XLOOKUP`, which returns a plain value or a reference for a single match, is in `FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS`. A new function that declares `sizeOfResultArrayMethod` but can return a single value or a reference goes in that set too.
 
 ### Never
 
