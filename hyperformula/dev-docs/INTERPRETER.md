@@ -82,6 +82,8 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 
 `arrayFunction` and `arraySizeMethod` are still declared on the interface but are **deprecated since 3.1.0**, superseded by `enableArrayArithmeticForArguments` and `sizeOfResultArrayMethod`. Do not carry them forward from an older plugin.
 
+`TYPE` reads a call to any function registered with `sizeOfResultArrayMethod` as an array, even when the result has a single value. A function that declares it but returns a plain value or a reference for a single match, as `XLOOKUP` does, goes in `FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS` in `InformationPlugin.ts`.
+
 ### Never
 
 - **Never throw.** Return a `CellError` with a message from `hyperformula/src/error-message.ts`.

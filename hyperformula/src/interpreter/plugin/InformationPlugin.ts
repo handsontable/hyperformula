@@ -20,7 +20,8 @@ const TYPE_CODE_ERROR = 16
 const TYPE_CODE_ARRAY = 64
 
 /**
- * Codes returned by ERROR.TYPE. #NULL! (code 1) has no counterpart in HyperFormula, and neither has a code for #CYCLE!.
+ * Codes returned by ERROR.TYPE. #NULL! (code 1) has no counterpart in HyperFormula. `#CYCLE!`, `#ERROR!` and `#LIC!`,
+ * which are HyperFormula's own errors, have no code and give `#N/A`.
  */
 const ERROR_TYPE_CODES: Partial<Record<ErrorType, number>> = {
   [ErrorType.DIV_BY_ZERO]: 2,
@@ -33,10 +34,15 @@ const ERROR_TYPE_CODES: Partial<Record<ErrorType, number>> = {
 }
 
 /**
- * Functions whose result is an array even when it holds a single value, whatever their arguments.
- * XLOOKUP and INDEX are not listed: for a single value they return a reference or a plain value, not an array.
+ * Functions that declare `sizeOfResultArrayMethod` but return the kind of their only argument: an array stays an
+ * array, while a single cell or a scalar stays a value.
  */
-const FUNCTIONS_RETURNING_ARRAYS = new Set(['FILTER', 'HSTACK', 'MMULT', 'SEQUENCE', 'SORT', 'UNIQUE', 'VSTACK'])
+const FUNCTIONS_KEEPING_ARGUMENT_KIND = new Set(['ARRAYFORMULA', 'TRANSPOSE'])
+
+/**
+ * Functions that declare `sizeOfResultArrayMethod` but return a plain value or a reference when they find a single cell.
+ */
+const FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS = new Set(['XLOOKUP'])
 
 /**
  * Returns the expression inside any number of enclosing parentheses.
@@ -48,28 +54,6 @@ function withoutParentheses(ast: Ast): Ast {
     ast = ast.expression
   }
   return ast
-}
-
-/**
- * Whether the expression gives an array even when the array holds a single value. The interpreter turns
- * a one-by-one array into its only value before TYPE receives it, so `{1}` and `SEQUENCE(1)` arrive as the
- * number 1, and TYPE tells them apart from a plain 1 by the formula. TRANSPOSE keeps the kind of its argument:
- * an array stays an array, while a single cell or a scalar stays a value.
- *
- * @param {Ast} ast - the argument of TYPE
- */
-function isArrayExpression(ast: Ast): boolean {
-  ast = withoutParentheses(ast)
-  if (ast.type === AstNodeType.ARRAY) {
-    return true
-  }
-  if (ast.type !== AstNodeType.FUNCTION_CALL) {
-    return false
-  }
-  if (ast.procedureName === 'TRANSPOSE') {
-    return ast.args.length === 1 && isArrayExpression(ast.args[0])
-  }
-  return FUNCTIONS_RETURNING_ARRAYS.has(ast.procedureName)
 }
 
 /**
@@ -274,9 +258,6 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    if (this.isRowOrColumnOfMultiCellRange(ast.args[0], state)) {
-      return TYPE_CODE_ARRAY
-    }
     if (withoutParentheses(ast.args[0]).type === AstNodeType.ARRAY) {
       // An array constant is an array whatever it holds, a single error included.
       return TYPE_CODE_ARRAY
@@ -285,40 +266,58 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     if (value instanceof SimpleRangeValue) {
       return TYPE_CODE_ARRAY
     }
-    if (!(value instanceof CellError) && isArrayExpression(ast.args[0])) {
+    if (!(value instanceof CellError) && (this.isRowOrColumnOfSeveralRowsOrColumns(ast.args[0], state) || this.isArrayExpression(ast.args[0]))) {
       return TYPE_CODE_ARRAY
     }
     return valueTypeCode(value)
   }
 
   /**
-   * ROW and COLUMN evaluate to a scalar here, while Excel returns an array when they are given a multi-cell range.
-   * TYPE reports the Excel classification.
+   * Whether the expression gives an array even when the array holds a single value. The interpreter turns
+   * a one-by-one array into its only value before TYPE receives it, so `{1}` and `SEQUENCE(1)` arrive as the
+   * number 1, and TYPE tells them apart from a plain 1 by the formula: an array constant, or a call to a function
+   * that the registry declares with `sizeOfResultArrayMethod`.
+   *
+   * @param {Ast} ast - the argument of TYPE
+   */
+  private isArrayExpression(ast: Ast): boolean {
+    ast = withoutParentheses(ast)
+    if (ast.type === AstNodeType.ARRAY) {
+      return true
+    }
+    if (ast.type !== AstNodeType.FUNCTION_CALL) {
+      return false
+    }
+    if (FUNCTIONS_KEEPING_ARGUMENT_KIND.has(ast.procedureName)) {
+      return ast.args.length === 1 && this.isArrayExpression(ast.args[0])
+    }
+    if (FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS.has(ast.procedureName)) {
+      return false
+    }
+    return this.interpreter.functionRegistry.getMetadata(ast.procedureName)?.sizeOfResultArrayMethod !== undefined
+  }
+
+  /**
+   * ROW and COLUMN evaluate to a single number here, but TYPE reads ROW over more than one row, or COLUMN over more
+   * than one column, as an array. It is called only after the call evaluated to a value that is not an error.
    *
    * @param ast
    * @param state
    */
-  private isRowOrColumnOfMultiCellRange(ast: Ast, state: InterpreterState): boolean {
+  private isRowOrColumnOfSeveralRowsOrColumns(ast: Ast, state: InterpreterState): boolean {
     ast = withoutParentheses(ast)
-    if (ast.type !== AstNodeType.FUNCTION_CALL || (ast.procedureName !== 'ROW' && ast.procedureName !== 'COLUMN')) {
-      return false
-    }
-    if (ast.args.length !== 1) {
-      // With no argument ROW and COLUMN return a number; with more than one they return #N/A.
+    if (ast.type !== AstNodeType.FUNCTION_CALL || (ast.procedureName !== 'ROW' && ast.procedureName !== 'COLUMN') || ast.args.length !== 1) {
       return false
     }
     const arg = withoutParentheses(ast.args[0])
     if (arg.type !== AstNodeType.CELL_RANGE && arg.type !== AstNodeType.COLUMN_RANGE && arg.type !== AstNodeType.ROW_RANGE) {
       return false
     }
-    if (arg.start.sheet !== arg.end.sheet) {
-      // A range across sheets makes ROW and COLUMN return #REF!, which TYPE classifies as an error.
+    const range = AbsoluteCellRange.fromAstOrUndef(arg, state.formulaAddress)
+    if (range === undefined) {
       return false
     }
-    if (arg.type === AstNodeType.CELL_RANGE) {
-      return AbsoluteCellRange.fromAst(arg, state.formulaAddress).size() > 1
-    }
-    return true
+    return ast.procedureName === 'ROW' ? range.height() > 1 : range.width() > 1
   }
 
   /**
