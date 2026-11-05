@@ -5,6 +5,7 @@
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
+import {ErrorMessage} from '../error-message'
 import {
   Ast,
   AstNodeType,
@@ -112,7 +113,7 @@ export abstract class Transformer implements FormulaTransformer {
     if (newCellAddress instanceof CellAddress) {
       return {...ast, reference: newCellAddress}
     } else if (newCellAddress === ErrorType.REF) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.ReferenceRemoved))
     } else {
       return ast
     }
@@ -123,7 +124,7 @@ export abstract class Transformer implements FormulaTransformer {
     if (Array.isArray(newRange)) {
       return {...ast, start: newRange[0], end: newRange[1]}
     } else if (newRange === ErrorType.REF) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.ReferenceRemoved))
     } else {
       return ast
     }
@@ -134,7 +135,7 @@ export abstract class Transformer implements FormulaTransformer {
     if (Array.isArray(newRange)) {
       return {...ast, start: newRange[0], end: newRange[1]}
     } else if (newRange === ErrorType.REF) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.ReferenceRemoved))
     } else {
       return ast
     }
@@ -145,7 +146,7 @@ export abstract class Transformer implements FormulaTransformer {
     if (Array.isArray(newRange)) {
       return {...ast, start: newRange[0], end: newRange[1]}
     } else if (newRange === ErrorType.REF) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.ReferenceRemoved))
     } else {
       return ast
     }

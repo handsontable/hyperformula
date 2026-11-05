@@ -612,7 +612,26 @@ export class DependencyGraph {
       return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
     }
 
-    return this.addressMapping.getCellValue(address)
+    const value = this.addressMapping.getCellValue(address)
+    if (!(value instanceof CellError)) {
+      return value
+    }
+
+    // Every read of another cell's value funnels through here, which makes this the one place
+    // that can tell "this error was produced by the current evaluation" from "this error was
+    // read from somewhere else". Marking it propagated is what stops the reading cell from
+    // being reported as the origin.
+    //
+    // A vertex holding a STATIC error (a parse error, or an error value the user typed) has no
+    // FormulaVertex to act as a root, so the address is stamped here instead, together with the
+    // transformation version it is true at. The reading cell caches the stamped copy and is not
+    // recomputed by a row or column change that merely shifts it, so the address alone would go
+    // stale; the version lets Exporter replay the intervening transformations over it.
+    const vertex = this.addressMapping.getCell(address)
+    const holdsAStaticError = vertex instanceof ParsingErrorVertex || vertex instanceof ValueCellVertex
+    return holdsAStaticError
+      ? value.withOriginAddress(address, this.lazilyTransformingAstService.version()).asPropagated()
+      : value.asPropagated()
   }
 
   public getRawValue(address: SimpleCellAddress): RawCellContent {
@@ -624,11 +643,9 @@ export class DependencyGraph {
   }
 
   public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
-    if (this.isPlaceholder(address.sheet)) {
-      return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
-    }
-
-    const value = this.addressMapping.getCellValue(address)
+    // Delegates rather than reading the address mapping itself, so that every caller of this
+    // method inherits the propagated marking above instead of bypassing it.
+    const value = this.getCellValue(address)
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     }
@@ -966,7 +983,7 @@ export class DependencyGraph {
       const oldValue = vertex.getArrayCellValue(address)
       if (this.getCell(address) === vertex) {
         if (vertex.isLeftCorner(address)) {
-          this.changes.addChange(new CellError(ErrorType.REF), address, oldValue)
+          this.changes.addChange(new CellError(ErrorType.REF, ErrorMessage.ArraySourceRemoved), address, oldValue)
         } else {
           this.addressMapping.removeCell(address)
           this.changes.addChange(EmptyValue, address, oldValue)

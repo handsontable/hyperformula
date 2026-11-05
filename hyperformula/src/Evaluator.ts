@@ -10,6 +10,7 @@ import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {ArrayFormulaVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
 import {FormulaVertex} from './DependencyGraph/FormulaVertex'
+import {ErrorMessage} from './error-message'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterState} from './interpreter/InterpreterState'
 import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
@@ -105,7 +106,7 @@ export class Evaluator {
     } else if (vertex instanceof FormulaVertex) {
       const address = vertex.getAddress(this.lazilyTransformingAstService)
       this.columnSearch.remove(getRawValue(vertex.valueOrUndef()), address)
-      const error = new CellError(ErrorType.CYCLE, undefined, vertex)
+      const error = new CellError(ErrorType.CYCLE, ErrorMessage.CircularReference, vertex)
       vertex.setCellValue(error)
       changes.addChange(error, address)
     }
@@ -117,7 +118,7 @@ export class Evaluator {
   private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
-        vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex))
+        vertex.setCellValue(new CellError(ErrorType.CYCLE, ErrorMessage.CircularReference, vertex))
       }
     })
     sorted.forEach((vertex: Vertex) => {
