@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added `LINEST` for simple and multiple linear regression, with optional intercept and regression statistics. The `stats` argument must be constant because result dimensions are determined before evaluation. [#1769](https://github.com/handsontable/hyperformula/pull/1769)
 - Added the `CONCAT` function, which joins text from values, ranges, and arrays, and the `VALUETOTEXT` function, which returns a value as text in a concise or a strict format. [#1816](https://github.com/handsontable/hyperformula/pull/1816)
 - Added `DetailedCellError.hasMessage`, so a consumer can tell a cell error that never carried a message (e.g. a custom function that omitted one) apart from one with a deliberately empty message — both previously surfaced identically as `message: ''`. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
-- Added `DetailedCellError.originFunction` and `DetailedCellError.argumentIndex`, which name the function or operator that produced a cell error and, when it failed to coerce an argument, that argument's position as written in the formula. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Added `DetailedCellError.originFunction` and `DetailedCellError.argumentIndex`, which name what produced a cell error (a function, an operator, or a source such as `reference` or `parser`) and, when it failed to coerce an argument, that argument's position as written. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ### Changed
 
@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed `getCellValue()`, `getSheetValues()` and the other methods that export cell values ignoring the `evaluateNullToZero` option: with the option on, they now return `0` for empty cells instead of `null`. [#1738](https://github.com/handsontable/hyperformula/pull/1738)
 - Fixed approximate `XLOOKUP` ignoring values of a different type in some search modes, and approximate `MATCH`, `VLOOKUP`, and `HLOOKUP` taking such values into account for non-range arrays, single-cell ranges, and binary search over sorted cell ranges; both now behave the same in linear and binary search, consistent with Microsoft Excel. [#1755](https://github.com/handsontable/hyperformula/pull/1755)
 - Fixed a cell holding a static error value, such as a rejected formula or a typed-in error, being reported under the address of the cell that read it first instead of its own address. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Fixed `#SPILL!` errors reporting no address; their `address` is now the cell whose array result could not spill. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ## [3.5.0] - 2026-10-09
 
