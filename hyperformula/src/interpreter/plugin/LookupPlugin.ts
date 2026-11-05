@@ -67,7 +67,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         // [match_mode]
         { argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 0 },
         // [search_mode]
-        { argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 1 },
+        { argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 1, emptyAsDefault: true },
       ]
     },
     'LOOKUP': {
@@ -183,11 +183,16 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   /**
    * Corresponds to XMATCH(lookup_value, lookup_array, [match_mode], [search_mode])
    *
+   * `match_mode` and `search_mode` are rounded down to an integer first.
+   *
    * @param ast
    * @param state
    */
   public xmatch(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('XMATCH'), (key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, matchMode: number, searchMode: number) => {
+    return this.runFunction(ast.args, state, this.metadata('XMATCH'), (key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, rawMatchMode: number, rawSearchMode: number) => {
+      const matchMode = Math.floor(rawMatchMode)
+      const searchMode = Math.floor(rawSearchMode)
+
       if (![0, -1, 1, 2].includes(matchMode) || ![1, -1, 2, -2].includes(searchMode)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
