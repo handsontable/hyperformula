@@ -459,7 +459,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   'RANK.EQ': {
     category: 'Statistical',
     shortDescription: 'Returns the rank of a number in a range; tied numbers share the top rank.',
-    parameters: [{name: 'number', description: 'The number whose rank to find.'}, {name: 'ref', description: 'The range of numbers to rank against; non-numeric cells are ignored.'}, {name: 'order', description: 'Optional. 0 or omitted ranks in descending order; any other value ranks in ascending order.'}],
+    parameters: [{name: 'number', description: 'The number whose rank to find.'}, {name: 'ref', description: 'The range of numbers to rank against; text, logical values and empty cells are ignored, and an error in the range is returned.'}, {name: 'order', description: 'Optional. 0 or omitted ranks in descending order; any other value ranks in ascending order.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=RANK.EQ(A1, A1:A10)', '=RANK.EQ(A1, A1:A10, 1)'],
   },

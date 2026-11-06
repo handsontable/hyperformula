@@ -117,7 +117,8 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
    * Corresponds to RANK.EQ(number, ref, [order]) and RANK(number, ref, [order]).
    *
    * Returns the rank of a number within a range; tied numbers share the top rank of the group.
-   * Order 0 (default) ranks descending, any other value ranks ascending. Only numeric cells of `ref` are considered.
+   * Order 0 (default) ranks descending, any other value ranks ascending. Text, booleans and empty cells of `ref` are
+   * ignored; an error in `ref` is returned.
    *
    * @param ast - procedure AST node
    * @param state - interpreter state
