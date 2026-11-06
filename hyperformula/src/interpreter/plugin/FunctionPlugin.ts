@@ -314,6 +314,23 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
   protected coerceScalarToNumberOrError = (arg: InternalScalarValue): ExtendedNumber | CellError => this.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
+  /**
+   * Reads a number written directly in a formula, with an optional sign, such as `3`, `+3` or `-3`. A function whose
+   * result size depends on an argument uses it to predict that size before the formula is evaluated.
+   *
+   * @param node - an argument of a function call
+   * @returns the number, or undefined when the argument is anything else and its value is known only after evaluation
+   */
+  protected signedNumberLiteral(node: Ast): Maybe<number> {
+    if (node.type === AstNodeType.NUMBER) {
+      return node.value
+    }
+    if ((node.type === AstNodeType.PLUS_UNARY_OP || node.type === AstNodeType.MINUS_UNARY_OP) && node.value.type === AstNodeType.NUMBER) {
+      return node.type === AstNodeType.MINUS_UNARY_OP ? -node.value.value : node.value.value
+    }
+    return undefined
+  }
+
   protected coerceToType(arg: InterpreterValue, coercedType: FunctionArgument, state: InterpreterState): Maybe<InterpreterValue | complex | RawNoErrorScalarValue> {
     let ret
     if (arg instanceof SimpleRangeValue) {
