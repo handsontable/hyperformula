@@ -119,6 +119,11 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | FLOOR.MATH    | =FLOOR.MATH(-4.7, 2, 2)                                        |           -6 |            -4 |              -4 |
 | RANK.EQ       | =RANK.EQ(2, {1, 2, 3})                                         |            2 |   Not checked |    Not accepted |
 | RANK          | =RANK(2, {1, 2, 3})                                            |            2 |   Not checked |    Not accepted |
+| RANK.EQ       | =RANK.EQ(5, 5)                                                 |            1 |   Not checked |    Not accepted |
+| RANK.EQ       | =RANK.EQ(10, A1:A3*1)<br>where A1:A3: 10, 30, 20; `useArrayArithmetic: true` |            3 |   Not checked |    Not accepted |
+| RANK.EQ       | =RANK.EQ("", A1:B2, 0)<br>where A1:B2: 1, 3, 2, 4              |          N/A |   Not checked |           VALUE |
+| RANK.EQ       | =RANK.EQ(2, A1:B2, "")<br>where A1:B2: 1, 3, 2, 4              |            3 |   Not checked |           VALUE |
+| RANK.EQ       | =RANK.EQ(2, A1:B2, "12")<br>where A1:B2: 1, 3, 2, 4            |            2 |   Not checked |           VALUE |
 
 A few of the rows above share a root cause worth stating once:
 
