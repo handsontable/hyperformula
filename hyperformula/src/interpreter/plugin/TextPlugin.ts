@@ -656,6 +656,8 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * @param {InterpreterState} state - The interpreter state
    */
   public textsplit(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const colDelimiterSlotIsEmpty = TextPlugin.isEmptySlot(ast.args[1])
+    const rowDelimiterSlotIsEmpty = TextPlugin.isEmptySlot(ast.args[2])
     return this.runFunction(ast.args, state, this.metadata('TEXTSPLIT'),
       (text: string,
         colDelimiterArg: InternalScalarValue | SimpleRangeValue,
@@ -664,12 +666,12 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         matchMode: number,
         padWith: Maybe<InternalScalarValue>) => {
 
-        const colDelimiters = this.delimitersFromArg(colDelimiterArg)
+        const colDelimiters = this.delimitersFromArg(colDelimiterArg, colDelimiterSlotIsEmpty)
         if (colDelimiters instanceof CellError) {
           return colDelimiters
         }
 
-        const rowDelimiters = this.delimitersFromArg(rowDelimiterArg)
+        const rowDelimiters = this.delimitersFromArg(rowDelimiterArg, rowDelimiterSlotIsEmpty)
         if (rowDelimiters instanceof CellError) {
           return rowDelimiters
         }
@@ -826,16 +828,18 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
 
   /**
    * Converts a TEXTSPLIT delimiter argument into a list of delimiters.
-   * An omitted or empty argument yields no delimiters, so the text is not split along that axis.
+   * An omitted argument or an empty argument slot yields no delimiters, so the text is not split along that axis.
+   * A reference to an empty cell is the empty text, which is not a valid delimiter.
    *
    * @param {Maybe<InternalScalarValue | SimpleRangeValue>} arg - The delimiter argument
+   * @param {boolean} slotIsEmpty - Whether the argument is an empty slot, as in TEXTSPLIT("a,b",,";")
    * @returns {string[] | CellError} - The delimiters, or the first error encountered
    */
-  private delimitersFromArg(arg: Maybe<InternalScalarValue | SimpleRangeValue>): string[] | CellError {
-    if (arg === undefined || arg === EmptyValue) {
+  private delimitersFromArg(arg: Maybe<InternalScalarValue | SimpleRangeValue>, slotIsEmpty: boolean): string[] | CellError {
+    if (arg === undefined || (arg === EmptyValue && slotIsEmpty)) {
       return []
     }
-    return this.flattenArgToStrings(arg)
+    return this.flattenArgToStrings(arg === EmptyValue ? '' : arg)
   }
 
   /**

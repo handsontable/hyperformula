@@ -234,7 +234,7 @@ const dictionary: RawTranslationPackage = {
     TBILLYIELD: 'ДОХОДКЧЕК',
     TEXT: 'ТЕКСТ',
     TEXTAFTER: 'ТЕКСТПОСЛЕ',
-    TEXTBEFORE: 'ТЕКСТДО',
+    TEXTBEFORE: 'TEXTBEFORE',
     TEXTJOIN: 'ОБЪЕДИНИТЬ',
     TEXTSPLIT: 'TEXTSPLIT',
     TIME: 'ВРЕМЯ',
