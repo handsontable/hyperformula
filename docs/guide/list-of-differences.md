@@ -117,9 +117,12 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
 | CEILING.MATH  | =CEILING.MATH(-4.3, 2, 2)                                      |           -4 |            -6 |              -6 |
 | FLOOR.MATH    | =FLOOR.MATH(-4.7, 2, 2)                                        |           -6 |            -4 |              -4 |
+| ERF.PRECISE   | =ERF.PRECISE(A1:B1) in A5<br>where A1 = 0.5, B1 = 1            |       0.5205 |  Not measured |           VALUE |
 
 A few of the rows above share a root cause worth stating once:
 
 - **Rounding toward zero, not down.** `INT` discards the fractional part rather than rounding toward negative infinity, so it differs from Excel and Google Sheets for negative input only. `ROUNDDOWN`/`ROUNDUP` are unaffected — they are defined in terms of zero in all three.
 - **`ISEVEN`/`ISODD` do not truncate.** They test the remainder of the value as given, so a value with a fractional part returns `FALSE` from *both*. Excel and Google Sheets truncate to an integer first, so exactly one of the two is always `TRUE`.
 - **`CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1.** Excel and Google Sheets switch the negative-number rounding direction for any non-zero `mode`.
+
+`ERF.PRECISE`, like `ERF`, loses relative accuracy for arguments very close to zero, and `ERFC` for large arguments: `=ERF.PRECISE(1e-10)` returns `1.128379612E-10` where Excel returns `1.12837916709551E-10`, `=ERF.PRECISE(1e-300)` returns about `1.1E-16` where Excel returns `1.12837916709551E-300`, and `=ERFC(5)` returns `1.5374368445E-12` where Excel returns `1.53745979442803E-12`, the exact value. At the default precision, results differ from the exact value for arguments of about `1e-6` and below in absolute value, and in the last digit for some arguments up to about `2e-4`.

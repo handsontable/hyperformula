@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     EOMONTH: 'MÅNEDSSLUTT',
     ERF: 'FEILF',
     ERFC: 'FEILFK',
+    'ERF.PRECISE': 'FEILF.PRESIS',
     EVEN: 'AVRUND.TIL.PARTALL',
     EXACT: 'EKSAKT',
     EXP: 'EKSP',
