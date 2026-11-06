@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed approximate `XLOOKUP` ignoring values of a different type in some search modes, and approximate `MATCH`, `VLOOKUP`, and `HLOOKUP` taking such values into account for non-range arrays, single-cell ranges, and binary search over sorted cell ranges; both now behave the same in linear and binary search, consistent with Microsoft Excel. [#1755](https://github.com/handsontable/hyperformula/pull/1755)
 - Fixed formulas with consecutive percent operators failing to parse: each `%` now divides by 100, so `=5%%` returns `0.0005`, as in Excel. [#1773](https://github.com/handsontable/hyperformula/pull/1773)
 - Fixed `setCellContents` returning a `#ERROR!` parsing error instead of `#SPILL!` for an array formula whose whole-column or whole-row result cannot fit, such as `=SORT(A:A)` entered below the first row. The result now matches the one for the same formula loaded with `buildFromSheets`. [#1797](https://github.com/handsontable/hyperformula/pull/1797)
+- Fixed number literals with an uppercase exponent marker, which the lowercase form already accepted: `=1E5` now returns `100000` instead of `#ERROR!`, a parse error. [#1835](https://github.com/handsontable/hyperformula/pull/1835)
 
 ## [3.5.0] - 2026-10-09
 
