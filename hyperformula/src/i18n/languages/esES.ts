@@ -227,6 +227,7 @@ export const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'SYD',
     T: 'T',
+    TAKE: 'TOMAR',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'LETRA.DE.TEST.EQV.A.BONO',
