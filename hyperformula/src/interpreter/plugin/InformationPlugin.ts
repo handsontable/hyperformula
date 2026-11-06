@@ -441,7 +441,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param _state
    */
   public na(_ast: ProcedureAst, _state: InterpreterState): CellError {
-    return new CellError(ErrorType.NA)
+    return new CellError(ErrorType.NA, ErrorMessage.NaFunction)
   }
 
   /**
