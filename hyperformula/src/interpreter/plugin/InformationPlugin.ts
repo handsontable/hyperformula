@@ -3,14 +3,79 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../../error-message'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import {ArrayPlugin} from './ArrayPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginDefinition, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import {LookupPlugin} from './LookupPlugin'
+import {MatrixPlugin} from './MatrixPlugin'
+
+const TYPE_CODE_NUMBER = 1
+const TYPE_CODE_TEXT = 2
+const TYPE_CODE_BOOLEAN = 4
+const TYPE_CODE_ERROR = 16
+const TYPE_CODE_ARRAY = 64
+
+/**
+ * Codes returned by ERROR.TYPE. #NULL! (code 1) has no counterpart in HyperFormula. `#CYCLE!`, `#ERROR!` and `#LIC!`,
+ * which are HyperFormula's own errors, have no code and give `#N/A`.
+ */
+const ERROR_TYPE_CODES: Partial<Record<ErrorType, number>> = {
+  [ErrorType.DIV_BY_ZERO]: 2,
+  [ErrorType.VALUE]: 3,
+  [ErrorType.REF]: 4,
+  [ErrorType.NAME]: 5,
+  [ErrorType.NUM]: 6,
+  [ErrorType.NA]: 7,
+  [ErrorType.SPILL]: 9,
+}
+
+/**
+ * Functions that declare `sizeOfResultArrayMethod` but return the kind of their only argument: an array stays an
+ * array, while a single cell or a scalar stays a value.
+ */
+const FUNCTIONS_KEEPING_ARGUMENT_KIND = new Set(['ARRAYFORMULA', 'TRANSPOSE'])
+
+/**
+ * Functions that declare `sizeOfResultArrayMethod` but return a plain value or a reference when they find a single cell.
+ */
+const FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS = new Set(['XLOOKUP'])
+
+/**
+ * Returns the expression inside any number of enclosing parentheses.
+ *
+ * @param {Ast} ast - the expression, possibly in parentheses
+ */
+function withoutParentheses(ast: Ast): Ast {
+  while (ast.type === AstNodeType.PARENTHESIS) {
+    ast = ast.expression
+  }
+  return ast
+}
+
+/**
+ * Returns the TYPE code of a single (non-array) value.
+ *
+ * @param value
+ */
+function valueTypeCode(value: InterpreterValue): number {
+  if (value instanceof CellError) {
+    return TYPE_CODE_ERROR
+  }
+  if (typeof value === 'string') {
+    return TYPE_CODE_TEXT
+  }
+  if (typeof value === 'boolean') {
+    return TYPE_CODE_BOOLEAN
+  }
+  return TYPE_CODE_NUMBER
+}
 
 /**
  * Interpreter plugin containing information functions
@@ -34,6 +99,12 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
+    },
+    'ERROR.TYPE': {
+      method: 'errortype',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR}
+      ]
     },
     'ISBINARY': {
       method: 'isbinary',
@@ -149,7 +220,124 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       ],
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
+    },
+    'TYPE': {
+      method: 'type',
+      parameters: [
+        {argumentType: FunctionArgumentType.ANY}
+      ],
+      vectorizationForbidden: true,
+      enableArrayArithmeticForArguments: true,
     }
+  }
+
+  /**
+   * Corresponds to ERROR.TYPE(value)
+   *
+   * Returns the number of an error type (2-7 and 9), or #N/A when the value is not an error or the error has no code
+   *
+   * @param ast
+   * @param state
+   */
+  public errortype(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ERROR.TYPE'), (arg: InternalScalarValue) => {
+      if (!(arg instanceof CellError)) {
+        return new CellError(ErrorType.NA)
+      }
+      return ERROR_TYPE_CODES[arg.type] ?? new CellError(ErrorType.NA)
+    })
+  }
+
+  /**
+   * Corresponds to TYPE(value)
+   *
+   * Returns the type of a value: 1 for numbers and empty cells, 2 for text, 4 for booleans, 16 for errors
+   * and 64 for arrays of any size and multi-cell ranges. Errors are classified, not propagated.
+   *
+   * @param ast
+   * @param state
+   */
+  public type(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+    }
+    if (withoutParentheses(ast.args[0]).type === AstNodeType.ARRAY) {
+      // An array constant is an array whatever it holds, a single error included.
+      return TYPE_CODE_ARRAY
+    }
+    const value = this.evaluateAst(ast.args[0], state)
+    if (value instanceof SimpleRangeValue) {
+      return TYPE_CODE_ARRAY
+    }
+    if (!(value instanceof CellError) && (this.isRowOrColumnOfSeveralRowsOrColumns(ast.args[0], state) || this.isArrayExpression(ast.args[0]))) {
+      return TYPE_CODE_ARRAY
+    }
+    return valueTypeCode(value)
+  }
+
+  /**
+   * Whether the expression gives an array even when the array holds a single value. The interpreter turns
+   * a one-by-one array into its only value before TYPE receives it, so `{1}` and `SEQUENCE(1)` arrive as the
+   * number 1, and TYPE tells them apart from a plain 1 by the formula: an array constant, or a call to a function
+   * that the registry declares with `sizeOfResultArrayMethod`.
+   *
+   * @param {Ast} ast - the argument of TYPE
+   */
+  private isArrayExpression(ast: Ast): boolean {
+    ast = withoutParentheses(ast)
+    if (ast.type === AstNodeType.ARRAY) {
+      return true
+    }
+    if (ast.type !== AstNodeType.FUNCTION_CALL) {
+      return false
+    }
+    if (FUNCTIONS_KEEPING_ARGUMENT_KIND.has(ast.procedureName) && this.isBuiltIn(ast.procedureName)) {
+      return ast.args.length === 1 && this.isArrayExpression(ast.args[0])
+    }
+    if (FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS.has(ast.procedureName) && this.isBuiltIn(ast.procedureName)) {
+      return false
+    }
+    return this.interpreter.functionRegistry.getMetadata(ast.procedureName)?.sizeOfResultArrayMethod !== undefined
+  }
+
+  /**
+   * Whether the function registered under the name is the built-in one that a name-based rule of TYPE describes.
+   * A function registered over it is classified by its value and its metadata only.
+   *
+   * @param {string} functionId - the name of a function that a rule of TYPE names
+   */
+  private isBuiltIn(functionId: string): boolean {
+    const builtIn: Record<string, FunctionPluginDefinition> = {
+      ARRAYFORMULA: ArrayPlugin,
+      COLUMN: InformationPlugin,
+      ROW: InformationPlugin,
+      TRANSPOSE: MatrixPlugin,
+      XLOOKUP: LookupPlugin,
+    }
+    return builtIn[functionId] !== undefined && this.interpreter.functionRegistry.getFunctionPlugin(functionId) === builtIn[functionId]
+  }
+
+  /**
+   * ROW and COLUMN evaluate to a single number here, but TYPE reads ROW over more than one row, or COLUMN over more
+   * than one column, as an array. It is called only after the call evaluated to a value that is not an error.
+   *
+   * @param ast
+   * @param state
+   */
+  private isRowOrColumnOfSeveralRowsOrColumns(ast: Ast, state: InterpreterState): boolean {
+    ast = withoutParentheses(ast)
+    if (ast.type !== AstNodeType.FUNCTION_CALL || (ast.procedureName !== 'ROW' && ast.procedureName !== 'COLUMN') || ast.args.length !== 1 || !this.isBuiltIn(ast.procedureName)) {
+      return false
+    }
+    const arg = withoutParentheses(ast.args[0])
+    if (arg.type !== AstNodeType.CELL_RANGE && arg.type !== AstNodeType.COLUMN_RANGE && arg.type !== AstNodeType.ROW_RANGE) {
+      return false
+    }
+    const range = AbsoluteCellRange.fromAstOrUndef(arg, state.formulaAddress)
+    if (range === undefined) {
+      return false
+    }
+    return ast.procedureName === 'ROW' ? range.height() > 1 : range.width() > 1
   }
 
   /**
