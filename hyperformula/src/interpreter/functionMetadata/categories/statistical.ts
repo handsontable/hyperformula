@@ -435,6 +435,20 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=PERCENTILE.INC(A1:A10, 0.9)'],
   },
+  PERMUT: {
+    category: 'Statistical',
+    shortDescription: 'Returns the number of permutations of a given number of items chosen from a set (without repetitions).',
+    parameters: [{name: 'number', description: 'The total number of items; truncated to an integer.'}, {name: 'number_chosen', description: 'The number of items in each permutation; truncated to an integer and must not exceed number.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=PERMUT(5, 2)', '=PERMUT(10, 3)'],
+  },
+  PERMUTATIONA: {
+    category: 'Statistical',
+    shortDescription: 'Returns the number of permutations of a given number of items chosen from a set (with repetitions).',
+    parameters: [{name: 'number', description: 'The total number of items; truncated to an integer.'}, {name: 'number_chosen', description: 'The number of items in each permutation, where an item may repeat; truncated to an integer.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=PERMUTATIONA(3, 2)', '=PERMUTATIONA(2, 10)'],
+  },
   PHI: {
     category: 'Statistical',
     shortDescription: 'Returns probability density of normal distribution.',

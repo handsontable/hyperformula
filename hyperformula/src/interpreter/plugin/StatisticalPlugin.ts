@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {besseli, besselj, besselk, bessely} from './3rdparty/bessel/bessel'
@@ -550,12 +550,17 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
     )
   }
 
+  /**
+   * An empty `number_s2` slot, as in `=BINOM.DIST.RANGE(10,0.5,3,)`, counts as omitted: the probability of exactly
+   * `number_s` successes.
+   */
   public binomialdistrange(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const upperIsEmptySlot = ast.args[3]?.type === AstNodeType.EMPTY
     return this.runFunction(ast.args, state, this.metadata('BINOM.DIST.RANGE'),
       (trials: number, prob: number, succ: number, succUpper?: number) => {
         trials = Math.trunc(trials)
         succ = Math.trunc(succ)
-        succUpper = succUpper === undefined ? succ : Math.trunc(succUpper)
+        succUpper = succUpper === undefined || upperIsEmptySlot ? succ : Math.trunc(succUpper)
         if (succ > succUpper || succUpper > trials) {
           return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
         }
