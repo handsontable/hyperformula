@@ -119,7 +119,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | FLOOR.MATH    | =FLOOR.MATH(-4.7, 2, 2)                                        |           -6 |            -4 |              -4 |
 | GESTEP        | =GESTEP(A1:A2, 0)<br>where A1:A2: 1, 2; `useArrayArithmetic: true` |  Spills 1, 1 |   Not checked |           VALUE |
 | GESTEP        | =GESTEP(A:A, 0)<br>where column A is empty in the formula's row |            1 |   Not checked |           VALUE |
-| GESTEP        | =GESTEP(C1:C2, NA())<br>where C1:C2: `#N/A`, "x"               |        VALUE |   Not checked |             N/A |
+| GESTEP        | =GESTEP(C1:C2, NA())<br>in row 3 or below, where C1:C2: `#N/A`, "x" |        VALUE |   Not checked |             N/A |
 
 A few of the rows above share a root cause worth stating once:
 

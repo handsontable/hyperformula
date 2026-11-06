@@ -36,7 +36,8 @@ export class DeltaPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
   /**
    * An empty `number` slot, as in `=GESTEP(,0)`, is #N/A, while an empty `step` counts as 0. The `step` is
-   * checked first, so an error in it wins over an empty `number`, as it does over an error in `number`.
+   * checked first, so an error in it wins over an empty `number`, as it does over an error in `number`. A range
+   * that cannot be reduced to one value is #VALUE! before either argument reaches this callback.
    */
   public gestep(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     const numberIsEmptySlot = ast.args[0]?.type === AstNodeType.EMPTY
