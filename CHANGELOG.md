@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added `LINEST` for simple and multiple linear regression, with optional intercept and regression statistics. The `stats` argument must be constant because result dimensions are determined before evaluation. [#1769](https://github.com/handsontable/hyperformula/pull/1769)
 - Added the `CONCAT` function, which joins text from values, ranges, and arrays, and the `VALUETOTEXT` function, which returns a value as text in a concise or a strict format. [#1816](https://github.com/handsontable/hyperformula/pull/1816)
+- Added the statistical functions `KURT`, `MODE.SNGL` (with the `MODE` alias), `PERCENTRANK.EXC` and `TRIMMEAN`. [#1800](https://github.com/handsontable/hyperformula/pull/1800)
 
 ### Fixed
 
@@ -19,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed approximate `XLOOKUP` ignoring values of a different type in some search modes, and approximate `MATCH`, `VLOOKUP`, and `HLOOKUP` taking such values into account for non-range arrays, single-cell ranges, and binary search over sorted cell ranges; both now behave the same in linear and binary search, consistent with Microsoft Excel. [#1755](https://github.com/handsontable/hyperformula/pull/1755)
 - Fixed formulas with consecutive percent operators failing to parse: each `%` now divides by 100, so `=5%%` returns `0.0005`, as in Excel. [#1773](https://github.com/handsontable/hyperformula/pull/1773)
 - Fixed `setCellContents` returning a `#ERROR!` parsing error instead of `#SPILL!` for an array formula whose whole-column or whole-row result cannot fit, such as `=SORT(A:A)` entered below the first row. The result now matches the one for the same formula loaded with `buildFromSheets`. [#1797](https://github.com/handsontable/hyperformula/pull/1797)
+- Fixed `AVEDEV`, `DEVSQ`, `GCD`, `GEOMEAN`, `HARMEAN`, `LCM`, `MEDIAN`, `NPV`, `SKEW` and `SKEW.P` stopping the engine from building on a range of about 125,000 cells or more. [#1800](https://github.com/handsontable/hyperformula/pull/1800)
 
 ## [3.5.0] - 2026-10-09
 

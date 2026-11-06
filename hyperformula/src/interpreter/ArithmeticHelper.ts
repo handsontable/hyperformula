@@ -505,8 +505,10 @@ export class ArithmeticHelper {
         const arr = rangeFn(val.valuesFromTopLeftCorner())
         if (arr instanceof CellError) {
           return arr
-        } else {
-          expandedVals.push(...arr)
+        }
+        // A loop rather than push(...arr): spreading a large range as arguments exceeds the call stack.
+        for (const value of arr) {
+          expandedVals.push(value)
         }
       } else {
         expandedVals.push(val)
