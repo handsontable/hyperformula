@@ -70,6 +70,7 @@ Each line names the page that owns the rules and when it applies. Where reviews 
 - [ ] Nothing breaks the [sensitive information rules](SENSITIVE-INFORMATION.md) — *always: code, comments, commits, pull request text, changelog, docs*
   - Most often missed: client names; personal data; credentials; private URLs; internal ticket content.
 - [ ] None of the mistakes in [Common ways agents fail](../AGENTS.md#common-ways-agents-fail) slipped through — *pull requests written with an AI agent*
+- [ ] The AI assistance section of the description names the tool and what it wrote, and those parts meet [AI-assisted changes](DEFINITION-OF-DONE.md#ai-assisted-changes), licence check included — *pull requests written with an AI tool*
 - [ ] An external contribution follows the [contributing guide](../CONTRIBUTING.md): CLA signed, tests in `hyperformula/test/` — *pull requests from outside the team*
 
 ## Review-specific checks
