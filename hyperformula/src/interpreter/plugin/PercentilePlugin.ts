@@ -86,7 +86,7 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 3},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 3, emptyAsDefault: true},
       ],
     },
     'QUARTILE.INC': {
@@ -165,10 +165,7 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
   public percentrankExc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PERCENTRANK.EXC'),
       (range: SimpleRangeValue, x: number, significance: number) => {
-        const digits = Math.trunc(significance)
-        if (digits < 1) {
-          return new CellError(ErrorType.NUM, ErrorMessage.LessThanOne)
-        }
+        // Checked in Excel's order: an error in the range, then x outside the values, then the significance.
         const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
         if (vals instanceof CellError) {
           return vals
@@ -180,6 +177,10 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
         }
         if (n === 1) {
           return 1
+        }
+        const digits = Math.trunc(significance)
+        if (digits < 1) {
+          return new CellError(ErrorType.NUM, ErrorMessage.LessThanOne)
         }
         const upperIndex = vals.findIndex(val => val >= x)
         const rank = vals[upperIndex] === x

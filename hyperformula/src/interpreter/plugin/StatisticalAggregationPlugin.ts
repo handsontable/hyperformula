@@ -8,6 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {
+  EmptyValue,
   getRawValue,
   InternalScalarValue,
   InterpreterValue,
@@ -587,7 +588,8 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
   /**
    * Corresponds to MODE(Number1, Number2, ...) and MODE.SNGL(Number1, Number2, ...).
    *
-   * Returns the most frequent number; on a tie, the one that occurs first. Text and boolean values are ignored.
+   * Returns the most frequent number; on a tie, the one that occurs first. Text and boolean values are ignored, while
+   * an empty argument, or a reference to an empty cell passed as an argument, is #VALUE!.
    *
    * @param ast
    * @param state
@@ -597,6 +599,9 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
       (...args: InterpreterValue[]) => {
         const values: number[] = []
         for (const arg of args) {
+          if (arg === EmptyValue) {
+            return new CellError(ErrorType.VALUE, ErrorMessage.EmptyArg)
+          }
           const scalars: InternalScalarValue[] = arg instanceof SimpleRangeValue ? arg.valuesFromTopLeftCorner() : [arg]
           const numbers = this.arithmeticHelper.manyToExactNumbers(scalars)
           if (numbers instanceof CellError) {
@@ -633,12 +638,13 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
   public trimmean(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TRIMMEAN'),
       (range: SimpleRangeValue, percent: number) => {
-        if (percent < 0 || percent >= 1) {
-          return new CellError(ErrorType.NUM, percent < 0 ? ErrorMessage.ValueSmall : ErrorMessage.ValueLarge)
-        }
+        // The range is read before `percent` is checked, so an error in the range is returned first, as in Excel.
         const values = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
         if (values instanceof CellError) {
           return values
+        }
+        if (percent < 0 || percent >= 1) {
+          return new CellError(ErrorType.NUM, percent < 0 ? ErrorMessage.ValueSmall : ErrorMessage.ValueLarge)
         }
         if (values.length === 0) {
           return new CellError(ErrorType.NUM, ErrorMessage.OneValue)
