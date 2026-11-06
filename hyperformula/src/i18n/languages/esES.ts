@@ -402,6 +402,7 @@ export const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'INTERVALO.CONFIANZA.T',
     DEVSQ: 'DESVIA2',
     GEOMEAN: 'MEDIA.GEOM',
+    GESTEP: 'MAYOR.O.IGUAL',
     HARMEAN: 'MEDIA.ARMO',
     CRITBINOM: 'BINOM.CRIT',
     PEARSON: 'PEARSON',
