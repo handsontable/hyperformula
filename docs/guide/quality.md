@@ -1,4 +1,5 @@
 ---
+title: "Quality & Security"
 tags:
   - audits
   - OWASP
@@ -7,8 +8,6 @@ tags:
   - vulnerability scanning
   - reliability
 ---
-
-# Quality & Security
 
 HyperFormula is built with the highest standards of software quality, backed by rigorous research, comprehensive testing, and transparent development practices.
 
@@ -35,7 +34,7 @@ Quality assurance is at the heart of our development process:
 - Continuous integration across multiple environments
 - Regular performance comparisons between versions
 
-::: tip
+:::tip
 Our high test coverage means you can be confident that HyperFormula will behave predictably in your application, even in complex scenarios.
 :::
 
@@ -62,6 +61,7 @@ HyperFormula maintains the highest security standards to protect your applicatio
 
 - **Regular external security audits** conducted by independent security experts
 - **Dependency vulnerability scanning** using industry-leading tools including Fossa, Dependabot, and Snyk
+- **Static code analysis** with GitHub CodeQL on every pull request, on every push to the main branches, and weekly
 - **Security risk assessments** to identify and mitigate potential threats
 - **Proactive monitoring** of security advisories and immediate response to emerging threats
 
@@ -75,7 +75,7 @@ The assessment covered HyperFormula [v3.3.0](https://www.npmjs.com/package/hyper
 - **Static, dynamic, and manual code analysis** carried out against the OWASP Application Security Verification Standard (ASVS), with a focus on the OWASP Top 10
 - **Dependency and dev-dependency analysis** to identify vulnerabilities in third-party packages
 
-<a :href="$withBase('/hyperformula_security_certificate.pdf')">Download the security certificate (PDF) &#8594;</a>
+[Download the security certificate (PDF) &#8594;](/hyperformula_security_certificate.pdf)
 
 ## Quality Assurance Process
 
