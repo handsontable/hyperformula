@@ -27,6 +27,7 @@ export class ErrorMessage {
   public static NumberExpected = 'Number argument expected.'
   public static IntegerExpected = 'Value needs to be an integer.'
   public static BadMode = 'Mode not recognized.'
+  public static BadFormat = 'Format not recognized.'
   public static DateBounds = 'Date outside of bounds.'
   public static OutOfSheet = 'Resulting reference is out of the sheet.'
   public static WrongType = 'Wrong type of argument.'

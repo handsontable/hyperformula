@@ -12,10 +12,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added `LINEST` for simple and multiple linear regression, with optional intercept and regression statistics. The `stats` argument must be constant because result dimensions are determined before evaluation. [#1769](https://github.com/handsontable/hyperformula/pull/1769)
 - Added the `CONCAT` function, which joins text from values, ranges, and arrays, and the `VALUETOTEXT` function, which returns a value as text in a concise or a strict format. [#1816](https://github.com/handsontable/hyperformula/pull/1816)
 
+### Changed
+
+- Changed the `stringifyDateTime` and `stringifyDuration` callbacks to receive the number-format mask without its color section, for example `dd-mm-yyyy` for `[Red]dd-mm-yyyy`. [#1716](https://github.com/handsontable/hyperformula/pull/1716)
+
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
 - Fixed `getCellValue()`, `getSheetValues()` and the other methods that export cell values ignoring the `evaluateNullToZero` option: with the option on, they now return `0` for empty cells instead of `null`. [#1738](https://github.com/handsontable/hyperformula/pull/1738)
+- Fixed the `TEXT` function mishandling number-format masks with thousands grouping (`#,##0`) or positive, negative and zero sections (`0.00;(0.00)`), and made it honor the `decimalSeparator` and `thousandSeparator` options and return `#VALUE!` for a mask with an unclosed `[`. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
 - Fixed approximate `XLOOKUP` ignoring values of a different type in some search modes, and approximate `MATCH`, `VLOOKUP`, and `HLOOKUP` taking such values into account for non-range arrays, single-cell ranges, and binary search over sorted cell ranges; both now behave the same in linear and binary search, consistent with Microsoft Excel. [#1755](https://github.com/handsontable/hyperformula/pull/1755)
 - Fixed formulas with consecutive percent operators failing to parse: each `%` now divides by 100, so `=5%%` returns `0.0005`, as in Excel. [#1773](https://github.com/handsontable/hyperformula/pull/1773)
 - Fixed `setCellContents` returning a `#ERROR!` parsing error instead of `#SPILL!` for an array formula whose whole-column or whole-row result cannot fit, such as `=SORT(A:A)` entered below the first row. The result now matches the one for the same formula loaded with `buildFromSheets`. [#1797](https://github.com/handsontable/hyperformula/pull/1797)
