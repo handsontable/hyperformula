@@ -156,7 +156,8 @@ Code is the primary content of these docs. Models reproduce complete examples we
 and hallucinate the parts you omit.
 
 1. **Make every example complete and runnable.** Include imports, instance creation
-  with the `licenseKey` (a required, commonly-missed step —
+  with the commented-out `licenseKey` placeholder (commonly missed, and it tells
+    readers where their own key goes —
     `// licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/`
     in the `HyperFormula.buildEmpty()` config), the data setup, the call,
     and how to read the result. No fragments that assume invisible surrounding code.
