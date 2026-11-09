@@ -80,15 +80,22 @@ function countChars(text: string, char: string) {
 /**
  * Renders a numeric mask after scaling once for each active percent operator.
  * Scaling precedes rounding and leaves custom formatter callbacks unaffected.
+ * The scaled value keeps 15 significant digits, so binary multiplication error
+ * does not move half-way values below the rounding boundary.
  */
 function numberFormat(tokens: FormatToken[], value: number): RawScalarValue {
+  let scaled = false
   for (const token of tokens) {
     if (token.type === TokenType.PERCENT) {
       value *= 100
+      scaled = true
       if (!Number.isFinite(value)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
       }
     }
+  }
+  if (scaled) {
+    value = Number(value.toPrecision(15))
   }
   let result = ''
 
