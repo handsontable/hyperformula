@@ -649,9 +649,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * Corresponds to TEXTSPLIT(text, col_delimiter, [row_delimiter], [ignore_empty], [match_mode], [pad_with])
    *
    * Splits text into rows on row_delimiter, then splits each row into columns on col_delimiter.
-   * Both delimiters may be arrays of delimiters; an empty col_delimiter or row_delimiter argument
-   * means that the text is not split along that axis. When ignore_empty is TRUE, empty pieces
-   * (and rows left with no pieces) are skipped. match_mode 1 makes the matching case-insensitive.
+   * Both delimiters may be arrays of delimiters; an omitted row_delimiter, or an empty argument slot for either
+   * delimiter, means that the text is not split along that axis, while an empty cell is #VALUE!. When ignore_empty is TRUE, empty pieces
+   * (and rows left with no pieces) are skipped. match_mode, truncated to an integer, must be 0 or 1;
+   * 1 makes the matching case-insensitive.
    * Rows shorter than the widest one are padded with pad_with (#N/A by default).
    *
    * @param {ProcedureAst} ast - The procedure AST node
@@ -678,11 +679,12 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
           return rowDelimiters
         }
 
-        if (!TextPlugin.isZeroOrOne(matchMode)) {
+        const mode = Math.trunc(matchMode)
+        if (!TextPlugin.isZeroOrOne(mode)) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
         }
 
-        const rows = TextPlugin.splitText(text, colDelimiters, rowDelimiters, ignoreEmpty, matchMode === 1)
+        const rows = TextPlugin.splitText(text, colDelimiters, rowDelimiters, ignoreEmpty, mode === 1)
         if (rows instanceof CellError) {
           return rows
         }
@@ -727,11 +729,12 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       return ArraySize.error()
     }
 
-    if (!TextPlugin.isZeroOrOne(matchMode)) {
+    const mode = Math.trunc(matchMode)
+    if (!TextPlugin.isZeroOrOne(mode)) {
       return ArraySize.scalar()
     }
 
-    const rows = TextPlugin.splitText(text, colDelimiters, rowDelimiters, ignoreEmpty !== 0, matchMode === 1)
+    const rows = TextPlugin.splitText(text, colDelimiters, rowDelimiters, ignoreEmpty !== 0, mode === 1)
     if (rows instanceof CellError) {
       return ArraySize.scalar()
     }
@@ -748,10 +751,11 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * Shared logic of TEXTBEFORE and TEXTAFTER.
    *
    * - delimiter may be an array of delimiters; occurrences of any of them are counted in text order.
-   * - instance_num is truncated to an integer; a negative instance_num counts occurrences from the end of text.
+   * - instance_num is rounded down to an integer; a negative instance_num counts occurrences from the end of text.
    *   0 is #VALUE!. Unless a delimiter is empty, an absolute value larger than the number of places where the shortest
    *   delimiter fits in text (the length of text minus the length of that delimiter, plus 1) is #VALUE! when
    *   instance_num is given, and counts as not found when it is omitted.
+   * - match_mode and match_end are truncated to integers, and each must then be 0 or 1.
    * - match_mode 1 makes the matching case-insensitive.
    * - match_end 1 treats the end of text (or its start, for a negative instance_num) as one more delimiter.
    * - When the delimiter is not found, if_not_found is returned, or #N/A when it is omitted.
@@ -780,11 +784,13 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       return delimiters
     }
 
-    if (!TextPlugin.isZeroOrOne(matchMode) || !TextPlugin.isZeroOrOne(matchEnd)) {
+    const mode = Math.trunc(matchMode)
+    const end = Math.trunc(matchEnd)
+    if (!TextPlugin.isZeroOrOne(mode) || !TextPlugin.isZeroOrOne(end)) {
       return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
     }
 
-    const instance = Math.trunc(instanceNum)
+    const instance = Math.floor(instanceNum)
     if (instance === 0) {
       return new CellError(ErrorType.VALUE, ErrorMessage.IndexBounds)
     }
@@ -802,7 +808,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         : TextPlugin.notFoundValue(ifNotFound)
     }
 
-    const match = TextPlugin.findDelimiterOccurrence(text, delimiters, instance, matchMode === 1, matchEnd === 1)
+    const match = TextPlugin.findDelimiterOccurrence(text, delimiters, instance, mode === 1, end === 1)
     if (match !== undefined) {
       return extractText(match)
     }
