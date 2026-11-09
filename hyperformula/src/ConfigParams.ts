@@ -299,7 +299,9 @@ export interface ConfigParams {
   /**
    * Sets a function that converts date-time values into strings.
    *
-   * The function should return a string or undefined.
+   * The function should return a string or undefined. For the `TEXT` function, it receives the mask without
+   * color tags (`dd-mm-yyyy` for `[Red]dd-mm-yyyy`), and it is not called for a mask that `TEXT` rejects with
+   * `#VALUE!`: one with an unclosed `[` or a lone backslash at its end.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    * @default defaultStringifyDateTime
@@ -309,7 +311,9 @@ export interface ConfigParams {
   /**
    * Sets a function that converts time duration values into strings.
    *
-   * The function should return a string or undefined.
+   * The function should return a string or undefined. For the `TEXT` function, it receives the mask without
+   * color tags (`[hh]:mm` for `[Red][hh]:mm`), and it is not called for a mask that `TEXT` rejects with
+   * `#VALUE!`: one with an unclosed `[` or a lone backslash at its end.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    * @default defaultStringifyDuration

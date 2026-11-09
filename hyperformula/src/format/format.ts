@@ -412,6 +412,9 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
   return negative && hasNonZeroDigit ? '-' + result : result
 }
 
+/** The most decimal places `Number#toFixed` accepts. */
+const MAX_TO_FIXED_DIGITS = 100
+
 /**
  * Stringifies the integer and fractional digits of a magnitude for rendering:
  * the value is rounded to `decimalPlaces` and split on the dot, with the
@@ -427,6 +430,9 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
  * - a value below `1e-6` keeps its digits, written after the leading zeros
  *   (`0.0000001`).
  *
+ * A mask with more than 100 decimal places is rounded at the 100th, the most `toFixed` takes; the placeholder
+ * padding writes the rest as zeros.
+ *
  * @param absValue the non-negative magnitude to stringify
  * @param decimalPlaces the number of decimal places requested by the format
  * @returns the integer digits and the trailing-zero-free fractional digits
@@ -436,7 +442,7 @@ function stringifyMagnitude(absValue: number, decimalPlaces: number): { integerP
     const [mantissa, exponent] = absValue.toPrecision(15).split('e+')
     return {integerPart: mantissa.replace('.', '').padEnd(Number(exponent) + 1, '0'), decimalPart: ''}
   }
-  const valueParts = toPlainNotation(Number(absValue.toFixed(decimalPlaces))).split('.')
+  const valueParts = toPlainNotation(Number(absValue.toFixed(Math.min(decimalPlaces, MAX_TO_FIXED_DIGITS)))).split('.')
   return {integerPart: valueParts[0] || '', decimalPart: valueParts[1] || ''}
 }
 

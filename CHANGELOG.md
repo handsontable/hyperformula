@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- Changed the `stringifyDateTime` and `stringifyDuration` callbacks to receive the number-format mask without its color section, for example `dd-mm-yyyy` for `[Red]dd-mm-yyyy`. [#1716](https://github.com/handsontable/hyperformula/pull/1716)
+- Changed the `stringifyDateTime` and `stringifyDuration` callbacks to receive the number-format mask without its color section, for example `dd-mm-yyyy` for `[Red]dd-mm-yyyy`, and not to be called for a mask that `TEXT` rejects with `#VALUE!`. [#1716](https://github.com/handsontable/hyperformula/pull/1716)
 
 ### Fixed
 
