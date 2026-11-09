@@ -157,7 +157,8 @@ and hallucinate the parts you omit.
 
 1. **Make every example complete and runnable.** Include imports, instance creation
   with the `licenseKey` (a required, commonly-missed step —
-    `HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' })`), the data setup, the call,
+    `// licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/`
+    in the `HyperFormula.buildEmpty()` config), the data setup, the call,
     and how to read the result. No fragments that assume invisible surrounding code.
 2. **Show where code lives when structure matters** — a filename comment
   (`// src/calc.ts`) or a short file tree for multi-file examples, so the reader can

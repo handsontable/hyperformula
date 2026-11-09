@@ -83,7 +83,9 @@ Once installed, you can use it to develop applications tailored to your specific
 import { HyperFormula } from 'hyperformula';
 
 // Create a HyperFormula instance
-const hf = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+const hf = HyperFormula.buildEmpty({
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/
+});
 
 // Add an empty sheet
 const sheetName = hf.addSheet('Mortgage Calculator');
