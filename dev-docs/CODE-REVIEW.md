@@ -105,7 +105,7 @@ Each line names the page that owns the rules and when it applies. Where reviews 
 ## Reporting findings
 
 - **One line per finding:** what is wrong, where, and what to do instead. No praise, no summary of what the pull request does.
-- **Label every comment.** `blocking:` must be fixed before merge; `suggestion:` and `nit:` are the author's call; `question:` means you need an answer to judge. Separate "this is a bug" from "I would have done it differently", and never present the second as the first.
+- **Label every comment.** `blocking:` must be fixed before merge; `suggestion:` and `nit:` are the author's call; `question:` means you need an answer to judge. Anything the [Definition of Done](DEFINITION-OF-DONE.md) requires is `blocking:` when it is missing or wrong. Separate "this is a bug" from "I would have done it differently", and never present the second as the first.
 - **Comments stand on their own.** The author should not need to open the spec to understand them. Explain why, so the author — human or agent — learns the rule, not only the fix.
 - **Use `suggestion` blocks** for small textual changes: changelog, docs, naming.
 - **Every comment you post is yours.** Verify each finding yourself, including the ones an AI review produced. Never paste raw AI output into a pull request.
