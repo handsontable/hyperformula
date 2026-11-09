@@ -61,6 +61,7 @@ HyperFormula maintains the highest security standards to protect your applicatio
 
 - **Regular external security audits** conducted by independent security experts
 - **Dependency vulnerability scanning** using industry-leading tools including Fossa, Dependabot, and Snyk
+- **Static code analysis** with GitHub CodeQL on every pull request, on every push to the main branches, and weekly
 - **Security risk assessments** to identify and mitigate potential threats
 - **Proactive monitoring** of security advisories and immediate response to emerging threats
 
