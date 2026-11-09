@@ -391,7 +391,7 @@ const dictionary: RawTranslationPackage = {
     LARGE: 'BESAR',
     SMALL: 'KECIL',
     'RANK.EQ': 'RANK.EQ',
-    RANK: 'RANK',
+    RANK: 'PERINGKAT',
     PERCENTILE: 'PERCENTILE',
     'PERCENTILE.INC': 'PERCENTILE.INC',
     'PERCENTILE.EXC': 'PERCENTILE.EXC',
