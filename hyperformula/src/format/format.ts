@@ -42,7 +42,7 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   if (tryCurrency !== undefined) {
     return tryCurrency
   }
-  if (hasUnclosedBracket(formatArg)) {
+  if (hasUnclosedBracket(formatArg) || endsWithLoneBackslash(formatArg)) {
     return new CellError(ErrorType.VALUE, ErrorMessage.BadFormat)
   }
   // Strip presentational color tags AFTER the (user-pluggable) currency callback
@@ -84,6 +84,31 @@ function hasUnclosedBracket(formatArg: string): boolean {
       i++
     } else if (ch === '[' && !formatArg.includes(']', i + 1)) {
       return true
+    }
+  }
+  return false
+}
+
+/**
+ * Tells whether a format string ends with a backslash that escapes nothing, as in
+ * `0\` or `dd\`. Such a format is invalid, so `TEXT` returns `#VALUE!`. An
+ * escaped backslash (`0\\`) or a backslash inside quoted text (`0"\"`) is
+ * literal text and does not count.
+ *
+ * @param formatArg the raw format string
+ * @returns `true` when the last character is a backslash that escapes nothing
+ */
+function endsWithLoneBackslash(formatArg: string): boolean {
+  let inQuotes = false
+  for (let i = 0; i < formatArg.length; i++) {
+    const ch = formatArg[i]
+    if (ch === '"') {
+      inQuotes = !inQuotes
+    } else if (!inQuotes && ch === '\\') {
+      if (i === formatArg.length - 1) {
+        return true
+      }
+      i++
     }
   }
   return false

@@ -47,6 +47,18 @@ a circular reference.
 * Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
 * The TEXT function does not accept embedded double-quote literals in the format string. In Excel, `""` inside a format string is an escape sequence for a literal `"` character — e.g. `=TEXT(1234.5, "#,##0.00 ""zł""")` returns `"1,234.50 zł"`. If your application requires this escape sequence, supply a custom [`stringifyCurrency`](currency-handling.md) callback.
 
+### TEXT function
+
+* The built-in number formatter does not implement these Excel number formats, so a mask that uses one returns a different result than in Excel:
+  * percent scaling (`0.00%`),
+  * scaler commas (`0,,`): `=TEXT(5000000, "0,,")` returns `5000000,,`, where Excel returns `5`,
+  * the `?` placeholder,
+  * scientific notation (`0.00E+00`),
+  * `[condition]` comparators,
+  * more than one group of digit placeholders: `=TEXT(5551234567, "(000) 000-0000")` returns `(5551234567) 000-0000`, where Excel returns `(555) 123-4567`,
+  * a mask that starts with the decimal point: `=TEXT(0.5, ".00")` returns `.01`, where Excel returns `.50`.
+* For these formats, supply a [`stringifyCurrency`](currency-handling.md) callback. See also [`TEXT` function formats](compatibility-with-microsoft-excel.md#text-function-formats).
+
 ### UNIQUE function
 
 * Comparison of values follows HyperFormula's own equality rules, which honor the `caseSensitive` and `accentSensitive` configuration options. By default comparison is case-insensitive.
