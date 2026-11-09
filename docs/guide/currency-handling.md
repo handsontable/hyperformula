@@ -67,7 +67,7 @@ console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })); // "1234.50 zł"
 
 Configure `stringifyCurrency` when your formula corpus needs more advanced currency formats. E.g.:
 
-- LCID-tagged symbols (`"[$€-2] #,##0.00"`, `"[$zł-415] #,##0.00"`), whose tag the built-in formatter writes as text,
+- LCID-tagged symbols (`"[$€-2] #,##0.00"`, `"[$zł-415] #,##0.00"`), which the built-in formatter does not interpret,
 - separators other than the configured [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) and [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator), which are the ones the built-in formatter writes, such as the Polish `"1 234,50 zł"` pattern in an instance with the default separators.
 
 The built-in formatter groups thousands (`"$#,##0.00"`) only when `thousandSeparator` is set, and it picks the section of an accounting format (`"$#,##0.00;($#,##0.00)"`) by the sign of the value. See [`TEXT` function formats](compatibility-with-microsoft-excel.md#text-function-formats).
@@ -107,7 +107,7 @@ Side-by-side comparison of the default formatter and the docs adapter from the s
 | `"$0.00"` | `"$1234.50"` | `"$1234.50"` |
 | `"$#.00"` | `"$1234.50"` | `"$1234.50"` |
 | `"$#,##0.00"` | `"$1234.50"` (no grouping glyph) | `"$1,234.50"` |
-| `"[$€-2] #,##0.00"` | `"[$€-2] 1234.50"` (tag written as text, no grouping glyph) | `"1.234,50 €"` |
+| `"[$€-2] #,##0.00"` | `"[$€-2] 1234.50"` (tag not interpreted, no grouping glyph) | `"1.234,50 €"` |
 | `"$#,##0.00;($#,##0.00)"` (value `-1234.5`) | `"($1234.50)"` (no grouping glyph) | `"($1,234.50)"` |
 
 The "Without callback" column uses the default config, where `thousandSeparator` is empty, so the built-in formatter writes no grouping glyph.
@@ -203,7 +203,7 @@ export const customStringifyCurrency = (value, currencyFormat) => {
 #### Limitations of the reference adapter
 
 - **It uses each currency's CLDR locale conventions, not your HyperFormula config.** Output is produced by `Intl.NumberFormat`, so the thousands grouping and decimal separator come from the currency's locale (e.g. `pl-PL` → `1 234,50 zł`, `de-DE` → `1.234,50 €`). The adapter does **not** read HyperFormula's [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) / [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator) config.
-- **It recognizes only a representative subset of format shapes.** It handles LCID-tagged formats (`[$SYM-LCID] #,##0.00`), `$`-shorthand (`$#,##0.00`), and simple two-section accounting (`$#,##0.00;($#,##0.00)`). For any other shape it returns `undefined`, so HyperFormula falls through to its built-in number formatter, which writes the separators from your config and an LCID tag as text.
+- **It recognizes only a representative subset of format shapes.** It handles LCID-tagged formats (`[$SYM-LCID] #,##0.00`), `$`-shorthand (`$#,##0.00`), and simple two-section accounting (`$#,##0.00;($#,##0.00)`). For any other shape it returns `undefined`, so HyperFormula falls through to its built-in number formatter, which writes the separators from your config and does not interpret LCID tags.
 
 If you need more complex currency formatting such as:
 - Arbitrary Excel-style format strings,
