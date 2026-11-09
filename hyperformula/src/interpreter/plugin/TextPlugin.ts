@@ -619,10 +619,11 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * @param {InterpreterState} state - The interpreter state
    */
   public textbefore(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const instanceNumIsGiven = ast.args[2] !== undefined && !TextPlugin.isEmptySlot(ast.args[2])
     const ifNotFoundSlotIsEmpty = TextPlugin.isEmptySlot(ast.args[5])
     return this.runFunction(ast.args, state, this.metadata('TEXTBEFORE'),
       (text: string, delimiterArg: InternalScalarValue | SimpleRangeValue, instanceNum: number, matchMode: number, matchEnd: number, ifNotFound: Maybe<InternalScalarValue>) =>
-        this.textAroundDelimiter(text, delimiterArg, instanceNum, matchMode, matchEnd, TextPlugin.ifNotFoundValue(ifNotFound, ifNotFoundSlotIsEmpty), (match) => text.substring(0, match.start))
+        this.textAroundDelimiter(text, delimiterArg, instanceNum, instanceNumIsGiven, matchMode, matchEnd, TextPlugin.ifNotFoundValue(ifNotFound, ifNotFoundSlotIsEmpty), (match) => text.substring(0, match.start))
     )
   }
 
@@ -636,10 +637,11 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * @param {InterpreterState} state - The interpreter state
    */
   public textafter(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const instanceNumIsGiven = ast.args[2] !== undefined && !TextPlugin.isEmptySlot(ast.args[2])
     const ifNotFoundSlotIsEmpty = TextPlugin.isEmptySlot(ast.args[5])
     return this.runFunction(ast.args, state, this.metadata('TEXTAFTER'),
       (text: string, delimiterArg: InternalScalarValue | SimpleRangeValue, instanceNum: number, matchMode: number, matchEnd: number, ifNotFound: Maybe<InternalScalarValue>) =>
-        this.textAroundDelimiter(text, delimiterArg, instanceNum, matchMode, matchEnd, TextPlugin.ifNotFoundValue(ifNotFound, ifNotFoundSlotIsEmpty), (match) => text.substring(match.end))
+        this.textAroundDelimiter(text, delimiterArg, instanceNum, instanceNumIsGiven, matchMode, matchEnd, TextPlugin.ifNotFoundValue(ifNotFound, ifNotFoundSlotIsEmpty), (match) => text.substring(match.end))
     )
   }
 
@@ -747,7 +749,9 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    *
    * - delimiter may be an array of delimiters; occurrences of any of them are counted in text order.
    * - instance_num is truncated to an integer; a negative instance_num counts occurrences from the end of text.
-   *   0, or an absolute value larger than the length of a non-empty text, is #VALUE!.
+   *   0 is #VALUE!. Unless a delimiter is empty, an absolute value larger than the number of places where the shortest
+   *   delimiter fits in text (the length of text minus the length of that delimiter, plus 1) is #VALUE! when
+   *   instance_num is given, and counts as not found when it is omitted.
    * - match_mode 1 makes the matching case-insensitive.
    * - match_end 1 treats the end of text (or its start, for a negative instance_num) as one more delimiter.
    * - When the delimiter is not found, if_not_found is returned, or #N/A when it is omitted.
@@ -755,6 +759,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * @param {string} text - The text to search
    * @param {InternalScalarValue | SimpleRangeValue} delimiterArg - The delimiter or array of delimiters
    * @param {number} instanceNum - Which occurrence of the delimiter to use
+   * @param {boolean} instanceNumIsGiven - Whether instance_num is given, rather than omitted or left as an empty slot
    * @param {number} matchMode - 0 for case-sensitive, 1 for case-insensitive matching
    * @param {number} matchEnd - 1 to treat the end of text as a delimiter
    * @param {Maybe<InternalScalarValue>} ifNotFound - The value returned when the delimiter is not found
@@ -764,6 +769,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     text: string,
     delimiterArg: InternalScalarValue | SimpleRangeValue,
     instanceNum: number,
+    instanceNumIsGiven: boolean,
     matchMode: number,
     matchEnd: number,
     ifNotFound: Maybe<InternalScalarValue>,
@@ -789,8 +795,11 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       return extractText({start: position, end: position})
     }
 
-    if (text.length > 0 && Math.abs(instance) > text.length) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.IndexBounds)
+    const shortestDelimiterLength = delimiters.reduce((shortest, delimiter) => Math.min(shortest, delimiter.length), Infinity)
+    if (Math.abs(instance) > text.length - shortestDelimiterLength + 1) {
+      return instanceNumIsGiven
+        ? new CellError(ErrorType.VALUE, ErrorMessage.IndexBounds)
+        : TextPlugin.notFoundValue(ifNotFound)
     }
 
     const match = TextPlugin.findDelimiterOccurrence(text, delimiters, instance, matchMode === 1, matchEnd === 1)
@@ -798,6 +807,15 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       return extractText(match)
     }
 
+    return TextPlugin.notFoundValue(ifNotFound)
+  }
+
+  /**
+   * The result of TEXTBEFORE and TEXTAFTER when the delimiter is not found: if_not_found, or #N/A when it is omitted.
+   *
+   * @param {Maybe<InternalScalarValue>} ifNotFound - The resolved if_not_found argument
+   */
+  private static notFoundValue(ifNotFound: Maybe<InternalScalarValue>): InternalScalarValue {
     return ifNotFound === undefined
       ? new CellError(ErrorType.NA, ErrorMessage.PatternNotFound)
       : ifNotFound
