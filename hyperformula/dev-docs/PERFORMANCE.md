@@ -8,7 +8,7 @@ HyperFormula is a calculation engine, so the performance of production code is a
 - **Memory counts.** No cache grows without eviction, and no reference is left behind after sheets, rows or columns are removed. The memory footprint of a new cache is known and acceptable.
 - **Bound the input.** Set a limit or a budget against huge ranges and very long strings.
 - **Mind the bundle.** No unnecessary imports, polyfills or data tables.
-- Run `npm run test:performance` for changes that may affect the evaluation or CRUD hot paths, and check the result is within noise.
+- Run `npm run test:performance` for changes that may affect the evaluation or CRUD hot paths, and check the result is within noise. On a pull request, the Performance workflow posts a comment with an advisory verdict for each scenario; `hyperformula/test/hyperformula-tests/performance/README.md` explains where each threshold comes from and how to read the verdicts.
 
 Hot paths worth knowing about before touching them:
 
