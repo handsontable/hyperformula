@@ -8,10 +8,6 @@ This software is protected by applicable copyright laws, including international
 licensed - depending on whether your use for commercial purposes, meaning intended for or
 resulting in commercial advantage or monetary compensation, or not.
 
-If your use is strictly personal or solely for evaluation purposes, meaning for the purposes of testing
-the suitability, performance, and usefulness of this software outside the production environment,
-you agree to be bound by the terms included in the "handsontable-non-commercial-license.pdf" file.
-
 Your use of this software for commercial purposes is subject to the terms included in an applicable
 license agreement.
 
