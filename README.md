@@ -38,6 +38,6 @@ npm run docs:dev
 
 ## Licence
 
-The `hyperformula` engine is GPL-3.0-only, plus a commercial licence. See [`LICENSE.txt`](LICENSE.txt).
+The `hyperformula` engine is proprietary software. See [`LICENSE.txt`](LICENSE.txt). Versions 3.x and earlier were released under GPL-3.0-only and remain available under it.
 
 The `hyperformula-ui` package is MIT. See [`hyperformula-ui/packages/core/LICENSE.txt`](hyperformula-ui/packages/core/LICENSE.txt).

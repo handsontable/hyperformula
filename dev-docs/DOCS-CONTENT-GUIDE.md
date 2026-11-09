@@ -18,7 +18,7 @@ helps humans and search. You are not gaming an algorithm — you are writing cle
 
 ## Project context
 
-- **Product:** HyperFormula — an open-source, headless spreadsheet and formula
+- **Product:** HyperFormula — a headless spreadsheet and formula
 engine written in TypeScript. It parses and evaluates ~400 Excel/Google
 Sheets–compatible functions. It has **no UI**. It runs in the browser or Node.js.
 - **Sibling product:** Handsontable (the data grid). HyperFormula is maintained by

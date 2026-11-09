@@ -47,7 +47,7 @@
     "last 2 and_qq versions",
     "last 2 op_mob versions"
   ],
-  "license": "GPL-3.0-only",
+  "license": "SEE LICENSE IN LICENSE.txt",
   "type": "commonjs",
   "module": "es/index.mjs",
   "main": "commonjs/index.js",
@@ -56,9 +56,9 @@
   "unpkg": "dist/hyperformula.min.js",
   "typings": "./typings/index.d.ts",
   "scripts": {
-    "copy-root-files": "node -e \"for (const f of ['CHANGELOG.md', 'LICENSE.txt']) require('fs').copyFileSync('../' + f, f)\"",
+    "copy-root-files": "node -e \"for (const f of ['CHANGELOG.md', 'LICENSE.txt', 'handsontable-non-commercial-license.pdf']) require('fs').copyFileSync('../' + f, f)\"",
     "prepack": "npm run copy-root-files",
-    "postpack": "node -e \"for (const f of ['CHANGELOG.md', 'LICENSE.txt']) require('fs').rmSync(f, { force: true })\"",
+    "postpack": "node -e \"for (const f of ['CHANGELOG.md', 'LICENSE.txt', 'handsontable-non-commercial-license.pdf']) require('fs').rmSync(f, { force: true })\"",
     "bundle-all": "cross-env HF_COMPILE=1 npm-run-all clean compile bundle:** verify-bundles",
     "bundle:es": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=es env-cmd -f ht.config.js babel lib --out-file-extension .mjs --out-dir es",
     "bundle:cjs": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=commonjs env-cmd -f ht.config.js babel lib --out-dir commonjs",

@@ -22,6 +22,7 @@ const UNPACKED_DIR_NAME = 'package'
  */
 const FILES_CHECKLIST = [
   'LICENSE.txt',
+  'handsontable-non-commercial-license.pdf',
   'CHANGELOG.md',
   'README.md',
   'package.json',
