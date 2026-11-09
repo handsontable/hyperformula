@@ -115,6 +115,4 @@ Contributions are welcome, but before you make them, please read the [Contributi
 
 HyperFormula is proprietary software. See [`LICENSE.txt`](https://github.com/handsontable/hyperformula/blob/develop/LICENSE.txt) for the license terms. A commercial license can be purchased by [contacting our team](https://handsontable.com/get-a-quote) at Handsontable.
 
-HyperFormula 3.x and earlier versions were released under GPLv3, and those versions remain available under GPLv3.
-
 Copyright (c) Handsoncode
