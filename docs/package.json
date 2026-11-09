@@ -2,7 +2,7 @@
   "name": "hyperformula-docs",
   "private": true,
   "description": "The HyperFormula documentation portal.",
-  "license": "SEE LICENSE IN LICENSE.txt",
+  "license": "SEE LICENSE IN ../LICENSE.txt",
   "engines": {
     "node": ">=22.22.0"
   },
