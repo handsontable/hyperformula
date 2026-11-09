@@ -173,7 +173,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
   },
   TEXTSPLIT: {
     category: 'Text',
-    shortDescription: 'Splits text into an array: col_delimiter separates columns and row_delimiter separates rows. Rows shorter than the widest one are padded with pad_with. The result spills only when its arguments are literals.',
+    shortDescription: 'Splits text into an array: col_delimiter separates columns and row_delimiter separates rows. Rows shorter than the widest one are padded with pad_with. The result spills only when every argument but pad_with is a literal.',
     parameters: [{name: 'text', description: 'The text to split.'}, {name: 'col_delimiter', description: 'The text (or array of texts) that separates columns. Leave empty to split into rows only.'}, {name: 'row_delimiter', description: 'The text (or array of texts) that separates rows. When omitted, the result has a single row.'}, {name: 'ignore_empty', description: 'When TRUE, empty pieces are skipped. Defaults to FALSE.'}, {name: 'match_mode', description: '0 (default) for case-sensitive matching, 1 for case-insensitive matching.'}, {name: 'pad_with', description: 'The value that fills the missing cells of short rows. Defaults to #N/A.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=TEXTSPLIT("a,b,c", ",")', '=TEXTSPLIT("a,b;c,d", ",", ";")'],
