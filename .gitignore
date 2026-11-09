@@ -18,10 +18,9 @@ node_modules/
 /hyperformula/typings/
 /hyperformula/storage/
 # Copied in by the package's prepack so the tarball carries them; the sources are
-# CHANGELOG.md, LICENSE.txt and handsontable-non-commercial-license.pdf at the repository root.
+# CHANGELOG.md and LICENSE.txt at the repository root.
 /hyperformula/CHANGELOG.md
 /hyperformula/LICENSE.txt
-/hyperformula/handsontable-non-commercial-license.pdf
 
 *.iml
 dev*.html

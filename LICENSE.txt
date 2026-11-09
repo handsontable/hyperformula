@@ -4,12 +4,8 @@ HYPERFORMULA is a software distributed by HANDSONCODE sp. z o. o., a Polish corp
 Gdynia, Poland, at Aleja Zwyciestwa 96-98, registered by the District Court in Gdansk under number
 538651, EU tax ID number: PL5862294002, share capital: PLN 67,200.00.
 
-This software is protected by applicable copyright laws, including international treaties, and dual-
-licensed - depending on whether your use for commercial purposes, meaning intended for or
-resulting in commercial advantage or monetary compensation, or not.
-
-Your use of this software for commercial purposes is subject to the terms included in an applicable
-license agreement.
+This software is protected by applicable copyright laws, including international treaties.
+Any use of this software is subject to the terms included in an applicable license agreement.
 
 In any case, you must not make any such use of this software as to develop software which may be
 considered competitive with this software.
