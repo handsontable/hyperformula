@@ -81,22 +81,29 @@ function percentRankInclusive(sortedVals: number[], x: number): number {
   return (lowerIndex + fraction) / (n - 1)
 }
 
-const TRUNCATION_TOLERANCE = 1e-9
-
-/** Beyond this many digits a double holds nothing more to keep, and `10 ** digits` would overflow for huge ones. */
+/** Beyond this many digits a double holds nothing more to keep. */
 const MAX_SIGNIFICANT_DIGITS = 15
 
 /**
- * Truncates (does not round) `value` to the given number of decimal digits. The tiny tolerance keeps
- * results such as 0.3, which the division leaves a hair below, from being cut to 0.2999.
+ * Truncates (does not round) `value` to the given number of decimal digits. The value is first rounded to
+ * 15 significant digits, so a rank that the division leaves a hair below a decimal, such as 0.29 computed as
+ * 0.28999999999999998, is truncated as 0.29, while a rank that is below the decimal at 15 digits, such as
+ * 0.2999999999, is truncated to 0.2 at one digit. The digits are cut from the decimal text, not from a scaled
+ * double, so no error of `value * 10 ** digits` reaches the result.
  *
- * @param value - a non-negative number
+ * @param value - a number in [0, 1]
  * @param digits - the number of decimal digits to keep
  * @returns the truncated value
  */
 function truncateToDigits(value: number, digits: number): number {
-  const scale = Math.pow(10, Math.min(digits, MAX_SIGNIFICANT_DIGITS))
-  return Math.floor(value * scale + TRUNCATION_TOLERANCE) / scale
+  const [mantissa, exponentText] = value.toExponential(MAX_SIGNIFICANT_DIGITS - 1).split('e')
+  const significantDigits = mantissa.replace('.', '')
+  const exponent = Number(exponentText)
+  const plain = exponent >= 0
+    ? `${significantDigits.slice(0, exponent + 1)}.${significantDigits.slice(exponent + 1)}`
+    : `0.${'0'.repeat(-exponent - 1)}${significantDigits}`
+  const [integerPart, fraction] = plain.split('.')
+  return Number(`${integerPart}.${fraction.slice(0, digits)}`)
 }
 
 /**
@@ -128,7 +135,7 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER, minValue: 1, defaultValue: 3},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1, defaultValue: 3, emptyAsDefault: true},
       ],
     },
     'QUARTILE.INC': {
@@ -199,7 +206,7 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
    * Corresponds to PERCENTRANK(array, x, [significance]) and PERCENTRANK.INC(array, x, [significance]).
    *
    * Returns the rank of `x` within the numbers of `array` as a fraction in [0, 1], truncated (not rounded)
-   * to `significance` digits (3 by default; a fractional value is truncated to an integer).
+   * to `significance` digits (3 by default, also when the argument is empty; a fractional value is truncated to an integer).
    * Returns #N/A when `array` holds no numbers or `x` lies outside of them, #NUM! when `significance` is below 1.
    *
    * @param ast - procedure AST node

@@ -6,7 +6,7 @@
 import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {
   getRawValue,
@@ -39,11 +39,10 @@ import {
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
- * PROB accepts its probabilities when their sum is at least 1 and, rounded to this many significant digits, is 1.
- * The sum is compensated (double-double), so 0.1 added ten times is exactly 1. A sum below 1 is rejected
- * however close it is, and a sum above 1 is accepted while it is less than 1 + 5e-15. The plain floating-point
- * sum, in the order of the cells, must also round to 1, so probabilities that cancel out, such as
- * {1, 1E+20, -1E+20}, are rejected.
+ * PROB accepts its probabilities when their sum, rounded to this many significant digits, is 1, so a sum
+ * within 5e-16 below 1 or 5e-15 above it is accepted. The sum is compensated (double-double), so 0.1 added
+ * ten times is exactly 1. The plain floating-point sum, in the order of the cells, must also round to 1, so
+ * probabilities that cancel out, such as {1, 1E+20, -1E+20}, are rejected.
  */
 const PROBABILITY_SUM_SIGNIFICANT_DIGITS = 15
 
@@ -213,12 +212,16 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
    * Corresponds to MODE.MULT(number1, [number2, ...]).
    *
    * Returns a column of the most frequent numbers, in order of first occurrence. Only numbers are counted:
-   * text, booleans and empty cells are skipped, an error is propagated. Returns #N/A when no number repeats.
+   * text, booleans and empty cells are skipped, an error is propagated. Returns #N/A when no number repeats, and
+   * #VALUE! when an argument is empty, as in `MODE.MULT(1, 1,)`.
    *
    * @param ast - procedure AST node
    * @param state - interpreter state
    */
   public modemult(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    if (ast.args.some(arg => arg.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.EmptyArg)
+    }
     return this.runFunction(ast.args, state, this.metadata('MODE.MULT'),
       (...args: RawInterpreterValue[]) => {
         const values = this.numbersOfArguments(args)
@@ -245,7 +248,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
    * upper bound is used: every mode needs at least two occurrences. The actual result is smaller or equal.
    * When an argument has no size before evaluation (see `ArraySizePredictor.isSizeKnownBeforeEvaluation`),
    * or a whole column or row makes the bound infinite, the size is `ArraySize.error()`: the formula takes one
-   * cell, and a result of more than one cell gives #VALUE!.
+   * cell, and a result of more than one cell gives #VALUE!. An empty argument gives a single cell for its #VALUE!.
    *
    * @param ast - procedure AST node
    * @param state - interpreter state
@@ -253,6 +256,9 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
   public modemultArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
     if (ast.args.length < 1) {
       return ArraySize.error()
+    }
+    if (ast.args.some(arg => arg.type === AstNodeType.EMPTY)) {
+      return ArraySize.scalar()
     }
     const argumentState = new InterpreterState(state.formulaAddress, true)
     if (!ast.args.every(arg => this.arraySizePredictor.isSizeKnownBeforeEvaluation(arg, argumentState))) {
@@ -275,12 +281,15 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
    * row stays at the position of its bin in `bins_array`; of equal bins only the first gets the count, the
    * others 0. The last row counts the numbers above the largest bin. Text, booleans and empty cells are skipped
    * in both arguments. When `bins_array` holds no number, the result is a single bin below all the data:
-   * 0, then the count of the numbers.
+   * 0, then the count of the numbers. An empty argument, as in `FREQUENCY(A1:A3,)`, gives #VALUE!.
    *
    * @param ast - procedure AST node
    * @param state - interpreter state
    */
   public frequency(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    if (ast.args.some(arg => arg.type === AstNodeType.EMPTY)) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.EmptyArg)
+    }
     return this.runFunction(ast.args, state, this.metadata('FREQUENCY'),
       (dataArray: SimpleRangeValue, binsArray: SimpleRangeValue) => {
         const data = this.arithmeticHelper.manyToExactNumbers(dataArray.valuesFromTopLeftCorner())
@@ -313,6 +322,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
    * that are not numbers are skipped at runtime, so the actual result may be shorter. When `bins_array` has no
    * size before evaluation (see `ArraySizePredictor.isSizeKnownBeforeEvaluation`) or is a whole column or row,
    * the size is `ArraySize.error()`: the formula takes one cell, and a result of more than one cell gives #VALUE!.
+   * An empty argument gives a single cell for its #VALUE!.
    *
    * @param ast - procedure AST node
    * @param state - interpreter state
@@ -320,6 +330,9 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
   public frequencyArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
     if (ast.args.length !== 2) {
       return ArraySize.error()
+    }
+    if (ast.args.some(arg => arg.type === AstNodeType.EMPTY)) {
+      return ArraySize.scalar()
     }
     const argumentState = new InterpreterState(state.formulaAddress, true)
     const binsArray = ast.args[1]
@@ -338,14 +351,16 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
    * Corresponds to PROB(x_range, prob_range, lower_limit, [upper_limit]).
    *
    * Returns the probability that a value of `x_range` equals `lower_limit`, or lies between `lower_limit`
-   * and `upper_limit` inclusive. Returns #N/A when the ranges differ in size, and #NUM! when the probabilities
-   * do not sum up to 1. A single probability is not checked, so one can be 0, negative or above 1 as long as
-   * the sum is 1. Pairs in which either cell is not a number are skipped, and their probability is not added.
+   * and `upper_limit` inclusive. An empty `upper_limit`, as in `PROB(A1:A4, B1:B4, 2,)`, counts as omitted.
+   * Returns #N/A when the ranges differ in size, and #NUM! when the probabilities do not sum up to 1. A single
+   * probability is not checked, so one can be 0, negative or above 1 as long as the sum is 1. Pairs in which
+   * either cell is not a number are skipped, and their probability is not added.
    *
    * @param ast - procedure AST node
    * @param state - interpreter state
    */
   public prob(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const upperLimitIsEmpty = ast.args[3]?.type === AstNodeType.EMPTY
     return this.runFunction(ast.args, state, this.metadata('PROB'),
       (values: SimpleRangeValue, probabilities: SimpleRangeValue, lowerLimit: number, upperLimit?: number) => {
         if (values.numberOfElements() !== probabilities.numberOfElements()) {
@@ -358,11 +373,11 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         const [xs, ps] = pairs
         const compensatedSum = roundDoubleDouble(ps.reduce((sum, p) => addDoubleDouble(sum, {hi: p, lo: 0}), DOUBLE_DOUBLE_ZERO))
         const floatingPointSum = ps.reduce((sum, p) => sum + p, 0)
-        const sumIsOne = compensatedSum >= 1 && isOneAtSignificantDigits(compensatedSum) && isOneAtSignificantDigits(floatingPointSum)
+        const sumIsOne = isOneAtSignificantDigits(compensatedSum) && isOneAtSignificantDigits(floatingPointSum)
         if (!sumIsOne) {
           return new CellError(ErrorType.NUM, ErrorMessage.ProbabilitySum)
         }
-        const upper = upperLimit ?? lowerLimit
+        const upper = upperLimitIsEmpty ? lowerLimit : upperLimit ?? lowerLimit
         return ps.reduce((sum, p, i) => xs[i] >= lowerLimit && xs[i] <= upper ? sum + p : sum, 0)
       })
   }
