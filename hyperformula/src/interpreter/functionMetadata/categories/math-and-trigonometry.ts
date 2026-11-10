@@ -278,7 +278,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   MDETERM: {
     category: 'Math and trigonometry',
-    shortDescription: 'Calculates the determinant of a square array. If the array holds a value that is not a number, the first one, row by row, decides the result: an error is returned as it is, and text, a boolean or an empty cell returns the #VALUE! error. A non-square array of numbers also returns the #VALUE! error. A determinant too large for a number returns the #NUM! error.',
+    shortDescription: 'Calculates the determinant of a square array. If the array holds a value that is not a number, the first one, row by row, decides the result: an error is returned as it is, and text, a boolean or an empty cell returns the #VALUE! error. A non-square array of numbers also returns the #VALUE! error. If the calculation overflows, the function returns the #NUM! error. This can happen for very large elements even when the determinant itself would fit in a number.',
     parameters: [{name: 'array', description: 'The square range or array of numbers whose determinant is calculated.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=MDETERM(A1:B2)', '=MDETERM({1,2;3,4})'],

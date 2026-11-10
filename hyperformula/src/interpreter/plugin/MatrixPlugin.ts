@@ -364,8 +364,9 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
    *
    * Returns the determinant of a square matrix of numbers. If the matrix holds a value that is not a number,
    * the first one, row by row, decides the result: an error is returned as it is, and any other value gives the
-   * #VALUE! error. A non-square matrix of numbers also gives the #VALUE! error. A determinant too large for a
-   * number returns the #NUM! error.
+   * #VALUE! error. A non-square matrix of numbers also gives the #VALUE! error. If the calculation overflows, the
+   * function returns the #NUM! error. This can happen for very large elements even when the determinant itself
+   * would fit in a number.
    */
   public mdeterm(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MDETERM'), (matrix: SimpleRangeValue) => {
