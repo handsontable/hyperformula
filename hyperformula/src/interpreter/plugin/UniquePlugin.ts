@@ -95,7 +95,7 @@ export class UniquePlugin extends FunctionPlugin implements FunctionPluginTypech
           : distinct
 
         if (kept.length === 0) {
-          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+          return new CellError(ErrorType.CALC, ErrorMessage.EmptyRange)
         }
 
         const result = byCol ? UniquePlugin.transpose(kept) : kept

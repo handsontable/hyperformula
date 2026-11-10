@@ -41,6 +41,9 @@ export enum ErrorType {
   /** Array spill error. */
   SPILL = 'SPILL',
 
+  /** Calculation error, e.g. an empty array result. */
+  CALC = 'CALC',
+
   /** Invalid/missing licence error. */
   LIC = 'LIC',
 

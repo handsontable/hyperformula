@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. [#1885](https://github.com/handsontable/hyperformula/pull/1885)
+- **Breaking change**: Added the `#CALC!` error, which `FILTER` and `UNIQUE` now return instead of `#N/A` when the result would be an empty array, `SEQUENCE` returns instead of `#VALUE!` when the number of rows or columns truncates to 0 (e.g. `=SEQUENCE(0)`), and `CONCAT` and `TEXTJOIN` return instead of `#VALUE!` when the result is longer than 32,767 characters, as in Microsoft Excel. `IFNA()` and `ISNA()` no longer catch these errors; use `IFERROR()` or `ISERROR()`. A custom language pack must now translate the `CALC` error, or `registerLanguage()` throws a `MissingTranslationError`. See the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html). [#1647](https://github.com/handsontable/hyperformula/issues/1647)
 
 ### Added
 
