@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed formulas with consecutive percent operators failing to parse: each `%` now divides by 100, so `=5%%` returns `0.0005`, as in Excel. [#1773](https://github.com/handsontable/hyperformula/pull/1773)
 - Fixed `setCellContents` returning a `#ERROR!` parsing error instead of `#SPILL!` for an array formula whose whole-column or whole-row result cannot fit, such as `=SORT(A:A)` entered below the first row. The result now matches the one for the same formula loaded with `buildFromSheets`. [#1797](https://github.com/handsontable/hyperformula/pull/1797)
 - Fixed number literals with an uppercase exponent marker, which the lowercase form already accepted: `=1E5` now returns `100000` instead of `#ERROR!`, a parse error. [#1835](https://github.com/handsontable/hyperformula/pull/1835)
+- Fixed the `ERF` function losing precision near zero and the `ERFC` function losing it for large arguments, which also corrected `NORM.INV`, `NORM.S.INV` and `LOGNORM.INV` in the tails (e.g. `=NORM.S.INV(1e-20)` now returns `-9.2623400898` instead of `-9.1468519416`). [#1795](https://github.com/handsontable/hyperformula/pull/1795)
 
 ## [3.5.0] - 2026-10-09
 
