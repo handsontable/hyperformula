@@ -410,13 +410,22 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     })
   }
 
+  /**
+   * Predicts the size of the argument, square or not, so that a row or column inserted inside the argument keeps the
+   * formula an array formula, and undoing the insertion spills the inverse again. A non-square argument evaluates to
+   * the #VALUE! error, which fills that area. A whole-column or whole-row argument is never square and its area does
+   * not fit in the sheet, so it is predicted as a single cell that holds the #VALUE! error.
+   */
   public minverseArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
     if (ast.args.length !== 1) {
       return ArraySize.error()
     }
     const metadata = this.metadata('MINVERSE')
     const size = this.arraySizeForAst(ast.args[0], new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)))
-    return size.width === size.height ? new ArraySize(size.width, size.height) : ArraySize.error()
+    if (!Number.isFinite(size.width) || !Number.isFinite(size.height)) {
+      return ArraySize.error()
+    }
+    return new ArraySize(size.width, size.height)
   }
 
   /**
