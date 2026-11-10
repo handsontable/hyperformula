@@ -188,8 +188,9 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
           : upperIndex + (x - vals[upperIndex - 1]) / (vals[upperIndex] - vals[upperIndex - 1])
         const scale = Math.pow(10, digits)
         // A quotient that is exactly a truncation step can come out one unit in the last place below it, e.g. for
-        // x = 1.2 in {1, 2}: 1.2 / 3 * 1000 = 399.99999999999994. The 1e-9 keeps it on the step (0.4, not 0.399).
-        return Math.floor(rank / (n + 1) * scale + 1e-9) / scale
+        // x = 1.2 in {1, 2}: 1.2 / 3 * 1000 = 399.99999999999994. Rounding the scaled quotient to 15 significant
+        // digits before truncating keeps it on the step (0.4, not 0.399), whatever the significance.
+        return Math.floor(Number((rank / (n + 1) * scale).toPrecision(15))) / scale
       }
     )
   }
