@@ -31,7 +31,7 @@ const SMALLEST_NORMAL_DOUBLE = 2.2250738585072014e-308
 /**
  * erf(x) for 0 <= x < 2 from its series exp(-x^2) * 2 / sqrt(pi) * sum(2^n * x^(2n + 1) / (2n + 1)!!).
  * All terms are positive, so there is no cancellation, and the relative error stays below about 1.1e-15 down to the
- * smallest numbers (the earlier 1 - exp(...) form lost every digit below about 1e-16).
+ * smallest numbers.
  */
 function erfSeries(x: number): number {
   const xx = x * x
