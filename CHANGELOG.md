@@ -7,15 +7,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. [#1885](https://github.com/handsontable/hyperformula/pull/1885)
+
 ### Added
 
 - Added `LINEST` for simple and multiple linear regression, with optional intercept and regression statistics. The `stats` argument must be constant because result dimensions are determined before evaluation. [#1769](https://github.com/handsontable/hyperformula/pull/1769)
 - Added the `CONCAT` function, which joins text from values, ranges, and arrays, and the `VALUETOTEXT` function, which returns a value as text in a concise or a strict format. [#1816](https://github.com/handsontable/hyperformula/pull/1816)
 - Added the statistical functions `KURT`, `MODE.SNGL` (with the `MODE` alias), `PERCENTRANK.EXC` and `TRIMMEAN`. [#1800](https://github.com/handsontable/hyperformula/pull/1800)
-
-### Changed
-
-- **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. [#1885](https://github.com/handsontable/hyperformula/pull/1885)
 
 ### Fixed
 
