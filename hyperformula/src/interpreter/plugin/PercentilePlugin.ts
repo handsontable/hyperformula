@@ -156,11 +156,11 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
    * Corresponds to PERCENTRANK.EXC(array, x, [significance]).
    *
    * Returns the exclusive rank of x in the array, i.e. the inverse of PERCENTILE.EXC, truncated (not rounded)
-   * to the given number of significant digits. Values between two array elements are linearly interpolated.
+   * to the given number of decimal places. Values between two array elements are linearly interpolated.
    *
    * @param ast - procedure AST node
    * @param state - interpreter state
-   * @returns rank in (0, 1), #N/A if x is outside of the array, or CellError on invalid input
+   * @returns rank between 0 and 1 (1 for a single value), #N/A if x is outside of the array, or CellError on invalid input
    */
   public percentrankExc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PERCENTRANK.EXC'),
@@ -187,6 +187,8 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
           ? upperIndex + 1
           : upperIndex + (x - vals[upperIndex - 1]) / (vals[upperIndex] - vals[upperIndex - 1])
         const scale = Math.pow(10, digits)
+        // A quotient that is exactly a truncation step can come out one unit in the last place below it, e.g. for
+        // x = 1.2 in {1, 2}: 1.2 / 3 * 1000 = 399.99999999999994. The 1e-9 keeps it on the step (0.4, not 0.399).
         return Math.floor(rank / (n + 1) * scale + 1e-9) / scale
       }
     )

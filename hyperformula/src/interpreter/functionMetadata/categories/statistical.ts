@@ -444,8 +444,8 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   'PERCENTRANK.EXC': {
     category: 'Statistical',
-    shortDescription: 'Returns the rank of a value in a data set as a fraction between 0 and 1, exclusive of 0 and 1.',
-    parameters: [{name: 'data', description: 'The range of values to evaluate.'}, {name: 'x', description: 'The value to rank; it must lie between the smallest and the largest value in `data`. A value between two elements is interpolated.'}, {name: 'significance', description: 'The number of significant digits the result is truncated to; defaults to 3.'}],
+    shortDescription: 'Returns the rank of a value in a data set as a fraction between 0 and 1.',
+    parameters: [{name: 'data', description: 'The range of values to evaluate.'}, {name: 'x', description: 'The value to rank; it must lie between the smallest and the largest value in `data`. A value between two elements is interpolated.'}, {name: 'significance', description: 'The number of decimal places the result is truncated to; defaults to 3.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=PERCENTRANK.EXC(A1:A10, 5)', '=PERCENTRANK.EXC(A1:A10, 5.5, 4)'],
   },
