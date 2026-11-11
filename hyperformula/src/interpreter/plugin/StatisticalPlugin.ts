@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {besseli, besselj, besselk, bessely} from './3rdparty/bessel/bessel'
 import {
   beta,
@@ -45,6 +45,12 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
       method: 'erfc',
       parameters: [
         {argumentType: FunctionArgumentType.NUMBER}
+      ]
+    },
+    'ERF.PRECISE': {
+      method: 'erfprecise',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'EXPON.DIST': {
@@ -438,6 +444,21 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
 
   public erfc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ERFC'), erfc)
+  }
+
+  /**
+   * Corresponds to ERF.PRECISE(x).
+   *
+   * Returns the error function integrated from 0 to x. A boolean or the empty text is #VALUE!.
+   *
+   * @param ast
+   * @param state
+   */
+  public erfprecise(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ERF.PRECISE'), (x: InternalScalarValue) => {
+      const value = this.arithmeticHelper.coerceScalarToNumberRejectingBooleanOrError(x)
+      return value instanceof CellError ? value : erf(getRawValue(value))
+    })
   }
 
   public expondist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
