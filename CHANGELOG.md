@@ -25,6 +25,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed formulas with consecutive percent operators failing to parse: each `%` now divides by 100, so `=5%%` returns `0.0005`, as in Excel. [#1773](https://github.com/handsontable/hyperformula/pull/1773)
 - Fixed `setCellContents` returning a `#ERROR!` parsing error instead of `#SPILL!` for an array formula whose whole-column or whole-row result cannot fit, such as `=SORT(A:A)` entered below the first row. The result now matches the one for the same formula loaded with `buildFromSheets`. [#1797](https://github.com/handsontable/hyperformula/pull/1797)
 - Fixed number literals with an uppercase exponent marker, which the lowercase form already accepted: `=1E5` now returns `100000` instead of `#ERROR!`, a parse error. [#1835](https://github.com/handsontable/hyperformula/pull/1835)
+- Fixed array formulas over a whole column or row (e.g. `=SORT(A:A)`, `=UNIQUE(A:A)`, `=FILTER(A:A, A:A>0)`) throwing an uncaught `Resizing to smaller array` error, and leaving the old values in the spill, when their result grew larger than it was when first calculated, for example because the source grew or more values matched the `FILTER` condition. They now return the `#SPILL!` error. [#1825](https://github.com/handsontable/hyperformula/issues/1825)
+- Fixed functions such as `MATCH`, `INDEX` and `COUNTIF` throwing an uncaught `Unknown array` error when they read a range that exactly matches the area of an array formula returning an error, for example `=MATCH(2, B1:B3, 0)` next to `=SORT(A1:A3)` whose source contains `#DIV/0!`. They now read the range cell by cell. [#1876](https://github.com/handsontable/hyperformula/pull/1876)
 
 ## [3.5.0] - 2026-10-09
 
