@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added new functions: ACCRINTM, DISC, INTRATE, PRICEDISC, RECEIVED, YIELDDISC. [#1799](https://github.com/handsontable/hyperformula/pull/1799)
 - Added new functions: COUPDAYBS, COUPDAYS, COUPDAYSNC, COUPNCD, COUPNUM, COUPPCD. [#1804](https://github.com/handsontable/hyperformula/pull/1804)
 - Added new functions: DURATION, PRICE. [#1848](https://github.com/handsontable/hyperformula/pull/1848)
-- Added a new function: MDURATION. [#1849](https://github.com/handsontable/hyperformula/pull/1849)
+- Added the `MDURATION` function, which returns the modified duration of a security that pays periodic interest. [#1849](https://github.com/handsontable/hyperformula/pull/1849)
 
 ### Fixed
 
