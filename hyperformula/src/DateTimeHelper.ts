@@ -141,7 +141,7 @@ export class DateTimeHelper {
     let year = Math.floor(dateNumber / 365.2425)
     if (this.dateToNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber) {
       year++
-    } else if (this.dateToNumberFromZero({year: year - 1, month: 1, day: 1}) > dateNumber) {
+    } else if (this.dateToNumberFromZero({year, month: 1, day: 1}) > dateNumber) {
       year--
     }
 
