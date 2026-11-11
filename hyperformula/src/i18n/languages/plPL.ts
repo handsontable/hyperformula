@@ -390,6 +390,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'TAN.LICZBY.ZESP',
     LARGE: 'MAX.K',
     SMALL: 'MIN.K',
+    'RANK.EQ': 'POZYCJA.NAJW',
+    RANK: 'POZYCJA',
     PERCENTILE: 'PERCENTYL',
     'PERCENTILE.INC': 'PERCENTYL.PRZEDZ.ZAMK',
     'PERCENTILE.EXC': 'PERCENTYL.PRZEDZ.OTW',
