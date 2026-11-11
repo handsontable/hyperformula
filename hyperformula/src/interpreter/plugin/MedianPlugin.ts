@@ -38,6 +38,14 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
         {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ],
     },
+    'RANK.AVG': {
+      method: 'rankAvg',
+      parameters: [
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 0},
+      ],
+    },
   }
 
   /**
@@ -97,6 +105,32 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         return vals[n - 1]
+      }
+    )
+  }
+
+  /**
+   * Corresponds to RANK.AVG(number, ref, [order]).
+   *
+   * Returns the rank of a number in a range of numbers. Tied values get the average of the ranks they span.
+   * The rank is descending when order is 0 or omitted, and ascending for any other order.
+   *
+   * @param ast
+   * @param state
+   */
+  public rankAvg(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('RANK.AVG'),
+      (value: number, range: SimpleRangeValue, order: number) => {
+        const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if (vals instanceof CellError) {
+          return vals
+        }
+        const ties = vals.filter(val => val === value).length
+        if (ties === 0) {
+          return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+        }
+        const ranksBefore = vals.filter(val => order === 0 ? val > value : val < value).length
+        return ranksBefore + (ties + 1) / 2
       }
     )
   }
