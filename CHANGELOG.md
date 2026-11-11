@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. [#1885](https://github.com/handsontable/hyperformula/pull/1885)
+- **Breaking change**: Changed the `INDEX` function to match Microsoft Excel. A row or column past the range now returns `#REF!` instead of `#NUM!`, a fractional row or column is truncated, and a row or column of `0` returns the whole column or row, which spills. Without a column number, `INDEX` returns `#REF!` for a range with more than one row and column instead of using its first column, and counts along a one-row range. `INDEX` also accepts the `area_num` argument. See the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html). [#1890](https://github.com/handsontable/hyperformula/pull/1890)
 
 ### Added
 

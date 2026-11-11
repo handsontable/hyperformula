@@ -3,10 +3,13 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
+import {ArraySize} from '../../ArraySize'
+import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../../Cell'
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../../error-message'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {Maybe} from '../../Maybe'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
@@ -106,11 +109,14 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     },
     'INDEX': {
       method: 'index',
+      sizeOfResultArrayMethod: 'indexArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
-      ]
+      ],
+      vectorizationForbidden: true,
     },
     'NA': {
       method: 'na',
@@ -413,23 +419,157 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
   }
 
   /**
-   * Corresponds to INDEX
+   * Corresponds to INDEX(array, row_num, [column_num], [area_num])
    *
-   * Returns specific position in 2d array.
+   * Returns the cell at `row_num` and `column_num` of `array`. A `row_num` of 0 returns the whole column, a
+   * `column_num` of 0 the whole row, and both 0 the whole of `array`; such results spill.
    *
-   * @param ast
-   * @param state
+   * @param {ProcedureAst} ast - The parsed function call AST node.
+   * @param {InterpreterState} state - Current interpreter evaluation state.
    */
   public index(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('INDEX'), (rangeValue: SimpleRangeValue, row: number, col: number) => {
-      if (col < 1 || row < 1) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+    return this.runFunction(ast.args, state, this.metadata('INDEX'), (source: SimpleRangeValue, row: number, column: Maybe<number>, area: number) => {
+      const range = source.range
+      const height = range !== undefined && !Number.isFinite(range.height()) ? this.config.maxRows : source.height()
+      const width = range !== undefined && !Number.isFinite(range.width()) ? this.config.maxColumns : source.width()
+
+      const target = InformationPlugin.indexTarget(height, width, range !== undefined, row, column, area)
+      if (target instanceof CellError) {
+        return target
       }
-      if (col > rangeValue.width() || row > rangeValue.height()) {
-        return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+      const [targetRow, targetColumn] = target
+
+      if (range === undefined) {
+        const rows = targetRow === 0 ? source.data : [source.data[targetRow - 1]]
+        const result: InternalScalarValue[][] = targetColumn === 0 ? rows : rows.map(rowValues => [rowValues[targetColumn - 1]])
+        return result.length === 1 && result[0].length === 1 ? result[0][0] : SimpleRangeValue.onlyValues(result)
       }
-      return rangeValue?.data?.[row - 1]?.[col - 1] ?? rangeValue?.data?.[0]?.[0] ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+
+      const topLeftCorner = simpleCellAddress(
+        range.sheet,
+        range.start.col + Math.max(targetColumn - 1, 0),
+        range.start.row + Math.max(targetRow - 1, 0),
+      )
+      const resultRange = AbsoluteCellRange.spanFrom(
+        topLeftCorner,
+        targetColumn === 0 ? range.width() : 1,
+        targetRow === 0 ? range.height() : 1,
+      )
+      return resultRange.width() === 1 && resultRange.height() === 1
+        ? this.dependencyGraph.getScalarValue(topLeftCorner)
+        : SimpleRangeValue.onlyRange(resultRange, this.dependencyGraph)
     })
+  }
+
+  /**
+   * Predicts the size of the INDEX result at parse time.
+   *
+   * The size is known only when `row_num`, `column_num` and `area_num` are number literals or empty. Otherwise
+   * INDEX is sized as a single cell, so a computed 0 index cannot spill.
+   *
+   * @param {ProcedureAst} ast - The parsed function call AST node.
+   * @param {InterpreterState} state - Current interpreter evaluation state.
+   */
+  public indexArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 2 || ast.args.length > 4) {
+      return ArraySize.scalar()
+    }
+
+    const row = InformationPlugin.literalIndex(ast.args[1])
+    const column = ast.args.length > 2 ? InformationPlugin.literalIndex(ast.args[2]) : undefined
+    const area = ast.args.length > 3 ? InformationPlugin.literalIndex(ast.args[3]) : 1
+    if (row === undefined || area === undefined || (ast.args.length > 2 && column === undefined)) {
+      return ArraySize.scalar()
+    }
+
+    const source = this.arraySizeForAst(ast.args[0], state)
+    const height = Number.isFinite(source.height) ? source.height : this.config.maxRows
+    const width = Number.isFinite(source.width) ? source.width : this.config.maxColumns
+    const target = InformationPlugin.indexTarget(height, width, InformationPlugin.isReferenceSource(ast.args[0]), row, column, area)
+    if (target instanceof CellError) {
+      return ArraySize.scalar()
+    }
+
+    const [targetRow, targetColumn] = target
+    const resultHeight = targetRow === 0 ? source.height : 1
+    const resultWidth = targetColumn === 0 ? source.width : 1
+    if (!Number.isFinite(resultHeight) || !Number.isFinite(resultWidth)) {
+      return ArraySize.scalar()
+    }
+    return new ArraySize(resultWidth, resultHeight)
+  }
+
+  /**
+   * Resolves the INDEX arguments against a source of the given size, following Microsoft Excel.
+   *
+   * Returns the 1-based row and column, where 0 stands for the whole column or row, or the error to return.
+   * Without `column_num`, the index counts along a one-row or one-column source; for a two-dimensional source
+   * it selects a row of an array and is an error for a reference.
+   */
+  private static indexTarget(height: number, width: number, isReference: boolean, row: number, column: Maybe<number>, area: number): CellError | [number, number] {
+    const areaNumber = Math.trunc(area)
+    if (areaNumber < 1) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+    }
+    if (row < 0 || (column !== undefined && column < 0)) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.Negative)
+    }
+    if (areaNumber > 1) {
+      return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
+    }
+
+    let targetRow = Math.trunc(row)
+    let targetColumn: number
+    if (column !== undefined) {
+      targetColumn = Math.trunc(column)
+    } else if (height === 1) {
+      targetColumn = targetRow
+      targetRow = 1
+    } else if (width === 1) {
+      targetColumn = 1
+    } else if (isReference) {
+      return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
+    } else {
+      targetColumn = 0
+    }
+
+    if (targetRow > height || targetColumn > width) {
+      return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
+    }
+    return [targetRow, targetColumn]
+  }
+
+  /**
+   * Tells whether an INDEX source evaluates to a reference: a range, a cell, or the result of INDEX on one.
+   * Matches `index`, which treats a source that carries a range as a reference.
+   */
+  private static isReferenceSource(ast: Ast): boolean {
+    switch (ast.type) {
+      case AstNodeType.CELL_RANGE:
+      case AstNodeType.COLUMN_RANGE:
+      case AstNodeType.ROW_RANGE:
+      case AstNodeType.CELL_REFERENCE:
+        return true
+      case AstNodeType.PARENTHESIS:
+        return InformationPlugin.isReferenceSource(ast.expression)
+      case AstNodeType.FUNCTION_CALL:
+        return ast.procedureName === 'INDEX' && ast.args.length > 0 && InformationPlugin.isReferenceSource(ast.args[0])
+      default:
+        return false
+    }
+  }
+
+  /**
+   * Returns the value of an INDEX argument known at parse time: a number literal, or 0 for an empty argument.
+   */
+  private static literalIndex(ast: Ast): Maybe<number> {
+    if (ast.type === AstNodeType.NUMBER) {
+      return ast.value
+    }
+    if (ast.type === AstNodeType.EMPTY) {
+      return 0
+    }
+    return undefined
   }
 
   /**

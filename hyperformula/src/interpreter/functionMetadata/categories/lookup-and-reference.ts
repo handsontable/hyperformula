@@ -76,10 +76,10 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
   },
   INDEX: {
     category: 'Lookup and reference',
-    shortDescription: 'Returns the contents of a cell specified by row and column number. The column number is optional and defaults to 1.',
-    parameters: [{name: 'range', description: 'The range from which a value is returned.'}, {name: 'row', description: 'The row number within range (counting from 1) of the value to return.'}, {name: 'column', description: 'The column number within range (counting from 1) of the value to return. Defaults to 1 when omitted.'}],
+    shortDescription: 'Returns the value at a given row and column of a range or array. A row or column number of 0 returns the whole column or row.',
+    parameters: [{name: 'range', description: 'The range or array from which a value is returned.'}, {name: 'row', description: 'The row number within range (counting from 1) of the value to return; 0 returns the whole column.'}, {name: 'column', description: 'The column number within range (counting from 1) of the value to return; 0 returns the whole row. When omitted, row counts along a one-row or one-column range.'}, {name: 'area', description: 'The area of range to use. Must be 1, because range is a single area.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    examples: ['=INDEX(A1:C10, 2, 3)', '=INDEX(A1:A10, 5)'],
+    examples: ['=INDEX(A1:C10, 2, 3)', '=INDEX(A1:A10, 5)', '=SUM(INDEX(A1:C10, 0, 2))'],
   },
   MATCH: {
     category: 'Lookup and reference',
