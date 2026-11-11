@@ -485,7 +485,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     const source = this.arraySizeForAst(ast.args[0], state)
     const height = Number.isFinite(source.height) ? source.height : this.config.maxRows
     const width = Number.isFinite(source.width) ? source.width : this.config.maxColumns
-    const target = InformationPlugin.indexTarget(height, width, source.isRef, row, column, area)
+    const target = InformationPlugin.indexTarget(height, width, InformationPlugin.isReferenceSource(ast.args[0]), row, column, area)
     if (target instanceof CellError) {
       return ArraySize.scalar()
     }
@@ -537,6 +537,26 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
     }
     return [targetRow, targetColumn]
+  }
+
+  /**
+   * Tells whether an INDEX source evaluates to a reference: a range, a cell, or the result of INDEX on one.
+   * Matches `index`, which treats a source that carries a range as a reference.
+   */
+  private static isReferenceSource(ast: Ast): boolean {
+    switch (ast.type) {
+      case AstNodeType.CELL_RANGE:
+      case AstNodeType.COLUMN_RANGE:
+      case AstNodeType.ROW_RANGE:
+      case AstNodeType.CELL_REFERENCE:
+        return true
+      case AstNodeType.PARENTHESIS:
+        return InformationPlugin.isReferenceSource(ast.expression)
+      case AstNodeType.FUNCTION_CALL:
+        return ast.procedureName === 'INDEX' && ast.args.length > 0 && InformationPlugin.isReferenceSource(ast.args[0])
+      default:
+        return false
+    }
   }
 
   /**
