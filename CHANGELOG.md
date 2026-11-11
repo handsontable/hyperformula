@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed array formulas over a whole column or row (e.g. `=SORT(A:A)`, `=UNIQUE(A:A)`, `=FILTER(A:A, A:A>0)`) throwing an uncaught `Resizing to smaller array` error, and leaving the old values in the spill, when their result grew larger than it was when first calculated, for example because the source grew or more values matched the `FILTER` condition. They now return the `#SPILL!` error. [#1825](https://github.com/handsontable/hyperformula/issues/1825)
 - Fixed functions such as `MATCH`, `INDEX` and `COUNTIF` throwing an uncaught `Unknown array` error when they read a range that exactly matches the area of an array formula returning an error, for example `=MATCH(2, B1:B3, 0)` next to `=SORT(A1:A3)` whose source contains `#DIV/0!`. They now read the range cell by cell. [#1876](https://github.com/handsontable/hyperformula/pull/1876)
 - Fixed unbounded parser cache growth in long-running instances that process many distinct formulas, including when undo is disabled. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
+- Fixed array formulas spilling past the `maxRows` and `maxColumns` limits: they now return `#SPILL!` when their result extends beyond the sheet edge. [#1774](https://github.com/handsontable/hyperformula/pull/1774)
 
 ## [3.5.0] - 2026-10-09
 
