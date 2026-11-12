@@ -37,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed array formulas spilling past the `maxRows` and `maxColumns` limits: they now return `#SPILL!` when their result extends beyond the sheet edge. [#1774](https://github.com/handsontable/hyperformula/pull/1774)
 - Fixed `DetailedCellError.address` for a typed-in error, an unparsable formula, or an overflow such as `=10^308*10`: the cell and every formula reading it now report the error's own cell, instead of none and each reader's own address. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 - Fixed `#SPILL!` errors reporting no address; their `address` is now the cell whose array result could not spill. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Fixed reading a formula cell's value before it was computed throwing a plain `Error` that did not say which cell it was; it now throws `CellValueNotComputedError`, which carries the cell's address. [#444](https://github.com/handsontable/hyperformula/issues/444)
 
 ## [3.5.0] - 2026-10-09
 
