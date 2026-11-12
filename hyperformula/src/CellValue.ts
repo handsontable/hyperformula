@@ -27,7 +27,9 @@ export class DetailedCellError {
 
   /**
    * What produced this error: the function or operator that rejected a value, e.g. `'SQRT'`
-   * or `'divide'`. An operator is named after the arithmetic helper it dispatches to.
+   * or `'/'`. A function is named by its canonical English name whatever the configured
+   * `language`: with `deDE`, `=WURZEL(-1)` reports `'SQRT'`. An operator is named as it is
+   * written in a formula, such as `'+'`, `'&'` or `'%'`.
    *
    * First occurrence wins, so a function that only received the error from a nested call
    * never replaces it: `=SUM(SQRT(-1))` reports `'SQRT'`. An error read from another cell
