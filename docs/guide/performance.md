@@ -115,9 +115,10 @@ sheets one at a time will add them the same way: an `addSheet` and a
 that depend on the sheet it fills. Building the instance yourself with
 `buildFromSheets` and passing that instead helps only if the library
 then reads the sheets from that instance. A library that writes each
-sheet's data into the engine again, for example when each of its
-grids is created with its own data, pays for the same per-sheet
-recalculation on top of the build.
+sheet's data into the engine again, for example when each of its grids
+is created with its own data, recalculates every loaded cell that
+depends on each sheet it rewrites. On top of the build, that can cost
+more than adding the sheets one at a time in dependency order.
 
 ## VLOOKUP/MATCH
 
