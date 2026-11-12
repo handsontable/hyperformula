@@ -131,10 +131,17 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         for (let j = 0; j < rangeVals.width(); j++) {
           let ok = true
           for (const filter of rangeFilters) {
-            const val = coerceScalarToBoolean(filter.data[i][j])
+            const condition = filter.data[i][j]
+            // Excel rejects text in a condition, even "TRUE", which coerceScalarToBoolean would accept.
+            if (typeof condition === 'string') {
+              return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+            }
+            const val = coerceScalarToBoolean(condition)
+            if (val instanceof CellError) {
+              return val
+            }
             if (val !== true) {
               ok = false
-              break
             }
           }
           if (ok) {
