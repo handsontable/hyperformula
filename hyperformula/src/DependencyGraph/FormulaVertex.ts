@@ -130,6 +130,12 @@ export class ArrayFormulaVertex extends FormulaVertex {
       return value
     }
     const array = ArrayValue.fromInterpreterValue(value)
+    if (array.width() > this.array.width() || array.height() > this.array.height()) {
+      // The reserved area is fixed once the formula is evaluated, and spills are not resized on updates.
+      const error = new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult)
+      this.setErrorValue(error)
+      return error
+    }
     array.resize(this.array.size)
     this.array = array
     return value
@@ -230,6 +236,25 @@ export class ArrayFormulaVertex extends FormulaVertex {
 
   isLeftCorner(address: SimpleCellAddress): boolean {
     return equalSimpleCellAddress(this.cellAddress, address)
+  }
+
+  /**
+   * Replaces every error in the stored result with `transform(error)`, leaving other values as
+   * they are.
+   */
+  public mapStoredErrors(transform: (error: CellError) => CellError): void {
+    if (this.array instanceof ErroredArray) {
+      this.array = new ErroredArray(transform(this.array.get(0, 0)), this.array.size)
+    } else if (this.array instanceof ArrayValue) {
+      for (const row of this.array.raw()) {
+        for (let col = 0; col < row.length; col++) {
+          const value = row[col]
+          if (value instanceof CellError) {
+            row[col] = transform(value)
+          }
+        }
+      }
+    }
   }
 
   private setErrorValue(error: CellError) {
