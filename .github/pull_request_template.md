@@ -7,6 +7,10 @@
 <!--- The commands you ran and what they showed – not "added tests". -->
 <!--- Internal team: name the paired branch in `hyperformula-tests`. External contributors: put your tests in `hyperformula/test/`. -->
 
+### AI assistance
+<!--- Did an AI tool (Claude Code, Cursor, Copilot or another) write a substantial part of this change? Name the tool and the parts it wrote: code, tests, docs. Write "None" if it didn't. -->
+<!--- AI-written code gets the same review, CI and tests as any other code. See dev-docs/DEFINITION-OF-DONE.md#ai-assisted-changes. -->
+
 ### Compatibility with Excel and Google Sheets
 <!--- List the formulas you checked in real Excel (and in Google Sheets, where relevant) and the results. -->
 <!--- If HyperFormula deliberately behaves differently, explain why here and add it to docs/guide/list-of-differences.md. -->
