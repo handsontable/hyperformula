@@ -119,6 +119,10 @@ export interface ConfigParams {
   decimalSeparator: '.' | ',',
   /**
    * When set to `true`, formulas evaluating to `null` evaluate to `0` instead.
+   *
+   * The same applies to an empty cell read through the API: `getCellValue()`, `getSheetValues()` and the
+   * other methods that return cell values, as well as the changes passed to the `valuesUpdated` event,
+   * give `0` for it instead of `null`. `ISBLANK` still treats the cell as blank.
    * @default false
    * @category Engine
    */
@@ -433,6 +437,22 @@ export interface ConfigParams {
    * @category Engine
    */
   maxPendingLazyTransformations: number,
+  /**
+   * Maximum number of parsed formula entries retained in the parser cache.
+   * Must be a non-negative safe integer. Set to `0` to disable parser caching,
+   * or to `Number.MAX_SAFE_INTEGER` to keep every entry.
+   *
+   * Least recently used entries are discarded when the limit is reached.
+   * Smaller limits can reduce cache memory but may increase parsing work. They
+   * can also increase total memory when many cells reuse the same formulas,
+   * because those cells share parts of a cached syntax tree, and all of it once
+   * a structural change rewrites them. This does not limit formulas retained by
+   * cells, named expressions, undo/redo or the clipboard.
+   *
+   * @default 10000
+   * @category Engine
+   */
+  maxParserCacheSize: number,
   /**
    * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) are allowed to use regular expressions.
    * @default false
