@@ -39,6 +39,7 @@ export const dictionary: RawTranslationPackage = {
     AVERAGE: 'PROMEDIO',
     AVERAGEA: 'PROMEDIOA',
     AVERAGEIF: 'PROMEDIO.SI',
+    AVERAGEIFS: 'PROMEDIO.SI.CONJUNTO',
     BASE: 'BASE',
     BIN2DEC: 'BIN.A.DEC',
     BIN2HEX: 'BIN.A.HEX',
