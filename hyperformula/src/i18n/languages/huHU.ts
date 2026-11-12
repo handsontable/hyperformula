@@ -228,6 +228,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'ÉSZÖ',
     T: 'T',
+    TAKE: 'ÁTHELYEZ',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'KJEGY.EGYENÉRT',

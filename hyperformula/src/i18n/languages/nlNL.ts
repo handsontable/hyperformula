@@ -228,6 +228,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'SYD',
     T: 'T',
+    TAKE: 'NEMEN',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'SCHATK.OBL',
