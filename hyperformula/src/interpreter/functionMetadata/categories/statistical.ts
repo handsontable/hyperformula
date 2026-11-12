@@ -38,6 +38,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=AVERAGEIF(A1:A10, ">5")', '=AVERAGEIF(B1:B10, "apples", C1:C10)'],
   },
+  AVERAGEIFS: {
+    category: 'Statistical',
+    shortDescription: 'Returns the arithmetic mean of the cells in a range that meet a set of criteria.',
+    parameters: [{name: 'average_range', description: 'The range of cells to average.'}, {name: 'criteria_range1', description: 'A range of cells tested against the paired criterion. Further range/criterion pairs can be passed as additional arguments, and only cells meeting every criterion are considered.'}, {name: 'criteria1', description: 'The condition applied to the preceding range, e.g. ">5", "apples", or a cell reference.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=AVERAGEIFS(C1:C10, A1:A10, ">5")', '=AVERAGEIFS(C1:C10, A1:A10, ">5", B1:B10, "apples")'],
+  },
   'BETA.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns the density of the beta distribution.',
