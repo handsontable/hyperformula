@@ -10,7 +10,7 @@ tags:
   - "#CYCLE!"
   - "#ERROR!"
   - "#LIC!"
-  - division by zero
+  - "#SPILL!"
 ---
 
 HyperFormula returns an error when a formula cannot be processed
@@ -37,3 +37,55 @@ according to the language settings.
 | #CYCLE! | Circular reference | It occurs when a formula refers to its own cell, both directly and indirectly. |
 | #ERROR! | An error occurred | It indicates that there is an unknown error in a formula. |
 | #LIC! | License key problem | It occurs when the license key is missing or invalid, when it has expired and your [license terms](license-key.md#license-key-notifications) stop it from working after that, or when the function is not included in the [feature package](license-key.md#feature-packages-and-add-ons) your license key grants. |
+| #SPILL! | No space for array result | It occurs when an array formula's result would overwrite one or more non-empty cells, so it has nowhere to spill into. |
+
+## Error messages and explanations
+
+An error's `message` property states the specific cause within its type: it
+tells you *why* a formula returned `#NUM!`, not only that it did. The message is
+always in English. The `language` option translates the error value, such as
+`#DZIEL/0!` for `#DIV/0!` in Polish, but not the message.
+
+Not every error has a message. An error value typed into a cell, a formula that
+reads one, and an error a custom function returns without a message all have
+`message: ''`. Check `hasMessage` to tell those apart from an error whose message
+is deliberately empty: it is `false` when no message was given.
+
+HyperFormula does not turn the message into a longer, plain-language explanation,
+and does not call out to a language model to generate one. An application that
+wants to rephrase an error for its end users, in natural language or in another
+language, should do so at the application layer, using the `type` and `message`
+HyperFormula provides as its input.
+
+## Finding out where an error came from
+
+Besides `type` and `message`, a `DetailedCellError` tells you what produced the
+error and, when it was a function rejecting one of its own arguments, which
+argument. `originFunction` names the function or operator that rejected a value:
+a function by its English name whatever the `language` option, and an operator as
+written, such as `/`. Otherwise it names what built the error: `reference` for a
+reference that cannot be resolved, `removed reference` for one destroyed by
+removing rows or columns, `parser` for a formula that could not be parsed, `user
+input` for a value written into a cell that is an error or that the engine
+rejects, `literal` for an error written into a formula, or `array literal` for an
+array literal whose rows differ in length. A `#SPILL!` or `#CYCLE!` that the
+engine raises has no `originFunction`, because it follows from the layout of the
+sheet rather than from evaluating a value. Neither does the `#VALUE!` of a
+formula whose result is a range that its cell cannot hold, such as `=C2:D2`
+entered in one cell. `argumentIndex` is zero-based.
+
+```javascript
+const hf = HyperFormula.buildFromArray(
+  [['=SUM(SQRT(-1))'], ['=DATE(2000, "x", 1)'], ['=SUM(A99999999999:A99999999999)']],
+  { licenseKey: 'gpl-v3' }
+);
+
+hf.getCellValue({ sheet: 0, row: 0, col: 0 }).originFunction; // 'SQRT', not 'SUM'
+hf.getCellValue({ sheet: 0, row: 1, col: 0 }).argumentIndex;  // 1, the second argument
+hf.getCellValue({ sheet: 0, row: 2, col: 0 }).originFunction; // 'reference'
+```
+
+The first occurrence wins, so a function that only read an error never replaces
+the identity already on it. `address` points at the cell where the error arose,
+which is not always the cell you read it from. For an error raised inside a named
+expression, `address` is the name of that expression, such as `MYNAME`.
