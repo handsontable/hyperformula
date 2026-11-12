@@ -148,7 +148,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       if (ret.length > 0) {
         return SimpleRangeValue.onlyValues(ret)
       } else {
-        return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+        return new CellError(ErrorType.CALC, ErrorMessage.EmptyRange)
       }
     })
   }

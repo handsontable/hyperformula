@@ -68,7 +68,7 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
         // An empty input range (e.g. a whole-column reference to an empty sheet)
         // yields no rows/columns to sort. Return #N/A rather than letting the empty
         // 2-D array reach SimpleRangeValue.onlyValues, which reads data[0].length and
-        // would throw. Mirrors UNIQUE/FILTER's empty-range handling.
+        // would throw.
         if (data.length === 0 || data[0].length === 0) {
           return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
         }

@@ -9,6 +9,7 @@ tags:
   - "#NUM!"
   - "#CYCLE!"
   - "#ERROR!"
+  - "#CALC!"
   - "#LIC!"
   - division by zero
 ---
@@ -36,4 +37,5 @@ according to the language settings.
 | #VALUE! | Wrong type of argument | It occurs when a formula tries to improperly use different types of data. For example, you will see this error when you will try to add a string to a number. |
 | #CYCLE! | Circular reference | It occurs when a formula refers to its own cell, both directly and indirectly. |
 | #ERROR! | An error occurred | It indicates that there is an unknown error in a formula. |
+| #CALC! | Calculation error | It occurs when a function cannot calculate its result, for example when the result would be an empty array (`=FILTER(A1:A3, A1:A3>10)` where no value is greater than 10). |
 | #LIC! | License key problem | It occurs when the license key is missing or invalid, when it has expired and your [license terms](license-key.md#license-key-notifications) stop it from working after that, or when the function is not included in the [feature package](license-key.md#feature-packages-and-add-ons) your license key grants. |
