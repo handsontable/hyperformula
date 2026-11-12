@@ -25,6 +25,7 @@ returns a cycle error regardless of whether TRUE or FALSE causes
 a circular reference.
 * Named ranges behave differently depending on where they are used in a formula. For details, see [Using named ranges in formulas](named-expressions.md#using-named-ranges-in-formulas).
 * [Custom functions](custom-functions.md) don't automatically recalculate the size of their [result arrays](custom-functions.md#return-an-array-of-data) when the formula dependencies change.
+* An array formula over a whole column or row (e.g., `=SORT(A:A)`) keeps the size it had when it was first calculated. If its result grows past that size, for example because the source grows or more values match a `FILTER` condition, the formula returns the `#SPILL!` error until the result fits again. Clearing cells that made the source taller is not enough, because the sheet keeps its size; removing those rows or columns is.
 * There is no relative referencing in named ranges.
 * The library doesn't offer (at least not yet) the following features:
   * 3D references
@@ -45,6 +46,7 @@ a circular reference.
 * The INDEX function doesn't support returning whole rows or columns of the source range – it always returns the contents of a single cell.
 * The FILTER function accepts either single rows of equal width or single columns of equal height. In other words, all arrays passed to the FILTER function must have equal dimensions, and at least one of those dimensions must be 1.
 * Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
+* `FILTER` and `UNIQUE` reserve the size of their source before they are evaluated, because the size of their result is not known until then. Near the sheet edge set by [`maxRows`](../api/interfaces/configparams.md#maxrows) and [`maxColumns`](../api/interfaces/configparams.md#maxcolumns), they return `#SPILL!` when that reserved area does not fit, even if the result itself would. For example, with `maxRows` set to `4` and 1 to 4 in `A1:A4`, `=FILTER(A1:A4, A1:A4>2)` in `B3` returns `#SPILL!`.
 * The TEXT function does not accept embedded double-quote literals in the format string. In Excel, `""` inside a format string is an escape sequence for a literal `"` character — e.g. `=TEXT(1234.5, "#,##0.00 ""zł""")` returns `"1,234.50 zł"`. If your application requires this escape sequence, supply a custom [`stringifyCurrency`](currency-handling.md) callback.
 
 ### UNIQUE function
@@ -59,6 +61,16 @@ a circular reference.
 * The `SortOrder` argument must be exactly `1` (ascending) or `-1` (descending). Any other value returns a `#VALUE!` error.
 
 * Ordering (including mixed types, empty cells, and text collation) follows HyperFormula's own comparison rules, which honor the `caseSensitive` and `accentSensitive` configuration options. Numbers sort before text, and text before logical values.
+
+### LINEST function
+
+* The `stats` argument controls whether the result has one or five rows. It must be omitted or supplied as a constant: `TRUE()`, `FALSE()`, a number, or the text `"TRUE"` or `"FALSE"`. Parentheses and numeric unary signs are supported. Cell references, named expressions, and calculated expressions such as `1=1` return `#VALUE!`, including when `LINEST` is nested inside another function.
+
+* Result width is determined from the predictor dimensions before evaluation. Changes to values within fixed input ranges and to a referenced `const` argument recalculate normally. Changes to dependency values do not resize the result automatically; this is the existing array-sizing limitation.
+
+* If an input expression returns a different predictor count than predicted, `LINEST` returns `#VALUE!`. For example, filtering predictor columns can change the required result width.
+
+* Very large or very small input magnitudes can reduce numerical accuracy. Intermediate calculations, such as residual sums of squares, can still overflow or underflow, producing `#NUM!` or inaccurate statistics. Rescale inputs to more moderate units where possible. See [LINEST numerical differences](list-of-differences.md#linest) for compatibility considerations.
 
 ### OFFSET function
 
