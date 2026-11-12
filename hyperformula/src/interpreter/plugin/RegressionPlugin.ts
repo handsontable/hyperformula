@@ -285,7 +285,7 @@ export class RegressionPlugin extends FunctionPlugin implements FunctionPluginTy
           return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
         }
         if (staticBoolean(ast.args[3]) === undefined) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.LinestStaticStats)
+          return new CellError(ErrorType.VALUE, ErrorMessage.StaticStats('LINEST'))
         }
         const x = generatedX ? undefined : coerceToRange(knownX)
         const shape = regressionShape(knownY.size, x?.size)
@@ -296,7 +296,7 @@ export class RegressionPlugin extends FunctionPlugin implements FunctionPluginTy
           return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
         }
         if (this.linestArraySize(ast, state).width !== shape.predictorCount + 1) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.LinestStaticSize)
+          return new CellError(ErrorType.VALUE, ErrorMessage.StaticResultSize('LINEST'))
         }
         const yValues = Array.from(knownY.valuesFromTopLeftCorner())
         const xValues = x === undefined ? yValues.map((_, i) => i + 1) : Array.from(x.valuesFromTopLeftCorner())

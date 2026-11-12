@@ -7,8 +7,6 @@
  * This is a class for detailed error messages across HyperFormula.
  */
 export class ErrorMessage {
-  public static LinestStaticSize = 'LINEST requires input dimensions that determine a fixed result size.'
-  public static LinestStaticStats = 'LINEST requires a constant stats argument to determine its result size.'
   public static PositiveValues = 'Values need to be positive.'
   public static ZeroVariance = 'Values cannot all be equal.'
   public static DistinctSigns = 'Distinct signs.'
