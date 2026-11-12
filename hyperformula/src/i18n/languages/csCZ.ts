@@ -39,6 +39,7 @@ const dictionary: RawTranslationPackage = {
     AVERAGE: 'PRŮMĚR',
     AVERAGEA: 'AVERAGEA',
     AVERAGEIF: 'AVERAGEIF',
+    AVERAGEIFS: 'AVERAGEIFS',
     BASE: 'BASE',
     BIN2DEC: 'BIN2DEC',
     BIN2HEX: 'BIN2HEX',
