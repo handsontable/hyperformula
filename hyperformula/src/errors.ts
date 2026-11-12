@@ -62,11 +62,11 @@ export class InvalidAddressError extends Error {
 }
 
 /**
- * Error thrown when a formula cell's value is read before it has been computed.
+ * Error thrown when the value of a formula cell is read before HyperFormula has calculated it.
  *
- * Carries the address as a field, so callers can trace the cell without parsing
- * it back out of the message.
- * Thrown by both ScalarFormulaVertex and ArrayFormulaVertex.
+ * `address` is the position of that cell; its `sheet` is the sheet ID (see `getSheetId()`), not
+ * the sheet name. The message gives the same three numbers instead of an A1-style address, because
+ * the code that throws this error has no access to sheet names.
  */
 export class CellValueNotComputedError extends Error {
   constructor(public readonly address: SimpleCellAddress) {

@@ -20,27 +20,31 @@ export class DetailedCellError {
    * Errors the engine raises while evaluating a formula always carry a message. A
    * `false` here means nobody stated a cause: a custom function that did not supply
    * one, or an error value a user typed straight into a cell, where the cause is the
-   * typing itself and `originFunction` says so.
+   * typing itself and `originFunction` says so. A `null` message, which a custom
+   * function written in JavaScript can pass, counts as no message.
    */
   public readonly hasMessage: boolean
 
   /**
    * What produced this error.
    *
-   * Usually the function or operator that rejected a value, e.g. `'SQRT'` or `'divide'`; an
-   * operator is named after the arithmetic helper it dispatches to. An error that exists
-   * before any function reads it names what built it instead: `'reference'` for a reference
-   * that cannot be resolved, `'removed reference'` for one destroyed by removing rows or
-   * columns, `'parser'` for a formula that could not be parsed, `'user input'` for an error
-   * value typed into a cell, `'literal'` for one written into a formula, and
-   * `'array literal'` for an array literal whose rows differ in length.
+   * Usually the function or operator that rejected a value, e.g. `'SQRT'` or `'/'`. A function
+   * is named by its canonical English name whatever the configured `language`: with `deDE`,
+   * `=WURZEL(-1)` reports `'SQRT'`. An operator is named as it is written in a formula, such as
+   * `'+'`, `'&'` or `'%'`. An error that exists before any function reads it names what built it
+   * instead: `'reference'` for a reference that cannot be resolved, `'removed reference'` for one
+   * destroyed by removing rows or columns, `'parser'` for a formula that could not be parsed,
+   * `'user input'` for a value written into a cell that is an error or that the engine rejects
+   * (such as `Infinity` or a date before 1900), `'literal'` for an error written into a formula,
+   * and `'array literal'` for an array literal whose rows differ in length.
    *
    * First occurrence wins, so a function that only read the error never replaces that:
    * `=SUM(SQRT(-1))` reports `'SQRT'`, and `=SUM(A2:A99999999999)` reports `'reference'`.
    * An error inside an array result names the operation that built the array.
    *
    * `undefined` for a `#SPILL!` or `#CYCLE!` that the engine raises, which arises from the
-   * layout of a sheet rather than from evaluating a value.
+   * layout of a sheet rather than from evaluating a value, and for the `#VALUE!` of a formula
+   * whose result is a range that its cell cannot hold, such as `=C2:D2` entered in one cell.
    */
   public readonly originFunction?: string
 
@@ -73,7 +77,7 @@ export class DetailedCellError {
   ) {
     this.type = error.type
     this.message = error.message ?? ''
-    this.hasMessage = error.message !== undefined
+    this.hasMessage = error.message != null
     this.originFunction = error.originFunction
     this.argumentIndex = error.argumentIndex
   }
