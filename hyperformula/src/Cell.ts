@@ -153,8 +153,11 @@ export class CellError {
     public readonly root?: FormulaVertex,
     public readonly originFunction?: string,
     public readonly argumentIndex?: number,
+    /** @internal */
     public readonly propagated: boolean = false,
+    /** @internal */
     public readonly originAddress?: SimpleCellAddress,
+    /** @internal */
     public readonly originAddressVersion?: number,
   ) {
   }
@@ -167,6 +170,8 @@ export class CellError {
    * rather than produced here — can never acquire an origin it did not already have.
    *
    * @param {string} functionName - the function or operator helper that produced the error
+   *
+   * @internal
    */
   public withOrigin(functionName: string): CellError {
     if (this.propagated || this.originFunction !== undefined) {
@@ -181,6 +186,8 @@ export class CellError {
    * offending argument.
    *
    * @param {number} index - zero-based index of the offending argument
+   *
+   * @internal
    */
   public withArgumentIndex(index: number): CellError {
     if (this.propagated || this.argumentIndex !== undefined) {
@@ -192,8 +199,11 @@ export class CellError {
   /**
    * Marks this error as read from another cell rather than produced by the current evaluation.
    *
-   * This is what stops a cell from adopting an error it only read: {@link attachRootVertex} skips
-   * a propagated error, so the reported address stays the one where the error actually appeared.
+   * This is what stops a cell from adopting an error it only read: `wrapperForRootVertex` in
+   * `Interpreter.ts` does not attach the evaluating cell as the root of a propagated error, so the
+   * reported address stays the one where the error actually appeared.
+   *
+   * @internal
    */
   public asPropagated(): CellError {
     if (this.propagated) {
@@ -216,11 +226,26 @@ export class CellError {
    *
    * @param {SimpleCellAddress} address - the address the error was read from
    * @param {number} version - the transformation version that address was current at
+   *
+   * @internal
    */
   public withOriginAddress(address: SimpleCellAddress, version: number): CellError {
     if (this.originAddress !== undefined) {
       return this
     }
+    return new CellError(this.type, this.message, this.root, this.originFunction, this.argumentIndex, this.propagated, address, version)
+  }
+
+  /**
+   * Replaces the recorded origin address with the same origin expressed at a later transformation
+   * version. Used before old transformations are discarded, so that a cached copy of a static
+   * error can still be moved by the transformations that follow.
+   *
+   * @param {SimpleCellAddress} address - the origin address as it is at `version`
+   * @param {number} version - the transformation version that address is current at
+   * @internal
+   */
+  public withRebasedOriginAddress(address: SimpleCellAddress, version: number): CellError {
     return new CellError(this.type, this.message, this.root, this.originFunction, this.argumentIndex, this.propagated, address, version)
   }
 

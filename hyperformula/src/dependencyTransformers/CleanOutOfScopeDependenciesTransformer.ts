@@ -3,7 +3,8 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {ErrorType, SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {ErrorMessage} from '../error-message'
 import {CellAddress} from '../parser'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
@@ -18,6 +19,14 @@ export class CleanOutOfScopeDependenciesTransformer extends Transformer {
 
   public isIrreversible() {
     return true
+  }
+
+  /**
+   * A reference this transformer invalidates was carried past the edge of the sheet, for example
+   * by pasting a formula with a relative reference; no row or column was removed.
+   */
+  protected invalidReferenceError(): CellError {
+    return new CellError(ErrorType.REF, ErrorMessage.OutOfSheet)
   }
 
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {

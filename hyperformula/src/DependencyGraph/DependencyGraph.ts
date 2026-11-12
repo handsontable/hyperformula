@@ -690,12 +690,38 @@ export class DependencyGraph {
     this.graph.markNodeAsChangingWithStructure(vertex)
   }
 
+  /**
+   * Brings every formula vertex up to the current transformation version, so that the stored
+   * transformations can be discarded.
+   *
+   * A cached error read from a static-error cell carries its origin address together with the
+   * version that address is true at (see {@link getCellValue}). Its address is moved to the current
+   * version here too; once the transformations are discarded it could no longer be moved.
+   */
   public forceApplyPostponedTransformations() {
     for (const vertex of this.graph.getNodes()) {
       if (vertex instanceof ScalarFormulaVertex) {
         vertex.ensureRecentData(this.lazilyTransformingAstService)
+        const value = vertex.valueOrUndef()
+        if (value instanceof CellError) {
+          vertex.setCellValue(this.rebaseOriginAddress(value))
+        }
+      } else if (vertex instanceof ArrayFormulaVertex) {
+        vertex.mapStoredErrors(error => this.rebaseOriginAddress(error))
       }
     }
+  }
+
+  private rebaseOriginAddress(error: CellError): CellError {
+    const {originAddress, originAddressVersion} = error
+    if (originAddress === undefined || originAddressVersion === undefined || originAddress.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
+      return error
+    }
+    const currentAddress = this.lazilyTransformingAstService.applyTransformationsToAddress(originAddress, originAddressVersion)
+    if (currentAddress === undefined) {
+      return error
+    }
+    return error.withRebasedOriginAddress(currentAddress, this.lazilyTransformingAstService.version())
   }
 
   public* rawValuesFromRange(range: AbsoluteCellRange): IterableIterator<[RawScalarValue, SimpleCellAddress]> {

@@ -237,6 +237,25 @@ export class ArrayFormulaVertex extends FormulaVertex {
     return equalSimpleCellAddress(this.cellAddress, address)
   }
 
+  /**
+   * Replaces every error in the stored result with `transform(error)`, leaving other values as
+   * they are.
+   */
+  public mapStoredErrors(transform: (error: CellError) => CellError): void {
+    if (this.array instanceof ErroredArray) {
+      this.array = new ErroredArray(transform(this.array.get(0, 0)), this.array.size)
+    } else if (this.array instanceof ArrayValue) {
+      for (const row of this.array.raw()) {
+        for (let col = 0; col < row.length; col++) {
+          const value = row[col]
+          if (value instanceof CellError) {
+            row[col] = transform(value)
+          }
+        }
+      }
+    }
+  }
+
   private setErrorValue(error: CellError) {
     this.array = new ErroredArray(error, this.array.size)
   }
