@@ -547,8 +547,11 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   public rri(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('RRI'),
       (periods, present, future) => {
-        if (present === 0 || (future < 0 && present > 0) || (future > 0 && present < 0)) {
-          return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+        if (present === 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.NonZero)
+        }
+        if ((future < 0 && present > 0) || (future > 0 && present < 0)) {
+          return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
         }
 
         return Math.pow(future / present, 1 / periods) - 1
@@ -707,7 +710,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
           }
         }
         if (!posFlag || !negFlag) {
-          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.PositiveAndNegative)
         }
         const n = vals.length
         const nom = npvCore(rrate, posValues)
