@@ -144,7 +144,7 @@ export const buildLexerConfig = (config: ParserConfig): LexerConfig => {
   const WhiteSpace = createToken({ name: 'WhiteSpace', pattern: whitespaceTokenRegexp })
   const ArrayRowSeparator = createToken({name: 'ArrayRowSep', pattern: config.arrayRowSeparator})
   const ArrayColSeparator = createToken({name: 'ArrayColSep', pattern: config.arrayColumnSeparator})
-  const NumberLiteral = createToken({ name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`) })
+  const NumberLiteral = createToken({ name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`, 'i') })
   // OFFSET has its own token because it has its own grammar rule, so it repeats the prefix handling of
   // ProcedureName. The 'i' flag, there for the translated OFFSET name, applies to the whole pattern, so
   // unlike ProcedureName it also accepts an upper-cased prefix: `_XLFN.OFFSET(...)` is accepted here
