@@ -37,7 +37,7 @@ If Microsoft Excel shows the error under a different name in your language, use 
 |:---------|:-----|:----|:----|
 | `FILTER` | No value meets the conditions. | `#N/A` | `#CALC!` |
 | `UNIQUE` | No row or column is kept: `exactly_once` is `TRUE` and every row or column occurs more than once. | `#N/A` | `#CALC!` |
-| `SEQUENCE` | The number of rows or columns is between 0 and 1, so it truncates to 0. | `#VALUE!` | `#CALC!` |
+| `SEQUENCE` | The number of rows or columns is 0 or truncates to 0, for example `0`, `0.5`, `FALSE()` or an empty cell. | `#VALUE!` | `#CALC!` |
 | `CONCAT` | The result is longer than 32,767 characters. | `#VALUE!` | `#CALC!` |
 | `TEXTJOIN` | The result is longer than 32,767 characters. | `#VALUE!` | `#CALC!` |
 

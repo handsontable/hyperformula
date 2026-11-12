@@ -206,6 +206,7 @@ describe("Lexer", () => {
       "#ERROR!",
       "#CYCLE!",
       "#SPILL!",
+      "#CALC!",
     ];
 
     for (const literal of literals) {
