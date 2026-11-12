@@ -38,6 +38,7 @@ const dictionary: RawTranslationPackage = {
     AVERAGE: 'СРЗНАЧ',
     AVERAGEA: 'СРЗНАЧА',
     AVERAGEIF: 'СРЗНАЧЕСЛИ',
+    AVERAGEIFS: 'СРЗНАЧЕСЛИМН',
     BASE: 'ОСНОВАНИЕ',
     BIN2DEC: 'ДВ.В.ДЕС',
     BIN2HEX: 'ДВ.В.ШЕСТН',
