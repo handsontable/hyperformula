@@ -7,10 +7,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. [#1885](https://github.com/handsontable/hyperformula/pull/1885)
+
 ### Added
 
 - Added `LINEST` for simple and multiple linear regression, with optional intercept and regression statistics. The `stats` argument must be constant because result dimensions are determined before evaluation. [#1769](https://github.com/handsontable/hyperformula/pull/1769)
 - Added the `CONCAT` function, which joins text from values, ranges, and arrays, and the `VALUETOTEXT` function, which returns a value as text in a concise or a strict format. [#1816](https://github.com/handsontable/hyperformula/pull/1816)
+- Added the `maxParserCacheSize` configuration option to control the number of cached formulas. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
 - Added `DetailedCellError.hasMessage`, so a consumer can tell a cell error that never carried a message (e.g. a custom function that omitted one) apart from one with a deliberately empty message — both previously surfaced identically as `message: ''`. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 - Added `DetailedCellError.originFunction` and `DetailedCellError.argumentIndex`, which name what produced a cell error (a function, an operator, or a source such as `reference` or `parser`) and, when it failed to coerce an argument, that argument's position as written. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
@@ -23,7 +28,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
 - Fixed `getCellValue()`, `getSheetValues()` and the other methods that export cell values ignoring the `evaluateNullToZero` option: with the option on, they now return `0` for empty cells instead of `null`. [#1738](https://github.com/handsontable/hyperformula/pull/1738)
 - Fixed approximate `XLOOKUP` ignoring values of a different type in some search modes, and approximate `MATCH`, `VLOOKUP`, and `HLOOKUP` taking such values into account for non-range arrays, single-cell ranges, and binary search over sorted cell ranges; both now behave the same in linear and binary search, consistent with Microsoft Excel. [#1755](https://github.com/handsontable/hyperformula/pull/1755)
-- Fixed a cell holding a static error value, such as a rejected formula or a typed-in error, being reported under the address of the cell that read it first instead of its own address. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Fixed formulas with consecutive percent operators failing to parse: each `%` now divides by 100, so `=5%%` returns `0.0005`, as in Excel. [#1773](https://github.com/handsontable/hyperformula/pull/1773)
+- Fixed `setCellContents` returning a `#ERROR!` parsing error instead of `#SPILL!` for an array formula whose whole-column or whole-row result cannot fit, such as `=SORT(A:A)` entered below the first row. The result now matches the one for the same formula loaded with `buildFromSheets`. [#1797](https://github.com/handsontable/hyperformula/pull/1797)
+- Fixed number literals with an uppercase exponent marker, which the lowercase form already accepted: `=1E5` now returns `100000` instead of `#ERROR!`, a parse error. [#1835](https://github.com/handsontable/hyperformula/pull/1835)
+- Fixed array formulas over a whole column or row (e.g. `=SORT(A:A)`, `=UNIQUE(A:A)`, `=FILTER(A:A, A:A>0)`) throwing an uncaught `Resizing to smaller array` error, and leaving the old values in the spill, when their result grew larger than it was when first calculated, for example because the source grew or more values matched the `FILTER` condition. They now return the `#SPILL!` error. [#1825](https://github.com/handsontable/hyperformula/issues/1825)
+- Fixed functions such as `MATCH`, `INDEX` and `COUNTIF` throwing an uncaught `Unknown array` error when they read a range that exactly matches the area of an array formula returning an error, for example `=MATCH(2, B1:B3, 0)` next to `=SORT(A1:A3)` whose source contains `#DIV/0!`. They now read the range cell by cell. [#1876](https://github.com/handsontable/hyperformula/pull/1876)
+- Fixed unbounded parser cache growth in long-running instances that process many distinct formulas, including when undo is disabled. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
+- Fixed array formulas spilling past the `maxRows` and `maxColumns` limits: they now return `#SPILL!` when their result extends beyond the sheet edge. [#1774](https://github.com/handsontable/hyperformula/pull/1774)
+- Fixed `DetailedCellError.address` for a typed-in error, an unparsable formula, or an overflow such as `=10^308*10`: the cell and every formula reading it now report the error's own cell, instead of none and each reader's own address. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 - Fixed `#SPILL!` errors reporting no address; their `address` is now the cell whose array result could not spill. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ## [3.5.0] - 2026-10-09

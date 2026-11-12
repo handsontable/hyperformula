@@ -299,13 +299,14 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   /**
    * Flattens the arguments into scalars, expanding any range into its values.
    *
-   * The fourth element of each tuple is the index of the ARGUMENT THE USER WROTE that the
-   * scalar came from. Every value expanded out of one range keeps that range's own index,
-   * so a later error can name the argument rather than its position in this flattened
-   * list — `=AND(A1:A3,"x")` must blame argument 1, not entry 3.
+   * The optional fourth element of each tuple is the index of the argument as written in the
+   * formula that the scalar came from. Every value expanded out of one range keeps that range's
+   * own index, so an error names the argument rather than its position in this flattened list:
+   * `=AND(A1:A3,"x")` blames argument 1, not entry 3. An override that returns three-element
+   * tuples still works; each value then counts as its own argument.
    */
-  protected listOfScalarValues(asts: Ast[], state: InterpreterState): [InternalScalarValue, boolean, boolean, number][] {
-    const ret: [InternalScalarValue, boolean, boolean, number][] = []
+  protected listOfScalarValues(asts: Ast[], state: InterpreterState): [InternalScalarValue, boolean, boolean, number?][] {
+    const ret: [InternalScalarValue, boolean, boolean, number?][] = []
     asts.forEach((argAst, argumentIndex) => {
       const isSyntacticallyEmpty = argAst.type === AstNodeType.EMPTY
       const value = this.evaluateAst(argAst, state)
@@ -419,8 +420,8 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     const argumentIgnorableFlags = evaluatedArguments.map(([, ignorable]) => ignorable)
     const syntacticallyEmptyFlags = evaluatedArguments.map(([, , empty]) => empty)
     // Which argument each value came from. Identical to the position in this list unless a
-    // range was expanded above; a custom plugin overriding `listOfScalarValues` with the
-    // old three-element tuple yields undefined here and falls back to the position.
+    // range was expanded above; an override of `listOfScalarValues` or `evaluateArguments`
+    // that returns three-element tuples yields undefined here, and the position is used.
     const sourceArgumentIndexes = evaluatedArguments.map(([, , , index]) => index)
     const argumentMetadata = this.buildMetadataForEachArgumentValue(argumentValues.length, metadata)
     const isVectorizationOn = state.arraysFlag && !metadata.vectorizationForbidden
@@ -460,7 +461,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     syntacticallyEmptyFlags: boolean[],
     functionImplementation: (...arg: any) => InterpreterValue,
     returnNumberType: NumberType | undefined,
-    sourceArgumentIndexes: number[] = [],
+    sourceArgumentIndexes: Maybe<number>[] = [],
   ): RawInterpreterValue {
     const coercedArguments = this.coerceArgumentsToRequiredTypes(state, vectorizedArguments, argumentsMetadata, argumentIgnorableFlags, syntacticallyEmptyFlags, sourceArgumentIndexes)
 
@@ -478,12 +479,11 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     argumentsMetadata: FunctionArgument[],
     argumentIgnorableFlags: boolean[],
     syntacticallyEmptyFlags: boolean[],
-    sourceArgumentIndexes: number[] = [],
+    sourceArgumentIndexes: Maybe<number>[] = [],
   ):  CellError | Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] {
     const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
-    // The argument the user wrote, which is the position in this loop only when no range
-    // was expanded. Reporting the loop index made the reported argument depend on how many
-    // cells a preceding range happened to cover.
+    // The argument as written in the formula. It equals the position in this loop only when no
+    // range was expanded: a range counts as one argument, however many cells it covers.
     const writtenArgumentIndex = (i: number): number => sourceArgumentIndexes[i] ?? i
 
     for (let i = 0; i < argumentsMetadata.length; i++) {
@@ -531,7 +531,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     return argumentValue.data[targetRowNum]?.[targetColNum]
   }
 
-  protected evaluateArguments(args: Ast[], state: InterpreterState, metadata: FunctionMetadata): [InterpreterValue, boolean, boolean, number][] {
+  protected evaluateArguments(args: Ast[], state: InterpreterState, metadata: FunctionMetadata): [InterpreterValue, boolean, boolean, number?][] {
     return metadata.expandRanges
       ? this.listOfScalarValues(args, state)
       : args.map((ast, argumentIndex) => [this.evaluateAst(ast, state), false, ast.type === AstNodeType.EMPTY, argumentIndex])

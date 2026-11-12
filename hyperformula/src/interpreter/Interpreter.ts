@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {ArraySizePredictor} from '../ArraySize'
-import {ArrayValue, NotComputedArray} from '../ArrayValue'
+import {ArrayValue, ErroredArray, NotComputedArray} from '../ArrayValue'
 import {CellError, ErrorType, isColOrRowInvalid} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -228,6 +228,9 @@ export class Interpreter {
             return array
           } else if (array instanceof ArrayValue) {
             return SimpleRangeValue.fromRange(array.raw(), range, this.dependencyGraph)
+          } else if (array instanceof ErroredArray) {
+            // Read cell by cell, like a range that does not match a spill exactly.
+            return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
           } else {
             throw new Error('Unknown array')
           }
@@ -514,11 +517,9 @@ function wrapperForRootVertex(val: InterpreterValue, vertex?: FormulaVertex): In
 
 /**
  * The name recorded as an error's `originFunction` when evaluating this AST node is what produced
- * it: the function name for a call, or the `ArithmeticHelper` method the operator dispatches to.
- *
- * Every name below was read off this file's own operator definitions rather than guessed, which is
- * why `PLUS_OP` maps to `addWithEpsilon` and `PERCENT_OP` to `unaryPercent`. Any other node type
- * returns undefined and leaves whatever origin the value already carries untouched.
+ * it: the canonical function name for a call, or the operator as it is written in a formula, such
+ * as `+`, `/`, `&` or `%`. Unary and binary minus are both `-`, and unary plus is `+`. Any other
+ * node type returns undefined and leaves whatever origin the value already carries untouched.
  *
  * @param {Ast} ast - the node being evaluated
  */
@@ -530,35 +531,35 @@ function originNameForAstNode(ast: Ast): Maybe<string> {
       // An array literal with mismatched rows builds its own error before any call sees it.
       return 'array literal'
     case AstNodeType.CONCATENATE_OP:
-      return 'concat'
+      return '&'
     case AstNodeType.EQUALS_OP:
-      return 'eq'
+      return '='
     case AstNodeType.NOT_EQUAL_OP:
-      return 'neq'
+      return '<>'
     case AstNodeType.GREATER_THAN_OP:
-      return 'gt'
+      return '>'
     case AstNodeType.LESS_THAN_OP:
-      return 'lt'
+      return '<'
     case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
-      return 'geq'
+      return '>='
     case AstNodeType.LESS_THAN_OR_EQUAL_OP:
-      return 'leq'
+      return '<='
     case AstNodeType.PLUS_OP:
-      return 'addWithEpsilon'
+      return '+'
     case AstNodeType.MINUS_OP:
-      return 'subtract'
+      return '-'
     case AstNodeType.TIMES_OP:
-      return 'multiply'
+      return '*'
     case AstNodeType.POWER_OP:
-      return 'pow'
+      return '^'
     case AstNodeType.DIV_OP:
-      return 'divide'
+      return '/'
     case AstNodeType.PLUS_UNARY_OP:
-      return 'unaryPlus'
+      return '+'
     case AstNodeType.MINUS_UNARY_OP:
-      return 'unaryMinus'
+      return '-'
     case AstNodeType.PERCENT_OP:
-      return 'unaryPercent'
+      return '%'
     default:
       return undefined
   }
