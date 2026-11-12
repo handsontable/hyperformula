@@ -204,7 +204,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       enableArrayArithmeticForArguments: true,
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.NUMBER},
         {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
       ],
       vectorizationForbidden: true,
@@ -344,17 +344,15 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * @returns {InterpreterValue} The selected source values or a spreadsheet error.
    */
   public take(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    // The default supports TAKE(array, , columns), but the rows argument
-    // position must still be present.
-    if (ast.args.length < 2) {
-      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-    }
+    // rows is required but may be left empty, as in TAKE(array, , columns), which keeps
+    // every row; a default would make the metadata report it as optional.
+    const rowsLeftEmpty = ast.args[1]?.type === AstNodeType.EMPTY
 
     return this.runFunction(ast.args, state, this.metadata('TAKE'),
       (range: SimpleRangeValue, rows: number, columns: number) => {
         const sourceHeight = range.height()
         const sourceWidth = range.width()
-        const requestedRows = Math.trunc(rows)
+        const requestedRows = rowsLeftEmpty ? Number.POSITIVE_INFINITY : Math.trunc(rows)
         const requestedColumns = Math.trunc(columns)
 
         if (requestedRows === 0 || requestedColumns === 0) {
