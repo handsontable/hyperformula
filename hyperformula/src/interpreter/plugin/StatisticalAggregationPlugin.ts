@@ -347,7 +347,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
           return arrY
         }
         if (arrX.length <= 1 || arrY.length <= 1) {
-          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
         }
         const vx = variance(arrX, true)
         const vy = variance(arrY, true)

@@ -99,8 +99,7 @@ export class LazilyTransformingAstService {
     for (let v = Math.max(version, this.versionOffset); v < currentVersion; v++) {
       const transformation = this.transformations[v - this.versionOffset]
       if (transformation.isIrreversible()) {
-        this.undoRedo!.storeDataForVersion(v, address, this.parser!.computeHashFromAst(ast))
-        this.parser!.rememberNewAst(ast)
+        this.undoRedo!.storeDataForVersion(v, address, ast)
       }
 
       const [newAst, newAddress] = transformation.transformSingleAst(ast, address)
@@ -124,11 +123,11 @@ export class LazilyTransformingAstService {
    * `MoveCellsTransformer` only moves an address that lies inside the range being moved, and that
    * decision lives in `transformSingleAst`, not in `fixNodeAddress`.
    *
-   * Returns `undefined` when the stamp predates the last compaction. Compaction brings every
-   * vertex up to date before it discards transformations, but a `CellError` cached inside a
-   * vertex's value is not a vertex and is never brought up to date, so its version can fall behind
-   * `versionOffset`. The transformations needed to move the address are gone by then, and naming
-   * some other cell is worse than naming none.
+   * Returns `undefined` when the stamp predates the last compaction. Before compacting,
+   * `DependencyGraph.forceApplyPostponedTransformations` moves the stamps of the errors cached in
+   * formula vertices to the current version, so this only happens to a stamp held anywhere else.
+   * The transformations needed to move such an address are gone, and naming some other cell is
+   * worse than naming none.
    *
    * @param {SimpleCellAddress} address - the address as it was at `version`
    * @param {number} version - the version the address was current at
