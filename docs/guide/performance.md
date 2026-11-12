@@ -37,8 +37,8 @@ const hf = HyperFormula.buildFromSheets({
 Loading the same data incrementally, with an
 [`addSheet`](../api/classes/hyperformula.md#addsheet) and a
 [`setSheetContent`](../api/classes/hyperformula.md#setsheetcontent)
-call per sheet, is much slower, and the gap widens with every sheet
-added. Each [`setSheetContent`](../api/classes/hyperformula.md#setsheetcontent)
+call per sheet, can be much slower, and the gap widens with every
+sheet added. Each [`setSheetContent`](../api/classes/hyperformula.md#setsheetcontent)
 call recalculates every loaded cell that depends on the sheet it just
 filled, so when the sheets already loaded reference the one being
 added, the work grows with each step. In a test with 500
@@ -48,8 +48,8 @@ times slower than a single `buildFromSheets` call.
 [`addSheet`](../api/classes/hyperformula.md#addsheet) adds to this
 whenever the formulas already loaded point at the sheet being added:
 it marks all the cells and ranges of that sheet as dirty and
-recalculates on its own; in the test above that roughly doubled the
-cost of each step. Registering all the sheet names upfront removes
+recalculates on its own; in the 500-sheet test that roughly doubled
+the cost of each step. Registering all the sheet names upfront removes
 that share, because there is nothing to recalculate yet when the names
 are registered, but it does not remove the growth.
 
@@ -79,29 +79,45 @@ hf.addSheet('Later')                                  // Hub!A1 is 1
 hf.setSheetContent(hf.getSheetId('Later'), [ ['41'] ])  // Hub!A1 is 42
 ```
 
-This also means that ordering the inserts by dependency is not a fix
-for the cost described above. It helps only as long as every reference
-happens to point the same way, and a single reference pointing back
-puts you on the slow path again with nothing to signal it.
+The order still affects the cost. Each
+[`setSheetContent`](../api/classes/hyperformula.md#setsheetcontent)
+call recalculates the loaded cells that depend on the sheet it fills,
+so the cost grows with how much of the loaded data depends on sheets
+not loaded yet. Adding every sheet after the sheets it references
+keeps the per-sheet loop close to a single `buildFromSheets` call, and
+a few formulas that point at sheets added later cost little. Adding
+the sheets in the reverse order makes every step recalculate the
+sheets added before it. In a test with 150 sheets of 10 rows by 40
+columns, each reading the previous sheet, the per-sheet loop took
+0.6 seconds in dependency order and 31 seconds in reverse order,
+against 0.5 seconds for `buildFromSheets`. `buildFromSheets` does not
+depend on the order, so it is the safe choice when you cannot
+guarantee one.
 
 ### One engine, not one per sheet
 
-Splitting the sheets across several engine instances is not a way out
-of the cost above. A formula can only reference a sheet that lives in
-the same instance: pointing at a sheet held by another one evaluates
-to `#REF!`, the same as pointing at a sheet that does not exist. So
-sharding by instance does not divide the work, it removes the
-cross-sheet references that made the work necessary – which is
-usually the feature the sheets were loaded for.
+Splitting the sheets across several engine instances does not avoid
+the recalculation that each per-sheet `setSheetContent` call triggers
+when loaded cells depend on the sheet it fills. A formula can only
+reference a sheet that lives in the same instance: pointing at a sheet
+held by another one evaluates to `#REF!`, the same as pointing at a
+sheet that does not exist. So sharding by instance does not divide the
+work, it removes the cross-sheet references that made the work
+necessary – which is usually the feature the sheets were loaded for.
 
 ### Passing the engine to other libraries
 
 A library you hand HyperFormula to may accept either the
 `HyperFormula` class or a ready instance. Given the class, it builds
 the engine on its own terms, and an integration that receives your
-sheets one at a time will add them the same way – the slow path
-above. Building the instance yourself with `buildFromSheets` and
-passing that instead takes the decision out of its hands.
+sheets one at a time will add them the same way: an `addSheet` and a
+`setSheetContent` call per sheet, each recalculating the loaded cells
+that depend on the sheet it fills. Building the instance yourself with
+`buildFromSheets` and passing that instead helps only if the library
+then reads the sheets from that instance. A library that writes each
+sheet's data into the engine again, for example when each of its
+grids is created with its own data, pays for the same per-sheet
+recalculation on top of the build.
 
 ## VLOOKUP/MATCH
 
