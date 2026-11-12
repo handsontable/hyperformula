@@ -6,11 +6,12 @@
 import {Maybe} from '../Maybe'
 
 const dateFormatRegex = /(\\.|dd|DD|d|D|mm|MM|m|M|YYYY|YY|yyyy|yy|HH|hh|H|h|ss(\.(0+|s+))?|s|AM\/PM|am\/pm|A\/P|a\/p|\[mm]|\[MM]|\[hh]|\[HH])/g
-const numberFormatRegex = /(\\.|[#0]+(\.[#0]*)?)/g
+const numberFormatRegex = /(\\.|"[^"]*"|[#0]+(\.[#0]*)?|%)/g
 
 export enum TokenType {
   FORMAT = 'FORMAT',
   FREE_TEXT = 'FREE_TEXT',
+  PERCENT = 'PERCENT',
 }
 
 export interface FormatToken {
@@ -52,15 +53,26 @@ function matchDateFormat(str: string): RegExpExecArray[] {
   return tokens
 }
 
+/**
+ * Finds one numeric mask and its surrounding literals and percent operators.
+ * Keeping quotes and escapes intact prevents literal percent signs from scaling
+ * the value. Later numeric masks remain free text, as in the existing formatter.
+ */
 function matchNumberFormat(str: string): RegExpExecArray[] {
   numberFormatRegex.lastIndex = 0
-  const numberFormatToken = numberFormatRegex.exec(str)
+  const tokens: RegExpExecArray[] = []
+  let foundNumber = false
+  let token
 
-  if (numberFormatToken !== null) {
-    return [numberFormatToken]
-  } else {
-    return []
+  while ((token = numberFormatRegex.exec(str)) !== null) {
+    const isNumber = token[0].startsWith('#') || token[0].startsWith('0')
+    if (!isNumber || !foundNumber) {
+      tokens.push(token)
+    }
+    foundNumber = foundNumber || isNumber
   }
+
+  return foundNumber ? tokens : []
 }
 
 function createTokens(regexTokens: RegExpExecArray[], str: string) {
@@ -106,6 +118,11 @@ export function parseForDateTimeFormat(str: string): Maybe<FormatExpression> {
   }
 }
 
+/**
+ * Tokenizes a numeric format, distinguishing percent operators from literals.
+ * Percent escapes and quoted literals are decoded only on the number path;
+ * date tokens and unrelated backslash escapes retain their representation.
+ */
 export function parseForNumberFormat(str: string): Maybe<FormatExpression> {
   const numberFormatTokens = matchNumberFormat(str)
   if (numberFormatTokens.every((elem) => isEscapeToken(elem))) {
@@ -113,7 +130,18 @@ export function parseForNumberFormat(str: string): Maybe<FormatExpression> {
   } else {
     return {
       type: FormatExpressionType.NUMBER,
-      tokens: createTokens(numberFormatTokens, str),
+      tokens: createTokens(numberFormatTokens, str).map((token) => {
+        if (token.value === '\\%' || token.value === '\\\\') {
+          return formatToken(TokenType.FREE_TEXT, token.value.substring(1))
+        }
+        if (token.type === TokenType.FORMAT && token.value.startsWith('"')) {
+          return formatToken(TokenType.FREE_TEXT, token.value.slice(1, -1))
+        }
+        if (token.type === TokenType.FORMAT && token.value === '%') {
+          return formatToken(TokenType.PERCENT, token.value)
+        }
+        return token
+      }),
     }
   }
 }
