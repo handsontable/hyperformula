@@ -166,7 +166,10 @@ Options related to date and time formats:
 
 ### `TEXT` function formats
 
-Excel's `TEXT` function supports a wide range of date, time, and currency formats. To cover the full range in HyperFormula, supply both [`stringifyDateTime()`](../api/interfaces/configparams.md#stringifydatetime) (for dates and durations) and [`stringifyCurrency()`](../api/interfaces/configparams.md#stringifycurrency) (for currency formats — locale-aware grouping, non-`$` symbols, accounting two-section patterns). See [Currency handling](currency-handling.md) for an `Intl.NumberFormat`-based example.
+Excel's `TEXT` function supports a wide range of date, time, and number formats. The built-in number formatter handles digit placeholders (`#`, `0`), thousands grouping (`#,##0`), and positive/negative/zero sections (`0.00;(0.00);0.0`). Two nuances follow from HyperFormula's config-authoritative model:
+
+- Separators come from the instance config, not the runtime locale. The decimal point uses [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) and the grouping glyph uses [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator). Because the default `thousandSeparator` is an empty string, a `#,##0` mask emits no visible grouping glyph until you configure one — and configuring `thousandSeparator: ','` also requires moving [`functionArgSeparator`](../api/interfaces/configparams.md#functionargseparator) off its default comma, since the three separators must be mutually distinct.
+- The built-in formatter does not implement every Excel number format; [Known limitations](known-limitations.md#text-function) lists the ones it does not support. For those, and for locale-aware currency formats, supply [`stringifyDateTime()`](../api/interfaces/configparams.md#stringifydatetime) (for dates and durations) and [`stringifyCurrency()`](../api/interfaces/configparams.md#stringifycurrency) (for currency). See [Currency handling](currency-handling.md) for an `Intl.NumberFormat`-based example.
 
 ## Full configuration
 
