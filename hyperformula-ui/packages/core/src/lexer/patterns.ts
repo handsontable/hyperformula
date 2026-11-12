@@ -8,4 +8,5 @@ export const RE_SHEET_BARE = /([\p{L}_][\p{L}\p{N}_]*)!/uy;
 export const RE_OP_MULTI = /<>|<=|>=/y;
 export const RE_OP_SINGLE = /[+\-*/^%&=<>:]/y;
 export const RE_COMMENT = /\/\/[^\n]*/y;
-export const RE_ERROR_LITERAL = /#(?:REF!|DIV\/0!|NAME\?|N\/A|NUM!|VALUE!|ERROR!|CYCLE!|SPILL!|CALC!)/iy;
+export const RE_ERROR_LITERAL =
+  /#(?:REF!|DIV\/0!|NAME\?|N\/A|NUM!|VALUE!|ERROR!|CYCLE!|SPILL!|CALC!)/iy;
