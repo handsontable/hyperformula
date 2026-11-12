@@ -11,7 +11,7 @@ import {RawCellContent} from '../CellContentParser'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {ContentChanges} from '../ContentChanges'
-import {ErrorMessage} from '../error-message'
+import {ErrorMessage, ErrorOrigin} from '../error-message'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {
   EmptyValue,
@@ -611,7 +611,7 @@ export class DependencyGraph {
 
   public getCellValue(address: SimpleCellAddress): InterpreterValue {
     if (this.isPlaceholder(address.sheet)) {
-      return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+      return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin(ErrorOrigin.Reference)
     }
 
     const value = this.addressMapping.getCellValue(address)

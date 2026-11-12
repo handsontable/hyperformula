@@ -102,3 +102,22 @@ export class ErrorMessage {
   public static LicenseKey = (arg: string) => `License key is ${arg}.`
   public static LicenseCapability = (functionName: string) => `Function ${functionName} is not included in your license.`
 }
+
+/**
+ * The `originFunction` values of cell errors that no function or operator produced: they name
+ * what built the error before any function read it.
+ */
+export class ErrorOrigin {
+  /** A reference the engine cannot resolve. */
+  public static Reference = 'reference'
+  /** A reference destroyed by removing rows or columns. */
+  public static RemovedReference = 'removed reference'
+  /** A formula that could not be parsed. */
+  public static Parser = 'parser'
+  /** A value written into a cell that is an error or that the engine rejects. */
+  public static UserInput = 'user input'
+  /** An error value written into a formula. */
+  public static Literal = 'literal'
+  /** An array literal whose rows differ in length. */
+  public static ArrayLiteral = 'array literal'
+}
