@@ -4,7 +4,7 @@
  */
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
-import {ErrorMessage} from '../error-message'
+import {ErrorMessage, ErrorOrigin} from '../error-message'
 import {CellAddress} from '../parser'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
@@ -26,7 +26,7 @@ export class CleanOutOfScopeDependenciesTransformer extends Transformer {
    * by pasting a formula with a relative reference; no row or column was removed.
    */
   protected invalidReferenceError(): CellError {
-    return new CellError(ErrorType.REF, ErrorMessage.OutOfSheet).withOrigin('reference')
+    return new CellError(ErrorType.REF, ErrorMessage.OutOfSheet).withOrigin(ErrorOrigin.Reference)
   }
 
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {

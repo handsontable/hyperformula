@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
-import {ErrorMessage} from '../error-message'
+import {ErrorMessage, ErrorOrigin} from '../error-message'
 import {
   Ast,
   AstNodeType,
@@ -112,7 +112,7 @@ export abstract class Transformer implements FormulaTransformer {
    * The error a reference becomes when this transformation leaves it pointing at no cell.
    */
   protected invalidReferenceError(): CellError {
-    return new CellError(ErrorType.REF, ErrorMessage.ReferenceRemoved).withOrigin('removed reference')
+    return new CellError(ErrorType.REF, ErrorMessage.ReferenceRemoved).withOrigin(ErrorOrigin.RemovedReference)
   }
 
   protected transformCellReferenceAst(ast: CellReferenceAst, formulaAddress: SimpleCellAddress): Ast {

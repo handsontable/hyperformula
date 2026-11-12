@@ -11,7 +11,7 @@ import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
 import {FormulaVertex} from '../DependencyGraph/FormulaVertex'
-import {ErrorMessage} from '../error-message'
+import {ErrorMessage, ErrorOrigin} from '../error-message'
 import {FunctionCallLicenseGate} from '../license/FunctionCallLicenseGate'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
@@ -103,11 +103,11 @@ export class Interpreter {
         const address = ast.reference.toSimpleCellAddress(state.formulaAddress)
 
         if (isColOrRowInvalid(address)) {
-          return new CellError(ErrorType.REF, ErrorMessage.BadRef).withOrigin('reference')
+          return new CellError(ErrorType.REF, ErrorMessage.BadRef).withOrigin(ErrorOrigin.Reference)
         }
 
         if (!this.isSheetValid(ast.reference)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin(ErrorOrigin.Reference)
         }
 
         return this.dependencyGraph.getCellValue(address)
@@ -205,16 +205,16 @@ export class Interpreter {
         if (namedExpression) {
           return this.dependencyGraph.getCellValue(namedExpression.address)
         } else {
-          return new CellError(ErrorType.NAME, ErrorMessage.NamedExpressionName(ast.expressionName)).withOrigin('reference')
+          return new CellError(ErrorType.NAME, ErrorMessage.NamedExpressionName(ast.expressionName)).withOrigin(ErrorOrigin.Reference)
         }
       }
       case AstNodeType.CELL_RANGE: {
         if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin(ErrorOrigin.Reference)
         }
 
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin('reference')
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin(ErrorOrigin.Reference)
         }
 
         const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
@@ -240,22 +240,22 @@ export class Interpreter {
       }
       case AstNodeType.COLUMN_RANGE: {
         if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin(ErrorOrigin.Reference)
         }
 
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin('reference')
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin(ErrorOrigin.Reference)
         }
         const range = AbsoluteColumnRange.fromColumnRange(ast, state.formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.ROW_RANGE: {
         if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin('reference')
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin(ErrorOrigin.Reference)
         }
 
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin('reference')
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin(ErrorOrigin.Reference)
         }
         const range = AbsoluteRowRange.fromRowRangeAst(ast, state.formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
@@ -529,7 +529,7 @@ function originNameForAstNode(ast: Ast): Maybe<string> {
       return ast.procedureName
     case AstNodeType.ARRAY:
       // An array literal with mismatched rows builds its own error before any call sees it.
-      return 'array literal'
+      return ErrorOrigin.ArrayLiteral
     case AstNodeType.CONCATENATE_OP:
       return '&'
     case AstNodeType.EQUALS_OP:

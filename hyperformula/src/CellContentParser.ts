@@ -6,7 +6,7 @@
 import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateTimeHelper, timeToNumber} from './DateTimeHelper'
-import {ErrorMessage} from './error-message'
+import {ErrorMessage, ErrorOrigin} from './error-message'
 import {UnableToParseError} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {
@@ -71,7 +71,7 @@ export namespace CellContent {
     // caller passes no message, because the rule only inspects this call site,
     // not who calls it.
     constructor(errorType: ErrorType, message?: string) {
-      this.value = new CellError(errorType, message).withOrigin('user input')
+      this.value = new CellError(errorType, message).withOrigin(ErrorOrigin.UserInput)
     }
   }
 
