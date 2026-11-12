@@ -226,10 +226,8 @@ export class ArithmeticHelper {
    * Coerces a scalar value to a number for use in arithmetic and numeric aggregation, without
    * attempting date-string parsing (see {@link coerceToMaybeNumber} for that extra step).
    *
-   * An empty string (`''`) is deliberately *not* coerced to `0` here: it is a text value, not a
-   * blank cell (that case is `EmptyValue`, handled above), so it is left for the caller to reject
-   * as non-numeric &mdash; matching how Excel treats `""` as text in arithmetic and numeric
-   * functions (`=""+0` and `=COUNT("")` both fail to find a number in Excel).
+   * A blank cell (`EmptyValue`) reads as `0`. An empty string is text, so like any non-numeric
+   * string it returns `undefined`.
    */
   public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<ExtendedNumber> {
     if (arg === EmptyValue) {
