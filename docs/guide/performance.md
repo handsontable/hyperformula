@@ -67,8 +67,8 @@ below.
 Since version 3.1.1, a formula that references a sheet which has not
 been added yet evaluates to `#REF!` but keeps a live reference: adding
 that sheet later repairs the formula, with no re-parsing and no
-rebuild on your side. Load the sheets in whatever order is
-convenient.
+rebuild on your side. The results therefore do not depend on the
+order in which you add the sheets.
 
 ```javascript
 const hf = HyperFormula.buildFromSheets({
