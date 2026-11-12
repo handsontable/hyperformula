@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added new functions: ACCRINTM, DISC, INTRATE, PRICEDISC, RECEIVED, YIELDDISC. [#1799](https://github.com/handsontable/hyperformula/pull/1799)
 - Added new functions: COUPDAYBS, COUPDAYS, COUPDAYSNC, COUPNCD, COUPNUM, COUPPCD. [#1804](https://github.com/handsontable/hyperformula/pull/1804)
 - Added a new function: ACCRINT. [#1812](https://github.com/handsontable/hyperformula/pull/1812)
-- Added new functions: ODDFPRICE, ODDLPRICE. [#1850](https://github.com/handsontable/hyperformula/pull/1850)
+- Added the `ODDFPRICE` and `ODDLPRICE` functions, which return the price per 100 face value of a security with an odd first or last coupon period. [#1850](https://github.com/handsontable/hyperformula/pull/1850)
 
 ### Fixed
 
