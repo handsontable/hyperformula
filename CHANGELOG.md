@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `CONCAT` function, which joins text from values, ranges, and arrays, and the `VALUETOTEXT` function, which returns a value as text in a concise or a strict format. [#1816](https://github.com/handsontable/hyperformula/pull/1816)
 - Added the `AVERAGEIFS` function. [#1732](https://github.com/handsontable/hyperformula/pull/1732)
 - Added the `maxParserCacheSize` configuration option to control the number of cached formulas. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
+- Added the `CHOOSECOLS` dynamic-array function. [#1734](https://github.com/handsontable/hyperformula/pull/1734)
+- Added the `CHOOSEROWS` dynamic-array function. [#1827](https://github.com/handsontable/hyperformula/pull/1827)
 
 ### Fixed
 
