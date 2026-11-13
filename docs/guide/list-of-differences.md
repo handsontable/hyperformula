@@ -50,6 +50,7 @@ Very large or very small input scales can also cause substantial differences in 
 | Booleans converted to text | =CONCAT(TRUE())<br><br>=VALUETOTEXT(FALSE())<br><br>=TRUE()&"" | `TRUE` and `FALSE` in every language, in `CONCAT`, `CONCATENATE`, `TEXTJOIN`, `VALUETOTEXT` and `&`. | Not checked. | The boolean names of the Excel language, for example `PRAWDA` and `FAŁSZ` in Polish. |
 | Array size limits | =SUM(VSTACK(SEQUENCE(1048576), SEQUENCE(1))) | An array computed inside a formula is not limited in either dimension, so the example returns the sum when [`maxRows`](../api/interfaces/configparams.md#maxrows) is at least 1,048,576. With the default `maxRows` (40,000), `SEQUENCE(1048576)` returns `#VALUE!`, because `SEQUENCE` is limited by the `maxRows` and [`maxColumns`](../api/interfaces/configparams.md#maxcolumns) configuration options. | In-memory arrays are not limited in either dimension. Returns `549756338177`. | In-memory arrays are limited to 1,048,576 rows and 1,048,576 columns. Returns `#NUM!`. |
 | FILTER and UNIQUE near the sheet edge | =FILTER(A1:A10, A1:A10>8)<br>in the second-to-last row, where A1:A10 = 1 to 10 | Returns `#SPILL!`: the area reserved for the result has the height of the source, and it does not fit before the sheet edge. See [Known limitations](known-limitations.md). | Not checked. | Spills `9` and `10` into the last two rows. |
+| MINVERSE function | =MINVERSE(A1:B3)<br>where A1:B3 = 1, 2; 3, 4; 5, 6 | `#VALUE!` in each cell of the argument's 3x2 area, because the result is sized from the argument before evaluation; `#SPILL!` when a cell of that area holds a value. | Not checked. | A single `#VALUE!` cell. |
 
 ## Built-in functions
 
@@ -119,6 +120,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
 | CEILING.MATH  | =CEILING.MATH(-4.3, 2, 2)                                      |           -4 |            -6 |              -6 |
 | FLOOR.MATH    | =FLOOR.MATH(-4.7, 2, 2)                                        |           -6 |            -4 |              -4 |
+| MUNIT         | =ROWS(MUNIT(A1:A2))<br>where A1:A2: 3, 2                       |        VALUE |   Not checked |               2 |
 
 A few of the rows above share a root cause worth stating once:
 
