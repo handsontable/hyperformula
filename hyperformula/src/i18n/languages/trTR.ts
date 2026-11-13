@@ -38,6 +38,7 @@ const dictionary: RawTranslationPackage = {
     AVERAGE: 'ORTALAMA',
     AVERAGEA: 'ORTALAMAA',
     AVERAGEIF: 'EĞERORTALAMA',
+    AVERAGEIFS: 'ÇOKEĞERORTALAMA',
     BASE: 'TABAN',
     BIN2DEC: 'BIN2DEC',
     BIN2HEX: 'BIN2HEX',
