@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `CONCAT` function, which joins text from values, ranges, and arrays, and the `VALUETOTEXT` function, which returns a value as text in a concise or a strict format. [#1816](https://github.com/handsontable/hyperformula/pull/1816)
 - Added the `AVERAGEIFS` function. [#1732](https://github.com/handsontable/hyperformula/pull/1732)
 - Added the `maxParserCacheSize` configuration option to control the number of cached formulas. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
+- Added the `openEndedRangeMinRows` and `openEndedRangeMinColumns` configuration options, which make a range at least that tall or wide hold cells only as far as its sheet holds them, like a whole-column or whole-row range, so that a range such as `A2:A1048576` no longer takes memory for every empty row.
 
 ### Fixed
 
