@@ -7,16 +7,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-### Changed
-
-- **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. [#1885](https://github.com/handsontable/hyperformula/pull/1885)
-
 ### Added
 
 - Added `LINEST` for simple and multiple linear regression, with optional intercept and regression statistics. The `stats` argument must be constant because result dimensions are determined before evaluation. [#1769](https://github.com/handsontable/hyperformula/pull/1769)
 - Added the `CONCAT` function, which joins text from values, ranges, and arrays, and the `VALUETOTEXT` function, which returns a value as text in a concise or a strict format. [#1816](https://github.com/handsontable/hyperformula/pull/1816)
 - Added the `AVERAGEIFS` function. [#1732](https://github.com/handsontable/hyperformula/pull/1732)
 - Added the `maxParserCacheSize` configuration option to control the number of cached formulas. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
+- Added the `emptyAsAbsent` argument-validation option for custom functions, which passes an empty slot of an optional argument to the function as `undefined` instead of the zero value for its type. [#1739](https://github.com/handsontable/hyperformula/pull/1739)
+
+### Changed
+
+- **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. [#1885](https://github.com/handsontable/hyperformula/pull/1885)
 
 ### Fixed
 
@@ -30,6 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed functions such as `MATCH`, `INDEX` and `COUNTIF` throwing an uncaught `Unknown array` error when they read a range that exactly matches the area of an array formula returning an error, for example `=MATCH(2, B1:B3, 0)` next to `=SORT(A1:A3)` whose source contains `#DIV/0!`. They now read the range cell by cell. [#1876](https://github.com/handsontable/hyperformula/pull/1876)
 - Fixed unbounded parser cache growth in long-running instances that process many distinct formulas, including when undo is disabled. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
 - Fixed array formulas spilling past the `maxRows` and `maxColumns` limits: they now return `#SPILL!` when their result extends beyond the sheet edge. [#1774](https://github.com/handsontable/hyperformula/pull/1774)
+- Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is an empty argument slot (e.g. `=ADDRESS(2,3,1,FALSE(),)` now returns `R2C3` instead of `!R2C3`), while an explicit `""` still adds it. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
 
 ## [3.5.0] - 2026-10-09
 
