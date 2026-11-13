@@ -38,6 +38,7 @@ const dictionary: RawTranslationPackage = {
     AVERAGE: 'ŚREDNIA',
     AVERAGEA: 'ŚREDNIA.A',
     AVERAGEIF: 'ŚREDNIA.JEŻELI',
+    AVERAGEIFS: 'ŚREDNIA.WARUNKÓW',
     BASE: 'PODSTAWA',
     BIN2DEC: 'DWÓJK.NA.DZIES',
     BIN2HEX: 'DWÓJK.NA.SZESN',
