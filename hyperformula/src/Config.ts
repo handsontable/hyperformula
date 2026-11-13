@@ -78,6 +78,8 @@ export class Config implements ConfigParams, ParserConfig {
     undoLimit: 20,
     maxPendingLazyTransformations: 50,
     maxParserCacheSize: 10_000,
+    openEndedRangeMinRows: Number.MAX_SAFE_INTEGER,
+    openEndedRangeMinColumns: Number.MAX_SAFE_INTEGER,
     useRegularExpressions: false,
     useWildcards: true,
     useColumnIndex: false,
@@ -157,6 +159,10 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly maxParserCacheSize: number
   /** @inheritDoc */
+  public readonly openEndedRangeMinRows: number
+  /** @inheritDoc */
+  public readonly openEndedRangeMinColumns: number
+  /** @inheritDoc */
   public readonly context: unknown
 
   /**
@@ -223,6 +229,8 @@ export class Config implements ConfigParams, ParserConfig {
       undoLimit,
       maxPendingLazyTransformations,
       maxParserCacheSize,
+      openEndedRangeMinRows,
+      openEndedRangeMinColumns,
       useColumnIndex,
       useRegularExpressions,
       useWildcards,
@@ -278,6 +286,10 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)
     validateNumberToBeAtLeast(this.maxPendingLazyTransformations, 'maxPendingLazyTransformations', 1)
     validateNumberToBeAtLeast(this.maxParserCacheSize, 'maxParserCacheSize', 0)
+    this.openEndedRangeMinRows = configValueFromParamCheck(openEndedRangeMinRows, Number.isSafeInteger, 'integer', 'openEndedRangeMinRows')
+    this.openEndedRangeMinColumns = configValueFromParamCheck(openEndedRangeMinColumns, Number.isSafeInteger, 'integer', 'openEndedRangeMinColumns')
+    validateNumberToBeAtLeast(this.openEndedRangeMinRows, 'openEndedRangeMinRows', 1)
+    validateNumberToBeAtLeast(this.openEndedRangeMinColumns, 'openEndedRangeMinColumns', 1)
     this.maxRows = configValueFromParam(maxRows, 'number', 'maxRows')
     validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')

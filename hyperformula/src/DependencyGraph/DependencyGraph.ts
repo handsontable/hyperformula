@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange, SimpleCellRange, simpleCellRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange, AbsoluteOpenEndedRange, SimpleCellRange, simpleCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
 import {ArraySize} from '../ArraySize'
 import {CellError, ErrorType, isSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from '../Cell'
@@ -182,13 +182,13 @@ export class DependencyGraph {
 
     cellDependencies.forEach((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
-        const range = dep
-
-        let rangeVertex = this.getRange(range.start, range.end)
+        let rangeVertex = this.getRange(dep.start, dep.end)
         if (rangeVertex === undefined) {
-          rangeVertex = new RangeVertex(range)
+          rangeVertex = new RangeVertex(this.rangeReferencedByFormula(dep))
           this.rangeMapping.addOrUpdateVertex(rangeVertex)
         }
+        // Whether a range is open-ended is decided once, when its vertex is created, and kept while structural changes resize it.
+        const range = rangeVertex.range
 
         this.graph.addNodeIfNotExists(rangeVertex)
         const rangeVertexId = rangeVertex.idInGraph
@@ -287,14 +287,16 @@ export class DependencyGraph {
       this.addressMapping.removeRows(removedRows)
     })
 
-    const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      const affectedRanges = this.truncateRanges(removedRows, address => address.row)
-      return this.getArrayVerticesRelatedToRanges(affectedRanges)
+    const affectedRanges = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      return this.truncateRanges(removedRows, address => address.row)
     })
+    const affectedArrays = this.getArrayVerticesRelatedToRanges(affectedRanges)
 
     this.stats.measure(StatType.ADJUSTING_ARRAY_MAPPING, () => {
       this.fixArraysAfterRemovingRows(removedRows.sheet, removedRows.rowStart, removedRows.numberOfRows)
     })
+
+    this.markOpenEndedRangesAsDirty(affectedRanges)
 
     this.addStructuralNodesToChangeSet()
 
@@ -324,9 +326,12 @@ export class DependencyGraph {
    * Removes all vertices without dependents in other sheets from address mapping, range mapping and array mapping.
    * - If nothing is left, removes the sheet from sheet mapping and address mapping.
    * - Otherwise, marks it as placeholder.
+   *
+   * Marks the ranges of the sheet as dirty, because a range that holds no cell has no cell to mark its dependents.
    */
   public removeSheet(sheetId: number): void {
     this.clearSheet(sheetId)
+    this.markAllRangesAsDirtyInSheet(sheetId)
     const addressMappingCleared = !this.addressMapping.hasAnyEntries(sheetId)
     const rangeMappingCleared = this.rangeMapping.getNumberOfRangesInSheet(sheetId) === 0
 
@@ -403,14 +408,16 @@ export class DependencyGraph {
       this.addressMapping.removeColumns(removedColumns)
     })
 
-    const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      const affectedRanges = this.truncateRanges(removedColumns, address => address.col)
-      return this.getArrayVerticesRelatedToRanges(affectedRanges)
+    const affectedRanges = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      return this.truncateRanges(removedColumns, address => address.col)
     })
+    const affectedArrays = this.getArrayVerticesRelatedToRanges(affectedRanges)
 
     this.stats.measure(StatType.ADJUSTING_ARRAY_MAPPING, () => {
       return this.fixArraysAfterRemovingColumns(removedColumns.sheet, removedColumns.columnStart, removedColumns.numberOfColumns)
     })
+
+    this.markOpenEndedRangesAsDirty(affectedRanges)
 
     this.addStructuralNodesToChangeSet()
 
@@ -422,18 +429,24 @@ export class DependencyGraph {
 
   public addRows(addedRows: RowsSpan): ArrayAffectingGraphChangeResult {
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
-      this.addressMapping.addRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
+      // Rows added below the last cell of the sheet, inside an open-ended range, move no cell and do not make the sheet taller.
+      if (addedRows.rowStart < this.addressMapping.getSheetHeight(addedRows.sheet)) {
+        this.addressMapping.addRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
+      }
     })
 
-    const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+    const resizedRanges = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const result = this.rangeMapping.moveAllRangesInSheetAfterAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
       this.fixRangesWhenAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
-      return this.getArrayVerticesRelatedToRanges(result.verticesWithChangedSize)
+      return result.verticesWithChangedSize
     })
+    const affectedArrays = this.getArrayVerticesRelatedToRanges(resizedRanges)
 
     this.stats.measure(StatType.ADJUSTING_ARRAY_MAPPING, () => {
       this.fixArraysAfterAddingRow(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
+
+    this.markOpenEndedRangesAsDirty(resizedRanges)
 
     for (const vertex of this.addressMapping.verticesFromRowsSpan(addedRows)) {
       this.graph.markNodeAsDirty(vertex)
@@ -446,18 +459,24 @@ export class DependencyGraph {
 
   public addColumns(addedColumns: ColumnsSpan): EagerChangesGraphChangeResult {
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
-      this.addressMapping.addColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
+      // Columns added right of the last cell of the sheet, inside an open-ended range, move no cell and do not make the sheet wider.
+      if (addedColumns.columnStart < this.addressMapping.getSheetWidth(addedColumns.sheet)) {
+        this.addressMapping.addColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
+      }
     })
 
-    const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+    const resizedRanges = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const result = this.rangeMapping.moveAllRangesInSheetAfterAddingColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
       this.fixRangesWhenAddingColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
-      return this.getArrayVerticesRelatedToRanges(result.verticesWithChangedSize)
+      return result.verticesWithChangedSize
     })
+    const affectedArrays = this.getArrayVerticesRelatedToRanges(resizedRanges)
 
     this.stats.measure(StatType.ADJUSTING_ARRAY_MAPPING, () => {
       return this.fixArraysAfterAddingColumn(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
+
+    this.markOpenEndedRangesAsDirty(resizedRanges)
 
     for (const vertex of this.addressMapping.verticesFromColumnsSpan(addedColumns)) {
       this.graph.markNodeAsDirty(vertex)
@@ -483,6 +502,8 @@ export class DependencyGraph {
   }
 
   public moveCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
+    const targetAddressesOfMovedCells: SimpleCellAddress[] = []
+
     for (const sourceAddress of sourceRange.addressesWithDirection(toRight, toBottom, this)) {
       const targetAddress = simpleCellAddress(toSheet, sourceAddress.col + toRight, sourceAddress.row + toBottom)
       let sourceVertex = this.addressMapping.getCell(sourceAddress)
@@ -493,6 +514,7 @@ export class DependencyGraph {
       if (sourceVertex !== undefined) {
         this.graph.markNodeAsDirty(sourceVertex)
         this.addressMapping.setCell(targetAddress, sourceVertex)
+        targetAddressesOfMovedCells.push(targetAddress)
         let emptyVertex = undefined
         for (const adjacentNode of this.graph.adjacentNodes(sourceVertex)) {
           if (adjacentNode instanceof RangeVertex && !sourceRange.containsRange(adjacentNode.range)) {
@@ -536,6 +558,15 @@ export class DependencyGraph {
     }
 
     this.rangeMapping.moveRangesInsideSourceRange(sourceRange, toRight, toBottom, toSheet)
+
+    // Only once the ranges are at their final addresses is it known which infinite ranges hold the moved cells.
+    // A cell moved onto its own address is no longer in the graph, so no range can depend on it.
+    for (const targetAddress of targetAddressesOfMovedCells) {
+      const movedVertex = this.addressMapping.getCell(targetAddress)
+      if (movedVertex !== undefined && this.graph.hasNode(movedVertex)) {
+        this.correctInfiniteRangesDependency(targetAddress)
+      }
+    }
   }
 
   /**
@@ -651,6 +682,59 @@ export class DependencyGraph {
 
   public getSheetWidth(sheet: number): number {
     return this.addressMapping.getSheetWidth(sheet)
+  }
+
+  /**
+   * Gets the height of the tallest sheet.
+   */
+  public getHeightOfTallestSheet(): number {
+    return this.addressMapping.getHeightOfTallestSheet()
+  }
+
+  /**
+   * Gets the width of the widest sheet.
+   */
+  public getWidthOfWidestSheet(): number {
+    return this.addressMapping.getWidthOfWidestSheet()
+  }
+
+  /**
+   * Returns the range the way formulas refer to it: a finite range at least `openEndedRangeMinRows` tall
+   * or `openEndedRangeMinColumns` wide as an open-ended range, any other range unchanged.
+   */
+  public rangeReferencedByFormula(range: AbsoluteCellRange): AbsoluteCellRange {
+    if (range.isFinite() && (range.height() >= this.config.openEndedRangeMinRows || range.width() >= this.config.openEndedRangeMinColumns)) {
+      return new AbsoluteOpenEndedRange(range.start, range.end)
+    }
+    return range
+  }
+
+  /**
+   * Gets the number of rows that adding and removing rows acts on: the height of the sheet, or more
+   * when an open-ended range of the sheet ends below its last cell.
+   */
+  public getSheetHeightWithOpenEndedRanges(sheet: number): number {
+    let height = this.addressMapping.getSheetHeight(sheet)
+    for (const rangeVertex of this.rangeMapping.rangesInSheet(sheet)) {
+      if (rangeVertex.range instanceof AbsoluteOpenEndedRange) {
+        height = Math.max(height, rangeVertex.range.end.row + 1)
+      }
+    }
+    return height
+  }
+
+  /**
+   * Gets the number of columns that adding and removing columns acts on: the width of the sheet, or more
+   * when an open-ended range of the sheet ends right of its last cell.
+   */
+  public getSheetWidthWithOpenEndedRanges(sheet: number): number {
+    let width = this.addressMapping.getSheetWidth(sheet)
+    for (const rangeVertex of this.rangeMapping.rangesInSheet(sheet)) {
+      if (rangeVertex.range instanceof AbsoluteOpenEndedRange) {
+        width = Math.max(width, rangeVertex.range.end.col + 1)
+      }
+    }
+    return width
   }
 
   public getArray(range: AbsoluteCellRange): Maybe<ArrayFormulaVertex> {
@@ -962,6 +1046,18 @@ export class DependencyGraph {
       })
   }
 
+  /**
+   * Makes every infinite range that the array spills into depend on it.
+   */
+  private correctInfiniteRangesDependenciesByArray(array: ArrayFormulaVertex) {
+    const arrayRange = array.getRange()
+    this.graph.getInfiniteRanges()
+      .filter((infiniteRangeVertex) => (infiniteRangeVertex as RangeVertex).range.doesOverlap(arrayRange))
+      .forEach((infiniteRangeVertex) => {
+        this.graph.addEdge(array, infiniteRangeVertex)
+      })
+  }
+
   private cleanAddressMappingUnderArray(vertex: ArrayFormulaVertex) {
     const arrayRange = vertex.getRange()
     for (const address of arrayRange.addresses(this)) {
@@ -1146,6 +1242,10 @@ export class DependencyGraph {
     for (const cellAddress of range.addresses(this)) {
       this.addressMapping.setCell(cellAddress, vertex)
     }
+
+    if (vertex instanceof ArrayFormulaVertex) {
+      this.correctInfiniteRangesDependenciesByArray(vertex)
+    }
   }
 
   private setAddressMappingForArrayVertex(vertex: CellVertex, formulaAddress: SimpleCellAddress): void {
@@ -1170,6 +1270,18 @@ export class DependencyGraph {
     }
   }
 
+  /**
+   * Marks the open-ended ranges among the given ranges as dirty. A row or column added to or removed from
+   * an open-ended range may hold no cell, so no cell marks the dependents of the resized range.
+   */
+  private markOpenEndedRangesAsDirty(rangeVertices: RangeVertex[]): void {
+    for (const rangeVertex of rangeVertices) {
+      if (rangeVertex.range instanceof AbsoluteOpenEndedRange && this.graph.hasNode(rangeVertex)) {
+        this.graph.markNodeAsDirty(rangeVertex)
+      }
+    }
+  }
+
   private truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number): RangeVertex[] {
     const {
       verticesToRemove,
@@ -1178,6 +1290,9 @@ export class DependencyGraph {
     } = this.rangeMapping.truncateRanges(span, coordinate)
     for (const [existingVertex, mergedVertex] of verticesToMerge) {
       this.rerouteDependents(mergedVertex, existingVertex)
+      if (mergedVertex.range instanceof AbsoluteOpenEndedRange) {
+        this.graph.markNodeAsDirty(existingVertex)
+      }
       this.removeVertexAndCleanupDependencies(mergedVertex)
     }
     for (const rangeVertex of verticesToRemove) {

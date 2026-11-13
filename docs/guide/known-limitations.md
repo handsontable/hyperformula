@@ -36,6 +36,41 @@ a circular reference.
   * Relative named expressions
   * Functions cannot use UI metadata (e.g., hidden rows for SUBTOTAL).
 
+## Open-ended ranges
+
+The [`openEndedRangeMinRows`](../api/interfaces/configparams.md#openendedrangeminrows)
+and [`openEndedRangeMinColumns`](../api/interfaces/configparams.md#openendedrangemincolumns)
+options make tall and wide ranges [open-ended](performance.md#open-ended-ranges).
+Both are off by default. An open-ended range holds cells only as far as its
+sheet holds cells, which changes three things:
+
+* Array arithmetic uses only as many rows of the range as the tallest sheet
+  holds, and only as many columns as the widest sheet holds. For example, in a
+  workbook whose tallest sheet holds 100 rows,
+  `=ARRAYFORMULA(SUM((A2:A40000="")*1))` counts the empty cells among the
+  first 100 rows of the range, not among all of them. The same applies to
+  array arithmetic enabled with the
+  [`useArrayArithmetic`](../api/interfaces/configparams.md#usearrayarithmetic)
+  option, and to functions that keep empty values, such as `TEXTJOIN` with
+  `ignore_empty` set to `FALSE`. `COUNTBLANK`, `COUNTIF`, and the other
+  criterion functions count the empty cells of the whole range, and `ROWS`,
+  `COLUMNS`, and `INDEX` use its full size. An array with as many rows as the
+  range, but not computed from such a range, for example `SEQUENCE(39999)`,
+  is therefore taller than the range.
+* A result that depends on how many rows or columns the sheets hold is
+  calculated from their sizes at the time the formula is calculated. Setting
+  a cell outside the range, on the same sheet or on another one, can make the
+  tallest sheet taller or the widest sheet wider without recalculating the
+  formula. Its result then differs from the one that
+  [`rebuildAndRecalculate()`](../api/classes/hyperformula.md#rebuildandrecalculate),
+  or loading the same workbook again, gives. A whole-column or whole-row
+  range behaves the same way for cells set on its own sheet.
+* Functions that return an error for ranges of different sizes, such as
+  `CORREL`, `SUMX2MY2`, or `XLOOKUP`, compare only the rows and columns that
+  the sheets hold. They accept two open-ended ranges of different sizes when
+  both run past the cells of every sheet. The criterion functions compare the
+  full sizes.
+
 ## Nuances of the implemented functions
 
 * HyperFormula immediately instantiates references to single cells to their values, instead of treating them as 1-length ranges, which slightly changes the behavior of some functions (e.g., NPV).

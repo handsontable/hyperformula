@@ -3,7 +3,6 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import { AbsoluteCellRange } from '../../AbsoluteCellRange'
 import { CellError, CellRange, ErrorType, simpleCellAddress } from '../../Cell'
 import { ErrorMessage } from '../../error-message'
 import { RowSearchStrategy } from '../../Lookup/RowSearchStrategy'
@@ -219,7 +218,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     if (range === undefined) {
       searchedRange = SimpleRangeValue.onlyValues(rangeValue.data.map((arg) => [arg[0]]))
     } else {
-      searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, 1, range.height()), this.dependencyGraph)
+      searchedRange = SimpleRangeValue.onlyRange(range.rangeWithSameHeight(range.start.col, 1), this.dependencyGraph)
     }
     const rowIndex = this.searchInRange(key, searchedRange, searchOptions.ordering === 'none', searchOptions, this.columnSearch)
 
@@ -249,7 +248,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     if (range === undefined) {
       searchedRange = SimpleRangeValue.onlyValues([rangeValue.data[0]])
     } else {
-      searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, range.width(), 1), this.dependencyGraph)
+      searchedRange = SimpleRangeValue.onlyRange(range.rangeWithSameWidth(range.start.row, 1), this.dependencyGraph)
     }
     const colIndex = this.searchInRange(key, searchedRange, searchOptions.ordering === 'none', searchOptions, this.rowSearch)
 

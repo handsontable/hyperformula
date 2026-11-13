@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `CONCAT` function, which joins text from values, ranges, and arrays, and the `VALUETOTEXT` function, which returns a value as text in a concise or a strict format. [#1816](https://github.com/handsontable/hyperformula/pull/1816)
 - Added the `AVERAGEIFS` function. [#1732](https://github.com/handsontable/hyperformula/pull/1732)
 - Added the `maxParserCacheSize` configuration option to control the number of cached formulas. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
+- Added the `openEndedRangeMinRows` and `openEndedRangeMinColumns` configuration options, which make a range at least that tall or wide hold cells only as far as its sheet holds them, like a whole-column or whole-row range, so that a range such as `A2:A1048576` no longer takes memory for every empty row. [#1892](https://github.com/handsontable/hyperformula/pull/1892)
 
 ### Fixed
 
@@ -30,6 +31,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed functions such as `MATCH`, `INDEX` and `COUNTIF` throwing an uncaught `Unknown array` error when they read a range that exactly matches the area of an array formula returning an error, for example `=MATCH(2, B1:B3, 0)` next to `=SORT(A1:A3)` whose source contains `#DIV/0!`. They now read the range cell by cell. [#1876](https://github.com/handsontable/hyperformula/pull/1876)
 - Fixed unbounded parser cache growth in long-running instances that process many distinct formulas, including when undo is disabled. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
 - Fixed array formulas spilling past the `maxRows` and `maxColumns` limits: they now return `#SPILL!` when their result extends beyond the sheet edge. [#1774](https://github.com/handsontable/hyperformula/pull/1774)
+- Fixed formulas over a whole column or row of another sheet (e.g. `=SUM(Sheet2!B:B)`) keeping their value instead of returning `#REF!` when that sheet is removed and it held no cells. [#1892](https://github.com/handsontable/hyperformula/pull/1892)
+- Fixed formulas over a whole column or row (e.g. `=SUM(B:B)`) ignoring a cell moved into that column or row with `moveCells()`. [#1892](https://github.com/handsontable/hyperformula/pull/1892)
+- Fixed formulas over a whole column or row (e.g. `=SUM(B:B)`) ignoring the result of an array formula that was entered later in a cell outside that column or row and spills into it. [#1892](https://github.com/handsontable/hyperformula/pull/1892)
+- Fixed `moveCells()` throwing an error when cells moved to another sheet include an empty cell. [#1892](https://github.com/handsontable/hyperformula/pull/1892)
 
 ## [3.5.0] - 2026-10-09
 
