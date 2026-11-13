@@ -41,6 +41,8 @@ When you pass JavaScript values directly (not as strings):
 - `Date` object → **Date/DateTime type** (converted to internal numeric representation)
 - `null` or `undefined` → **Empty cell**
 
+To empty a cell, pass `null`, not an empty string: `''` is stored as Text, so `=A1+1` returns `#VALUE!` when `A1` holds it.
+
 ```js
 const hf = HyperFormula.buildFromArray([
   [42],            // Number
