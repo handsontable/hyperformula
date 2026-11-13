@@ -454,6 +454,39 @@ export interface ConfigParams {
    */
   maxParserCacheSize: number,
   /**
+   * Sets the number of rows from which a cell range is open-ended, like a whole-column range.
+   * Must be a positive integer. No range reaches the default value, so by default no range is open-ended.
+   *
+   * An open-ended range holds cells only as far down as its sheet holds cells, instead of one
+   * cell for every row between its two corners, and it takes in the cells set below them later.
+   * This keeps the memory used by a range that runs to the bottom of a sheet, such as
+   * `A2:A1048576`, proportional to the data in the sheet. An open-ended range must fit within
+   * [maxRows](/api/interfaces/configparams.md#maxrows) and [maxColumns](/api/interfaces/configparams.md#maxcolumns),
+   * like any other range.
+   *
+   * `ROWS`, `COLUMNS`, `INDEX`, `COUNTBLANK`, and the criterion functions (`COUNTIF`, `SUMIFS`, ...)
+   * use the full size of an open-ended range. Array arithmetic and the other functions use only
+   * the rows and columns that the sheets hold, as they do for a whole-column range.
+   *
+   * For more information, see the [Performance guide](/guide/performance.md#open-ended-ranges)
+   * and the [Known limitations](/guide/known-limitations.md#open-ended-ranges).
+   * @default Number.MAX_SAFE_INTEGER
+   * @category Engine
+   */
+  openEndedRangeMinRows: number,
+  /**
+   * Sets the number of columns from which a cell range is open-ended, like a whole-row range.
+   * Must be a positive integer. No range reaches the default value, so by default no range is open-ended.
+   *
+   * Works like [openEndedRangeMinRows](/api/interfaces/configparams.md#openendedrangeminrows),
+   * for a range that runs to the right edge of a sheet, such as `B1:XFD1`.
+   *
+   * For more information, see the [Performance guide](/guide/performance.md#open-ended-ranges).
+   * @default Number.MAX_SAFE_INTEGER
+   * @category Engine
+   */
+  openEndedRangeMinColumns: number,
+  /**
    * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) are allowed to use regular expressions.
    * @default false
    * @category String

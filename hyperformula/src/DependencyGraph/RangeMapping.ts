@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange, AbsoluteOpenEndedRange} from '../AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {Span} from '../Span'
@@ -212,10 +212,10 @@ export class RangeMapping {
   }
 
   /**
-   * Finds smaller range if exists.
+   * Finds smaller range if exists. Ranges of infinite height and open-ended ranges are never built from a smaller one.
    */
   public findSmallerRange(range: AbsoluteCellRange): { smallerRangeVertex?: RangeVertex, restRange: AbsoluteCellRange } {
-    if (range.height() > 1 && Number.isFinite(range.height())) {
+    if (range.height() > 1 && Number.isFinite(range.height()) && !(range instanceof AbsoluteOpenEndedRange)) {
       const valuesRangeEndRowLess = simpleCellAddress(range.end.sheet, range.end.col, range.end.row - 1)
       const rowLessVertex = this.getRangeVertex(range.start, valuesRangeEndRowLess)
       if (rowLessVertex !== undefined) {

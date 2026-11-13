@@ -11,7 +11,7 @@ import {split} from '../generatorUtils'
 import {Maybe} from '../Maybe'
 import {CriterionLambda, CriterionPackage} from './Criterion'
 import {Interpreter} from './Interpreter'
-import {getRawValue, InternalScalarValue, RawScalarValue} from './InterpreterValue'
+import {EmptyValue, getRawValue, InternalScalarValue, RawScalarValue} from './InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 
 const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): { smallerRangeVertex?: RangeVertex, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange } => {
@@ -47,7 +47,7 @@ export class CriterionFunctionCompute<T> {
 
   public compute(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): T | CellError {
     for (const condition of conditions) {
-      if (!condition.conditionRange.sameDimensionsAs(simpleValuesRange)) {
+      if (!haveSameDimensions(condition.conditionRange, simpleValuesRange)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.EqualLength)
       }
     }
@@ -111,7 +111,28 @@ export class CriterionFunctionCompute<T> {
     const values = Array.from(simpleValuesRange.valuesFromTopLeftCorner()).map(this.mapFunction)[Symbol.iterator]()
     const conditionsIterators = conditions.map((condition) => condition.conditionRange.iterateValuesFromTopLeftCorner())
     const filteredValues = ifFilter(criterionLambdas, conditionsIterators, values)
-    return this.reduceFunction(filteredValues)
+    const result = this.reduceFunction(filteredValues)
+
+    // An open-ended range leaves the cells past the cells of the sheets out of its data. They are empty in the values
+    // range and in every condition range, unless a condition is an array computed from a range rather than a range.
+    const numberOfEmptyCellsPastData = simpleValuesRange.fullWidth() * simpleValuesRange.fullHeight() - simpleValuesRange.numberOfElements()
+    const everyConditionIsRange = conditions.every((condition) => !condition.conditionRange.isAdHoc())
+    if (numberOfEmptyCellsPastData > 0 && everyConditionIsRange && criterionLambdas.every((lambda) => lambda(EmptyValue))) {
+      return this.composeFunction(result, this.composeRepeatedly(this.mapFunction(EmptyValue), numberOfEmptyCellsPastData))
+    }
+    return result
+  }
+
+  /**
+   * Composes `times` copies of a value, in a logarithmic number of steps. Relies on the compose function being associative.
+   */
+  private composeRepeatedly(value: T, times: number): T {
+    if (times === 1) {
+      return value
+    }
+    const half = this.composeRepeatedly(value, Math.floor(times / 2))
+    const doubled = this.composeFunction(half, half)
+    return times % 2 === 0 ? doubled : this.composeFunction(doubled, value)
   }
 
   private buildNewCriterionCache(cacheKey: string, simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange): CriterionCache {
@@ -149,6 +170,20 @@ function* getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCe
   for (const cellFromRange of cellRange.addresses(dependencyGraph)) {
     yield getRawValue(dependencyGraph.getScalarValue(cellFromRange))
   }
+}
+
+/**
+ * Checks whether two range values pair up cell by cell. Their data must have the same size, and when both are ranges,
+ * the ranges must have the same full size as well, because the data of an open-ended range can be smaller than the range.
+ */
+function haveSameDimensions(left: SimpleRangeValue, right: SimpleRangeValue): boolean {
+  if (!left.sameDimensionsAs(right)) {
+    return false
+  }
+  if (left.isAdHoc() || right.isAdHoc()) {
+    return true
+  }
+  return left.fullWidth() === right.fullWidth() && left.fullHeight() === right.fullHeight()
 }
 
 function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables: IterableIterator<InternalScalarValue>[], computableIterable: IterableIterator<T>): IterableIterator<T> {
