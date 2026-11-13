@@ -931,7 +931,7 @@ export class Operations {
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
     for (const formulaAddress of targetRange.addresses(this.dependencyGraph)) {
-      const vertex = this.addressMapping.getCell(formulaAddress, { throwIfCellNotExists: true })
+      const vertex = this.addressMapping.getCell(formulaAddress)
       if (vertex instanceof ScalarFormulaVertex && formulaAddress.sheet !== sourceLeftCorner.sheet) {
         const ast = vertex.getFormula(this.lazilyTransformingAstService)
         const { dependencies } = this.parser.fetchCachedResultForAst(ast)
