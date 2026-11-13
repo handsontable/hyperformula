@@ -403,6 +403,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'GÜVENİLİRLİK.T',
     DEVSQ: 'SAPKARE',
     GEOMEAN: 'GEOORT',
+    GESTEP: 'BESINIR',
     HARMEAN: 'HARORT',
     CRITBINOM: 'KRİTİKBİNOM',
     PEARSON: 'PEARSON',
