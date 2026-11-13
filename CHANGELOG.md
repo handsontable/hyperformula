@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed formulas over a whole column or row of another sheet (e.g. `=SUM(Sheet2!B:B)`) keeping their value instead of returning `#REF!` when that sheet is removed and it held no cells.
 - Fixed formulas over a whole column or row (e.g. `=SUM(B:B)`) ignoring a cell moved into that column or row with `moveCells()`.
 - Fixed formulas over a whole column or row (e.g. `=SUM(B:B)`) ignoring the result of an array formula that was entered later in a cell outside that column or row and spills into it.
+- Fixed `moveCells()` throwing an error when cells moved to another sheet include an empty cell.
 
 ## [3.5.0] - 2026-10-09
 

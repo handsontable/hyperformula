@@ -63,6 +63,17 @@ describe('Whole-column and whole-row ranges', () => {
       expect(engine.getCellValue(cell(engine, 'B1'))).toBe(10)
     })
 
+    it('a whole-column range of another sheet includes a cell moved into it together with an empty cell', () => {
+      const engine = HyperFormula.buildFromSheets({
+        Sheet1: [['=COUNT(Sheet2!B:B)', 5, null, 7]],
+        Sheet2: [[1]],
+      }, {licenseKey: 'gpl-v3'})
+
+      engine.moveCells({start: cell(engine, 'B1'), end: cell(engine, 'D1')}, cell(engine, 'B2', 1))
+
+      expect(engine.getCellValue(cell(engine, 'A1'))).toBe(1)
+    })
+
     it('a whole-column range that moves with its cells keeps their sum', () => {
       const engine = HyperFormula.buildFromArray([['=SUM(B:C)', 1, 2]], {licenseKey: 'gpl-v3'})
 
