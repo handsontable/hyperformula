@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `CHOOSEROWS` dynamic-array function. [#1827](https://github.com/handsontable/hyperformula/pull/1827)
 - Added the `ACCRINTM`, `DISC`, `INTRATE`, `PRICEDISC`, `RECEIVED` and `YIELDDISC` functions, which return the accrued interest, discount rate, interest rate, price, amount received and yield of discounted securities and securities that pay interest at maturity. [#1799](https://github.com/handsontable/hyperformula/pull/1799)
 - Added the `TAKE` dynamic-array function. [#1722](https://github.com/handsontable/hyperformula/pull/1722)
+- Added the `openEndedRangeMinRows` and `openEndedRangeMinColumns` configuration options, which make a range at least that tall or wide hold cells only as far as its sheet holds them, like a whole-column or whole-row range, so that a range such as `A2:A1048576` no longer takes memory for every empty row.
 
 ### Changed
 
