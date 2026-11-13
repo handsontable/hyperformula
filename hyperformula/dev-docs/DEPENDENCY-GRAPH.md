@@ -24,6 +24,10 @@
 - **`EmptyCellVertex` is not "no vertex".** An empty cell that something depends on still needs a vertex, or the dependency is lost when it is later filled.
 - This is the hottest code in the engine after the interpreter — every read and every structural change goes through it.
 
+## Infinite ranges
+
+A whole-column or whole-row range (`AbsoluteColumnRange`, `AbsoluteRowRange`) has no vertex per cell of its own. It gets edges from the cells its sheet holds when it is added, and `Graph` marks it as an infinite range. A cell that appears inside it later is linked by `correctInfiniteRangesDependency`, so every way of putting a cell at an address has to call it: setting a value or a formula, moving cells, and spilling an array. Such a range may hold no cell at all, so a change that must reach its dependents, such as removing its sheet, has to mark the range vertex itself as dirty. Such a range is never built from the same range one row shorter.
+
 ## Testing
 
 Structural-change tests are the ones that catch real bugs here: add and remove rows and columns around a formula, move a range across a formula that references it, and assert **both** the recalculated value and the formula text afterwards. Structural bugs show up in the formula text first.

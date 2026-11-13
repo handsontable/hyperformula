@@ -324,9 +324,12 @@ export class DependencyGraph {
    * Removes all vertices without dependents in other sheets from address mapping, range mapping and array mapping.
    * - If nothing is left, removes the sheet from sheet mapping and address mapping.
    * - Otherwise, marks it as placeholder.
+   *
+   * Marks the ranges of the sheet as dirty, because a range that holds no cell has no cell to mark its dependents.
    */
   public removeSheet(sheetId: number): void {
     this.clearSheet(sheetId)
+    this.markAllRangesAsDirtyInSheet(sheetId)
     const addressMappingCleared = !this.addressMapping.hasAnyEntries(sheetId)
     const rangeMappingCleared = this.rangeMapping.getNumberOfRangesInSheet(sheetId) === 0
 
@@ -483,6 +486,8 @@ export class DependencyGraph {
   }
 
   public moveCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
+    const targetAddressesOfMovedCells: SimpleCellAddress[] = []
+
     for (const sourceAddress of sourceRange.addressesWithDirection(toRight, toBottom, this)) {
       const targetAddress = simpleCellAddress(toSheet, sourceAddress.col + toRight, sourceAddress.row + toBottom)
       let sourceVertex = this.addressMapping.getCell(sourceAddress)
@@ -493,6 +498,7 @@ export class DependencyGraph {
       if (sourceVertex !== undefined) {
         this.graph.markNodeAsDirty(sourceVertex)
         this.addressMapping.setCell(targetAddress, sourceVertex)
+        targetAddressesOfMovedCells.push(targetAddress)
         let emptyVertex = undefined
         for (const adjacentNode of this.graph.adjacentNodes(sourceVertex)) {
           if (adjacentNode instanceof RangeVertex && !sourceRange.containsRange(adjacentNode.range)) {
@@ -536,6 +542,15 @@ export class DependencyGraph {
     }
 
     this.rangeMapping.moveRangesInsideSourceRange(sourceRange, toRight, toBottom, toSheet)
+
+    // Only once the ranges are at their final addresses is it known which infinite ranges hold the moved cells.
+    // A cell moved onto its own address is no longer in the graph, so no range can depend on it.
+    for (const targetAddress of targetAddressesOfMovedCells) {
+      const movedVertex = this.addressMapping.getCell(targetAddress)
+      if (movedVertex !== undefined && this.graph.hasNode(movedVertex)) {
+        this.correctInfiniteRangesDependency(targetAddress)
+      }
+    }
   }
 
   /**
@@ -962,6 +977,18 @@ export class DependencyGraph {
       })
   }
 
+  /**
+   * Makes every infinite range that the array spills into depend on it.
+   */
+  private correctInfiniteRangesDependenciesByArray(array: ArrayFormulaVertex) {
+    const arrayRange = array.getRange()
+    this.graph.getInfiniteRanges()
+      .filter((infiniteRangeVertex) => (infiniteRangeVertex as RangeVertex).range.doesOverlap(arrayRange))
+      .forEach((infiniteRangeVertex) => {
+        this.graph.addEdge(array, infiniteRangeVertex)
+      })
+  }
+
   private cleanAddressMappingUnderArray(vertex: ArrayFormulaVertex) {
     const arrayRange = vertex.getRange()
     for (const address of arrayRange.addresses(this)) {
@@ -1145,6 +1172,10 @@ export class DependencyGraph {
 
     for (const cellAddress of range.addresses(this)) {
       this.addressMapping.setCell(cellAddress, vertex)
+    }
+
+    if (vertex instanceof ArrayFormulaVertex) {
+      this.correctInfiniteRangesDependenciesByArray(vertex)
     }
   }
 
