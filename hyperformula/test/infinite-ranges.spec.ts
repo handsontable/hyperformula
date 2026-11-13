@@ -119,6 +119,50 @@ describe('Whole-column and whole-row ranges', () => {
     })
   })
 
+  describe('functions that count empty cells', () => {
+    it('COUNTIF counts the empty cells of a whole-column range for the "" criterion', () => {
+      const engine = HyperFormula.buildFromArray([['=COUNTIF(B:B, "")', 1], [null, null], [null, 3]], {licenseKey: 'gpl-v3'})
+
+      expect(engine.getCellValue(cell(engine, 'A1'))).toBe(1)
+    })
+
+    it('COUNTIF counts the empty cells of a whole-column range for the "=" criterion', () => {
+      const engine = HyperFormula.buildFromArray([['=COUNTIF(B:B, "=")', 1], [null, null], [null, 3]], {licenseKey: 'gpl-v3'})
+
+      expect(engine.getCellValue(cell(engine, 'A1'))).toBe(1)
+    })
+
+    it('COUNTIF counts the empty cells of a whole-row range for the "" criterion', () => {
+      const engine = HyperFormula.buildFromArray([['=COUNTIF(2:2, "")'], [1, null, 3]], {licenseKey: 'gpl-v3'})
+
+      expect(engine.getCellValue(cell(engine, 'A1'))).toBe(1)
+    })
+
+    it('SUMIF sums the cells of a whole-column range next to empty cells', () => {
+      const engine = HyperFormula.buildFromArray([['=SUMIF(B:B, "", C:C)', 1, 5], [null, null, 7], [null, 3, 9]], {licenseKey: 'gpl-v3'})
+
+      expect(engine.getCellValue(cell(engine, 'A1'))).toBe(7)
+    })
+
+    it('COUNTBLANK counts the empty cells of a whole-column range', () => {
+      const engine = HyperFormula.buildFromArray([['=COUNTBLANK(B:B)', 1], [null, null], [null, 3]], {licenseKey: 'gpl-v3'})
+
+      expect(engine.getCellValue(cell(engine, 'A1'))).toBe(1)
+    })
+
+    it('COUNTBLANK counts the empty cells of a named expression that refers to a whole-column range', () => {
+      const engine = HyperFormula.buildFromArray([['=COUNTBLANK(Values)', 1], [null, null], [null, 3]], {licenseKey: 'gpl-v3'}, [{name: 'Values', expression: '=Sheet1!$B:$B'}])
+
+      expect(engine.getCellValue(cell(engine, 'A1'))).toBe(1)
+    })
+
+    it('COUNTBLANK counts the empty cells of a named expression that refers to a whole-row range', () => {
+      const engine = HyperFormula.buildFromArray([['=COUNTBLANK(Values)'], [1, null, 3]], {licenseKey: 'gpl-v3'}, [{name: 'Values', expression: '=Sheet1!$2:$2'}])
+
+      expect(engine.getCellValue(cell(engine, 'A1'))).toBe(1)
+    })
+  })
+
   describe('removing a sheet', () => {
     it('a whole-column range of a sheet that holds no cell returns the #REF! error when the sheet is removed', () => {
       const engine = HyperFormula.buildFromSheets({Sheet1: [], Sheet2: [['=SUM(Sheet1!D:D)']]}, {licenseKey: 'gpl-v3'})

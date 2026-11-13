@@ -299,6 +299,28 @@ export class AddressMapping {
   }
 
   /**
+   * Gets the height of the tallest sheet.
+   */
+  public getHeightOfTallestSheet(): number {
+    let height = 0
+    for (const sheetMapping of this.mapping.values()) {
+      height = Math.max(height, sheetMapping.getHeight())
+    }
+    return height
+  }
+
+  /**
+   * Gets the width of the widest sheet.
+   */
+  public getWidthOfWidestSheet(): number {
+    let width = 0
+    for (const sheetMapping of this.mapping.values()) {
+      width = Math.max(width, sheetMapping.getWidth())
+    }
+    return width
+  }
+
+  /**
    * Adds rows to a sheet.
    */
   public addRows(sheetId: number, row: number, numberOfRows: number) {

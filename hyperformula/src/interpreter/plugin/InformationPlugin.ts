@@ -539,7 +539,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     } else {
       const val = this.evaluateAst(argAst, state)
       if (val instanceof SimpleRangeValue) {
-        return val.width()
+        return val.fullWidth()
       } else if (val instanceof CellError) {
         return val
       } else {
@@ -591,7 +591,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     } else {
       const val = this.evaluateAst(argAst, state)
       if (val instanceof SimpleRangeValue) {
-        return val.height()
+        return val.fullHeight()
       } else if (val instanceof CellError) {
         return val
       } else {
@@ -613,8 +613,11 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       if (col < 1 || row < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
-      if (col > rangeValue.width() || row > rangeValue.height()) {
+      if (col > rangeValue.fullWidth() || row > rangeValue.fullHeight()) {
         return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+      }
+      if (col > rangeValue.width() || row > rangeValue.height()) {
+        return EmptyValue
       }
       return rangeValue?.data?.[row - 1]?.[col - 1] ?? rangeValue?.data?.[0]?.[0] ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     })

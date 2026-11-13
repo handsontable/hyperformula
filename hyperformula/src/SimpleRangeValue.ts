@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {AbsoluteCellRange, AbsoluteOpenEndedRange} from './AbsoluteCellRange'
 import {ArraySize} from './ArraySize'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
@@ -101,6 +101,26 @@ export class SimpleRangeValue {
    */
   public height(): number {
     return this.size.height
+  }
+
+  /**
+   * Returns the number of columns of the range, including the columns that an open-ended range leaves out of its data.
+   * An open-ended range holds data only as far as the sheets hold cells; every cell past them is empty.
+   *
+   * Internal use only.
+   */
+  public fullWidth(): number {
+    return this.range instanceof AbsoluteOpenEndedRange ? this.range.width() : this.width()
+  }
+
+  /**
+   * Returns the number of rows of the range, including the rows that an open-ended range leaves out of its data.
+   * An open-ended range holds data only as far as the sheets hold cells; every cell past them is empty.
+   *
+   * Internal use only.
+   */
+  public fullHeight(): number {
+    return this.range instanceof AbsoluteOpenEndedRange ? this.range.height() : this.height()
   }
 
   /**

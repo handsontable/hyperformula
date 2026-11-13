@@ -723,13 +723,13 @@ export class Operations {
   }
 
   /**
-   * Returns true if row number is outside of given sheet.
+   * Returns true if row number is outside of given sheet and below every open-ended range of it.
    * @param {number} row - row number
    * @param {number} sheet - sheet ID number
    */
   public rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
     const height = this.dependencyGraph.addressMapping.getSheetHeight(sheet)
-    return row >= height
+    return row >= height && row >= this.dependencyGraph.getSheetHeightWithOpenEndedRanges(sheet)
   }
 
   public getAndClearContentChanges(): ContentChanges {
@@ -871,13 +871,13 @@ export class Operations {
   }
 
   /**
-   * Returns true if row number is outside of given sheet.
-   * @param {number} column - row number
+   * Returns true if column number is outside of given sheet and right of every open-ended range of it.
+   * @param {number} column - column number
    * @param {number} sheet - sheet ID number
    */
   private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
     const width = this.dependencyGraph.addressMapping.getSheetWidth(sheet)
-    return column >= width
+    return column >= width && column >= this.dependencyGraph.getSheetWidthWithOpenEndedRanges(sheet)
   }
 
   private adjustNamedExpressionEdges(namedExpression: InternalNamedExpression, expressionName: string, sheetId?: number) {

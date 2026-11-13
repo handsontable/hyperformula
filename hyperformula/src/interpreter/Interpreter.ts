@@ -87,7 +87,7 @@ export class Interpreter {
         val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
       }
     }
-    if (val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
+    if (val instanceof SimpleRangeValue && val.fullHeight() === 1 && val.fullWidth() === 1) {
       [[val]] = val.data
     }
     return wrapperForRootVertex(val, state.formulaVertex)
@@ -222,7 +222,7 @@ export class Interpreter {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
 
-        const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
+        const range = this.dependencyGraph.rangeReferencedByFormula(AbsoluteCellRange.fromCellRange(ast, state.formulaAddress))
         const arrayVertex = this.dependencyGraph.getArray(range)
 
         if (arrayVertex) {

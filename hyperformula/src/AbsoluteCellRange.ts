@@ -487,7 +487,7 @@ export class AbsoluteCellRange implements SimpleCellRange {
   }
 
   /**
-   * Maps each address in the range (clipped to the sheet's effective bounds) through a callback and returns the results in row-major 2D form.
+   * Maps each address in the range (clipped to its effective width and height) through a callback and returns the results in row-major 2D form.
    * @param {DependencyGraph} dependencyGraph - Graph used to resolve effective sheet bounds
    * @param {(arg: SimpleCellAddress) => T} op - Callback invoked for each address
    * @returns {T[][]} Mapped values indexed by `[row][column]`
@@ -495,11 +495,13 @@ export class AbsoluteCellRange implements SimpleCellRange {
    */
   public addressesArrayMap<T>(dependencyGraph: DependencyGraph, op: (arg: SimpleCellAddress) => T): T[][] {
     const ret = []
+    const limitRow = this.start.row + this.effectiveHeight(dependencyGraph) - 1
+    const limitColumn = this.start.col + this.effectiveWidth(dependencyGraph) - 1
     let currentRow = this.start.row
-    while (currentRow <= this.effectiveEndRow(dependencyGraph)) {
+    while (currentRow <= limitRow) {
       let currentColumn = this.start.col
       const tmp = []
-      while (currentColumn <= this.effectiveEndColumn(dependencyGraph)) {
+      while (currentColumn <= limitColumn) {
         tmp.push(op(simpleCellAddress(this.start.sheet, currentColumn, currentRow)))
         currentColumn++
       }
@@ -914,5 +916,82 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
    */
   protected removeColumns(_columnStart: number, _columnEnd: number) {
     return
+  }
+}
+
+/**
+ * Represents a finite range that is handled like one spanning entire columns or rows: its cells are visited only as far as the sheets hold cells.
+ */
+export class AbsoluteOpenEndedRange extends AbsoluteCellRange {
+  /**
+   * An open-ended range is handled as an infinite one, although its size is finite.
+   * @returns {boolean} Always false
+   */
+  public isFinite(): boolean {
+    return false
+  }
+
+  /**
+   * Builds a new open-ended range with the same column extent as this one but rooted at a different row.
+   * @param {number} startRow - Top row of the new range
+   * @param {number} numberOfRows - Height of the new range
+   * @returns {AbsoluteCellRange} New open-ended range with this range's width
+   */
+  public rangeWithSameWidth(startRow: number, numberOfRows: number): AbsoluteCellRange {
+    return new AbsoluteOpenEndedRange(
+      simpleCellAddress(this.sheet, this.start.col, startRow),
+      simpleCellAddress(this.sheet, this.end.col, startRow + numberOfRows - 1),
+    )
+  }
+
+  /**
+   * Builds a new open-ended range with the same row extent as this one but rooted at a different column.
+   * @param {number} startColumn - Left column of the new range
+   * @param {number} numberOfColumns - Width of the new range
+   * @returns {AbsoluteCellRange} New open-ended range with this range's height
+   */
+  public rangeWithSameHeight(startColumn: number, numberOfColumns: number): AbsoluteCellRange {
+    return new AbsoluteOpenEndedRange(
+      simpleCellAddress(this.sheet, startColumn, this.start.row),
+      simpleCellAddress(this.sheet, startColumn + numberOfColumns - 1, this.end.row),
+    )
+  }
+
+  /**
+   * Returns the effective last column: the range's own, or the last column of its sheet when the sheet ends before it.
+   * @param {DependencyGraph} dependencyGraph - Graph used to resolve sheet width
+   * @returns {number} Effective last column index; less than the start column when the range lies past the sheet's cells
+   */
+  public effectiveEndColumn(dependencyGraph: DependencyGraph): number {
+    return Math.min(this.end.col, dependencyGraph.getSheetWidth(this.sheet) - 1)
+  }
+
+  /**
+   * Returns the effective last row: the range's own, or the last row of its sheet when the sheet ends before it.
+   * @param {DependencyGraph} dependencyGraph - Graph used to resolve sheet height
+   * @returns {number} Effective last row index; less than the start row when the range lies past the sheet's cells
+   */
+  public effectiveEndRow(dependencyGraph: DependencyGraph): number {
+    return Math.min(this.end.row, dependencyGraph.getSheetHeight(this.sheet) - 1)
+  }
+
+  /**
+   * Returns the effective width: the range's own, or the width of the widest sheet when that is smaller.
+   * It does not depend on where the range starts or on its sheet, so open-ended ranges of one width keep one effective width.
+   * @param {DependencyGraph} dependencyGraph - Graph used to resolve sheet widths
+   * @returns {number} Effective width in columns; 1 when no sheet holds a cell
+   */
+  public effectiveWidth(dependencyGraph: DependencyGraph): number {
+    return Math.max(1, Math.min(this.width(), dependencyGraph.getWidthOfWidestSheet()))
+  }
+
+  /**
+   * Returns the effective height: the range's own, or the height of the tallest sheet when that is smaller.
+   * It does not depend on where the range starts or on its sheet, so open-ended ranges of one height keep one effective height.
+   * @param {DependencyGraph} dependencyGraph - Graph used to resolve sheet heights
+   * @returns {number} Effective height in rows; 1 when no sheet holds a cell
+   */
+  public effectiveHeight(dependencyGraph: DependencyGraph): number {
+    return Math.max(1, Math.min(this.height(), dependencyGraph.getHeightOfTallestSheet()))
   }
 }
