@@ -54,7 +54,7 @@ export class Interpreter {
     public readonly columnSearch: ColumnSearchStrategy,
     public readonly stats: Statistics,
     public readonly arithmeticHelper: ArithmeticHelper,
-    private readonly functionRegistry: FunctionRegistry,
+    public readonly functionRegistry: FunctionRegistry,
     private readonly namedExpressions: NamedExpressions,
     public readonly serialization: Serialization,
     public readonly arraySizePredictor: ArraySizePredictor,

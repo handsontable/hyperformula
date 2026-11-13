@@ -11,6 +11,13 @@ import {FunctionDoc} from '../FunctionDescription'
  * `VERSION` function, whose structural metadata lives in `protectedFunctionMetadata.ts` rather than in a plugin.
  */
 export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
+  'ERROR.TYPE': {
+    category: 'Information',
+    shortDescription: 'Returns the number of an error type: 2 for #DIV/0!, 3 for #VALUE!, 4 for #REF!, 5 for #NAME?, 6 for #NUM!, 7 for #N/A and 9 for #SPILL!, or #N/A for a value that is not an error or an error without a number.',
+    parameters: [{name: 'value', description: 'The value or cell reference to inspect; any value that is not an error, a number or text included, results in #N/A.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=ERROR.TYPE(1/0)', '=ERROR.TYPE(A1)', '=ERROR.TYPE(NA())'],
+  },
   ISBINARY: {
     category: 'Information',
     shortDescription: 'Returns TRUE if provided value is a valid binary number.',
@@ -129,6 +136,13 @@ export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'value', description: 'An optional cell or range reference; when omitted, returns the total number of sheets in the workbook, otherwise returns 1 for the sheet containing the reference.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=SHEETS()', '=SHEETS(A1:B3)'],
+  },
+  TYPE: {
+    category: 'Information',
+    shortDescription: 'Returns the type of a value: 1 for a number or an empty cell, 2 for text, 4 for a logical value, 16 for an error and 64 for an array or a multi-cell range.',
+    parameters: [{name: 'value', description: 'The value or reference to classify; an error is reported as 16 instead of being propagated, and a single-cell range is classified by the value it holds.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TYPE(A1)', '=TYPE("text")', '=TYPE(A1:B2)'],
   },
   // VERSION is a protected function (its plugin, VersionPlugin, is kept out of the general registry so it can
   // never be unregistered; see `FunctionRegistry._protectedPlugins`). Its structural metadata (parameters,
