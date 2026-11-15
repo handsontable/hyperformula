@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `AVERAGEIFS` function. [#1732](https://github.com/handsontable/hyperformula/pull/1732)
 - Added the `maxParserCacheSize` configuration option to control the number of cached formulas. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
 - Added the `TYPE` and `ERROR.TYPE` information functions: `TYPE` returns the code of a value's type (number, text, boolean, error, array), and `ERROR.TYPE` returns the code of an error, or `#N/A` for any other value. [#1813](https://github.com/handsontable/hyperformula/pull/1813)
+- Added the `PERMUT` and `PERMUTATIONA` functions, which count permutations without and with repetition, and `BINOM.DIST.RANGE`, which returns the binomial probability of a range of successes. [#1790](https://github.com/handsontable/hyperformula/pull/1790)
 
 ### Changed
 
