@@ -18,6 +18,9 @@ import {AverageResult} from './AverageResult'
 import {MomentsAggregate} from './MomentsAggregate'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 import {RangeVertex} from '../../DependencyGraph'
+import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
+import {BooleanPlugin} from './BooleanPlugin'
+import {InformationPlugin} from './InformationPlugin'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
@@ -555,7 +558,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
               return reducingFunction(left, right)
             }
           }, acc)
-      } else if (arg.type === AstNodeType.CELL_REFERENCE) {
+      } else if (arg.type === AstNodeType.CELL_REFERENCE || this.evaluatesToReference(arg, state)) {
         value = coercionFunction(value)
         if (value === undefined) {
           return acc
@@ -574,6 +577,99 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
 
       return reducingFunction(acc, mapFunction(value))
     }, initialAccValue)
+  }
+
+  /**
+   * Tells whether an argument other than a bare reference or range evaluates to the content of a
+   * referenced cell, so that the aggregation ignores its non-numeric values as it does for `A1`.
+   *
+   * That holds for a parenthesized reference, a named expression defined as a reference, `INDEX`
+   * over a reference, and `IF` or `CHOOSE` whose every result argument is one of these or a number
+   * literal. A number reads the same whether it comes from a cell or not, so a number literal does
+   * not change how the result is read. `INDEX`, `IF` and `CHOOSE` count only while the built-in
+   * implementation answers for them, not a custom plugin registered over their ids. The check looks
+   * only at the formula, so no argument is evaluated a second time.
+   *
+   * @param {Ast} arg - the argument of the aggregation
+   * @param {InterpreterState} state - interpreter state
+   * @returns {boolean} whether the value of `arg` is the content of a referenced cell
+   */
+  private evaluatesToReference(arg: Ast, state: InterpreterState): boolean {
+    switch (arg.type) {
+      case AstNodeType.PARENTHESIS:
+        return this.evaluatesToReference(arg.expression, state)
+      case AstNodeType.CELL_REFERENCE:
+      case AstNodeType.CELL_RANGE:
+      case AstNodeType.COLUMN_RANGE:
+      case AstNodeType.ROW_RANGE:
+        return true
+      case AstNodeType.NAMED_EXPRESSION:
+        return this.namedExpressionIsReference(arg.expressionName, state)
+      case AstNodeType.FUNCTION_CALL:
+        return this.functionCallEvaluatesToReference(arg, state)
+      default:
+        return false
+    }
+  }
+
+  /**
+   * The function-call case of {@link evaluatesToReference}: `INDEX` over a reference, and `IF` with
+   * three arguments or `CHOOSE` whose result arguments are all references or number literals.
+   *
+   * @param {ProcedureAst} ast - the function call passed to the aggregation
+   * @param {InterpreterState} state - interpreter state
+   * @returns {boolean} whether the function call returns the content of a referenced cell
+   */
+  private functionCallEvaluatesToReference(ast: ProcedureAst, state: InterpreterState): boolean {
+    const resultArgumentIsReferenceOrNumber = (resultArg: Ast) => isNumberLiteral(resultArg) || this.evaluatesToReference(resultArg, state)
+    const plugin = this.dependencyGraph.functionRegistry.getFunctionPlugin(ast.procedureName)
+
+    switch (ast.procedureName) {
+      case 'INDEX':
+        if (plugin !== InformationPlugin) {
+          return false
+        }
+        return ast.args.length >= 1 && this.evaluatesToReference(ast.args[0], state)
+      case 'IF':
+        if (plugin !== BooleanPlugin) {
+          return false
+        }
+        return ast.args.length === 3 && ast.args.slice(1).every(resultArgumentIsReferenceOrNumber)
+      case 'CHOOSE':
+        if (plugin !== BooleanPlugin) {
+          return false
+        }
+        return ast.args.length >= 2 && ast.args.slice(1).every(resultArgumentIsReferenceOrNumber)
+      default:
+        return false
+    }
+  }
+
+  /**
+   * Tells whether a named expression, as seen from the formula being evaluated, is defined as a
+   * reference or a range, optionally in parentheses. Other definitions, such as `=""`, are values.
+   *
+   * @param {string} expressionName - the name used in the formula
+   * @param {InterpreterState} state - interpreter state
+   * @returns {boolean} whether the named expression is a reference
+   */
+  private namedExpressionIsReference(expressionName: string, state: InterpreterState): boolean {
+    const namedExpression = this.dependencyGraph.namedExpressions.nearestNamedExpression(expressionName, state.formulaAddress.sheet)
+    if (namedExpression === undefined) {
+      return false
+    }
+    const vertex = this.dependencyGraph.getCell(namedExpression.address)
+    if (!(vertex instanceof FormulaVertex)) {
+      return false
+    }
+    let definition = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
+    while (definition.type === AstNodeType.PARENTHESIS) {
+      definition = definition.expression
+    }
+    return definition.type === AstNodeType.CELL_REFERENCE
+      || definition.type === AstNodeType.CELL_RANGE
+      || definition.type === AstNodeType.COLUMN_RANGE
+      || definition.type === AstNodeType.ROW_RANGE
   }
 
   /**
@@ -682,6 +778,26 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
 
     return rangeResult
+  }
+}
+
+/**
+ * Tells whether an AST is a number literal, optionally signed or in parentheses, such as `0` or `-1`.
+ *
+ * @param {Ast} ast - the AST to check
+ * @returns {boolean} whether the AST always evaluates to the same number
+ */
+function isNumberLiteral(ast: Ast): boolean {
+  switch (ast.type) {
+    case AstNodeType.NUMBER:
+      return true
+    case AstNodeType.PARENTHESIS:
+      return isNumberLiteral(ast.expression)
+    case AstNodeType.MINUS_UNARY_OP:
+    case AstNodeType.PLUS_UNARY_OP:
+      return isNumberLiteral(ast.value)
+    default:
+      return false
   }
 }
 
