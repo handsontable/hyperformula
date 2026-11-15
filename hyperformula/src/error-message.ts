@@ -47,6 +47,8 @@ export class ErrorMessage {
   public static NumberRange = 'Number-only range expected.'
   public static ValueNotFound = 'Value not found.'
   public static NaFunction = 'The NA function always evaluates to the #N/A error.'
+  public static ErrorTypeNotError = 'The value is not an error, so ERROR.TYPE has no number to return.'
+  public static ErrorTypeNoCode = 'This error type has no ERROR.TYPE number.'
   public static ValueBaseLarge = 'Value in base too large.'
   public static ValueBaseSmall = 'Value in base too small.'
   public static ValueBaseLong = 'Value in base too long.'

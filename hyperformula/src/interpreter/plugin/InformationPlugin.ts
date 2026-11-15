@@ -242,9 +242,9 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
   public errortype(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ERROR.TYPE'), (arg: InternalScalarValue) => {
       if (!(arg instanceof CellError)) {
-        return new CellError(ErrorType.NA)
+        return new CellError(ErrorType.NA, ErrorMessage.ErrorTypeNotError)
       }
-      return ERROR_TYPE_CODES[arg.type] ?? new CellError(ErrorType.NA)
+      return ERROR_TYPE_CODES[arg.type] ?? new CellError(ErrorType.NA, ErrorMessage.ErrorTypeNoCode)
     })
   }
 
