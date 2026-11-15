@@ -18,6 +18,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `AVERAGEIFS` function. [#1732](https://github.com/handsontable/hyperformula/pull/1732)
 - Added the `maxParserCacheSize` configuration option to control the number of cached formulas. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
 
+### Changed
+
+- Changed the `DELTA`, `ERF` and `ERFC` functions to return `#VALUE!` for a boolean or an empty text argument, as Excel does; to keep the previous result, pass the argument through `N()`, as in `=DELTA(N(TRUE()))`. [#1836](https://github.com/handsontable/hyperformula/pull/1836)
+
 ### Fixed
 
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
