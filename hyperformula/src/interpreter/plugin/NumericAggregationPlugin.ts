@@ -16,7 +16,7 @@ import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtended
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {AverageResult} from './AverageResult'
 import {MomentsAggregate} from './MomentsAggregate'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginDefinition, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 import {RangeVertex} from '../../DependencyGraph'
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
 import {BooleanPlugin} from './BooleanPlugin'
@@ -622,27 +622,35 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    */
   private functionCallEvaluatesToReference(ast: ProcedureAst, state: InterpreterState): boolean {
     const resultArgumentIsReferenceOrNumber = (resultArg: Ast) => isNumberLiteral(resultArg) || this.evaluatesToReference(resultArg, state)
-    const plugin = this.dependencyGraph.functionRegistry.getFunctionPlugin(ast.procedureName)
 
     switch (ast.procedureName) {
       case 'INDEX':
-        if (plugin !== InformationPlugin) {
-          return false
-        }
-        return ast.args.length >= 1 && this.evaluatesToReference(ast.args[0], state)
+        return this.isBuiltIn('INDEX', InformationPlugin)
+          && ast.args.length >= 1
+          && this.evaluatesToReference(ast.args[0], state)
       case 'IF':
-        if (plugin !== BooleanPlugin) {
-          return false
-        }
-        return ast.args.length === 3 && ast.args.slice(1).every(resultArgumentIsReferenceOrNumber)
+        return this.isBuiltIn('IF', BooleanPlugin)
+          && ast.args.length === 3
+          && ast.args.slice(1).every(resultArgumentIsReferenceOrNumber)
       case 'CHOOSE':
-        if (plugin !== BooleanPlugin) {
-          return false
-        }
-        return ast.args.length >= 2 && ast.args.slice(1).every(resultArgumentIsReferenceOrNumber)
+        return this.isBuiltIn('CHOOSE', BooleanPlugin)
+          && ast.args.length >= 2
+          && ast.args.slice(1).every(resultArgumentIsReferenceOrNumber)
       default:
         return false
     }
+  }
+
+  /**
+   * Tells whether the built-in plugin answers for a function id, rather than a custom plugin
+   * registered over it.
+   *
+   * @param {string} functionId - the function id
+   * @param {FunctionPluginDefinition} builtInPlugin - the plugin that implements the id by default
+   * @returns {boolean} whether `builtInPlugin` is registered for `functionId`
+   */
+  private isBuiltIn(functionId: string, builtInPlugin: FunctionPluginDefinition): boolean {
+    return this.dependencyGraph.functionRegistry.getFunctionPlugin(functionId) === builtInPlugin
   }
 
   /**

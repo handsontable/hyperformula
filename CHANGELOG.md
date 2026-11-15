@@ -30,7 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed unbounded parser cache growth in long-running instances that process many distinct formulas, including when undo is disabled. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
 - Fixed array formulas spilling past the `maxRows` and `maxColumns` limits: they now return `#SPILL!` when their result extends beyond the sheet edge. [#1774](https://github.com/handsontable/hyperformula/pull/1774)
 - Fixed numeric contexts reading an empty string (`""`) as `0` instead of as text (e.g. `=""+0` now returns `#VALUE!` instead of `0`), and numeric aggregations treating a parenthesized reference such as `(A1)` differently from `A1`. [#1768](https://github.com/handsontable/hyperformula/pull/1768)
-- Fixed numeric aggregations such as `SUM`, `AVERAGE`, `MIN` and `MAX` returning `#VALUE!` for text read from a cell through `INDEX`, `CHOOSE`, `IF` or a named expression, which they now ignore as they do for a direct reference. [#1768](https://github.com/handsontable/hyperformula/pull/1768)
+- Fixed numeric aggregations such as `SUM`, `AVERAGE` and `MAX` reading a cell reached through `INDEX`, `CHOOSE`, `IF` or a named expression as a value: as with a direct reference, its text, booleans and blanks are now ignored. [#1768](https://github.com/handsontable/hyperformula/pull/1768)
 
 ## [3.5.0] - 2026-10-09
 
