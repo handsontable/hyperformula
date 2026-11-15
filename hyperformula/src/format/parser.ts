@@ -77,7 +77,7 @@ function matchNumberFormat(str: string): RegExpExecArray[] {
 
   // A run admitted by the flat class is only a genuine number token if it
   // contains at least one `#`/`0` placeholder. A run that is punctuation-only
-  // (e.g. a lone grouping `,`, now inside the class) or an escape token is NOT
+  // (e.g. a lone grouping `,`, which the class admits) or an escape token is NOT
   // a number token — Excel treats a placeholder-less segment as a literal — so
   // skip it and keep scanning for the first placeholder-bearing run. Without
   // this guard a mask such as `,` or `a,b` would splice the value into free
