@@ -58,8 +58,11 @@ a circular reference.
   * scientific notation (`0.00E+00`),
   * `[condition]` comparators,
   * more than one group of digit placeholders: `=TEXT(5551234567, "(000) 000-0000")` returns `(5551234567) 000-0000`, where Excel returns `(555) 123-4567`,
-  * a mask that starts with the decimal point: `=TEXT(0.5, ".00")` returns `.01`, where Excel returns `.50`.
-* For these formats, supply a [`stringifyCurrency`](currency-handling.md) callback. See also [`TEXT` function formats](compatibility-with-microsoft-excel.md#text-function-formats).
+  * a mask that starts with the decimal point: `=TEXT(0.5, ".00")` returns `.01`, where Excel returns `.50`,
+  * the `_` padding code: `=TEXT(5, "0_)")` returns `5_)`, where Excel returns `5` followed by a space,
+  * the `@` text placeholder: `=TEXT(5, "@")` returns `@`, where Excel returns `5`.
+* For these number formats, supply a [`stringifyCurrency`](currency-handling.md) callback. See also [`TEXT` function formats](compatibility-with-microsoft-excel.md#text-function-formats).
+* Positive, negative and zero sections apply to number masks only. A date mask is not split into sections: with `dd-mm-yyyy;"neg"` in `A1`, `=TEXT(-5, A1)` returns `25-12-1899;"neg"`, where Excel returns `neg`.
 
 ### UNIQUE function
 
