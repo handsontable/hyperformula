@@ -292,6 +292,28 @@ export class ErrorPopup extends BasePopup {
     this.containerScope.activate();
   }
 
+  syncCell(cell: HTMLElement): void {
+    const message = cell.dataset.hfeError;
+
+    if (!message && cell === this.suppressedCell) {
+      this.suppressedCell = null;
+    }
+
+    if (cell !== this.activeCell || !this.isVisible()) {
+      return;
+    }
+
+    if (!message) {
+      this.close();
+
+      return;
+    }
+
+    if (message !== this.pendingMessage) {
+      this.anchorTo(cell, message);
+    }
+  }
+
   protected override onVisibilityChanged(visible: boolean): void {
     if (!visible) {
       this.pruneDetachedCells();

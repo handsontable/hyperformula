@@ -370,6 +370,20 @@ describe("FormulaBuilder", () => {
       expect(cell.dataset.hfeError).toBeUndefined();
       expect(cell.classList.contains(CN.cellError)).toBe(false);
     });
+
+    it("closes the error tooltip when the cell it points at is cleared", () => {
+      const cell = document.createElement("td");
+      rootEl.appendChild(cell);
+      builder.markCell(cell, { type: "DIV_BY_ZERO", value: "#DIV/0!" });
+      cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+
+      expect(document.body.querySelector<HTMLElement>(sel(CN.errorPopup))?.hidden).toBe(false);
+
+      builder.markCell(cell, 4);
+
+      expect(document.body.querySelector<HTMLElement>(sel(CN.errorPopup))?.hidden).toBe(true);
+      expect(cell.getAttribute("aria-errormessage")).toBeNull();
+    });
   });
 
   describe("destroy", () => {

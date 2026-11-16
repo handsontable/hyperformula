@@ -461,6 +461,7 @@ export class FormulaBuilder {
    */
   markCell(cellEl: HTMLElement, value: unknown): void {
     setCellError(cellEl, cellErrorMessage(value));
+    this.errorPopup.syncCell(cellEl);
   }
 
   /** The single shared editor instance this builder owns. */

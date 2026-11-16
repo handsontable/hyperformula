@@ -939,3 +939,76 @@ describe("ErrorPopup RTL positioning", () => {
     cell.remove();
   });
 });
+
+describe("ErrorPopup syncCell", () => {
+  let popup: ErrorPopup;
+  let popupCtx: PopupContext;
+  let cell: HTMLElement;
+
+  beforeEach(() => {
+    popupCtx = new PopupContext();
+    popup = new ErrorPopup({ container: popupCtx.portal });
+    popup.attach(document.body);
+    cell = document.createElement("div");
+    cell.tabIndex = 0;
+    document.body.appendChild(cell);
+    setCellError(cell, "#DIV/0!");
+  });
+
+  afterEach(() => {
+    popup.destroy();
+    popupCtx.destroy();
+    cell.remove();
+  });
+
+  it("closes the tooltip when the anchored cell's error is cleared", () => {
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    setCellError(cell, null);
+    popup.syncCell(cell);
+
+    expect(popup.isVisible()).toBe(false);
+    expect(cell.getAttribute("aria-errormessage")).toBeNull();
+  });
+
+  it("shows the new message when the anchored cell's error changes", () => {
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    setCellError(cell, "#REF! — bad reference");
+    popup.syncCell(cell);
+
+    expect(popup.isVisible()).toBe(true);
+    expect(document.body.querySelector(sel(CN.errorPopupTitle))?.textContent).toBe("#REF!");
+    expect(document.body.querySelector(sel(CN.errorPopupMessage))?.textContent).toBe(
+      "bad reference",
+    );
+    expect(cell.getAttribute("aria-errormessage")).toBe(
+      document.body.querySelector(sel(CN.errorPopup))?.id,
+    );
+  });
+
+  it("keeps the tooltip when another cell's error is cleared", () => {
+    const other = document.createElement("div");
+    document.body.appendChild(other);
+    setCellError(other, "#NAME?");
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    setCellError(other, null);
+    popup.syncCell(other);
+
+    expect(popup.isVisible()).toBe(true);
+    expect(document.body.querySelector(sel(CN.errorPopupTitle))?.textContent).toBe("#DIV/0!");
+    other.remove();
+  });
+
+  it("shows a new error on a cell whose previous error was dismissed with Escape", () => {
+    cell.focus();
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    setCellError(cell, null);
+    popup.syncCell(cell);
+    setCellError(cell, "#REF!");
+    popup.syncCell(cell);
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+
+    expect(popup.isVisible()).toBe(true);
+    expect(document.body.querySelector(sel(CN.errorPopupTitle))?.textContent).toBe("#REF!");
+  });
+});
