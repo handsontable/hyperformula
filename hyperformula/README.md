@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <strong>An open-source headless spreadsheet for business web apps</strong>
+  <strong>A headless spreadsheet for business web apps</strong>
 </p>
 
 <p align="center">
@@ -50,7 +50,7 @@ HyperFormula doesn't assume any existing user interface, making it a general-pur
 - [Support for data sorting](https://handsontable.com/docs/hyperformula/guide/sorting-data.html)
 - [Support for formula localization with 18 built-in languages](https://handsontable.com/docs/hyperformula/guide/i18n-features.html)
 - Easy integration with any front-end or back-end application
-- GPLv3 or a [commercial license](https://handsontable.com/get-a-quote)
+- Available under a [commercial license](https://handsontable.com/get-a-quote)
 - Maintained by the team that stands behind the [Handsontable](https://handsontable.com/) data grid
 
 ## Documentation
@@ -83,7 +83,9 @@ Once installed, you can use it to develop applications tailored to your specific
 import { HyperFormula } from 'hyperformula';
 
 // Create a HyperFormula instance
-const hf = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+const hf = HyperFormula.buildEmpty({
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/
+});
 
 // Add an empty sheet
 const sheetName = hf.addSheet('Mortgage Calculator');
@@ -111,6 +113,6 @@ Contributions are welcome, but before you make them, please read the [Contributi
 
 ## License
 
-HyperFormula is available under two different licenses: GPLv3 and proprietary. The proprietary license can be purchased by [contacting our team](https://handsontable.com/get-a-quote) at Handsontable.
+HyperFormula is proprietary software. See [`LICENSE.txt`](https://github.com/handsontable/hyperformula/blob/develop/LICENSE.txt) for the license terms. A commercial license can be purchased by [contacting our team](https://handsontable.com/get-a-quote) at Handsontable.
 
 Copyright (c) Handsoncode

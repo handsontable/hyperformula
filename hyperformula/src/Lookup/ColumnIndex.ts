@@ -107,13 +107,11 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, ifNoMatch, returnOccurrence }: SearchOptions): number {
-    if (returnOccurrence == null) {
-      returnOccurrence = ordering === 'none' ? 'first' : 'last'
-    }
+  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchOptions: SearchOptions): number {
+    const returnOccurrence = searchOptions.returnOccurrence ?? (searchOptions.ordering === 'none' ? 'first' : 'last')
 
     const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, returnOccurrence)
-    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, ifNoMatch, returnOccurrence })
+    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ...searchOptions, returnOccurrence })
   }
 
   private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, returnOccurrence: 'first' | 'last'): Maybe<number> {
