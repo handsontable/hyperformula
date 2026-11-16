@@ -63,7 +63,7 @@ const hfInstance = HyperFormula.buildFromArray([
   [3000, '2026-12-01'],
   ['=XIRR(A1:A5, B1:B5)'],
 ], {
-  licenseKey: 'gpl-v3',
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/
   dateFormats: ['DD/MM/YYYY', 'DD/MM/YY', 'YYYY-MM-DD'],
 });
 
@@ -87,7 +87,9 @@ const hfInstance = HyperFormula.buildFromArray([
   [3250, '2026-09-01'],
   [3000, '2026-12-01'],
   ['=XIRR(A1:A5, B1:B5)'],
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/
+});
 
 // #VALUE!, because B1:B5 contains text, not dates
 const result = hfInstance.getCellValue({ sheet: 0, row: 5, col: 0 });
