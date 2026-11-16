@@ -129,6 +129,12 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | CHOOSECOLS    | =COLUMNS(CHOOSECOLS(A1:C3, {1,2}))                              | 1 (only the first index of an array is used) | 2 | 2 |
 | CHOOSEROWS    | =CHOOSEROWS(Data!1:1, 1)                                      | Spills the source sheet's used columns from column A; returns SPILL outside column A. | Returns every column of the source sheet's row. | Returns all 16,384 columns of the row. |
 | CHOOSEROWS    | =CHOOSEROWS(Data!A:A, -1)                                     | Returns the source sheet's last used row. | Returns the source sheet's last row. | Returns row 1,048,576. |
+| TAKE          | =TAKE(A1:A3, 0)                                                |          N/A | No such function. |           CALC  |
+| TAKE          | =TAKE(Data!A:A, , 1)                                           | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | No such function. | Spills all 1,048,576 rows from row 1, with blank source cells as 0; returns SPILL below row 1. |
+| TAKE          | =SUM(TAKE(A:A, -2))<br>where A1:A5: 1, 2, 3, 4, 5              | 9 (counts back from the last used row) | No such function. | 0 (counts back from the last row of the sheet) |
+| TAKE          | =SUM(TAKE(1:1, , -2))<br>where A1:C1: 1, 2, 3                  | 5 (counts back from the last used column) | No such function. | 0 (counts back from the last column of the sheet) |
+| TAKE          | =TAKE(A:A, B1) in C5,<br>where A1:A5: 1, 2, 3, 4, 5 and B1 = 6 | Returns SPILL: the result is taller than the area reserved for it below row 1 (5 rows, the source's height). A count that fits, such as 2, spills 1, 2. A negative count, such as -2, counts back from the end of the reserved area and returns 2 empty cells. | No such function. | Spills 1, 2, 3, 4, 5, 0 into C5:C10. With B1 = -2, spills 0, 0. |
+| TAKE          | =TAKE(A1:C3, NA())                                             | Fills the whole area reserved for the array (here 3x3) with N/A. | No such function. | A single N/A error. |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |

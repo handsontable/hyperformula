@@ -242,6 +242,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: 'PRZEŁĄCZ',
     SYD: 'SYD',
     T: 'T',
+    TAKE: 'WYCINEK',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'RENT.EKW.BS',
