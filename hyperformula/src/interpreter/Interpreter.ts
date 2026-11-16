@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {ArraySizePredictor} from '../ArraySize'
-import {ArrayValue, NotComputedArray} from '../ArrayValue'
+import {ArrayValue, ErroredArray, NotComputedArray} from '../ArrayValue'
 import {CellError, ErrorType, isColOrRowInvalid} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -55,7 +55,7 @@ export class Interpreter {
     public readonly columnSearch: ColumnSearchStrategy,
     public readonly stats: Statistics,
     public readonly arithmeticHelper: ArithmeticHelper,
-    private readonly functionRegistry: FunctionRegistry,
+    public readonly functionRegistry: FunctionRegistry,
     private readonly namedExpressions: NamedExpressions,
     public readonly serialization: Serialization,
     public readonly arraySizePredictor: ArraySizePredictor,
@@ -233,6 +233,9 @@ export class Interpreter {
             return array
           } else if (array instanceof ArrayValue) {
             return SimpleRangeValue.fromRange(array.raw(), range, this.dependencyGraph)
+          } else if (array instanceof ErroredArray) {
+            // Read cell by cell, like a range that does not match a spill exactly.
+            return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
           } else {
             throw new Error('Unknown array')
           }
