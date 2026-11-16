@@ -46,6 +46,7 @@ a circular reference.
 * The INDEX function doesn't support returning whole rows or columns of the source range – it always returns the contents of a single cell.
 * The FILTER function accepts either single rows of equal width or single columns of equal height. In other words, all arrays passed to the FILTER function must have equal dimensions, and at least one of those dimensions must be 1.
 * Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
+* `FILTER` and `UNIQUE` reserve the size of their source before they are evaluated, because the size of their result is not known until then. Near the sheet edge set by [`maxRows`](../api/interfaces/configparams.md#maxrows) and [`maxColumns`](../api/interfaces/configparams.md#maxcolumns), they return `#SPILL!` when that reserved area does not fit, even if the result itself would. For example, with `maxRows` set to `4` and 1 to 4 in `A1:A4`, `=FILTER(A1:A4, A1:A4>2)` in `B3` returns `#SPILL!`.
 * The TEXT function does not accept embedded double-quote literals in the format string. In Excel, `""` inside a format string is an escape sequence for a literal `"` character — e.g. `=TEXT(1234.5, "#,##0.00 ""zł""")` returns `"1,234.50 zł"`. If your application requires this escape sequence, supply a custom [`stringifyCurrency`](currency-handling.md) callback.
 
 ### UNIQUE function
@@ -70,6 +71,24 @@ a circular reference.
 * If an input expression returns a different predictor count than predicted, `LINEST` returns `#VALUE!`. For example, filtering predictor columns can change the required result width.
 
 * Very large or very small input magnitudes can reduce numerical accuracy. Intermediate calculations, such as residual sums of squares, can still overflow or underflow, producing `#NUM!` or inaccurate statistics. Rescale inputs to more moderate units where possible. See [LINEST numerical differences](list-of-differences.md#linest) for compatibility considerations.
+
+### CHOOSECOLS function
+
+* Column indexes must be supplied as separate scalar arguments. When an array of indexes is passed, only its first index is used: `=CHOOSECOLS(A1:C3, {1,2})` returns column A only. A range of indexes returns `#VALUE!`.
+
+* A whole-column source can spill when the formula is in the first row, regardless of whether the source is on the same sheet. Below the first row, the formula returns `#SPILL!` because its result would extend beyond the worksheet edge; inside another function, such as `=SUM(CHOOSECOLS(A:A, 1))`, it is computed. In the first row, or inside another function, an empty source returns `#N/A` because its effective range is empty. Finite-height sources are supported.
+
+* HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal column-index expression can therefore be reported as `#SPILL!`. For a source of finite width, errors in literal column indexes are detected before spill allocation.
+
+### CHOOSEROWS function
+
+* Row indexes must be supplied as separate scalar arguments. Passing multiple indexes through an array or range argument is not supported.
+
+* A whole-row source can spill when the formula is in the first column, regardless of whether the source is on the same sheet. A formula outside the first column returns `#SPILL!` because its result would extend beyond the worksheet edge. An empty source returns `#N/A` because its effective range is empty. Finite-width sources are supported.
+
+* HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal row-index expression can therefore be reported as `#SPILL!`. Errors in literal row indexes are detected before spill allocation.
+
+* A named expression, or a function whose result size depends on cell values, passed directly as the source returns `#VALUE!` when the result has more than one cell, because its size cannot be predicted before evaluation.
 
 ### OFFSET function
 
