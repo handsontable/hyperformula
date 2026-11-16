@@ -42,7 +42,7 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   if (tryCurrency !== undefined) {
     return tryCurrency
   }
-  if (hasUnclosedBracket(formatArg) || endsWithLoneBackslash(formatArg)) {
+  if (hasUnclosedBracket(formatArg) || hasUnclosedQuote(formatArg) || endsWithLoneBackslash(formatArg)) {
     return new CellError(ErrorType.VALUE, ErrorMessage.BadFormat)
   }
   // Strip presentational color tags AFTER the (user-pluggable) currency callback
@@ -87,6 +87,27 @@ function hasUnclosedBracket(formatArg: string): boolean {
     }
   }
   return false
+}
+
+/**
+ * Tells whether a format string opens a quoted literal that no later `"` closes,
+ * as in `0"abc` or `"abc`. Such a format is invalid, so `TEXT` returns `#VALUE!`.
+ * An escaped quote (`0\"`) is literal text and does not open a quoted literal.
+ *
+ * @param formatArg the raw format string
+ * @returns `true` when a quoted literal is never closed
+ */
+function hasUnclosedQuote(formatArg: string): boolean {
+  let inQuotes = false
+  for (let i = 0; i < formatArg.length; i++) {
+    const ch = formatArg[i]
+    if (ch === '"') {
+      inQuotes = !inQuotes
+    } else if (!inQuotes && ch === '\\') {
+      i++
+    }
+  }
+  return inQuotes
 }
 
 /**
