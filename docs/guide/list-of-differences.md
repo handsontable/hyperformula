@@ -50,6 +50,9 @@ Very large or very small input scales can also cause substantial differences in 
 | Booleans converted to text | =CONCAT(TRUE())<br><br>=VALUETOTEXT(FALSE())<br><br>=TRUE()&"" | `TRUE` and `FALSE` in every language, in `CONCAT`, `CONCATENATE`, `TEXTJOIN`, `VALUETOTEXT` and `&`. | Not checked. | The boolean names of the Excel language, for example `PRAWDA` and `FAŁSZ` in Polish. |
 | Array size limits | =SUM(VSTACK(SEQUENCE(1048576), SEQUENCE(1))) | An array computed inside a formula is not limited in either dimension, so the example returns the sum when [`maxRows`](../api/interfaces/configparams.md#maxrows) is at least 1,048,576. With the default `maxRows` (40,000), `SEQUENCE(1048576)` returns `#VALUE!`, because `SEQUENCE` is limited by the `maxRows` and [`maxColumns`](../api/interfaces/configparams.md#maxcolumns) configuration options. | In-memory arrays are not limited in either dimension. Returns `549756338177`. | In-memory arrays are limited to 1,048,576 rows and 1,048,576 columns. Returns `#NUM!`. |
 | FILTER and UNIQUE near the sheet edge | =FILTER(A1:A10, A1:A10>8)<br>in the second-to-last row, where A1:A10 = 1 to 10 | Returns `#SPILL!`: the area reserved for the result has the height of the source, and it does not fit before the sheet edge. See [Known limitations](known-limitations.md). | Not checked. | Spills `9` and `10` into the last two rows. |
+| TYPE of ROW or COLUMN in an expression | =TYPE(ROW(A1:A2)+0) | `ROW` over more than one row and `COLUMN` over more than one column count as arrays only when passed to `TYPE` directly, so the example gives `1`. | Not checked. | Returns `64`. |
+| TYPE of a one-by-one array | =TYPE({1}+0)<br>=TYPE(IF(TRUE(), {1}))<br>=TYPE(VSTACK(A1))<br>where A1 holds an error | An array that holds a single value counts as an array (`64`) only when it is the argument itself: an array constant, a call to a function that returns arrays, such as `FILTER`, `SEQUENCE` or `VSTACK`, or `TRANSPOSE` of such an array. Passed through an operator or another function first, it is reduced to its value, so the first two examples give `1`. When such a function call has an error as its single value, `TYPE` gives `16`, as in the third example. | Not checked. | Returns `64` for all three examples. |
+| ERROR.TYPE function | =ERROR.TYPE(#NULL!)<br>=ERROR.TYPE(#GETTING_DATA) | HyperFormula has no `#NULL!` or `#GETTING_DATA` error, so the codes 1 and 8 are never returned and the literals do not parse. `#CYCLE!`, `#ERROR!` and `#LIC!`, which are HyperFormula's own errors, have no code and give `#N/A`. | Not checked. | Returns `1` for `#NULL!` and `8` for `#GETTING_DATA`. |
 
 ## Built-in functions
 
@@ -75,6 +78,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | LCMP          | =LCM(1000000, 1000001, 1000002, 1000003)                       |          NUM |   5.00003E+23 |             NUM |
 | TBILLPRICE    | =TBILLPRICE(0, 180, 1.9)                                       |       5.0000 |           NUM |          5.0000 |
 | TBILLPRICE    | =TBILLPRICE(0, 180, 2)                                         |       0.0000 |           NUM |          0.0000 |
+| ACCRINTM      | =ACCRINTM(DATE(2008,4,1), DATE(2008,6,15), 0.1)                |      20.5556 |       20.5556 |    Wrong number |
 | NPV           | =NPV(1, TRUE(), 1)                                             |       0.7500 |        0.5000 |          0.7500 |
 | NPV           | =NPV(1,B1) where B1 = true                                     |       0.5000 |        0.0000 |          0.0000 |
 | POISSON.DIST  | =POISSON.DIST(-0.01, 0, FALSE())                               |          NUM |        1.0000 |             NUM |
@@ -114,6 +118,14 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | NORMSDIST     | =NORMSDIST(0, TRUE())                                          |          0.5 |  Wrong number |    Wrong number |
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
+| CHOOSECOLS    | =CHOOSECOLS(Data!A:A, 1)                                      | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | Spills the whole column when space is available. | Spills all 1,048,576 rows from row 1, with blank source cells as 0; returns SPILL below row 1. |
+| CHOOSECOLS    | =CHOOSECOLS(1:1, -1)<br>where A1:C1: 1, 2, 3                    | 3 (counts back from the last used column) | Empty cell (counts back from the last column of the sheet) | 0 (counts back from the last column of the sheet) |
+| CHOOSECOLS    | =CHOOSECOLS(1:1, 5)<br>where A1:C1: 1, 2, 3                     | VALUE (column 5 is past the last used column) | Empty cell | 0 |
+| CHOOSECOLS    | =SUM(CHOOSECOLS(Data!A:A, 1))<br>where the Data sheet is empty   | N/A | 0 | 0 |
+| CHOOSECOLS    | =COLUMNS(CHOOSECOLS(A1:C3, E1:F1))<br>where E1:F1: 1, 2         | VALUE (column indexes must be separate arguments) | 2 | 2 |
+| CHOOSECOLS    | =COLUMNS(CHOOSECOLS(A1:C3, {1,2}))                              | 1 (only the first index of an array is used) | 2 | 2 |
+| CHOOSEROWS    | =CHOOSEROWS(Data!1:1, 1)                                      | Spills the source sheet's used columns from column A; returns SPILL outside column A. | Returns every column of the source sheet's row. | Returns all 16,384 columns of the row. |
+| CHOOSEROWS    | =CHOOSEROWS(Data!A:A, -1)                                     | Returns the source sheet's last used row. | Returns the source sheet's last row. | Returns row 1,048,576. |
 | TAKE          | =TAKE(A1:A3, 0)                                                |          N/A | No such function. |           CALC  |
 | TAKE          | =TAKE(Data!A:A, , 1)                                           | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | No such function. | Spills all 1,048,576 rows from row 1, with blank source cells as 0; returns SPILL below row 1. |
 | TAKE          | =SUM(TAKE(A:A, -2))<br>where A1:A5: 1, 2, 3, 4, 5              | 9 (counts back from the last used row) | No such function. | 0 (counts back from the last row of the sheet) |
@@ -125,6 +137,9 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
 | CEILING.MATH  | =CEILING.MATH(-4.3, 2, 2)                                      |           -4 |            -6 |              -6 |
 | FLOOR.MATH    | =FLOOR.MATH(-4.7, 2, 2)                                        |           -6 |            -4 |              -4 |
+| GESTEP        | =GESTEP(A1:A2, 0)<br>where A1:A2: 1, 2; `useArrayArithmetic: true` |  Spills 1, 1 |   Not checked |           VALUE |
+| GESTEP        | =GESTEP(A1:A3, 4) in B2<br>where A1:A3: 1, 5, 2                |            1 |   Not checked |           VALUE |
+| GESTEP        | =GESTEP(C1:C2, NA())<br>in row 3 or below, where C1:C2: `#N/A`, "x" |        VALUE |   Not checked |             N/A |
 
 A few of the rows above share a root cause worth stating once:
 
