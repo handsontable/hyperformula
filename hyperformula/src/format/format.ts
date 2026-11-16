@@ -409,6 +409,12 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
       hasNonZeroDigit = true
     }
 
+    /* a zero integer part is insignificant: only the `0` placeholders write it,
+     * through the padding below (`#.00` with 0.5 → `.50`, `#,##0` with 0 → `0`) */
+    if (integerPart === '0') {
+      integerPart = ''
+    }
+
     if (integerSkeleton.length > integerPart.length) {
       const padSizeInteger = countChars(integerSkeleton.substr(0, integerSkeleton.length - integerPart.length), '0')
       integerPart = padLeft(integerPart, padSizeInteger + integerPart.length)
