@@ -47,7 +47,7 @@ const FUNCTIONS_KEEPING_ARGUMENT_KIND = new Set(['ARRAYFORMULA', 'TRANSPOSE'])
 /**
  * Functions that declare `sizeOfResultArrayMethod` but return a plain value or a reference when they find a single cell.
  */
-const FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS = new Set(['XLOOKUP'])
+const FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS = new Set(['INDEX', 'XLOOKUP'])
 
 /**
  * Returns the expression inside any number of enclosing parentheses.
@@ -315,6 +315,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     const builtIn: Record<string, FunctionPluginDefinition> = {
       ARRAYFORMULA: ArrayPlugin,
       COLUMN: InformationPlugin,
+      INDEX: InformationPlugin,
       ROW: InformationPlugin,
       TRANSPOSE: MatrixPlugin,
       XLOOKUP: LookupPlugin,
