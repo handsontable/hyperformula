@@ -3,17 +3,225 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {BooleanPlugin} from './BooleanPlugin'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/** A CHOOSECOLS or CHOOSEROWS index classified without evaluating a formula expression. */
+type ChooseLiteralIndex =
+  | {kind: 'value', value: number}
+  | {kind: 'invalid'}
+  | {kind: 'unresolved'}
+
+/** The source dimension that CHOOSECOLS (columns) or CHOOSEROWS (rows) picks from. */
+type ChooseAxis = 'columns' | 'rows'
+
+/** The functions that share the CHOOSECOLS and CHOOSEROWS implementation. */
+type ChooseFunctionName = 'CHOOSECOLS' | 'CHOOSEROWS'
+
+/**
+ * Classifies a TAKE count expression whose value may be known before evaluation.
+ *
+ * @internal
+ */
+type TakeLiteralNumber =
+  | {kind: 'value', value: number}
+  | {kind: 'invalid'}
+  | {kind: 'unresolved'}
+
+/**
+ * Distinguishes an omitted or empty TAKE count from an expression whose value
+ * cannot be resolved during static result-size prediction.
+ *
+ * @internal
+ */
+type TakeLiteralDimension = TakeLiteralNumber | {kind: 'unbounded'}
+
 export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ArrayPlugin> {
+  /**
+   * Classifies an index literal for static CHOOSECOLS and CHOOSEROWS result-size prediction.
+   *
+   * @param {Ast} argument - The index argument to inspect without evaluating formulas.
+   * @returns {ChooseLiteralIndex} A coerced literal value, an invalid marker, or an unresolved marker.
+   */
+  private parseChooseLiteralIndex(argument: Ast): ChooseLiteralIndex {
+    if (argument.type === AstNodeType.NUMBER) {
+      return {kind: 'value', value: Math.trunc(argument.value)}
+    }
+
+    if (argument.type === AstNodeType.STRING) {
+      const coercedValue = this.arithmeticHelper.coerceToMaybeNumber(argument.value)
+      if (coercedValue === undefined) {
+        return {kind: 'invalid'}
+      }
+      return {kind: 'value', value: Math.trunc(getRawValue(coercedValue))}
+    }
+
+    if (argument.type === AstNodeType.EMPTY || argument.type === AstNodeType.ERROR || argument.type === AstNodeType.ERROR_WITH_RAW_INPUT) {
+      return {kind: 'invalid'}
+    }
+
+    if (argument.type === AstNodeType.PLUS_UNARY_OP || argument.type === AstNodeType.MINUS_UNARY_OP) {
+      const index = this.parseChooseLiteralIndex(argument.value)
+      if (index.kind !== 'value') {
+        return index
+      }
+      return {
+        kind: 'value',
+        value: argument.type === AstNodeType.MINUS_UNARY_OP ? -index.value : index.value,
+      }
+    }
+
+    if (argument.type === AstNodeType.PARENTHESIS) {
+      return this.parseChooseLiteralIndex(argument.expression)
+    }
+
+    return {kind: 'unresolved'}
+  }
+
+  /**
+   * Evaluates the dependency-free subset of TAKE count expressions used for
+   * static result-size prediction.
+   *
+   * @param {Ast | undefined} argument - The count expression to inspect before evaluation.
+   * @returns {TakeLiteralNumber} The constant value, an invalid-literal marker, or an unresolved marker.
+   * @internal
+   */
+  private parseTakeLiteralNumber(argument: Ast | undefined): TakeLiteralNumber {
+    if (argument?.type === AstNodeType.NUMBER) {
+      return {kind: 'value', value: argument.value}
+    }
+
+    if (argument?.type === AstNodeType.STRING) {
+      const coercedValue = this.arithmeticHelper.coerceToMaybeNumber(argument.value)
+      if (coercedValue === undefined) {
+        return {kind: 'invalid'}
+      }
+      return {kind: 'value', value: getRawValue(coercedValue)}
+    }
+
+    if (argument?.type === AstNodeType.ERROR || argument?.type === AstNodeType.ERROR_WITH_RAW_INPUT) {
+      return {kind: 'invalid'}
+    }
+
+    if (argument?.type === AstNodeType.PLUS_UNARY_OP || argument?.type === AstNodeType.MINUS_UNARY_OP) {
+      const dimension = this.parseTakeLiteralNumber(argument.value)
+      if (dimension.kind !== 'value') {
+        return dimension
+      }
+      return {kind: 'value', value: argument.type === AstNodeType.MINUS_UNARY_OP ? -dimension.value : dimension.value}
+    }
+
+    if (argument?.type === AstNodeType.PARENTHESIS) {
+      return this.parseTakeLiteralNumber(argument.expression)
+    }
+
+    if (argument?.type === AstNodeType.PERCENT_OP) {
+      const dimension = this.parseTakeLiteralNumber(argument.value)
+      if (dimension.kind !== 'value') {
+        return dimension
+      }
+      return {kind: 'value', value: getRawValue(this.arithmeticHelper.unaryPercent(dimension.value))}
+    }
+
+    if (
+      argument?.type === AstNodeType.FUNCTION_CALL
+      && argument.args.length === 0
+      && (argument.procedureName === 'TRUE' || argument.procedureName === 'FALSE')
+      && this.interpreter.isFunctionImplementedBy(argument.procedureName, BooleanPlugin)
+    ) {
+      return {kind: 'value', value: argument.procedureName === 'TRUE' ? 1 : 0}
+    }
+
+    if (
+      argument?.type === AstNodeType.PLUS_OP
+      || argument?.type === AstNodeType.MINUS_OP
+      || argument?.type === AstNodeType.TIMES_OP
+      || argument?.type === AstNodeType.DIV_OP
+      || argument?.type === AstNodeType.POWER_OP
+    ) {
+      const left = this.parseTakeLiteralNumber(argument.left)
+      const right = this.parseTakeLiteralNumber(argument.right)
+      if (left.kind === 'invalid' || right.kind === 'invalid') {
+        return {kind: 'invalid'}
+      }
+      if (left.kind === 'value' && right.kind === 'value') {
+        let value: number
+        switch (argument.type) {
+          case AstNodeType.PLUS_OP:
+            value = this.arithmeticHelper.addWithEpsilonRaw(left.value, right.value)
+            break
+          case AstNodeType.MINUS_OP:
+            value = getRawValue(this.arithmeticHelper.subtract(left.value, right.value))
+            break
+          case AstNodeType.TIMES_OP:
+            value = getRawValue(this.arithmeticHelper.multiply(left.value, right.value))
+            break
+          case AstNodeType.DIV_OP: {
+            const quotient = this.arithmeticHelper.divide(left.value, right.value)
+            if (quotient instanceof CellError) {
+              return {kind: 'invalid'}
+            }
+            value = getRawValue(quotient)
+            break
+          }
+          case AstNodeType.POWER_OP:
+            value = this.arithmeticHelper.pow(left.value, right.value)
+            break
+        }
+        return Number.isFinite(value) ? {kind: 'value', value} : {kind: 'invalid'}
+      }
+    }
+
+    return {kind: 'unresolved'}
+  }
+
+  /**
+   * Converts a statically resolved TAKE count into its output dimension.
+   *
+   * @param {Ast | undefined} argument - The count expression to classify.
+   * @returns {TakeLiteralDimension} The non-negative truncated dimension or its invalid, unresolved, or unbounded classification.
+   * @internal
+   */
+  private parseTakeLiteralDimension(argument: Ast | undefined): TakeLiteralDimension {
+    if (argument === undefined || argument.type === AstNodeType.EMPTY) {
+      return {kind: 'unbounded'}
+    }
+
+    const dimension = this.parseTakeLiteralNumber(argument)
+    return dimension.kind === 'value'
+      ? {kind: 'value', value: Math.abs(Math.trunc(dimension.value))}
+      : dimension
+  }
+
+  /**
+   * Resolves a direct TAKE source reference without evaluating its values.
+   * The range supplies materialized dimensions only; spill placement never
+   * depends on its sheet.
+   *
+   * @param {Ast} argument - The source expression to inspect.
+   * @param {InterpreterState} state - The formula state used to resolve relative addresses.
+   * @returns {AbsoluteCellRange | undefined} The source range, or `undefined` for a computed array.
+   * @internal
+   */
+  private takeSourceRange(argument: Ast, state: InterpreterState): AbsoluteCellRange | undefined {
+    if (argument.type === AstNodeType.PARENTHESIS) {
+      return this.takeSourceRange(argument.expression, state)
+    }
+    if (argument.type === AstNodeType.CELL_RANGE || argument.type === AstNodeType.COLUMN_RANGE || argument.type === AstNodeType.ROW_RANGE) {
+      return AbsoluteCellRange.fromAstOrUndef(argument, state.formulaAddress)
+    }
+    return undefined
+  }
+
   public static implementedFunctions: ImplementedFunctions = {
     'ARRAYFORMULA': {
       method: 'arrayformula',
@@ -42,6 +250,39 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: FunctionArgumentType.RANGE},
       ],
       repeatLastArgs: 1,
+    },
+    'CHOOSECOLS': {
+      method: 'choosecols',
+      sizeOfResultArrayMethod: 'choosecolsArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+      ],
+      repeatLastArgs: 1,
+      vectorizationForbidden: true,
+    },
+    'CHOOSEROWS': {
+      method: 'chooserows',
+      sizeOfResultArrayMethod: 'chooserowsArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+      ],
+      repeatLastArgs: 1,
+      vectorizationForbidden: true,
+    },
+    'TAKE': {
+      method: 'take',
+      sizeOfResultArrayMethod: 'takeArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
+      ],
+      vectorizationForbidden: true,
     },
     'VSTACK': {
       method: 'vstack',
@@ -171,6 +412,341 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const width = Math.max(...(subChecks).map(val => val.width))
     const height = Math.max(...(subChecks).map(val => val.height))
     return new ArraySize(width, height)
+  }
+
+  /**
+   * Corresponds to CHOOSECOLS(array, col_num1, [col_num2], ...).
+   *
+   * Returns the requested source columns in argument order. Positive indexes
+   * count from the left, negative indexes count from the right, and duplicate
+   * indexes duplicate their columns in the result.
+   *
+   * @param {ProcedureAst} ast - The parsed function-call AST node.
+   * @param {InterpreterState} state - The current interpreter evaluation state.
+   * @returns {InterpreterValue} The selected source columns or a spreadsheet error.
+   */
+  public choosecols(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.chooseAlongAxis(ast, state, 'CHOOSECOLS', 'columns')
+  }
+
+  /**
+   * Predicts the CHOOSECOLS spill size from the source height and index count.
+   *
+   * @param {ProcedureAst} ast - The parsed function-call AST node.
+   * @param {InterpreterState} state - The current interpreter evaluation state.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  public choosecolsArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    return this.chooseArraySize(ast, state, 'CHOOSECOLS', 'columns')
+  }
+
+  /**
+   * Corresponds to CHOOSEROWS(array, row_num1, [row_num2], ...).
+   *
+   * Returns the requested source rows in argument order. Positive indexes
+   * count from the top, negative indexes count from the bottom, and duplicate
+   * indexes duplicate their rows in the result.
+   *
+   * @param {ProcedureAst} ast - The parsed function-call AST node.
+   * @param {InterpreterState} state - The current interpreter evaluation state.
+   * @returns {InterpreterValue} The selected source rows or a spreadsheet error.
+   */
+  public chooserows(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.chooseAlongAxis(ast, state, 'CHOOSEROWS', 'rows')
+  }
+
+  /**
+   * Predicts the CHOOSEROWS spill size from the source width and index count.
+   *
+   * @param {ProcedureAst} ast - The parsed function-call AST node.
+   * @param {InterpreterState} state - The current interpreter evaluation state.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  public chooserowsArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    return this.chooseArraySize(ast, state, 'CHOOSEROWS', 'rows')
+  }
+
+  /**
+   * Shared implementation of CHOOSECOLS and CHOOSEROWS: returns the source
+   * columns or rows named by the indexes, in argument order.
+   *
+   * @param {ProcedureAst} ast - The parsed function-call AST node.
+   * @param {InterpreterState} state - The current interpreter evaluation state.
+   * @param {ChooseFunctionName} functionName - The function whose metadata drives argument handling.
+   * @param {ChooseAxis} axis - The source dimension the indexes pick from.
+   * @returns {InterpreterValue} The selected source columns or rows, or a spreadsheet error.
+   */
+  private chooseAlongAxis(ast: ProcedureAst, state: InterpreterState, functionName: ChooseFunctionName, axis: ChooseAxis): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata(functionName),
+      (range: SimpleRangeValue, ...indexNumbers: number[]) => {
+        const sourceWidth = range.width()
+        const sourceHeight = range.height()
+
+        if (sourceHeight === 0 || sourceWidth === 0) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+        }
+
+        const chosenLength = axis === 'columns' ? sourceWidth : sourceHeight
+        const indexes = indexNumbers.map(indexNumber => Math.trunc(indexNumber))
+
+        if (indexes.some(index =>
+          !Number.isFinite(index) || index === 0 || Math.abs(index) > chosenLength
+        )) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.IndexBounds)
+        }
+
+        const zeroBasedIndexes = indexes.map(index =>
+          index > 0 ? index - 1 : chosenLength + index
+        )
+
+        const sourceRange = range.range
+        const startsRightOfFirstColumn = axis === 'rows'
+          && sourceRange !== undefined
+          && !Number.isFinite(sourceRange.width())
+          && state.formulaAddress.col !== 0
+
+        if (startsRightOfFirstColumn) {
+          return new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult)
+        }
+
+        if (sourceRange !== undefined) {
+          const selectedLines = zeroBasedIndexes.map(index => {
+            const lineRange = axis === 'columns'
+              ? AbsoluteCellRange.spanFrom(sourceRange.getAddress(index, 0), 1, sourceHeight)
+              : AbsoluteCellRange.spanFrom(sourceRange.getAddress(0, index), sourceWidth, 1)
+            return SimpleRangeValue.onlyRange(lineRange, this.dependencyGraph).data
+          })
+          const result = axis === 'columns'
+            ? Array.from({length: sourceHeight}, (_, row) => selectedLines.map(column => column[row][0]))
+            : selectedLines.map(row => row[0])
+          return SimpleRangeValue.onlyValues(result)
+        }
+
+        const result = axis === 'columns'
+          ? range.data.map(row => zeroBasedIndexes.map(index => row[index]))
+          : zeroBasedIndexes.map(index => range.data[index])
+        return SimpleRangeValue.onlyValues(result)
+      }
+    )
+  }
+
+  /**
+   * Predicts the CHOOSECOLS or CHOOSEROWS spill size: one result column or
+   * row per index, each as long as the source's other dimension.
+   *
+   * Invalid literals are rejected before spill allocation. A whole-column
+   * (CHOOSECOLS) or whole-row (CHOOSEROWS) result spills only from the first
+   * output row or column, where its source range supplies the materialized
+   * spill length. Below the first row a whole-column CHOOSECOLS result keeps
+   * its unbounded height, so array-space validation returns a spill error
+   * while the formula still evaluates inside another function. Outside the
+   * first column a whole-row CHOOSEROWS result is an invalid size.
+   *
+   * @param {ProcedureAst} ast - The parsed function-call AST node.
+   * @param {InterpreterState} state - The current interpreter evaluation state.
+   * @param {ChooseFunctionName} functionName - The function whose metadata drives argument handling.
+   * @param {ChooseAxis} axis - The source dimension the indexes pick from.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  private chooseArraySize(ast: ProcedureAst, state: InterpreterState, functionName: ChooseFunctionName, axis: ChooseAxis): ArraySize {
+    if (ast.args.length < 2) {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata(functionName)
+    const sourceSize = this.arraySizeForAst(
+      ast.args[0],
+      new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
+    )
+    const chosenLength = axis === 'columns' ? sourceSize.width : sourceSize.height
+    const keptLength = axis === 'columns' ? sourceSize.height : sourceSize.width
+
+    let sourceAst = ast.args[0]
+    while (sourceAst.type === AstNodeType.PARENTHESIS) {
+      sourceAst = sourceAst.expression
+    }
+
+    if (axis === 'rows' && this.isUnpredictedSize(sourceAst, sourceSize)) {
+      return ArraySize.error()
+    }
+
+    const startsOutsideFirstLine = !Number.isFinite(keptLength) && (axis === 'columns'
+      ? state.formulaAddress.row !== 0
+      : state.formulaAddress.col !== 0)
+    const sourceRange = sourceAst.type === (axis === 'columns' ? AstNodeType.COLUMN_RANGE : AstNodeType.ROW_RANGE)
+      ? AbsoluteCellRange.fromAstOrUndef(sourceAst, state.formulaAddress)
+      : undefined
+    let effectiveKeptLength = keptLength
+    if (!Number.isFinite(keptLength) && sourceRange !== undefined) {
+      effectiveKeptLength = axis === 'columns'
+        ? sourceRange.effectiveHeight(this.dependencyGraph)
+        : sourceRange.effectiveWidth(this.dependencyGraph)
+    }
+
+    for (const argument of ast.args.slice(1)) {
+      const index = this.parseChooseLiteralIndex(argument)
+      if (
+        index.kind === 'invalid'
+        || (index.kind === 'value' && (
+          !Number.isFinite(index.value)
+          || index.value === 0
+          || Math.abs(index.value) > chosenLength
+        ))
+      ) {
+        return ArraySize.error()
+      }
+    }
+
+    const indexCount = ast.args.length - 1
+    if (startsOutsideFirstLine && axis === 'columns') {
+      return new ArraySize(indexCount, keptLength)
+    }
+
+    if (startsOutsideFirstLine || effectiveKeptLength < 1) {
+      return ArraySize.error()
+    }
+
+    return axis === 'columns'
+      ? new ArraySize(indexCount, effectiveKeptLength)
+      : new ArraySize(effectiveKeptLength, indexCount)
+  }
+
+  /**
+   * Tells whether a CHOOSEROWS source has a size that cannot be predicted
+   * before evaluation, such as a named expression or a function whose result
+   * size depends on cell values. Size prediction reports such a source as
+   * one cell, which only a cell reference or a one-cell range really is.
+   *
+   * @param {Ast} sourceAst - The source argument, without enclosing parentheses.
+   * @param {ArraySize} sourceSize - The predicted size of the source.
+   * @returns {boolean} True when the source's real size is unknown.
+   */
+  private isUnpredictedSize(sourceAst: Ast, sourceSize: ArraySize): boolean {
+    return sourceSize.isRef
+      && sourceSize.width === 1
+      && sourceSize.height === 1
+      && sourceAst.type !== AstNodeType.CELL_REFERENCE
+      && sourceAst.type !== AstNodeType.CELL_RANGE
+  }
+
+  /**
+   * Corresponds to TAKE(array, rows, [columns]).
+   *
+   * Returns rows and columns from the beginning or end of the source array.
+   * Syntactically empty dimensions keep all rows or columns. Counts that
+   * evaluate to zero return a #N/A error.
+   *
+   * @param {ProcedureAst} ast - The parsed TAKE call.
+   * @param {InterpreterState} state - The current formula evaluation state.
+   * @returns {InterpreterValue} The selected source values or a spreadsheet error.
+   */
+  public take(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    // rows is required but may be left empty, as in TAKE(array, , columns), which keeps
+    // every row; a default would make the metadata report it as optional.
+    const rowsLeftEmpty = ast.args[1]?.type === AstNodeType.EMPTY
+
+    return this.runFunction(ast.args, state, this.metadata('TAKE'),
+      (range: SimpleRangeValue, rows: number, columns: number) => {
+        const sourceHeight = range.height()
+        const sourceWidth = range.width()
+        const requestedRows = rowsLeftEmpty ? Number.POSITIVE_INFINITY : Math.trunc(rows)
+        const requestedColumns = Math.trunc(columns)
+
+        if (requestedRows === 0 || requestedColumns === 0) {
+          return new CellError(ErrorType.NA, ErrorMessage.ZeroRowOrColumnCount)
+        }
+
+        if (sourceHeight === 0 || sourceWidth === 0) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+        }
+
+        const rowsToTake = Math.min(Math.abs(requestedRows), sourceHeight)
+        const columnsToTake = Math.min(Math.abs(requestedColumns), sourceWidth)
+        const startRow = requestedRows > 0 ? 0 : sourceHeight - rowsToTake
+        const startColumn = requestedColumns > 0 ? 0 : sourceWidth - columnsToTake
+        const sourceRange = range.range
+
+        if (sourceRange !== undefined) {
+          // Keep address-backed ranges lazy to avoid materializing cells outside the TAKE result.
+          const resultRange = AbsoluteCellRange.spanFrom(
+            sourceRange.getAddress(startColumn, startRow),
+            columnsToTake,
+            rowsToTake,
+          )
+          const result = SimpleRangeValue.onlyRange(resultRange, this.dependencyGraph).data
+          return SimpleRangeValue.onlyValues(result)
+        }
+
+        const result = range.data
+          .slice(startRow, startRow + rowsToTake)
+          .map(row => row.slice(startColumn, startColumn + columnsToTake))
+
+        return SimpleRangeValue.onlyValues(result)
+      }
+    )
+  }
+
+  /**
+   * Calculates the spilled array size of TAKE using the source dimensions as
+   * the upper bound. Finite counts are capped at the configured sheet limits.
+   * Direct references that remain unbounded use their effective dimensions,
+   * while computed sources use the configured limit. Unbounded dimensions are
+   * valid only at the corresponding output-sheet edge.
+   *
+   * An unbounded result anchored away from the required sheet edge retains its
+   * unbounded predicted dimension so array-space validation returns a spill
+   * error without evaluating TAKE as a scalar formula.
+   *
+   * @param {ProcedureAst} ast - The parsed TAKE call.
+   * @param {InterpreterState} state - The formula state whose address anchors the spill.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
+   */
+  public takeArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 2 || ast.args.length > 3) {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata('TAKE')
+    const sourceSize = this.arraySizeForAst(
+      ast.args[0],
+      new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
+    )
+
+    const rowDimension = this.parseTakeLiteralDimension(ast.args[1])
+    const columnDimension = this.parseTakeLiteralDimension(ast.args[2])
+
+    const hasZeroDimension = (rowDimension.kind === 'value' && rowDimension.value === 0)
+      || (columnDimension.kind === 'value' && columnDimension.value === 0)
+
+    if (rowDimension.kind === 'invalid' || columnDimension.kind === 'invalid' || hasZeroDimension) {
+      return ArraySize.error()
+    }
+
+    const height = rowDimension.kind === 'value'
+      ? Math.min(sourceSize.height, rowDimension.value, this.config.maxRows)
+      : sourceSize.height
+    const width = columnDimension.kind === 'value'
+      ? Math.min(sourceSize.width, columnDimension.value, this.config.maxColumns)
+      : sourceSize.width
+    const sourceRange = this.takeSourceRange(ast.args[0], state)
+    const startsBelowFirstRow = rowDimension.kind === 'unbounded' && !Number.isFinite(height) && state.formulaAddress.row !== 0
+    const startsRightOfFirstColumn = columnDimension.kind === 'unbounded' && !Number.isFinite(width) && state.formulaAddress.col !== 0
+    const effectiveHeight = !Number.isFinite(height)
+      ? sourceRange?.effectiveHeight(this.dependencyGraph) ?? this.config.maxRows
+      : height
+    const effectiveWidth = !Number.isFinite(width)
+      ? sourceRange?.effectiveWidth(this.dependencyGraph) ?? this.config.maxColumns
+      : width
+
+    if (startsBelowFirstRow || startsRightOfFirstColumn) {
+      return new ArraySize(width, height)
+    }
+
+    if (effectiveHeight < 1 || effectiveWidth < 1) {
+      return ArraySize.error()
+    }
+
+    return new ArraySize(effectiveWidth, effectiveHeight)
   }
 
   /**
