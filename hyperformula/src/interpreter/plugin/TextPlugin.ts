@@ -544,7 +544,9 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
           if (coerced instanceof CellError) {
             return coerced
           }
-          texts.push(...coerced)
+          for (const text of coerced) {
+            texts.push(text)
+          }
         }
 
         const parts = ignoreEmpty ? texts.filter((t) => t !== '') : texts
