@@ -46,7 +46,7 @@ Use one of the following options:
 2. Write each date in a format listed in [`dateFormats`](../api/interfaces/configparams.md#dateformats), for example `'01/01/2026'` with the default settings.
 3. Add the format you use to [`dateFormats`](../api/interfaces/configparams.md#dateformats). Setting this option replaces the default list, so keep the default formats if you still need them.
 
-HyperFormula's `DATEVALUE` function takes text, not a date. Pass it a string in one of the `dateFormats` (option 2), or add your format to `dateFormats` (option 3). Passing it a `DATE` result returns `#VALUE!`.
+HyperFormula's `DATEVALUE` function takes text, such as `=DATEVALUE("01/01/2026")`. A cell whose content matches `dateFormats` (options 2 and 3) already holds a date and needs no `DATEVALUE`: passing it such a cell, or a `DATE` result, returns `#VALUE!`.
 
 Option 3 covers date-only ISO strings such as `2026-01-01`. For full ISO timestamps such as `2026-01-01T00:00:00.000Z`, remove the time part before you pass the data (for example, `value.slice(0, 10)`), or parse the timestamps with a custom [`parseDateTime`](#custom-date-and-time-handling) function.
 
