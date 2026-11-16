@@ -5,10 +5,31 @@
 
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {ProcedureAst} from '../../parser'
+import {Maybe} from '../../Maybe'
+import {Ast, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalNoErrorScalarValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+
+/**
+ * For a call to `IF` or `CHOOSE`, the argument that its last evaluation returned. A call that returned
+ * none of its arguments, such as one whose selector is an error or out of range, one that returned the
+ * default value of an omitted argument, or one that returned an array, has no entry.
+ */
+const selectedArguments = new WeakMap<ProcedureAst, Ast>()
+
+/**
+ * Returns the argument that the call to `IF` or `CHOOSE` returned when it was last evaluated, so that
+ * a function that has just evaluated the call can tell whether its result is the content of a
+ * referenced cell.
+ *
+ * @param {ProcedureAst} ast - a call to `IF` or `CHOOSE` evaluated by this plugin
+ * @returns {Maybe<Ast>} the returned argument, or `undefined` when the call returned none of its arguments
+ */
+export function selectedArgument(ast: ProcedureAst): Maybe<Ast> {
+  return selectedArguments.get(ast)
+}
 
 /**
  * Interpreter plugin containing boolean functions
@@ -135,9 +156,12 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    * @param state
    */
   public conditionalIf(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('IF'), (condition, arg2, arg3) => {
+    selectedArguments.delete(ast)
+    const result = this.runFunction(ast.args, state, this.metadata('IF'), (condition, arg2, arg3) => {
+      recordSelectedArgument(ast, condition ? 1 : 2)
       return condition ? arg2 : arg3
     })
+    return forgetSelectionUnlessScalar(ast, result)
   }
 
   /**
@@ -242,11 +266,43 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   }
 
   public choose(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('CHOOSE'), (selector, ...args) => {
+    selectedArguments.delete(ast)
+    const result = this.runFunction(ast.args, state, this.metadata('CHOOSE'), (selector: number, ...args) => {
       if (selector > args.length) {
         return new CellError(ErrorType.NUM, ErrorMessage.Selector)
       }
+      recordSelectedArgument(ast, selector)
       return args[selector - 1]
     })
+    return forgetSelectionUnlessScalar(ast, result)
   }
+}
+
+/**
+ * Records that a call to `IF` or `CHOOSE` returned its argument at the given position.
+ *
+ * @param {ProcedureAst} ast - the call
+ * @param {number} position - the position of the returned argument in `ast.args`
+ */
+function recordSelectedArgument(ast: ProcedureAst, position: number): void {
+  const argument = ast.args[position]
+  if (argument === undefined) {
+    selectedArguments.delete(ast)
+  } else {
+    selectedArguments.set(ast, argument)
+  }
+}
+
+/**
+ * Removes the record of a call that returned an array, where each cell can come from a different argument.
+ *
+ * @param {ProcedureAst} ast - the call
+ * @param {InterpreterValue} result - what the call returned
+ * @returns {InterpreterValue} `result`, unchanged
+ */
+function forgetSelectionUnlessScalar(ast: ProcedureAst, result: InterpreterValue): InterpreterValue {
+  if (result instanceof SimpleRangeValue) {
+    selectedArguments.delete(ast)
+  }
+  return result
 }

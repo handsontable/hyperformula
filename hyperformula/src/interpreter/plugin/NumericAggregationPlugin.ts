@@ -19,7 +19,7 @@ import {MomentsAggregate} from './MomentsAggregate'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginDefinition, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 import {RangeVertex} from '../../DependencyGraph'
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
-import {BooleanPlugin} from './BooleanPlugin'
+import {BooleanPlugin, selectedArgument} from './BooleanPlugin'
 import {InformationPlugin} from './InformationPlugin'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
@@ -580,17 +580,17 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   }
 
   /**
-   * Tells whether an argument other than a bare reference or range evaluates to the content of a
-   * referenced cell, so that the aggregation ignores its non-numeric values as it does for `A1`.
+   * Tells whether an argument other than a bare reference or range, which has just been evaluated,
+   * returned the content of a referenced cell, so that the aggregation ignores its non-numeric values
+   * as it does for `A1`.
    *
    * That holds for a parenthesized reference, a named expression defined as a reference, `INDEX`
-   * over a reference, and `IF` or `CHOOSE` whose every result argument is one of these or a number
-   * literal. A number reads the same whether it comes from a cell or not, so a number literal does
-   * not change how the result is read. `INDEX`, `IF` and `CHOOSE` count only while the built-in
-   * implementation answers for them, not a custom plugin registered over their ids. The check looks
-   * only at the formula, so no argument is evaluated a second time.
+   * over a reference, and `IF` or `CHOOSE` whose evaluation returned one of these. `IF` and `CHOOSE`
+   * report the argument they returned, so no argument is evaluated a second time. `INDEX`, `IF` and
+   * `CHOOSE` count only while the built-in implementation answers for them, not a custom plugin
+   * registered over their ids.
    *
-   * @param {Ast} arg - the argument of the aggregation
+   * @param {Ast} arg - the argument of the aggregation, already evaluated
    * @param {InterpreterState} state - interpreter state
    * @returns {boolean} whether the value of `arg` is the content of a referenced cell
    */
@@ -613,29 +613,27 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   }
 
   /**
-   * The function-call case of {@link evaluatesToReference}: `INDEX` over a reference, and `IF` with
-   * three arguments or `CHOOSE` whose result arguments are all references or number literals.
+   * The function-call case of {@link evaluatesToReference}: `INDEX` over a reference, and `IF` or
+   * `CHOOSE` that returned a reference.
    *
-   * @param {ProcedureAst} ast - the function call passed to the aggregation
+   * @param {ProcedureAst} ast - the function call passed to the aggregation, already evaluated
    * @param {InterpreterState} state - interpreter state
-   * @returns {boolean} whether the function call returns the content of a referenced cell
+   * @returns {boolean} whether the function call returned the content of a referenced cell
    */
   private functionCallEvaluatesToReference(ast: ProcedureAst, state: InterpreterState): boolean {
-    const resultArgumentIsReferenceOrNumber = (resultArg: Ast) => isNumberLiteral(resultArg) || this.evaluatesToReference(resultArg, state)
-
     switch (ast.procedureName) {
       case 'INDEX':
         return this.isBuiltIn('INDEX', InformationPlugin)
           && ast.args.length >= 1
           && this.evaluatesToReference(ast.args[0], state)
       case 'IF':
-        return this.isBuiltIn('IF', BooleanPlugin)
-          && ast.args.length === 3
-          && ast.args.slice(1).every(resultArgumentIsReferenceOrNumber)
-      case 'CHOOSE':
-        return this.isBuiltIn('CHOOSE', BooleanPlugin)
-          && ast.args.length >= 2
-          && ast.args.slice(1).every(resultArgumentIsReferenceOrNumber)
+      case 'CHOOSE': {
+        if (!this.isBuiltIn(ast.procedureName, BooleanPlugin)) {
+          return false
+        }
+        const returnedArgument = selectedArgument(ast)
+        return returnedArgument !== undefined && this.evaluatesToReference(returnedArgument, state)
+      }
       default:
         return false
     }
@@ -786,26 +784,6 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
 
     return rangeResult
-  }
-}
-
-/**
- * Tells whether an AST is a number literal, optionally signed or in parentheses, such as `0` or `-1`.
- *
- * @param {Ast} ast - the AST to check
- * @returns {boolean} whether the AST always evaluates to the same number
- */
-function isNumberLiteral(ast: Ast): boolean {
-  switch (ast.type) {
-    case AstNodeType.NUMBER:
-      return true
-    case AstNodeType.PARENTHESIS:
-      return isNumberLiteral(ast.expression)
-    case AstNodeType.MINUS_UNARY_OP:
-    case AstNodeType.PLUS_UNARY_OP:
-      return isNumberLiteral(ast.value)
-    default:
-      return false
   }
 }
 
