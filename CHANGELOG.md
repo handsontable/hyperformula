@@ -19,7 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. [#1885](https://github.com/handsontable/hyperformula/pull/1885)
 - Changed the `TEXT` function to write the separators set by the `decimalSeparator` and `thousandSeparator` options: with a comma decimal separator, `=TEXT(1,5; "0.00")` returns `1,50` instead of `1.50`, and by default `=TEXT(5, "0,000")` returns `0005` instead of `5,000`. [#1716](https://github.com/handsontable/hyperformula/pull/1716)
-- Changed the `TEXT` function to return `#VALUE!` instead of text for a mask with an unclosed `[` or `"`, or a lone `\` at its end: `=TEXT(5, "0[")` returned `5[`. [#1716](https://github.com/handsontable/hyperformula/pull/1716)
+- Changed the `TEXT` function to return `#VALUE!` instead of text for a mask with an unclosed `[` or `"`, or a lone `\` at its end: `=TEXT(5, "0[")` now returns `#VALUE!` instead of `5[`. [#1716](https://github.com/handsontable/hyperformula/pull/1716)
 - Changed the `stringifyDateTime` and `stringifyDuration` callbacks to receive the number-format mask without its color section, for example `dd-mm-yyyy` for `[Red]dd-mm-yyyy`, and not to be called for a mask that `TEXT` rejects with `#VALUE!`. [#1716](https://github.com/handsontable/hyperformula/pull/1716)
 
 ### Fixed
