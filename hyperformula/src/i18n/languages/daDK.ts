@@ -18,6 +18,7 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#VÆRDI!',
   },
   functions: {
+    CHOOSECOLS: 'VÆLGKOL',
     FILTER: 'FILTER',
     VSTACK: 'VSTAK',
     HSTACK: 'HSTAK',

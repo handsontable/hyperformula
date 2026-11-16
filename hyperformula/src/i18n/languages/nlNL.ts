@@ -18,6 +18,7 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#WAARDE!',
   },
   functions: {
+    CHOOSECOLS: 'KIES.KOLOMMEN',
     FILTER: 'FILTER',
     VSTACK: 'VERT.STAPELEN',
     HSTACK: 'HOR.STAPELEN',
