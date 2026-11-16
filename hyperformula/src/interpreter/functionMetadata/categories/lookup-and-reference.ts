@@ -25,6 +25,20 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=CHOOSE(2, "apple", "banana", "cherry")', '=CHOOSE(1, A1, A2, A3)'],
   },
+  CHOOSECOLS: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns specified columns from an array.',
+    parameters: [{name: 'array', description: 'The array or range containing the columns to return.'}, {name: 'col_num1', description: 'The first column to return. Positive values count from the left and negative values count from the right. Further column indexes can be passed as additional arguments.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=CHOOSECOLS(A1:E5, 1, 3, 5)', '=CHOOSECOLS(A1:D5, -1, -2)'],
+  },
+  CHOOSEROWS: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns specified rows from an array.',
+    parameters: [{name: 'array', description: 'The array or range containing the rows to return.'}, {name: 'row_num1', description: 'The first row to return. Positive values count from the top and negative values count from the bottom. Further row indexes can be passed as additional arguments.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=CHOOSEROWS(A1:E5, 1, 3, 5)', '=CHOOSEROWS(A1:D5, -1, -2)'],
+  },
   COLUMN: {
     category: 'Lookup and reference',
     shortDescription: 'Returns column number of a given reference or formula reference if argument not provided.',
@@ -127,6 +141,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'array', description: 'The range or array whose rows (or columns) are sorted.'}, {name: 'sort_index', description: 'The 1-based row or column index within array to sort by. Defaults to 1 (the first row or column).'}, {name: 'sort_order', description: '1 (default) sorts in ascending order; -1 sorts in descending order.'}, {name: 'by_col', description: 'FALSE (default) sorts the rows of array; TRUE sorts its columns.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=SORT(A1:A10)', '=SORT(A1:B10, 2, -1)'],
+  },
+  TAKE: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns specified rows or columns from the beginning or end of an array.',
+    parameters: [{name: 'array', description: 'The array or range from which to take rows or columns.'}, {name: 'rows', description: 'The number of rows to take; a negative value takes rows from the end. An empty argument keeps all rows.'}, {name: 'columns', description: 'The number of columns to take; a negative value takes columns from the end. When omitted or empty, all columns are kept.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TAKE(A1:C5, 2)', '=TAKE(A1:C5, -2, -1)', '=TAKE(A1:C5, , 2)'],
   },
   TRANSPOSE: {
     category: 'Lookup and reference',

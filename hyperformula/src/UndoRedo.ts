@@ -7,6 +7,7 @@ import {equalSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Ce
 import {RawCellContent} from './CellContentParser'
 import {ClipboardCell} from './ClipboardOperations'
 import {Config} from './Config'
+import {Ast} from './parser/Ast'
 import {InternalNamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {
   AddColumnsCommand,
@@ -475,11 +476,11 @@ export class BatchUndoEntry extends BaseUndoEntry {
  * For example, when a row is removed, formulas referencing that row are rewritten
  * to `#REF!` — an irreversible change.
  *
- * To support undo of such operations, `oldData` stores snapshots of formula AST
- * hashes keyed by the LazilyTransformingAstService version at which the irreversible
+ * To support undo of such operations, `oldData` stores formula AST references
+ * keyed by the LazilyTransformingAstService version at which the irreversible
  * transformation was applied. Each entry maps a version number to an array of
- * `[cellAddress, astHash]` pairs that can be used to restore the original formula
- * from the parser cache.
+ * `[cellAddress, ast]` pairs. These references keep the original formulas available
+ * independently of parser cache eviction, and are released when the snapshots expire.
  *
  * ### Memory Management
  *
@@ -498,7 +499,7 @@ export class BatchUndoEntry extends BaseUndoEntry {
  *    would never be used.
  */
 export class UndoRedo {
-  public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
+  public oldData: Map<number, [SimpleCellAddress, Ast][]> = new Map()
   private undoStack: UndoEntry[] = []
   private redoStack: UndoEntry[] = []
   private readonly undoLimit: number
@@ -532,10 +533,10 @@ export class UndoRedo {
   }
 
   /**
-   * Stores a formula AST hash snapshot for the given LazilyTransformingAstService version.
+   * Retains a formula AST for the given LazilyTransformingAstService version.
    * Skipped when `undoLimit` is 0 (undo disabled) to avoid storing data that would never be used.
    */
-  public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
+  public storeDataForVersion(version: number, address: SimpleCellAddress, ast: Ast) {
     if (this.undoLimit === 0) {
       return
     }
@@ -543,7 +544,7 @@ export class UndoRedo {
       this.oldData.set(version, [])
     }
     const currentOldData = this.oldData.get(version)!
-    currentOldData.push([address, astHash])
+    currentOldData.push([address, ast])
   }
 
   /** Clears the redo stack and removes oldData entries no longer referenced by any remaining entry. */
@@ -927,8 +928,8 @@ export class UndoRedo {
   private restoreOldDataFromVersion(version: number) {
     const oldDataToRestore = this.oldData.get(version) || []
     for (const entryToRestore of oldDataToRestore) {
-      const [address, hash] = entryToRestore
-      this.operations.setFormulaToCellFromCache(hash, address)
+      const [address, ast] = entryToRestore
+      this.operations.setFormulaToCellFromAst(ast, address)
     }
   }
 }
