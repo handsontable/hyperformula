@@ -4,7 +4,7 @@
     <picture>
       <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/handsontable/hyperformula/develop/resources/hyperformula-logo-black.svg"/>
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/handsontable/hyperformula/develop/resources/hyperformula-logo-white.svg"/>
-      <img width="350" alt="HyperFormula - A headless spreadsheet, a parser and evaluator of Excel formulas" src="https://raw.githubusercontent.com/handsontable/hyperformula/develop/resources/hyperformula-logo-black.svg"/>
+      <img width="420" alt="HyperFormula - A headless spreadsheet, a parser and evaluator of Excel formulas" src="https://raw.githubusercontent.com/handsontable/hyperformula/develop/resources/hyperformula-logo-black.svg"/>
     </picture>
   </a>
 </p>
