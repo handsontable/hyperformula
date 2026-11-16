@@ -123,6 +123,8 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | CHOOSECOLS    | =SUM(CHOOSECOLS(Data!A:A, 1))<br>where the Data sheet is empty   | N/A | 0 | 0 |
 | CHOOSECOLS    | =COLUMNS(CHOOSECOLS(A1:C3, E1:F1))<br>where E1:F1: 1, 2         | VALUE (column indexes must be separate arguments) | 2 | 2 |
 | CHOOSECOLS    | =COLUMNS(CHOOSECOLS(A1:C3, {1,2}))                              | 1 (only the first index of an array is used) | 2 | 2 |
+| CHOOSEROWS    | =CHOOSEROWS(Data!1:1, 1)                                      | Spills the source sheet's used columns from column A; returns SPILL outside column A. | Returns every column of the source sheet's row. | Returns all 16,384 columns of the row. |
+| CHOOSEROWS    | =CHOOSEROWS(Data!A:A, -1)                                     | Returns the source sheet's last used row. | Returns the source sheet's last row. | Returns row 1,048,576. |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |

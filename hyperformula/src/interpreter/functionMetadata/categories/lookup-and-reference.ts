@@ -32,6 +32,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=CHOOSECOLS(A1:E5, 1, 3, 5)', '=CHOOSECOLS(A1:D5, -1, -2)'],
   },
+  CHOOSEROWS: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns specified rows from an array.',
+    parameters: [{name: 'array', description: 'The array or range containing the rows to return.'}, {name: 'row_num1', description: 'The first row to return. Positive values count from the top and negative values count from the bottom. Further row indexes can be passed as additional arguments.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=CHOOSEROWS(A1:E5, 1, 3, 5)', '=CHOOSEROWS(A1:D5, -1, -2)'],
+  },
   COLUMN: {
     category: 'Lookup and reference',
     shortDescription: 'Returns column number of a given reference or formula reference if argument not provided.',

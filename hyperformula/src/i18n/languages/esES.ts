@@ -19,6 +19,7 @@ export const dictionary: RawTranslationPackage = {
   },
   functions: {
     CHOOSECOLS: 'ELEGIRCOLS',
+    CHOOSEROWS: 'ELEGIRFILAS',
     FILTER: 'FILTER',
     VSTACK: 'APILARV',
     HSTACK: 'APILARH',
