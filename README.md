@@ -1,3 +1,20 @@
+<br>
+<p align="center">
+  <a href="https://hyperformula.handsontable.com/">
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/handsontable/hyperformula/develop/resources/hyperformula-logo-black.svg"/>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/handsontable/hyperformula/develop/resources/hyperformula-logo-white.svg"/>
+      <img width="350" alt="HyperFormula - A headless spreadsheet, a parser and evaluator of Excel formulas" src="https://raw.githubusercontent.com/handsontable/hyperformula/develop/resources/hyperformula-logo-black.svg"/>
+    </picture>
+  </a>
+</p>
+
+<p align="center">
+  <strong>A headless spreadsheet for business web apps</strong>
+</p>
+
+<hr>
+
 # HyperFormula monorepo
 
 [HyperFormula](https://hyperformula.handsontable.com/) is a headless spreadsheet calculation engine in TypeScript. It parses formulas, tracks cell dependencies, and recalculates incrementally, in the browser and in Node.
