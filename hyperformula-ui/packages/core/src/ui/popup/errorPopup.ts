@@ -299,6 +299,17 @@ export class ErrorPopup extends BasePopup {
       this.suppressedCell = null;
     }
 
+    if (
+      message &&
+      !this.isVisible() &&
+      cell !== this.suppressedCell &&
+      (cell === this.pointerCell || cell === this.focusCell)
+    ) {
+      this.anchorTo(cell, message);
+
+      return;
+    }
+
     if (cell !== this.activeCell || !this.isVisible()) {
       return;
     }

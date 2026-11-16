@@ -985,6 +985,38 @@ describe("ErrorPopup syncCell", () => {
     );
   });
 
+  it("reopens the tooltip when a new error lands on the cell that still holds focus", () => {
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    setCellError(cell, null);
+    popup.syncCell(cell);
+    setCellError(cell, "#REF!");
+    popup.syncCell(cell);
+
+    expect(popup.isVisible()).toBe(true);
+    expect(document.body.querySelector(sel(CN.errorPopupTitle))?.textContent).toBe("#REF!");
+  });
+
+  it("reopens the tooltip when a new error lands on the cell under the pointer", () => {
+    cell.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+    setCellError(cell, null);
+    popup.syncCell(cell);
+    setCellError(cell, "#REF!");
+    popup.syncCell(cell);
+
+    expect(popup.isVisible()).toBe(true);
+  });
+
+  it("keeps the tooltip closed when a new error lands on a cell that pointer and focus left", () => {
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    setCellError(cell, null);
+    popup.syncCell(cell);
+    cell.dispatchEvent(new FocusEvent("focusout", { bubbles: true, relatedTarget: document.body }));
+    setCellError(cell, "#REF!");
+    popup.syncCell(cell);
+
+    expect(popup.isVisible()).toBe(false);
+  });
+
   it("keeps the tooltip when another cell's error is cleared", () => {
     const other = document.createElement("div");
     document.body.appendChild(other);
