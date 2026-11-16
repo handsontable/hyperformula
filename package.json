@@ -582,6 +582,8 @@
     }
   },
   "overrides": {
-    "handlebars": "4.7.10"
+    "handlebars": "4.7.10",
+    "node-forge": "1.4.1",
+    "toml": "5.0.1"
   }
 }
