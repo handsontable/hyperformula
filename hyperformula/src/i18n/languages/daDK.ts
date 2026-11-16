@@ -239,6 +239,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'ÅRSAFSKRIVNING',
     T: 'T',
+    TAKE: 'TAG',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'STATSOBLIGATION',
