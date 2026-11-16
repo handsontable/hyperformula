@@ -315,7 +315,7 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    * @param {InterpreterState} state - the interpreter state
    */
   public couppcd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.couponFunction(ast, state, 'COUPPCD',
+    return this.couponFunction(ast, state, 'COUPPCD', true,
       (schedule: CouponSchedule) => this.dateTimeHelper.dateToNumber(schedule.previous)
     )
   }
@@ -329,7 +329,7 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    * @param {InterpreterState} state - the interpreter state
    */
   public coupncd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.couponFunction(ast, state, 'COUPNCD',
+    return this.couponFunction(ast, state, 'COUPNCD', false,
       (schedule: CouponSchedule) => this.dateTimeHelper.dateToNumber(schedule.next)
     )
   }
@@ -343,7 +343,7 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    * @param {InterpreterState} state - the interpreter state
    */
   public coupnum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.couponFunction(ast, state, 'COUPNUM',
+    return this.couponFunction(ast, state, 'COUPNUM', true,
       (schedule: CouponSchedule) => schedule.count
     )
   }
@@ -357,7 +357,7 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    * @param {InterpreterState} state - the interpreter state
    */
   public coupdaybs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.couponFunction(ast, state, 'COUPDAYBS',
+    return this.couponFunction(ast, state, 'COUPDAYBS', true,
       (schedule: CouponSchedule) => daysBeforeSettlement(this.dateTimeHelper, schedule)
     )
   }
@@ -372,7 +372,7 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    * @param {InterpreterState} state - the interpreter state
    */
   public coupdaysnc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.couponFunction(ast, state, 'COUPDAYSNC',
+    return this.couponFunction(ast, state, 'COUPDAYSNC', false,
       (schedule: CouponSchedule) => {
         if (schedule.basis === 0) {
           return thirtyDayPeriodLength(this.dateTimeHelper, schedule) - daysBeforeSettlement(this.dateTimeHelper, schedule)
@@ -393,7 +393,7 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    * @param {InterpreterState} state - the interpreter state
    */
   public coupdays(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.couponFunction(ast, state, 'COUPDAYS',
+    return this.couponFunction(ast, state, 'COUPDAYS', false,
       (schedule: CouponSchedule) => {
         switch (schedule.basis) {
           case 1:
@@ -719,18 +719,20 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
    *
    * Validates in Excel's order: settlement, maturity, settlement before maturity, then an empty settlement, maturity
    * or frequency argument (#N/A), then frequency and basis. An empty date is not compared with the other date. Builds
-   * the coupon schedule and passes it to `calculate`. A previous coupon date before the earliest supported date is
-   * #NUM!.
+   * the coupon schedule and passes it to `calculate`.
    *
    * @param {ProcedureAst} ast - the function's AST
    * @param {InterpreterState} state - the interpreter state
    * @param {string} functionName - the function's id, used to look up its metadata
+   * @param {boolean} checkPreviousCoupon - when true, a previous coupon date before the earliest supported date is
+   * #NUM!: COUPPCD would return that date and COUPDAYBS counts from it, and Excel returns #NUM! for COUPNUM there
    * @param {Function} calculate - computes the result from the coupon schedule
    */
   private couponFunction(
     ast: ProcedureAst,
     state: InterpreterState,
     functionName: string,
+    checkPreviousCoupon: boolean,
     calculate: (schedule: CouponSchedule) => number,
   ): InterpreterValue {
     const isArgumentEmpty = (index: number) => ast.args[index]?.type === AstNodeType.EMPTY
@@ -760,7 +762,7 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
         if (basis instanceof CellError) {
           return basis
         }
-        const schedule = buildCouponSchedule(this.dateTimeHelper, settlement, maturity, frequency, basis)
+        const schedule = buildCouponSchedule(this.dateTimeHelper, settlement, maturity, frequency, basis, checkPreviousCoupon)
         if (schedule instanceof CellError) {
           return schedule
         }

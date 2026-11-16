@@ -93,20 +93,21 @@ export interface SettlementPeriod {
 }
 
 /**
- * Builds the coupon schedule of a coupon function call from its validated arguments. A previous coupon date before
- * the earliest supported date is #NUM!.
+ * Builds the coupon schedule of a coupon function call from its validated arguments. When `checkPreviousCoupon` is
+ * true, a previous coupon date before the earliest supported date is #NUM!.
  *
  * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
  * @param {number} settlement - the settlement date serial, truncated
  * @param {number} maturity - the maturity date serial, truncated, later than `settlement`
  * @param {number} frequency - the number of coupons per year: 1, 2 or 4
  * @param {number} basis - the day-count basis: 0 to 4
+ * @param {boolean} checkPreviousCoupon - whether a previous coupon date before the earliest supported date is #NUM!
  */
-export function buildCouponSchedule(dateTimeHelper: DateTimeHelper, settlement: number, maturity: number, frequency: number, basis: number): CouponSchedule | CellError {
+export function buildCouponSchedule(dateTimeHelper: DateTimeHelper, settlement: number, maturity: number, frequency: number, basis: number, checkPreviousCoupon = true): CouponSchedule | CellError {
   const maturityDate = dateTimeHelper.numberToSimpleDate(maturity)
   const count = couponsAfter(dateTimeHelper, settlement, maturityDate, frequency)
   const previous = couponDate(dateTimeHelper, maturityDate, -count, frequency)
-  if (dateTimeHelper.dateToNumber(previous) < 0) {
+  if (checkPreviousCoupon && dateTimeHelper.dateToNumber(previous) < 0) {
     return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
   }
   const next = couponDate(dateTimeHelper, maturityDate, 1 - count, frequency)
