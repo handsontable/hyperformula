@@ -16,6 +16,29 @@ export interface ErrorPopupOptions {
 
 let errorPopupIdCounter = 0;
 
+function addIdRef(element: HTMLElement, attribute: string, id: string): void {
+  const ids = element.getAttribute(attribute)?.split(/\s+/).filter(Boolean) ?? [];
+
+  if (!ids.includes(id)) {
+    element.setAttribute(attribute, [...ids, id].join(" "));
+  }
+}
+
+function removeIdRef(element: HTMLElement, attribute: string, id: string): void {
+  const ids = element.getAttribute(attribute)?.split(/\s+/).filter(Boolean) ?? [];
+  const remaining = ids.filter((token) => token !== id);
+
+  if (remaining.length === ids.length) {
+    return;
+  }
+
+  if (remaining.length === 0) {
+    element.removeAttribute(attribute);
+  } else {
+    element.setAttribute(attribute, remaining.join(" "));
+  }
+}
+
 export class ErrorPopup extends BasePopup {
   private container: HTMLElement | null = null;
   private containerScope: EventScope | null = null;
@@ -109,7 +132,12 @@ export class ErrorPopup extends BasePopup {
   }
 
   private clearErrorAssociation(): void {
-    this.activeCell?.removeAttribute("aria-errormessage");
+    if (!this.activeCell) {
+      return;
+    }
+
+    this.activeCell.removeAttribute("aria-errormessage");
+    removeIdRef(this.activeCell, "aria-describedby", this.root.id);
   }
 
   private handleEnter(target: EventTarget | null, viaPointer: boolean): void {
@@ -155,6 +183,7 @@ export class ErrorPopup extends BasePopup {
       direction: this.direction,
     });
     cell.setAttribute("aria-errormessage", this.root.id);
+    addIdRef(cell, "aria-describedby", this.root.id);
   }
 
   private anchorToRemainingCell(): boolean {
