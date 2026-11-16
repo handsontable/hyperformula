@@ -13,18 +13,19 @@ import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
- * For a call to `IF` or `CHOOSE`, the argument that its last evaluation returned. A call that returned
- * none of its arguments, such as one whose selector is an error or out of range, one that returned the
- * default value of an omitted argument, or one that returned an array, has no entry.
+ * For a call to `IF`, `IFS`, `SWITCH` or `CHOOSE`, the argument that its last evaluation returned. A call
+ * that returned none of its arguments, such as one whose selector is an error or out of range, one where
+ * no condition or case matched, one that returned the default value of an omitted argument, or one that
+ * returned an array, has no entry.
  */
 const selectedArguments = new WeakMap<ProcedureAst, Ast>()
 
 /**
- * Returns the argument that the call to `IF` or `CHOOSE` returned when it was last evaluated, so that
- * a function that has just evaluated the call can tell whether its result is the content of a
- * referenced cell.
+ * Returns the argument that the call to `IF`, `IFS`, `SWITCH` or `CHOOSE` returned when it was last
+ * evaluated, so that a function that has just evaluated the call can tell whether its result is the
+ * content of a referenced cell.
  *
- * @param {ProcedureAst} ast - a call to `IF` or `CHOOSE` evaluated by this plugin
+ * @param {ProcedureAst} ast - a call to `IF`, `IFS`, `SWITCH` or `CHOOSE` evaluated by this plugin
  * @returns {Maybe<Ast>} the returned argument, or `undefined` when the call returned none of its arguments
  */
 export function selectedArgument(ast: ProcedureAst): Maybe<Ast> {
@@ -171,14 +172,17 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    * @param state
    */
   public ifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('IFS'), (...args) => {
+    selectedArguments.delete(ast)
+    const result = this.runFunction(ast.args, state, this.metadata('IFS'), (...args) => {
       for (let idx = 0; idx < args.length; idx += 2) {
         if (args[idx]) {
+          recordSelectedArgument(ast, idx + 1)
           return args[idx+1]
         }
       }
       return new CellError(ErrorType.NA, ErrorMessage.NoConditionMet)
     })
+    return forgetSelectionUnlessScalar(ast, result)
   }
 
   /**
@@ -226,7 +230,8 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   }
 
   public switch(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('SWITCH'), (selector, ...args) => {
+    selectedArguments.delete(ast)
+    const result = this.runFunction(ast.args, state, this.metadata('SWITCH'), (selector, ...args) => {
       const n = args.length
       let i = 0
       for (; i + 1 < n; i += 2) {
@@ -234,15 +239,18 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
           continue
         }
         if (this.arithmeticHelper.eq(selector, args[i] as InternalNoErrorScalarValue)) {
+          recordSelectedArgument(ast, i + 2)
           return args[i + 1]
         }
       }
       if (i < n) {
+        recordSelectedArgument(ast, i + 1)
         return args[i]
       } else {
         return new CellError(ErrorType.NA, ErrorMessage.NoDefault)
       }
     })
+    return forgetSelectionUnlessScalar(ast, result)
   }
 
   public iferror(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
@@ -279,7 +287,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
 }
 
 /**
- * Records that a call to `IF` or `CHOOSE` returned its argument at the given position.
+ * Records that a call to `IF`, `IFS`, `SWITCH` or `CHOOSE` returned its argument at the given position.
  *
  * @param {ProcedureAst} ast - the call
  * @param {number} position - the position of the returned argument in `ast.args`

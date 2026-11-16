@@ -585,10 +585,11 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    * as it does for `A1`.
    *
    * That holds for a parenthesized reference, a named expression defined as a reference, `INDEX`
-   * over a reference, and `IF` or `CHOOSE` whose evaluation returned one of these. `IF` and `CHOOSE`
-   * report the argument they returned, so no argument is evaluated a second time. `INDEX`, `IF` and
-   * `CHOOSE` count only while the built-in implementation answers for them, not a custom plugin
-   * registered over their ids.
+   * over a reference, and `IF`, `IFS`, `SWITCH` or `CHOOSE` whose evaluation returned one of these.
+   * These four report the argument they returned, so no argument is evaluated a second time. `IFERROR`
+   * and `IFNA` are not among them: they return the value of the cell, as in Excel. `INDEX`, `IF`, `IFS`,
+   * `SWITCH` and `CHOOSE` count only while the built-in implementation answers for them, not a custom
+   * plugin registered over their ids.
    *
    * @param {Ast} arg - the argument of the aggregation, already evaluated
    * @param {InterpreterState} state - interpreter state
@@ -613,8 +614,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   }
 
   /**
-   * The function-call case of {@link evaluatesToReference}: `INDEX` over a reference, and `IF` or
-   * `CHOOSE` that returned a reference.
+   * The function-call case of {@link evaluatesToReference}: `INDEX` over a reference, and `IF`, `IFS`,
+   * `SWITCH` or `CHOOSE` that returned a reference.
    *
    * @param {ProcedureAst} ast - the function call passed to the aggregation, already evaluated
    * @param {InterpreterState} state - interpreter state
@@ -627,6 +628,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
           && ast.args.length >= 1
           && this.evaluatesToReference(ast.args[0], state)
       case 'IF':
+      case 'IFS':
+      case 'SWITCH':
       case 'CHOOSE': {
         if (!this.isBuiltIn(ast.procedureName, BooleanPlugin)) {
           return false
