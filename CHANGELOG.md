@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `GESTEP` function, which returns 1 when a number is greater than or equal to a step (0 by default) and 0 otherwise. [#1788](https://github.com/handsontable/hyperformula/pull/1788)
 - Added the `CHOOSECOLS` dynamic-array function. [#1734](https://github.com/handsontable/hyperformula/pull/1734)
 - Added the `CHOOSEROWS` dynamic-array function. [#1827](https://github.com/handsontable/hyperformula/pull/1827)
+- Added the `ACCRINTM`, `DISC`, `INTRATE`, `PRICEDISC`, `RECEIVED` and `YIELDDISC` functions, which return the accrued interest, discount rate, interest rate, price, amount received and yield of discounted securities and securities that pay interest at maturity. [#1799](https://github.com/handsontable/hyperformula/pull/1799)
 
 ### Changed
 
