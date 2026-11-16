@@ -11,7 +11,7 @@ import {DependencyGraph} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {InvalidArgumentsError, SheetSizeLimitExceededError} from './errors'
 import {Operations} from './Operations'
-import {ParsingError} from './parser/Ast'
+import {Ast, ParsingError} from './parser/Ast'
 
 export type ClipboardCell = ClipboardCellValue | ClipboardCellFormula | ClipboardCellEmpty | ClipboardCellParsingError
 
@@ -39,7 +39,8 @@ export interface ClipboardCellEmpty {
 
 export interface ClipboardCellFormula {
   type: ClipboardCellType.FORMULA,
-  hash: string,
+  /** Keeps the formula available even when its parsing cache entry is evicted. */
+  ast: Ast,
 }
 
 export interface ClipboardCellParsingError {
