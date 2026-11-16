@@ -580,5 +580,8 @@
       "import": "./es/i18n/languages/trTR.mjs",
       "require": "./commonjs/i18n/languages/trTR.js"
     }
+  },
+  "overrides": {
+    "handlebars": "4.7.10"
   }
 }
