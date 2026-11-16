@@ -80,6 +80,31 @@ describe('Function MEDIAN', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(2)
   })
 
+  it('ignores empty cells passed as single-cell references, like a range does', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null, '4', '1', '2', '3', '=MEDIAN(A1,B1,C1,D1,E1,F1)', '=MEDIAN(A1:F1)'],
+    ])
+
+    expect(engine.getCellValue(adr('G1'))).toEqual(2.5)
+    expect(engine.getCellValue(adr('H1'))).toEqual(2.5)
+  })
+
+  it('ignores text and logical values in single-cell references', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['foo', '=TRUE()', '="5"', '1', '3', '=MEDIAN(A1,B1,C1,D1,E1)'],
+    ])
+
+    expect(engine.getCellValue(adr('F1'))).toEqual(2)
+  })
+
+  it('returns NUM when every single-cell reference is empty', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null, '=MEDIAN(A1,B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
+  })
+
   it('ignores nonnumeric values as long as theres at least one numeric value', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MEDIAN(TRUE(), "foobar", 42)'],

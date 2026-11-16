@@ -5,9 +5,9 @@
 
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {InterpreterValue, isExtendedNumber, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
@@ -57,7 +57,19 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
    * @param state
    */
   public median(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('MEDIAN'),
+    // Excel ignores empty, text and logical values reached through a single-cell reference, as it already
+    // does for a range; only explicitly typed arguments are coerced (so a blank cell must not count as 0).
+    const args = ast.args.filter((arg) => {
+      if (arg.type !== AstNodeType.CELL_REFERENCE) {
+        return true
+      }
+      const value = this.evaluateAst(arg, state)
+      return value instanceof CellError || isExtendedNumber(value)
+    })
+    if (ast.args.length > 0 && args.length === 0) {
+      return new CellError(ErrorType.NUM, ErrorMessage.OneValue)
+    }
+    return this.runFunction(args, state, this.metadata('MEDIAN'),
       (...args: RawScalarValue[]) => {
         const values = this.arithmeticHelper.coerceNumbersExactRanges(args)
         if (values instanceof CellError) {
