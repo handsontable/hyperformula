@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fixed axe reporting `aria-valid-attr-value` on an error cell while its error popup is open. The cell's `aria-describedby` now lists the popup, so screen readers read the error message as the cell's description, and the ids the grid already put there are kept. [#1897](https://github.com/handsontable/hyperformula/pull/1897)
+
 ## [0.3.6] - 2026-10-26
 
 ### Added
