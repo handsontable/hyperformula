@@ -36,6 +36,13 @@ Ask questions and share what you build with other HyperFormula developers on the
 [Handsontable Slack Community](https://handsontable-public.slack.com/). Report bugs on
 [GitHub](https://github.com/handsontable/hyperformula/issues).
 
+## Report a security vulnerability
+
+Don't report security vulnerabilities in public GitHub issues. Email
+[security@handsontable.com](mailto:security@handsontable.com) instead, and see the
+[security policy](https://github.com/handsontable/hyperformula/blob/master/SECURITY.md)
+for what to include.
+
 ## Looking for technical support?
 
 [Learn more about support options &#8594;](https://handsontable.com/support)
