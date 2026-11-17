@@ -31,7 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed functions such as `MATCH`, `INDEX` and `COUNTIF` throwing an uncaught `Unknown array` error when they read a range that exactly matches the area of an array formula returning an error, for example `=MATCH(2, B1:B3, 0)` next to `=SORT(A1:A3)` whose source contains `#DIV/0!`. They now read the range cell by cell. [#1876](https://github.com/handsontable/hyperformula/pull/1876)
 - Fixed unbounded parser cache growth in long-running instances that process many distinct formulas, including when undo is disabled. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
 - Fixed array formulas spilling past the `maxRows` and `maxColumns` limits: they now return `#SPILL!` when their result extends beyond the sheet edge. [#1774](https://github.com/handsontable/hyperformula/pull/1774)
-- Fixed `IMSUM`, `IMPRODUCT` and `TEXTJOIN` throwing an uncaught `RangeError` for very large ranges, such as `=IMSUM(A1:D40000)`, which stopped the recalculation; they now return a result or an error value in the cell.
+- Fixed `IMSUM`, `IMPRODUCT` and `TEXTJOIN` throwing an uncaught `RangeError` for very large ranges, such as `=IMSUM(A1:D40000)`, which stopped the recalculation; they now return a result or an error value in the cell. [#1901](https://github.com/handsontable/hyperformula/pull/1901)
 
 ## [3.5.0] - 2026-10-09
 
