@@ -1,17 +1,22 @@
-Copyright (c) HANDSONCODE sp. z o. o.
+HyperFormula Copyright (c) 2020–2026 Handsoncode sp. z o.o. All rights reserved.
 
-HYPERFORMULA is a software distributed by HANDSONCODE sp. z o. o., a Polish corporation based in
-Gdynia, Poland, at Aleja Zwyciestwa 96-98, registered by the District Court in Gdansk under number
-538651, EU tax ID number: PL5862294002, share capital: PLN 67,200.00.
+This software is proprietary and is licensed, not sold. You may use, copy, modify, or distribute it
+only under a valid license agreement with Handsoncode sp. z o.o. or its authorized reseller, and
+only within the scope of that agreement. No other rights are granted, whether by implication,
+estoppel, or otherwise.
 
-This software is protected by applicable copyright laws, including international treaties.
-Any use of this software is subject to the terms included in an applicable license agreement.
-
-In any case, you must not make any such use of this software as to develop software which may be
-considered competitive with this software.
+Warranties and liability are governed exclusively by your license agreement.
 
 UNLESS EXPRESSLY AGREED OTHERWISE, HANDSONCODE PROVIDES THIS SOFTWARE ON AN "AS IS"
 BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, AND IN NO EVENT AND UNDER NO
 LEGAL THEORY, SHALL HANDSONCODE BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY DIRECT,
 INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER ARISING FROM
 USE OR INABILITY TO USE THIS SOFTWARE.
+
+You may not remove or alter this notice or any other copyright notice in this software.
+
+HyperFormula is a trademark of Handsoncode sp. z o.o. (Al. Zwycięstwa 96-98, Gdynia, Poland;
+District Court for Gdańsk-Północ in Gdańsk, Poland, KRS no. 0000538651; share capital: PLN
+67,200.00).
+
+Licensing: https://handsontable.com/pricing/?tab=hyperformula
