@@ -1,7 +1,7 @@
 /*
- * The one file of `src/components/DocsAssistant/` that is not a verbatim copy of the Handsontable docs'
- * (handsontable/handsontable at 71be5d4, docs/src/components/DocsAssistant/): its storage keys, starter
- * questions and backend fallback are HyperFormula's. Refresh the other files by copying them again.
+ * Not a verbatim copy of the Handsontable docs' file (handsontable/handsontable at 71be5d4,
+ * docs/src/components/DocsAssistant/): its storage keys, starter questions and backend fallback are HyperFormula's.
+ * The other files are copies, except for one fix in `MarkdownRendererSimple.tsx` (see `docs/README.md`).
  */
 // Not the Handsontable docs' `hot-docs-chat-*`: both portals are on handsontable.com, so shared keys would carry a
 // conversation (and the open panel) from one product's docs into the other's.

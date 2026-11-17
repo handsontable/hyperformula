@@ -98,7 +98,7 @@ The **Ask AI** button in the header opens the docs assistant, the same chat pane
 
 - `src/components/DocsAssistant/` is the React widget and `src/scripts/docs-assistant-bootstrap.ts` mounts it on every page (loaded from the `Header` override). `constants.ts` holds the HyperFormula values: starter questions, storage keys and the backend fallback.
 - Everything else is copied from the Handsontable docs (`docs/src/` in handsontable/handsontable). To refresh it, copy all of these again, not just the widget folder:
-  - `components/DocsAssistant/`, except `constants.ts`;
+  - `components/DocsAssistant/`, except `constants.ts`, and keep our fix in `MarkdownRendererSimple.tsx` (it finds links before escaping the text, so a URL's `&` isn't escaped twice) until theirs has it;
   - `scripts/docs-assistant-bootstrap.ts`;
   - `lib/supports-modern-regex.mjs`, which `MarkdownRenderer.tsx` imports;
   - the inline `vite:preloadError` guard, which is in their `Head.astro` and in our `Header.astro`.

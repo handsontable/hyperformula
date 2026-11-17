@@ -25,13 +25,16 @@ function renderSimpleMarkdown(content: string): string {
       }
       html += `<pre class="da-code-fallback"><code>${escapeHtml(code.replace(/\n$/, ''))}</code></pre>`;
     } else {
-      const text = escapeHtml(parts[i]);
-      const withLinks = text.replace(
-        /(https?:\/\/[^\s<"]+)/g,
-        (url) => (
-          `<a href="${escapeHtmlAttr(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`
-        )
-      );
+      // Find the URLs in the raw text and escape each piece once: escaping first would turn a URL's `&` into
+      // `&amp;` and then escape that again, breaking query strings.
+      const withLinks = parts[i]
+        .split(/(https?:\/\/[^\s<"]+)/)
+        .map((piece, j) => (
+          j % 2 === 1
+            ? `<a href="${escapeHtmlAttr(piece)}" target="_blank" rel="noopener noreferrer">${escapeHtml(piece)}</a>`
+            : escapeHtml(piece)
+        ))
+        .join('');
       html += withLinks.replace(/\n/g, '<br>');
     }
   }
