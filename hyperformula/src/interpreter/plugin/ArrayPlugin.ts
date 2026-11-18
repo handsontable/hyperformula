@@ -1130,10 +1130,13 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    *
    * Cuts the vector into lines of `wrap_count` values, rows for WRAPROWS and
    * columns for WRAPCOLS; a line is never longer than the vector. The last
-   * line is padded with `pad_with`, or with #N/A when `pad_with` is omitted or
-   * empty. `wrap_count` is truncated toward zero. A two-dimensional vector or
-   * an empty or blank one returns #VALUE!, and a `wrap_count` below 1 returns
-   * #NUM!. Runs in time proportional to the vector's length.
+   * line is padded with `pad_with`, or with #N/A when the `pad_with` argument
+   * is omitted or left empty; a reference to an empty cell pads with blanks.
+   * `wrap_count` is truncated toward zero. A two-dimensional vector or an
+   * empty or blank one returns #VALUE!, a `wrap_count` below 1 returns #NUM!,
+   * and a result larger than the configured sheet size (`maxRows`,
+   * `maxColumns`) returns #VALUE!. Runs in time proportional to the vector's
+   * length.
    *
    * @param {ProcedureAst} ast - The parsed WRAPROWS or WRAPCOLS call.
    * @param {InterpreterState} state - The current formula evaluation state.
@@ -1163,7 +1166,12 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
         const padWith = this.isOmittedArgument(ast.args[2]) ? undefined : padWithArgument
         const lineLength = Math.min(wrapCount, elements.length)
-        const lines = Array.from({length: Math.ceil(elements.length / lineLength)}, (_, line) =>
+        const lineCount = Math.ceil(elements.length / lineLength)
+        const [height, width] = functionName === 'WRAPROWS' ? [lineCount, lineLength] : [lineLength, lineCount]
+        if (height > this.config.maxRows || width > this.config.maxColumns) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
+        }
+        const lines = Array.from({length: lineCount}, (_, line) =>
           this.padRowToWidth(elements.slice(line * lineLength, (line + 1) * lineLength), lineLength, padWith)
         )
 
@@ -1187,8 +1195,9 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    *
    * A whole-column (whole-row) vector is measured by its effective size. The
    * number of lines grows with it, so the result fits only when the formula
-   * starts in the first row (column); otherwise that dimension stays
-   * unbounded, which makes array-space validation report a spill error.
+   * starts in the first row (column); otherwise the number of lines stays
+   * unbounded, which makes array-space validation report a spill error. A result larger than the configured
+   * sheet size is a single cell, so the formula evaluates to #VALUE!.
    *
    * @param {ProcedureAst} ast - The parsed WRAPROWS or WRAPCOLS call.
    * @param {InterpreterState} state - The formula state whose address anchors the spill.
@@ -1214,13 +1223,24 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     }
 
     const lineLength = Math.min(Math.trunc(wrapCount.value), length)
+    const lineCount = Math.ceil(length / lineLength)
+    const [height, width] = functionName === 'WRAPROWS' ? [lineCount, lineLength] : [lineLength, lineCount]
+    if (height > this.config.maxRows || width > this.config.maxColumns) {
+      return ArraySize.error()
+    }
+
     const startsAwayFromSheetEdge = (!Number.isFinite(sourceSize.height) && state.formulaAddress.row !== 0)
       || (!Number.isFinite(sourceSize.width) && state.formulaAddress.col !== 0)
-    const lineCount = startsAwayFromSheetEdge ? Number.POSITIVE_INFINITY : Math.ceil(length / lineLength)
+    if (!startsAwayFromSheetEdge) {
+      return new ArraySize(width, height)
+    }
 
+    // The number of lines is unbounded. When the formula sits on the sheet edge that the line axis needs (column A
+    // for WRAPCOLS, row 1 for WRAPROWS), the other axis is unbounded too, so that array-space validation reports a
+    // spill error rather than reserving a partial result.
     return functionName === 'WRAPROWS'
-      ? new ArraySize(lineLength, lineCount)
-      : new ArraySize(lineCount, lineLength)
+      ? new ArraySize(state.formulaAddress.row === 0 ? Number.POSITIVE_INFINITY : lineLength, Number.POSITIVE_INFINITY)
+      : new ArraySize(Number.POSITIVE_INFINITY, state.formulaAddress.col === 0 ? Number.POSITIVE_INFINITY : lineLength)
   }
 
   /**
