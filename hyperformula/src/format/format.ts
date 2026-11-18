@@ -67,13 +67,15 @@ export function format(value: number, formatArg: string, config: Config, dateHel
  * Tells whether a format string opens a `[` that no later `]` closes, as in
  * `[Red` or `0[`. Such a format is invalid, so `TEXT` returns `#VALUE!`.
  * A `[` inside quoted text or after a backslash is literal text and does not
- * count.
+ * count. A `]` inside quoted text does not close a bracket, so `[Red"]"0` is
+ * invalid, as it is in Excel; a `]` after a backslash does (`[Red\]0`).
  *
  * @param formatArg the raw format string
  * @returns `true` when an opening bracket is never closed
  */
 function hasUnclosedBracket(formatArg: string): boolean {
   let inQuotes = false
+  let inBracket = false
   for (let i = 0; i < formatArg.length; i++) {
     const ch = formatArg[i]
     if (ch === '"') {
@@ -82,11 +84,12 @@ function hasUnclosedBracket(formatArg: string): boolean {
       continue
     } else if (ch === '\\') {
       i++
-    } else if (ch === '[' && !formatArg.includes(']', i + 1)) {
-      return true
+      inBracket = inBracket && formatArg[i] !== ']'
+    } else if (ch === '[' || ch === ']') {
+      inBracket = ch === '['
     }
   }
-  return false
+  return inBracket
 }
 
 /**
