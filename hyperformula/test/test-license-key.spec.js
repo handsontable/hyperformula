@@ -25,6 +25,10 @@ const CONSTANTS = [
   'hyperformula-ui/demo/shared/test-license-key.ts',
 ]
 
+// The private suite's own constant, checked when the suite is attached. The benchmarks also run against the base
+// branch's engine, which may not have the constants above, so the suite keeps a copy of its own.
+const PRIVATE_SUITE_CONSTANT = 'hyperformula/test/hyperformula-tests/performance/testLicenseKey.ts'
+
 // The files that may name the key's holder without holding the key: this guard, and the docs build check.
 const MARKER_ONLY = ['hyperformula/test/test-license-key.spec.js', 'docs/src/preview-license-key.mjs']
 
@@ -32,7 +36,8 @@ const KEY_LITERAL = /'(This is a HyperFormula license key [^']*)'/g
 
 describe('the internal test license key', () => {
   it('is the same key in every constant', () => {
-    const keys = CONSTANTS.map((file) => {
+    const attached = fs.existsSync(path.join(REPO_ROOT, PRIVATE_SUITE_CONSTANT)) ? [PRIVATE_SUITE_CONSTANT] : []
+    const keys = [...CONSTANTS, ...attached].map((file) => {
       const found = [...fs.readFileSync(path.join(REPO_ROOT, file), 'utf8').matchAll(KEY_LITERAL)].map((match) => match[1])
 
       expect({file, count: found.length}).toEqual({file, count: 1})

@@ -36,6 +36,7 @@ The key is written out once per consumer, and nowhere else:
 | `hyperformula/script/test-license-key.js` | `script/check-file.js` |
 | `docs/src/test-license-key.mjs` | `docs/src/docs-data.mjs`, and the preview builds of the docs |
 | `hyperformula-ui/demo/shared/test-license-key.ts` | the formula editor demo, which the end-to-end suite runs |
+| `performance/testLicenseKey.ts` in the private suite | the benchmarks and the compatibility check, which the performance workflow also runs against the base branch's engine |
 
 `hyperformula/test/test-license-key.spec.js` fails when the constants disagree, or when the key appears in any other file. To renew the key, issue it again upstream and paste it into every constant.
 
