@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
@@ -18,6 +18,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#VALUE!',
   },
   functions: {
+    CHOOSECOLS: 'CHOOSECOLS',
+    CHOOSEROWS: 'CHOOSEROWS',
     FILTER: 'FILTER',
     VSTACK: 'VSTACK',
     HSTACK: 'HSTACK',
@@ -25,6 +27,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINTM: 'ACCRINTM',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
     ACOT: 'ACOT',
@@ -39,6 +42,7 @@ const dictionary: RawTranslationPackage = {
     AVERAGE: 'AVERAGE',
     AVERAGEA: 'AVERAGEA',
     AVERAGEIF: 'AVERAGEIF',
+    AVERAGEIFS: 'AVERAGEIFS',
     BASE: 'BASE',
     BIN2DEC: 'BIN2DEC',
     BIN2HEX: 'BIN2HEX',
@@ -98,6 +102,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DECIMAL',
     DEGREES: 'DEGREES',
     DELTA: 'DELTA',
+    DISC: 'DISC',
     DOLLARDE: 'DOLLARDE',
     DOLLARFR: 'DOLLARFR',
     EDATE: 'EDATE',
@@ -105,6 +110,7 @@ const dictionary: RawTranslationPackage = {
     EOMONTH: 'EOMONTH',
     ERF: 'ERF',
     ERFC: 'ERFC',
+    'ERROR.TYPE': 'ERROR.TYPE',
     EVEN: 'EVEN',
     EXACT: 'EXACT',
     EXP: 'EXP',
@@ -126,6 +132,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEX',
     INT: 'INT',
     INTERVAL: 'INTERVAL',
+    INTRATE: 'INTRATE',
     IPMT: 'IPMT',
     IRR: 'IRR',
     ISBINARY: 'ISBINARY',
@@ -187,11 +194,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'PRODUCT',
     POWER: 'POWER',
     PPMT: 'PPMT',
+    PRICEDISC: 'PRICEDISC',
     PROPER: 'PROPER',
     PV: 'PV',
     RADIANS: 'RADIANS',
     RAND: 'RAND',
     RATE: 'RATE',
+    RECEIVED: 'RECEIVED',
     REPLACE: 'REPLACE',
     REPT: 'REPT',
     RIGHT: 'RIGHT',
@@ -229,6 +238,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: 'SWITCH',
     SYD: 'SYD',
     T: 'T',
+    TAKE: 'TAKE',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'TBILLEQ',
@@ -243,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'TRIM',
     TRUE: 'TRUE',
     TRUNC: 'TRUNC',
+    TYPE: 'TYPE',
     UNICHAR: 'UNICHAR',
     UNICODE: 'UNICODE',
     UNIQUE: 'UNIQUE',
@@ -264,6 +275,7 @@ const dictionary: RawTranslationPackage = {
     XLOOKUP: 'XLOOKUP',
     YEAR: 'YEAR',
     YEARFRAC: 'YEARFRAC',
+    YIELDDISC: 'YIELDDISC',
     'HF.ADD': 'HF.ADD',
     'HF.CONCAT': 'HF.CONCAT',
     'HF.DIVIDE': 'HF.DIVIDE',
@@ -402,6 +414,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'CONFIDENCE.T',
     DEVSQ: 'DEVSQ',
     GEOMEAN: 'GEOMEAN',
+    GESTEP: 'GESTEP',
     HARMEAN: 'HARMEAN',
     CRITBINOM: 'CRITBINOM',
     'COVARIANCE.P': 'COVARIANCE.P',
