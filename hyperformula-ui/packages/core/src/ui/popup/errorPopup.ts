@@ -170,7 +170,7 @@ export class ErrorPopup extends BasePopup {
     this.anchorTo(cell, message);
   }
 
-  private anchorTo(cell: HTMLElement, message: string): void {
+  private anchorTo(cell: HTMLElement, message: string, fromRepaint = false): void {
     this.pendingMessage = message;
     this.clearErrorAssociation();
     this.activeCell = cell;
@@ -183,7 +183,23 @@ export class ErrorPopup extends BasePopup {
       direction: this.direction,
     });
     cell.setAttribute("aria-errormessage", this.root.id);
-    addIdRef(cell, "aria-describedby", this.root.id);
+
+    if (fromRepaint) {
+      this.associateAfterRepaint(cell);
+    } else {
+      addIdRef(cell, "aria-describedby", this.root.id);
+    }
+  }
+
+  private associateAfterRepaint(cell: HTMLElement): void {
+    queueMicrotask(() => {
+      if (cell !== this.activeCell || !this.isVisible()) {
+        return;
+      }
+
+      cell.setAttribute("aria-errormessage", this.root.id);
+      addIdRef(cell, "aria-describedby", this.root.id);
+    });
   }
 
   private anchorToRemainingCell(): boolean {
@@ -325,6 +341,10 @@ export class ErrorPopup extends BasePopup {
     const message = cell.dataset.hfeError;
 
     if (message === previousMessage) {
+      if (message && this.isVisible() && cell === this.activeCell) {
+        this.associateAfterRepaint(cell);
+      }
+
       return;
     }
 
@@ -334,7 +354,7 @@ export class ErrorPopup extends BasePopup {
 
     if (this.isVisible() && cell === this.activeCell) {
       if (message) {
-        this.anchorTo(cell, message);
+        this.anchorTo(cell, message, true);
       } else {
         this.close();
       }
@@ -343,7 +363,7 @@ export class ErrorPopup extends BasePopup {
     }
 
     if (message && !this.isVisible() && (cell === this.pointerCell || cell === this.focusCell)) {
-      this.anchorTo(cell, message);
+      this.anchorTo(cell, message, true);
     }
   }
 

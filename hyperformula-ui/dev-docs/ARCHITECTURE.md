@@ -763,10 +763,17 @@ inside their host-specific renderers, because each host renders cells differentl
 
 `markCell` also keeps the tooltip in step with the mark, through `ErrorPopup.syncCell(cell,
 previousMessage)`. Hosts repaint often (Handsontable on every draw), so a repaint that leaves
-the message unchanged does nothing. When the message changes on the cell the tooltip shows,
+the message unchanged leaves the tooltip and the suppression alone. When the message changes on the cell the tooltip shows,
 the tooltip closes (error cleared) or shows the new text. When it changes on a cell that still
 holds the pointer or focus while no tooltip shows, the tooltip opens there. A change also
 lifts that cell's Escape suppression, since the dismissed content is gone.
+
+While the tooltip is open, the cell carries `aria-errormessage` and the popup id in its
+`aria-describedby`, appended to the ids already there. A host repaint can wipe both:
+Handsontable strips every `aria-*` attribute before its renderer runs, and adds its
+column-header id to `aria-describedby` after it, only when the renderer left none. So when
+`syncCell` runs for the anchored cell, repaint or not, it writes the association in a
+microtask, after the host's synchronous render has finished.
 
 The error tooltip itself is Esc-dismissible: `ErrorPopup` owns a window-level `keydown`
 (capture) listener, registered while attached; it consumes Escape only while the tooltip is

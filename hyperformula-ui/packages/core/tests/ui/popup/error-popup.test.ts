@@ -1051,6 +1051,54 @@ describe("ErrorPopup syncCell", () => {
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
   }
 
+  function repaint(target: HTMLElement, message: string | null): void {
+    for (const name of target.getAttributeNames()) {
+      if (name.startsWith("aria-")) {
+        target.removeAttribute(name);
+      }
+    }
+
+    remark(target, message);
+
+    if (!target.hasAttribute("aria-describedby")) {
+      target.setAttribute("aria-describedby", "col-header-2");
+    }
+  }
+
+  function popupId(): string | undefined {
+    return document.body.querySelector(sel(CN.errorPopup))?.id;
+  }
+
+  it("restores the popup association after a repaint that strips aria attributes and keeps the error", async () => {
+    cell.setAttribute("aria-describedby", "col-header-2");
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    repaint(cell, "#DIV/0!");
+    await Promise.resolve();
+
+    expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupId()}`);
+    expect(cell.getAttribute("aria-errormessage")).toBe(popupId());
+  });
+
+  it("keeps the host's aria-describedby id when a repaint changes the anchored cell's error", async () => {
+    cell.setAttribute("aria-describedby", "col-header-2");
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    repaint(cell, "#REF!");
+    await Promise.resolve();
+
+    expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupId()}`);
+    expect(cell.getAttribute("aria-errormessage")).toBe(popupId());
+  });
+
+  it("leaves only the host's aria-describedby id when a repaint clears the anchored cell's error", async () => {
+    cell.setAttribute("aria-describedby", "col-header-2");
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    repaint(cell, null);
+    await Promise.resolve();
+
+    expect(cell.getAttribute("aria-describedby")).toBe("col-header-2");
+    expect(cell.getAttribute("aria-errormessage")).toBeNull();
+  });
+
   it("closes the tooltip when the anchored cell's error is cleared", () => {
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
     remark(cell, null);
