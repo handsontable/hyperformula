@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
@@ -18,6 +18,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#ARG!',
   },
   functions: {
+    CHOOSECOLS: 'WYBIERZ.KOLUMNY',
+    CHOOSEROWS: 'WYBIERZ.WIERSZE',
     FILTER: 'FILTER',
     VSTACK: 'STOS.PION',
     HSTACK: 'STOS.POZ',
@@ -25,6 +27,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'WART.BEZWGL',
+    ACCRINTM: 'NAL.ODS.WYKUP',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
     ACOT: 'ACOT',
@@ -38,6 +41,7 @@ const dictionary: RawTranslationPackage = {
     AVERAGE: 'ŚREDNIA',
     AVERAGEA: 'ŚREDNIA.A',
     AVERAGEIF: 'ŚREDNIA.JEŻELI',
+    AVERAGEIFS: 'ŚREDNIA.WARUNKÓW',
     BASE: 'PODSTAWA',
     BIN2DEC: 'DWÓJK.NA.DZIES',
     BIN2HEX: 'DWÓJK.NA.SZESN',
@@ -97,6 +101,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DZIESIĘTNA',
     DEGREES: 'STOPNIE',
     DELTA: 'DELTA',
+    DISC: 'STOPA.DYSK',
     DOLLARDE: 'CENA.DZIES',
     DOLLARFR: 'CENA.UŁAM',
     EDATE: 'NR.SER.DATY',
@@ -104,6 +109,7 @@ const dictionary: RawTranslationPackage = {
     EOMONTH: 'NR.SER.OST.DN.MIEŚ',
     ERF: 'FUNKCJA.BŁ',
     ERFC: 'KOMP.FUNKCJA.BŁ',
+    'ERROR.TYPE': 'NR.BŁĘDU',
     EVEN: 'ZAOKR.DO.PARZ',
     EXACT: 'PORÓWNAJ',
     EXP: 'EXP',
@@ -125,6 +131,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEKS',
     INT: 'ZAOKR.DO.CAŁK',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'STOPA.PROC',
     IPMT: 'IPMT',
     IRR: 'IRR',
     ISBINARY: 'ISBINARY',
@@ -186,11 +193,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'ILOCZYN',
     POWER: 'POTĘGA',
     PPMT: 'PPMT',
+    PRICEDISC: 'CENA.DYSK',
     PROPER: 'Z.WIELKIEJ.LITERY',
     PV: 'PV',
     RADIANS: 'RADIANY',
     RAND: 'LOSUJ',
     RATE: 'RATE',
+    RECEIVED: 'KWOTA.WYKUP',
     REPLACE: 'ZASTĄP',
     REPT: 'POWT',
     RIGHT: 'PRAWY',
@@ -227,6 +236,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: 'PRZEŁĄCZ',
     SYD: 'SYD',
     T: 'T',
+    TAKE: 'WYCINEK',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'RENT.EKW.BS',
@@ -241,6 +251,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'USUŃ.ZBĘDNE.ODSTĘPY',
     TRUE: 'PRAWDA',
     TRUNC: 'LICZBA.CAŁK',
+    TYPE: 'TYP',
     UNICHAR: 'ZNAK.UNICODE',
     UNICODE: 'UNICODE',
     UNIQUE: 'UNIKATOWE',
@@ -262,6 +273,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'ROK',
     YEARFRAC: 'CZĘŚĆ.ROKU',
+    YIELDDISC: 'RENT.DYSK',
     ROMAN: 'RZYMSKIE',
     ARABIC: 'ARABSKA',
     'HF.ADD': 'HF.ADD',
@@ -402,6 +414,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'UFNOŚĆ.T',
     DEVSQ: 'ODCH.KWADRATOWE',
     GEOMEAN: 'ŚREDNIA.GEOMETRYCZNA',
+    GESTEP: 'SPRAWDŹ.PRÓG',
     HARMEAN: 'ŚREDNIA.HARMONICZNA',
     CRITBINOM: 'PRÓG.ROZKŁAD.DWUM',
     PEARSON: 'PEARSON',
