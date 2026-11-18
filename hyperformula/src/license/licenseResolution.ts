@@ -202,7 +202,7 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
 
   if (!license.licensed) {
     // `unreadable` (a broken block, or edited or missing prose) and `product_missing` (a key for other products only) both
-    // resolve to an invalid key that restricts nothing; only their console messages differ.
+    // resolve to an invalid key that restricts nothing, and both print the same invalid-key warning.
     if (notifyConsole) {
       notifyUnlicensedEntitlementKey()
     }

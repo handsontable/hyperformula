@@ -45,7 +45,7 @@ The code examples in this documentation don't contain a license key. Each one ha
 ```
 
 To run an example in your own project, uncomment the line and replace `your-license-key` with your license key.
-Without a key, the example runs, but its functions return `#LIC!`.
+Without a key, functions return `#LIC!` and methods that change data, such as `addSheet()`, throw a `LicenseCapabilityMissingError`. See [Missing license key](#missing-license-key).
 
 The live examples on handsontable.com run without a license key: HyperFormula doesn't check the license key on handsontable.com.
 
