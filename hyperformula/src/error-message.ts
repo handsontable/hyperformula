@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 /**
@@ -53,6 +53,8 @@ export class ErrorMessage {
   public static NumberRange = 'Number-only range expected.'
   public static ValueNotFound = 'Value not found.'
   public static NaFunction = 'The NA function always evaluates to the #N/A error.'
+  public static ErrorTypeNotError = 'The value is not an error, so ERROR.TYPE has no number to return.'
+  public static ErrorTypeNoCode = 'This error type has no ERROR.TYPE number.'
   public static ValueBaseLarge = 'Value in base too large.'
   public static ValueBaseSmall = 'Value in base too small.'
   public static ValueBaseLong = 'Value in base too long.'
@@ -89,6 +91,7 @@ export class ErrorMessage {
   public static CharacterCodeBounds = 'Character code out of bounds.'
   public static NonZero = 'Argument cannot be 0.'
   public static DivisionByZero = 'Division by zero.'
+  public static ZeroRowOrColumnCount = 'Row or column count cannot be zero.'
   public static LessThanOne = 'Argument cannot be less than 1.'
   public static WeekendString = 'Incorrect weekend bitmask string.'
   public static InvalidRoman = 'Invalid roman numeral.'
