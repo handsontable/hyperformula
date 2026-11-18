@@ -140,24 +140,44 @@ export function actualCouponPeriodLength(dateTimeHelper: DateTimeHelper, schedul
  * Returns `maturity` stepped back `periods` coupon periods, each step keeping the previous date's day clamped to the
  * length of its month, so the day can drift down (31 March, 30 September, 30 March).
  *
- * Constant time: the drifted day is the smallest of maturity's day and the lengths of the months visited, and those
- * months repeat every year, so after `2 * frequency` steps (two Februaries, at least one in a non-leap year) the
- * day no longer changes.
- *
  * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
  * @param {SimpleDate} maturity - the maturity date
  * @param {number} periods - the number of coupon periods to step back
  * @param {number} frequency - the number of coupons per year: 1, 2 or 4
  */
 function driftedCouponDate(dateTimeHelper: DateTimeHelper, maturity: SimpleDate, periods: number, frequency: number): SimpleDate {
+  return chainedCouponDate(dateTimeHelper, maturity, -periods, frequency, false)
+}
+
+/**
+ * Returns `start` stepped `periods` coupon periods (back when negative), each step from the date before: the last day
+ * of the month when `monthEnd` is true, and otherwise the previous date's day clamped to the length of its month, so
+ * the day can drift down (31 March, 30 September, 30 March).
+ *
+ * Constant time: the drifted day is the smallest of `start`'s day and the lengths of the months visited, and those
+ * months repeat every year, so after `2 * frequency` steps (two Februaries, at least one in a non-leap year) the
+ * day no longer changes.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {SimpleDate} start - the date to step from
+ * @param {number} periods - the number of coupon periods to step, negative to step back
+ * @param {number} frequency - the number of coupons per year: 1, 2 or 4
+ * @param {boolean} monthEnd - whether every date is the last day of its month
+ */
+function chainedCouponDate(dateTimeHelper: DateTimeHelper, start: SimpleDate, periods: number, frequency: number, monthEnd: boolean): SimpleDate {
   const monthsPerPeriod = 12 / frequency
-  let day = maturity.day
-  for (let step = 1; step <= Math.min(periods, 2 * frequency); step++) {
-    const visited = offsetMonth(maturity, -step * monthsPerPeriod)
+  const direction = Math.sign(periods)
+  const target = offsetMonth(start, periods * monthsPerPeriod)
+  const targetMonthLength = dateTimeHelper.daysInMonth(target.year, target.month)
+  if (monthEnd) {
+    return {...target, day: targetMonthLength}
+  }
+  let day = start.day
+  for (let step = 1; step <= Math.min(Math.abs(periods), 2 * frequency); step++) {
+    const visited = offsetMonth(start, direction * step * monthsPerPeriod)
     day = Math.min(day, dateTimeHelper.daysInMonth(visited.year, visited.month))
   }
-  const target = offsetMonth(maturity, -periods * monthsPerPeriod)
-  return {...target, day: Math.min(day, dateTimeHelper.daysInMonth(target.year, target.month))}
+  return {...target, day: Math.min(day, targetMonthLength)}
 }
 
 /**
@@ -195,24 +215,17 @@ interface QuasiCouponSchedule {
  */
 export function accruedCouponPeriods(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, issue: number, settlement: number, calcMethod: boolean): number | CellError {
   const {firstInterest, frequency, basis} = schedule
-  const months = 12 / frequency
   const monthEnd = isMonthEnd(dateTimeHelper, firstInterest)
-  const previousCoupon = stepCouponDate(dateTimeHelper, firstInterest, -months, monthEnd)
+  const step = (date: SimpleDate, periods: number) => chainedCouponDate(dateTimeHelper, date, periods, frequency, monthEnd)
+  const previousCoupon = step(firstInterest, -1)
 
   let accrualStart = previousCoupon
   if (calcMethod && settlement > dateTimeHelper.dateToNumber(firstInterest)) {
-    accrualStart = firstInterest
-    for (;;) {
-      const next = stepCouponDate(dateTimeHelper, accrualStart, months, monthEnd)
-      const nextSerial = dateTimeHelper.dateToNumber(next)
-      if (dateTimeHelper.getWithinBounds(nextSerial) === undefined) {
-        return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
-      }
-      if (nextSerial >= settlement) {
-        break
-      }
-      accrualStart = next
+    const periodsBefore = lastPeriodBefore(dateTimeHelper, firstInterest, settlement, frequency, step)
+    if (dateTimeHelper.getWithinBounds(dateTimeHelper.dateToNumber(step(firstInterest, periodsBefore + 1))) === undefined) {
+      return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
     }
+    accrualStart = step(firstInterest, periodsBefore)
   }
 
   const accrualStartSerial = dateTimeHelper.dateToNumber(accrualStart)
@@ -224,22 +237,78 @@ export function accruedCouponPeriods(dateTimeHelper: DateTimeHelper, schedule: Q
   if (issue >= accrualStartSerial) {
     return accrualStartSerial < 0 ? new CellError(ErrorType.NUM, ErrorMessage.DateBounds) : periods
   }
-  let periodEnd = accrualStart
-  for (;;) {
-    const periodStart = stepCouponDate(dateTimeHelper, periodEnd, -months, monthEnd)
-    const periodStartSerial = dateTimeHelper.dateToNumber(periodStart)
-    if (issue > periodStartSerial) {
-      if (periodStartSerial < 0) {
-        return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
-      }
-      return periods + issuePeriodPart(dateTimeHelper, schedule, issue, periodStart, periodEnd)
-    }
-    periods += calcMethod ? 1 : 0
-    if (issue === periodStartSerial) {
-      return periods
-    }
-    periodEnd = periodStart
+
+  const periodsBack = firstPeriodOnOrBefore(dateTimeHelper, accrualStart, issue, frequency, step)
+  const issuePeriodStart = step(accrualStart, -periodsBack)
+  const issuePeriodStartSerial = dateTimeHelper.dateToNumber(issuePeriodStart)
+  const issueOnCouponDate = issuePeriodStartSerial === issue
+  if (!issueOnCouponDate && issuePeriodStartSerial < 0) {
+    return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
   }
+  if (calcMethod) {
+    const wholePeriods = issueOnCouponDate ? periodsBack : periodsBack - 1
+    for (let period = 0; period < wholePeriods; period++) {
+      periods += 1
+    }
+  }
+  return issueOnCouponDate
+    ? periods
+    : periods + issuePeriodPart(dateTimeHelper, schedule, issue, issuePeriodStart, step(accrualStart, 1 - periodsBack))
+}
+
+/**
+ * Returns the number of coupon periods from `firstInterest` to the last coupon date before `settlement`, which is
+ * after `firstInterest`. Constant time: estimated from the months between them, then corrected by a period.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {SimpleDate} firstInterest - the first interest date
+ * @param {number} settlement - the settlement date serial
+ * @param {number} frequency - the number of coupons per year: 1, 2 or 4
+ * @param {Function} step - steps a coupon date by a number of periods
+ */
+function lastPeriodBefore(dateTimeHelper: DateTimeHelper, firstInterest: SimpleDate, settlement: number, frequency: number, step: (date: SimpleDate, periods: number) => SimpleDate): number {
+  const settlementDate = dateTimeHelper.numberToSimpleDate(settlement)
+  let periods = Math.max(0, Math.floor(monthsBetween(firstInterest, settlementDate) * frequency / 12))
+  while (dateTimeHelper.dateToNumber(step(firstInterest, periods + 1)) < settlement) {
+    periods++
+  }
+  while (periods > 0 && dateTimeHelper.dateToNumber(step(firstInterest, periods)) >= settlement) {
+    periods--
+  }
+  return periods
+}
+
+/**
+ * Returns the smallest number of coupon periods back from `accrualStart` that reaches a coupon date on or before
+ * `issue`, which is before `accrualStart`. Constant time: estimated from the months between them, then corrected by
+ * a period.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {SimpleDate} accrualStart - the coupon date the accrual starts at
+ * @param {number} issue - the issue date serial
+ * @param {number} frequency - the number of coupons per year: 1, 2 or 4
+ * @param {Function} step - steps a coupon date by a number of periods
+ */
+function firstPeriodOnOrBefore(dateTimeHelper: DateTimeHelper, accrualStart: SimpleDate, issue: number, frequency: number, step: (date: SimpleDate, periods: number) => SimpleDate): number {
+  const issueDate = dateTimeHelper.numberToSimpleDate(issue)
+  let periods = Math.max(1, Math.ceil(monthsBetween(issueDate, accrualStart) * frequency / 12))
+  while (dateTimeHelper.dateToNumber(step(accrualStart, -periods)) > issue) {
+    periods++
+  }
+  while (periods > 1 && dateTimeHelper.dateToNumber(step(accrualStart, 1 - periods)) <= issue) {
+    periods--
+  }
+  return periods
+}
+
+/**
+ * Returns the number of months from `start`'s month to `end`'s month.
+ *
+ * @param {SimpleDate} start - the start date
+ * @param {SimpleDate} end - the end date
+ */
+function monthsBetween(start: SimpleDate, end: SimpleDate): number {
+  return 12 * (end.year - start.year) + end.month - start.month
 }
 
 /**
@@ -260,7 +329,10 @@ function issuePeriodPart(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSc
   switch (schedule.basis) {
     case 0:
     case 2:
-      return days / days360BothEnds(dateTimeHelper, periodStart, periodEnd)
+      return days / daysIn30DayMonths(
+        {...periodStart, day: thirtyDayMonthDay(dateTimeHelper, periodStart)},
+        {...periodEnd, day: thirtyDayMonthDay(dateTimeHelper, periodEnd)},
+      )
     case 4:
       return days / daysIn30DayMonths(toBasisEU(periodStart), toBasisEU(periodEnd))
     case 1:
@@ -281,34 +353,13 @@ function issuePeriodPart(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSc
  */
 function daysBetween(dateTimeHelper: DateTimeHelper, basis: number, start: number, end: number): number {
   if (basis === 0) {
-    return days360US(dateTimeHelper, dateTimeHelper.numberToSimpleDate(start), dateTimeHelper.numberToSimpleDate(end))
+    const [adjustedStart, adjustedEnd] = dateTimeHelper.toBasisUS(dateTimeHelper.numberToSimpleDate(start), dateTimeHelper.numberToSimpleDate(end))
+    return daysIn30DayMonths(adjustedStart, adjustedEnd)
   }
   if (basis === 4) {
     return daysIn30DayMonths(toBasisEU(dateTimeHelper.numberToSimpleDate(start)), toBasisEU(dateTimeHelper.numberToSimpleDate(end)))
   }
   return end - start
-}
-
-/**
- * Counts the days from `start` to `end` in US 30-day months, as Excel's ACCRINT does, also when `end` is before
- * `start`: the 31st and the last day of February count as the 30th at the start; at the end, the last day of February
- * counts as the 30th when the start is also the last day of February, and the 31st when the start is the 30th or 31st.
- *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {SimpleDate} start - the start date
- * @param {SimpleDate} end - the end date
- */
-function days360US(dateTimeHelper: DateTimeHelper, start: SimpleDate, end: SimpleDate): number {
-  const startIsLastOfFebruary = start.month === 2 && isMonthEnd(dateTimeHelper, start)
-  let endDay = end.day
-  if (startIsLastOfFebruary && end.month === 2 && isMonthEnd(dateTimeHelper, end)) {
-    endDay = 30
-  }
-  if (endDay === 31 && start.day >= 30) {
-    endDay = 30
-  }
-  const startDay = start.day === 31 || startIsLastOfFebruary ? 30 : start.day
-  return daysIn30DayMonths({...start, day: startDay}, {...end, day: endDay})
 }
 
 /**
@@ -319,34 +370,6 @@ function days360US(dateTimeHelper: DateTimeHelper, start: SimpleDate, end: Simpl
  */
 function yearDays(basis: number): number {
   return basis === 3 ? 365 : 360
-}
-
-/**
- * Counts the days from `start` to `end` in US 30-day months, counting the last day of February and the 31st as the
- * 30th at both ends.
- *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {SimpleDate} start - the start date
- * @param {SimpleDate} end - the end date
- */
-function days360BothEnds(dateTimeHelper: DateTimeHelper, start: SimpleDate, end: SimpleDate): number {
-  const adjust = (date: SimpleDate) => ({...date, day: date.day === 31 || (date.month === 2 && isMonthEnd(dateTimeHelper, date)) ? 30 : date.day})
-  return daysIn30DayMonths(adjust(start), adjust(end))
-}
-
-/**
- * Returns the coupon date `months` months after `date` (before it when negative): `date`'s day, clamped to the
- * length of the month, or the last day of the month when `monthEnd` is true.
- *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {SimpleDate} date - the coupon date to step from
- * @param {number} months - the months to step, negative to step back
- * @param {boolean} monthEnd - whether coupon dates fall on the last day of the month
- */
-function stepCouponDate(dateTimeHelper: DateTimeHelper, date: SimpleDate, months: number, monthEnd: boolean): SimpleDate {
-  const {year, month} = offsetMonth(date, months)
-  const lastDay = dateTimeHelper.daysInMonth(year, month)
-  return {year, month, day: monthEnd ? lastDay : Math.min(date.day, lastDay)}
 }
 
 /**
