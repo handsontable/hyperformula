@@ -67,8 +67,9 @@ export function format(value: number, formatArg: string, config: Config, dateHel
  * Tells whether a format string opens a `[` that no later `]` closes, as in
  * `[Red` or `0[`. Such a format is invalid, so `TEXT` returns `#VALUE!`.
  * A `[` inside quoted text or after a backslash is literal text and does not
- * count. A `]` inside quoted text does not close a bracket, so `[Red"]"0` is
- * invalid, as it is in Excel; a `]` after a backslash does (`[Red\]0`).
+ * count. A `]` inside quoted text does not close a bracket, so `[Red"]"0`
+ * returns `#VALUE!`, the result Excel gives for it; a `]` after a backslash
+ * does close it.
  *
  * @param formatArg the raw format string
  * @returns `true` when an opening bracket is never closed
