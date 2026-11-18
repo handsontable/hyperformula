@@ -24,6 +24,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. [#1885](https://github.com/handsontable/hyperformula/pull/1885)
+- **Breaking change**: Changed the `gpl-v3` license key to an invalid key: with `licenseKey: 'gpl-v3'`, functions return `#LIC!` and license-gated API methods throw a `LicenseCapabilityMissingError`. See [Migrating from 3.x to 4.0](https://handsontable.com/docs/hyperformula/guide/migration-from-3.x-to-4.0.html). [#1905](https://github.com/handsontable/hyperformula/pull/1905)
+- Changed the license key check to be skipped on handsontable.com and its subdomains, so the live examples in the documentation run without a license key. [#1905](https://github.com/handsontable/hyperformula/pull/1905)
 
 ### Fixed
 
