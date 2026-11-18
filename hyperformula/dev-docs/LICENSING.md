@@ -19,3 +19,24 @@ Group names are part of the license key format, so never rename a group or remov
 Nothing may live in it that upstream does not ship, other than the files `upstream.json` lists under `own_files`. That is why its `AGENTS.md`, which comes from upstream, has no `CLAUDE.md` symlink beside it.
 
 `npm run check:license-key-parser-drift --workspace=hyperformula` compares the copy with the pinned upstream commit and fails on any difference or on a newer upstream tag. It needs read access to the upstream repository, so it runs in its own CI workflow (`.github/workflows/vendored-parser.yml`) rather than in `npm run test` or `npm run lint`.
+
+## The license check skip on handsontable.com
+
+On `handsontable.com` and its one-label subdomains, `resolveLicense()` reads no key: every key, a missing one included, resolves as valid and unrestricted, and prints nothing. That is how the live examples of the documentation run without a key. The test is `isLicenseCheckSkipped()` in `licenseResolution.ts`, the same as Handsontable's `_ignored()`: it reads `location.host`, so it never applies in Node, and it never matches a look-alike host. Its tests are Jest-only (`unit/license/domain-skip.spec.ts`), because Karma's browser has a `location` that cannot be replaced.
+
+## The internal test key
+
+Everything in the repository that builds an engine for a test, a build script, the docs build or the formula editor demo uses the HyperFormula internal test key: an entitlement key that grants `fun:all` and `feat:all`, for builds released on or before 2036-11-04. Its text says in capitals that it is not licensed for production. It is issued with `npm run generate-internal-test-key` in the private `handsontable/license-key` repository, from `HYPERFORMULA_INTERNAL_TEST_RECORD`.
+
+The key is written out once per consumer, and nowhere else:
+
+| Constant | Read by |
+|---|---|
+| `hyperformula/test/_setupFiles/testLicenseKey.ts` | the test bootstrap (the default `licenseKey` of every test engine), the smoke tests, the private test suite, `docs/script/generate-builtin-functions-doc.ts` |
+| `hyperformula/script/test-license-key.js` | `script/check-file.js` |
+| `docs/src/test-license-key.mjs` | `docs/src/docs-data.mjs`, and the preview builds of the docs |
+| `hyperformula-ui/demo/shared/test-license-key.ts` | the formula editor demo, which the end-to-end suite runs |
+
+`hyperformula/test/test-license-key.spec.js` fails when the constants disagree, or when the key appears in any other file. To renew the key, issue it again upstream and paste it into every constant.
+
+A docs build on Cloudflare Workers Builds for any branch other than `master` is a preview: `docs/src/preview-license-key.mjs` writes the key into the script of every live example, after the pages are built, so the examples run on the preview URL. The code a page shows and the StackBlitz project keep the placeholder. Every build then checks its output: a production build must not hold the key anywhere, and a preview build only in the example scripts.
