@@ -21,16 +21,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `ACCRINTM`, `DISC`, `INTRATE`, `PRICEDISC`, `RECEIVED` and `YIELDDISC` functions, which return the accrued interest, discount rate, interest rate, price, amount received and yield of discounted securities and securities that pay interest at maturity. [#1799](https://github.com/handsontable/hyperformula/pull/1799)
 - Added the `TAKE` dynamic-array function. [#1722](https://github.com/handsontable/hyperformula/pull/1722)
 - Added the `COUPDAYBS`, `COUPDAYS`, `COUPDAYSNC`, `COUPNCD`, `COUPNUM` and `COUPPCD` functions, which return the coupon dates of a security, the number of coupons until maturity and the days in and around the coupon period. [#1804](https://github.com/handsontable/hyperformula/pull/1804)
-- Added new functions: DURATION, PRICE. [#1848](https://github.com/handsontable/hyperformula/pull/1848)
+- Added the `PRICE` and `DURATION` functions, which return the price per 100 face value and the Macaulay duration of a security that pays periodic interest. [#1848](https://github.com/handsontable/hyperformula/pull/1848)
 - Added the `MDURATION` function, which returns the modified duration of a security that pays periodic interest. [#1849](https://github.com/handsontable/hyperformula/pull/1849)
 
 ### Changed
 
 - **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. [#1885](https://github.com/handsontable/hyperformula/pull/1885)
+- **Breaking change**: Changed the Polish name of `PDURATION` from `ROCZ.PRZYCH` to `O.CZAS.TRWANIA` and the Turkish name of `VALUE` from `DEĞER` to `SAYIYAÇEVİR`, as in Microsoft Excel, which uses `ROCZ.PRZYCH` for `DURATION` and `DEĞER` for `PRICE`. A Polish or Turkish formula with an old name now calls `DURATION` or `PRICE`; use the new names instead. See the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html). [#1848](https://github.com/handsontable/hyperformula/pull/1848)
 
 ### Fixed
 
-- Fixed the Polish name of `PDURATION` (now `O.CZAS.TRWANIA`) and the Turkish name of `VALUE` (now `SAYIYAÇEVİR`) to match Microsoft Excel, which uses the old names for `DURATION` and `PRICE`. [#1848](https://github.com/handsontable/hyperformula/pull/1848)
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
 - Fixed `getCellValue()`, `getSheetValues()` and the other methods that export cell values ignoring the `evaluateNullToZero` option: with the option on, they now return `0` for empty cells instead of `null`. [#1738](https://github.com/handsontable/hyperformula/pull/1738)
 - Fixed approximate `XLOOKUP` ignoring values of a different type in some search modes, and approximate `MATCH`, `VLOOKUP`, and `HLOOKUP` taking such values into account for non-range arrays, single-cell ranges, and binary search over sorted cell ranges; both now behave the same in linear and binary search, consistent with Microsoft Excel. [#1755](https://github.com/handsontable/hyperformula/pull/1755)

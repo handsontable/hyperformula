@@ -37,6 +37,12 @@ export default defineConfig({
     define: {
       'import.meta.env.PUBLIC_HF_VERSION': JSON.stringify(DOCS_DATA.version),
     },
+    // The docs assistant (`src/components/DocsAssistant/`) is React, mounted in the browser by
+    // `src/scripts/docs-assistant-bootstrap.ts`: its `.tsx` files use the automatic JSX runtime.
+    esbuild: {
+      jsx: 'automatic',
+      jsxImportSource: 'react',
+    },
   },
   markdown: {
     processor: satteri({ mdastPlugins: [docsMarkdownPlugin(base)], hastPlugins: [tableWrapperPlugin, legacyAnchorsPlugin] }),
@@ -215,6 +221,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             { label: 'Migrating from 0.6 to 1.0', slug: 'guide/migration-from-0.6-to-1.0' },
             { label: 'Migrating from 1.x to 2.0', slug: 'guide/migration-from-1.x-to-2.0' },
             { label: 'Migrating from 2.x to 3.0', slug: 'guide/migration-from-2.x-to-3.0' },
+            { label: 'Migrating from 3.x to 4.0', slug: 'guide/migration-from-3.x-to-4.0' },
           ],
         },
         {
