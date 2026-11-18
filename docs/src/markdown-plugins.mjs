@@ -6,7 +6,8 @@
  *   (`basic-usage.md`, `/guide/basic-usage.md`, `../api/README.md`) becomes the URL of the page built from it, and a
  *   root-relative URL (`/hf_logo.png`) gets the base.
  * - `:::example{#id}` blocks become live examples: the HTML, CSS and compiled JS they include render on the page,
- *   and the TypeScript opens in StackBlitz.
+ *   and the TypeScript opens in StackBlitz. A preview build writes the internal test license key into the script
+ *   each example runs, once the pages are written (`preview-license-key.mjs`).
  * - A heading whose VuePress anchor differs from its new one keeps the old anchor too (`legacyAnchorsPlugin`).
  */
 import { readFileSync } from 'node:fs';
@@ -151,11 +152,12 @@ function renderExample(node, ctx) {
     'index.ts': `import './styles.css'\n${sandboxCode(files.ts)}`,
   };
 
-  // The script runs in a block of its own, so two examples on one page cannot clash over a top-level name.
+  // The script runs in a block of its own, so two examples on one page cannot clash over a top-level name. The
+  // `data-hf-example` attribute marks it as the script a preview build gives the license key (`preview-license-key.mjs`).
   return `<div class="hf-example not-content" id="${escapeHtml(id)}">
 <style>${files.css}</style>
 <div class="hf-example__preview">${files.html}</div>
-<script>{
+<script data-hf-example>{
 ${previewCode(files.js)}
 }</script>
 <form class="hf-example__stackblitz" action="https://stackblitz.com/run" method="post" target="_blank">
