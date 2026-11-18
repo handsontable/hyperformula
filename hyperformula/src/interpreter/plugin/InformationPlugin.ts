@@ -612,11 +612,21 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * Returns the cell at `row_num` and `column_num` of `array`. A `row_num` of 0 returns the whole column, a
    * `column_num` of 0 the whole row, and both 0 the whole of `array`; such results spill.
    *
+   * In array arithmetic mode, an array as `row_num`, `column_num` or `area_num` is evaluated element by element,
+   * as in Microsoft Excel. Each element returns one value: an element that selects a whole row or column returns
+   * its top-left cell, and a position that a shorter index array doesn't reach returns #N/A.
+   *
    * @param {ProcedureAst} ast - The parsed function call AST node.
    * @param {InterpreterState} state - Current interpreter evaluation state.
    */
   public index(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('INDEX'), (source: SimpleRangeValue, row: number, column: Maybe<number>, area: number) => {
+    const elementwise = this.hasArrayIndexArgument(ast, state)
+    const metadata = elementwise ? {...this.metadata('INDEX'), vectorizationForbidden: false} : this.metadata('INDEX')
+    return this.runFunction(ast.args, state, metadata, (source: SimpleRangeValue, row: number, column: Maybe<number>, area: number) => {
+      if (elementwise && (row === undefined || (column === undefined && ast.args.length > 2))) {
+        return new CellError(ErrorType.NA, ErrorMessage.WrongDimension)
+      }
+
       const range = source.range
       const height = range !== undefined && !Number.isFinite(range.height()) ? this.config.maxRows : source.height()
       const width = range !== undefined && !Number.isFinite(range.width()) ? this.config.maxColumns : source.width()
@@ -625,7 +635,8 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       if (target instanceof CellError) {
         return target
       }
-      const [targetRow, targetColumn] = target
+      const targetRow = elementwise ? Math.max(target[0], 1) : target[0]
+      const targetColumn = elementwise ? Math.max(target[1], 1) : target[1]
 
       if (range === undefined) {
         const rows = targetRow === 0 ? source.data : [source.data[targetRow - 1]]
@@ -652,8 +663,9 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
   /**
    * Predicts the size of the INDEX result at parse time.
    *
-   * The size is known only when `row_num`, `column_num` and `area_num` are number literals or empty. Otherwise
-   * INDEX is sized as a single cell, so a computed 0 index cannot spill.
+   * In array arithmetic mode, an array index is evaluated element by element, so the result has the size of the
+   * largest index array. Otherwise the size is known only when `row_num`, `column_num` and `area_num` are number
+   * literals or empty, and INDEX is sized as a single cell for any other index, so a computed 0 index cannot spill.
    *
    * @param {ProcedureAst} ast - The parsed function call AST node.
    * @param {InterpreterState} state - Current interpreter evaluation state.
@@ -661,6 +673,11 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
   public indexArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
     if (ast.args.length < 2 || ast.args.length > 4) {
       return ArraySize.scalar()
+    }
+
+    if (this.hasArrayIndexArgument(ast, state)) {
+      const indexSizes = ast.args.slice(1).map(arg => this.arraySizeForAst(arg, state))
+      return new ArraySize(Math.max(...indexSizes.map(size => size.width)), Math.max(...indexSizes.map(size => size.height)))
     }
 
     const row = InformationPlugin.literalIndex(ast.args[1])
@@ -685,6 +702,17 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       return ArraySize.scalar()
     }
     return new ArraySize(resultWidth, resultHeight)
+  }
+
+  /**
+   * Tells whether INDEX is evaluated element by element: in array arithmetic mode, when `row_num`, `column_num` or
+   * `area_num` is an array.
+   */
+  private hasArrayIndexArgument(ast: ProcedureAst, state: InterpreterState): boolean {
+    return state.arraysFlag && ast.args.slice(1).some(arg => {
+      const size = this.arraySizeForAst(arg, state)
+      return size.width > 1 || size.height > 1
+    })
   }
 
   /**

@@ -22,6 +22,7 @@ HyperFormula 4.0 changes the `INDEX` function to return what Microsoft Excel ret
 | A row of `0` | `=INDEX(A1:C3, 0, 2)` | `#VALUE!` | `B1:B3`, spilled |
 | A column of `0` or an empty column argument | `=INDEX(A1:C3, 2, 0)`, `=INDEX(A1:C3, 2, )` | `#VALUE!` | `A2:C2`, spilled |
 | No column, on a range with more than one row and column | `=INDEX(A1:C3, 2)` | The value of `A2` | `#REF!` |
+| No column, on an array with more than one row and column | `=INDEX({1,2;3,4}, 2)` | `3` | `{3,4}`, spilled |
 | No column, on a one-row range | `=INDEX(A1:C1, 3)` | `#NUM!` | The value of `C1` |
 | The `area_num` argument | `=INDEX(A1:C3, 1, 1, 1)` | `#N/A` (wrong number of arguments) | The value of `A1` |
 
