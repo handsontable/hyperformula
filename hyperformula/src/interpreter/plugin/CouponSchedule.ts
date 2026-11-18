@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {CellError, ErrorType} from '../../Cell'
@@ -26,24 +26,6 @@ export interface CouponSchedule {
   /** The first coupon date after settlement. */
   next: SimpleDate,
 }
-
-/**
- * The quasi-coupon schedule of an ACCRINT call: coupon dates anchored at `first_interest`. Period k runs from the
- * coupon date k periods after `first_interest` (before it when k is negative) to the next coupon date.
- */
-interface QuasiCouponSchedule {
-  /** The first interest date, the anchor of the schedule. */
-  firstInterest: SimpleDate,
-  /** The number of coupons per year: 1, 2 or 4. */
-  frequency: number,
-  /** The day-count basis: 0 to 4. */
-  basis: number,
-}
-
-/**
- * The index of the quasi-coupon period that ends on `first_interest`.
- */
-const FIRST_INTEREST_PERIOD = -1
 
 /**
  * Returns the coupon date `periods` coupon periods after `anchor` (before it when negative). The date is computed
@@ -157,40 +139,72 @@ export function actualCouponPeriodLength(dateTimeHelper: DateTimeHelper, schedul
  * Returns `maturity` stepped back `periods` coupon periods, each step keeping the previous date's day clamped to the
  * length of its month, so the day can drift down (31 March, 30 September, 30 March).
  *
- * Constant time: the drifted day is the smallest of maturity's day and the lengths of the months visited, and those
- * months repeat every year, so after `2 * frequency` steps (two Februaries, at least one in a non-leap year) the
- * day no longer changes.
- *
  * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
  * @param {SimpleDate} maturity - the maturity date
  * @param {number} periods - the number of coupon periods to step back
  * @param {number} frequency - the number of coupons per year: 1, 2 or 4
  */
 function driftedCouponDate(dateTimeHelper: DateTimeHelper, maturity: SimpleDate, periods: number, frequency: number): SimpleDate {
+  return chainedCouponDate(dateTimeHelper, maturity, -periods, frequency, false)
+}
+
+/**
+ * Returns `start` stepped `periods` coupon periods (back when negative), each step from the date before: the last day
+ * of the month when `monthEnd` is true, and otherwise the previous date's day clamped to the length of its month, so
+ * the day can drift down (31 March, 30 September, 30 March).
+ *
+ * Constant time: the drifted day is the smallest of `start`'s day and the lengths of the months visited, and those
+ * months repeat every year, so after `2 * frequency` steps (two Februaries, at least one in a non-leap year) the
+ * day no longer changes.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {SimpleDate} start - the date to step from
+ * @param {number} periods - the number of coupon periods to step, negative to step back
+ * @param {number} frequency - the number of coupons per year: 1, 2 or 4
+ * @param {boolean} monthEnd - whether every date is the last day of its month
+ */
+function chainedCouponDate(dateTimeHelper: DateTimeHelper, start: SimpleDate, periods: number, frequency: number, monthEnd: boolean): SimpleDate {
   const monthsPerPeriod = 12 / frequency
-  let day = maturity.day
-  for (let step = 1; step <= Math.min(periods, 2 * frequency); step++) {
-    const visited = offsetMonth(maturity, -step * monthsPerPeriod)
+  const direction = Math.sign(periods)
+  const target = offsetMonth(start, periods * monthsPerPeriod)
+  const targetMonthLength = dateTimeHelper.daysInMonth(target.year, target.month)
+  if (monthEnd) {
+    return {...target, day: targetMonthLength}
+  }
+  let day = start.day
+  for (let step = 1; step <= Math.min(Math.abs(periods), 2 * frequency); step++) {
+    const visited = offsetMonth(start, direction * step * monthsPerPeriod)
     day = Math.min(day, dateTimeHelper.daysInMonth(visited.year, visited.month))
   }
-  const target = offsetMonth(maturity, -periods * monthsPerPeriod)
-  return {...target, day: Math.min(day, dateTimeHelper.daysInMonth(target.year, target.month))}
+  return {...target, day: Math.min(day, targetMonthLength)}
+}
+
+/**
+ * The quasi-coupon schedule of an ACCRINT call: coupon dates one coupon period apart, counted from `first_interest`.
+ */
+interface QuasiCouponSchedule {
+  /** The first interest date, the anchor of the schedule. */
+  firstInterest: SimpleDate,
+  /** The number of coupons per year: 1, 2 or 4. */
+  frequency: number,
+  /** The day-count basis: 0 to 4. */
+  basis: number,
 }
 
 /**
  * Returns the interest that ACCRINT accrues from `issue` to `settlement` in coupon periods (the result divided by
- * `par` * `rate` / `frequency`), as Excel computes it. "The issue's period" and "the settlement's period" are the
- * periods of `schedule` that contain them.
+ * `par` * `rate` / `frequency`), as Excel computes it.
  *
- * - Settlement after `first_interest`: `accrualFromIssue` up to the settlement's period, or with `calcMethod` FALSE
- *   up to `first_interest`'s period, so that the time from the start of that period to settlement counts as one span.
- * - Settlement on or before `first_interest`, with `calcMethod` FALSE and issue in an earlier period than
- *   settlement: `partialPeriodsBeforeFirstInterest`.
- * - Otherwise, settlement in a period before `first_interest`'s: `accrualBeforeFirstInterestPeriod`.
- * - Otherwise: `accrualFromIssue` up to `first_interest`'s period.
+ * The accrual starts at the last coupon date before settlement when settlement is after `first_interest` and
+ * `calcMethod` is TRUE, and at the coupon date before `first_interest` otherwise. The time from that date (or from
+ * `issue`, when later) to settlement counts as days over the length of `first_interest`'s period. When `issue` is
+ * before that date, the periods back to `issue` are added one at a time: each whole period counts 1, or 0 when
+ * `calcMethod` is FALSE, and `issue`'s own period counts the days from `issue` to its end over that period's length.
  *
- * The coupon date on or before issue must not be before the earliest supported date and, for a settlement after
- * `first_interest`, the coupon date after settlement must not be after the latest one (#NUM! otherwise).
+ * Coupon dates are stepped one period at a time, each from the one before, keeping `first_interest`'s day clamped to
+ * the length of the month (or the last day when `first_interest` is the last day of its month), so a date clamped in
+ * February keeps the shorter day afterwards. A coupon date reached before the earliest supported date, or after the
+ * latest one, returns #NUM!.
  *
  * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
  * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
@@ -199,299 +213,162 @@ function driftedCouponDate(dateTimeHelper: DateTimeHelper, maturity: SimpleDate,
  * @param {boolean} calcMethod - the `calc_method` argument
  */
 export function accruedCouponPeriods(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, issue: number, settlement: number, calcMethod: boolean): number | CellError {
-  const issuePeriod = couponPeriodIndex(dateTimeHelper, issue, schedule.firstInterest, schedule.frequency)
-  if (quasiCouponDate(dateTimeHelper, schedule, issuePeriod) < 0) {
-    return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
-  }
-  const firstInterest = quasiCouponDate(dateTimeHelper, schedule, 0)
-  if (settlement > firstInterest) {
-    const settlementPeriod = periodEndingOnOrAfter(dateTimeHelper, schedule, settlement)
-    if (dateTimeHelper.getWithinBounds(quasiCouponDate(dateTimeHelper, schedule, settlementPeriod + 1)) === undefined) {
+  const {firstInterest, frequency, basis} = schedule
+  const monthEnd = isMonthEnd(dateTimeHelper, firstInterest)
+  const step = (date: SimpleDate, periods: number) => chainedCouponDate(dateTimeHelper, date, periods, frequency, monthEnd)
+  const previousCoupon = step(firstInterest, -1)
+
+  let accrualStart = previousCoupon
+  if (calcMethod && settlement > dateTimeHelper.dateToNumber(firstInterest)) {
+    const periodsBefore = lastPeriodBefore(dateTimeHelper, firstInterest, settlement, frequency, step)
+    if (dateTimeHelper.getWithinBounds(dateTimeHelper.dateToNumber(step(firstInterest, periodsBefore + 1))) === undefined) {
       return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
     }
-    return accrualFromIssue(dateTimeHelper, schedule, issue, issuePeriod, settlement, calcMethod ? settlementPeriod : FIRST_INTEREST_PERIOD)
+    accrualStart = step(firstInterest, periodsBefore)
   }
-  const settlementPeriod = settlement === firstInterest
-    ? FIRST_INTEREST_PERIOD
-    : couponPeriodIndex(dateTimeHelper, settlement, schedule.firstInterest, schedule.frequency)
-  if (!calcMethod && issuePeriod !== settlementPeriod) {
-    return partialPeriodsBeforeFirstInterest(dateTimeHelper, schedule, issue, issuePeriod, settlement, settlementPeriod)
+
+  const accrualStartSerial = dateTimeHelper.dateToNumber(accrualStart)
+  const firstInterestPeriodLength = basis === 1
+    ? dateTimeHelper.dateToNumber(firstInterest) - dateTimeHelper.dateToNumber(previousCoupon)
+    : yearDays(basis) / frequency
+  let periods = daysBetween(dateTimeHelper, basis, Math.max(issue, accrualStartSerial), settlement) / firstInterestPeriodLength
+
+  if (issue >= accrualStartSerial) {
+    return accrualStartSerial < 0 ? new CellError(ErrorType.NUM, ErrorMessage.DateBounds) : periods
   }
-  if (settlementPeriod < FIRST_INTEREST_PERIOD) {
-    return accrualBeforeFirstInterestPeriod(dateTimeHelper, schedule, issue, issuePeriod, settlement, settlementPeriod)
+
+  const periodsBack = firstPeriodOnOrBefore(dateTimeHelper, accrualStart, issue, frequency, step)
+  const issuePeriodStart = step(accrualStart, -periodsBack)
+  const issuePeriodStartSerial = dateTimeHelper.dateToNumber(issuePeriodStart)
+  const issueOnCouponDate = issuePeriodStartSerial === issue
+  if (!issueOnCouponDate && issuePeriodStartSerial < 0) {
+    return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
   }
-  return accrualFromIssue(dateTimeHelper, schedule, issue, issuePeriod, settlement, FIRST_INTEREST_PERIOD)
+  if (calcMethod) {
+    const wholePeriods = issueOnCouponDate ? periodsBack : periodsBack - 1
+    for (let period = 0; period < wholePeriods; period++) {
+      periods += 1
+    }
+  }
+  return issueOnCouponDate
+    ? periods
+    : periods + issuePeriodPart(dateTimeHelper, schedule, issue, issuePeriodStart, step(accrualStart, 1 - periodsBack))
 }
 
 /**
- * Returns the index of the period that contains `settlement`, or of the period before it when settlement is on a
- * coupon date: a settlement on a coupon date ends the period before.
+ * Returns the number of coupon periods from `firstInterest` to the last coupon date before `settlement`, which is
+ * after `firstInterest`. Constant time: estimated from the months between them, then corrected by a period.
  *
  * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
+ * @param {SimpleDate} firstInterest - the first interest date
  * @param {number} settlement - the settlement date serial
+ * @param {number} frequency - the number of coupons per year: 1, 2 or 4
+ * @param {Function} step - steps a coupon date by a number of periods
  */
-function periodEndingOnOrAfter(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, settlement: number): number {
-  const period = couponPeriodIndex(dateTimeHelper, settlement, schedule.firstInterest, schedule.frequency)
-  return quasiCouponDate(dateTimeHelper, schedule, period) === settlement ? period - 1 : period
-}
-
-/**
- * Returns the accrued coupon periods from `issue` to `settlement` when settlement is in `lastPeriod`: the issue's
- * partial period (`issuePeriodPart`), plus the days from the start of `lastPeriod` to settlement over the length of
- * `first_interest`'s period, plus each whole period in between. When `lastPeriod` is not after the issue's period,
- * the days from issue to settlement over the length of `first_interest`'s period.
- *
- * The whole periods are added one at a time, in Excel's order of additions: O(n) in their number. A period after
- * `first_interest` counts as 1, except under basis 1, where its actual length can differ from its length as
- * `couponPeriodLength` gives it.
- *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
- * @param {number} issue - the issue date serial
- * @param {number} issuePeriod - the index of the issue's period
- * @param {number} settlement - the settlement date serial
- * @param {number} lastPeriod - the index of the period in which the accrual ends at settlement
- */
-function accrualFromIssue(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, issue: number, issuePeriod: number, settlement: number, lastPeriod: number): number {
-  const firstInterestPeriodLength = couponPeriodLength(dateTimeHelper, schedule, FIRST_INTEREST_PERIOD)
-  if (issuePeriod >= lastPeriod) {
-    return accruedDays(dateTimeHelper, schedule, issue, settlement) / firstInterestPeriodLength
+function lastPeriodBefore(dateTimeHelper: DateTimeHelper, firstInterest: SimpleDate, settlement: number, frequency: number, step: (date: SimpleDate, periods: number) => SimpleDate): number {
+  const settlementDate = dateTimeHelper.numberToSimpleDate(settlement)
+  let periods = Math.max(0, Math.floor(monthsBetween(firstInterest, settlementDate) * frequency / 12))
+  while (dateTimeHelper.dateToNumber(step(firstInterest, periods + 1)) < settlement) {
+    periods++
   }
-  let periods = issuePeriodPart(dateTimeHelper, schedule, issue, issuePeriod)
-    + accruedDays(dateTimeHelper, schedule, quasiCouponDate(dateTimeHelper, schedule, lastPeriod), settlement) / firstInterestPeriodLength
-  for (let period = issuePeriod + 1; period < lastPeriod; period++) {
-    periods += wholePeriod(dateTimeHelper, schedule, period)
+  while (periods > 0 && dateTimeHelper.dateToNumber(step(firstInterest, periods)) >= settlement) {
+    periods--
   }
   return periods
 }
 
 /**
- * Returns the accrued coupon periods for a settlement in a period before `first_interest`'s: the time from issue to
- * `first_interest` minus the time from settlement to `first_interest`, both in periods of `first_interest`'s
- * length, grouped as Excel adds them. The days from settlement to `first_interest` are the rest of the settlement's
- * period (of the length `settlementPeriodLength` gives) plus the later periods: 360 / `frequency` days each under
- * bases 0 and 4, their actual days under the other bases. The lengths of the periods in between cancel out, so this
- * takes constant time.
+ * Returns the smallest number of coupon periods back from `accrualStart` that reaches a coupon date on or before
+ * `issue`, which is before `accrualStart`. Constant time: estimated from the months between them, then corrected by
+ * a period.
  *
  * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
+ * @param {SimpleDate} accrualStart - the coupon date the accrual starts at
  * @param {number} issue - the issue date serial
- * @param {number} issuePeriod - the index of the issue's period
- * @param {number} settlement - the settlement date serial
- * @param {number} settlementPeriod - the index of the settlement's period, before `first_interest`'s
+ * @param {number} frequency - the number of coupons per year: 1, 2 or 4
+ * @param {Function} step - steps a coupon date by a number of periods
  */
-function accrualBeforeFirstInterestPeriod(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, issue: number, issuePeriod: number, settlement: number, settlementPeriod: number): number {
-  const {basis, frequency} = schedule
-  const daysAfterSettlementPeriod = basis === 0 || basis === 4
-    ? (FIRST_INTEREST_PERIOD - settlementPeriod) * 360 / frequency
-    : quasiCouponDate(dateTimeHelper, schedule, 0) - quasiCouponDate(dateTimeHelper, schedule, settlementPeriod + 1)
-  const daysToFirstInterest = settlementPeriodLength(dateTimeHelper, schedule, issuePeriod, settlementPeriod)
-    - accruedDays(dateTimeHelper, schedule, quasiCouponDate(dateTimeHelper, schedule, settlementPeriod), settlement) + daysAfterSettlementPeriod
-  return issuePeriodPart(dateTimeHelper, schedule, issue, issuePeriod)
-    + ((FIRST_INTEREST_PERIOD - issuePeriod) - daysToFirstInterest / couponPeriodLength(dateTimeHelper, schedule, FIRST_INTEREST_PERIOD))
-}
-
-/**
- * Returns the accrued coupon periods with `calc_method` FALSE when issue and settlement are in different periods
- * and settlement is on or before `first_interest`: the issue's partial period (none when issue is on a coupon date),
- * plus the settlement's partial period over its length, minus the whole periods from the settlement's period to
- * `first_interest`. The result can be negative.
- *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
- * @param {number} issue - the issue date serial
- * @param {number} issuePeriod - the index of the issue's period
- * @param {number} settlement - the settlement date serial
- * @param {number} settlementPeriod - the index of the settlement's period, not after `first_interest`'s
- */
-function partialPeriodsBeforeFirstInterest(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, issue: number, issuePeriod: number, settlement: number, settlementPeriod: number): number {
-  const issuePart = quasiCouponDate(dateTimeHelper, schedule, issuePeriod) === issue ? 0 : issuePeriodPart(dateTimeHelper, schedule, issue, issuePeriod)
-  const settlementPart = accruedDays(dateTimeHelper, schedule, quasiCouponDate(dateTimeHelper, schedule, settlementPeriod), settlement)
-    / couponPeriodLength(dateTimeHelper, schedule, settlementPeriod)
-  return issuePart + settlementPart - (FIRST_INTEREST_PERIOD - settlementPeriod)
-}
-
-/**
- * Returns the part of the issue's period from issue to the next coupon date, over the period's length:
- * `issuePeriodLength` when the period is before `first_interest`'s, `couponPeriodLength` otherwise. An issue on a
- * coupon date gives a whole period (`wholePeriod`).
- *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
- * @param {number} issue - the issue date serial
- * @param {number} issuePeriod - the index of the issue's period
- */
-function issuePeriodPart(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, issue: number, issuePeriod: number): number {
-  if (quasiCouponDate(dateTimeHelper, schedule, issuePeriod) === issue) {
-    return wholePeriod(dateTimeHelper, schedule, issuePeriod)
+function firstPeriodOnOrBefore(dateTimeHelper: DateTimeHelper, accrualStart: SimpleDate, issue: number, frequency: number, step: (date: SimpleDate, periods: number) => SimpleDate): number {
+  const issueDate = dateTimeHelper.numberToSimpleDate(issue)
+  let periods = Math.max(1, Math.ceil(monthsBetween(issueDate, accrualStart) * frequency / 12))
+  while (dateTimeHelper.dateToNumber(step(accrualStart, -periods)) > issue) {
+    periods++
   }
-  const length = issuePeriod < FIRST_INTEREST_PERIOD
-    ? issuePeriodLength(dateTimeHelper, schedule, issuePeriod)
-    : couponPeriodLength(dateTimeHelper, schedule, issuePeriod)
-  return accruedDays(dateTimeHelper, schedule, issue, quasiCouponDate(dateTimeHelper, schedule, issuePeriod + 1)) / length
-}
-
-/**
- * Returns a whole period in coupon periods: 1, except for a period after `first_interest` under basis 1, which is
- * its actual length over its length as `couponPeriodLength` gives it. The two lengths differ only when the period's
- * end rolls over (`periodEndRollsOver`), so the date arithmetic is skipped for every other period.
- *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
- * @param {number} period - the index of the period
- */
-function wholePeriod(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, period: number): number {
-  if (period < 0 || schedule.basis !== 1 || !periodEndRollsOver(dateTimeHelper, schedule, period)) {
-    return 1
+  while (periods > 1 && dateTimeHelper.dateToNumber(step(accrualStart, 1 - periods)) <= issue) {
+    periods--
   }
-  const actualLength = quasiCouponDate(dateTimeHelper, schedule, period + 1) - quasiCouponDate(dateTimeHelper, schedule, period)
-  return actualLength / couponPeriodLength(dateTimeHelper, schedule, period)
+  return periods
 }
 
 /**
- * Returns true when `rolledOverPeriodEnd` is after the coupon date that ends `period`: `first_interest` is not the
- * last day of its month and its day does not exist in the month of that coupon date.
+ * Returns the number of months from `start`'s month to `end`'s month.
  *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
- * @param {number} period - the index of the period
- */
-function periodEndRollsOver(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, period: number): boolean {
-  const {firstInterest, frequency} = schedule
-  const end = offsetMonth(firstInterest, (period + 1) * 12 / frequency)
-  return !isMonthEnd(dateTimeHelper, firstInterest) && firstInterest.day > dateTimeHelper.daysInMonth(end.year, end.month)
-}
-
-/**
- * Returns the length in days of a period that is not the issue's period before `first_interest`'s: 360 /
- * `frequency` under bases 0, 2 and 4, 365 / `frequency` under basis 3, and under basis 1 the days from the period
- * start to `rolledOverPeriodEnd`.
- *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
- * @param {number} period - the index of the period
- */
-function couponPeriodLength(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, period: number): number {
-  switch (schedule.basis) {
-    case 1:
-      return rolledOverPeriodEnd(dateTimeHelper, schedule, period) - quasiCouponDate(dateTimeHelper, schedule, period)
-    case 3:
-      return 365 / schedule.frequency
-    default:
-      return 360 / schedule.frequency
-  }
-}
-
-/**
- * Returns the length in days of the issue's period when it is before `first_interest`'s. Under bases 0 and 2, the
- * US 30/360 days (`days360`) from the period start to `rolledOverPeriodEnd`; under basis 4, the European 30/360
- * days to the date with `first_interest`'s day in the month of the next coupon date, even when that day does not
- * exist (30 February counts as day 30); under bases 1 and 3, `couponPeriodLength`.
- *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
- * @param {number} period - the index of the issue's period, before `first_interest`'s
- */
-function issuePeriodLength(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, period: number): number {
-  const {firstInterest, frequency} = schedule
-  const start = couponDate(dateTimeHelper, firstInterest, period, frequency)
-  switch (schedule.basis) {
-    case 0:
-    case 2:
-      return days360(dateTimeHelper, start, dateTimeHelper.numberToSimpleDate(rolledOverPeriodEnd(dateTimeHelper, schedule, period)))
-    case 4: {
-      const next = couponDate(dateTimeHelper, firstInterest, period + 1, frequency)
-      const end = {...next, day: isMonthEnd(dateTimeHelper, firstInterest) ? next.day : firstInterest.day}
-      return daysIn30DayMonths(toBasisEU(start), toBasisEU(end))
-    }
-    default:
-      return couponPeriodLength(dateTimeHelper, schedule, period)
-  }
-}
-
-/**
- * Returns the length in days that Excel uses for the settlement's period when settlement is in a period before
- * `first_interest`'s: the days to the next coupon date when issue is in the same period (US 30/360 under bases 0
- * and 2, European 30/360 under basis 4, actual under basis 1, 365 / `frequency` under basis 3), and
- * `issuePeriodLength` otherwise.
- *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
- * @param {number} issuePeriod - the index of the issue's period
- * @param {number} settlementPeriod - the index of the settlement's period, before `first_interest`'s
- */
-function settlementPeriodLength(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, issuePeriod: number, settlementPeriod: number): number {
-  if (issuePeriod !== settlementPeriod) {
-    return issuePeriodLength(dateTimeHelper, schedule, settlementPeriod)
-  }
-  const {firstInterest, frequency} = schedule
-  switch (schedule.basis) {
-    case 0:
-    case 2:
-      return days360(dateTimeHelper, couponDate(dateTimeHelper, firstInterest, settlementPeriod, frequency), couponDate(dateTimeHelper, firstInterest, settlementPeriod + 1, frequency))
-    case 3:
-      return 365 / frequency
-    default:
-      return accruedDays(dateTimeHelper, schedule, quasiCouponDate(dateTimeHelper, schedule, settlementPeriod), quasiCouponDate(dateTimeHelper, schedule, settlementPeriod + 1))
-  }
-}
-
-/**
- * Returns the date serial of the day with `first_interest`'s day of the month in the month of the coupon date that
- * ends `period`, rolled over into the next month when that month is shorter (for `first_interest` on 30 August,
- * "30 February 2008" is 1 March 2008). A month-end `first_interest` gives the coupon date itself.
- *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
- * @param {number} period - the index of the period
- */
-function rolledOverPeriodEnd(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, period: number): number {
-  const {firstInterest, frequency} = schedule
-  const next = couponDate(dateTimeHelper, firstInterest, period + 1, frequency)
-  const day = isMonthEnd(dateTimeHelper, firstInterest) ? next.day : firstInterest.day
-  return dateTimeHelper.dateToNumber(next) + day - next.day
-}
-
-/**
- * Counts the days from `start` to `end` with the US (NASD) 30/360 method as Microsoft documents it for Excel's
- * DAYS360: a start date on the last day of its month counts as day 30; an end date on the last day of its month
- * counts as the 1st of the next month when the start day is below 30, and as day 30 otherwise.
- *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
  * @param {SimpleDate} start - the start date
  * @param {SimpleDate} end - the end date
  */
-function days360(dateTimeHelper: DateTimeHelper, start: SimpleDate, end: SimpleDate): number {
-  const adjustedStart = {...start, day: isMonthEnd(dateTimeHelper, start) ? 30 : start.day}
-  if (!isMonthEnd(dateTimeHelper, end)) {
-    return daysIn30DayMonths(adjustedStart, end)
-  }
-  const adjustedEnd = adjustedStart.day < 30 ? {...offsetMonth(end, 1), day: 1} : {...end, day: 30}
-  return daysIn30DayMonths(adjustedStart, adjustedEnd)
+function monthsBetween(start: SimpleDate, end: SimpleDate): number {
+  return 12 * (end.year - start.year) + end.month - start.month
 }
 
 /**
- * Returns the days from `start` to `end` counted by the schedule's basis.
+ * Returns the part of `issue`'s coupon period that ACCRINT accrues: the days from `issue` to the period's end over the
+ * period's length. Bases 0, 2 and 4 count the length in 30-day months, US for 0 and 2 (with the last day of February
+ * and the 31st counted as the 30th at both ends) and European for 4; basis 1 counts its actual days, and basis 3 is
+ * 365 / frequency.
  *
  * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
  * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
+ * @param {number} issue - the issue date serial, inside the period
+ * @param {SimpleDate} periodStart - the coupon date that starts the period
+ * @param {SimpleDate} periodEnd - the coupon date that ends the period
+ */
+function issuePeriodPart(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, issue: number, periodStart: SimpleDate, periodEnd: SimpleDate): number {
+  const periodEndSerial = dateTimeHelper.dateToNumber(periodEnd)
+  const days = daysBetween(dateTimeHelper, schedule.basis, issue, periodEndSerial)
+  switch (schedule.basis) {
+    case 0:
+    case 2:
+      return days / daysIn30DayMonths(
+        {...periodStart, day: thirtyDayMonthDay(dateTimeHelper, periodStart)},
+        {...periodEnd, day: thirtyDayMonthDay(dateTimeHelper, periodEnd)},
+      )
+    case 4:
+      return days / daysIn30DayMonths(toBasisEU(periodStart), toBasisEU(periodEnd))
+    case 1:
+      return days / (periodEndSerial - dateTimeHelper.dateToNumber(periodStart))
+    default:
+      return days / (365 / schedule.frequency)
+  }
+}
+
+/**
+ * Returns the days from `start` to `end` that ACCRINT accrues under `basis`: US 30/360 for basis 0, European 30/360
+ * for basis 4, and actual days otherwise.
+ *
+ * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
+ * @param {number} basis - the day-count basis: 0 to 4
  * @param {number} start - the start date serial
  * @param {number} end - the end date serial
  */
-function accruedDays(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, start: number, end: number): number {
-  return dayCount(dateTimeHelper, start, end, schedule.basis)
+function daysBetween(dateTimeHelper: DateTimeHelper, basis: number, start: number, end: number): number {
+  if (basis === 0) {
+    const [adjustedStart, adjustedEnd] = dateTimeHelper.toBasisUS(dateTimeHelper.numberToSimpleDate(start), dateTimeHelper.numberToSimpleDate(end))
+    return daysIn30DayMonths(adjustedStart, adjustedEnd)
+  }
+  if (basis === 4) {
+    return daysIn30DayMonths(toBasisEU(dateTimeHelper.numberToSimpleDate(start)), toBasisEU(dateTimeHelper.numberToSimpleDate(end)))
+  }
+  return end - start
 }
 
 /**
- * Returns the date serial of the coupon date `period` periods after `first_interest` (before it when negative).
+ * Returns the days of a year under `basis` that a coupon period's length is a fraction of: 365 for basis 3, 360
+ * otherwise. Basis 1 periods are measured in actual days instead.
  *
- * @param {DateTimeHelper} dateTimeHelper - the engine's date helper
- * @param {QuasiCouponSchedule} schedule - the schedule anchored at `first_interest`
- * @param {number} period - the number of periods after `first_interest`, negative before it
+ * @param {number} basis - the day-count basis: 0 to 4
  */
-function quasiCouponDate(dateTimeHelper: DateTimeHelper, schedule: QuasiCouponSchedule, period: number): number {
-  return dateTimeHelper.dateToNumber(couponDate(dateTimeHelper, schedule.firstInterest, period, schedule.frequency))
+function yearDays(basis: number): number {
+  return basis === 3 ? 365 : 360
 }
 
 /**
