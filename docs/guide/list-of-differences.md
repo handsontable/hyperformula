@@ -78,6 +78,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | LCMP          | =LCM(1000000, 1000001, 1000002, 1000003)                       |          NUM |   5.00003E+23 |             NUM |
 | TBILLPRICE    | =TBILLPRICE(0, 180, 1.9)                                       |       5.0000 |           NUM |          5.0000 |
 | TBILLPRICE    | =TBILLPRICE(0, 180, 2)                                         |       0.0000 |           NUM |          0.0000 |
+| ACCRINTM      | =ACCRINTM(DATE(2008,4,1), DATE(2008,6,15), 0.1)                |      20.5556 |       20.5556 |    Wrong number |
 | NPV           | =NPV(1, TRUE(), 1)                                             |       0.7500 |        0.5000 |          0.7500 |
 | NPV           | =NPV(1,B1) where B1 = true                                     |       0.5000 |        0.0000 |          0.0000 |
 | POISSON.DIST  | =POISSON.DIST(-0.01, 0, FALSE())                               |          NUM |        1.0000 |             NUM |
@@ -117,11 +118,28 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | NORMSDIST     | =NORMSDIST(0, TRUE())                                          |          0.5 |  Wrong number |    Wrong number |
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
+| CHOOSECOLS    | =CHOOSECOLS(Data!A:A, 1)                                      | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | Spills the whole column when space is available. | Spills all 1,048,576 rows from row 1, with blank source cells as 0; returns SPILL below row 1. |
+| CHOOSECOLS    | =CHOOSECOLS(1:1, -1)<br>where A1:C1: 1, 2, 3                    | 3 (counts back from the last used column) | Empty cell (counts back from the last column of the sheet) | 0 (counts back from the last column of the sheet) |
+| CHOOSECOLS    | =CHOOSECOLS(1:1, 5)<br>where A1:C1: 1, 2, 3                     | VALUE (column 5 is past the last used column) | Empty cell | 0 |
+| CHOOSECOLS    | =SUM(CHOOSECOLS(Data!A:A, 1))<br>where the Data sheet is empty   | N/A | 0 | 0 |
+| CHOOSECOLS    | =COLUMNS(CHOOSECOLS(A1:C3, E1:F1))<br>where E1:F1: 1, 2         | VALUE (column indexes must be separate arguments) | 2 | 2 |
+| CHOOSECOLS    | =COLUMNS(CHOOSECOLS(A1:C3, {1,2}))                              | 1 (only the first index of an array is used) | 2 | 2 |
+| CHOOSEROWS    | =CHOOSEROWS(Data!1:1, 1)                                      | Spills the source sheet's used columns from column A; returns SPILL outside column A. | Returns every column of the source sheet's row. | Returns all 16,384 columns of the row. |
+| CHOOSEROWS    | =CHOOSEROWS(Data!A:A, -1)                                     | Returns the source sheet's last used row. | Returns the source sheet's last row. | Returns row 1,048,576. |
+| TAKE          | =TAKE(A1:A3, 0)                                                |          N/A | No such function. |           CALC  |
+| TAKE          | =TAKE(Data!A:A, , 1)                                           | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | No such function. | Spills all 1,048,576 rows from row 1, with blank source cells as 0; returns SPILL below row 1. |
+| TAKE          | =SUM(TAKE(A:A, -2))<br>where A1:A5: 1, 2, 3, 4, 5              | 9 (counts back from the last used row) | No such function. | 0 (counts back from the last row of the sheet) |
+| TAKE          | =SUM(TAKE(1:1, , -2))<br>where A1:C1: 1, 2, 3                  | 5 (counts back from the last used column) | No such function. | 0 (counts back from the last column of the sheet) |
+| TAKE          | =TAKE(A:A, B1) in C5,<br>where A1:A5: 1, 2, 3, 4, 5 and B1 = 6 | Returns SPILL: the result is taller than the area reserved for it below row 1 (5 rows, the source's height). A count that fits, such as 2, spills 1, 2. A negative count, such as -2, counts back from the end of the reserved area and returns 2 empty cells. | No such function. | Spills 1, 2, 3, 4, 5, 0 into C5:C10. With B1 = -2, spills 0, 0. |
+| TAKE          | =TAKE(A1:C3, NA())                                             | Fills the whole area reserved for the array (here 3x3) with N/A. | No such function. | A single N/A error. |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
 | CEILING.MATH  | =CEILING.MATH(-4.3, 2, 2)                                      |           -4 |            -6 |              -6 |
 | FLOOR.MATH    | =FLOOR.MATH(-4.7, 2, 2)                                        |           -6 |            -4 |              -4 |
+| GESTEP        | =GESTEP(A1:A2, 0)<br>where A1:A2: 1, 2; `useArrayArithmetic: true` |  Spills 1, 1 |   Not checked |           VALUE |
+| GESTEP        | =GESTEP(A1:A3, 4) in B2<br>where A1:A3: 1, 5, 2                |            1 |   Not checked |           VALUE |
+| GESTEP        | =GESTEP(C1:C2, NA())<br>in row 3 or below, where C1:C2: `#N/A`, "x" |        VALUE |   Not checked |             N/A |
 
 A few of the rows above share a root cause worth stating once:
 
