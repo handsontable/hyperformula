@@ -961,10 +961,20 @@ describe("ErrorPopup syncCell", () => {
     cell.remove();
   });
 
+  function remark(target: HTMLElement, message: string | null): void {
+    const previousMessage = target.dataset.hfeError;
+
+    setCellError(target, message);
+    popup.syncCell(target, previousMessage);
+  }
+
+  function pressEscape(): void {
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+  }
+
   it("closes the tooltip when the anchored cell's error is cleared", () => {
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
-    setCellError(cell, null);
-    popup.syncCell(cell);
+    remark(cell, null);
 
     expect(popup.isVisible()).toBe(false);
     expect(cell.getAttribute("aria-errormessage")).toBeNull();
@@ -972,8 +982,7 @@ describe("ErrorPopup syncCell", () => {
 
   it("shows the new message when the anchored cell's error changes", () => {
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
-    setCellError(cell, "#REF! — bad reference");
-    popup.syncCell(cell);
+    remark(cell, "#REF! — bad reference");
 
     expect(popup.isVisible()).toBe(true);
     expect(document.body.querySelector(sel(CN.errorPopupTitle))?.textContent).toBe("#REF!");
@@ -987,10 +996,8 @@ describe("ErrorPopup syncCell", () => {
 
   it("reopens the tooltip when a new error lands on the cell that still holds focus", () => {
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
-    setCellError(cell, null);
-    popup.syncCell(cell);
-    setCellError(cell, "#REF!");
-    popup.syncCell(cell);
+    remark(cell, null);
+    remark(cell, "#REF!");
 
     expect(popup.isVisible()).toBe(true);
     expect(document.body.querySelector(sel(CN.errorPopupTitle))?.textContent).toBe("#REF!");
@@ -998,21 +1005,17 @@ describe("ErrorPopup syncCell", () => {
 
   it("reopens the tooltip when a new error lands on the cell under the pointer", () => {
     cell.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
-    setCellError(cell, null);
-    popup.syncCell(cell);
-    setCellError(cell, "#REF!");
-    popup.syncCell(cell);
+    remark(cell, null);
+    remark(cell, "#REF!");
 
     expect(popup.isVisible()).toBe(true);
   });
 
   it("keeps the tooltip closed when a new error lands on a cell that pointer and focus left", () => {
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
-    setCellError(cell, null);
-    popup.syncCell(cell);
+    remark(cell, null);
     cell.dispatchEvent(new FocusEvent("focusout", { bubbles: true, relatedTarget: document.body }));
-    setCellError(cell, "#REF!");
-    popup.syncCell(cell);
+    remark(cell, "#REF!");
 
     expect(popup.isVisible()).toBe(false);
   });
@@ -1022,8 +1025,7 @@ describe("ErrorPopup syncCell", () => {
     document.body.appendChild(other);
     setCellError(other, "#NAME?");
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
-    setCellError(other, null);
-    popup.syncCell(other);
+    remark(other, null);
 
     expect(popup.isVisible()).toBe(true);
     expect(document.body.querySelector(sel(CN.errorPopupTitle))?.textContent).toBe("#DIV/0!");
@@ -1033,12 +1035,44 @@ describe("ErrorPopup syncCell", () => {
   it("shows a new error on a cell whose previous error was dismissed with Escape", () => {
     cell.focus();
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
-    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-    setCellError(cell, null);
-    popup.syncCell(cell);
-    setCellError(cell, "#REF!");
-    popup.syncCell(cell);
+    pressEscape();
+    remark(cell, null);
+    remark(cell, "#REF!");
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+
+    expect(popup.isVisible()).toBe(true);
+    expect(document.body.querySelector(sel(CN.errorPopupTitle))?.textContent).toBe("#REF!");
+  });
+
+  it("keeps a tooltip dismissed with Escape closed when a repaint leaves the error unchanged", () => {
+    cell.focus();
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    pressEscape();
+    remark(cell, "#DIV/0!");
+
+    expect(popup.isVisible()).toBe(false);
+  });
+
+  it("keeps every tooltip closed after Escape when a repaint leaves the hovered cell's error unchanged", () => {
+    const hovered = document.createElement("div");
+    document.body.appendChild(hovered);
+    setCellError(hovered, "#NAME?");
+    hovered.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+    cell.focus();
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    pressEscape();
+    remark(cell, "#DIV/0!");
+    remark(hovered, "#NAME?");
+
+    expect(popup.isVisible()).toBe(false);
+    hovered.remove();
+  });
+
+  it("shows the new error at once when the error of a cell dismissed with Escape changes", () => {
+    cell.focus();
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    pressEscape();
+    remark(cell, "#REF!");
 
     expect(popup.isVisible()).toBe(true);
     expect(document.body.querySelector(sel(CN.errorPopupTitle))?.textContent).toBe("#REF!");

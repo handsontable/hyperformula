@@ -384,6 +384,16 @@ describe("FormulaBuilder", () => {
       expect(document.body.querySelector<HTMLElement>(sel(CN.errorPopup))?.hidden).toBe(true);
       expect(cell.getAttribute("aria-errormessage")).toBeNull();
     });
+
+    it("keeps the error tooltip open when a repaint leaves the error unchanged", () => {
+      const cell = document.createElement("td");
+      rootEl.appendChild(cell);
+      builder.markCell(cell, { type: "DIV_BY_ZERO", value: "#DIV/0!" });
+      cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+      builder.markCell(cell, { type: "DIV_BY_ZERO", value: "#DIV/0!" });
+
+      expect(document.body.querySelector<HTMLElement>(sel(CN.errorPopup))?.hidden).toBe(false);
+    });
   });
 
   describe("destroy", () => {

@@ -292,35 +292,28 @@ export class ErrorPopup extends BasePopup {
     this.containerScope.activate();
   }
 
-  syncCell(cell: HTMLElement): void {
+  syncCell(cell: HTMLElement, previousMessage: string | undefined): void {
     const message = cell.dataset.hfeError;
 
-    if (!message && cell === this.suppressedCell) {
+    if (message === previousMessage) {
+      return;
+    }
+
+    if (cell === this.suppressedCell) {
       this.suppressedCell = null;
     }
 
-    if (
-      message &&
-      !this.isVisible() &&
-      cell !== this.suppressedCell &&
-      (cell === this.pointerCell || cell === this.focusCell)
-    ) {
-      this.anchorTo(cell, message);
+    if (this.isVisible() && cell === this.activeCell) {
+      if (message) {
+        this.anchorTo(cell, message);
+      } else {
+        this.close();
+      }
 
       return;
     }
 
-    if (cell !== this.activeCell || !this.isVisible()) {
-      return;
-    }
-
-    if (!message) {
-      this.close();
-
-      return;
-    }
-
-    if (message !== this.pendingMessage) {
+    if (message && !this.isVisible() && (cell === this.pointerCell || cell === this.focusCell)) {
       this.anchorTo(cell, message);
     }
   }
