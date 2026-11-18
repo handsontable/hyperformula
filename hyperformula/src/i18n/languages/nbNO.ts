@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
@@ -18,6 +18,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#VERDI!',
   },
   functions: {
+    CHOOSECOLS: 'VELGKOL',
+    CHOOSEROWS: 'VELGRADER',
     FILTER: 'FILTER',
     VSTACK: 'VSTAKK',
     HSTACK: 'HSTAKK',
@@ -25,6 +27,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINTM: 'PÅLØPT.FORFALLSRENTE',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSH',
     ACOT: 'ACOT',
@@ -38,6 +41,7 @@ const dictionary: RawTranslationPackage = {
     AVERAGE: 'GJENNOMSNITT',
     AVERAGEA: 'GJENNOMSNITTA',
     AVERAGEIF: 'GJENNOMSNITTHVIS',
+    AVERAGEIFS: 'GJENNOMSNITT.HVIS.SETT',
     BASE: 'BASE',
     BIN2DEC: 'BINTILDES',
     BIN2HEX: 'BINTILHEKS',
@@ -97,6 +101,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DESIMAL',
     DEGREES: 'GRADER',
     DELTA: 'DELTA',
+    DISC: 'DISKONTERT',
     DOLLARDE: 'DOLLARDE',
     DOLLARFR: 'DOLLARBR',
     EDATE: 'DAG.ETTER',
@@ -104,6 +109,7 @@ const dictionary: RawTranslationPackage = {
     EOMONTH: 'MÅNEDSSLUTT',
     ERF: 'FEILF',
     ERFC: 'FEILFK',
+    'ERROR.TYPE': 'FEIL.TYPE',
     EVEN: 'AVRUND.TIL.PARTALL',
     EXACT: 'EKSAKT',
     EXP: 'EKSP',
@@ -125,6 +131,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEKS',
     INT: 'HELTALL',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'RENTESATS',
     IPMT: 'RAVDRAG',
     IRR: 'IR',
     ISBINARY: 'ISBINARY',
@@ -186,11 +193,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'PRODUKT',
     POWER: 'OPPHØYD.I',
     PPMT: 'AMORT',
+    PRICEDISC: 'PRIS.DISKONTERT',
     PROPER: 'STOR.FORBOKSTAV',
     PV: 'NÅVERDI',
     RADIANS: 'RADIANER',
     RAND: 'TILFELDIG',
     RATE: 'RENTE',
+    RECEIVED: 'MOTTATT.AVKAST',
     REPLACE: 'ERSTATT',
     REPT: 'GJENTA',
     RIGHT: 'HØYRE',
@@ -227,6 +236,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'ÅRSAVS',
     T: 'T',
+    TAKE: 'TA',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'TBILLEKV',
@@ -241,6 +251,7 @@ const dictionary: RawTranslationPackage = {
     TRIM: 'TRIMME',
     TRUE: 'SANN',
     TRUNC: 'AVKORT',
+    TYPE: 'VERDITYPE',
     UNICHAR: 'UNICODETEGN',
     UNICODE: 'UNICODE',
     UNIQUE: 'UNIK',
@@ -262,6 +273,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'EKSKLUSIVELLER',
     YEAR: 'ÅR',
     YEARFRAC: 'ÅRDEL',
+    YIELDDISC: 'AVKAST.DISKONTERT',
     ROMAN: 'ROMERTALL',
     ARABIC: 'ARABISK',
     'HF.ADD': 'HF.ADD',
@@ -402,6 +414,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'KONFIDENS.T',
     DEVSQ: 'AVVIK.KVADRERT',
     GEOMEAN: 'GJENNOMSNITT.GEOMETRISK',
+    GESTEP: 'GRENSEVERDI',
     HARMEAN: 'GJENNOMSNITT.HARMONISK',
     CRITBINOM: 'GRENSE.BINOM',
     PEARSON: 'PEARSON',
