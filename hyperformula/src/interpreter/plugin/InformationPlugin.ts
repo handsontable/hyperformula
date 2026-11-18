@@ -14,7 +14,7 @@ import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {ArrayPlugin} from './ArrayPlugin'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginDefinition, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionMetadata, FunctionPlugin, FunctionPluginDefinition, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 import {LookupPlugin} from './LookupPlugin'
 import {MatrixPlugin} from './MatrixPlugin'
 
@@ -621,11 +621,12 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    */
   public index(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     const elementwise = this.hasArrayIndexArgument(ast, state)
-    const metadata = elementwise ? {...this.metadata('INDEX'), vectorizationForbidden: false} : this.metadata('INDEX')
-    return this.runFunction(ast.args, state, metadata, (source: SimpleRangeValue, row: number, column: Maybe<number>, area: number) => {
-      if (elementwise && (row === undefined || (column === undefined && ast.args.length > 2))) {
+    const metadata = elementwise ? this.elementwiseIndexMetadata() : this.metadata('INDEX')
+    return this.runFunction(ast.args, state, metadata, (source: SimpleRangeValue, row: number, column: Maybe<number>, areaArgument: Maybe<number>) => {
+      if (elementwise && (row === undefined || (column === undefined && ast.args.length > 2) || (areaArgument === undefined && ast.args.length > 3))) {
         return new CellError(ErrorType.NA, ErrorMessage.WrongDimension)
       }
+      const area = areaArgument ?? 1
 
       const range = source.range
       const height = range !== undefined && !Number.isFinite(range.height()) ? this.config.maxRows : source.height()
@@ -702,6 +703,17 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       return ArraySize.scalar()
     }
     return new ArraySize(resultWidth, resultHeight)
+  }
+
+  /**
+   * Returns the INDEX metadata for element-by-element evaluation: vectorized, and without the `area_num` default, so
+   * that a position a shorter `area_num` array doesn't reach arrives as `undefined` rather than as 1.
+   */
+  private elementwiseIndexMetadata(): FunctionMetadata {
+    const metadata = this.metadata('INDEX')
+    const parameters = [...(metadata.parameters ?? [])]
+    parameters[3] = {argumentType: FunctionArgumentType.NUMBER, optionalArg: true}
+    return {...metadata, parameters, vectorizationForbidden: false}
   }
 
   /**
