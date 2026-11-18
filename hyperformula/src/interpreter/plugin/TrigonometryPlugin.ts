@@ -182,7 +182,7 @@ export class TrigonometryPlugin extends FunctionPlugin implements FunctionPlugin
     return this.runFunction(ast.args, state, this.metadata('ATAN2'),
       (x: number, y: number) => {
         if (x === 0 && y === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         return Math.atan2(y, x)
       }
@@ -191,7 +191,7 @@ export class TrigonometryPlugin extends FunctionPlugin implements FunctionPlugin
 
   public cot(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COT'),
-      (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.tan(arg))
+      (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero) : (1 / Math.tan(arg))
     )
   }
 
@@ -209,7 +209,7 @@ export class TrigonometryPlugin extends FunctionPlugin implements FunctionPlugin
 
   public csc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CSC'),
-      (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.sin(arg))
+      (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero) : (1 / Math.sin(arg))
     )
   }
 
@@ -239,7 +239,7 @@ export class TrigonometryPlugin extends FunctionPlugin implements FunctionPlugin
 
   public coth(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COTH'),
-      (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.tanh(arg))
+      (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero) : (1 / Math.tanh(arg))
     )
   }
 
@@ -257,7 +257,7 @@ export class TrigonometryPlugin extends FunctionPlugin implements FunctionPlugin
 
   public csch(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CSCH'),
-      (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO) : (1 / Math.sinh(arg))
+      (arg) => (arg === 0) ? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero) : (1 / Math.sinh(arg))
     )
   }
 }
