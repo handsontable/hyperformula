@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {ALL_UNICODE_LETTERS_ARRAY, NAMED_EXPRESSION_PATTERN, R1C1_CELL_REFERENCE_PATTERN} from './parser-consts'
