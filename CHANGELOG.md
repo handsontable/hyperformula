@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. [#1885](https://github.com/handsontable/hyperformula/pull/1885)
+- **Breaking change**: Changed the `FILTER` function to return `#VALUE!` for text in its `include` argument, including the empty text and `"TRUE"`, and to return an error found there, as in Microsoft Excel. Before, it dropped those rows, or kept them for `"TRUE"`. For example, a condition column of `=IF(B1>0, TRUE(), "")` now makes `FILTER` return `#VALUE!`; return `FALSE()` instead of `""`. See the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html). [#1891](https://github.com/handsontable/hyperformula/pull/1891)
 
 ### Fixed
 
@@ -38,7 +39,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed unbounded parser cache growth in long-running instances that process many distinct formulas, including when undo is disabled. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
 - Fixed array formulas spilling past the `maxRows` and `maxColumns` limits: they now return `#SPILL!` when their result extends beyond the sheet edge. [#1774](https://github.com/handsontable/hyperformula/pull/1774)
 - Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is an empty argument slot (e.g. `=ADDRESS(2,3,1,FALSE(),)` now returns `R2C3` instead of `!R2C3`), while an explicit `""` still adds it. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
-- Fixed the `FILTER` function ignoring text and errors in its conditions: text now returns `#VALUE!` and an error is returned as is, as in Microsoft Excel. For example, `=FILTER(A1:A2, B1:B2)` with `TRUE` and `"x"` in `B1:B2` now returns `#VALUE!` instead of `1`. [#1891](https://github.com/handsontable/hyperformula/pull/1891)
 
 ## [3.5.0] - 2026-10-09
 
