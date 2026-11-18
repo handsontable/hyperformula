@@ -21,7 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `ACCRINTM`, `DISC`, `INTRATE`, `PRICEDISC`, `RECEIVED` and `YIELDDISC` functions, which return the accrued interest, discount rate, interest rate, price, amount received and yield of discounted securities and securities that pay interest at maturity. [#1799](https://github.com/handsontable/hyperformula/pull/1799)
 - Added the `TAKE` dynamic-array function. [#1722](https://github.com/handsontable/hyperformula/pull/1722)
 - Added the `COUPDAYBS`, `COUPDAYS`, `COUPDAYSNC`, `COUPNCD`, `COUPNUM` and `COUPPCD` functions, which return the coupon dates of a security, the number of coupons until maturity and the days in and around the coupon period. [#1804](https://github.com/handsontable/hyperformula/pull/1804)
-- Added a new function: ACCRINT. [#1812](https://github.com/handsontable/hyperformula/pull/1812)
+- Added the `ACCRINT` function, which returns the accrued interest of a security that pays periodic interest. [#1812](https://github.com/handsontable/hyperformula/pull/1812)
 
 ### Changed
 

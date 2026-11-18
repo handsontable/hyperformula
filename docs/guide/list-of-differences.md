@@ -83,7 +83,6 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | COUPDAYBS     | =COUPDAYBS(1, DATE(1900,5,15), 2)                              |          NUM |       46.0000 |          1.0000 |
 | COUPNUM       | =COUPNUM(1, DATE(1900,5,15), 2)                                |          NUM |        1.0000 |             NUM |
 | COUPDAYS      | =COUPDAYS(DATE(1900,2,15), DATE(1900,8,31), 2, 1)              |     181.0000 |      181.0000 |        184.0000 |
-| ACCRINT       | =ACCRINT(DATE(2009,9,1), DATE(2010,8,29), DATE(2009,10,15), 0.1, 1000, 2, 0) |      10.8486 |       12.2222 |         11.1264 |
 | NPV           | =NPV(1, TRUE(), 1)                                             |       0.7500 |        0.5000 |          0.7500 |
 | NPV           | =NPV(1,B1) where B1 = true                                     |       0.5000 |        0.0000 |          0.0000 |
 | POISSON.DIST  | =POISSON.DIST(-0.01, 0, FALSE())                               |          NUM |        1.0000 |             NUM |
