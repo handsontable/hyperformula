@@ -10,7 +10,7 @@ Never write sensitive information into code, comments, tests, commit messages, b
 
 - **Clients, customers, and partners** — their names, and details that identify them indirectly: their domains, their deployments, the wording of their reports.
 - **Personal data of any kind** — names, e-mail addresses, phone numbers, user accounts, IP addresses.
-- **Credentials and secrets** — API keys, tokens, passwords, licence keys, private URLs. The one exception is the internal test license key, which is committed on purpose; see [`hyperformula/dev-docs/LICENSING.md`](../hyperformula/dev-docs/LICENSING.md#the-internal-test-key).
+- **Credentials and secrets** — API keys, tokens, passwords, licence keys, private URLs. Two exceptions: the internal test license key, which is committed on purpose (see [`hyperformula/dev-docs/LICENSING.md`](../hyperformula/dev-docs/LICENSING.md#the-internal-test-key)), and links to Claude Code sessions (see [Describe the change on its own terms](#describe-the-change-on-its-own-terms)).
 - **Internal-only material** — the contents of private repositories and internal tickets, unreleased plans, contract and pricing details.
 
 Nothing internal goes into the public documentation either — the guides in `docs/` and the JSDoc the API reference is generated from. That covers contract details, internal validation mechanisms, and internal tooling.
