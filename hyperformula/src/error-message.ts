@@ -84,8 +84,10 @@ export class ErrorMessage {
   public static ResultTooLong = 'Result exceeds the maximum allowed length.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
-  public static LicenseKey = (arg: string) => `License key is ${arg}.`
-  public static LicenseCapability = (functionName: string) => `Function ${functionName} is not included in your license.`
+  public static LicenseKey = (arg: string) => `License key is ${arg}.` +
+    ' If you need any help, contact us at sales@handsontable.com.'
+  public static LicenseCapability = (functionName: string) => `Function ${functionName} is not included in your license.` +
+    ' If you need any help, contact us at sales@handsontable.com.'
   public static StaticResultSize = (functionName: string) => `${functionName} requires input dimensions that determine a fixed result size.`
   public static StaticStats = (functionName: string) => `${functionName} requires a constant stats argument to determine its result size.`
 }
