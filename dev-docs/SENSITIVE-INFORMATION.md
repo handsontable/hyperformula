@@ -17,4 +17,4 @@ Nothing internal goes into the public documentation either — the guides in `do
 
 ## Describe the change on its own terms
 
-Describe the change on its own technical terms: write "fix an off-by-one error in `SUMIFS` when the criteria range is empty", not "fix the bug reported by \<company\>". An internal ticket identifier such as `HF-123` is fine on its own; the contents of that ticket are not.
+Describe the change on its own technical terms: write "fix an off-by-one error in `SUMIFS` when the criteria range is empty", not "fix the bug reported by \<company\>". An internal ticket identifier such as `HF-123` is fine on its own; the contents of that ticket are not. A `Claude-Session:` trailer that links a Claude Code session is fine in commit messages and pull request descriptions. The link opens only for people with access to the session; what the session contains is not, so never quote it.
