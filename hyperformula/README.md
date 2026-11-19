@@ -88,7 +88,7 @@ import { HyperFormula } from 'hyperformula';
 
 // Create a HyperFormula instance
 const hf = HyperFormula.buildEmpty({
-  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
 });
 
 // Add an empty sheet
