@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
@@ -389,7 +389,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       if (ret.length > 0) {
         return SimpleRangeValue.onlyValues(ret)
       } else {
-        return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+        return new CellError(ErrorType.CALC, ErrorMessage.EmptyRange)
       }
     })
   }
