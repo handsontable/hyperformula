@@ -1089,6 +1089,19 @@ describe("ErrorPopup syncCell", () => {
     expect(cell.getAttribute("aria-errormessage")).toBe(popupId());
   });
 
+  it("keeps the host's aria-describedby id when a repaint reopens the tooltip on a focused cell", async () => {
+    cell.setAttribute("aria-describedby", "col-header-2");
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    repaint(cell, null);
+    await Promise.resolve();
+    repaint(cell, "#REF!");
+    await Promise.resolve();
+
+    expect(popup.isVisible()).toBe(true);
+    expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupId()}`);
+    expect(cell.getAttribute("aria-errormessage")).toBe(popupId());
+  });
+
   it("leaves only the host's aria-describedby id when a repaint clears the anchored cell's error", async () => {
     cell.setAttribute("aria-describedby", "col-header-2");
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
