@@ -6,13 +6,23 @@
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
+import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {
+  accruedCouponPeriods,
+  actualCouponPeriodLength,
+  buildCouponSchedule,
+  CouponSchedule,
+  daysBeforeSettlement,
+  settlementPeriod,
+  thirtyDayPeriodLength,
+} from './CouponSchedule'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
- * Holds the securities functions, which compute a security's price, yield, discount or interest rate, amount received
- * or accrued interest from its dates and a day-count basis.
+ * Holds the securities functions, which compute a security's price, yield, duration, discount or interest rate, amount
+ * received, accrued interest, or coupon dates and periods from its dates and a day-count basis.
  */
 export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SecuritiesPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
@@ -73,6 +83,96 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: 1000, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPPCD': {
+      method: 'couppcd',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPNCD': {
+      method: 'coupncd',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPNUM': {
+      method: 'coupnum',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPDAYBS': {
+      method: 'coupdaybs',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPDAYSNC': {
+      method: 'coupdaysnc',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPDAYS': {
+      method: 'coupdays',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'ACCRINT': {
+      method: 'accrint',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 1000, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: true, emptyAsDefault: true},
+      ],
+    },
+    'DURATION': {
+      method: 'duration',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'PRICE': {
+      method: 'price',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
       ],
     },
@@ -211,6 +311,380 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
   }
 
   /**
+   * Corresponds to COUPPCD(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the last coupon date on or before the settlement date, as a date serial number.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public couppcd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPPCD', true,
+      (schedule: CouponSchedule) => this.dateTimeHelper.dateToNumber(schedule.previous)
+    )
+  }
+
+  /**
+   * Corresponds to COUPNCD(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the first coupon date after the settlement date, as a date serial number.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public coupncd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPNCD', false,
+      (schedule: CouponSchedule) => this.dateTimeHelper.dateToNumber(schedule.next)
+    )
+  }
+
+  /**
+   * Corresponds to COUPNUM(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the number of coupons payable after the settlement date, up to and including the maturity date.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public coupnum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPNUM', true,
+      (schedule: CouponSchedule) => schedule.count
+    )
+  }
+
+  /**
+   * Corresponds to COUPDAYBS(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the number of days from the previous coupon date to the settlement date, counted by `basis`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public coupdaybs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPDAYBS', true,
+      (schedule: CouponSchedule) => daysBeforeSettlement(this.dateTimeHelper, schedule)
+    )
+  }
+
+  /**
+   * Corresponds to COUPDAYSNC(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the number of days from the settlement date to the next coupon date. Basis 0 counts it as Excel does:
+   * the 30/360 length of the coupon period minus COUPDAYBS, so it is not always the direct 30/360 count.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public coupdaysnc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPDAYSNC', false,
+      (schedule: CouponSchedule) => {
+        if (schedule.basis === 0) {
+          return thirtyDayPeriodLength(this.dateTimeHelper, schedule) - daysBeforeSettlement(this.dateTimeHelper, schedule)
+        }
+        const next = this.dateTimeHelper.dateToNumber(schedule.next)
+        return this.dateTimeHelper.dayCountByBasis(schedule.settlement, next, schedule.basis).dayCount
+      }
+    )
+  }
+
+  /**
+   * Corresponds to COUPDAYS(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the number of days in the coupon period that contains the settlement date: 360 / `frequency` for bases
+   * 0, 2 and 4, 365 / `frequency` for basis 3, and the actual length of the period, as Excel computes it, for basis 1.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public coupdays(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPDAYS', false,
+      (schedule: CouponSchedule) => {
+        switch (schedule.basis) {
+          case 1:
+            return actualCouponPeriodLength(this.dateTimeHelper, schedule)
+          case 3:
+            return 365 / schedule.frequency
+          default:
+            return 360 / schedule.frequency
+        }
+      }
+    )
+  }
+
+  /**
+   * Corresponds to ACCRINT(issue, first_interest, settlement, rate, [par], frequency, [basis], [calc_method]).
+   *
+   * Returns the accrued interest of a security that pays periodic interest: `par` * `rate` / `frequency` times the
+   * accrued time in coupon periods, as `accruedCouponPeriods` computes it. An empty `par` is 1000, and an empty or
+   * omitted `calc_method` is TRUE.
+   *
+   * Validates in Excel's order: `calc_method` first, then the other arguments from left to right (an empty required
+   * argument is #N/A), then `rate` and `par` greater than 0, then `issue` before `settlement`. `first_interest` may be
+   * on or before `issue`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public accrint(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ACCRINT'),
+      (issueArg: InternalScalarValue, firstInterestArg: InternalScalarValue, settlementArg: InternalScalarValue, rateArg: InternalScalarValue,
+        parArg: InternalScalarValue, frequencyArg: InternalScalarValue, basisArg: InternalScalarValue, calcMethodArg: InternalScalarValue) => {
+        const calcMethod = this.coerceToCalcMethod(calcMethodArg)
+        if (calcMethod instanceof CellError) {
+          return calcMethod
+        }
+        if (this.isArgumentEmpty(ast, 0)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const issue = this.coerceToSecurityDate(issueArg)
+        if (issue instanceof CellError) {
+          return issue
+        }
+        if (this.isArgumentEmpty(ast, 1)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const firstInterest = this.coerceToSecurityDate(firstInterestArg)
+        if (firstInterest instanceof CellError) {
+          return firstInterest
+        }
+        if (this.isArgumentEmpty(ast, 2)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const settlement = this.coerceToSecurityDate(settlementArg)
+        if (settlement instanceof CellError) {
+          return settlement
+        }
+        if (this.isArgumentEmpty(ast, 3)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const rate = this.strictNumber(rateArg)
+        if (rate instanceof CellError) {
+          return rate
+        }
+        const par = this.strictNumber(parArg)
+        if (par instanceof CellError) {
+          return par
+        }
+        if (this.isArgumentEmpty(ast, 5)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const frequency = this.coerceToCouponFrequency(frequencyArg)
+        if (frequency instanceof CellError) {
+          return frequency
+        }
+        const basis = this.coerceToDayCountBasis(basisArg)
+        if (basis instanceof CellError) {
+          return basis
+        }
+        if (rate <= 0 || par <= 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+        if (issue >= settlement) {
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
+        }
+        const schedule = {firstInterest: this.dateTimeHelper.numberToSimpleDate(firstInterest), frequency, basis}
+        const periods = accruedCouponPeriods(this.dateTimeHelper, schedule, issue, settlement, calcMethod)
+        if (periods instanceof CellError) {
+          return periods
+        }
+        return par * rate / frequency * periods
+      }
+    )
+  }
+
+  /**
+   * Corresponds to DURATION(settlement, maturity, coupon, yld, frequency, [basis]).
+   *
+   * Returns the Macaulay duration, in years, of a security that pays periodic interest, for a par value of $100.
+   * Arguments are validated from left to right, as in Excel: settlement and maturity (error, #VALUE!, date range),
+   * coupon and yld (error, #VALUE!), frequency (error, #VALUE!, 1, 2 or 4) and basis (error, #VALUE!, 0 to 4), each in
+   * turn; then settlement before maturity and `coupon` and `yld` not negative (#NUM!). An empty argument other than
+   * `basis` is #N/A in its own place of that order. A previous coupon date before the earliest supported date is #NUM!.
+   *
+   * With N coupons left, the coupon c = 100 * `coupon` / `frequency`, v = 1 + `yld` / `frequency`, and the exponent
+   * of period k, x_k = (k + DSC / E) - 1 (see `settlementPeriod`), each coupon's present value is c / v^x_k, plus
+   * 100 / v^x_N for the redemption at maturity, and the duration is the sum of (x_k / `frequency`) times the present
+   * value of period k, divided by the sum of the present values. A discount factor v^x_k too large for a number is
+   * #NUM!.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public duration(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DURATION'),
+      (settlementArg: InternalScalarValue, maturityArg: InternalScalarValue, couponArg: InternalScalarValue, yldArg: InternalScalarValue, frequencyArg: InternalScalarValue, basisArg: InternalScalarValue) => {
+        if (this.isArgumentEmpty(ast, 0)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const settlement = this.coerceToSecurityDate(settlementArg)
+        if (settlement instanceof CellError) {
+          return settlement
+        }
+        if (this.isArgumentEmpty(ast, 1)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const maturity = this.coerceToSecurityDate(maturityArg)
+        if (maturity instanceof CellError) {
+          return maturity
+        }
+        if (this.isArgumentEmpty(ast, 2)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const coupon = this.strictNumber(couponArg)
+        if (coupon instanceof CellError) {
+          return coupon
+        }
+        if (this.isArgumentEmpty(ast, 3)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const yld = this.strictNumber(yldArg)
+        if (yld instanceof CellError) {
+          return yld
+        }
+        if (this.isArgumentEmpty(ast, 4)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const frequency = this.coerceToCouponFrequency(frequencyArg)
+        if (frequency instanceof CellError) {
+          return frequency
+        }
+        const basis = this.coerceToDayCountBasis(basisArg)
+        if (basis instanceof CellError) {
+          return basis
+        }
+        if (settlement >= maturity) {
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
+        }
+        if (coupon < 0 || yld < 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+        const schedule = buildCouponSchedule(this.dateTimeHelper, settlement, maturity, frequency, basis)
+        if (schedule instanceof CellError) {
+          return schedule
+        }
+        const {couponCount, periodDays, daysToNextCoupon} = settlementPeriod(this.dateTimeHelper, schedule)
+        const payment = 100 * coupon / frequency
+        const discountBase = 1 + yld / frequency
+        const periodFraction = daysToNextCoupon / periodDays
+        let weightedPresentValues = 0
+        let presentValues = 0
+        for (let period = 1; period <= couponCount; period++) {
+          const exponent = (period + periodFraction) - 1
+          const discountFactor = Math.pow(discountBase, exponent)
+          if (!Number.isFinite(discountFactor)) {
+            return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+          }
+          const cashFlow = period === couponCount ? payment + 100 : payment
+          const presentValue = cashFlow / discountFactor
+          weightedPresentValues += exponent / frequency * presentValue
+          presentValues += presentValue
+        }
+        return weightedPresentValues / presentValues
+      }
+    )
+  }
+
+  /**
+   * Corresponds to PRICE(settlement, maturity, rate, yld, redemption, frequency, [basis]).
+   *
+   * Returns the price per $100 face value of a security that pays periodic interest. Arguments are validated in
+   * Excel's order: basis (error, #VALUE!, 0 to 4) first, then settlement and maturity (error, #VALUE!, date range),
+   * rate, yld and redemption (error, #VALUE!) and frequency (error, #VALUE!, 1, 2 or 4), each in turn; then
+   * settlement before maturity, `rate` and `yld` not negative and `redemption` greater than 0 (#NUM!). An empty
+   * argument other than `basis` is #N/A in its own place of that order. A previous coupon date before the earliest
+   * supported date is #NUM!.
+   *
+   * With N coupons left, the coupon c = 100 * `rate` / `frequency`, v = 1 + `yld` / `frequency`, and the exponent of
+   * period k, x_k = (k + DSC / E) - 1 (see `settlementPeriod`), the price is the sum of c / v^x_k for k = 1 to N, plus
+   * `redemption` / v^x_N, minus the accrued interest c * A / E. With one coupon left (N = 1), it is
+   * (c + `redemption`) / (1 + DSC / E * `yld` / `frequency`) - c * A / E. A large `yld` can give a negative price; a
+   * discount factor v^x_k too large for a number is #NUM!.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public price(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('PRICE'),
+      (settlementArg: InternalScalarValue, maturityArg: InternalScalarValue, rateArg: InternalScalarValue, yldArg: InternalScalarValue, redemptionArg: InternalScalarValue, frequencyArg: InternalScalarValue, basisArg: InternalScalarValue) => {
+        const basis = this.coerceToDayCountBasis(basisArg)
+        if (basis instanceof CellError) {
+          return basis
+        }
+        if (this.isArgumentEmpty(ast, 0)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const settlement = this.coerceToSecurityDate(settlementArg)
+        if (settlement instanceof CellError) {
+          return settlement
+        }
+        if (this.isArgumentEmpty(ast, 1)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const maturity = this.coerceToSecurityDate(maturityArg)
+        if (maturity instanceof CellError) {
+          return maturity
+        }
+        if (this.isArgumentEmpty(ast, 2)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const rate = this.strictNumber(rateArg)
+        if (rate instanceof CellError) {
+          return rate
+        }
+        if (this.isArgumentEmpty(ast, 3)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const yld = this.strictNumber(yldArg)
+        if (yld instanceof CellError) {
+          return yld
+        }
+        if (this.isArgumentEmpty(ast, 4)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const redemption = this.strictNumber(redemptionArg)
+        if (redemption instanceof CellError) {
+          return redemption
+        }
+        if (this.isArgumentEmpty(ast, 5)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const frequency = this.coerceToCouponFrequency(frequencyArg)
+        if (frequency instanceof CellError) {
+          return frequency
+        }
+        if (settlement >= maturity) {
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
+        }
+        if (rate < 0 || yld < 0 || redemption <= 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+        const schedule = buildCouponSchedule(this.dateTimeHelper, settlement, maturity, frequency, basis)
+        if (schedule instanceof CellError) {
+          return schedule
+        }
+        const {couponCount, daysFromPeriodStart, periodDays, daysToNextCoupon} = settlementPeriod(this.dateTimeHelper, schedule)
+        const payment = 100 * rate / frequency
+        const accruedInterest = payment * daysFromPeriodStart / periodDays
+        const periodFraction = daysToNextCoupon / periodDays
+        if (couponCount === 1) {
+          return (payment + redemption) / (1 + periodFraction * yld / frequency) - accruedInterest
+        }
+        const discountBase = 1 + yld / frequency
+        let price = 0
+        for (let period = 1; period <= couponCount; period++) {
+          const discountFactor = Math.pow(discountBase, (period + periodFraction) - 1)
+          if (!Number.isFinite(discountFactor)) {
+            return new CellError(ErrorType.NUM, ErrorMessage.NaN)
+          }
+          price += payment / discountFactor
+        }
+        price += redemption / Math.pow(discountBase, (couponCount + periodFraction) - 1)
+        return price - accruedInterest
+      }
+    )
+  }
+
+  /**
    * Runs DISC, INTRATE, PRICEDISC, RECEIVED and YIELDDISC, which share the arguments
    * (settlement, maturity, first amount, second amount, [basis]).
    *
@@ -288,6 +762,64 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
   }
 
   /**
+   * Runs COUPPCD, COUPNCD, COUPNUM, COUPDAYBS, COUPDAYSNC and COUPDAYS, which share the arguments
+   * (settlement, maturity, frequency, [basis]).
+   *
+   * Validates in Excel's order: settlement, maturity, settlement before maturity, then an empty settlement, maturity
+   * or frequency argument (#N/A), then frequency and basis. An empty date is not compared with the other date. Builds
+   * the coupon schedule and passes it to `calculate`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   * @param {string} functionName - the function's id, used to look up its metadata
+   * @param {boolean} checkPreviousCoupon - when true, a previous coupon date before the earliest supported date is
+   * #NUM!: COUPPCD would return that date and COUPDAYBS counts from it, and Excel returns #NUM! for COUPNUM there
+   * @param {Function} calculate - computes the result from the coupon schedule
+   */
+  private couponFunction(
+    ast: ProcedureAst,
+    state: InterpreterState,
+    functionName: string,
+    checkPreviousCoupon: boolean,
+    calculate: (schedule: CouponSchedule) => number,
+  ): InterpreterValue {
+    const isArgumentEmpty = (index: number) => ast.args[index]?.type === AstNodeType.EMPTY
+    const isDateEmpty = isArgumentEmpty(0) || isArgumentEmpty(1)
+    const isFrequencyEmpty = isArgumentEmpty(2)
+    return this.runFunction(ast.args, state, this.metadata(functionName),
+      (settlementArg: InternalScalarValue, maturityArg: InternalScalarValue, frequencyArg: InternalScalarValue, basisArg: InternalScalarValue) => {
+        const settlement = this.coerceToSecurityDate(settlementArg)
+        if (settlement instanceof CellError) {
+          return settlement
+        }
+        const maturity = this.coerceToSecurityDate(maturityArg)
+        if (maturity instanceof CellError) {
+          return maturity
+        }
+        if (!isDateEmpty && settlement >= maturity) {
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
+        }
+        if (isDateEmpty || isFrequencyEmpty) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const frequency = this.coerceToCouponFrequency(frequencyArg)
+        if (frequency instanceof CellError) {
+          return frequency
+        }
+        const basis = this.coerceToDayCountBasis(basisArg)
+        if (basis instanceof CellError) {
+          return basis
+        }
+        const schedule = buildCouponSchedule(this.dateTimeHelper, settlement, maturity, frequency, basis, checkPreviousCoupon)
+        if (schedule instanceof CellError) {
+          return schedule
+        }
+        return calculate(schedule)
+      }
+    )
+  }
+
+  /**
    * Converts a date argument of a securities function: a number as `strictNumber` accepts it, truncated to an integer.
    * A date outside the supported range is #NUM!, and so is a negative value even when it truncates to 0, as in Excel.
    */
@@ -325,6 +857,22 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
   }
 
   /**
+   * Converts the `frequency` argument of a coupon function: a number as `strictNumber` accepts it, truncated to an
+   * integer, that must be 1 (annual), 2 (semiannual) or 4 (quarterly).
+   */
+  private coerceToCouponFrequency(value: InternalScalarValue): number | CellError {
+    const frequency = this.strictNumber(value)
+    if (frequency instanceof CellError) {
+      return frequency
+    }
+    const truncated = Math.trunc(frequency)
+    if (truncated !== 1 && truncated !== 2 && truncated !== 4) {
+      return new CellError(ErrorType.NUM, ErrorMessage.CouponFrequency)
+    }
+    return truncated
+  }
+
+  /**
    * Converts an argument the way Excel does for these functions: numbers, dates, numeric text and empty cells are
    * accepted, while a boolean or the empty text is #VALUE!. Errors are passed on.
    */
@@ -337,5 +885,14 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
     }
     const coerced = this.coerceScalarToNumberOrError(value)
     return coerced instanceof CellError ? coerced : getRawValue(coerced)
+  }
+
+  /**
+   * Converts the `calc_method` argument of ACCRINT: an error is passed on, text (even "TRUE" or "1") is #VALUE!, a
+   * number is TRUE when it is not 0, and a blank cell is FALSE.
+   */
+  private coerceToCalcMethod(value: InternalScalarValue): boolean | CellError {
+    const calcMethod = typeof value === 'string' ? undefined : coerceScalarToBoolean(value)
+    return calcMethod ?? new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
   }
 }
