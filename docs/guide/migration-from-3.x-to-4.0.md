@@ -15,6 +15,7 @@ To upgrade your HyperFormula version from 3.x.x to 4.0.0, follow this guide.
 ## The `gpl-v3` license key no longer works
 
 HyperFormula 4.0.0 is available only under a commercial license. It no longer accepts the `gpl-v3` license key.
+For the background of this change, see [HyperFormula is moving from GPLv3 to a proprietary license](https://github.com/handsontable/hyperformula/issues/1888).
 
 With `licenseKey: 'gpl-v3'`, HyperFormula 4.0.0 reads the key as invalid:
 
