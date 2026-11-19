@@ -9,9 +9,8 @@ tags:
 
 HyperFormula can be customized through easy-to-setup `options`.
 
-The only mandatory key is `licenseKey`. It has a
-[dedicated section](license-key.md) in which you can find all allowed
-types of key values.
+The only mandatory key is `licenseKey`. To learn how to set it and what depends on it, see
+[License key](license-key.md).
 
 Below you can see the example of a configuration object and the
 static method called to initiate a new instance of HyperFormula.
