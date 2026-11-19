@@ -75,3 +75,16 @@ HyperFormula 4.0 reads the `include` argument of `FILTER`, its second argument, 
 | An error, such as `#DIV/0!` | The row is dropped | The error |
 
 If a condition column can hold text, for example `=IF(B1>0, TRUE(), "")`, return `FALSE()` instead of `""`. Conditions after `include`, which HyperFormula accepts in addition to Excel, still drop such rows.
+
+## Function names in the Polish and Turkish language packs
+
+HyperFormula 4.0 changes two function names to the ones Microsoft Excel uses:
+
+| Language pack | Name | 3.x | 4.0 |
+|:--------------|:-----|:----|:----|
+| `plPL` | `ROCZ.PRZYCH` | `PDURATION` | `DURATION` |
+| `plPL` | `O.CZAS.TRWANIA` | `#NAME?` | `PDURATION` |
+| `trTR` | `DEĞER` | `VALUE` | `PRICE` |
+| `trTR` | `SAYIYAÇEVİR` | `#NAME?` | `VALUE` |
+
+A Polish or Turkish formula with an old name now calls `DURATION` or `PRICE`, which take different arguments, so it returns `#N/A`. In the formulas you store in these languages, replace `ROCZ.PRZYCH` with `O.CZAS.TRWANIA`, and `DEĞER` with `SAYIYAÇEVİR`. Formulas in other languages are not affected.
