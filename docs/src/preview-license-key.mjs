@@ -81,12 +81,11 @@ const EXAMPLE_SCRIPT = /(<script data-hf-example(?:="")?>)([\s\S]*?)(<\/script>)
 
 /**
  * Writes the key into the live example scripts of every page under `distDir`. The code a page shows and the
- * StackBlitz project are outside them, so they keep the placeholder.
+ * StackBlitz project are outside them, so they keep the placeholder. Running it again on pages it already injected
+ * changes nothing.
  *
  * @param {string} distDir The build output directory.
  * @param {string} key The license key.
- * Running it again on pages it already injected changes nothing.
- *
  * @returns {number} How many placeholders it replaced.
  */
 export function injectIntoPages(distDir, key) {
