@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `TAKE` dynamic-array function. [#1722](https://github.com/handsontable/hyperformula/pull/1722)
 - Added the regression functions `FORECAST.LINEAR` (also available as `FORECAST`), `INTERCEPT`, `TREND`, `GROWTH`, and `LOGEST`. `LOGEST`, like `LINEST`, requires a constant `stats` argument. [#1802](https://github.com/handsontable/hyperformula/pull/1802)
 - Added the `RANK.EQ` function and its alias `RANK`, which return the rank of a number among the numbers of a range, tied numbers sharing the top rank. [#1786](https://github.com/handsontable/hyperformula/pull/1786)
+- Added the `COUPDAYBS`, `COUPDAYS`, `COUPDAYSNC`, `COUPNCD`, `COUPNUM` and `COUPPCD` functions, which return the coupon dates of a security, the number of coupons until maturity and the days in and around the coupon period. [#1804](https://github.com/handsontable/hyperformula/pull/1804)
 
 ### Changed
 
