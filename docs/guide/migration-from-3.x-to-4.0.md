@@ -9,6 +9,7 @@ tags:
   - "#CALC!"
   - language packs
   - INDEX
+  - FILTER
   - TEXT
 ---
 
@@ -61,6 +62,20 @@ HyperFormula 4.0 changes the `INDEX` function to return what Microsoft Excel ret
 | The `area_num` argument | `=INDEX(A1:C3, 1, 1, 1)` | `#N/A` (wrong number of arguments) | The value of `A1` |
 
 A spilled result needs empty cells to spill into, or it returns `#SPILL!`. If your code checks for `ErrorType.NUM` from `INDEX`, check for `ErrorType.REF` instead.
+
+## The `FILTER` function
+
+HyperFormula 4.0 reads the `include` argument of `FILTER`, its second argument, as Microsoft Excel does. Text in it returns `#VALUE!`, and an error in it is returned:
+
+| Value in `include` | 3.x | 4.0 |
+|:-------------------|:----|:----|
+| `TRUE`, a non-zero number | The row is kept | The row is kept |
+| `FALSE`, `0`, a blank cell | The row is dropped | The row is dropped |
+| Text, such as `"x"` or the empty text `""` | The row is dropped | `#VALUE!` |
+| The text `"TRUE"` | The row is kept | `#VALUE!` |
+| An error, such as `#DIV/0!` | The row is dropped | The error |
+
+If a condition column can hold text, for example `=IF(B1>0, TRUE(), "")`, return `FALSE()` instead of `""`. Conditions after `include`, which HyperFormula accepts in addition to Excel, still drop such rows.
 
 ## The `TEXT` function
 
