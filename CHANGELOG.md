@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `CHOOSEROWS` dynamic-array function. [#1827](https://github.com/handsontable/hyperformula/pull/1827)
 - Added the `ACCRINTM`, `DISC`, `INTRATE`, `PRICEDISC`, `RECEIVED` and `YIELDDISC` functions, which return the accrued interest, discount rate, interest rate, price, amount received and yield of discounted securities and securities that pay interest at maturity. [#1799](https://github.com/handsontable/hyperformula/pull/1799)
 - Added the `TAKE` dynamic-array function. [#1722](https://github.com/handsontable/hyperformula/pull/1722)
+- Added the regression functions `FORECAST.LINEAR` (also available as `FORECAST`), `INTERCEPT`, `TREND`, `GROWTH`, and `LOGEST`. `LOGEST`, like `LINEST`, requires a constant `stats` argument. [#1802](https://github.com/handsontable/hyperformula/pull/1802)
 - Added the `RANK.EQ` function and its alias `RANK`, which return the rank of a number among the numbers of a range, tied numbers sharing the top rank. [#1786](https://github.com/handsontable/hyperformula/pull/1786)
 
 ### Changed
