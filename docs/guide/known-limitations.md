@@ -142,6 +142,8 @@ HyperFormula resolves the OFFSET function at parse time rather than during evalu
 * OFFSET is resolved at parse time, so `getCellFormula` returns the computed reference, not the original `OFFSET` call.
 
   ```js
-  const hf = HyperFormula.buildFromArray([[1, 45, '=OFFSET(A1, 0, 1)']], { licenseKey: 'gpl-v3' });
+  const hf = HyperFormula.buildFromArray([[1, 45, '=OFFSET(A1, 0, 1)']], {
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+  });
   hf.getCellFormula({ sheet: 0, row: 0, col: 2 }); // '=B1'
   ```
