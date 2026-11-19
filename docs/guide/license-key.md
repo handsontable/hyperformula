@@ -71,7 +71,8 @@ If you don't set `licenseKey`, or set it to an empty string, the library is bloc
 
 * Every function call evaluates to a `#LIC!` error, except `VERSION()` and `OFFSET()`.
 * Every license-gated API method throws a `LicenseCapabilityMissingError` that names the key's
-  state, for example: `License key is missing. Feature crud is not available.` The gated methods
+  state, for example: `License key is missing. Feature crud is not available. If you need any
+  help, contact us at sales@handsontable.com.` The gated methods
   are the ones that edit cells, rows, columns, and sheets, `copy()`, `cut()`, `paste()`, `undo()`,
   `redo()`, `batch()`, `suspendEvaluation()`, and the methods that add, change, or remove named
   expressions. Building an engine with named expressions throws the same error.
