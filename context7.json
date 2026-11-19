@@ -8,7 +8,6 @@
   "rules": [
     "HyperFormula is an in-process library, not a REST API — there is no HTTP endpoint or base URL.",
     "Public API cell addresses are 0-indexed: { sheet, col, row }.",
-    "There is no #CALC! error type.",
     "EmptyValue is exported as a Symbol, not null/undefined.",
     "A license key is required when constructing the engine. Code examples show it as a commented-out placeholder: // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula"
   ]
