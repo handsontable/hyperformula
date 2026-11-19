@@ -266,7 +266,7 @@ function formatDate(date: Date): string {
     'July', 'August', 'September', 'October', 'November', 'December'
   ]
   const month = monthNames[date.getUTCMonth()]
-  const day = date.getUTCDate()
+  const day = String(date.getUTCDate()).padStart(2, '0')
   const year = date.getUTCFullYear()
 
   return `${month} ${day}, ${year}`
