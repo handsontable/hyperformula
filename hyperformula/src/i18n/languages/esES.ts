@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 export const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#CALC!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#¡DIV/0!',
     ERROR: '#ERROR!',
@@ -18,6 +19,8 @@ export const dictionary: RawTranslationPackage = {
     VALUE: '#¡VALOR!',
   },
   functions: {
+    CHOOSECOLS: 'ELEGIRCOLS',
+    CHOOSEROWS: 'ELEGIRFILAS',
     FILTER: 'FILTER',
     VSTACK: 'APILARV',
     HSTACK: 'APILARH',
@@ -25,6 +28,7 @@ export const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINTM: 'INT.ACUM.V',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
     ACOT: 'ACOT',
@@ -98,6 +102,7 @@ export const dictionary: RawTranslationPackage = {
     DECIMAL: 'CONV.DECIMAL',
     DEGREES: 'GRADOS',
     DELTA: 'DELTA',
+    DISC: 'TASA.DESC',
     DOLLARDE: 'MONEDA.DEC',
     DOLLARFR: 'MONEDA.FRAC',
     EDATE: 'FECHA.MES',
@@ -127,6 +132,7 @@ export const dictionary: RawTranslationPackage = {
     INDEX: 'INDICE',
     INT: 'ENTERO',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'TASA.INT',
     IPMT: 'PAGOINT',
     IRR: 'TIR',
     ISBINARY: 'ISBINARY',
@@ -188,11 +194,13 @@ export const dictionary: RawTranslationPackage = {
     PRODUCT: 'PRODUCTO',
     POWER: 'POTENCIA',
     PPMT: 'PAGOPRIN',
+    PRICEDISC: 'PRECIO.DESCUENTO',
     PROPER: 'NOMPROPIO',
     PV: 'VA',
     RADIANS: 'RADIANES',
     RAND: 'ALEATORIO',
     RATE: 'TASA',
+    RECEIVED: 'CANTIDAD.RECIBIDA',
     REPLACE: 'REEMPLAZAR',
     REPT: 'REPETIR',
     RIGHT: 'DERECHA',
@@ -229,6 +237,7 @@ export const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'SYD',
     T: 'T',
+    TAKE: 'TOMAR',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'LETRA.DE.TEST.EQV.A.BONO',
@@ -265,6 +274,7 @@ export const dictionary: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'AÑO',
     YEARFRAC: 'FRAC.AÑO',
+    YIELDDISC: 'RENDTO.DESC',
     ROMAN: 'NUMERO.ROMANO',
     ARABIC: 'ARABIC',
     'HF.ADD': 'HF.ADD',
@@ -405,6 +415,7 @@ export const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'INTERVALO.CONFIANZA.T',
     DEVSQ: 'DESVIA2',
     GEOMEAN: 'MEDIA.GEOM',
+    GESTEP: 'MAYOR.O.IGUAL',
     HARMEAN: 'MEDIA.ARMO',
     CRITBINOM: 'BINOM.CRIT',
     PEARSON: 'PEARSON',

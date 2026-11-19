@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#CALC!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#ZÉRÓOSZTÓ!',
     ERROR: '#ERROR!',
@@ -18,6 +19,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#ÉRTÉK!',
   },
   functions: {
+    CHOOSECOLS: 'OSZLOPVÁLASZTÁS',
+    CHOOSEROWS: 'SORVÁLASZTÁS',
     FILTER: 'FILTER',
     VSTACK: 'FÜGG.HALMOZÁS',
     HSTACK: 'VÍZSZ.HALMOZÁS',
@@ -25,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINTM: 'LEJÁRATI.KAMAT',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSH',
     ACOT: 'ARCCOT',
@@ -98,6 +102,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'TIZEDES',
     DEGREES: 'FOK',
     DELTA: 'DELTA',
+    DISC: 'LESZÁM',
     DOLLARDE: 'FORINT.DEC',
     DOLLARFR: 'FORINT.TÖRT',
     EDATE: 'KALK.DÁTUM',
@@ -127,6 +132,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEX',
     INT: 'INT',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'KAMATRÁTA',
     IPMT: 'RRÉSZLET',
     IRR: 'BMR',
     ISBINARY: 'ISBINARY',
@@ -188,11 +194,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'SZORZAT',
     POWER: 'HATVÁNY',
     PPMT: 'PRÉSZLET',
+    PRICEDISC: 'ÁR.LESZÁM',
     PROPER: 'TNÉV',
     PV: 'MÉ',
     RADIANS: 'RADIÁN',
     RAND: 'VÉL',
     RATE: 'RÁTA',
+    RECEIVED: 'KAPOTT',
     REPLACE: 'CSERE',
     REPT: 'SOKSZOR',
     RIGHT: 'JOBB',
@@ -229,6 +237,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'ÉSZÖ',
     T: 'T',
+    TAKE: 'ÁTHELYEZ',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'KJEGY.EGYENÉRT',
@@ -265,6 +274,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XVAGY',
     YEAR: 'ÉV',
     YEARFRAC: 'TÖRTÉV',
+    YIELDDISC: 'HOZAM.LESZÁM',
     ROMAN: 'RÓMAI',
     ARABIC: 'ARAB',
     'HF.ADD': 'HF.ADD',
@@ -405,6 +415,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'MEGBÍZHATÓSÁG.T',
     DEVSQ: 'SQ',
     GEOMEAN: 'MÉRTANI.KÖZÉP',
+    GESTEP: 'KÜSZÖBNÉL.NAGYOBB',
     HARMEAN: 'HARM.KÖZÉP',
     CRITBINOM: 'KRITBINOM',
     PEARSON: 'PEARSON',

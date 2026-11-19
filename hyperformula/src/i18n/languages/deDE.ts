@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#CALC!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
     ERROR: '#ERROR!',
@@ -18,6 +19,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#WERT!',
   },
   functions: {
+    CHOOSECOLS: 'SPALTENWAHL',
+    CHOOSEROWS: 'ZEILENWAHL',
     FILTER: 'FILTER',
     VSTACK: 'VSTAPELN',
     HSTACK: 'HSTAPELN',
@@ -25,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINTM: 'AUFGELZINSF',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSHYP',
     ACOT: 'ARCCOTAN',
@@ -98,6 +102,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DEZIMAL',
     DEGREES: 'GRAD',
     DELTA: 'DELTA',
+    DISC: 'DISAGIO',
     DOLLARDE: 'NOTIERUNGDEZ',
     DOLLARFR: 'NOTIERUNGBRU',
     EDATE: 'EDATUM',
@@ -127,6 +132,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEX',
     INT: 'GANZZAHL',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'ZINSSATZ',
     IPMT: 'ZINSZ',
     IRR: 'IKV',
     ISBINARY: 'ISBINARY',
@@ -188,11 +194,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'PRODUKT',
     POWER: 'POTENZ',
     PPMT: 'KAPZ',
+    PRICEDISC: 'KURSDISAGIO',
     PROPER: 'GROSS2',
     PV: 'BW',
     RADIANS: 'BOGENMASS',
     RAND: 'ZUFALLSZAHL',
     RATE: 'ZINS',
+    RECEIVED: 'AUSZAHLUNG',
     REPLACE: 'ERSETZEN',
     REPT: 'WIEDERHOLEN',
     RIGHT: 'RECHTS',
@@ -229,6 +237,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'DIA',
     T: 'T',
+    TAKE: 'ÜBERNEHMEN',
     TAN: 'TAN',
     TANH: 'TANHYP',
     TBILLEQ: 'TBILLÄQUIV',
@@ -265,6 +274,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XODER',
     YEAR: 'JAHR',
     YEARFRAC: 'BRTEILJAHRE',
+    YIELDDISC: 'RENDITEDIS',
     ROMAN: 'RÖMISCH',
     ARABIC: 'ARABISCH',
     'HF.ADD': 'HF.ADD',
@@ -405,6 +415,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'KONFIDENZ.T',
     DEVSQ: 'SUMQUADABW',
     GEOMEAN: 'GEOMITTEL',
+    GESTEP: 'GGANZZAHL',
     HARMEAN: 'HARMITTEL',
     CRITBINOM: 'KRITBINOM',
     PEARSON: 'PEARSON',

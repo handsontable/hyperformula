@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#CALC!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIVISION/0!',
     ERROR: '#ERROR!',
@@ -18,6 +19,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#VÆRDI!',
   },
   functions: {
+    CHOOSECOLS: 'VÆLGKOL',
+    CHOOSEROWS: 'VÆLGRÆKKER',
     FILTER: 'FILTER',
     VSTACK: 'VSTAK',
     HSTACK: 'HSTAK',
@@ -25,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINTM: 'PÅLØBRENTE.UDLØB',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSH',
     ACOT: 'ARCCOT',
@@ -98,6 +102,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DECIMAL',
     DEGREES: 'GRADER',
     DELTA: 'DELTA',
+    DISC: 'DISKONTO',
     DOLLARDE: 'KR.DECIMAL',
     DOLLARFR: 'KR.BRØK',
     EDATE: 'EDATO',
@@ -127,6 +132,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEKS',
     INT: 'HELTAL',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'RENTEFOD',
     IPMT: 'R.YDELSE',
     IRR: 'IA',
     ISBINARY: 'ISBINARY',
@@ -188,11 +194,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'PRODUKT',
     POWER: 'POTENS',
     PPMT: 'H.YDELSE',
+    PRICEDISC: 'KURS.DISKONTO',
     PROPER: 'STORT.FORBOGSTAV',
     PV: 'NV',
     RADIANS: 'RADIANER',
     RAND: 'SLUMP',
     RATE: 'RENTE',
+    RECEIVED: 'MODTAGET.VED.UDLØB',
     REPLACE: 'ERSTAT',
     REPT: 'GENTAG',
     RIGHT: 'HØJRE',
@@ -229,6 +237,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'ÅRSAFSKRIVNING',
     T: 'T',
+    TAKE: 'TAG',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'STATSOBLIGATION',
@@ -265,6 +274,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XELLER',
     YEAR: 'ÅR',
     YEARFRAC: 'ÅR.BRØK',
+    YIELDDISC: 'AFKAST.DISKONTO',
     ROMAN: 'ROMERTAL',
     ARABIC: 'ARABISK',
     'HF.ADD': 'HF.ADD',
@@ -405,6 +415,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'KONFIDENST',
     DEVSQ: 'SAK',
     GEOMEAN: 'GEOMIDDELVÆRDI',
+    GESTEP: 'GETRIN',
     HARMEAN: 'HARMIDDELVÆRDI',
     CRITBINOM: 'KRITBINOM',
     PEARSON: 'PEARSON',

@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#LASKE!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#JAKO/0!',
     ERROR: '#ERROR!',
@@ -18,6 +19,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#ARVO!',
   },
   functions: {
+    CHOOSECOLS: 'VALITSESARAKKEET',
+    CHOOSEROWS: 'VALITSERIVIT',
     FILTER: 'FILTER',
     VSTACK: 'VPINO',
     HSTACK: 'HPINO',
@@ -25,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ITSEISARVO',
+    ACCRINTM: 'KERTYNYT.KORKO.LOPUSSA',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
     ACOT: 'ACOT',
@@ -98,6 +102,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DESIMAALI',
     DEGREES: 'ASTEET',
     DELTA: 'SAMA.ARVO',
+    DISC: 'DISKONTTOKORKO',
     DOLLARDE: 'VALUUTTA.DES',
     DOLLARFR: 'VALUUTTA.MURTO',
     EDATE: 'PÄIVÄ.KUUKAUSI',
@@ -127,6 +132,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEKSI',
     INT: 'KOKONAISLUKU',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'KORKO.ARVOPAPERI',
     IPMT: 'IPMT',
     IRR: 'SISÄINEN.KORKO',
     ISBINARY: 'ISBINARY',
@@ -188,11 +194,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'TULO',
     POWER: 'POTENSSI',
     PPMT: 'PPMT',
+    PRICEDISC: 'HINTA.DISK',
     PROPER: 'ERISNIMI',
     PV: 'NA',
     RADIANS: 'RADIAANIT',
     RAND: 'SATUNNAISLUKU',
     RATE: 'KORKO',
+    RECEIVED: 'SAATU.HINTA',
     REPLACE: 'KORVAA',
     REPT: 'TOISTA',
     RIGHT: 'OIKEA',
@@ -229,6 +237,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'VUOSIPOISTO',
     T: 'T',
+    TAKE: 'OTA',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'OBLIG.TUOTTOPROS',
@@ -265,6 +274,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'EHDOTON.TAI',
     YEAR: 'VUOSI',
     YEARFRAC: 'VUOSI.OSA',
+    YIELDDISC: 'TUOTTO.DISK',
     ROMAN: 'ROMAN',
     ARABIC: 'ARABIA',
     'HF.ADD': 'HF.ADD',
@@ -405,6 +415,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'LUOTTAMUSVÄLI.T',
     DEVSQ: 'OIKAISTU.NELIÖSUMMA',
     GEOMEAN: 'KESKIARVO.GEOM',
+    GESTEP: 'RAJA',
     HARMEAN: 'KESKIARVO.HARM',
     CRITBINOM: 'BINOMIJAKAUMA.KRIT',
     PEARSON: 'PEARSON',

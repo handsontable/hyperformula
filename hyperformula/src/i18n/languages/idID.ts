@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#CALC!',
     CYCLE: '#SIKLUS!',
     DIV_BY_ZERO: '#BAGI0!',
     ERROR: '#GALAT!',
@@ -18,6 +19,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#NILAI!',
   },
   functions: {
+    CHOOSECOLS: 'CHOOSECOLS',
+    CHOOSEROWS: 'CHOOSEROWS',
     FILTER: 'FILTER',
     VSTACK: 'VSTACK',
     HSTACK: 'HSTACK',
@@ -25,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'BATASAN.MATRIKS',
     ARRAYFORMULA: 'RUMUS.MATRIKS',
     ABS: 'ABS',
+    ACCRINTM: 'ACCRINTM',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
     ACOT: 'ACOT',
@@ -99,6 +103,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DESIMAL',
     DEGREES: 'DERAJAT',
     DELTA: 'DELTA',
+    DISC: 'DISC',
     DOLLARDE: 'DOLAR.DES',
     DOLLARFR: 'DOLAR.PEC',
     EDATE: 'EDATE',
@@ -128,6 +133,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEKS',
     INT: 'BULAT.BAWAH',
     INTERVAL: 'INTERVAL',
+    INTRATE: 'INTRATE',
     IPMT: 'IPMT',
     IRR: 'IRR',
     ISBINARY: 'ADALAH.BINER',
@@ -189,11 +195,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'PRODUK',
     POWER: 'PANGKAT',
     PPMT: 'PPMT',
+    PRICEDISC: 'PRICEDISC',
     PROPER: 'HURUF.AWAL.BESAR',
     PV: 'PV',
     RADIANS: 'RADIAN',
     RAND: 'ACAK',
     RATE: 'SUKU.BUNGA',
+    RECEIVED: 'RECEIVED',
     REPLACE: 'GANTI',
     REPT: 'ULANG',
     RIGHT: 'KANAN',
@@ -231,6 +239,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: 'BERALIH',
     SYD: 'SYD',
     T: 'T',
+    TAKE: 'TAKE',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'TBILL.SAMA',
@@ -267,6 +276,7 @@ const dictionary: RawTranslationPackage = {
     XLOOKUP: 'XLOOKUP',
     YEAR: 'TAHUN',
     YEARFRAC: 'FRAC.TAHUN',
+    YIELDDISC: 'YIELDDISC',
     'HF.ADD': 'HF.ADD',
     'HF.CONCAT': 'HF.CONCAT',
     'HF.DIVIDE': 'HF.DIVIDE',
@@ -405,6 +415,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'KEYAKINAN.T',
     DEVSQ: 'KUADRAT.SIMPANG',
     GEOMEAN: 'RATA.GEO',
+    GESTEP: 'GESTEP',
     HARMEAN: 'RATA.HARM',
     CRITBINOM: 'KRIT.BINOM',
     'COVARIANCE.P': 'KOVAR.P',

@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#OBL!',
     CYCLE: '#CYKL!',
     DIV_BY_ZERO: '#DZIEL/0!',
     ERROR: '#BŁĄD!',
@@ -18,6 +19,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#ARG!',
   },
   functions: {
+    CHOOSECOLS: 'WYBIERZ.KOLUMNY',
+    CHOOSEROWS: 'WYBIERZ.WIERSZE',
     FILTER: 'FILTER',
     VSTACK: 'STOS.PION',
     HSTACK: 'STOS.POZ',
@@ -25,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'WART.BEZWGL',
+    ACCRINTM: 'NAL.ODS.WYKUP',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
     ACOT: 'ACOT',
@@ -98,6 +102,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DZIESIĘTNA',
     DEGREES: 'STOPNIE',
     DELTA: 'DELTA',
+    DISC: 'STOPA.DYSK',
     DOLLARDE: 'CENA.DZIES',
     DOLLARFR: 'CENA.UŁAM',
     EDATE: 'NR.SER.DATY',
@@ -127,6 +132,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEKS',
     INT: 'ZAOKR.DO.CAŁK',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'STOPA.PROC',
     IPMT: 'IPMT',
     IRR: 'IRR',
     ISBINARY: 'ISBINARY',
@@ -188,11 +194,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'ILOCZYN',
     POWER: 'POTĘGA',
     PPMT: 'PPMT',
+    PRICEDISC: 'CENA.DYSK',
     PROPER: 'Z.WIELKIEJ.LITERY',
     PV: 'PV',
     RADIANS: 'RADIANY',
     RAND: 'LOSUJ',
     RATE: 'RATE',
+    RECEIVED: 'KWOTA.WYKUP',
     REPLACE: 'ZASTĄP',
     REPT: 'POWT',
     RIGHT: 'PRAWY',
@@ -229,6 +237,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: 'PRZEŁĄCZ',
     SYD: 'SYD',
     T: 'T',
+    TAKE: 'WYCINEK',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'RENT.EKW.BS',
@@ -265,6 +274,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'ROK',
     YEARFRAC: 'CZĘŚĆ.ROKU',
+    YIELDDISC: 'RENT.DYSK',
     ROMAN: 'RZYMSKIE',
     ARABIC: 'ARABSKA',
     'HF.ADD': 'HF.ADD',
@@ -405,6 +415,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'UFNOŚĆ.T',
     DEVSQ: 'ODCH.KWADRATOWE',
     GEOMEAN: 'ŚREDNIA.GEOMETRYCZNA',
+    GESTEP: 'SPRAWDŹ.PRÓG',
     HARMEAN: 'ŚREDNIA.HARMONICZNA',
     CRITBINOM: 'PRÓG.ROZKŁAD.DWUM',
     PEARSON: 'PEARSON',
