@@ -40,8 +40,8 @@ export class UniquePlugin extends FunctionPlugin implements FunctionPluginTypech
    * Corresponds to UNIQUE(array, [by_col], [exactly_once]).
    *
    * Errors found anywhere in the input range are propagated. An empty result
-   * (only reachable via exactly_once when nothing occurs exactly once) yields
-   * #N/A, mirroring FILTER's empty-result handling.
+   * (exactly_once when nothing occurs exactly once) yields #CALC!, as in
+   * FILTER.
    *
    * @param {ProcedureAst} ast - the parsed function-call AST node.
    * @param {InterpreterState} state - current interpreter evaluation state.
@@ -95,7 +95,7 @@ export class UniquePlugin extends FunctionPlugin implements FunctionPluginTypech
           : distinct
 
         if (kept.length === 0) {
-          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+          return new CellError(ErrorType.CALC, ErrorMessage.EmptyRange)
         }
 
         const result = byCol ? UniquePlugin.transpose(kept) : kept
