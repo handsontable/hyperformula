@@ -1065,6 +1065,10 @@ describe("ErrorPopup syncCell", () => {
     }
   }
 
+  function mutationsDelivered(): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve));
+  }
+
   function popupId(): string | undefined {
     return document.body.querySelector(sel(CN.errorPopup))?.id;
   }
@@ -1073,17 +1077,37 @@ describe("ErrorPopup syncCell", () => {
     cell.setAttribute("aria-describedby", "col-header-2");
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
     repaint(cell, "#DIV/0!");
-    await Promise.resolve();
+    await mutationsDelivered();
 
     expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupId()}`);
     expect(cell.getAttribute("aria-errormessage")).toBe(popupId());
+  });
+
+  it("restores the popup association when the host rewrites the cell's aria attributes without calling syncCell", async () => {
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    cell.removeAttribute("aria-errormessage");
+    cell.setAttribute("aria-describedby", "col-header-2");
+    await mutationsDelivered();
+
+    expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupId()}`);
+    expect(cell.getAttribute("aria-errormessage")).toBe(popupId());
+  });
+
+  it("stops restoring the popup association once the popup closes", async () => {
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    cell.dispatchEvent(new FocusEvent("focusout", { bubbles: true, relatedTarget: document.body }));
+    cell.setAttribute("aria-describedby", "col-header-2");
+    await mutationsDelivered();
+
+    expect(cell.getAttribute("aria-describedby")).toBe("col-header-2");
+    expect(cell.getAttribute("aria-errormessage")).toBeNull();
   });
 
   it("keeps the host's aria-describedby id when a repaint changes the anchored cell's error", async () => {
     cell.setAttribute("aria-describedby", "col-header-2");
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
     repaint(cell, "#REF!");
-    await Promise.resolve();
+    await mutationsDelivered();
 
     expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupId()}`);
     expect(cell.getAttribute("aria-errormessage")).toBe(popupId());
@@ -1093,9 +1117,9 @@ describe("ErrorPopup syncCell", () => {
     cell.setAttribute("aria-describedby", "col-header-2");
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
     repaint(cell, null);
-    await Promise.resolve();
+    await mutationsDelivered();
     repaint(cell, "#REF!");
-    await Promise.resolve();
+    await mutationsDelivered();
 
     expect(popup.isVisible()).toBe(true);
     expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupId()}`);
@@ -1106,7 +1130,7 @@ describe("ErrorPopup syncCell", () => {
     cell.setAttribute("aria-describedby", "col-header-2");
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
     repaint(cell, null);
-    await Promise.resolve();
+    await mutationsDelivered();
 
     expect(cell.getAttribute("aria-describedby")).toBe("col-header-2");
     expect(cell.getAttribute("aria-errormessage")).toBeNull();

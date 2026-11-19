@@ -769,11 +769,20 @@ holds the pointer or focus while no tooltip shows, the tooltip opens there. A ch
 lifts that cell's Escape suppression, since the dismissed content is gone.
 
 While the tooltip is open, the cell carries `aria-errormessage` and the popup id in its
-`aria-describedby`, appended to the ids already there. A host repaint can wipe both:
-Handsontable strips every `aria-*` attribute before its renderer runs, and adds its
-column-header id to `aria-describedby` after it, only when the renderer left none. So when
-`syncCell` runs for the anchored cell, repaint or not, it writes the association in a
-microtask, after the host's synchronous render has finished.
+`aria-describedby`, appended to the ids already there. A host can rewrite either attribute
+at any time: Handsontable strips every `aria-*` attribute on each draw, and a React grid
+writes its own value when a prop changes. So `ErrorPopup` keeps a `MutationObserver` on those
+two attributes of the anchored cell while the tooltip is open, and puts the association back
+whenever it is missing. It needs no call from the host, so it also covers a host that never
+calls `markCell`. The observer is disconnected whenever the association is cleared.
+
+One case needs care. Some hosts add their own id only when `aria-describedby` is still empty
+after the renderer returns (Handsontable's column-header id). When `syncCell` anchors the
+tooltip from inside a render, it therefore writes only `aria-errormessage` and leaves
+`aria-describedby` to the observer, which runs after the host has finished the cell.
+
+happy-dom delivers observer records on a timer, not in a microtask as browsers do, so a unit
+test waits one timer tick before it checks the restored attributes.
 
 The error tooltip itself is Esc-dismissible: `ErrorPopup` owns a window-level `keydown`
 (capture) listener, registered while attached; it consumes Escape only while the tooltip is

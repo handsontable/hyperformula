@@ -56,6 +56,7 @@ export class ErrorPopup extends BasePopup {
     this.handleLeave(event.relatedTarget, false);
   private readonly onScroll = (): void => this.scheduleScrollReposition();
   private readonly onKeydown = (event: KeyboardEvent): void => this.handleEscape(event);
+  private readonly associationObserver = new MutationObserver(() => this.restoreErrorAssociation());
 
   constructor({ container, options, direction, icons, phrases }: ErrorPopupOptions) {
     super({
@@ -132,12 +133,28 @@ export class ErrorPopup extends BasePopup {
   }
 
   private clearErrorAssociation(): void {
+    this.associationObserver.disconnect();
+
     if (!this.activeCell) {
       return;
     }
 
     this.activeCell.removeAttribute("aria-errormessage");
     removeIdRef(this.activeCell, "aria-describedby", this.root.id);
+  }
+
+  private restoreErrorAssociation(): void {
+    const cell = this.activeCell;
+
+    if (!cell || !this.isVisible()) {
+      return;
+    }
+
+    if (cell.getAttribute("aria-errormessage") !== this.root.id) {
+      cell.setAttribute("aria-errormessage", this.root.id);
+    }
+
+    addIdRef(cell, "aria-describedby", this.root.id);
   }
 
   private handleEnter(target: EventTarget | null, viaPointer: boolean): void {
@@ -170,7 +187,7 @@ export class ErrorPopup extends BasePopup {
     this.anchorTo(cell, message);
   }
 
-  private anchorTo(cell: HTMLElement, message: string, fromRepaint = false): void {
+  private anchorTo(cell: HTMLElement, message: string, duringHostRender = false): void {
     this.pendingMessage = message;
     this.clearErrorAssociation();
     this.activeCell = cell;
@@ -182,24 +199,15 @@ export class ErrorPopup extends BasePopup {
       width: rect.width,
       direction: this.direction,
     });
+    this.associationObserver.observe(cell, {
+      attributes: true,
+      attributeFilter: ["aria-errormessage", "aria-describedby"],
+    });
     cell.setAttribute("aria-errormessage", this.root.id);
 
-    if (fromRepaint) {
-      this.associateAfterRepaint(cell);
-    } else {
+    if (!duringHostRender) {
       addIdRef(cell, "aria-describedby", this.root.id);
     }
-  }
-
-  private associateAfterRepaint(cell: HTMLElement): void {
-    queueMicrotask(() => {
-      if (cell !== this.activeCell || !this.isVisible()) {
-        return;
-      }
-
-      cell.setAttribute("aria-errormessage", this.root.id);
-      addIdRef(cell, "aria-describedby", this.root.id);
-    });
   }
 
   private anchorToRemainingCell(): boolean {
@@ -341,10 +349,6 @@ export class ErrorPopup extends BasePopup {
     const message = cell.dataset.hfeError;
 
     if (message === previousMessage) {
-      if (message && this.isVisible() && cell === this.activeCell) {
-        this.associateAfterRepaint(cell);
-      }
-
       return;
     }
 
@@ -399,6 +403,7 @@ export class ErrorPopup extends BasePopup {
   }
 
   override destroy(): void {
+    this.associationObserver.disconnect();
     this.cancelScrollReposition();
     super.destroy();
   }
