@@ -66,7 +66,7 @@ expired, you see a message in the console. Each case is described below.
 
 ### Missing license key
 
-If you don't set `licenseKey`, or set it to an empty string, the library is blocked and you see a warning in the console:
+If you don't set `licenseKey`, or set it to an empty string, HyperFormula is blocked and you see a warning in the console:
 
 * Every function call evaluates to a `#LIC!` error, except `VERSION()` and `OFFSET()`.
 * Every license-gated API method throws a `LicenseCapabilityMissingError` that names the key's
@@ -84,7 +84,7 @@ Formulas without a function call, such as `=A1+B1`, keep calculating.
 
 ### Invalid license key
 
-If HyperFormula can't read your key, or your key doesn't include HyperFormula, the key is invalid. The library is blocked in the same way as with a
+If HyperFormula can't read your key, or your key doesn't include HyperFormula, the key is invalid. HyperFormula is blocked in the same way as with a
 [missing key](#missing-license-key), and you see a warning in the console.
 
 The `gpl-v3` key is invalid. For details, see [Migrating from 3.x to 4.0](migration-from-3.x-to-4.0.md).
@@ -92,16 +92,16 @@ The `gpl-v3` key is invalid. For details, see [Migrating from 3.x to 4.0](migrat
 ### Expired license key
 
 If your key doesn't cover the version of HyperFormula you installed, or its term has ended, you see a message in the console.
-Depending on your license terms, an expired key either blocks the library in the same way as a
+Depending on your license terms, an expired key either blocks HyperFormula in the same way as a
 [missing key](#missing-license-key), or keeps working with what it grants.
 
 To keep using HyperFormula, renew your license key, or install a version that your key covers.
 
 ### Function or feature not included in your license key
 
-A license key may grant the whole library, or only part of it.
+A license key may grant all of HyperFormula, or only part of it.
 
-If your key grants only part of the library, then:
+If your key grants only part of HyperFormula, then:
 
 * A function your key doesn't include evaluates to a `#LIC!` error, in the same way as any other
   [error value](types-of-errors.md). Everything else in the sheet keeps calculating.
