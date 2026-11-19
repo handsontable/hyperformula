@@ -152,7 +152,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
   },
   TEXTJOIN: {
     category: 'Text',
-    shortDescription: 'Joins text from multiple strings and/or ranges with a delimiter. Supports array/range delimiters that cycle through gaps. When ignore_empty is TRUE, empty strings are skipped. Returns #VALUE! if result exceeds 32,767 characters.',
+    shortDescription: 'Joins text from multiple strings and/or ranges with a delimiter. Supports array/range delimiters that cycle through gaps. When ignore_empty is TRUE, empty strings are skipped. Returns #CALC! if result exceeds 32,767 characters.',
     parameters: [{name: 'delimiter', description: 'The text (or range/array of texts, cycled through the gaps) inserted between joined values.'}, {name: 'ignore_empty', description: 'When TRUE, empty strings among the joined values are skipped instead of producing an extra delimiter.'}, {name: 'text1', description: 'A text value, cell reference, or range to join. Further text values or ranges can be passed as additional arguments and are appended in order.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=TEXTJOIN(", ", TRUE(), A1:A3)', '=TEXTJOIN("-", FALSE(), "a", "b", "c")'],

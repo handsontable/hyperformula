@@ -537,8 +537,18 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         const row = []
         for (let j = 0; j < rangeVals.width(); j++) {
           let ok = true
-          for (const filter of rangeFilters) {
-            const val = coerceScalarToBoolean(filter.data[i][j])
+          for (let k = 0; k < rangeFilters.length; k++) {
+            const condition = rangeFilters[k].data[i][j]
+            // The first condition is Excel's `include`: text in it, even "TRUE", which coerceScalarToBoolean would
+            // accept, returns #VALUE!, and an error in it is returned. Further conditions are HyperFormula's own
+            // extension and keep dropping such rows.
+            if (k === 0 && typeof condition === 'string') {
+              return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+            }
+            const val = coerceScalarToBoolean(condition)
+            if (k === 0 && val instanceof CellError) {
+              return val
+            }
             if (val !== true) {
               ok = false
               break
@@ -555,7 +565,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       if (ret.length > 0) {
         return SimpleRangeValue.onlyValues(ret)
       } else {
-        return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+        return new CellError(ErrorType.CALC, ErrorMessage.EmptyRange)
       }
     })
   }

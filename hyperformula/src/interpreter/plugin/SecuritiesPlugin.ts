@@ -8,11 +8,19 @@ import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {
+  actualCouponPeriodLength,
+  couponDate,
+  couponsAfter,
+  CouponSchedule,
+  daysBeforeSettlement,
+  thirtyDayPeriodLength,
+} from './CouponSchedule'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
- * Holds the securities functions, which compute a security's price, yield, discount or interest rate, amount received
- * or accrued interest from its dates and a day-count basis.
+ * Holds the securities functions, which compute a security's price, yield, discount or interest rate, amount received,
+ * accrued interest, or coupon dates and periods from its dates and a day-count basis.
  */
 export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SecuritiesPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
@@ -73,6 +81,60 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: 1000, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPPCD': {
+      method: 'couppcd',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPNCD': {
+      method: 'coupncd',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPNUM': {
+      method: 'coupnum',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPDAYBS': {
+      method: 'coupdaybs',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPDAYSNC': {
+      method: 'coupdaysnc',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'COUPDAYS': {
+      method: 'coupdays',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
       ],
     },
@@ -211,6 +273,107 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
   }
 
   /**
+   * Corresponds to COUPPCD(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the last coupon date on or before the settlement date, as a date serial number.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public couppcd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPPCD', true,
+      (schedule: CouponSchedule) => this.dateTimeHelper.dateToNumber(schedule.previous)
+    )
+  }
+
+  /**
+   * Corresponds to COUPNCD(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the first coupon date after the settlement date, as a date serial number.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public coupncd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPNCD', false,
+      (schedule: CouponSchedule) => this.dateTimeHelper.dateToNumber(schedule.next)
+    )
+  }
+
+  /**
+   * Corresponds to COUPNUM(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the number of coupons payable after the settlement date, up to and including the maturity date.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public coupnum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPNUM', true,
+      (schedule: CouponSchedule) => schedule.count
+    )
+  }
+
+  /**
+   * Corresponds to COUPDAYBS(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the number of days from the previous coupon date to the settlement date, counted by `basis`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public coupdaybs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPDAYBS', true,
+      (schedule: CouponSchedule) => daysBeforeSettlement(this.dateTimeHelper, schedule)
+    )
+  }
+
+  /**
+   * Corresponds to COUPDAYSNC(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the number of days from the settlement date to the next coupon date. Basis 0 counts it as Excel does:
+   * the 30/360 length of the coupon period minus COUPDAYBS, so it is not always the direct 30/360 count.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public coupdaysnc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPDAYSNC', false,
+      (schedule: CouponSchedule) => {
+        if (schedule.basis === 0) {
+          return thirtyDayPeriodLength(this.dateTimeHelper, schedule) - daysBeforeSettlement(this.dateTimeHelper, schedule)
+        }
+        const next = this.dateTimeHelper.dateToNumber(schedule.next)
+        return this.dateTimeHelper.dayCountByBasis(schedule.settlement, next, schedule.basis).dayCount
+      }
+    )
+  }
+
+  /**
+   * Corresponds to COUPDAYS(settlement, maturity, frequency, [basis]).
+   *
+   * Returns the number of days in the coupon period that contains the settlement date: 360 / `frequency` for bases
+   * 0, 2 and 4, 365 / `frequency` for basis 3, and the actual length of the period, as Excel computes it, for basis 1.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public coupdays(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.couponFunction(ast, state, 'COUPDAYS', false,
+      (schedule: CouponSchedule) => {
+        switch (schedule.basis) {
+          case 1:
+            return actualCouponPeriodLength(this.dateTimeHelper, schedule)
+          case 3:
+            return 365 / schedule.frequency
+          default:
+            return 360 / schedule.frequency
+        }
+      }
+    )
+  }
+
+  /**
    * Runs DISC, INTRATE, PRICEDISC, RECEIVED and YIELDDISC, which share the arguments
    * (settlement, maturity, first amount, second amount, [basis]).
    *
@@ -288,6 +451,67 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
   }
 
   /**
+   * Runs COUPPCD, COUPNCD, COUPNUM, COUPDAYBS, COUPDAYSNC and COUPDAYS, which share the arguments
+   * (settlement, maturity, frequency, [basis]).
+   *
+   * Validates in Excel's order: settlement, maturity, settlement before maturity, then an empty settlement, maturity
+   * or frequency argument (#N/A), then frequency and basis. An empty date is not compared with the other date. Builds
+   * the coupon schedule and passes it to `calculate`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   * @param {string} functionName - the function's id, used to look up its metadata
+   * @param {boolean} checkPreviousCoupon - when true, a previous coupon date before the earliest supported date is
+   * #NUM!: COUPPCD would return that date and COUPDAYBS counts from it, and Excel returns #NUM! for COUPNUM there
+   * @param {Function} calculate - computes the result from the coupon schedule
+   */
+  private couponFunction(
+    ast: ProcedureAst,
+    state: InterpreterState,
+    functionName: string,
+    checkPreviousCoupon: boolean,
+    calculate: (schedule: CouponSchedule) => number,
+  ): InterpreterValue {
+    const isArgumentEmpty = (index: number) => ast.args[index]?.type === AstNodeType.EMPTY
+    const isDateEmpty = isArgumentEmpty(0) || isArgumentEmpty(1)
+    const isFrequencyEmpty = isArgumentEmpty(2)
+    return this.runFunction(ast.args, state, this.metadata(functionName),
+      (settlementArg: InternalScalarValue, maturityArg: InternalScalarValue, frequencyArg: InternalScalarValue, basisArg: InternalScalarValue) => {
+        const settlement = this.coerceToSecurityDate(settlementArg)
+        if (settlement instanceof CellError) {
+          return settlement
+        }
+        const maturity = this.coerceToSecurityDate(maturityArg)
+        if (maturity instanceof CellError) {
+          return maturity
+        }
+        if (!isDateEmpty && settlement >= maturity) {
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
+        }
+        if (isDateEmpty || isFrequencyEmpty) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const frequency = this.coerceToCouponFrequency(frequencyArg)
+        if (frequency instanceof CellError) {
+          return frequency
+        }
+        const basis = this.coerceToDayCountBasis(basisArg)
+        if (basis instanceof CellError) {
+          return basis
+        }
+        const maturityDate = this.dateTimeHelper.numberToSimpleDate(maturity)
+        const count = couponsAfter(this.dateTimeHelper, settlement, maturityDate, frequency)
+        const previous = couponDate(this.dateTimeHelper, maturityDate, -count, frequency)
+        if (checkPreviousCoupon && this.dateTimeHelper.dateToNumber(previous) < 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
+        }
+        const next = couponDate(this.dateTimeHelper, maturityDate, 1 - count, frequency)
+        return calculate({settlement, maturity: maturityDate, frequency, basis, count, previous, next})
+      }
+    )
+  }
+
+  /**
    * Converts a date argument of a securities function: a number as `strictNumber` accepts it, truncated to an integer.
    * A date outside the supported range is #NUM!, and so is a negative value even when it truncates to 0, as in Excel.
    */
@@ -322,6 +546,22 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
       return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
     }
     return Math.trunc(basis)
+  }
+
+  /**
+   * Converts the `frequency` argument of a coupon function: a number as `strictNumber` accepts it, truncated to an
+   * integer, that must be 1 (annual), 2 (semiannual) or 4 (quarterly).
+   */
+  private coerceToCouponFrequency(value: InternalScalarValue): number | CellError {
+    const frequency = this.strictNumber(value)
+    if (frequency instanceof CellError) {
+      return frequency
+    }
+    const truncated = Math.trunc(frequency)
+    if (truncated !== 1 && truncated !== 2 && truncated !== 4) {
+      return new CellError(ErrorType.NUM, ErrorMessage.CouponFrequency)
+    }
+    return truncated
   }
 
   /**
