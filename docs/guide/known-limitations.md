@@ -106,6 +106,12 @@ a circular reference.
 
 * A named expression, or a function whose result size depends on cell values, passed directly as the source returns `#VALUE!` when the result has more than one cell, because its size cannot be predicted before evaluation.
 
+### TREND, GROWTH and LOGEST functions
+
+* `TREND` and `GROWTH` determine their result size before evaluation: from `new_x`, or from `known_y` when `new_x` is omitted. If an input expression returns a different size at evaluation, they return `#VALUE!`.
+
+* `LOGEST` returns the same layout as `LINEST`, and the `LINEST` limitations above apply to it: `stats` must be a constant, and the result width is determined from the predictor dimensions before evaluation.
+
 ### OFFSET function
 
 HyperFormula resolves the OFFSET function at parse time rather than during evaluation. The parser inspects the arguments and rewrites the expression into a plain cell reference or range. This keeps the dependency graph accurate but imposes several restrictions.

@@ -22,6 +22,14 @@ Numerical results can differ for nearly dependent predictors and nearly perfect 
 
 Very large or very small input scales can also cause substantial differences in coefficients and statistics, including for a single predictor with a non-perfect fit. HyperFormula does not reproduce Excel's loss of predictors or zero standard errors observed at extreme scales. Rescaling inputs to more moderate units can reduce numerical errors in both engines.
 
+## TREND, GROWTH and LOGEST
+
+Like `LINEST`, these functions determine their result size before evaluation. `LOGEST` requires a constant `stats` argument, as `LINEST` does: `=LOGEST(A1:A10,B1:B10,TRUE(),D1)` returns `#VALUE!`. The numerical differences described for `LINEST` also apply to the statistics returned by `LOGEST`, which are those of the fit to the natural logarithm of `known_y`.
+
+An array passed as `const` (or as `stats` in `LOGEST`) is not evaluated element by element. Microsoft Excel returns one result for each element, for example for `=TREND(A1:A6,B1:B6,C1:C3,{TRUE(),FALSE()})`; HyperFormula uses the first element as `const`, and returns `#VALUE!` for an array `stats`.
+
+A single cell that holds an error, passed as `known_x` or `new_x`, returns that error before the other arguments are checked. Microsoft Excel returns `#VALUE!`. For example, `=TREND(A1:A6,B1:B6,C1)` where C1 contains `=1/0` returns `#DIV/0!` in HyperFormula. An error inside a range of several cells returns `#VALUE!`, as in Microsoft Excel.
+
 ## General functionalities
 
 | Functionality                                      | Examples                                                                  | HyperFormula                                                                                                                                                                                                                                                                                                                                                 | Google Sheets                                                                                                                  | Microsoft Excel                                                                                                                |
@@ -79,6 +87,10 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | TBILLPRICE    | =TBILLPRICE(0, 180, 1.9)                                       |       5.0000 |           NUM |          5.0000 |
 | TBILLPRICE    | =TBILLPRICE(0, 180, 2)                                         |       0.0000 |           NUM |          0.0000 |
 | ACCRINTM      | =ACCRINTM(DATE(2008,4,1), DATE(2008,6,15), 0.1)                |      20.5556 |       20.5556 |    Wrong number |
+| COUPPCD       | =COUPPCD(1, DATE(1900,5,15), 2)                                |          NUM |      -45.0000 |          0.0000 |
+| COUPDAYBS     | =COUPDAYBS(1, DATE(1900,5,15), 2)                              |          NUM |       46.0000 |          1.0000 |
+| COUPNUM       | =COUPNUM(1, DATE(1900,5,15), 2)                                |          NUM |        1.0000 |             NUM |
+| COUPDAYS      | =COUPDAYS(DATE(1900,2,15), DATE(1900,8,31), 2, 1)              |     181.0000 |      181.0000 |        184.0000 |
 | NPV           | =NPV(1, TRUE(), 1)                                             |       0.7500 |        0.5000 |          0.7500 |
 | NPV           | =NPV(1,B1) where B1 = true                                     |       0.5000 |        0.0000 |          0.0000 |
 | POISSON.DIST  | =POISSON.DIST(-0.01, 0, FALSE())                               |          NUM |        1.0000 |             NUM |
@@ -140,6 +152,13 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | GESTEP        | =GESTEP(A1:A2, 0)<br>where A1:A2: 1, 2; `useArrayArithmetic: true` |  Spills 1, 1 |   Not checked |           VALUE |
 | GESTEP        | =GESTEP(A1:A3, 4) in B2<br>where A1:A3: 1, 5, 2                |            1 |   Not checked |           VALUE |
 | GESTEP        | =GESTEP(C1:C2, NA())<br>in row 3 or below, where C1:C2: `#N/A`, "x" |        VALUE |   Not checked |             N/A |
+| RANK.EQ       | =RANK.EQ(2, {1, 2, 3})                                         |            2 |   Not checked |    Not accepted |
+| RANK          | =RANK(2, {1, 2, 3})                                            |            2 |   Not checked |    Not accepted |
+| RANK.EQ       | =RANK.EQ(5, 5)                                                 |            1 |   Not checked |    Not accepted |
+| RANK.EQ       | =RANK.EQ(10, A1:A3*1)<br>where A1:A3: 10, 30, 20; `useArrayArithmetic: true` |            3 |   Not checked |    Not accepted |
+| RANK.EQ       | =RANK.EQ("", A1:B2, 0)<br>where A1:B2: 1, 3, 2, 4              |          N/A |   Not checked |           VALUE |
+| RANK.EQ       | =RANK.EQ(2, A1:B2, "")<br>where A1:B2: 1, 3, 2, 4              |            3 |   Not checked |           VALUE |
+| RANK.EQ       | =RANK.EQ(2, A1:B2, "12")<br>where A1:B2: 1, 3, 2, 4            |            2 |   Not checked |           VALUE |
 
 A few of the rows above share a root cause worth stating once:
 
