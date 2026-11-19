@@ -31,7 +31,7 @@ Declare the engine at the top of `<script>` so it lives for the component's life
   ];
 
   const hf = HyperFormula.buildFromArray(data, {
-    licenseKey: 'gpl-v3',
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
     // more configuration options go here
   });
 
@@ -97,7 +97,9 @@ In SvelteKit, top-level statements in `<script>` run on the server too. HyperFor
         [1, 2, '=A1+B1'],
         // your data rows go here
       ],
-      { licenseKey: 'gpl-v3' }
+      {
+        // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+      }
     );
   });
 
