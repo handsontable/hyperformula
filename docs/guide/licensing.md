@@ -4,7 +4,6 @@ tags:
   - commercial licence
   - proprietary
   - buy a license
-  - GPLv3
 ---
 
 HyperFormula is proprietary software. See [`LICENSE.txt`](https://github.com/handsontable/hyperformula/blob/develop/LICENSE.txt) for the license terms.
