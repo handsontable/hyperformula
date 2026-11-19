@@ -10,11 +10,11 @@ Never write sensitive information into code, comments, tests, commit messages, b
 
 - **Clients, customers, and partners** — their names, and details that identify them indirectly: their domains, their deployments, the wording of their reports.
 - **Personal data of any kind** — names, e-mail addresses, phone numbers, user accounts, IP addresses.
-- **Credentials and secrets** — API keys, tokens, passwords, licence keys, private URLs.
+- **Credentials and secrets** — API keys, tokens, passwords, licence keys, private URLs. The one exception is the internal test license key, which is committed on purpose; see [`hyperformula/dev-docs/LICENSING.md`](../hyperformula/dev-docs/LICENSING.md#the-internal-test-key).
 - **Internal-only material** — the contents of private repositories and internal tickets, unreleased plans, contract and pricing details.
 
 Nothing internal goes into the public documentation either — the guides in `docs/` and the JSDoc the API reference is generated from. That covers contract details, internal validation mechanisms, and internal tooling.
 
 ## Describe the change on its own terms
 
-Describe the change on its own technical terms: write "fix an off-by-one error in `SUMIFS` when the criteria range is empty", not "fix the bug reported by \<company\>". An internal ticket identifier such as `HF-123` is fine on its own; the contents of that ticket are not. A `Claude-Session:` trailer that links a Claude Code session is fine in commit messages and pull request descriptions. The link opens only for people with access to the session; what the session contains is not, so never quote it.
+Describe the change on its own technical terms: write "fix an off-by-one error in `SUMIFS` when the criteria range is empty", not "fix the bug reported by \<company\>". An internal ticket identifier such as `HF-123` is fine on its own; the contents of that ticket are not. A link to a Claude Code session, as a `Claude-Session:` commit trailer or at the end of a pull request description, is fine: it opens only for people with access to the session. What the session contains is not fine to publish, so never quote it.
