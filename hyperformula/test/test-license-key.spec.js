@@ -50,6 +50,20 @@ describe('the internal test license key', () => {
     expect(keys[0]).toContain(TEST_KEY_MARKER)
   })
 
+  it('is not written out in the files that may only name its holder', () => {
+    // The search below skips these files by path, so check their content: no key literal, and not the key's
+    // bracketed block, which any copy of the key holds whatever its quotes or line breaks.
+    const key = [...fs.readFileSync(path.join(REPO_ROOT, CONSTANTS[0]), 'utf8').matchAll(KEY_LITERAL)][0][1]
+    const block = key.slice(key.lastIndexOf('['))
+
+    MARKER_ONLY.forEach((file) => {
+      const text = fs.readFileSync(path.join(REPO_ROOT, file), 'utf8')
+
+      expect({file, literals: [...text.matchAll(KEY_LITERAL)].length, holdsBlock: text.includes(block)})
+        .toEqual({file, literals: 0, holdsBlock: false})
+    })
+  })
+
   it('is written out nowhere else in the repository', () => {
     // `--untracked`, so a new file counts before it is committed. `git grep` exits with 1 when nothing
     // matches. The private suite is a repository of its own, ignored by this one, so it is searched on its own.
