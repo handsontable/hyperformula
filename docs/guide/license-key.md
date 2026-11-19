@@ -59,9 +59,8 @@ Which versions of HyperFormula a key covers, and for how long, follows from the
 terms of your contract. Your key carries those terms, and HyperFormula applies
 them locally, without any connection to a server.
 
-HyperFormula reads the key every time you build an engine or change its configuration. You can check the result in the
-[`licenseKeyValidityState`](../api/classes/hyperformula.md#licensekeyvaliditystate) property: `valid`, `missing`,
-`invalid`, or `expired`.
+HyperFormula reads the key every time you build an engine or change its configuration. If the key is missing, invalid, or
+expired, you see a message in the console. Each case is described below.
 
 ## What depends on the license key
 
