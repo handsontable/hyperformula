@@ -6,13 +6,8 @@ tags:
   - upgrade
   - breaking changes
   - v4.0
-  - gpl-v3
-  - license key
   - "#LIC!"
-  - "#CALC!"
   - language packs
-  - INDEX
-  - FILTER
 ---
 
 To upgrade your HyperFormula version from 3.x.x to 4.0.0, follow this guide.
