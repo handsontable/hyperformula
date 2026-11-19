@@ -130,6 +130,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'HAHIÁNYZIK',
     IFS: 'HAELSŐIGAZ',
     INDEX: 'INDEX',
+    INDIRECT: 'INDIREKT',
     INT: 'INT',
     INTERVAL: 'INTERVAL', //FIXME
     INTRATE: 'KAMATRÁTA',

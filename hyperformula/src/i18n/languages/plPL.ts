@@ -130,6 +130,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'JEŻELI.ND',
     IFS: 'WARUNKI',
     INDEX: 'INDEKS',
+    INDIRECT: 'ADR.POŚR',
     INT: 'ZAOKR.DO.CAŁK',
     INTERVAL: 'INTERVAL', //FIXME
     INTRATE: 'STOPA.PROC',

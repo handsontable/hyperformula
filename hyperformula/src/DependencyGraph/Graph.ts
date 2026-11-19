@@ -5,7 +5,7 @@
 
 import { SimpleCellAddress } from '../Cell'
 import { SimpleCellRange } from '../AbsoluteCellRange'
-import { TopSort, TopSortResult } from './TopSort'
+import { NodeProcessingResult, TopSort, TopSortResult } from './TopSort'
 import { ProcessableValue } from './ProcessableValue'
 
 export type NodeId = number
@@ -15,6 +15,21 @@ export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | Simp
  * Interface for nodes that can be stored in the Graph.
  * The idInGraph property is managed by the Graph class and should not be set externally.
  */
+/**
+ * View of a running top-sort pass, passed to the operating function together with the node.
+ */
+export interface TopSortPass<Node> {
+  /**
+   * Returns true if the node was reached by the pass and its value may still change later in it.
+   */
+  isPending(node: Node): boolean,
+  /**
+   * Requests that a pending node is computed before the node being processed is retried.
+   * Call it right before returning {@link NodeProcessingResult.DEFERRED}.
+   */
+  requestPull(node: Node): void,
+}
+
 export interface GraphNode {
   idInGraph?: NodeId,
 }
@@ -258,24 +273,41 @@ export class Graph<Node extends GraphNode> {
    * Sorts the whole graph topologically. Nodes that are on cycles are kept separate.
    */
   public topSortWithScc(): TopSortResult<Node> {
-    return this.getTopSortedWithSccSubgraphFrom(this.getNodes(), () => true, () => { })
+    return this.getTopSortedWithSccSubgraphFrom(this.getNodes(), () => NodeProcessingResult.CHANGED, () => { })
   }
 
   /**
    * Sorts the graph topologically. Nodes that are on cycles are kept separate.
    *
    * @param {Node[]} modifiedNodes - seed for computation. The algorithm assumes that only these nodes have changed since the last run.
-   * @param {(node: Node) => boolean} operatingFunction - recomputes value of a node, and returns whether a change occurred
+   * @param {(node: Node, pass: TopSortPass<Node>) => NodeProcessingResult} operatingFunction - recomputes value of a node, and returns the outcome
    * @param {(node: Node) => void} onCycle - action to be performed when node is on cycle
    */
   public getTopSortedWithSccSubgraphFrom(
     modifiedNodes: Node[],
-    operatingFunction: (node: Node) => boolean,
+    operatingFunction: (node: Node, pass: TopSortPass<Node>) => NodeProcessingResult,
     onCycle: (node: Node) => void
   ): TopSortResult<Node> {
-    const topSortAlgorithm = new TopSort<Node>(this.nodesSparseArray, this.edgesSparseArray)
+    const precedentIds = (id: NodeId): NodeId[] => {
+      const node = this.nodesSparseArray[id]
+      if (node === undefined) {
+        return []
+      }
+      return this.dependencyQuery(node)
+        .map(([, dependency]) => dependency.idInGraph)
+        .filter((dependencyId): dependencyId is NodeId => dependencyId !== undefined)
+    }
+    const topSortAlgorithm = new TopSort<Node>(this.nodesSparseArray, this.edgesSparseArray, precedentIds)
+    const pass: TopSortPass<Node> = {
+      isPending: (node: Node) => node.idInGraph !== undefined && topSortAlgorithm.isPending(node.idInGraph),
+      requestPull: (node: Node) => {
+        if (node.idInGraph !== undefined) {
+          topSortAlgorithm.requestPull(node.idInGraph)
+        }
+      },
+    }
     const modifiedNodesIds = modifiedNodes.map(node => node.idInGraph).filter(id => id !== undefined) as NodeId[]
-    return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodesIds, operatingFunction, onCycle)
+    return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodesIds, (node: Node) => operatingFunction(node, pass), onCycle)
   }
 
   /**

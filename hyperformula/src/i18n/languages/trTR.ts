@@ -130,6 +130,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'EĞERYOKSA',
     IFS: 'ÇOKEĞER',
     INDEX: 'İNDİS',
+    INDIRECT: 'DOLAYLI',
     INT: 'TAMSAYI',
     INTERVAL: 'INTERVAL', //FIXME
     INTRATE: 'FAİZORANI',

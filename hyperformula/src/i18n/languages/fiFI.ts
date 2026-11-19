@@ -130,6 +130,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'JOSPUUTTUU',
     IFS: 'JOSS',
     INDEX: 'INDEKSI',
+    INDIRECT: 'EPÄSUORA',
     INT: 'KOKONAISLUKU',
     INTERVAL: 'INTERVAL', //FIXME
     INTRATE: 'KORKO.ARVOPAPERI',

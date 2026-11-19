@@ -130,6 +130,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'HVIS.IT',
     IFS: 'HVIS.SETT',
     INDEX: 'INDEKS',
+    INDIRECT: 'INDIREKTE',
     INT: 'HELTALL',
     INTERVAL: 'INTERVAL', //FIXME
     INTRATE: 'RENTESATS',

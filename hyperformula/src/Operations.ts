@@ -284,6 +284,8 @@ export class Operations {
     mergedPlaceholderSheetId?: number,
   } {
     const { previousDisplayName, mergedWithPlaceholderSheet } = this.sheetMapping.renameSheet(sheetId, newName)
+    // a formula like INDIRECT("OldName!A1") must resolve again
+    this.dependencyGraph.markStructureDependentFormulasAsDirty()
 
     let version: number | undefined
     if (mergedWithPlaceholderSheet !== undefined) {
@@ -421,6 +423,8 @@ export class Operations {
     const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId, options)
     this.storeNamedExpressionInCell(namedExpression.address, expression)
     this.adjustNamedExpressionEdges(namedExpression, expressionName, sheetId)
+    // a formula like INDIRECT("Name") may now resolve
+    this.dependencyGraph.markStructureDependentFormulasAsDirty()
   }
 
   public restoreNamedExpression(namedExpression: InternalNamedExpression, content: ClipboardCell, sheetId?: number) {
@@ -428,6 +432,7 @@ export class Operations {
     this.restoreCell(namedExpression.address, content)
     const restoredNamedExpression = this.namedExpressions.restoreNamedExpression(namedExpression, sheetId)
     this.adjustNamedExpressionEdges(restoredNamedExpression, expressionName, sheetId)
+    this.dependencyGraph.markStructureDependentFormulasAsDirty()
   }
 
   public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions): [InternalNamedExpression, ClipboardCell] {
@@ -441,6 +446,8 @@ export class Operations {
     namedExpression.options = options
     const content = this.getClipboardCell(namedExpression.address)
     this.storeNamedExpressionInCell(namedExpression.address, newExpression)
+    // a formula like INDIRECT("Name") must resolve again
+    this.dependencyGraph.markStructureDependentFormulasAsDirty()
     return [oldNamedExpression, content]
   }
 
@@ -450,6 +457,7 @@ export class Operations {
       throw new NamedExpressionDoesNotExistError(expressionName)
     }
     this.namedExpressions.remove(namedExpression.displayName, sheetId)
+    this.dependencyGraph.markStructureDependentFormulasAsDirty()
     const content = this.getClipboardCell(namedExpression.address)
     if (sheetId !== undefined) {
       const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
