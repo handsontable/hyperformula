@@ -87,8 +87,7 @@ Formulas without a function call, such as `=A1+B1`, keep calculating.
 If HyperFormula can't read your key, or your key doesn't include HyperFormula, the key is invalid. The library is blocked in the same way as with a
 [missing key](#missing-license-key), and you see a warning in the console.
 
-The `gpl-v3` key is invalid. HyperFormula 4.0 and later is available only under a commercial license, so the
-`gpl-v3` key no longer works. For details, see [Migrating from 3.x to 4.0](migration-from-3.x-to-4.0.md).
+The `gpl-v3` key is invalid. For details, see [Migrating from 3.x to 4.0](migration-from-3.x-to-4.0.md).
 
 ### Expired license key
 
