@@ -19,8 +19,10 @@ import {MomentsAggregate} from './MomentsAggregate'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginDefinition, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 import {RangeVertex} from '../../DependencyGraph'
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
-import {BooleanPlugin, selectedArgument} from './BooleanPlugin'
+import {BooleanPlugin} from './BooleanPlugin'
 import {InformationPlugin} from './InformationPlugin'
+import {LookupPlugin} from './LookupPlugin'
+import {selectedArgument} from './SelectedArgument'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
@@ -585,11 +587,11 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    * as it does for `A1`.
    *
    * That holds for a parenthesized reference, a named expression defined as a reference, `INDEX`
-   * over a reference, and `IF`, `IFS`, `SWITCH` or `CHOOSE` whose evaluation returned one of these.
-   * These four report the argument they returned, so no argument is evaluated a second time. `IFERROR`
-   * and `IFNA` are not among them: they return the value of the cell, as in Excel. `INDEX`, `IF`, `IFS`,
-   * `SWITCH` and `CHOOSE` count only while the built-in implementation answers for them, not a custom
-   * plugin registered over their ids.
+   * over a reference, and `IF`, `IFS`, `SWITCH`, `CHOOSE` or `XLOOKUP` whose evaluation returned one of these.
+   * These five report the argument they returned, so no argument is evaluated a second time. `XLOOKUP` returns
+   * from its `return_array`, or from `if_not_found` when nothing matches. `IFERROR` and `IFNA` are not among them:
+   * they return the value of the cell, as in Excel. `INDEX`, `IF`, `IFS`, `SWITCH`, `CHOOSE` and `XLOOKUP` count
+   * only while the built-in implementation answers for them, not a custom plugin registered over their ids.
    *
    * @param {Ast} arg - the argument of the aggregation, already evaluated
    * @param {InterpreterState} state - interpreter state
@@ -615,7 +617,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
 
   /**
    * The function-call case of {@link evaluatesToReference}: `INDEX` over a reference, and `IF`, `IFS`,
-   * `SWITCH` or `CHOOSE` that returned a reference.
+   * `SWITCH`, `CHOOSE` or `XLOOKUP` that returned a reference.
    *
    * @param {ProcedureAst} ast - the function call passed to the aggregation, already evaluated
    * @param {InterpreterState} state - interpreter state
@@ -630,16 +632,26 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       case 'IF':
       case 'IFS':
       case 'SWITCH':
-      case 'CHOOSE': {
-        if (!this.isBuiltIn(ast.procedureName, BooleanPlugin)) {
-          return false
-        }
-        const returnedArgument = selectedArgument(ast)
-        return returnedArgument !== undefined && this.evaluatesToReference(returnedArgument, state)
-      }
+      case 'CHOOSE':
+        return this.isBuiltIn(ast.procedureName, BooleanPlugin) && this.selectedArgumentIsReference(ast, state)
+      case 'XLOOKUP':
+        return this.isBuiltIn('XLOOKUP', LookupPlugin) && this.selectedArgumentIsReference(ast, state)
       default:
         return false
     }
+  }
+
+  /**
+   * Tells whether the argument that a call to `IF`, `IFS`, `SWITCH`, `CHOOSE` or `XLOOKUP` returned, as its
+   * plugin recorded it, evaluates to a reference.
+   *
+   * @param {ProcedureAst} ast - the function call, already evaluated
+   * @param {InterpreterState} state - interpreter state
+   * @returns {boolean} whether the call returned a reference
+   */
+  private selectedArgumentIsReference(ast: ProcedureAst, state: InterpreterState): boolean {
+    const returnedArgument = selectedArgument(ast)
+    return returnedArgument !== undefined && this.evaluatesToReference(returnedArgument, state)
   }
 
   /**
