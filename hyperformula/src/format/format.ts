@@ -144,6 +144,7 @@ function endsWithLoneBackslash(formatArg: string): boolean {
   return false
 }
 
+const COLOR_TAG_REGEX = /\[(black|blue|cyan|green|magenta|red|white|yellow|color\s?(?:[1-9]|[1-4]\d|5[0-6]))\]/gi
 const COLOR_CODE_REGEX = /^(?:black|blue|cyan|green|magenta|red|white|yellow|color\s?(?:[1-9]|[1-4]\d|5[0-6])(?!\d))/i
 
 /**
@@ -152,30 +153,33 @@ const COLOR_CODE_REGEX = /^(?:black|blue|cyan|green|magenta|red|white|yellow|col
  * so presentational color tags are semantically meaningless and are simply
  * dropped.
  *
- * A color tag is a bracket whose code starts with a color name, up to the first
- * `]`: Excel returns 5 for `[Redx]0`, `[Red\]0` and `[Color5x]0`, and `]5` for
- * `[Red\]]0`. A bracket inside quoted text or after a backslash is literal text
- * and is kept. The color names are deliberately specific, so other bracketed
- * tokens are left untouched: duration tags `[hh]`/`[mm]`, currency/locale tags
- * `[$USD-409]`/`[$-409]`, and condition tags `[>=100]`.
+ * A tag that is exactly a color name is removed wherever it occurs. A bracket
+ * whose code starts with a color name and goes on up to the first `]` is a
+ * color tag too: Excel returns 5 for `[Redx]0`, `[Red\]0` and `[Color5x]0`, and
+ * `]5` for `[Red\]]0`. Such a longer tag inside quoted text or after a
+ * backslash is literal text and is kept. The color names are deliberately
+ * specific, so other bracketed tokens are left untouched: duration tags
+ * `[hh]`/`[mm]`, currency/locale tags `[$USD-409]`/`[$-409]`, and condition
+ * tags `[>=100]`.
  *
  * @param formatArg the raw format string
  * @returns the format string with recognized color tags removed
  */
 function stripColorTags(formatArg: string): string {
+  const withoutExactTags = formatArg.replace(COLOR_TAG_REGEX, '')
   let result = ''
   let inQuotes = false
-  for (let i = 0; i < formatArg.length; i++) {
-    const ch = formatArg[i]
+  for (let i = 0; i < withoutExactTags.length; i++) {
+    const ch = withoutExactTags[i]
     if (ch === '"') {
       inQuotes = !inQuotes
     } else if (!inQuotes && ch === '\\') {
-      result += formatArg.slice(i, i + 2)
+      result += withoutExactTags.slice(i, i + 2)
       i++
       continue
     } else if (!inQuotes && ch === '[') {
-      const end = formatArg.indexOf(']', i + 1)
-      if (end !== -1 && COLOR_CODE_REGEX.test(formatArg.slice(i + 1, end))) {
+      const end = withoutExactTags.indexOf(']', i + 1)
+      if (end !== -1 && COLOR_CODE_REGEX.test(withoutExactTags.slice(i + 1, end))) {
         i = end
         continue
       }
