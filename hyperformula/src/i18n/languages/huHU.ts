@@ -197,6 +197,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OKT.DEC',
     OCT2HEX: 'OKT.HEX',
     ODD: 'PÁRATLAN',
+    ODDFPRICE: 'ELTÉRŐ.EÁR',
+    ODDLPRICE: 'ELTÉRŐ.UÁR',
     OFFSET: 'ELTOLÁS',
     OR: 'VAGY',
     PDURATION: 'KAMATÉRZ.PER',
