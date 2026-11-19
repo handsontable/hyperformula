@@ -36,6 +36,7 @@ const ERROR_TYPE_CODES: Partial<Record<ErrorType, number>> = {
   [ErrorType.NUM]: 6,
   [ErrorType.NA]: 7,
   [ErrorType.SPILL]: 9,
+  [ErrorType.CALC]: 14,
 }
 
 /**
@@ -239,7 +240,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
   /**
    * Corresponds to ERROR.TYPE(value)
    *
-   * Returns the number of an error type (2-7 and 9), or #N/A when the value is not an error or the error has no code
+   * Returns the number of an error type (2-7, 9 and 14), or #N/A when the value is not an error or the error has no code
    *
    * @param ast
    * @param state
