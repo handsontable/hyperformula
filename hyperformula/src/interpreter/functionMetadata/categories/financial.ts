@@ -108,6 +108,13 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=DOLLARFR(1.125, 16)', '=DOLLARFR(1.3, 32)'],
   },
+  DURATION: {
+    category: 'Financial',
+    shortDescription: 'Returns the Macaulay duration, in years, of a security that pays periodic interest, for a par value of $100.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'coupon', description: 'The annual coupon rate; must not be negative.'}, {name: 'yld', description: 'The annual yield; must not be negative.'}, {name: 'frequency', description: 'The number of coupon payments per year, truncated to an integer: 1 (annual), 2 (semiannual) or 4 (quarterly).'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=DURATION(DATE(2018,7,1), DATE(2048,1,1), 0.08, 0.09, 2, 1)', '=DURATION(A1, B1, 0.05, 0.06, 4)'],
+  },
   EFFECT: {
     category: 'Financial',
     shortDescription: 'Calculates the effective annual interest rate from a nominal interest rate and the number of compounding periods per year.',
@@ -205,6 +212,13 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'rate', description: 'The interest rate per period.'}, {name: 'per', description: 'The period, between 1 and nper, for which the principal portion is calculated.'}, {name: 'nper', description: 'The total number of payment periods.'}, {name: 'pv', description: 'The present value, i.e. the loan principal.'}, {name: 'fv', description: 'The future value, i.e. the desired cash balance after the last payment; defaults to 0.'}, {name: 'type', description: 'When payments are due: 0 for the end of each period, 1 for the beginning; defaults to 0.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=PPMT(0.05/12, 1, 60, 20000)', '=PPMT(0.04/12, 12, 360, 200000, 0, 1)'],
+  },
+  PRICE: {
+    category: 'Financial',
+    shortDescription: 'Returns the price per $100 face value of a security that pays periodic interest.',
+    parameters: [{name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'maturity', description: 'The maturity date, as a date serial number, truncated to an integer; must be later than `settlement`.'}, {name: 'rate', description: 'The annual coupon rate; must not be negative.'}, {name: 'yld', description: 'The annual yield; must not be negative. A large `yld` can give a negative price.'}, {name: 'redemption', description: 'The redemption value per $100 face value; must be greater than 0.'}, {name: 'frequency', description: 'The number of coupon payments per year, truncated to an integer: 1 (annual), 2 (semiannual) or 4 (quarterly).'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=PRICE(DATE(2008,2,15), DATE(2017,11,15), 0.0575, 0.065, 100, 2, 0)', '=PRICE(A1, B1, 0.05, 0.06, 100, 4)'],
   },
   PRICEDISC: {
     category: 'Financial',
