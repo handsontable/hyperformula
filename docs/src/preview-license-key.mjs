@@ -85,6 +85,8 @@ const EXAMPLE_SCRIPT = /(<script data-hf-example(?:="")?>)([\s\S]*?)(<\/script>)
  *
  * @param {string} distDir The build output directory.
  * @param {string} key The license key.
+ * Running it again on pages it already injected changes nothing.
+ *
  * @returns {number} How many placeholders it replaced.
  */
 export function injectIntoPages(distDir, key) {
@@ -95,7 +97,8 @@ export function injectIntoPages(distDir, key) {
     const html = readFileSync(path, 'utf8').replace(EXAMPLE_SCRIPT, (match, open, code, close) => {
       const { code: injected, replaced } = injectLicenseKey(code, key);
 
-      if (replaced === 0 && /HyperFormula\.build/.test(code)) {
+      // A script that already holds the key was injected by an earlier run, so running the injection again is harmless.
+      if (replaced === 0 && /HyperFormula\.build/.test(code) && !code.includes(TEST_KEY_MARKER)) {
         throw new Error(`${relative(distDir, path)}: a live example builds an engine but has no license key `
           + 'placeholder, so the preview cannot give it the internal test key.');
       }
