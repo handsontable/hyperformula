@@ -42,7 +42,7 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   if (tryCurrency !== undefined) {
     return tryCurrency
   }
-  if (hasUnclosedBracket(formatArg) || hasUnclosedQuote(formatArg) || endsWithLoneBackslash(formatArg)) {
+  if (hasInvalidBracket(formatArg) || hasUnclosedQuote(formatArg) || endsWithLoneBackslash(formatArg)) {
     return new CellError(ErrorType.VALUE, ErrorMessage.BadFormat)
   }
   // Strip presentational color tags AFTER the (user-pluggable) currency callback
@@ -64,17 +64,19 @@ export function format(value: number, formatArg: string, config: Config, dateHel
 }
 
 /**
- * Tells whether a format string opens a `[` that no later `]` closes, as in
- * `[Red` or `0[`. Such a format is invalid, so `TEXT` returns `#VALUE!`.
+ * Tells whether a format string has a bracket that is invalid in Excel: a `[`
+ * that no later `]` closes (`[Red`, `0[`), an empty bracket (`0[]`), or a
+ * bracket whose code starts with a backslash (`0[\]`, `0[\x]`). Such a format
+ * returns `#VALUE!` in Excel, so `TEXT` returns `#VALUE!`.
  * A `[` inside quoted text or after a backslash is literal text and does not
- * count. A `]` inside quoted text does not close a bracket, so `[Red"]"0`
- * returns `#VALUE!`, the result Excel gives for it; a `]` after a backslash
- * does close it.
+ * count. A `]` inside quoted text does not close a bracket: Excel returns
+ * `#VALUE!` for `[Red"]"0`. A `]` after a backslash closes it: Excel returns
+ * 5 for `[Red\]0` and `]5` for `[Red\]]0`.
  *
  * @param formatArg the raw format string
- * @returns `true` when an opening bracket is never closed
+ * @returns `true` when a bracket is never closed, is empty, or starts with a backslash
  */
-function hasUnclosedBracket(formatArg: string): boolean {
+function hasInvalidBracket(formatArg: string): boolean {
   let inQuotes = false
   let inBracket = false
   for (let i = 0; i < formatArg.length; i++) {
@@ -88,6 +90,9 @@ function hasUnclosedBracket(formatArg: string): boolean {
       inBracket = inBracket && formatArg[i] !== ']'
     } else if (ch === '[' || ch === ']') {
       inBracket = ch === '['
+      if (inBracket && (formatArg[i + 1] === ']' || formatArg[i + 1] === '\\')) {
+        return true
+      }
     }
   }
   return inBracket
@@ -139,7 +144,7 @@ function endsWithLoneBackslash(formatArg: string): boolean {
   return false
 }
 
-const COLOR_TAG_REGEX = /\[(black|blue|cyan|green|magenta|red|white|yellow|color\s?(?:[1-9]|[1-4]\d|5[0-6]))\]/gi
+const COLOR_CODE_REGEX = /^(?:black|blue|cyan|green|magenta|red|white|yellow|color\s?(?:[1-9]|[1-4]\d|5[0-6])(?!\d))/i
 
 /**
  * Removes Excel color tags (`[Red]`, `[Blue]`, …, `[Color56]`) from a format
@@ -147,16 +152,37 @@ const COLOR_TAG_REGEX = /\[(black|blue|cyan|green|magenta|red|white|yellow|color
  * so presentational color tags are semantically meaningless and are simply
  * dropped.
  *
- * The whitelist is deliberately color-NAME-specific (flat alternation, no
- * nested quantifier) so it cannot clobber other bracketed tokens: duration
- * tags `[hh]`/`[mm]`, currency/locale tags `[$USD-409]`/`[$-409]`, and
- * condition tags `[>=100]` are all left untouched.
+ * A color tag is a bracket whose code starts with a color name, up to the first
+ * `]`: Excel returns 5 for `[Redx]0`, `[Red\]0` and `[Color5x]0`, and `]5` for
+ * `[Red\]]0`. A bracket inside quoted text or after a backslash is literal text
+ * and is kept. The color names are deliberately specific, so other bracketed
+ * tokens are left untouched: duration tags `[hh]`/`[mm]`, currency/locale tags
+ * `[$USD-409]`/`[$-409]`, and condition tags `[>=100]`.
  *
  * @param formatArg the raw format string
  * @returns the format string with recognized color tags removed
  */
 function stripColorTags(formatArg: string): string {
-  return formatArg.replace(COLOR_TAG_REGEX, '')
+  let result = ''
+  let inQuotes = false
+  for (let i = 0; i < formatArg.length; i++) {
+    const ch = formatArg[i]
+    if (ch === '"') {
+      inQuotes = !inQuotes
+    } else if (!inQuotes && ch === '\\') {
+      result += formatArg.slice(i, i + 2)
+      i++
+      continue
+    } else if (!inQuotes && ch === '[') {
+      const end = formatArg.indexOf(']', i + 1)
+      if (end !== -1 && COLOR_CODE_REGEX.test(formatArg.slice(i + 1, end))) {
+        i = end
+        continue
+      }
+    }
+    result += ch
+  }
+  return result
 }
 
 /**

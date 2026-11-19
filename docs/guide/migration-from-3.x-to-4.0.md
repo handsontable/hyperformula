@@ -83,13 +83,15 @@ To keep `.` in the result, keep the default `decimalSeparator: '.'`, or replace 
 
 ### Masks that return `#VALUE!`
 
-A mask with an unclosed `[` or `"`, or with `\` as its last character, returns `#VALUE!`. In 3.x, `TEXT` wrote these characters as text.
+A mask with an unclosed `[` or `"`, an empty bracket `[]`, a bracket that starts with `\`, or `\` as its last character, returns `#VALUE!`. In 3.x, `TEXT` wrote these characters as text.
 
 | Mask | Formula | 3.x | 4.0 |
 |:-----|:--------|:----|:----|
 | `0[` | `=TEXT(5, "0[")` | `5[` | `#VALUE!` |
 | `0"x`, in `B1` | `=TEXT(5, B1)` | `5"x` | `#VALUE!` |
 | `0\`, in `B1` | `=TEXT(5, B1)` | `5\` | `#VALUE!` |
+| `0[]` | `=TEXT(5, "0[]")` | `5[]` | `#VALUE!` |
+| `0[\]`, in `B1` | `=TEXT(5, B1)` | `5[\]` | `#VALUE!` |
 
 To write one of these characters as text, put `\` before it, or close the quoted text. In 4.0, `=TEXT(5, "0\[")` returns `5[`, and the mask `0"x"` returns `5x`.
 
