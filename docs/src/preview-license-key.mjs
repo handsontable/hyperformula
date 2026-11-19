@@ -40,7 +40,7 @@ const PLACEHOLDER_LINE = /^([ \t]*)\/\/ ?licenseKey: ?(['"])your-license-key\2,?
  *
  * Workers Builds runs the same build command for every branch, so the opt-in is set by the preview deploy command
  * (`npm run preview:cf`, `script/inject-preview-license-key.mjs`), which writes the key into the built pages before
- * it uploads them. A local build or `npm run dev` can set it too (see `docs/README.md`).
+ * it uploads them. A local build can set it too; `npm run dev` can't, because the dev server never runs the injection (see `docs/README.md`).
  *
  * @param {NodeJS.ProcessEnv} env The environment.
  * @returns {string | null}
