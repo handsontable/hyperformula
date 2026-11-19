@@ -65,6 +65,7 @@ cells when something goes wrong:
 ```javascript
 // localized errors
 errors: {
+  CALC: '#CALC!',
   CYCLE: '#CYCLE!',
   DIV_BY_ZERO: '#DIV/0!',
   ERROR: '#ERROR!',
@@ -72,6 +73,7 @@ errors: {
   NAME: '#NOM?',
   NUM: '#NOMBRE!',
   REF: '#REF!',
+  SPILL: '#EPARS!',
   VALUE: '#VALEUR!',
 }
 ```
