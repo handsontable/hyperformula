@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#CALC!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
     ERROR: '#ERROR!',
@@ -27,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINT: 'ACCRINT',
     ACCRINTM: 'ACCRINTM',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
@@ -72,6 +74,12 @@ const dictionary: RawTranslationPackage = {
     COUNTIF: 'COUNTIF',
     COUNTIFS: 'COUNTIFS',
     COUNTUNIQUE: 'COUNTUNIQUE',
+    COUPDAYBS: 'COUPDAYBS',
+    COUPDAYS: 'COUPDAYS',
+    COUPDAYSNC: 'COUPDAYSNC',
+    COUPNCD: 'COUPNCD',
+    COUPNUM: 'COUPNUM',
+    COUPPCD: 'COUPPCD',
     CSC: 'CSC',
     CSCH: 'CSCH',
     CUMIPMT: 'CUMIPMT',
@@ -105,6 +113,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'DISC',
     DOLLARDE: 'DOLLARDE',
     DOLLARFR: 'DOLLARFR',
+    DURATION: 'DURATION',
     EDATE: 'EDATE',
     EFFECT: 'EFFECT',
     EOMONTH: 'EOMONTH',
@@ -153,6 +162,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'LEFT',
     LEN: 'LEN',
     LINEST: 'LINEST',
+    LOGEST: 'LOGEST',
+    TREND: 'TREND',
+    GROWTH: 'GROWTH',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -186,6 +198,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OCT2DEC',
     OCT2HEX: 'OCT2HEX',
     ODD: 'ODD',
+    ODDFPRICE: 'ODDFPRICE',
+    ODDLPRICE: 'ODDLPRICE',
     OFFSET: 'OFFSET',
     OR: 'OR',
     PI: 'PI',
@@ -194,6 +208,7 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'PRODUCT',
     POWER: 'POWER',
     PPMT: 'PPMT',
+    PRICE: 'PRICE',
     PRICEDISC: 'PRICEDISC',
     PROPER: 'PROPER',
     PV: 'PV',
@@ -402,6 +417,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'IMTAN',
     LARGE: 'LARGE',
     SMALL: 'SMALL',
+    'RANK.EQ': 'RANK.EQ',
+    RANK: 'RANK',
     PERCENTILE: 'PERCENTILE',
     'PERCENTILE.INC': 'PERCENTILE.INC',
     'PERCENTILE.EXC': 'PERCENTILE.EXC',
@@ -429,6 +446,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTEST',
     STEYX: 'STEYX',
     SLOPE: 'SLOPE',
+    INTERCEPT: 'INTERCEPT',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'FORECAST',
     'CHISQ.TEST': 'CHISQ.TEST',
     CHITEST: 'CHITEST',
     'T.TEST': 'T.TEST',

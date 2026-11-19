@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#CALC!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#ZÉRÓOSZTÓ!',
     ERROR: '#ERROR!',
@@ -27,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINT: 'IDŐSZAKI.KAMAT',
     ACCRINTM: 'LEJÁRATI.KAMAT',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSH',
@@ -71,6 +73,12 @@ const dictionary: RawTranslationPackage = {
     COUNTIF: 'DARABTELI',
     COUNTIFS: 'DARABHATÖBB',
     COUNTUNIQUE: 'COUNTUNIQUE',
+    COUPDAYBS: 'SZELVÉNYIDŐ.KEZDETTŐL',
+    COUPDAYS: 'SZELVÉNYIDŐ',
+    COUPDAYSNC: 'SZELVÉNYIDŐ.KIFIZETÉSTŐL',
+    COUPNCD: 'ELSŐ.SZELVÉNYDÁTUM',
+    COUPNUM: 'SZELVÉNYSZÁM',
+    COUPPCD: 'UTOLSÓ.SZELVÉNYDÁTUM',
     CSC: 'CSC',
     CSCH: 'CSCH',
     CUMIPMT: 'ÖSSZES.KAMAT',
@@ -104,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'LESZÁM',
     DOLLARDE: 'FORINT.DEC',
     DOLLARFR: 'FORINT.TÖRT',
+    DURATION: 'KAMATÉRZ',
     EDATE: 'KALK.DÁTUM',
     EFFECT: "TÉNYLEGES",
     EOMONTH: 'HÓNAP.UTOLSÓ.NAP',
@@ -152,6 +161,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'BAL',
     LEN: 'HOSSZ',
     LINEST: 'LIN.ILL',
+    LOGEST: 'LOG.ILL',
+    TREND: 'TREND',
+    GROWTH: 'NÖV',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -185,6 +197,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OKT.DEC',
     OCT2HEX: 'OKT.HEX',
     ODD: 'PÁRATLAN',
+    ODDFPRICE: 'ELTÉRŐ.EÁR',
+    ODDLPRICE: 'ELTÉRŐ.UÁR',
     OFFSET: 'ELTOLÁS',
     OR: 'VAGY',
     PDURATION: 'KAMATÉRZ.PER',
@@ -193,6 +207,7 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'SZORZAT',
     POWER: 'HATVÁNY',
     PPMT: 'PRÉSZLET',
+    PRICE: 'ÁR',
     PRICEDISC: 'ÁR.LESZÁM',
     PROPER: 'TNÉV',
     PV: 'MÉ',
@@ -402,6 +417,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'KÉPZ.TAN',
     LARGE: 'NAGY',
     SMALL: 'KICSI',
+    'RANK.EQ': 'RANG.EGY',
+    RANK: 'SORSZÁM',
     PERCENTILE: 'PERCENTILIS',
     'PERCENTILE.INC': 'PERCENTILIS.TARTALMAZ',
     'PERCENTILE.EXC': 'PERCENTILIS.KIZÁR',
@@ -426,6 +443,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'F.PRÓBA',
     STEYX: 'STHIBAYX',
     SLOPE: 'MEREDEKSÉG',
+    INTERCEPT: 'METSZ',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'ELŐREJELZÉS',
     COVAR: 'KOVAR',
     'COVARIANCE.P': 'KOVARIANCIA.S',
     'COVARIANCE.S': 'KOVARIANCIA.M',

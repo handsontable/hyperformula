@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#LASKE!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#JAKO/0!',
     ERROR: '#ERROR!',
@@ -27,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ITSEISARVO',
+    ACCRINT: 'KERTYNYT.KORKO',
     ACCRINTM: 'KERTYNYT.KORKO.LOPUSSA',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
@@ -71,6 +73,12 @@ const dictionary: RawTranslationPackage = {
     COUNTIF: 'LASKE.JOS',
     COUNTIFS: 'LASKE.JOS.JOUKKO',
     COUNTUNIQUE: 'COUNTUNIQUE',
+    COUPDAYBS: 'KORKOPÄIVÄT.ALUSTA',
+    COUPDAYS: 'KORKOPÄIVÄT',
+    COUPDAYSNC: 'KORKOPÄIVÄT.SEURAAVA',
+    COUPNCD: 'KORKOPÄIVÄ.SEURAAVA',
+    COUPNUM: 'KORKOPÄIVÄ.JAKSOT',
+    COUPPCD: 'KORKOPÄIVÄ.EDELLINEN',
     CSC: 'KOSEK',
     CSCH: 'KOSEKH',
     CUMIPMT: 'MAKSETTU.KORKO',
@@ -104,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'DISKONTTOKORKO',
     DOLLARDE: 'VALUUTTA.DES',
     DOLLARFR: 'VALUUTTA.MURTO',
+    DURATION: 'KESTO',
     EDATE: 'PÄIVÄ.KUUKAUSI',
     EFFECT: "KORKO.EFEKT",
     EOMONTH: 'KUUKAUSI.LOPPU',
@@ -152,6 +161,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'VASEN',
     LEN: 'PITUUS',
     LINEST: 'LINREGR',
+    LOGEST: 'LOGREGR',
+    TREND: 'SUUNTAUS',
+    GROWTH: 'KASVU',
     LN: 'LUONNLOG',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -185,6 +197,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OKTDES',
     OCT2HEX: 'OKTHEKSA',
     ODD: 'PARITON',
+    ODDFPRICE: 'PARITON.ENS.NIMELLISARVO',
+    ODDLPRICE: 'PARITON.VIIM.NIMELLISARVO',
     OFFSET: 'SIIRTYMÄ',
     OR: 'TAI',
     PDURATION: 'KESTO.JAKSO',
@@ -193,6 +207,7 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'TULO',
     POWER: 'POTENSSI',
     PPMT: 'PPMT',
+    PRICE: 'HINTA',
     PRICEDISC: 'HINTA.DISK',
     PROPER: 'ERISNIMI',
     PV: 'NA',
@@ -402,6 +417,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'KOMPLEKSI.TAN',
     LARGE: 'SUURI',
     SMALL: 'PIENI',
+    'RANK.EQ': 'ARVON.MUKAAN.TASAN',
+    RANK: 'ARVON.MUKAAN',
     PERCENTILE: 'PROSENTTIPISTE',
     'PERCENTILE.INC': 'PROSENTTIPISTE.SIS',
     'PERCENTILE.EXC': 'PROSENTTIPISTE.ULK',
@@ -426,6 +443,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTESTI',
     STEYX: 'KESKIVIRHE',
     SLOPE: 'KULMAKERROIN',
+    INTERCEPT: 'LEIKKAUSPISTE',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'ENNUSTE',
     COVAR: 'KOVARIANSSI',
     'COVARIANCE.P': 'KOVARIANSSI.P',
     'COVARIANCE.S': 'KOVARIANSSI.S',

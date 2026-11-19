@@ -1,7 +1,8 @@
 import {HyperFormula} from '../src'
+import {TEST_LICENSE_KEY} from './_setupFiles/testLicenseKey'
 
 describe('leapYear1900', () => {
-  const excelDates = {leapYear1900: true, nullDate: {year: 1899, month: 12, day: 31}, licenseKey: 'gpl-v3'}
+  const excelDates = {leapYear1900: true, nullDate: {year: 1899, month: 12, day: 31}, licenseKey: TEST_LICENSE_KEY}
 
   it('returns 31 as the day of 31 December of a leap year', () => {
     const hf = HyperFormula.buildFromArray([[]], excelDates)
@@ -36,7 +37,7 @@ describe('leapYear1900', () => {
   })
 
   it('returns 31 as the day of 31 December with the default nullDate', () => {
-    const hf = HyperFormula.buildFromArray([[]], {leapYear1900: true, licenseKey: 'gpl-v3'})
+    const hf = HyperFormula.buildFromArray([[]], {leapYear1900: true, licenseKey: TEST_LICENSE_KEY})
 
     expect(hf.calculateFormula('=DAY(DATE(2036, 12, 31))', 0)).toBe(31)
 

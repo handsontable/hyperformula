@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#VÝPOČET!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DĚLENÍ_NULOU!',
     ERROR: '#ERROR!',
@@ -27,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINT: 'ACCRINT',
     ACCRINTM: 'ACCRINTM',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSH',
@@ -71,6 +73,12 @@ const dictionary: RawTranslationPackage = {
     COUNTIF: 'COUNTIF',
     COUNTIFS: 'COUNTIFS',
     COUNTUNIQUE: 'COUNTUNIQUE',
+    COUPDAYBS: 'COUPDAYBS',
+    COUPDAYS: 'COUPDAYS',
+    COUPDAYSNC: 'COUPDAYSNC',
+    COUPNCD: 'COUPNCD',
+    COUPNUM: 'COUPNUM',
+    COUPPCD: 'COUPPCD',
     CSC: 'CSC',
     CSCH: 'CSCH',
     CUMIPMT: 'CUMIPMT',
@@ -104,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'DISC',
     DOLLARDE: 'DOLLARDE',
     DOLLARFR: 'DOLLARFR',
+    DURATION: 'DURATION',
     EDATE: 'EDATE',
     EFFECT: "EFFECT",
     EOMONTH: 'EOMONTH',
@@ -152,6 +161,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'ZLEVA',
     LEN: 'DÉLKA',
     LINEST: 'LINREGRESE',
+    LOGEST: 'LOGLINREGRESE',
+    TREND: 'LINTREND',
+    GROWTH: 'LOGLINTREND',
     LN: 'LN',
     LOG10: 'LOG',
     LOG: 'LOGZ',
@@ -185,6 +197,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OCT2DEC',
     OCT2HEX: 'OCT2HEX',
     ODD: 'ZAOKROUHLIT.NA.LICHÉ',
+    ODDFPRICE: 'ODDFPRICE',
+    ODDLPRICE: 'ODDLPRICE',
     OFFSET: 'POSUN',
     OR: 'NEBO',
     PDURATION: 'PDURATION',
@@ -193,6 +207,7 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'SOUČIN',
     POWER: 'POWER',
     PPMT: 'PLATBA.ZÁKLAD',
+    PRICE: 'PRICE',
     PRICEDISC: 'PRICEDISC',
     PROPER: 'VELKÁ2',
     PV: 'SOUČHODNOTA',
@@ -402,6 +417,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'IMTAN',
     LARGE: 'LARGE',
     SMALL: 'SMALL',
+    'RANK.EQ': 'RANK.EQ',
+    RANK: 'RANK',
     PERCENTILE: 'PERCENTIL',
     'PERCENTILE.INC': 'PERCENTIL.INC',
     'PERCENTILE.EXC': 'PERCENTIL.EXC',
@@ -426,6 +443,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTEST',
     STEYX: 'STEYX',
     SLOPE: 'SLOPE',
+    INTERCEPT: 'INTERCEPT',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'FORECAST',
     COVAR: 'COVAR',
     'COVARIANCE.P': 'COVARIANCE.P',
     'COVARIANCE.S': 'COVARIANCE.S',

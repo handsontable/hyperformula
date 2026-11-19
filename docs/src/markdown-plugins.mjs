@@ -6,7 +6,8 @@
  *   (`basic-usage.md`, `/guide/basic-usage.md`, `../api/README.md`) becomes the URL of the page built from it, and a
  *   root-relative URL (`/hf_logo.png`) gets the base.
  * - `:::example{#id}` blocks become live examples: the HTML, CSS and compiled JS they include render on the page,
- *   and the TypeScript opens in StackBlitz.
+ *   and the TypeScript opens in StackBlitz. A preview build writes the internal test license key into the script
+ *   each example runs, once the pages are written (`preview-license-key.mjs`).
  * - A heading whose VuePress anchor differs from its new one keeps the old anchor too (`legacyAnchorsPlugin`).
  */
 import { readFileSync } from 'node:fs';
@@ -122,6 +123,46 @@ const sandboxCode = (code) => code
 const escapeHtml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /**
+ * The StackBlitz project runs off handsontable.com, so the engine checks the license key there, and the example shows
+ * only the placeholder. Without this module, the first blocked call throws an uncaught `LicenseCapabilityMissingError`
+ * and the preview stays empty. Imported before the example, it shows a banner that says to add a license key when the
+ * engine warns about the key or throws that error.
+ */
+const SANDBOX_LICENSE_NOTICE = `import { LicenseCapabilityMissingError } from 'hyperformula';
+
+const showLicenseNotice = () => {
+  if (document.getElementById('license-notice')) {
+    return;
+  }
+
+  const notice = document.createElement('p');
+
+  notice.id = 'license-notice';
+  notice.style.cssText = 'padding: 8px 12px; background: #fff4e5; border: 1px solid #f0b429; font-family: sans-serif;';
+  notice.innerHTML = 'This example needs a HyperFormula license key. In <code>index.ts</code>, uncomment the '
+    + '<code>licenseKey</code> line and replace <code>your-license-key</code> with your key. '
+    + '<a href="https://handsontable.com/pricing/?tab=hyperformula" target="_blank">Get a license key</a>.';
+  document.body.prepend(notice);
+};
+
+const warn = console.warn.bind(console);
+
+console.warn = (...args: unknown[]) => {
+  if (String(args[0]).startsWith('The license key for HyperFormula')) {
+    showLicenseNotice();
+  }
+
+  warn(...args);
+};
+
+window.addEventListener('error', (event) => {
+  if (event.error instanceof LicenseCapabilityMissingError) {
+    showLicenseNotice();
+  }
+});
+`;
+
+/**
  * Renders an example from the files its `@[code](@/docs/examples/...)` lines name.
  *
  * @param {object} node The `example` container directive.
@@ -148,14 +189,16 @@ function renderExample(node, ctx) {
     'package.json': JSON.stringify({ name: 'hyperformula-demo', version: '1.0.0', main: 'index.html', dependencies: { hyperformula: 'latest', moment: 'latest' } }, null, 2),
     'index.html': `<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset="utf-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n    <title>HyperFormula demo</title>\n  </head>\n\n  <body>\n    ${files.html}\n  </body>\n</html>`,
     'styles.css': files.css,
-    'index.ts': `import './styles.css'\n${sandboxCode(files.ts)}`,
+    'license-notice.ts': SANDBOX_LICENSE_NOTICE,
+    'index.ts': `import './styles.css'\nimport './license-notice'\n${sandboxCode(files.ts)}`,
   };
 
-  // The script runs in a block of its own, so two examples on one page cannot clash over a top-level name.
+  // The script runs in a block of its own, so two examples on one page cannot clash over a top-level name. The
+  // `data-hf-example` attribute marks it as the script a preview build gives the license key (`preview-license-key.mjs`).
   return `<div class="hf-example not-content" id="${escapeHtml(id)}">
 <style>${files.css}</style>
 <div class="hf-example__preview">${files.html}</div>
-<script>{
+<script data-hf-example>{
 ${previewCode(files.js)}
 }</script>
 <form class="hf-example__stackblitz" action="https://stackblitz.com/run" method="post" target="_blank">

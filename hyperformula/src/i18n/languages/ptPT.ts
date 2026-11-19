@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#CÁLC!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
     ERROR: '#ERROR!',
@@ -27,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINT: 'JUROSACUM',
     ACCRINTM: 'JUROSACUMV',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
@@ -71,6 +73,12 @@ const dictionary: RawTranslationPackage = {
     COUNTIF: 'CONT.SE',
     COUNTIFS: 'CONT.SES',
     COUNTUNIQUE: 'COUNTUNIQUE',
+    COUPDAYBS: 'CUPDIASINLIQ',
+    COUPDAYS: 'CUPDIAS',
+    COUPDAYSNC: 'CUPDIASPRÓX',
+    COUPNCD: 'CUPDATAPRÓX',
+    COUPNUM: 'CUPNÚM',
+    COUPPCD: 'CUPDATAANT',
     CSC: 'COSEC',
     CSCH: 'COSECH',
     CUMIPMT: 'PGTOJURACUM',
@@ -104,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'DESC',
     DOLLARDE: 'MOEDADEC',
     DOLLARFR: 'MOEDAFRA',
+    DURATION: 'DURAÇÃO',
     EDATE: 'DATAM',
     EFFECT: "EFETIVA",
     EOMONTH: 'FIMMÊS',
@@ -152,6 +161,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'ESQUERDA',
     LEN: 'NÚM.CARACT',
     LINEST: 'PROJ.LIN',
+    LOGEST: 'PROJ.LOG',
+    TREND: 'TENDÊNCIA',
+    GROWTH: 'CRESCIMENTO',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -185,6 +197,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OCTADEC',
     OCT2HEX: 'OCTAHEX',
     ODD: 'ÍMPAR',
+    ODDFPRICE: 'PREÇOPRIMINC',
+    ODDLPRICE: 'PREÇOÚLTINC',
     OFFSET: 'DESLOC',
     OR: 'OU',
     PDURATION: 'DURAÇÃOP',
@@ -193,6 +207,7 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'MULT',
     POWER: 'POTÊNCIA',
     PPMT: 'PPGTO',
+    PRICE: 'PREÇO',
     PRICEDISC: 'PREÇODESC',
     PROPER: 'PRI.MAIÚSCULA',
     PV: 'VP',
@@ -402,6 +417,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'IMTAN',
     LARGE: 'MAIOR',
     SMALL: 'MENOR',
+    'RANK.EQ': 'ORDEM.EQ',
+    RANK: 'ORDEM',
     PERCENTILE: 'PERCENTIL',
     'PERCENTILE.INC': 'PERCENTIL.INC',
     'PERCENTILE.EXC': 'PERCENTIL.EXC',
@@ -426,6 +443,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'TESTEF',
     STEYX: 'EPADYX',
     SLOPE: 'INCLINAÇÃO',
+    INTERCEPT: 'INTERCETAR',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'PREVISÃO',
     COVAR: 'COVAR',
     'COVARIANCE.P': 'COVARIAÇÃO.P',
     'COVARIANCE.S': 'COVARIAÇÃO.S',

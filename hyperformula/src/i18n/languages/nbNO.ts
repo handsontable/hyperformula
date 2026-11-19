@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#BEREGN!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIV/0!',
     ERROR: '#ERROR!',
@@ -27,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINT: 'PÅLØPT.PERIODISK.RENTE',
     ACCRINTM: 'PÅLØPT.FORFALLSRENTE',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSH',
@@ -71,6 +73,12 @@ const dictionary: RawTranslationPackage = {
     COUNTIF: 'ANTALL.HVIS',
     COUNTIFS: 'ANTALL.HVIS.SETT',
     COUNTUNIQUE: 'COUNTUNIQUE',
+    COUPDAYBS: 'OBLIG.DAGER.FF',
+    COUPDAYS: 'OBLIG.DAGER',
+    COUPDAYSNC: 'OBLIG.DAGER.NF',
+    COUPNCD: 'OBLIG.DAGER.EF',
+    COUPNUM: 'OBLIG.ANTALL',
+    COUPPCD: 'OBLIG.DAG.FORRIGE',
     CSC: 'CSC',
     CSCH: 'CSCH',
     CUMIPMT: 'SAMLET.RENTE',
@@ -104,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'DISKONTERT',
     DOLLARDE: 'DOLLARDE',
     DOLLARFR: 'DOLLARBR',
+    DURATION: 'VARIGHET',
     EDATE: 'DAG.ETTER',
     EFFECT: "EFFEKTIV.RENTE",
     EOMONTH: 'MÅNEDSSLUTT',
@@ -152,6 +161,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'VENSTRE',
     LEN: 'LENGDE',
     LINEST: 'RETTLINJE',
+    LOGEST: 'KURVE',
+    TREND: 'TREND',
+    GROWTH: 'VEKST',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -185,6 +197,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OKTTILDES',
     OCT2HEX: 'OKTTILHEKS',
     ODD: 'AVRUND.TIL.ODDETALL',
+    ODDFPRICE: 'AVVIKFP.PRIS',
+    ODDLPRICE: 'AVVIKSP.PRIS',
     OFFSET: 'FORSKYVNING',
     OR: 'ELLER',
     PDURATION: 'PVARIGHET',
@@ -193,6 +207,7 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'PRODUKT',
     POWER: 'OPPHØYD.I',
     PPMT: 'AMORT',
+    PRICE: 'PRIS',
     PRICEDISC: 'PRIS.DISKONTERT',
     PROPER: 'STOR.FORBOKSTAV',
     PV: 'NÅVERDI',
@@ -402,6 +417,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'IMTAN',
     LARGE: 'N.STØRST',
     SMALL: 'N.MINST',
+    'RANK.EQ': 'RANG.EKV',
+    RANK: 'RANG',
     PERCENTILE: 'PERSENTIL',
     'PERCENTILE.INC': 'PERSENTIL.INK',
     'PERCENTILE.EXC': 'PERSENTIL.EKS',
@@ -426,6 +443,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTEST',
     STEYX: 'STANDARDFEIL',
     SLOPE: 'STIGNINGSTALL',
+    INTERCEPT: 'SKJÆRINGSPUNKT',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'PROGNOSE',
     COVAR: 'KOVARIANS',
     'COVARIANCE.P': 'KOVARIANS.P',
     'COVARIANCE.S': 'KOVARIANS.S',

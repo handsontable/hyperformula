@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#CALC!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DELING.DOOR.0!',
     ERROR: '#ERROR!',
@@ -27,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINT: 'SAMENG.RENTE',
     ACCRINTM: 'SAMENG.RENTE.V',
     ACOS: 'BOOGCOS',
     ACOSH: 'BOOGCOSH',
@@ -71,6 +73,12 @@ const dictionary: RawTranslationPackage = {
     COUNTIF: 'AANTAL.ALS',
     COUNTIFS: 'AANTALLEN.ALS',
     COUNTUNIQUE: 'COUNTUNIQUE',
+    COUPDAYBS: 'COUP.DAGEN.BB',
+    COUPDAYS: 'COUP.DAGEN',
+    COUPDAYSNC: 'COUP.DAGEN.VV',
+    COUPNCD: 'COUP.DATUM.NB',
+    COUPNUM: 'COUP.AANTAL',
+    COUPPCD: 'COUP.DATUM.VB',
     CSC: 'COSEC',
     CSCH: 'COSECH',
     CUMIPMT: 'CUM.RENTE',
@@ -104,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'DISCONTO',
     DOLLARDE: 'EURO.DE',
     DOLLARFR: 'EURO.BR',
+    DURATION: 'DUUR',
     EDATE: 'ZELFDE.DAG',
     EFFECT: "EFFECT.RENTE",
     EOMONTH: 'LAATSTE.DAG',
@@ -152,6 +161,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'LINKS',
     LEN: 'PITUUS',
     LINEST: 'LIJNSCH',
+    LOGEST: 'LOGSCH',
+    TREND: 'TREND',
+    GROWTH: 'GROEI',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -185,6 +197,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OCT.N.DEC',
     OCT2HEX: 'OCT.N.HEX',
     ODD: 'ONEVEN',
+    ODDFPRICE: 'AFW.ET.PRIJS',
+    ODDLPRICE: 'AFW.LT.PRIJS',
     OFFSET: 'VERSCHUIVING',
     OR: 'OF',
     PDURATION: 'PDUUR',
@@ -193,6 +207,7 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'PRODUCT',
     POWER: 'MACHT',
     PPMT: 'PBET',
+    PRICE: 'PRIJS.NOM',
     PRICEDISC: 'PRIJS.DISCONTO',
     PROPER: 'BEGINLETTERS',
     PV: 'HW',
@@ -402,6 +417,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'C.TAN',
     LARGE: 'GROOTSTE',
     SMALL: 'KLEINSTE',
+    'RANK.EQ': 'RANG.GELIJK',
+    RANK: 'RANG',
     PERCENTILE: 'PERCENTIEL',
     'PERCENTILE.INC': 'PERCENTIEL.INC',
     'PERCENTILE.EXC': 'PERCENTIEL.EXC',
@@ -426,6 +443,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'F.TOETS',
     STEYX: 'STAND.FOUT.YX',
     SLOPE: 'RICHTING',
+    INTERCEPT: 'SNIJPUNT',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'VOORSPELLEN',
     COVAR: 'COVARIANTIE',
     'COVARIANCE.P': 'COVARIANTIE.P',
     'COVARIANCE.S': 'COVARIANTIE.S',

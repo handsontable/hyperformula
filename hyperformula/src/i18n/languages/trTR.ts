@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#HESAPLA!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#SAYI/0!',
     ERROR: '#ERROR!',
@@ -27,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'MUTLAK',
+    ACCRINT: 'GERÇEKFAİZ',
     ACCRINTM: 'GERÇEKFAİZV',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
@@ -71,6 +73,12 @@ const dictionary: RawTranslationPackage = {
     COUNTIF: 'EĞERSAY',
     COUNTIFS: 'ÇOKEĞERSAY',
     COUNTUNIQUE: 'COUNTUNIQUE',
+    COUPDAYBS: 'KUPONGÜNBD',
+    COUPDAYS: 'KUPONGÜN',
+    COUPDAYSNC: 'KUPONGÜNDSK',
+    COUPNCD: 'KUPONGÜNSKT',
+    COUPNUM: 'KUPONSAYI',
+    COUPPCD: 'KUPONGÜNÖKT',
     CSC: 'CSC',
     CSCH: 'CSCH',
     CUMIPMT: 'TOPÖDENENFAİZ',
@@ -104,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'İNDİRİM',
     DOLLARDE: 'LİRAON',
     DOLLARFR: 'LİRAKES',
+    DURATION: 'SÜRE',
     EDATE: 'SERİTARİH',
     EFFECT: "ETKİN",
     EOMONTH: 'SERİAY',
@@ -152,6 +161,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'SOL',
     LEN: 'UZUNLUK',
     LINEST: 'DOT',
+    LOGEST: 'LOT',
+    TREND: 'EĞİLİM',
+    GROWTH: 'BÜYÜME',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -185,6 +197,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'OCT2DEC',
     OCT2HEX: 'OCT2HEX',
     ODD: 'TEK',
+    ODDFPRICE: 'TEKYDEĞER',
+    ODDLPRICE: 'TEKSDEĞER',
     OFFSET: 'KAYDIR',
     OR: 'VEYA',
     PDURATION: 'PSÜRE',
@@ -193,6 +207,7 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'ÇARPIM',
     POWER: 'KUVVET',
     PPMT: 'ANA_PARA_ÖDEMESİ',
+    PRICE: 'DEĞER',
     PRICEDISC: 'DEĞERİND',
     PROPER: 'YAZIM.DÜZENİ',
     PV: 'BD',
@@ -256,7 +271,7 @@ const dictionary: RawTranslationPackage = {
     UNICODE: 'UNICODE',
     UNIQUE: 'BENZERSİZ',
     UPPER: 'BÜYÜKHARF',
-    VALUE: 'DEĞER',
+    VALUE: 'SAYIYAÇEVİR',
     VALUETOTEXT: 'DEĞERMETİN',
     VARA: 'VARA',
     'VAR.P': 'VAR.P',
@@ -402,6 +417,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'SANTAN',
     LARGE: 'BÜYÜK',
     SMALL: 'KÜÇÜK',
+    'RANK.EQ': 'RANK.EŞİT',
+    RANK: 'RANK',
     PERCENTILE: 'YÜZDEBİRLİK',
     'PERCENTILE.INC': 'YÜZDEBİRLİK.DHL',
     'PERCENTILE.EXC': 'YÜZDEBİRLİK.HRC',
@@ -426,6 +443,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTEST',
     STEYX: 'STHYX',
     SLOPE: 'EĞİM',
+    INTERCEPT: 'KESMENOKTASI',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'TAHMİN',
     COVAR: 'KOVARYANS',
     'COVARIANCE.P': 'KOVARYANS.P',
     'COVARIANCE.S': 'KOVARYANS.S',
