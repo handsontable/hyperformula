@@ -39,6 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed unbounded parser cache growth in long-running instances that process many distinct formulas, including when undo is disabled. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
 - Fixed array formulas spilling past the `maxRows` and `maxColumns` limits: they now return `#SPILL!` when their result extends beyond the sheet edge. [#1774](https://github.com/handsontable/hyperformula/pull/1774)
 - Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is an empty argument slot (e.g. `=ADDRESS(2,3,1,FALSE(),)` now returns `R2C3` instead of `!R2C3`), while an explicit `""` still adds it. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
+- Fixed percentage scaling in `TEXT`: `TEXT(0.0123,"0.00%")` now returns `1.23%` instead of `0.01%`. Quoted or escaped percent signs remain literal. Remove manual multiplication by 100 used to work around the previous behavior. [#1776](https://github.com/handsontable/hyperformula/pull/1776)
 
 ## [3.5.0] - 2026-10-09
 
