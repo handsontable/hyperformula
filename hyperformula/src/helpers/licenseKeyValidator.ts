@@ -3,7 +3,7 @@
  * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
-import {LicenseState, UnlicensedReason} from '../license/handsontable-license-key-parser'
+import {LicenseState} from '../license/handsontable-license-key-parser'
 import {checkKeySchema, extractTime} from './licenseKeyHelper'
 
 /**
@@ -32,13 +32,17 @@ type MessageDescriptor = {
 }
 
 /**
- * List of all not valid messages which may occur.
+ * List of all not valid messages which may occur: Handsontable's text
+ * (`handsontable/src/helpers/mixed.ts`, `consoleMessages`), with HyperFormula as the product.
  */
 const consoleMessages: ConsoleMessages = {
-  invalid: () => 'The license key for HyperFormula is invalid.',
-  expired: ({keyValidityDate}) => 'The license key for HyperFormula expired' +
-    ` on ${keyValidityDate}, and is not valid for the installed version.`,
-  missing: () => 'The license key for HyperFormula is missing.',
+  invalid: () => 'The license key for HyperFormula is invalid.' +
+    ' If you need any help, contact us at support@handsontable.com.',
+  expired: ({keyValidityDate}) => `The license key for HyperFormula expired on ${keyValidityDate}, and is not valid` +
+    ` for the installed version ${process.env.HT_VERSION as string}. Renew your license key at handsontable.com or` +
+    ` downgrade to a version released prior to ${keyValidityDate}. If you need any help, contact us at sales@handsontable.com.`,
+  missing: () => 'The license key for HyperFormula is missing. Use your purchased key to activate the product.' +
+    ' If you need any help, contact us at support@handsontable.com.',
 }
 
 let _notified = false
@@ -128,18 +132,15 @@ const ENTITLEMENT_CONSOLE_NOTIFICATIONS: Partial<Record<LicenseState, Entitlemen
 }
 
 /**
- * The console message for each reason an entitlement key does not license HyperFormula. Both are
- * errors: neither key evaluates formulas.
+ * The console message for an entitlement key that does not license HyperFormula, whatever the
+ * reason: the classic invalid-key message, as a warning. Handsontable does the same
+ * (`handsontable/src/helpers/mixed.ts`, `_injectEntitlementProductInfo`): an unreadable key and a key
+ * for other products only are the same failure to the developer, and the key specification leaves
+ * the wording open.
  */
-const UNLICENSED_CONSOLE_NOTIFICATIONS: Record<UnlicensedReason, EntitlementConsoleNotification<void>> = {
-  unreadable: {
-    severity: 'error',
-    message: () => 'The license key for HyperFormula is invalid. If you need any help, contact us at support@handsontable.com.',
-  },
-  product_missing: {
-    severity: 'error',
-    message: () => 'The license key does not include a license for HyperFormula. To purchase one, contact sales@handsontable.com.',
-  },
+const UNLICENSED_CONSOLE_NOTIFICATION: EntitlementConsoleNotification<void> = {
+  severity: 'warn',
+  message: () => consoleMessages.invalid({}),
 }
 
 /**
@@ -192,14 +193,10 @@ export function notifyEntitlementKey(state: LicenseState, params: EntitlementMes
 
 /**
  * Prints the console message for an entitlement key that does not license HyperFormula, every
- * time such a key is resolved.
- *
- * @param {UnlicensedReason} reason - why the reader does not license HyperFormula with the key
+ * time such a key is resolved. Every reason the reader gives prints the same message.
  */
-export function notifyUnlicensedEntitlementKey(reason: UnlicensedReason): void {
-  const notification = UNLICENSED_CONSOLE_NOTIFICATIONS[reason]
-
-  printNotification(notification.severity, notification.message())
+export function notifyUnlicensedEntitlementKey(): void {
+  printNotification(UNLICENSED_CONSOLE_NOTIFICATION.severity, UNLICENSED_CONSOLE_NOTIFICATION.message())
 }
 
 /**
@@ -227,7 +224,7 @@ export function checkLicenseKeyValidity(licenseKey: string): LicenseKeyValidityS
     template: LicenseKeyValidityState.MISSING,
   }
 
-  if (licenseKey === 'gpl-v3' || licenseKey === 'internal-use-in-handsontable' || licenseKey === 'hftrial-0168e-1f2b7-47158-70b05-0842f') {
+  if (licenseKey === 'internal-use-in-handsontable' || licenseKey === 'hftrial-0168e-1f2b7-47158-70b05-0842f') {
     messageDescriptor.template = LicenseKeyValidityState.VALID
 
   } else if (typeof licenseKey === 'string' && checkKeySchema(licenseKey)) {
@@ -269,7 +266,7 @@ function formatDate(date: Date): string {
     'July', 'August', 'September', 'October', 'November', 'December'
   ]
   const month = monthNames[date.getUTCMonth()]
-  const day = date.getUTCDate()
+  const day = String(date.getUTCDate()).padStart(2, '0')
   const year = date.getUTCFullYear()
 
   return `${month} ${day}, ${year}`

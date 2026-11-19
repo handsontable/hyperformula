@@ -1,5 +1,6 @@
 import {HyperFormula} from '../src'
 import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import {TEST_LICENSE_KEY} from './_setupFiles/testLicenseKey'
 
 const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
 
@@ -26,7 +27,7 @@ describe('HyperFormula', () => {
       ['=SUM(A1:C1)', '=SUM(A2:C2)', '=SUM(A1:C2)'],
     ]
 
-    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: TEST_LICENSE_KEY})
 
     expect(hf.getCellValue(adr('A3'))).toBe(6)
     expect(hf.getCellValue(adr('B3'))).toBe(15)
@@ -43,7 +44,7 @@ describe('HyperFormula', () => {
       ['=IF(A1>5, "big", "small")', '=AND(A1>0, B1>0)', '=OR(A1<0, B1>0)'],
     ]
 
-    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: TEST_LICENSE_KEY})
 
     expect(hf.getCellValue(adr('A2'))).toBe(60)
     expect(hf.getCellValue(adr('B2'))).toBe(200)
@@ -63,7 +64,7 @@ describe('HyperFormula', () => {
       ['=CONCATENATE("Hello", " ", "World")', '=LEN("Test")', '=UPPER("hello")', '=LOWER("HELLO")', '=ABS(-5)'],
     ]
 
-    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: TEST_LICENSE_KEY})
 
     expect(hf.getCellValue(adr('A2'))).toBe(15)
     expect(hf.getCellValue(adr('B2'))).toBe(3)
@@ -88,7 +89,7 @@ describe('HyperFormula', () => {
       ['=SUM(A1:A3)'],
     ]
 
-    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: TEST_LICENSE_KEY})
 
     expect(hf.getCellValue(adr('A4'))).toBe(6)
 
