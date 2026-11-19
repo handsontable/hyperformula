@@ -3,15 +3,16 @@
  * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, simpleCellAddress} from '../Cell'
+import {AbsoluteCellRange, AbsoluteOpenEndedRange} from '../AbsoluteCellRange'
+import {ArraySize} from '../ArraySize'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {split} from '../generatorUtils'
 import {Maybe} from '../Maybe'
 import {CriterionLambda, CriterionPackage} from './Criterion'
 import {Interpreter} from './Interpreter'
-import {getRawValue, InternalScalarValue, RawScalarValue} from './InterpreterValue'
+import {EmptyValue, getRawValue, InternalScalarValue, RawScalarValue} from './InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 
 const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): { smallerRangeVertex?: RangeVertex, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange } => {
@@ -46,10 +47,9 @@ export class CriterionFunctionCompute<T> {
   }
 
   public compute(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): T | CellError {
-    for (const condition of conditions) {
-      if (!condition.conditionRange.sameDimensionsAs(simpleValuesRange)) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.EqualLength)
-      }
+    const pairedSize = findPairedSize([simpleValuesRange, ...conditions.map((condition) => condition.conditionRange)])
+    if (pairedSize === undefined) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.EqualLength)
     }
 
     const valuesRangeVertex = this.tryToGetRangeVertexForRangeValue(simpleValuesRange)
@@ -67,7 +67,7 @@ export class CriterionFunctionCompute<T> {
 
       if (!cache.has(fullCriterionString)) {
         cache.set(fullCriterionString, [
-          this.evaluateRangeValue(simpleValuesRange, conditions),
+          this.evaluateRangeValue(simpleValuesRange, conditions, pairedSize),
           conditions.map((condition) => condition.criterionPackage.lambda),
         ])
       }
@@ -81,7 +81,7 @@ export class CriterionFunctionCompute<T> {
 
       return cache.get(fullCriterionString)![0]
     } else {
-      return this.evaluateRangeValue(simpleValuesRange, conditions)
+      return this.evaluateRangeValue(simpleValuesRange, conditions, pairedSize)
     }
   }
 
@@ -106,12 +106,31 @@ export class CriterionFunctionCompute<T> {
     return rangeVertex.getCriterionFunctionValue(cacheKey, criterionString)
   }
 
-  private evaluateRangeValue(simpleValuesRange: SimpleRangeValue, conditions: Condition[]) {
+  private evaluateRangeValue(simpleValuesRange: SimpleRangeValue, conditions: Condition[], pairedSize: PairedSize) {
     const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
-    const values = Array.from(simpleValuesRange.valuesFromTopLeftCorner()).map(this.mapFunction)[Symbol.iterator]()
-    const conditionsIterators = conditions.map((condition) => condition.conditionRange.iterateValuesFromTopLeftCorner())
+    const values = Array.from(valuesPaddedTo(simpleValuesRange, pairedSize.data)).map(this.mapFunction)[Symbol.iterator]()
+    const conditionsIterators = conditions.map((condition) => valuesPaddedTo(condition.conditionRange, pairedSize.data))
     const filteredValues = ifFilter(criterionLambdas, conditionsIterators, values)
-    return this.reduceFunction(filteredValues)
+    const result = this.reduceFunction(filteredValues)
+
+    // The cells past the data are empty in the values range and in every condition range.
+    const numberOfEmptyCellsPastData = pairedSize.full.width * pairedSize.full.height - pairedSize.data.width * pairedSize.data.height
+    if (numberOfEmptyCellsPastData > 0 && criterionLambdas.every((lambda) => lambda(EmptyValue))) {
+      return this.composeFunction(result, this.composeRepeatedly(this.mapFunction(EmptyValue), numberOfEmptyCellsPastData))
+    }
+    return result
+  }
+
+  /**
+   * Composes `times` copies of a value, in a logarithmic number of steps. Relies on the compose function being associative.
+   */
+  private composeRepeatedly(value: T, times: number): T {
+    if (times === 1) {
+      return value
+    }
+    const half = this.composeRepeatedly(value, Math.floor(times / 2))
+    const doubled = this.composeFunction(half, half)
+    return times % 2 === 0 ? doubled : this.composeFunction(doubled, value)
   }
 
   private buildNewCriterionCache(cacheKey: string, simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange): CriterionCache {
@@ -148,6 +167,122 @@ export class Condition {
 function* getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<RawScalarValue> {
   for (const cellFromRange of cellRange.addresses(dependencyGraph)) {
     yield getRawValue(dependencyGraph.getScalarValue(cellFromRange))
+  }
+}
+
+/**
+ * The size over which the values range and the condition ranges of a criterion function pair up cell by cell,
+ * and the size of the data that is read from each of them. Every cell past the data is empty.
+ */
+interface PairedSize {
+  full: ArraySize,
+  data: ArraySize,
+}
+
+/**
+ * The extent of a range value along one axis.
+ */
+interface AxisExtent {
+  /** Number of cells of the data along the axis */
+  data: number,
+  /** Number of cells of the range along the axis, or undefined for a range that spans the whole axis */
+  declared?: number,
+  /** Whether the range is an open-ended range */
+  isOpenEnded: boolean,
+  /** Sheet of the range */
+  sheet: number,
+  /** Start of the range along the axis */
+  start: number,
+}
+
+/**
+ * Finds the size over which range values pair up cell by cell, or returns undefined when they do not pair up.
+ *
+ * Arrays pair up by the size of their data. Ranges pair up by their declared size: an open-ended range pairs up with
+ * ranges of its own size even where its data, cut where the sheets end, is smaller. A whole-column or whole-row range
+ * has no declared size and pairs up with a range by the size of its data. Paired with open-ended ranges only, it pairs up
+ * when its data fits in them and none of them starts before it on its sheet. These include every pair that its sheet
+ * would accept if it held a cell for every cell of the open-ended ranges.
+ */
+function findPairedSize(rangeValues: SimpleRangeValue[]): Maybe<PairedSize> {
+  const ranges = rangeValues.filter((rangeValue) => !rangeValue.isAdHoc())
+  const width = findPairedExtent(ranges.map((rangeValue) => axisExtent(rangeValue, rangeValue.width(), (address) => address.col)))
+  const height = findPairedExtent(ranges.map((rangeValue) => axisExtent(rangeValue, rangeValue.height(), (address) => address.row)))
+  if (width === undefined || height === undefined) {
+    return undefined
+  }
+
+  if (ranges.length < rangeValues.length) {
+    const [first, ...rest] = rangeValues
+    if (!rest.every((rangeValue) => rangeValue.sameDimensionsAs(first))) {
+      return undefined
+    }
+    return {full: first.size, data: first.size}
+  }
+
+  return {
+    full: new ArraySize(width.full, height.full),
+    data: new ArraySize(width.data, height.data),
+  }
+}
+
+/**
+ * Returns the extent along one axis of a range value that has a range.
+ */
+function axisExtent(rangeValue: SimpleRangeValue, data: number, coordinate: (address: SimpleCellAddress) => number): AxisExtent {
+  const range = rangeValue.range as AbsoluteCellRange
+  const declared = coordinate(range.end) - coordinate(range.start) + 1
+  return {
+    data,
+    declared: Number.isFinite(declared) ? declared : undefined,
+    isOpenEnded: range instanceof AbsoluteOpenEndedRange,
+    sheet: range.sheet,
+    start: coordinate(range.start),
+  }
+}
+
+/**
+ * Finds the extent along one axis over which ranges pair up, and the extent of the data read from them,
+ * or returns undefined when they do not pair up.
+ */
+function findPairedExtent(extents: AxisExtent[]): Maybe<{ full: number, data: number }> {
+  const data = Math.max(0, ...extents.map((extent) => extent.data))
+  const declaredExtents = extents.map((extent) => extent.declared).filter((declared): declared is number => declared !== undefined)
+
+  if (declaredExtents.length === 0) {
+    return extents.every((extent) => extent.data === data) ? {full: data, data} : undefined
+  }
+
+  const full = declaredExtents[0]
+  if (!declaredExtents.every((declared) => declared === full)) {
+    return undefined
+  }
+
+  if (extents.some((extent) => extent.declared !== undefined && !extent.isOpenEnded)) {
+    return extents.every((extent) => extent.data === full) ? {full, data} : undefined
+  }
+
+  const openEndedExtents = extents.filter((extent) => extent.isOpenEnded)
+  const everyWholeRangePairsUp = extents.filter((extent) => extent.declared === undefined).every((wholeExtent) =>
+    wholeExtent.data <= full && openEndedExtents.every((openEndedExtent) => openEndedExtent.sheet !== wholeExtent.sheet || openEndedExtent.start <= wholeExtent.start)
+  )
+  return everyWholeRangePairsUp ? {full, data} : undefined
+}
+
+/**
+ * Iterates over the values of a range value from its top left corner, row by row, as if its data had the given size.
+ * The cells past its data are empty.
+ */
+function* valuesPaddedTo(rangeValue: SimpleRangeValue, size: ArraySize): IterableIterator<InternalScalarValue> {
+  if (rangeValue.width() === size.width && rangeValue.height() === size.height) {
+    yield* rangeValue.iterateValuesFromTopLeftCorner()
+    return
+  }
+  const data = rangeValue.data
+  for (let row = 0; row < size.height; row++) {
+    for (let column = 0; column < size.width; column++) {
+      yield data[row]?.[column] ?? EmptyValue
+    }
   }
 }
 

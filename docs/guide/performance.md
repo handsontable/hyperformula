@@ -10,6 +10,8 @@ tags:
   - chooseAddressMappingPolicy
   - maxPendingLazyTransformations
   - maxParserCacheSize
+  - openEndedRangeMinRows
+  - openEndedRangeMinColumns
 ---
 
 We implemented various techniques to boost the performance of
@@ -94,6 +96,53 @@ The limit counts cache entries, not bytes or cells. Formulas still needed by
 the workbook, undo/redo history, or clipboard remain in memory independently
 of the cache. Use [`undoLimit`](../api/interfaces/configparams.md#undolimit)
 to control the length of undo history separately.
+
+## Open-ended ranges
+
+A formula often refers to a column from some row down to the last row of
+the sheet, for example `=SUM(A2:A1048576)`. By default, HyperFormula keeps
+a cell for every row of such a range, empty or not, so a single range can
+add a million cells to the memory the engine uses. A whole-column range such
+as `A:A` does not have this cost, but it cannot start below the first row.
+
+The [`openEndedRangeMinRows`](../api/interfaces/configparams.md#openendedrangeminrows)
+and [`openEndedRangeMinColumns`](../api/interfaces/configparams.md#openendedrangemincolumns)
+options make a tall or a wide range behave like a whole-column or a
+whole-row range. A range with at least that many rows, or at least that
+many columns, is open-ended: it holds cells only as far as its sheet holds
+cells, and it takes in the cells you set past them later. Both options are
+`Number.MAX_SAFE_INTEGER` by default, which makes no range open-ended.
+
+```javascript
+const hf = HyperFormula.buildFromArray([
+  ['=SUM(A2:A1048576)'],
+  [10],
+  [20],
+], {
+  licenseKey: 'gpl-v3',
+  maxRows: 1048576,
+  openEndedRangeMinRows: 32768,
+})
+
+// the sheet holds 3 rows, not 1,048,576
+console.log(hf.getSheetDimensions(0)) // { width: 1, height: 3 }
+
+// a cell set below the data is still a part of the range
+hf.setCellContents({ sheet: 0, col: 0, row: 4999 }, 30)
+console.log(hf.getCellValue({ sheet: 0, col: 0, row: 0 })) // 60
+```
+
+Choose values larger than the ranges your formulas use for ordinary data,
+so that only ranges meant to run to the edge of a sheet are open-ended.
+A range that reaches the last row of the sheet must fit within
+[`maxRows`](../api/interfaces/configparams.md#maxrows) and
+[`maxColumns`](../api/interfaces/configparams.md#maxcolumns), like any
+other range.
+
+`ROWS`, `COLUMNS`, `INDEX`, `COUNTBLANK`, and the criterion functions
+(`COUNTIF`, `SUMIFS`, and similar) use the full size of an open-ended
+range. A few results differ from those of an ordinary range. See the
+[known limitations](known-limitations.md#open-ended-ranges).
 
 ## Suspending automatic recalculations
 

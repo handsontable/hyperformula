@@ -584,7 +584,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   private evaluateRange<T>(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, state: InterpreterState, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coercionFunction: coercionOperation): T | CellError {
     let range
     try {
-      range = AbsoluteCellRange.fromAst(ast, state.formulaAddress)
+      range = this.dependencyGraph.rangeReferencedByFormula(AbsoluteCellRange.fromAst(ast, state.formulaAddress))
     } catch (err) {
       if (err instanceof SheetsNotEqual) {
         return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
