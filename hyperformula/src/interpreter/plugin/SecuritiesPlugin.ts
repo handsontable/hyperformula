@@ -6,9 +6,11 @@
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
+import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {
+  accruedCouponPeriods,
   actualCouponPeriodLength,
   buildCouponSchedule,
   CouponSchedule,
@@ -136,6 +138,19 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR},
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+      ],
+    },
+    'ACCRINT': {
+      method: 'accrint',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 1000, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: true, emptyAsDefault: true},
       ],
     },
     'DURATION': {
@@ -392,6 +407,87 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
           default:
             return 360 / schedule.frequency
         }
+      }
+    )
+  }
+
+  /**
+   * Corresponds to ACCRINT(issue, first_interest, settlement, rate, [par], frequency, [basis], [calc_method]).
+   *
+   * Returns the accrued interest of a security that pays periodic interest: `par` * `rate` / `frequency` times the
+   * accrued time in coupon periods, as `accruedCouponPeriods` computes it. An empty `par` is 1000, and an empty or
+   * omitted `calc_method` is TRUE.
+   *
+   * Validates in Excel's order: `calc_method` first, then the other arguments from left to right (an empty required
+   * argument is #N/A), then `rate` and `par` greater than 0, then `issue` before `settlement`. `first_interest` may be
+   * on or before `issue`.
+   *
+   * @param {ProcedureAst} ast - the function's AST
+   * @param {InterpreterState} state - the interpreter state
+   */
+  public accrint(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ACCRINT'),
+      (issueArg: InternalScalarValue, firstInterestArg: InternalScalarValue, settlementArg: InternalScalarValue, rateArg: InternalScalarValue,
+        parArg: InternalScalarValue, frequencyArg: InternalScalarValue, basisArg: InternalScalarValue, calcMethodArg: InternalScalarValue) => {
+        const calcMethod = this.coerceToCalcMethod(calcMethodArg)
+        if (calcMethod instanceof CellError) {
+          return calcMethod
+        }
+        if (this.isArgumentEmpty(ast, 0)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const issue = this.coerceToSecurityDate(issueArg)
+        if (issue instanceof CellError) {
+          return issue
+        }
+        if (this.isArgumentEmpty(ast, 1)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const firstInterest = this.coerceToSecurityDate(firstInterestArg)
+        if (firstInterest instanceof CellError) {
+          return firstInterest
+        }
+        if (this.isArgumentEmpty(ast, 2)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const settlement = this.coerceToSecurityDate(settlementArg)
+        if (settlement instanceof CellError) {
+          return settlement
+        }
+        if (this.isArgumentEmpty(ast, 3)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const rate = this.strictNumber(rateArg)
+        if (rate instanceof CellError) {
+          return rate
+        }
+        const par = this.strictNumber(parArg)
+        if (par instanceof CellError) {
+          return par
+        }
+        if (this.isArgumentEmpty(ast, 5)) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyArg)
+        }
+        const frequency = this.coerceToCouponFrequency(frequencyArg)
+        if (frequency instanceof CellError) {
+          return frequency
+        }
+        const basis = this.coerceToDayCountBasis(basisArg)
+        if (basis instanceof CellError) {
+          return basis
+        }
+        if (rate <= 0 || par <= 0) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+        }
+        if (issue >= settlement) {
+          return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
+        }
+        const schedule = {firstInterest: this.dateTimeHelper.numberToSimpleDate(firstInterest), frequency, basis}
+        const periods = accruedCouponPeriods(this.dateTimeHelper, schedule, issue, settlement, calcMethod)
+        if (periods instanceof CellError) {
+          return periods
+        }
+        return par * rate / frequency * periods
       }
     )
   }
@@ -789,5 +885,14 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
     }
     const coerced = this.coerceScalarToNumberOrError(value)
     return coerced instanceof CellError ? coerced : getRawValue(coerced)
+  }
+
+  /**
+   * Converts the `calc_method` argument of ACCRINT: an error is passed on, text (even "TRUE" or "1") is #VALUE!, a
+   * number is TRUE when it is not 0, and a blank cell is FALSE.
+   */
+  private coerceToCalcMethod(value: InternalScalarValue): boolean | CellError {
+    const calcMethod = typeof value === 'string' ? undefined : coerceScalarToBoolean(value)
+    return calcMethod ?? new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
   }
 }

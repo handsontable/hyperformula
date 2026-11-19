@@ -10,6 +10,13 @@ import {FunctionDoc} from '../FunctionDescription'
  * truth for the function metadata API, and `docs/guide/built-in-functions.md` is generated from it.
  */
 export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
+  ACCRINT: {
+    category: 'Financial',
+    shortDescription: 'Returns the accrued interest of a security that pays periodic interest.',
+    parameters: [{name: 'issue', description: 'The issue date, as a date serial number, truncated to an integer; must be earlier than `settlement`.'}, {name: 'first_interest', description: 'The first interest date, as a date serial number, truncated to an integer. The coupon schedule is counted from it.'}, {name: 'settlement', description: 'The settlement date, as a date serial number, truncated to an integer.'}, {name: 'rate', description: 'The annual coupon rate; must be greater than 0.'}, {name: 'par', description: 'The par value; must be greater than 0. If the argument is empty, 1000 is used.'}, {name: 'frequency', description: 'The number of coupon payments per year, truncated to an integer: 1 (annual), 2 (semiannual) or 4 (quarterly).'}, {name: 'basis', description: 'The day-count basis, truncated to an integer: 0 (default) US 30/360, 1 actual/actual, 2 actual/360, 3 actual/365, 4 European 30/360.'}, {name: 'calc_method', description: 'TRUE (default, also when empty) or a non-zero number: interest accrues from `issue` through each coupon period to `settlement`. FALSE or 0: when `settlement` is after `first_interest`, the days from the start of the coupon period that ends on `first_interest` to `settlement` count as one span; when `settlement` is on or before `first_interest` and in a later coupon period than `issue`, the result is the partial coupon periods of `issue` and `settlement` minus the whole periods from `settlement` to `first_interest`, and can be negative. Text is not accepted.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=ACCRINT(DATE(2008,3,1), DATE(2008,8,31), DATE(2008,5,1), 0.1, 1000, 2, 0)', '=ACCRINT(A1, B1, C1, 0.05, 1000, 2, 0, FALSE())'],
+  },
   ACCRINTM: {
     category: 'Financial',
     shortDescription: 'Returns the accrued interest of a security that pays interest at maturity.',
