@@ -7,6 +7,7 @@ import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#HESAPLA!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#SAYI/0!',
     ERROR: '#ERROR!',
@@ -160,6 +161,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'SOL',
     LEN: 'UZUNLUK',
     LINEST: 'DOT',
+    LOGEST: 'LOT',
+    TREND: 'EĞİLİM',
+    GROWTH: 'BÜYÜME',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -416,6 +420,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'SANTAN',
     LARGE: 'BÜYÜK',
     SMALL: 'KÜÇÜK',
+    'RANK.EQ': 'RANK.EŞİT',
+    RANK: 'RANK',
     PERCENTILE: 'YÜZDEBİRLİK',
     'PERCENTILE.INC': 'YÜZDEBİRLİK.DHL',
     'PERCENTILE.EXC': 'YÜZDEBİRLİK.HRC',
@@ -440,6 +446,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTEST',
     STEYX: 'STHYX',
     SLOPE: 'EĞİM',
+    INTERCEPT: 'KESMENOKTASI',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'TAHMİN',
     COVAR: 'KOVARYANS',
     'COVARIANCE.P': 'KOVARYANS.P',
     'COVARIANCE.S': 'KOVARYANS.S',

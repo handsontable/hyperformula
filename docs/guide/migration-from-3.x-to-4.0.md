@@ -6,10 +6,75 @@ tags:
   - upgrade
   - breaking changes
   - v4.0
+  - "#CALC!"
   - language packs
+  - INDEX
+  - FILTER
 ---
 
 To upgrade your HyperFormula version from 3.x.x to 4.0.0, follow this guide.
+
+## The `#CALC!` error
+
+HyperFormula 4.0 adds the `#CALC!` error (`ErrorType.CALC`). Like Microsoft Excel, HyperFormula returns it when a function cannot calculate its result, for example when the result would be an empty array. See [Types of errors](types-of-errors.md).
+
+### Custom language packs
+
+Every language pack must translate the new `CALC` error. The built-in language packs already do. A custom language pack without `errors.CALC` makes `registerLanguage()` throw a `MissingTranslationError`.
+
+Add the entry to the `errors` object of your language pack:
+
+```javascript
+errors: {
+  CALC: '#CALC!',
+  // ...
+},
+```
+
+If Microsoft Excel shows the error under a different name in your language, use that name instead, for example `#OBL!` in Polish.
+
+### Functions that return `#CALC!`
+
+| Function | Case | 3.x | 4.0 |
+|:---------|:-----|:----|:----|
+| `FILTER` | No value meets the conditions. | `#N/A` | `#CALC!` |
+| `UNIQUE` | No row or column is kept: `exactly_once` is `TRUE` and every row or column occurs more than once. | `#N/A` | `#CALC!` |
+| `SEQUENCE` | The number of rows or columns is 0 or truncates to 0, for example `0`, `0.5`, `FALSE()` or an empty cell. | `#VALUE!` | `#CALC!` |
+| `CONCAT` | The result is longer than 32,767 characters. | `#VALUE!` | `#CALC!` |
+| `TEXTJOIN` | The result is longer than 32,767 characters. | `#VALUE!` | `#CALC!` |
+
+Formulas that handle these errors with `IFNA()` or `ISNA()` no longer catch them. Use `IFERROR()` or `ISERROR()` instead. Likewise, if your code checks a cell's error type, check for `ErrorType.CALC` in these cases.
+
+## The `INDEX` function
+
+HyperFormula 4.0 changes the `INDEX` function to return what Microsoft Excel returns:
+
+| Case | Example | 3.x | 4.0 |
+|:-----|:--------|:----|:----|
+| A row or column past the range | `=INDEX(A1:C3, 4, 1)` | `#NUM!` | `#REF!` |
+| A fractional row or column | `=INDEX(A1:C3, 2.9, 1)` | The value of `A1` | The value of `A2`: `2.9` truncates to `2` |
+| A row of `0` | `=INDEX(A1:C3, 0, 2)` | `#VALUE!` | `B1:B3`, spilled |
+| A column of `0` or an empty column argument | `=INDEX(A1:C3, 2, 0)`, `=INDEX(A1:C3, 2, )` | `#VALUE!` | `A2:C2`, spilled |
+| No column, on a range with more than one row and column | `=INDEX(A1:C3, 2)` | The value of `A2` | `#REF!` |
+| No column, on an array with more than one row and column | `=INDEX({1,2;3,4}, 2)` | `3` | `{3,4}`, spilled |
+| No column, on a one-row range | `=INDEX(A1:C1, 3)` | `#NUM!` | The value of `C1` |
+| The `area_num` argument | `=INDEX(A1:C3, 1, 1, 1)` | `#N/A` (wrong number of arguments) | The value of `A1` |
+
+A spilled result needs empty cells to spill into, or it returns `#SPILL!`. If your code checks for `ErrorType.NUM` from `INDEX`, check for `ErrorType.REF` instead.
+
+## The `FILTER` function
+
+HyperFormula 4.0 reads the `include` argument of `FILTER`, its second argument, as Microsoft Excel does. Text in it returns `#VALUE!`, and an error in it is returned:
+
+| Value in `include` | 3.x | 4.0 |
+|:-------------------|:----|:----|
+| `TRUE`, a non-zero number | The row is kept | The row is kept |
+| `FALSE`, `0`, a blank cell | The row is dropped | The row is dropped |
+| Text, such as `"x"` or the empty text `""` | The row is dropped | `#VALUE!` |
+| The text `"TRUE"` | The row is kept | `#VALUE!` |
+| An error, such as `#DIV/0!` | The row is dropped | The error |
+
+If a condition column can hold text, for example `=IF(B1>0, TRUE(), "")`, return `FALSE()` instead of `""`. Conditions after `include`, which HyperFormula accepts in addition to Excel, still drop such rows.
 
 ## Function names in the Polish and Turkish language packs
 
