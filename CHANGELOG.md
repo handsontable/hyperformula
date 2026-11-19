@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `COUPDAYBS`, `COUPDAYS`, `COUPDAYSNC`, `COUPNCD`, `COUPNUM` and `COUPPCD` functions, which return the coupon dates of a security, the number of coupons until maturity and the days in and around the coupon period. [#1804](https://github.com/handsontable/hyperformula/pull/1804)
 - Added the `PRICE` and `DURATION` functions, which return the price per 100 face value and the Macaulay duration of a security that pays periodic interest. [#1848](https://github.com/handsontable/hyperformula/pull/1848)
 - Added the `ACCRINT` function, which returns the accrued interest of a security that pays periodic interest. [#1812](https://github.com/handsontable/hyperformula/pull/1812)
+- Added the `ODDFPRICE` and `ODDLPRICE` functions, which return the price per 100 face value of a security with an odd first or last coupon period. [#1850](https://github.com/handsontable/hyperformula/pull/1850)
 
 ### Changed
 

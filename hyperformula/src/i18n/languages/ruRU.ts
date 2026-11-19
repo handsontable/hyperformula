@@ -197,6 +197,8 @@ const dictionary: RawTranslationPackage = {
     OCT2DEC: 'ВОСЬМ.В.ДЕС',
     OCT2HEX: 'ВОСЬМ.В.ШЕСТН',
     ODD: 'НЕЧЁТ',
+    ODDFPRICE: 'ЦЕНАПЕРВНЕРЕГ',
+    ODDLPRICE: 'ЦЕНАПОСЛНЕРЕГ',
     OFFSET: 'СМЕЩ',
     OR: 'ИЛИ',
     PDURATION: 'ПДЛИТ',
