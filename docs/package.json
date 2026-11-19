@@ -14,7 +14,7 @@
     "dev:cf": "wrangler dev",
     "deploy:cf": "wrangler deploy",
     "lint": "eslint . --ext .js,.mjs,.ts",
-    "preview:cf": "wrangler versions upload",
+    "preview:cf": "DOCS_TEST_LICENSE_KEY=true node script/inject-preview-license-key.mjs && wrangler versions upload",
     "code-examples:generate-js": "bash code-examples-generator.sh",
     "code-examples:generate-all-js": "bash code-examples-generator.sh --generateAll",
     "code-examples:format-all-ts": "bash code-examples-generator.sh --formatAllTsExamples"

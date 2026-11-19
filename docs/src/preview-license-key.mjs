@@ -23,7 +23,7 @@ import { TEST_LICENSE_KEY } from './test-license-key.mjs';
 export const TEST_KEY_MARKER = 'HYPERFORMULA INTERNAL TEST KEY';
 
 /**
- * The branch Workers Builds deploys to production. Every other branch it builds is a preview.
+ * The branch Workers Builds deploys to production. A build of it never gets the key.
  */
 const PRODUCTION_BRANCH = 'master';
 
@@ -34,17 +34,23 @@ const PRODUCTION_BRANCH = 'master';
 const PLACEHOLDER_LINE = /^([ \t]*)\/\/ ?licenseKey: ?(['"])your-license-key\2,?.*$/gm;
 
 /**
- * Returns the key to inject, or `null`. Only a Workers Builds build of a branch other than the production one
- * gets the key: Workers Builds sets `WORKERS_CI_BRANCH`, so a local build, a GitHub Actions build and a fork
- * (which Workers Builds does not build) get none.
+ * Returns the key to inject, or `null`. The key is opt-in, as in Handsontable's docs: only a build or script run
+ * with `DOCS_TEST_LICENSE_KEY=true` gets it, and a Workers Builds build of the production branch never does, even
+ * with the opt-in set. Without the opt-in, a build is strict: the key anywhere in its output fails it.
+ *
+ * Workers Builds runs the same build command for every branch, so the opt-in is set by the preview deploy command
+ * (`npm run preview:cf`, `script/inject-preview-license-key.mjs`), which writes the key into the built pages before
+ * it uploads them. A local build or `npm run dev` can set it too (see `docs/README.md`).
  *
  * @param {NodeJS.ProcessEnv} env The environment.
  * @returns {string | null}
  */
 export function resolvePreviewLicenseKey(env) {
-  const branch = env.WORKERS_CI_BRANCH;
+  if (env.DOCS_TEST_LICENSE_KEY !== 'true' || env.WORKERS_CI_BRANCH === PRODUCTION_BRANCH) {
+    return null;
+  }
 
-  return branch && branch !== PRODUCTION_BRANCH ? TEST_LICENSE_KEY : null;
+  return TEST_LICENSE_KEY;
 }
 
 /**

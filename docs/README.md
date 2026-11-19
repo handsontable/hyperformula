@@ -28,6 +28,15 @@ To start a local HyperFormula docs server:
    ```
 5. In your browser, go to: http://localhost:4321/docs/hyperformula/. Search works only in a full build (`npm run docs:build`), which indexes the pages with [Pagefind](https://pagefind.app/).
 
+The live examples load HyperFormula from the CDN, and HyperFormula checks the license key everywhere except on handsontable.com. On `localhost`, an example shows `#LIC!` once the CDN serves a version that needs a key. `npm run docs:dev` can't give the examples a key. To run them locally with the internal test key, build with the opt-in and serve the build:
+
+```bash
+DOCS_TEST_LICENSE_KEY=true npm run docs:build
+npm run docs:dev:cf
+```
+
+Never deploy a build made with `DOCS_TEST_LICENSE_KEY=true` to production. A build without it fails if the key is anywhere in its output.
+
 ## What is generated
 
 `guide/built-in-functions.md` and the whole of `api/` are produced by a build step and git-ignored. Never edit or commit them: change the function metadata catalogue in `hyperformula/src/interpreter/functionMetadata/categories/` or the JSDoc in `hyperformula/src/`, and regenerate. Both are regenerated as the first step of `docs:dev` and `docs:build`, so a missing `api/` folder only means it has not been built yet.

@@ -22,7 +22,7 @@ Nothing may live in it that upstream does not ship, other than the files `upstre
 
 ## The license check skip on handsontable.com
 
-On `handsontable.com` and its one-label subdomains, `resolveLicense()` reads no key: every key, a missing one included, resolves as valid and unrestricted, and prints nothing. That is how the live examples of the documentation run without a key. The test is `isLicenseCheckSkipped()` in `licenseResolution.ts`, the same as Handsontable's `_ignored()`: it reads `location.host`, so it never applies in Node, and it never matches a look-alike host. Its tests are Jest-only (`unit/license/domain-skip.spec.ts`), because Karma's browser has a `location` that cannot be replaced.
+On `handsontable.com` and its one-label subdomains, `resolveLicense()` reads no key: every key, a missing one included, resolves as valid and unrestricted, and prints nothing. That is how the live examples of the documentation run without a key. The test is `isLicenseCheckSkipped()` in `licenseResolution.ts`, the same as Handsontable's `_ignored()`: it reads `location.host`, so it applies only where a global `location` exists, which Node does not have by default, and it never matches a look-alike host. Its tests are Jest-only (`unit/license/domain-skip.spec.ts`), because Karma's browser has a `location` that cannot be replaced.
 
 ## The internal test key
 
@@ -40,4 +40,4 @@ The key is written out once per consumer, and nowhere else:
 
 `hyperformula/test/test-license-key.spec.js` fails when the constants disagree, or when the key appears in any other file. To renew the key, issue it again upstream and paste it into every constant.
 
-A docs build on Cloudflare Workers Builds for any branch other than `master` is a preview: `docs/src/preview-license-key.mjs` writes the key into the script of every live example, after the pages are built, so the examples run on the preview URL. The code a page shows and the StackBlitz project keep the placeholder. Every build then checks its output: a production build must not hold the key anywhere, and a preview build only in the example scripts.
+The docs get the key only on an explicit opt-in, `DOCS_TEST_LICENSE_KEY=true`, and a Workers Builds build of `master` never does. `npm run preview:cf` sets it: `docs/script/inject-preview-license-key.mjs` writes the key into the script of every live example of the built site, before the preview version is uploaded, so the examples run on the preview URL. The code a page shows and the StackBlitz project keep the placeholder. Every build checks its output: without the opt-in, the key anywhere fails the build; with it, the key may appear only in the example scripts.

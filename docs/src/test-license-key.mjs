@@ -1,6 +1,6 @@
 /**
  * The license key of the engines the docs build runs in Node (`docs-data.mjs`), and of the executed
- * examples of a preview build: `markdown-plugins.mjs` writes it into the example scripts at build time,
+ * examples of a preview build: `preview-license-key.mjs` writes it into the example scripts after the build,
  * never into the code a page shows, and never in a production build. Import it only from Node-side
  * code, never from client code.
  *
