@@ -12,7 +12,7 @@
     "build": "astro build && node script/prepare-cf-assets.js",
     "build:cf": "rimraf dist && npm run build",
     "dev:cf": "wrangler dev",
-    "deploy:cf": "wrangler deploy",
+    "deploy:cf": "node script/check-no-preview-license-key.mjs && wrangler deploy",
     "lint": "eslint . --ext .js,.mjs,.ts",
     "preview:cf": "DOCS_TEST_LICENSE_KEY=true node script/inject-preview-license-key.mjs && wrangler versions upload",
     "code-examples:generate-js": "bash code-examples-generator.sh",

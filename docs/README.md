@@ -35,7 +35,7 @@ DOCS_TEST_LICENSE_KEY=true npm run docs:build
 npm run docs:dev:cf
 ```
 
-Never deploy a build made with `DOCS_TEST_LICENSE_KEY=true` to production. A build without it fails if the key is anywhere in its output.
+Never deploy a build made with `DOCS_TEST_LICENSE_KEY=true` to production. A build without it fails if the key is anywhere in its output, and `npm run docs:deploy:cf` refuses to deploy a built site that holds the key.
 
 ## What is generated
 
@@ -95,9 +95,11 @@ Deploying by hand is only needed for debugging; regular deployments go through W
 ```bash
 npm run docs:build:cf     # build the documentation and prepare the asset directory
 npm run docs:dev:cf       # serve the built site locally at http://localhost:8787
-npm run docs:preview:cf   # upload a preview version (does not touch production)
-npm run docs:deploy:cf    # deploy to production
+npm run docs:preview:cf   # write the internal test key into the built site, then upload a preview version
+npm run docs:deploy:cf    # deploy to production; refuses a built site that holds the key
 ```
+
+`docs:preview:cf` changes the built site in place. Run `docs:build:cf` again before `docs:deploy:cf`, and never promote a preview version to production from the Cloudflare dashboard: it holds the internal test key.
 
 When changing the asset routing, verify it with browser navigation headers, not plain requests: `curl -H "Sec-Fetch-Mode: navigate" -H "Sec-Fetch-Dest: document"`. The asset router treats navigation requests differently from other requests, so a plain `curl` check can pass while browsers get a 404.
 
