@@ -322,7 +322,9 @@ export class ArithmeticHelper {
         if (arr instanceof CellError) {
           return arr
         } else {
-          expandedVals.push(...arr)
+          for (const value of arr) {
+            expandedVals.push(value)
+          }
         }
       } else {
         expandedVals.push(val)

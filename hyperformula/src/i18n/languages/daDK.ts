@@ -7,6 +7,7 @@ import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#CALC!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIVISION/0!',
     ERROR: '#ERROR!',
@@ -159,6 +160,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'VENSTRE',
     LEN: 'LÆNGDE',
     LINEST: 'LINREGR',
+    LOGEST: 'LOGREGR',
+    TREND: 'TENDENS',
+    GROWTH: 'FORØGELSE',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -411,6 +415,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'IMAGTAN',
     LARGE: 'STØRSTE',
     SMALL: 'MINDSTE',
+    'RANK.EQ': 'PLADS.LIGE',
+    RANK: 'PLADS',
     PERCENTILE: 'FRAKTIL',
     'PERCENTILE.INC': 'FRAKTIL.MEDTAG',
     'PERCENTILE.EXC': 'FRAKTIL.UDELAD',
@@ -435,6 +441,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTEST',
     STEYX: 'STFYX',
     SLOPE: 'STIGNING',
+    INTERCEPT: 'SKÆRING',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'PROGNOSE',
     COVAR: 'KOVARIANS',
     'COVARIANCE.P': 'KOVARIANS.P',
     'COVARIANCE.S': 'KOVARIANS.S',
