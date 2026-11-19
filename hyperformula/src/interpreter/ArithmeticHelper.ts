@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {CellError, CellValueTypeOrd, ErrorType, getCellValueType} from '../Cell'
@@ -216,6 +216,17 @@ export class ArithmeticHelper {
     return this.coerceToMaybeNumber(arg) ?? new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
   }
 
+  /**
+   * Coerces a scalar to a number like coerceScalarToNumberOrError, except that a boolean or the empty text is #VALUE!.
+   * Numbers, dates, numeric text and empty cells are accepted; an error is returned as it is.
+   */
+  public coerceScalarToNumberRejectingBooleans(arg: InternalScalarValue): ExtendedNumber | CellError {
+    if (typeof arg === 'boolean' || arg === '') {
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+    }
+    return this.coerceScalarToNumberOrError(arg)
+  }
+
   public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<ExtendedNumber> {
     return this.coerceNonDateScalarToMaybeNumber(arg) ?? (
       typeof arg === 'string' ? this.dateTimeHelper.dateStringToDateNumber(arg) : undefined
@@ -311,7 +322,9 @@ export class ArithmeticHelper {
         if (arr instanceof CellError) {
           return arr
         } else {
-          expandedVals.push(...arr)
+          for (const value of arr) {
+            expandedVals.push(value)
+          }
         }
       } else {
         expandedVals.push(val)

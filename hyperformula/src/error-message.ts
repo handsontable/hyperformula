@@ -1,14 +1,14 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 /**
  * This is a class for detailed error messages across HyperFormula.
  */
 export class ErrorMessage {
-  public static LinestStaticSize = 'LINEST requires input dimensions that determine a fixed result size.'
-  public static LinestStaticStats = 'LINEST requires a constant stats argument to determine its result size.'
+  public static PositiveValues = 'Values need to be positive.'
+  public static ZeroVariance = 'Values cannot all be equal.'
   public static DistinctSigns = 'Distinct signs.'
   public static WrongArgNumber = 'Wrong number of arguments.'
   public static EmptyArg = 'Empty function argument.'
@@ -70,6 +70,7 @@ export class ErrorMessage {
   public static IncorrectDateTime = 'String does not represent correct DateTime.'
   public static CharacterCodeBounds = 'Character code out of bounds.'
   public static NonZero = 'Argument cannot be 0.'
+  public static ZeroRowOrColumnCount = 'Row or column count cannot be zero.'
   public static LessThanOne = 'Argument cannot be less than 1.'
   public static WeekendString = 'Incorrect weekend bitmask string.'
   public static InvalidRoman = 'Invalid roman numeral.'
@@ -82,4 +83,6 @@ export class ErrorMessage {
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
   public static LicenseKey = (arg: string) => `License key is ${arg}.`
   public static LicenseCapability = (functionName: string) => `Function ${functionName} is not included in your license.`
+  public static StaticResultSize = (functionName: string) => `${functionName} requires input dimensions that determine a fixed result size.`
+  public static StaticStats = (functionName: string) => `${functionName} requires a constant stats argument to determine its result size.`
 }

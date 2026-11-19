@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#HESAPLA!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#SAYI/0!',
     ERROR: '#ERROR!',
@@ -18,6 +19,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#DEĞER!',
   },
   functions: {
+    CHOOSECOLS: 'SÜTUNSEÇ',
+    CHOOSEROWS: 'SATIRSEÇ',
     FILTER: 'FILTER',
     VSTACK: 'DÜŞEYYIĞ',
     HSTACK: 'YATAYYIĞ',
@@ -25,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'MUTLAK',
+    ACCRINTM: 'GERÇEKFAİZV',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
     ACOT: 'ACOT',
@@ -98,6 +102,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'ONDALIK',
     DEGREES: 'DERECE',
     DELTA: 'DELTA',
+    DISC: 'İNDİRİM',
     DOLLARDE: 'LİRAON',
     DOLLARFR: 'LİRAKES',
     EDATE: 'SERİTARİH',
@@ -127,6 +132,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'İNDİS',
     INT: 'TAMSAYI',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'FAİZORANI',
     IPMT: 'FAİZTUTARI',
     IRR: 'İÇ_VERİM_ORANI',
     ISBINARY: 'ISBINARY',
@@ -147,6 +153,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'SOL',
     LEN: 'UZUNLUK',
     LINEST: 'DOT',
+    LOGEST: 'LOT',
+    TREND: 'EĞİLİM',
+    GROWTH: 'BÜYÜME',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -188,11 +197,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'ÇARPIM',
     POWER: 'KUVVET',
     PPMT: 'ANA_PARA_ÖDEMESİ',
+    PRICEDISC: 'DEĞERİND',
     PROPER: 'YAZIM.DÜZENİ',
     PV: 'BD',
     RADIANS: 'RADYAN',
     RAND: 'S_SAYI_ÜRET',
     RATE: 'FAİZ_ORANI',
+    RECEIVED: 'GETİRİ',
     REPLACE: 'DEĞİŞTİR',
     REPT: 'YİNELE',
     RIGHT: 'SAĞ',
@@ -229,6 +240,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'YAT',
     T: 'T',
+    TAKE: 'AL',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'HTAHEŞ',
@@ -265,6 +277,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'ÖZELVEYA',
     YEAR: 'YIL',
     YEARFRAC: 'YILORAN',
+    YIELDDISC: 'ÖDEMEİND',
     ROMAN: 'ROMEN',
     ARABIC: 'ARAPÇA',
     'HF.ADD': 'HF.ADD',
@@ -393,6 +406,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'SANTAN',
     LARGE: 'BÜYÜK',
     SMALL: 'KÜÇÜK',
+    'RANK.EQ': 'RANK.EŞİT',
+    RANK: 'RANK',
     PERCENTILE: 'YÜZDEBİRLİK',
     'PERCENTILE.INC': 'YÜZDEBİRLİK.DHL',
     'PERCENTILE.EXC': 'YÜZDEBİRLİK.HRC',
@@ -405,6 +420,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'GÜVENİLİRLİK.T',
     DEVSQ: 'SAPKARE',
     GEOMEAN: 'GEOORT',
+    GESTEP: 'BESINIR',
     HARMEAN: 'HARORT',
     CRITBINOM: 'KRİTİKBİNOM',
     PEARSON: 'PEARSON',
@@ -416,6 +432,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTEST',
     STEYX: 'STHYX',
     SLOPE: 'EĞİM',
+    INTERCEPT: 'KESMENOKTASI',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'TAHMİN',
     COVAR: 'KOVARYANS',
     'COVARIANCE.P': 'KOVARYANS.P',
     'COVARIANCE.S': 'KOVARYANS.S',

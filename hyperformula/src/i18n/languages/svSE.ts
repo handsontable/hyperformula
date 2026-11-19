@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#KALK!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DIVISION/0!',
     ERROR: '#ERROR!',
@@ -18,6 +19,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#VÄRDEFEL!',
   },
   functions: {
+    CHOOSECOLS: 'VÄLJKOL',
+    CHOOSEROWS: 'VÄLJRADER',
     FILTER: 'FILTER',
     VSTACK: 'VSTACK',
     HSTACK: 'HSTACK',
@@ -25,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINTM: 'UPPLOBLRÄNTA',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSH',
     ACOT: 'ACOT',
@@ -98,6 +102,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DECIMAL',
     DEGREES: 'GRADER',
     DELTA: 'DELTA',
+    DISC: 'DISK',
     DOLLARDE: 'DECTAL',
     DOLLARFR: 'BRÅK',
     EDATE: 'EDATUM',
@@ -127,6 +132,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEX',
     INT: 'HELTAL',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'ÅRSRÄNTA',
     IPMT: 'RBETALNING',
     IRR: 'IR',
     ISBINARY: 'ISBINARY',
@@ -147,6 +153,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'VÄNSTER',
     LEN: 'LÄNGD',
     LINEST: 'REGR',
+    LOGEST: 'EXPREGR',
+    TREND: 'TREND',
+    GROWTH: 'EXPTREND',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -188,11 +197,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'PRODUKT',
     POWER: 'UPPHÖJT.TILL',
     PPMT: 'AMORT',
+    PRICEDISC: 'PRISDISK',
     PROPER: 'INITIAL',
     PV: 'NUVÄRDE',
     RADIANS: 'RADIANER',
     RAND: 'SLUMP',
     RATE: 'RÄNTA',
+    RECEIVED: 'BELOPP',
     REPLACE: 'ERSÄTT',
     REPT: 'REP',
     RIGHT: 'HÖGER',
@@ -229,6 +240,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'ÅRSAVSKR',
     T: 'T',
+    TAKE: 'TA',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'SSVXEKV',
@@ -265,6 +277,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'ÅR',
     YEARFRAC: 'ÅRDEL',
+    YIELDDISC: 'NOMAVKDISK',
     ROMAN: 'ROMERSK',
     ARABIC: 'ARABIC',
     'HF.ADD': 'HF.ADD',
@@ -393,6 +406,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'IMTAN',
     LARGE: 'STÖRSTA',
     SMALL: 'MINSTA',
+    'RANK.EQ': 'RANG.EKV',
+    RANK: 'RANG',
     PERCENTILE: 'PERCENTIL',
     'PERCENTILE.INC': 'PERCENTIL.INK',
     'PERCENTILE.EXC': 'PERCENTIL.EXK',
@@ -405,6 +420,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'KONFIDENS.T',
     DEVSQ: 'KVADAVV',
     GEOMEAN: 'GEOMEDEL',
+    GESTEP: 'SLSTEG',
     HARMEAN: 'HARMMEDEL',
     CRITBINOM: 'KRITBINOM',
     PEARSON: 'PEARSON',
@@ -416,6 +432,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTEST',
     STEYX: 'STDFELYX',
     SLOPE: 'LUTNING',
+    INTERCEPT: 'SKÄRNINGSPUNKT',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'PREDIKTION',
     COVAR: 'KOVAR',
     'COVARIANCE.P': 'KOVARIANS.P',
     'COVARIANCE.S': 'KOVARIANS.S',

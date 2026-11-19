@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#CALC!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DELING.DOOR.0!',
     ERROR: '#ERROR!',
@@ -18,6 +19,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#WAARDE!',
   },
   functions: {
+    CHOOSECOLS: 'KIES.KOLOMMEN',
+    CHOOSEROWS: 'KIES.RIJEN',
     FILTER: 'FILTER',
     VSTACK: 'VERT.STAPELEN',
     HSTACK: 'HOR.STAPELEN',
@@ -25,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINTM: 'SAMENG.RENTE.V',
     ACOS: 'BOOGCOS',
     ACOSH: 'BOOGCOSH',
     ACOT: 'BOOGCOT',
@@ -98,6 +102,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DECIMAAL',
     DEGREES: 'GRADEN',
     DELTA: 'DELTA',
+    DISC: 'DISCONTO',
     DOLLARDE: 'EURO.DE',
     DOLLARFR: 'EURO.BR',
     EDATE: 'ZELFDE.DAG',
@@ -127,6 +132,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEX',
     INT: 'INTEGER',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'RENTEPERCENTAGE',
     IPMT: 'IBET',
     IRR: 'IR',
     ISBINARY: 'ISBINARY',
@@ -147,6 +153,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'LINKS',
     LEN: 'PITUUS',
     LINEST: 'LIJNSCH',
+    LOGEST: 'LOGSCH',
+    TREND: 'TREND',
+    GROWTH: 'GROEI',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -188,11 +197,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'PRODUCT',
     POWER: 'MACHT',
     PPMT: 'PBET',
+    PRICEDISC: 'PRIJS.DISCONTO',
     PROPER: 'BEGINLETTERS',
     PV: 'HW',
     RADIANS: 'RADIALEN',
     RAND: 'ASELECT',
     RATE: 'RENTE',
+    RECEIVED: 'OPBRENGST',
     REPLACE: 'VERVANGEN',
     REPT: 'HERHALING',
     RIGHT: 'RECHTS',
@@ -229,6 +240,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'SYD',
     T: 'T',
+    TAKE: 'NEMEN',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'SCHATK.OBL',
@@ -265,6 +277,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'EX.OF',
     YEAR: 'JAAR',
     YEARFRAC: 'JAAR.DEEL',
+    YIELDDISC: 'REND.DISCONTO',
     ROMAN: 'ROMEINS',
     ARABIC: 'ARABISCH',
     'HF.ADD': 'HF.ADD',
@@ -393,6 +406,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'C.TAN',
     LARGE: 'GROOTSTE',
     SMALL: 'KLEINSTE',
+    'RANK.EQ': 'RANG.GELIJK',
+    RANK: 'RANG',
     PERCENTILE: 'PERCENTIEL',
     'PERCENTILE.INC': 'PERCENTIEL.INC',
     'PERCENTILE.EXC': 'PERCENTIEL.EXC',
@@ -405,6 +420,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'VERTROUWELIJKHEID.T',
     DEVSQ: 'DEV.KWAD',
     GEOMEAN: 'MEETK.GEM',
+    GESTEP: 'GROTER.DAN',
     HARMEAN: 'HARM.GEM',
     CRITBINOM: 'CRIT.BINOM',
     PEARSON: 'PEARSON',
@@ -416,6 +432,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'F.TOETS',
     STEYX: 'STAND.FOUT.YX',
     SLOPE: 'RICHTING',
+    INTERCEPT: 'SNIJPUNT',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'VOORSPELLEN',
     COVAR: 'COVARIANTIE',
     'COVARIANCE.P': 'COVARIANTIE.P',
     'COVARIANCE.S': 'COVARIANTIE.S',

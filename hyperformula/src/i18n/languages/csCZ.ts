@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#VÝPOČET!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DĚLENÍ_NULOU!',
     ERROR: '#ERROR!',
@@ -18,6 +19,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#HODNOTA!',
   },
   functions: {
+    CHOOSECOLS: 'ZVOLITSLOUPCE',
+    CHOOSEROWS: 'ZVOLITŘÁDKY',
     FILTER: 'FILTER',
     VSTACK: 'SROVNAT.SVISLE',
     HSTACK: 'SROVNAT.VODOROVNĚ',
@@ -25,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINTM: 'ACCRINTM',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSH',
     ACOT: 'ACOT',
@@ -98,6 +102,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'DECIMAL',
     DEGREES: 'DEGREES',
     DELTA: 'DELTA',
+    DISC: 'DISC',
     DOLLARDE: 'DOLLARDE',
     DOLLARFR: 'DOLLARFR',
     EDATE: 'EDATE',
@@ -127,6 +132,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'INDEX',
     INT: 'CELÁ.ČÁST',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'INTRATE',
     IPMT: 'PLATBA.ÚROK',
     IRR: 'MÍRA.VÝNOSNOSTI',
     ISBINARY: 'ISBINARY',
@@ -147,6 +153,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'ZLEVA',
     LEN: 'DÉLKA',
     LINEST: 'LINREGRESE',
+    LOGEST: 'LOGLINREGRESE',
+    TREND: 'LINTREND',
+    GROWTH: 'LOGLINTREND',
     LN: 'LN',
     LOG10: 'LOG',
     LOG: 'LOGZ',
@@ -188,11 +197,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'SOUČIN',
     POWER: 'POWER',
     PPMT: 'PLATBA.ZÁKLAD',
+    PRICEDISC: 'PRICEDISC',
     PROPER: 'VELKÁ2',
     PV: 'SOUČHODNOTA',
     RADIANS: 'RADIANS',
     RAND: 'NÁHČÍSLO',
     RATE: 'ÚROKOVÁ.MÍRA',
+    RECEIVED: 'RECEIVED',
     REPLACE: 'NAHRADIT',
     REPT: 'OPAKOVAT',
     RIGHT: 'ZPRAVA',
@@ -229,6 +240,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'ODPIS.NELIN',
     T: 'T',
+    TAKE: 'VZÍT',
     TAN: 'TG',
     TANH: 'TGH',
     TBILLEQ: 'TBILLEQ',
@@ -265,6 +277,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'XOR',
     YEAR: 'ROK',
     YEARFRAC: 'YEARFRAC',
+    YIELDDISC: 'YIELDDISC',
     ROMAN: 'ROMAN',
     ARABIC: 'ARABIC',
     'HF.ADD': 'HF.ADD',
@@ -393,6 +406,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'IMTAN',
     LARGE: 'LARGE',
     SMALL: 'SMALL',
+    'RANK.EQ': 'RANK.EQ',
+    RANK: 'RANK',
     PERCENTILE: 'PERCENTIL',
     'PERCENTILE.INC': 'PERCENTIL.INC',
     'PERCENTILE.EXC': 'PERCENTIL.EXC',
@@ -405,6 +420,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'CONFIDENCE.T',
     DEVSQ: 'DEVSQ',
     GEOMEAN: 'GEOMEAN',
+    GESTEP: 'GESTEP',
     HARMEAN: 'HARMEAN',
     CRITBINOM: 'CRITBINOM',
     PEARSON: 'PEARSON',
@@ -416,6 +432,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'FTEST',
     STEYX: 'STEYX',
     SLOPE: 'SLOPE',
+    INTERCEPT: 'INTERCEPT',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'FORECAST',
     COVAR: 'COVAR',
     'COVARIANCE.P': 'COVARIANCE.P',
     'COVARIANCE.S': 'COVARIANCE.S',

@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#ВЫЧИСЛ!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#ДЕЛ/0!',
     ERROR: '#ERROR!',
@@ -18,6 +19,8 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#ЗНАЧ!',
   },
   functions: {
+    CHOOSECOLS: 'ВЫБОРСТОЛБЦ',
+    CHOOSEROWS: 'ВЫБОРСТРОК',
     FILTER: 'FILTER',
     VSTACK: 'ВСТОЛБИК',
     HSTACK: 'ГСТОЛБИК',
@@ -25,6 +28,7 @@ const dictionary: RawTranslationPackage = {
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
+    ACCRINTM: 'НАКОПДОХОДПОГАШ',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
     ACOT: 'ACOT',
@@ -98,6 +102,7 @@ const dictionary: RawTranslationPackage = {
     DECIMAL: 'ДЕС',
     DEGREES: 'ГРАДУСЫ',
     DELTA: 'ДЕЛЬТА',
+    DISC: 'СКИДКА',
     DOLLARDE: 'РУБЛЬ.ДЕС',
     DOLLARFR: 'РУБЛЬ.ДРОБЬ',
     EDATE: 'ДАТАМЕС',
@@ -127,6 +132,7 @@ const dictionary: RawTranslationPackage = {
     INDEX: 'ИНДЕКС',
     INT: 'ЦЕЛОЕ',
     INTERVAL: 'INTERVAL', //FIXME
+    INTRATE: 'ИНОРМА',
     IPMT: 'ПРПЛТ',
     IRR: 'ВСД',
     ISBINARY: 'ISBINARY',
@@ -147,6 +153,9 @@ const dictionary: RawTranslationPackage = {
     LEFT: 'ЛЕВСИМВ',
     LEN: 'ДЛСТР',
     LINEST: 'ЛИНЕЙН',
+    LOGEST: 'ЛГРФПРИБЛ',
+    TREND: 'ТЕНДЕНЦИЯ',
+    GROWTH: 'РОСТ',
     LN: 'LN',
     LOG10: 'LOG10',
     LOG: 'LOG',
@@ -188,11 +197,13 @@ const dictionary: RawTranslationPackage = {
     PRODUCT: 'ПРОИЗВЕД',
     POWER: 'СТЕПЕНЬ',
     PPMT: 'ОСПЛТ',
+    PRICEDISC: 'ЦЕНАСКИДКА',
     PROPER: 'ПРОПНАЧ',
     PV: 'ПС',
     RADIANS: 'РАДИАНЫ',
     RAND: 'СЛЧИС',
     RATE: 'СТАВКА',
+    RECEIVED: 'ПОЛУЧЕНО',
     REPLACE: 'ЗАМЕНИТЬ',
     REPT: 'ПОВТОР',
     RIGHT: 'ПРАВСИМВ',
@@ -229,6 +240,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'АСЧ',
     T: 'Т',
+    TAKE: 'ВЗЯТЬ',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'РАВНОКЧЕК',
@@ -265,6 +277,7 @@ const dictionary: RawTranslationPackage = {
     XOR: 'ИСКЛИЛИ',
     YEAR: 'ГОД',
     YEARFRAC: 'ДОЛЯГОДА',
+    YIELDDISC: 'ДОХОДСКИДКА',
     ROMAN: 'РИМСКОЕ',
     ARABIC: 'АРАБСКОЕ',
     'HF.ADD': 'HF.ADD',
@@ -393,6 +406,8 @@ const dictionary: RawTranslationPackage = {
     IMTAN: 'МНИМ.TAN',
     LARGE: 'НАИБОЛЬШИЙ',
     SMALL: 'НАИМЕНЬШИЙ',
+    'RANK.EQ': 'РАНГ.РВ',
+    RANK: 'РАНГ',
     PERCENTILE: 'ПЕРСЕНТИЛЬ',
     'PERCENTILE.INC': 'ПРОЦЕНТИЛЬ.ВКЛ',
     'PERCENTILE.EXC': 'ПРОЦЕНТИЛЬ.ИСКЛ',
@@ -405,6 +420,7 @@ const dictionary: RawTranslationPackage = {
     'CONFIDENCE.T': 'ДОВЕРИТ.СТЬЮДЕНТ',
     DEVSQ: 'КВАДРОТКЛ',
     GEOMEAN: 'СРГЕОМ',
+    GESTEP: 'ПОРОГ',
     HARMEAN: 'СРГАРМ',
     CRITBINOM: 'КРИТБИНОМ',
     PEARSON: 'PEARSON',
@@ -416,6 +432,9 @@ const dictionary: RawTranslationPackage = {
     FTEST: 'ФТЕСТ',
     STEYX: 'СТОШYX',
     SLOPE: 'НАКЛОН',
+    INTERCEPT: 'ОТРЕЗОК',
+    'FORECAST.LINEAR': 'FORECAST.LINEAR',
+    FORECAST: 'ПРЕДСКАЗ',
     COVAR: 'КОВАР',
     'COVARIANCE.P': 'КОВАРИАЦИЯ.Г',
     'COVARIANCE.S': 'КОВАРИАЦИЯ.В',

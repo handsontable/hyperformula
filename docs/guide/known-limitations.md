@@ -43,17 +43,17 @@ a circular reference.
 * CHISQ.INV, CHISQ.INV.RT, CHISQ.DIST.RT, CHIDIST, CHIINV and CHISQ.DIST (CHISQ.DIST in CDF mode): Running time grows linearly with the value of the second parameter, degrees_of_freedom (slow for values>1e7).
 * GAMMA.DIST, GAMMA.INV, GAMMADIST, GAMMAINV (GAMMA.DIST and GAMMADIST in CDF mode): Running time grows linearly with the value of the second parameter, alpha (slow for values>1e7). 
 * For certain inputs, the RATE function might have no solutions, or have multiple solutions. Our implementation uses an iterative algorithm (Newton's method) to find an approximation for one of the solutions to within 1e-7. If the approximation is not found after 50 iterations, the RATE function returns the `#NUM!` error.
-* The INDEX function doesn't support returning whole rows or columns of the source range – it always returns the contents of a single cell.
+* The INDEX function returns values, not references: `ISREF(INDEX(A1:C3, 1, 1))` returns `FALSE`, `ROW(INDEX(...))` and `COLUMN(INDEX(...))` return an error, and a range such as `A1:INDEX(A1:C3, 2, 2)` can't be parsed. Its `area_num` argument accepts only `1`, because HyperFormula doesn't support references to more than one area, such as `(A1:B2, D1:D3)`. Unless [array arithmetic mode](arrays.md#array-arithmetic-mode) is on, an array passed as `row_num`, `column_num` or `area_num` is not evaluated element by element; INDEX uses its first value.
 * The FILTER function accepts either single rows of equal width or single columns of equal height. In other words, all arrays passed to the FILTER function must have equal dimensions, and at least one of those dimensions must be 1.
 * Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
 * `FILTER` and `UNIQUE` reserve the size of their source before they are evaluated, because the size of their result is not known until then. Near the sheet edge set by [`maxRows`](../api/interfaces/configparams.md#maxrows) and [`maxColumns`](../api/interfaces/configparams.md#maxcolumns), they return `#SPILL!` when that reserved area does not fit, even if the result itself would. For example, with `maxRows` set to `4` and 1 to 4 in `A1:A4`, `=FILTER(A1:A4, A1:A4>2)` in `B3` returns `#SPILL!`.
+* INDEX spills a whole row or column only when `row_num` or `column_num` is a number and the first argument is a range or an array, such as `=INDEX(A1:C3, 0, 2)`. When the `0` comes from a cell reference or a formula, such as `=INDEX(A1:C3, B5, 2)`, or the first argument is a named expression, the result can't spill and the formula returns a `#VALUE!` error; inside another function, such as `=SUM(INDEX(A1:C3, B5, 2))`, it works. A whole row or column of a whole-column or whole-row reference, such as `=INDEX(A:A, 0)`, doesn't spill either.
 * The TEXT function does not accept embedded double-quote literals in the format string. In Excel, `""` inside a format string is an escape sequence for a literal `"` character — e.g. `=TEXT(1234.5, "#,##0.00 ""zł""")` returns `"1,234.50 zł"`. If your application requires this escape sequence, supply a custom [`stringifyCurrency`](currency-handling.md) callback.
 
 ### UNIQUE function
 
 * Comparison of values follows HyperFormula's own equality rules, which honor the `caseSensitive` and `accentSensitive` configuration options. By default comparison is case-insensitive.
 
-* When `ExactlyOnce` is TRUE and no row or column occurs exactly once, `UNIQUE` returns a `#N/A` error (the result would otherwise be empty).
 ### SORT function
 
 * The `SortIndex` argument accepts a single key only. Multi-key sorting through an array constant (for example `=SORT(A1:B9, {1,2})`) is not supported; sort by one column or row at a time.
@@ -71,6 +71,30 @@ a circular reference.
 * If an input expression returns a different predictor count than predicted, `LINEST` returns `#VALUE!`. For example, filtering predictor columns can change the required result width.
 
 * Very large or very small input magnitudes can reduce numerical accuracy. Intermediate calculations, such as residual sums of squares, can still overflow or underflow, producing `#NUM!` or inaccurate statistics. Rescale inputs to more moderate units where possible. See [LINEST numerical differences](list-of-differences.md#linest) for compatibility considerations.
+
+### CHOOSECOLS function
+
+* Column indexes must be supplied as separate scalar arguments. When an array of indexes is passed, only its first index is used: `=CHOOSECOLS(A1:C3, {1,2})` returns column A only. A range of indexes returns `#VALUE!`.
+
+* A whole-column source can spill when the formula is in the first row, regardless of whether the source is on the same sheet. Below the first row, the formula returns `#SPILL!` because its result would extend beyond the worksheet edge; inside another function, such as `=SUM(CHOOSECOLS(A:A, 1))`, it is computed. In the first row, or inside another function, an empty source returns `#N/A` because its effective range is empty. Finite-height sources are supported.
+
+* HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal column-index expression can therefore be reported as `#SPILL!`. For a source of finite width, errors in literal column indexes are detected before spill allocation.
+
+### CHOOSEROWS function
+
+* Row indexes must be supplied as separate scalar arguments. Passing multiple indexes through an array or range argument is not supported.
+
+* A whole-row source can spill when the formula is in the first column, regardless of whether the source is on the same sheet. A formula outside the first column returns `#SPILL!` because its result would extend beyond the worksheet edge. An empty source returns `#N/A` because its effective range is empty. Finite-width sources are supported.
+
+* HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal row-index expression can therefore be reported as `#SPILL!`. Errors in literal row indexes are detected before spill allocation.
+
+* A named expression, or a function whose result size depends on cell values, passed directly as the source returns `#VALUE!` when the result has more than one cell, because its size cannot be predicted before evaluation.
+
+### TREND, GROWTH and LOGEST functions
+
+* `TREND` and `GROWTH` determine their result size before evaluation: from `new_x`, or from `known_y` when `new_x` is omitted. If an input expression returns a different size at evaluation, they return `#VALUE!`.
+
+* `LOGEST` returns the same layout as `LINEST`, and the `LINEST` limitations above apply to it: `stats` must be a constant, and the result width is determined from the predictor dimensions before evaluation.
 
 ### OFFSET function
 
