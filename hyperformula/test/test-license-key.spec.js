@@ -27,7 +27,8 @@ const CONSTANTS = [
 
 // The private suite's own constant, checked when the suite is attached. The benchmarks also run against the base
 // branch's engine, which may not have the constants above, so the suite keeps a copy of its own.
-const PRIVATE_SUITE_CONSTANT = 'hyperformula/test/hyperformula-tests/performance/testLicenseKey.ts'
+const PRIVATE_SUITE = 'hyperformula/test/hyperformula-tests'
+const PRIVATE_SUITE_CONSTANT = `${PRIVATE_SUITE}/performance/testLicenseKey.ts`
 
 // The files that may name the key's holder without holding the key: this guard, and the docs build check.
 const MARKER_ONLY = ['hyperformula/test/test-license-key.spec.js', 'docs/src/preview-license-key.mjs']
@@ -51,20 +52,29 @@ describe('the internal test license key', () => {
 
   it('is written out nowhere else in the repository', () => {
     // `--untracked`, so a new file counts before it is committed. `git grep` exits with 1 when nothing
-    // matches.
-    const listHolding = () => {
+    // matches. The private suite is a repository of its own, ignored by this one, so it is searched on its own.
+    const listHolding = (cwd, prefix) => {
       try {
-        return childProcess.execFileSync('git', ['grep', '--untracked', '-l', '-F', TEST_KEY_MARKER], {cwd: REPO_ROOT, encoding: 'utf8'})
+        return childProcess.execFileSync('git', ['grep', '--untracked', '-l', '-F', TEST_KEY_MARKER], {cwd, encoding: 'utf8'})
+          .split('\n')
+          .filter((file) => file !== '')
+          .map((file) => `${prefix}${file}`)
       } catch (error) {
         if (error.status === 1) {
-          return ''
+          return []
         }
 
         throw error
       }
     }
-    const holding = listHolding().split('\n').filter((file) => file !== '')
+    const holding = listHolding(REPO_ROOT, '')
 
-    expect(holding.filter((file) => !CONSTANTS.includes(file) && !MARKER_ONLY.includes(file))).toEqual([])
+    if (fs.existsSync(path.join(REPO_ROOT, PRIVATE_SUITE, '.git'))) {
+      holding.push(...listHolding(path.join(REPO_ROOT, PRIVATE_SUITE), `${PRIVATE_SUITE}/`))
+    }
+
+    const allowed = [...CONSTANTS, PRIVATE_SUITE_CONSTANT, ...MARKER_ONLY]
+
+    expect(holding.filter((file) => !allowed.includes(file))).toEqual([])
   })
 })
