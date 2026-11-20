@@ -95,6 +95,9 @@ a circular reference.
 * `TREND` and `GROWTH` determine their result size before evaluation: from `new_x`, or from `known_y` when `new_x` is omitted. If an input expression returns a different size at evaluation, they return `#VALUE!`.
 
 * `LOGEST` returns the same layout as `LINEST`, and the `LINEST` limitations above apply to it: `stats` must be a constant, and the result width is determined from the predictor dimensions before evaluation.
+### TOROW and TOCOL functions
+
+* When formulas on two sheets flatten each other's whole columns below the first row and skip blank cells, for example `=TOCOL(Sheet2!A:A, 1)` in cell B5 of Sheet1 and `=TOCOL(Sheet1!A:A, 1)` in cell B5 of Sheet2, the space reserved for each result counts toward the size of the other sheet. Both sheets get taller than their data, and taller again each time one of these formulas is entered again. The results stay correct. TOROW behaves the same way with whole rows right of the first column.
 
 ### OFFSET function
 
