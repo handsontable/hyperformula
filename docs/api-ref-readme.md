@@ -28,7 +28,7 @@ This section contains information about options that allow you to configure the 
 An example set of options:
 ```javascript
 const options = {
-  licenseKey: 'gpl-v3',
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
   nullDate: { year: 1900, month: 1, day: 1 },
   functionArgSeparator: '.'
 };
@@ -43,7 +43,9 @@ For example, subscribing to `sheetAdded` event:
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ],
-}, { licenseKey: 'gpl-v3' });
+}, {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 const handler = ( ) => { console.log('baz') }
 

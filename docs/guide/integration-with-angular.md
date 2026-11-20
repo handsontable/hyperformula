@@ -39,7 +39,7 @@ export class SpreadsheetService {
         // your data rows go here
       ],
       {
-        licenseKey: 'gpl-v3',
+        // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
         // more configuration options go here
       }
     );
@@ -142,7 +142,7 @@ export class SpreadsheetService {
         // your data rows go here
       ],
       {
-        licenseKey: 'gpl-v3',
+        // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
         // more configuration options go here
       }
     );
