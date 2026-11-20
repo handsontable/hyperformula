@@ -50,14 +50,19 @@ export class DetailedCellError {
 
   /**
    * The zero-based index of the argument that was rejected, when `originFunction` names a
-   * function whose own argument coercion produced this error.
+   * function and this error came from converting one of its arguments to the type its
+   * parameter declares.
+   *
+   * Functions that convert their arguments themselves report no index: `=ROUND(1,"x")`
+   * reports `1`, but `=SUM(1,"x")` reports none, and neither do `MAX`, `PRODUCT` and the
+   * other numeric aggregates.
    *
    * The index counts the arguments AS WRITTEN in the formula. For a function that accepts
    * ranges, a range is one argument however many cells it covers, so `=AND(A1:A100,"x")`
    * reports `1` for `"x"` — the index describes the formula, not the data behind it.
    *
-   * `undefined` whenever the error was not a coercion failure on one of the origin
-   * function's own arguments — including when it came from a nested call (its own
+   * `undefined` also whenever the error was not such a conversion failure on one of the
+   * origin function's own arguments — including when it came from a nested call (its own
    * `originFunction` already claimed it), when it was propagated from elsewhere, or when
    * the offending value sat inside a range that the function IGNORES
    * (`=AND(A1:A2,TRUE())` over text returns `TRUE`, so there is no error to attribute).

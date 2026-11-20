@@ -588,7 +588,7 @@ function originNameForAstNode(ast: Ast): Maybe<string> {
  * that produced them, so it is the one that signs.
  *
  * `withOrigin` is first-wins, so an element that already carries an origin keeps it, and the array
- * is rebuilt only if at least one element actually changed.
+ * is copied only if at least one element actually changes.
  *
  * @param {SimpleRangeValue} val - the array this node produced
  * @param {Ast} ast - the node being evaluated
@@ -602,17 +602,14 @@ function stampOriginForArrayElements(val: SimpleRangeValue, ast: Ast): SimpleRan
     return val
   }
 
-  let changed = false
-  const stamped = val.data.map(row => row.map(cell => {
-    if (!(cell instanceof CellError)) {
-      return cell
-    }
-    const withOrigin = cell.withOrigin(originName)
-    changed = changed || withOrigin !== cell
-    return withOrigin
-  }))
+  // Scan before copying: most arrays hold no error to stamp, and copying them only to throw the
+  // copy away would allocate a second array of the same size on every evaluation.
+  const hasErrorToStamp = val.data.some(row => row.some(cell => cell instanceof CellError && cell.withOrigin(originName) !== cell))
+  if (!hasErrorToStamp) {
+    return val
+  }
 
-  return changed ? SimpleRangeValue.onlyValues(stamped) : val
+  return SimpleRangeValue.onlyValues(val.data.map(row => row.map(cell => cell instanceof CellError ? cell.withOrigin(originName) : cell)))
 }
 
 /**
