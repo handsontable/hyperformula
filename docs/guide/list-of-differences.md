@@ -93,6 +93,8 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | COUPDAYBS     | =COUPDAYBS(1, DATE(1900,5,15), 2)                              |          NUM |       46.0000 |          1.0000 |
 | COUPNUM       | =COUPNUM(1, DATE(1900,5,15), 2)                                |          NUM |        1.0000 |             NUM |
 | COUPDAYS      | =COUPDAYS(DATE(1900,2,15), DATE(1900,8,31), 2, 1)              |     181.0000 |      181.0000 |        184.0000 |
+| YIELD         | =YIELD(DATE(2008,1,30), DATE(2008,1,31), 0.05, 99, 100, 4) |        DIV/0 |             – |          0.0000 |
+| ODDLYIELD     | =ODDLYIELD(DATE(2008,3,30), DATE(2008,3,31), DATE(2007,12,24), 0.0375, 99.875, 100, 2) |        DIV/0 |             – |          0.0000 |
 | NPV           | =NPV(1, TRUE(), 1)                                             |       0.7500 |        0.5000 |          0.7500 |
 | NPV           | =NPV(1,B1) where B1 = true                                     |       0.5000 |        0.0000 |          0.0000 |
 | POISSON.DIST  | =POISSON.DIST(-0.01, 0, FALSE())                               |          NUM |        1.0000 |             NUM |
