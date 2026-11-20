@@ -42,6 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `DROP` dynamic-array function. [#1796](https://github.com/handsontable/hyperformula/pull/1796)
 - Added the `TRIMRANGE` dynamic-array function. [#1842](https://github.com/handsontable/hyperformula/pull/1842)
 - Added the `WRAPROWS`, `WRAPCOLS` and `EXPAND` dynamic-array functions. [#1830](https://github.com/handsontable/hyperformula/pull/1830)
+- Added the `PRICEMAT` and `YIELDMAT` functions, which return the price and the yield of securities that pay interest at maturity. [#1811](https://github.com/handsontable/hyperformula/pull/1811)
 
 ### Fixed
 
