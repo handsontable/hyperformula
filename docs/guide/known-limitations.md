@@ -64,6 +64,7 @@ a circular reference.
   * the `@` text placeholder: `=TEXT(5, "@")` returns `@`, where Excel returns `5`.
 * For these number formats, supply a [`stringifyCurrency`](currency-handling.md) callback. See also [`TEXT` function formats](compatibility-with-microsoft-excel.md#text-function-formats).
 * `TEXT` does not check the code inside a bracket, other than a color: `=TEXT(5, "0[x]")` returns `5[x]`, where Excel returns `#VALUE!`.
+* `TEXT` does not check the letters outside brackets and quotes, so a color name after an escaped bracket is still read as a color: `=TEXT(5, "0\[Red]")` returns `5\` and `=TEXT(5, "\[Red]0")` returns `0`, where Excel reads the bracket as text, rejects the letters after it, and returns `#VALUE!` for both.
 * Positive, negative and zero sections apply to number masks only. A date mask is not split into sections: with `dd-mm-yyyy;"neg"` in `A1`, `=TEXT(-5, A1)` returns `25-12-1899;"neg"`, where Excel returns `neg`.
 
 ### UNIQUE function
