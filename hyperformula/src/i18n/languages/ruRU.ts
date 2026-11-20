@@ -269,6 +269,7 @@ const dictionary: RawTranslationPackage = {
     TODAY: 'СЕГОДНЯ',
     TRANSPOSE: 'ТРАНСП',
     TRIM: 'СЖПРОБЕЛЫ',
+    TRIMRANGE: 'УРЕЗДИАПАЗОН',
     TRUE: 'ИСТИНА',
     TRUNC: 'ОТБР',
     TYPE: 'ТИП',

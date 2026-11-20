@@ -269,6 +269,7 @@ const dictionary: RawTranslationPackage = {
     TODAY: 'VANDAAG',
     TRANSPOSE: 'TRANSPONEREN',
     TRIM: 'SPATIES.WISSEN',
+    TRIMRANGE: 'TRIMBEREIK',
     TRUE: 'WAAR',
     TRUNC: 'GEHEEL',
     TYPE: 'TYPE',

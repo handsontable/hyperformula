@@ -271,6 +271,7 @@ const dictionary: RawTranslationPackage = {
     TODAY: 'HARI.INI',
     TRANSPOSE: 'TRANSPOS',
     TRIM: 'HAPUS.SPASI',
+    TRIMRANGE: 'TRIMRANGE',
     TRUE: 'BENAR',
     TRUNC: 'POTONG',
     TYPE: 'TYPE',

@@ -269,6 +269,7 @@ const dictionary: RawTranslationPackage = {
     TODAY: 'AUJOURDHUI',
     TRANSPOSE: 'TRANSPOSE',
     TRIM: 'SUPPRESPACE',
+    TRIMRANGE: 'SUPPR.PLAGE',
     TRUE: 'VRAI',
     TRUNC: 'TRONQUE',
     TYPE: 'TYPE',
