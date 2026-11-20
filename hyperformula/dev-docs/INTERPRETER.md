@@ -20,6 +20,7 @@
 
 - **Coerce through `ArithmeticHelper`.** Never write ad-hoc string-to-number or value-to-boolean conversion inside a function; the coercion rules are spreadsheet semantics, not JavaScript semantics, and they are already implemented once.
 - **Errors are values.** Return a `CellError` with a message from `hyperformula/src/error-message.ts`. Do not throw: a thrown error escapes the evaluation of one cell and takes the recalculation with it.
+- **Never spread a range's values into a call.** `push(...values)` and `Math.max(...values)` pass one argument per value, and a range or array of about 125,000 values (Node 24, default stack size) throws `RangeError: Maximum call stack size exceeded` out of the recalculation. Append in a loop.
 - **The registry is keyed by id, not by implementation.** A custom plugin can be registered over a built-in id. Do not assume the plugin you are reading is the one that will answer for that id at run time.
 - **Evaluate each argument once.** Evaluating the same argument twice doubles its cost and, when it contains a volatile function such as `RAND`, can see two different values.
 - **This is the hot path.** `Interpreter.evaluateAst` runs once per formula, and once per cell for array-broadcast arguments. Allocation inside a per-cell loop is measurable.
@@ -63,6 +64,7 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 | `optionalArg` | The argument may be omitted |
 | `defaultValue` | Value used when omitted |
 | `emptyAsDefault` | An empty argument falls back to `defaultValue` instead of the zero-value for its type; requires `defaultValue` |
+| `emptyAsAbsent` | An empty argument is passed as `undefined`, like an omitted one, instead of the zero-value for its type; applies only to an optional argument (`optionalArg`) whose `defaultValue` is unset |
 | `minValue`, `maxValue`, `lessThan`, `greaterThan` | Range constraints, enforced during coercion |
 | `passSubtype` | Keep the extended number subtype instead of unwrapping to a raw number |
 
@@ -81,6 +83,8 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 | `returnNumberType` | The result is a percent, currency, date, or time |
 
 `arrayFunction` and `arraySizeMethod` are still declared on the interface but are **deprecated since 3.1.0**, superseded by `enableArrayArithmeticForArguments` and `sizeOfResultArrayMethod`. Do not carry them forward from an older plugin.
+
+`TYPE` reads a call to any function registered with `sizeOfResultArrayMethod` as an array, even when the result has a single value, unless the call evaluates to an error. `InformationPlugin.ts` has its own rule for three names, applied only while the built-in plugin is the one registered under the name: `TRANSPOSE` and `ARRAYFORMULA` keep the kind of their argument, and `XLOOKUP`, which returns a plain value or a reference for a single match, is in `FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS`. A new function that declares `sizeOfResultArrayMethod` but can return a single value or a reference goes in that set too.
 
 ### Never
 
