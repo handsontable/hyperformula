@@ -18,7 +18,9 @@ npm install hyperformula-ui hyperformula
 import { HyperFormula } from "hyperformula";
 import { FormulaBuilder } from "hyperformula-ui";
 
-const hyperformula = HyperFormula.buildEmpty({ licenseKey: "gpl-v3" });
+const hyperformula = HyperFormula.buildEmpty({
+  // licenseKey: "your-license-key", // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 hyperformula.addSheet("Sheet1");
 
 const host = document.getElementById("editor-host")!;

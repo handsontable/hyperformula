@@ -275,7 +275,10 @@ export class HyperFormula implements TypedEmitter {
    * ];
    *
    * // method with optional config parameter maxColumns
-   * const hfInstance = HyperFormula.buildFromArray(sheetData, { licenseKey: 'gpl-v3', maxColumns: 1000 }, namedExpressions);
+   * const hfInstance = HyperFormula.buildFromArray(sheetData, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   *   maxColumns: 1000,
+   * }, namedExpressions);
    * ```
    *
    * @category Factories
@@ -323,7 +326,10 @@ export class HyperFormula implements TypedEmitter {
    * ];
    *
    * // method with optional config parameter useColumnIndex
-   * const hfInstance = HyperFormula.buildFromSheets(sheetData, { licenseKey: 'gpl-v3', useColumnIndex: true }, namedExpressions);
+   * const hfInstance = HyperFormula.buildFromSheets(sheetData, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   *   useColumnIndex: true,
+   * }, namedExpressions);
    * ```
    *
    * @category Factories
@@ -352,7 +358,10 @@ export class HyperFormula implements TypedEmitter {
    * ];
    *
    * // build with no initial data and with optional config parameter maxColumns
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3', maxColumns: 1000 }, namedExpressions);
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   *   maxColumns: 1000,
+   * }, namedExpressions);
    * ```
    *
    * @category Factories
@@ -405,7 +414,10 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * // return registered language
    * HyperFormula.registerLanguage('enUS', enUS);
-   * const engine = HyperFormula.buildEmpty({licenseKey: 'gpl-v3', language: 'enUS'});
+   * const engine = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   *   language: 'enUS',
+   * });
    * ```
    *
    * @category Static Methods
@@ -852,7 +864,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1, 2, 3)', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // get value of A1 cell, should be '6'
    * const A1Value = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
@@ -883,7 +897,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1, 2, 3)', '0'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return a normalized A1 cell formula: '=SUM(1, 2, 3)'
    * const A1Formula = hfInstance.getCellFormula({ sheet: 0, col: 0, row: 0 });
@@ -913,7 +929,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=HYPERLINK("https://hyperformula.handsontable.com/", "HyperFormula")', '0'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return url of 'HYPERLINK': https://hyperformula.handsontable.com/
    * const A1Hyperlink = hfInstance.getCellHyperlink({ sheet: 0, col: 0, row: 0 });
@@ -945,7 +963,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1, 2, 3)', '0'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return serialized content of A1 cell: '=SUM(1, 2, 3)'
    * const cellA1Serialized = hfInstance.getCellSerialized({ sheet: 0, col: 0, row: 0 });
@@ -980,7 +1000,9 @@ export class HyperFormula implements TypedEmitter {
    *  ['0', '=SUM(1, 2, 3)', '=A1'],
    *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
    *  ['2', '=SUM(A1:C1)', '=C1'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return all values of a sheet: [[0, 6, 0], [1, '1.0%', 0], [2, 6, 0]]
    * const sheetValues = hfInstance.getSheetValues(0);
@@ -1008,7 +1030,9 @@ export class HyperFormula implements TypedEmitter {
    *  ['0', '=SUM(1, 2, 3)', '=A1'],
    *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
    *  ['2', '=SUM(A1:C1)', '=C1'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return all formulas of a sheet:
    * // [
@@ -1041,7 +1065,9 @@ export class HyperFormula implements TypedEmitter {
    *  ['0', '=SUM(1, 2, 3)', '=A1'],
    *  ['1', '=TEXT(A2, "0.0%")', '=C1'],
    *  ['2', '=SUM(A1:C1)', '=C1'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return:
    * // [
@@ -1075,7 +1101,9 @@ export class HyperFormula implements TypedEmitter {
    *    ['3'],
    *    ['4'],
    *   ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return the dimensions of all sheets:
    * // { Sheet1: { width: 3, height: 1 }, Sheet2: { width: 1, height: 2 } }
@@ -1103,7 +1131,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *    ['1', '2', '=Sheet2!$A1'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return provided sheet's dimensions: { width: 3, height: 1 }
    * const sheetDimensions = hfInstance.getSheetDimensions(0);
@@ -1128,7 +1158,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '=A1+10', '3'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return all sheets values: { Sheet1: [ [ 1, 11, 3 ] ] }
    * const allSheetsValues = hfInstance.getAllSheetsValues();
@@ -1148,7 +1180,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '=A1+10'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return only formulas: { Sheet1: [ [ undefined, undefined, '=A1+10' ] ] }
    * const allSheetsFormulas = hfInstance.getAllSheetsFormulas();
@@ -1171,7 +1205,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', 2, '=A1+10'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return all sheets serialized content: { Sheet1: [ [ '1', 2, '=A1+10' ] ] }
    * // note: the string '1' stays a string and the number 2 stays a number
@@ -1199,7 +1235,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // add a config param, for example maxColumns,
    * // you can check the configuration with getConfig method
@@ -1280,7 +1318,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
    *  ['3', ''],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // perform CRUD operation, for example remove the second row
    * hfInstance.removeRows(0, [1, 1]);
@@ -1317,7 +1357,9 @@ export class HyperFormula implements TypedEmitter {
    *  ['1'],
    *  ['2'],
    *  ['3'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // perform CRUD operation, for example remove the second row
    * hfInstance.removeRows(0, [1, 1]);
@@ -1349,7 +1391,9 @@ export class HyperFormula implements TypedEmitter {
    *  ['1'],
    *  ['2'],
    *  ['3'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // perform CRUD operation, for example remove the second row
    * hfInstance.removeRows(0, [1, 1]);
@@ -1406,7 +1450,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // top left corner
    * const address1 = { col: 0, row: 0, sheet: 0 };
@@ -1465,7 +1511,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '=A1'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should set the content, returns:
    * // [{
@@ -1507,7 +1555,9 @@ export class HyperFormula implements TypedEmitter {
    *  [1],
    *  [2],
    *  [4, 5],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should set swap rows 0 and 2 in place, returns:
    * // [{
@@ -1553,7 +1603,9 @@ export class HyperFormula implements TypedEmitter {
    *  [1],
    *  [2],
    *  [4, 5],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // returns true
    * const isSwappable = hfInstance.isItPossibleToSwapRowIndexes(0, [[0, 2], [2, 0]]);
@@ -1608,7 +1660,9 @@ export class HyperFormula implements TypedEmitter {
    *  ['A'],
    *  ['B'],
    *  ['C']
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // Move 'A' to index 1, 'B' to index 2, and 'C' to index 0.
    * const newRowOrder = [1, 2, 0]; // [ newPosForA, newPosForB, newPosForC ]
@@ -1646,7 +1700,9 @@ export class HyperFormula implements TypedEmitter {
    *  ['A'],
    *  ['B'],
    *  ['C']
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // returns true
    * hfInstance.isItPossibleToSetRowOrder(0, [1, 2, 0]);
@@ -1695,7 +1751,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  [1, 2, 4],
    *  [5]
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should set swap columns 0 and 2 in place, returns:
    * // [{
@@ -1738,7 +1796,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  [1, 2, 4],
    *  [5]
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // returns true
    * hfInstance.isItPossibleToSwapColumnIndexes(0, [[0, 2], [2, 0]]);
@@ -1791,7 +1851,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['A', 'B', 'C']
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // Move 'A' to index 1, 'B' to index 2, and 'C' to index 0.
    * const newColumnOrder = [1, 2, 0]; // [ newPosForA, newPosForB, newPosForC ]
@@ -1827,7 +1889,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['A', 'B', 'C']
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // returns true
    * hfInstance.isItPossibleToSetColumnOrder(0, [1, 2, 0]);
@@ -1869,7 +1933,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '3'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' for this example,
    * // it is possible to add one row in the second row of sheet 0
@@ -1915,7 +1981,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values
@@ -1948,7 +2016,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' for this example
    * // it is possible to remove one row from row 1 of sheet 0
@@ -1994,7 +2064,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return: [{ sheet: 0, col: 1, row: 2, value: null }] for this example
    * const changes = hfInstance.removeRows(0, [1, 1]);
@@ -2025,7 +2097,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' for this example,
    * // it is possible to add 1 column in sheet 0, at column 1
@@ -2071,7 +2145,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=RAND()', '42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, for this example:
@@ -2107,7 +2183,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' for this example
    * // it is possible to remove one column, in place of the second column of sheet 0
@@ -2152,7 +2230,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['0', '=SUM(1, 2, 3)', '=A1'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, in this example it will return:
@@ -2189,7 +2269,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // choose the coordinates and assign them to variables
    * const source = { sheet: 0, col: 1, row: 0 };
@@ -2247,7 +2329,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=RAND()', '42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // choose the coordinates and assign them to variables
    * const source = { sheet: 0, col: 1, row: 0 };
@@ -2296,7 +2380,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' for this example
    * // it is possible to move one row from row 0 into row 2
@@ -2347,7 +2433,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1'],
    *  ['2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values
@@ -2384,7 +2472,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' for this example
    * // it is possible to move one column from column 1 into column 2 of sheet 0
@@ -2434,7 +2524,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2', '3', '=RAND()', '=SUM(A1:C1)'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // move column B before column D; the SUM range follows its cells and becomes A1:B1
    * // should return a list of cells which values changed after the operation,
@@ -2478,7 +2570,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['1', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // it copies [ [ 2 ] ]
    * const clipboardContent = hfInstance.copy({
@@ -2520,7 +2614,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['1', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // returns the values that were cut: [ [ 1 ] ]
    * const clipboardContent = hfInstance.cut({
@@ -2570,7 +2666,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['1', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // [ [ 2 ] ] was copied
    * const clipboardContent = hfInstance.copy({
@@ -2606,7 +2704,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // copy desired content
    * const clipboardContent = hfInstance.copy({
@@ -2652,7 +2752,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['1', '2', '3'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // do an operation, for example remove columns
    * hfInstance.removeColumns(0, [0, 1]);
@@ -2682,7 +2784,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['1', '2', '3'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // do an operation, for example remove columns
    * hfInstance.removeColumns(0, [0, 1]);
@@ -2715,7 +2819,9 @@ export class HyperFormula implements TypedEmitter {
    *  ['=SUM(1, 2)', '2', '10'],
    *  ['5', '6', '7'],
    *  ['40', '30', '20'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    *
    * // returns calculated cells content: [ [ 3, 2 ], [ 5, 6 ] ]
@@ -2751,7 +2857,9 @@ export class HyperFormula implements TypedEmitter {
    *  ['=SUM(1, 2)', '2', '10'],
    *  ['5', '6', '7'],
    *  ['40', '30', '20'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // returns cell formulas of a given range only:
    * // [ [ '=SUM(1, 2)', undefined ], [ undefined, undefined ] ]
@@ -2790,7 +2898,9 @@ export class HyperFormula implements TypedEmitter {
    *  ['=SUM(1, 2)', 2, 10],
    *  [5, 6, 7],
    *  [40, 30, 20],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return serialized cell content for the given range:
    * // [ [ '=SUM(1, 2)', 2 ], [ 5, 6 ] ]
@@ -2824,7 +2934,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildFromArray([[1, '=A1'], ['=$A$1', '2']], { licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildFromArray([[1, '=A1'], ['=$A$1', '2']], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return [['2', '=$A$1', '2'], ['=A3', 1, '=C3'], ['2', '=$A$1', '2']]
    * hfInstance.getFillRangeData( {start: {sheet: 0, row: 0, col: 0}, end: {sheet: 0, row: 1, col: 1}},
@@ -2870,7 +2982,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['1'] ],
    *   MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'false' because 'MySheet2' already exists
    * const isAddable = hfInstance.isItPossibleToAddSheet('MySheet2');
@@ -2909,7 +3023,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'MySheet3'
    * const nameProvided = hfInstance.addSheet('MySheet3');
@@ -2947,7 +3063,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' because sheet with ID 1 exists and is removable
    * const isRemovable = hfInstance.isItPossibleToRemoveSheet(1);
@@ -2989,7 +3107,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
    *  MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, in this example it will return:
@@ -3027,7 +3147,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' because 'MySheet2' exists and can be cleared
    * const isClearable = hfInstance.isItPossibleToClearSheet(1);
@@ -3068,7 +3190,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
    *  MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values, in this example it will return:
@@ -3104,7 +3228,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' because sheet of ID 0 exists
    * // and the provided content can be placed in this sheet
@@ -3145,7 +3271,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return a list of cells which values changed after the operation,
    * // their absolute addresses and new values
@@ -3175,7 +3303,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    * hfInstance.addSheet('Sheet0'); //sheetId = 0
    *
    * // returns { sheet: 42, col: 0, row: 0 }
@@ -3213,7 +3343,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    * hfInstance.addSheet('Sheet0'); //sheetId = 0
    *
    * // should return { start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 1, row: 0 } }
@@ -3240,7 +3372,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    * hfInstance.addSheet('Sheet0'); //sheetId = 0
    * const addr = { sheet: 0, col: 1, row: 1 };
    *
@@ -3293,7 +3427,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    * hfInstance.addSheet('Sheet0'); //sheetId = 0
    * const range = { start: { sheet: 0, col: 1, row: 1 }, end: { sheet: 0, col: 2, row: 1 } };
    *
@@ -3344,7 +3480,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] , { licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] , {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0});
    * // returns [{ sheet: 0, col: 1, row: 0}, { sheet: 0, col: 2, row: 0}]
@@ -3382,7 +3520,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] , { licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] , {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0});
    * // returns [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
@@ -3417,7 +3557,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'MySheet2' as this sheet is the second one
    * const sheetName = hfInstance.getSheetName(1);
@@ -3439,7 +3581,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return all sheets names: ['MySheet1', 'MySheet2']
    * const sheetNames = hfInstance.getSheetNames();
@@ -3463,7 +3607,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['1'] ],
    *   MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return '0' because 'MySheet1' is of ID '0'
    * const sheetID = hfInstance.getSheetId('MySheet1');
@@ -3488,7 +3634,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['1'] ],
    *   MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' since 'MySheet1' exists
    * const sheetExist = hfInstance.doesSheetExist('MySheet1');
@@ -3514,7 +3662,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(A2:A3)', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'FORMULA', the cell of given coordinates is of this type
    * const cellA1Type = hfInstance.getCellType({ sheet: 0, col: 0, row: 0 });
@@ -3546,7 +3696,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(A2:A3)', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' since the selected cell contains a simple value
    * const isA1Simple = hfInstance.doesCellHaveSimpleValue({ sheet: 0, col: 0, row: 0 });
@@ -3577,7 +3729,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(A2:A3)', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' since the A1 cell contains a formula
    * const A1Formula = hfInstance.doesCellHaveFormula({ sheet: 0, col: 0, row: 0 });
@@ -3609,7 +3763,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   [null, '1'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true', cell of provided coordinates is empty
    * const isEmpty = hfInstance.isCellEmpty({ sheet: 0, col: 0, row: 0 });
@@ -3640,7 +3796,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *    ['{=TRANSPOSE(B1:B1)}'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true', cell of provided coordinates is a part of an array
    * const isPartOfArray = hfInstance.isCellPartOfArray({ sheet: 0, col: 0, row: 0 });
@@ -3672,7 +3830,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['=SUM(1, 2, 3)', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'NUMBER', cell value type of provided coordinates is a number
    * const cellValue = hfInstance.getCellValueType({ sheet: 0, col: 1, row: 0 });
@@ -3708,7 +3868,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1%', '1$'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'NUMBER_PERCENT', cell value type of provided coordinates is a number with a format inference percent.
    * const cellType = hfInstance.getCellValueDetailedType({ sheet: 0, col: 0, row: 0 });
@@ -3742,7 +3904,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1$', '1'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return '$', cell value type of provided coordinates is a number with a format inference currency, parsed as using '$' as currency.
    * const cellFormat = hfInstance.getCellValueFormat({ sheet: 0, col: 0, row: 0 });
@@ -3769,7 +3933,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['1', '2'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return the number of sheets which is '1'
    * const sheetsCount = hfInstance.countSheets();
@@ -3797,7 +3963,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['1'] ],
    *   MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // returns true
    * hfInstance.isItPossibleToRenameSheet(0, 'MySheet0');
@@ -3839,7 +4007,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['1'] ],
    *   MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // renames the sheet 'MySheet1'
    * hfInstance.renameSheet(0, 'MySheet0');
@@ -3878,7 +4048,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // multiple operations in a single callback will trigger evaluation only once
    * // and only one set of changes is returned as a combined result of all
@@ -3922,7 +4094,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // similar to batch() but operations are not within a callback,
    * // one method suspends the recalculation
@@ -3959,7 +4133,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  MySheet1: [ ['1'] ],
    *  MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // similar to batch() but operations are not within a callback,
    * // one method suspends the recalculation
@@ -3999,7 +4175,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // suspend the evaluation
    * hfInstance.suspendEvaluation();
@@ -4034,7 +4212,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // should return 'true' for this example,
    * // it is possible to add named expression to global scope
@@ -4085,7 +4265,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // add own expression, scope limited to 'Sheet1' (sheetId=0), the method should return a list of cells which values
    * // changed after the operation, their absolute addresses and new values
@@ -4127,7 +4309,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // add a named expression, only 'Sheet1' (sheetId=0) considered as it is the scope
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
@@ -4168,7 +4352,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // add a named expression in 'Sheet1' (sheetId=0)
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
@@ -4209,7 +4395,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // add a named expression in 'Sheet1' (sheetId=0)
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
@@ -4263,7 +4451,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // add a named expression
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
@@ -4316,7 +4506,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // add a named expression, scope limited to 'Sheet1' (sheetId=0)
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
@@ -4353,7 +4545,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // add a named expression
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
@@ -4403,7 +4597,9 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // add a named expression
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
@@ -4448,7 +4644,9 @@ export class HyperFormula implements TypedEmitter {
    *  ['42'],
    *  ['50'],
    *  ['60'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // add two named expressions and one scoped
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
@@ -4483,7 +4681,9 @@ export class HyperFormula implements TypedEmitter {
    *  ['42'],
    *  ['50'],
    *  ['60'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // add two named expressions and one scoped
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100');
@@ -4520,7 +4720,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['42'],
    *  ['50'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // returns '=Sheet1!$A$1+10'
    * const normalizedFormula = hfInstance.normalizeFormula('=SHEET1!$A$1+10');
@@ -4555,7 +4757,9 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromSheets({
    *  Sheet1: [['58']],
    *  Sheet2: [['1', '2', '3'], ['4', '5', '6']]
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // returns the calculated formula's value
    * // for this example, returns `68`
@@ -4589,7 +4793,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // returns a list of named expressions used by a formula
    * // for this example, returns ['foo', 'bar']
@@ -4650,7 +4856,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // return translated names of all functions, assign to a variable
    * const allNames = hfInstance.getRegisteredFunctionNames();
@@ -4677,7 +4885,9 @@ export class HyperFormula implements TypedEmitter {
    * // import your own plugin
    * import { MyExamplePlugin } from './file_with_your_plugin';
    *
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // register a plugin
    * HyperFormula.registerFunctionPlugin(MyExamplePlugin);
@@ -4698,7 +4908,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // return classes of all plugins registered, assign to a variable
    * const allNames = hfInstance.getAllFunctionPlugins();
@@ -4750,7 +4962,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // get the list of available functions, translated for the configured language
    * const functions = hfInstance.getAvailableFunctions();
@@ -4796,7 +5010,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // get the details of the SUMIF function, translated for the configured language
    * const details = hfInstance.getFunctionDetails('SUMIF');
@@ -4821,7 +5037,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // pass the number of days since nullDate
    * // the method should return formatted date and time, for this example:
@@ -4848,7 +5066,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // pass the number of days since nullDate
    * // the method should return formatted date, for this example:
@@ -4874,7 +5094,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // pass a number to be interpreted as a time
    * // should return {hours: 26, minutes: 24} for this example
@@ -4897,7 +5119,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // subscribe to a 'sheetAdded', pass a simple handler
    * hfInstance.on('sheetAdded', ( ) => { console.log('foo') });
@@ -4922,7 +5146,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // subscribe to a 'sheetAdded', pass a simple handler
    * hfInstance.once('sheetAdded', ( ) => { console.log('foo') });
@@ -4948,7 +5174,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // define a simple function to be called upon emitting an event
    * const handler = ( ) => { console.log('baz') }
