@@ -268,6 +268,7 @@ const dictionary: RawTranslationPackage = {
     TODAY: 'BUGÜN',
     TRANSPOSE: 'DEVRİK_DÖNÜŞÜM',
     TRIM: 'KIRP',
+    TRIMRANGE: 'KIRPARALIĞI',
     TRUE: 'DOĞRU',
     TRUNC: 'NSAT',
     TYPE: 'TÜR',

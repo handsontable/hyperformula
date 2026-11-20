@@ -270,6 +270,7 @@ const dictionary: RawTranslationPackage = {
     TODAY: 'TODAY',
     TRANSPOSE: 'TRANSPOSE',
     TRIM: 'TRIM',
+    TRIMRANGE: 'TRIMRANGE',
     TRUE: 'TRUE',
     TRUNC: 'TRUNC',
     TYPE: 'TYPE',

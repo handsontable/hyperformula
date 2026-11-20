@@ -268,6 +268,7 @@ const dictionary: RawTranslationPackage = {
     TODAY: 'OGGI',
     TRANSPOSE: 'MATR.TRASPOSTA',
     TRIM: 'ANNULLA.SPAZI',
+    TRIMRANGE: 'ESCLUDI.VUOTE',
     TRUE: 'VERO',
     TRUNC: 'TRONCA',
     TYPE: 'TIPO',

@@ -268,6 +268,7 @@ const dictionary: RawTranslationPackage = {
     TODAY: 'MA',
     TRANSPOSE: 'TRANSZPONÁLÁS',
     TRIM: 'KIMETSZ',
+    TRIMRANGE: 'KIMETSZÉSITARTOMÁNY',
     TRUE: 'IGAZ',
     TRUNC: 'CSONK',
     TYPE: 'TÍPUS',

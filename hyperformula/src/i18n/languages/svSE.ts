@@ -268,6 +268,7 @@ const dictionary: RawTranslationPackage = {
     TODAY: 'IDAG',
     TRANSPOSE: 'TRANSPONERA',
     TRIM: 'RENSA',
+    TRIMRANGE: 'KLIPPOMRÅDE',
     TRUE: 'SANT',
     TRUNC: 'AVKORTA',
     TYPE: 'VÄRDETYP',
