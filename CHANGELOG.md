@@ -43,6 +43,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is an empty argument slot (e.g. `=ADDRESS(2,3,1,FALSE(),)` now returns `R2C3` instead of `!R2C3`), while an explicit `""` still adds it. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
 - Fixed `DetailedCellError.address` for a typed-in error, an unparsable formula, or an overflow such as `=10^308*10`: the cell and every formula reading it now report the error's own cell, instead of none and each reader's own address. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 - Fixed `#SPILL!` errors reporting no address; their `address` is now the cell whose array result could not spill. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Fixed reading a formula cell's value before it was computed throwing a plain `Error` that did not say which cell it was; it now throws `CellValueNotComputedError`, which carries the cell's address. [#444](https://github.com/handsontable/hyperformula/issues/444)
 
 ## [3.5.0] - 2026-10-09
 
