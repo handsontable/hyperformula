@@ -112,6 +112,7 @@ export const dictionary: RawTranslationPackage = {
     DISC: 'TASA.DESC',
     DOLLARDE: 'MONEDA.DEC',
     DOLLARFR: 'MONEDA.FRAC',
+    DROP: 'EXCLUIR',
     DURATION: 'DURACION',
     EDATE: 'FECHA.MES',
     EFFECT: "INT.EFECTIVO",

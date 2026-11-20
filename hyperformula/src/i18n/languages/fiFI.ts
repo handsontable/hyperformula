@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'DISKONTTOKORKO',
     DOLLARDE: 'VALUUTTA.DES',
     DOLLARFR: 'VALUUTTA.MURTO',
+    DROP: 'HYLKÄÄ',
     DURATION: 'KESTO',
     EDATE: 'PÄIVÄ.KUUKAUSI',
     EFFECT: "KORKO.EFEKT",

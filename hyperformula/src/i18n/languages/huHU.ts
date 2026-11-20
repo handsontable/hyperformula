@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'LESZÁM',
     DOLLARDE: 'FORINT.DEC',
     DOLLARFR: 'FORINT.TÖRT',
+    DROP: 'ELTÁVOLÍT',
     DURATION: 'KAMATÉRZ',
     EDATE: 'KALK.DÁTUM',
     EFFECT: "TÉNYLEGES",

@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'DISK',
     DOLLARDE: 'DECTAL',
     DOLLARFR: 'BRÅK',
+    DROP: 'UTESLUT',
     DURATION: 'LÖPTID',
     EDATE: 'EDATUM',
     EFFECT: "EFFRÄNTA",

@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'DISCONTO',
     DOLLARDE: 'EURO.DE',
     DOLLARFR: 'EURO.BR',
+    DROP: 'WEGLATEN',
     DURATION: 'DUUR',
     EDATE: 'ZELFDE.DAG',
     EFFECT: "EFFECT.RENTE",

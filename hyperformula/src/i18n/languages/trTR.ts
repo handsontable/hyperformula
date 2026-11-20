@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'İNDİRİM',
     DOLLARDE: 'LİRAON',
     DOLLARFR: 'LİRAKES',
+    DROP: 'BIRAK',
     DURATION: 'SÜRE',
     EDATE: 'SERİTARİH',
     EFFECT: "ETKİN",

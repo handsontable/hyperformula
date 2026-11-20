@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'STOPA.DYSK',
     DOLLARDE: 'CENA.DZIES',
     DOLLARFR: 'CENA.UŁAM',
+    DROP: 'POMIŃ',
     DURATION: 'ROCZ.PRZYCH',
     EDATE: 'NR.SER.DATY',
     EFFECT: "EFEKTYWNA",

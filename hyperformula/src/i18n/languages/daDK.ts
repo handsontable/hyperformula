@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'DISKONTO',
     DOLLARDE: 'KR.DECIMAL',
     DOLLARFR: 'KR.BRØK',
+    DROP: 'UDELAD',
     DURATION: 'VARIGHED',
     EDATE: 'EDATO',
     EFFECT: "EFFEKTIV.RENTE",

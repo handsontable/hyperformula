@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'СКИДКА',
     DOLLARDE: 'РУБЛЬ.ДЕС',
     DOLLARFR: 'РУБЛЬ.ДРОБЬ',
+    DROP: 'СБРОСИТЬ',
     DURATION: 'ДЛИТ',
     EDATE: 'ДАТАМЕС',
     EFFECT: "ЭФФЕКТ",

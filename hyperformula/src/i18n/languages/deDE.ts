@@ -112,6 +112,7 @@ const dictionary: RawTranslationPackage = {
     DISC: 'DISAGIO',
     DOLLARDE: 'NOTIERUNGDEZ',
     DOLLARFR: 'NOTIERUNGBRU',
+    DROP: 'WEGLASSEN',
     DURATION: 'DURATION',
     EDATE: 'EDATUM',
     EFFECT: "EFFEKTIV",
