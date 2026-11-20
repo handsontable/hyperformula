@@ -173,6 +173,7 @@ const dictionary: RawTranslationPackage = {
     MAXA: 'MAX.VALORI',
     MAXIFS: 'MAX.PIÙ.SE',
     MAXPOOL: 'MAXPOOL',
+    MDURATION: 'DURATA.M',
     MEDIAN: 'MEDIANA',
     MEDIANPOOL: 'MEDIANPOOL',
     MID: 'STRINGA.ESTRAI',

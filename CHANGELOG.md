@@ -38,6 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `ACCRINT` function, which returns the accrued interest of a security that pays periodic interest. [#1812](https://github.com/handsontable/hyperformula/pull/1812)
 - Added the `ODDFPRICE` and `ODDLPRICE` functions, which return the price per 100 face value of a security with an odd first or last coupon period. [#1850](https://github.com/handsontable/hyperformula/pull/1850)
 - Added the `YIELD`, `ODDFYIELD` and `ODDLYIELD` functions, which return the yield of a security that pays periodic interest, with a regular, an odd first or an odd last coupon period. [#1851](https://github.com/handsontable/hyperformula/pull/1851)
+- Added the `MDURATION` function, which returns the modified duration of a security that pays periodic interest. [#1849](https://github.com/handsontable/hyperformula/pull/1849)
 
 ### Fixed
 
