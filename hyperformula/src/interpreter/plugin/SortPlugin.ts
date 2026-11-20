@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {ArraySize} from '../../ArraySize'
@@ -21,9 +21,10 @@ const SORT_ERROR_RANK: Record<ErrorType, number> = {
   [ErrorType.NUM]: 6,
   [ErrorType.NA]: 7,
   [ErrorType.SPILL]: 9,
-  [ErrorType.CYCLE]: 10,
-  [ErrorType.LIC]: 11,
-  [ErrorType.ERROR]: 12,
+  [ErrorType.CALC]: 14,
+  [ErrorType.CYCLE]: 15,
+  [ErrorType.LIC]: 16,
+  [ErrorType.ERROR]: 17,
 }
 
 /**
@@ -98,7 +99,7 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
         // An empty input range (e.g. a whole-column reference to an empty sheet)
         // yields no rows/columns to sort. Return #N/A rather than letting the empty
         // 2-D array reach SimpleRangeValue.onlyValues, which reads data[0].length and
-        // would throw. Mirrors UNIQUE/FILTER's empty-range handling.
+        // would throw.
         if (data.length === 0 || data[0].length === 0) {
           return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
         }
