@@ -78,6 +78,7 @@ const builder = new FormulaBuilder({ rootEl: gridRoot, adapter, formulaBarContai
 
 | Export | Kind | Summary |
 |---|---|---|
+| `AddressBoxNavigation` | type | Outcome of an address-box navigation: `true` accepted, `false` not a target in the grid, `"unavailable"` a valid target the grid could not select (a hidden or filtered-out cell). |
 | `AddressBoxRange` | interface | Normalized coordinates a typed `A1:B5` range resolves to. |
 | `AddressBoxTarget` | interface | Sheet-less cell coordinates a typed `A1` address resolves to. |
 | `FormulaBar` ★ | class | Excel-style formula bar composing `FormulaBarAddressBox` and `FormulaBarCell`. |
@@ -191,15 +192,17 @@ const builder = new FormulaBuilder({ rootEl: gridRoot, adapter, formulaBarContai
 | Export | Kind | Summary |
 |---|---|---|
 | `CN` | const | The `hfe-` BEM class-name table shared by core, adapters, and consumer CSS overrides. |
-| `createStyleInjector` | function | Creates a ref-counted, SSR-guarded injector that maintains one `<style [marker]>` tag in `document.head`. |
+| `createStyleInjector` | function | Creates a ref-counted, SSR-guarded injector that maintains one `<style [marker]>` tag per document (in its `<head>`) or shadow root. |
 | `IconName` | type | A glyph the editor renders: the popup close button (`close`), the function-help "Learn more" link (`externalLink`), the named-expression marker in suggestions (`namedExpression`), and the formula bar's fx icon (`function`). |
 | `IconsOptions` | type | Host factories that replace the built-in glyphs, keyed by `IconName`. |
 | `StyleInjector` | interface | Ref-counted style handle returned by `createStyleInjector`. |
+| `StyleRoot` | type | Where an injected stylesheet lives: a document (its `<head>`) or a shadow root. |
 
 ## Utilities
 
 | Export | Kind | Summary |
 |---|---|---|
+| `DEFAULT_PHRASES` | const | The English phrases the editor uses unless the `phrases` option replaces them. |
 | `ensureRelativePosition` | function | Forces `position: relative` onto a statically-positioned element so absolute overlays can anchor inside it; returns a restore function. |
 | `expandHeaderSpan` | function | Expands a whole-row/column `HeaderPick` to the concrete cell range it covers in a grid of `size`. |
 | `findDataEdge` | function | Walks from `from` in `direction` to the edge of the contiguous data block — ctrl+arrow-style navigation. |
@@ -211,6 +214,7 @@ const builder = new FormulaBuilder({ rootEl: gridRoot, adapter, formulaBarContai
 | `LiveRegion` | class | Visually-hidden polite `aria-live` region for screen-reader announcements; messages are cleared then re-set after a short delay so repeat announcements are re-spoken. |
 | `normalizeRange` | function | Builds the normalized `CellRange` spanning two corners: `start` gets the minima, `end` the maxima, regardless of drag direction. |
 | `parseCellInput` | function | Parses raw cell input into its stored form: numeric text becomes a `number`; formulas (leading `=`) and everything else stay strings. |
+| `Phrases` | interface | The words the editor shows or speaks: accessible names, hints, and screen-reader announcements. |
 | `splitRangeByFrozen` | function | Splits a range into per-pane pieces along frozen row/column boundaries (top, bottom, and left panes), so each piece can be drawn inside its own overlay pane. |
 | `stepCell` | function | Clamped single-step move from `from` in `direction`, staying inside `size`. |
 | `unionRectRelativeTo` | function | Returns the bounding `RangeRect` of two cell elements relative to `host` (including its scroll offset), or `null` when either element is missing. |

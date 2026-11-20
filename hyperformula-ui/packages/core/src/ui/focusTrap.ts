@@ -1,3 +1,5 @@
+import { deepActiveElement } from "./dom";
+
 const FOCUSABLE_SELECTOR =
   'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
@@ -36,7 +38,9 @@ export class FocusTrap {
       return false;
     }
 
-    const currentIndex = focusables.indexOf(document.activeElement as HTMLElement);
+    const currentIndex = focusables.indexOf(
+      deepActiveElement(this.root.ownerDocument) as HTMLElement,
+    );
 
     if (currentIndex === -1) {
       focusables[backward ? focusables.length - 1 : 0]?.focus();
@@ -65,7 +69,7 @@ export class FocusTrap {
   }
 
   hasFocus(): boolean {
-    return this.root.contains(document.activeElement);
+    return this.root.contains(deepActiveElement(this.root.ownerDocument));
   }
 
   interceptKeydown(event: KeyboardEvent): void {
