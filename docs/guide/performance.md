@@ -31,7 +31,9 @@ dependency graph once:
 const hf = HyperFormula.buildFromSheets({
   Sheet1: [ ['1', '=Sheet2!A1'] ],
   Sheet2: [ ['10'] ],
-}, { licenseKey: 'gpl-v3' })
+}, {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+})
 ```
 
 Loading the same data incrementally, with an
@@ -73,7 +75,9 @@ order in which you add the sheets.
 ```javascript
 const hf = HyperFormula.buildFromSheets({
   Hub: [ ['=Later!A1+1'] ],  // #REF! for now
-}, { licenseKey: 'gpl-v3' })
+}, {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+})
 
 hf.addSheet('Later')                                  // Hub!A1 is 1
 hf.setSheetContent(hf.getSheetId('Later'), [ ['41'] ])  // Hub!A1 is 42
@@ -96,14 +100,14 @@ guarantee one.
 
 ### One engine, not one per sheet
 
-Splitting the sheets across several engine instances does not avoid
-the recalculation that each per-sheet `setSheetContent` call triggers
-when loaded cells depend on the sheet it fills. A formula can only
-reference a sheet that lives in the same instance: pointing at a sheet
-held by another one evaluates to `#REF!`, the same as pointing at a
-sheet that does not exist. So sharding by instance does not divide the
-work, it removes the cross-sheet references that made the work
-necessary – which is usually the feature the sheets were loaded for.
+Splitting the sheets across several engine instances avoids the
+recalculation only by giving up cross-sheet formulas. A formula can
+only reference a sheet that lives in the same instance: pointing at a
+sheet held by another one evaluates to `#REF!`, the same as pointing at
+a sheet that does not exist. With one sheet per instance, no loaded
+cell depends on the sheet a `setSheetContent` call fills, so nothing
+is recalculated, but every cross-sheet formula returns `#REF!` – and
+cross-sheet formulas are usually what the sheets were loaded for.
 
 ### Passing the engine to other libraries
 
