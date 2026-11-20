@@ -5,6 +5,7 @@
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
+import {ErrorMessage} from '../error-message'
 import {
   Ast,
   AstNodeType,
@@ -107,12 +108,19 @@ export abstract class Transformer implements FormulaTransformer {
     }
   }
 
+  /**
+   * The error a reference becomes when this transformation leaves it pointing at no cell.
+   */
+  protected invalidReferenceError(): CellError {
+    return new CellError(ErrorType.REF, ErrorMessage.ReferenceRemoved)
+  }
+
   protected transformCellReferenceAst(ast: CellReferenceAst, formulaAddress: SimpleCellAddress): Ast {
     const newCellAddress = this.transformCellAddress(ast.reference, formulaAddress)
     if (newCellAddress instanceof CellAddress) {
       return {...ast, reference: newCellAddress}
     } else if (newCellAddress === ErrorType.REF) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+      return buildCellErrorAst(this.invalidReferenceError())
     } else {
       return ast
     }
@@ -123,7 +131,7 @@ export abstract class Transformer implements FormulaTransformer {
     if (Array.isArray(newRange)) {
       return {...ast, start: newRange[0], end: newRange[1]}
     } else if (newRange === ErrorType.REF) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+      return buildCellErrorAst(this.invalidReferenceError())
     } else {
       return ast
     }
@@ -134,7 +142,7 @@ export abstract class Transformer implements FormulaTransformer {
     if (Array.isArray(newRange)) {
       return {...ast, start: newRange[0], end: newRange[1]}
     } else if (newRange === ErrorType.REF) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+      return buildCellErrorAst(this.invalidReferenceError())
     } else {
       return ast
     }
@@ -145,7 +153,7 @@ export abstract class Transformer implements FormulaTransformer {
     if (Array.isArray(newRange)) {
       return {...ast, start: newRange[0], end: newRange[1]}
     } else if (newRange === ErrorType.REF) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+      return buildCellErrorAst(this.invalidReferenceError())
     } else {
       return ast
     }

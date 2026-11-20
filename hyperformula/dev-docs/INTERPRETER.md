@@ -20,6 +20,8 @@
 
 - **Coerce through `ArithmeticHelper`.** Never write ad-hoc string-to-number or value-to-boolean conversion inside a function; the coercion rules are spreadsheet semantics, not JavaScript semantics, and they are already implemented once.
 - **Errors are values.** Return a `CellError` with a message from `hyperformula/src/error-message.ts`. Do not throw: a thrown error escapes the evaluation of one cell and takes the recalculation with it.
+- **Read cell values through `DependencyGraph.getCellValue`.** It marks an error read from another cell as propagated, and stamps the address of a cell that holds a typed or unparsable error. Reading the address mapping directly skips both, and the reading cell is then reported as the error's origin.
+- **Pass a read error on unchanged.** An error that came from an argument or another cell already names its origin; return that instance. `withOrigin` and `withArgumentIndex` keep the first value set and ignore a propagated error, so a function that only received an error never takes it over. Building a new `CellError` from a read error's type discards its origin and address.
 - **The registry is keyed by id, not by implementation.** A custom plugin can be registered over a built-in id. Do not assume the plugin you are reading is the one that will answer for that id at run time.
 - **Evaluate each argument once.** Evaluating the same argument twice doubles its cost and, when it contains a volatile function such as `RAND`, can see two different values.
 - **This is the hot path.** `Interpreter.evaluateAst` runs once per formula, and once per cell for array-broadcast arguments. Allocation inside a per-cell loop is measurable.

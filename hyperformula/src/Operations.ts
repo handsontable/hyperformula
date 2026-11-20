@@ -6,7 +6,7 @@
 import { AbsoluteCellRange } from './AbsoluteCellRange'
 import { absolutizeDependencies, filterDependenciesOutOfScope } from './absolutizeDependencies'
 import { ArraySize, ArraySizePredictor } from './ArraySize'
-import { equalSimpleCellAddress, isColOrRowInvalid, simpleCellAddress, SimpleCellAddress } from './Cell'
+import { CellError, equalSimpleCellAddress, isColOrRowInvalid, simpleCellAddress, SimpleCellAddress } from './Cell'
 import { CellContent, CellContentParser, RawCellContent } from './CellContentParser'
 import { ClipboardCell, ClipboardCellType } from './ClipboardOperations'
 import { Config } from './Config'
@@ -653,7 +653,9 @@ export class Operations {
 
     this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)
-    this.changes.addChange(vertex.getCellValue(), address)
+    // Read back through the dependency graph so the change carries the same address that
+    // getCellValue() reports for this cell.
+    this.changes.addChange(this.dependencyGraph.getCellValue(address), address)
   }
 
   /**
@@ -685,7 +687,9 @@ export class Operations {
 
     this.columnSearch.applyChanges(arrayChanges.getChanges().filter(change => !equalSimpleCellAddress(change.address, address)))
     this.changes.addAll(arrayChanges)
-    this.changes.addChange(value.parsedValue, address)
+    // A typed error value is read back through the dependency graph so the change carries the
+    // same address that getCellValue() reports for this cell.
+    this.changes.addChange(value.parsedValue instanceof CellError ? this.dependencyGraph.getCellValue(address) : value.parsedValue, address)
   }
 
   /**

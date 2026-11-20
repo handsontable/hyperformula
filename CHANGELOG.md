@@ -24,7 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. [#1885](https://github.com/handsontable/hyperformula/pull/1885)
-- Changed the cell errors produced while evaluating a formula to carry a message describing their cause. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Changed the cell errors the engine produces, including invalidated references, circular references and error values typed into a formula, to carry a message describing their cause. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ### Fixed
 
@@ -39,6 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed unbounded parser cache growth in long-running instances that process many distinct formulas, including when undo is disabled. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
 - Fixed array formulas spilling past the `maxRows` and `maxColumns` limits: they now return `#SPILL!` when their result extends beyond the sheet edge. [#1774](https://github.com/handsontable/hyperformula/pull/1774)
 - Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is an empty argument slot (e.g. `=ADDRESS(2,3,1,FALSE(),)` now returns `R2C3` instead of `!R2C3`), while an explicit `""` still adds it. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
+- Fixed `DetailedCellError.address` for a typed-in error, an unparsable formula, or an overflow such as `=10^308*10`: the cell and every formula reading it now report the error's own cell, instead of none and each reader's own address. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ## [3.5.0] - 2026-10-09
 
