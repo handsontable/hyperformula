@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {CellError, ErrorType} from '../../Cell'
@@ -46,6 +46,18 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
         {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 0},
       ],
     },
+    'RANK.EQ': {
+      method: 'rankEq',
+      parameters: [
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+      ],
+    },
+  }
+
+  public static aliases = {
+    RANK: 'RANK.EQ',
   }
 
   /**
@@ -131,6 +143,33 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
         }
         const ranksBefore = vals.filter(val => order === 0 ? val > value : val < value).length
         return ranksBefore + (ties + 1) / 2
+      }
+    )
+  }
+
+  /**
+   * Corresponds to RANK.EQ(number, ref, [order]) and RANK(number, ref, [order]).
+   *
+   * Returns the rank of a number within a range; tied numbers share the top rank of the group.
+   * Order 0 (default) ranks descending, any other value ranks ascending. Text, booleans and empty cells of `ref` are
+   * ignored; an error in `ref` is returned.
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   */
+  public rankEq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('RANK.EQ'),
+      (target: number, range: SimpleRangeValue, order: number) => {
+        const numbers = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if (numbers instanceof CellError) {
+          return numbers
+        }
+        if (!numbers.includes(target)) {
+          return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+        }
+        const isAscending = order !== 0
+        const better = numbers.filter(value => isAscending ? value < target : value > target)
+        return better.length + 1
       }
     )
   }
