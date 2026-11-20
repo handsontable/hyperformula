@@ -38,7 +38,7 @@ Quality assurance is at the heart of our development process:
 Our high test coverage means you can be confident that HyperFormula will behave predictably in your application, even in complex scenarios.
 :::
 
-## Open Source Transparency
+## Source Code Transparency
 
 HyperFormula's **entire source code is available on GitHub**, providing complete transparency that allows you to:
 
@@ -61,6 +61,7 @@ HyperFormula maintains the highest security standards to protect your applicatio
 
 - **Regular external security audits** conducted by independent security experts
 - **Dependency vulnerability scanning** using industry-leading tools including Fossa, Dependabot, and Snyk
+- **Static code analysis** with GitHub CodeQL on every pull request, on every push to the main branches, and weekly
 - **Security risk assessments** to identify and mitigate potential threats
 - **Proactive monitoring** of security advisories and immediate response to emerging threats
 
