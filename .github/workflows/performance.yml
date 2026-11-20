@@ -116,11 +116,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           path: performance-report.md
 
-      # Replaces the previous push's table, so a failed run never leaves an older report standing for this head.
+      # Replaces the previous push's table, so a failed, timed-out or cancelled run never leaves an older report
+      # standing for this head (a timeout counts as cancelled, not as a failure).
       - name: Publish a comment - failure
-        if: failure()
+        if: failure() || cancelled()
         uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           message: |
-            ## Performance comparison of head (${{ github.event.pull_request.head.sha }}) failed; see the job log.
+            ## Performance comparison of head (${{ github.event.pull_request.head.sha }}) did not finish; see the job log.
