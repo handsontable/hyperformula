@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {FeatureId, LicenseEntitlement} from './LicenseEntitlement'
@@ -73,7 +73,7 @@ export class CapabilityRegistry {
    * only place `entitlement.unrestricted` is read, so a future edit that touches one axis and
    * not the other has nowhere else to be caught except the per-axis fail-open tests in
    * `unit/license/capability-registry.spec.ts`. The axis a change forgets fails CLOSED, not
-   * open — silently turning a working gpl-v3/legacy install into a partial denial — which is why
+   * open — silently turning a working literal-key or legacy install into a partial denial — which is why
    * both are pinned separately rather than with one combined assertion.
    *
    * @param {LicenseEntitlement} entitlement - the entitlement to resolve, e.g. one built by

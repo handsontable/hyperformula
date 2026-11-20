@@ -158,7 +158,7 @@ and hallucinate the parts you omit.
 1. **Make every example complete and runnable.** Include imports, instance creation
   with the commented-out `licenseKey` placeholder (commonly missed, and it tells
     readers where their own key goes —
-    `// licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/`
+    `// licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula`
     in the `HyperFormula.buildEmpty()` config), the data setup, the call,
     and how to read the result. No fragments that assume invisible surrounding code.
 2. **Show where code lives when structure matters** — a filename comment

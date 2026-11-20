@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {CellError, CellValueTypeOrd, ErrorType, getCellValueType} from '../Cell'
@@ -217,6 +217,17 @@ export class ArithmeticHelper {
   }
 
   /**
+   * Coerces a scalar to a number like coerceScalarToNumberOrError, except that a boolean or the empty text is #VALUE!.
+   * Numbers, dates, numeric text and empty cells are accepted; an error is returned as it is.
+   */
+  public coerceScalarToNumberRejectingBooleans(arg: InternalScalarValue): ExtendedNumber | CellError {
+    if (typeof arg === 'boolean' || arg === '') {
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+    }
+    return this.coerceScalarToNumberOrError(arg)
+  }
+
+  /**
    * Coerces a scalar to a number like `coerceScalarToNumberOrError`, except that a boolean or the empty text is
    * #VALUE!. Errors are passed on.
    */
@@ -233,14 +244,17 @@ export class ArithmeticHelper {
     )
   }
 
+  /**
+   * Coerces a scalar value to a number for use in arithmetic and numeric aggregation, without
+   * attempting date-string parsing (see {@link coerceToMaybeNumber} for that extra step).
+   *
+   * A blank cell (`EmptyValue`) reads as `0`. An empty string is text, so like any non-numeric
+   * string it returns `undefined`.
+   */
   public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<ExtendedNumber> {
     if (arg === EmptyValue) {
       return 0
     } else if (typeof arg === 'string') {
-      if (arg === '') {
-        return 0
-      }
-
       const maybePercentNumber = this.coerceStringToMaybePercentNumber(arg)
       if (maybePercentNumber !== undefined) {
         return maybePercentNumber
@@ -322,7 +336,9 @@ export class ArithmeticHelper {
         if (arr instanceof CellError) {
           return arr
         } else {
-          expandedVals.push(...arr)
+          for (const value of arr) {
+            expandedVals.push(value)
+          }
         }
       } else {
         expandedVals.push(val)

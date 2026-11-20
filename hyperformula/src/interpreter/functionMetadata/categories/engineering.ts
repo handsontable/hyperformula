@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {FunctionDoc} from '../FunctionDescription'
@@ -149,6 +149,13 @@ export const ENGINEERING_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'x', description: 'The upper limit of the integral, calculated from 0 to x.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=ERF.PRECISE(1)', '=ERF.PRECISE(-0.5)'],
+  },
+  GESTEP: {
+    category: 'Engineering',
+    shortDescription: 'Returns 1 if number is greater than or equal to step, otherwise returns 0.',
+    parameters: [{name: 'number', description: 'The value to compare against the step.'}, {name: 'step', description: 'The threshold value; defaults to 0 when omitted.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=GESTEP(5, 4)', '=GESTEP(3, 4)', '=GESTEP(-1)'],
   },
   HEX2BIN: {
     category: 'Engineering',
