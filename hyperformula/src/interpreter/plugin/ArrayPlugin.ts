@@ -837,7 +837,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    *
    * Returns rows and columns from the beginning or end of the source array.
    * Syntactically empty dimensions keep all rows or columns. Counts that
-   * evaluate to zero return a #N/A error.
+   * evaluate to zero return a #CALC! error, as in Excel.
    *
    * @param {ProcedureAst} ast - The parsed TAKE call.
    * @param {InterpreterState} state - The current formula evaluation state.
@@ -856,7 +856,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         const requestedColumns = Math.trunc(columns)
 
         if (requestedRows === 0 || requestedColumns === 0) {
-          return new CellError(ErrorType.NA, ErrorMessage.ZeroRowOrColumnCount)
+          return new CellError(ErrorType.CALC, ErrorMessage.ZeroRowOrColumnCount)
         }
 
         if (sourceHeight === 0 || sourceWidth === 0) {
@@ -879,7 +879,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * Removes rows and columns from the beginning (positive counts) or the end
    * (negative counts) of the source array and returns the rest. Counts are
    * truncated toward zero; a zero, omitted, or empty count drops nothing.
-   * Dropping every row or every column returns a #N/A error.
+   * Dropping every row or every column returns a #CALC! error, as in Excel.
    *
    * @param {ProcedureAst} ast - The parsed DROP call.
    * @param {InterpreterState} state - The current formula evaluation state.
@@ -894,7 +894,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         const remainingColumns = range.width() - columnsToDrop
 
         if (remainingRows === 0 || remainingColumns === 0) {
-          return new CellError(ErrorType.NA, ErrorMessage.EmptyArray)
+          return new CellError(ErrorType.CALC, ErrorMessage.EmptyArray)
         }
 
         const startRow = rows > 0 ? rowsToDrop : 0
