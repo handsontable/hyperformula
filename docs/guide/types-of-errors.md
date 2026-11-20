@@ -72,7 +72,10 @@ array literal whose rows differ in length. A `#SPILL!` or `#CYCLE!` that the
 engine raises has no `originFunction`, because it follows from the layout of the
 sheet rather than from evaluating a value. Neither does the `#VALUE!` of a
 formula whose result is a range that its cell cannot hold, such as `=C2:D2`
-entered in one cell. `argumentIndex` is zero-based.
+entered in one cell. `argumentIndex` is zero-based, and is set only when the
+engine converts an argument to the type its parameter declares: `SUM`, `MAX`,
+`PRODUCT` and the other numeric aggregates convert their arguments themselves and
+report none.
 
 ```javascript
 const hf = HyperFormula.buildFromArray(
@@ -88,4 +91,7 @@ hf.getCellValue({ sheet: 0, row: 2, col: 0 }).originFunction; // 'reference'
 The first occurrence wins, so a function that only read an error never replaces
 the identity already on it. `address` points at the cell where the error arose,
 which is not always the cell you read it from. For an error raised inside a named
-expression, `address` is the name of that expression, such as `MYNAME`.
+expression, `address` is the name of that expression, such as `MYNAME`. `address`
+is `undefined` when the error arose in no cell: the `#VALUE!` of `=C2:D2` entered
+in one cell has none, and neither does an error that `calculateFormula` computes
+itself, such as `=SQRT(-1)`. Check it before you use it.
