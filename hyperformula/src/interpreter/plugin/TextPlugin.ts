@@ -192,7 +192,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     'TEXTBEFORE': {
       method: 'textbefore',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NOERROR},
         {argumentType: FunctionArgumentType.ANY},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1, emptyAsDefault: true},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0, emptyAsDefault: true},
@@ -203,7 +203,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     'TEXTAFTER': {
       method: 'textafter',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NOERROR},
         {argumentType: FunctionArgumentType.ANY},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1, emptyAsDefault: true},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0, emptyAsDefault: true},
@@ -215,7 +215,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       method: 'textsplit',
       sizeOfResultArrayMethod: 'textsplitArraySize',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NOERROR},
         {argumentType: FunctionArgumentType.ANY},
         {argumentType: FunctionArgumentType.ANY, optionalArg: true},
         {argumentType: FunctionArgumentType.BOOLEAN, defaultValue: false, emptyAsDefault: true},
@@ -624,8 +624,13 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     const instanceNumIsGiven = ast.args[2] !== undefined && !TextPlugin.isEmptySlot(ast.args[2])
     const ifNotFoundSlotIsEmpty = TextPlugin.isEmptySlot(ast.args[5])
     return this.runFunction(ast.args, state, this.metadata('TEXTBEFORE'),
-      (text: string, delimiterArg: InternalScalarValue | SimpleRangeValue, instanceNum: number, matchMode: number, matchEnd: number, ifNotFound: Maybe<InternalScalarValue>) =>
-        this.textAroundDelimiter(text, delimiterArg, instanceNum, instanceNumIsGiven, matchMode, matchEnd, TextPlugin.ifNotFoundValue(ifNotFound, ifNotFoundSlotIsEmpty), (match) => text.substring(0, match.start))
+      (textValue: InternalScalarValue, delimiterArg: InternalScalarValue | SimpleRangeValue, instanceNum: number, matchMode: number, matchEnd: number, ifNotFound: Maybe<InternalScalarValue>) => {
+        const text = this.coerceScalarToText(textValue)
+        if (text instanceof CellError) {
+          return text
+        }
+        return this.textAroundDelimiter(text, delimiterArg, instanceNum, instanceNumIsGiven, matchMode, matchEnd, TextPlugin.ifNotFoundValue(ifNotFound, ifNotFoundSlotIsEmpty), (match) => text.substring(0, match.start))
+      }
     )
   }
 
@@ -642,8 +647,13 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     const instanceNumIsGiven = ast.args[2] !== undefined && !TextPlugin.isEmptySlot(ast.args[2])
     const ifNotFoundSlotIsEmpty = TextPlugin.isEmptySlot(ast.args[5])
     return this.runFunction(ast.args, state, this.metadata('TEXTAFTER'),
-      (text: string, delimiterArg: InternalScalarValue | SimpleRangeValue, instanceNum: number, matchMode: number, matchEnd: number, ifNotFound: Maybe<InternalScalarValue>) =>
-        this.textAroundDelimiter(text, delimiterArg, instanceNum, instanceNumIsGiven, matchMode, matchEnd, TextPlugin.ifNotFoundValue(ifNotFound, ifNotFoundSlotIsEmpty), (match) => text.substring(match.end))
+      (textValue: InternalScalarValue, delimiterArg: InternalScalarValue | SimpleRangeValue, instanceNum: number, matchMode: number, matchEnd: number, ifNotFound: Maybe<InternalScalarValue>) => {
+        const text = this.coerceScalarToText(textValue)
+        if (text instanceof CellError) {
+          return text
+        }
+        return this.textAroundDelimiter(text, delimiterArg, instanceNum, instanceNumIsGiven, matchMode, matchEnd, TextPlugin.ifNotFoundValue(ifNotFound, ifNotFoundSlotIsEmpty), (match) => text.substring(match.end))
+      }
     )
   }
 
@@ -664,12 +674,17 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     const colDelimiterSlotIsEmpty = TextPlugin.isEmptySlot(ast.args[1])
     const rowDelimiterSlotIsEmpty = TextPlugin.isEmptySlot(ast.args[2])
     return this.runFunction(ast.args, state, this.metadata('TEXTSPLIT'),
-      (text: string,
+      (textValue: InternalScalarValue,
         colDelimiterArg: InternalScalarValue | SimpleRangeValue,
         rowDelimiterArg: Maybe<InternalScalarValue | SimpleRangeValue>,
         ignoreEmpty: boolean,
         matchMode: number,
         padWith: Maybe<InternalScalarValue>) => {
+
+        const text = this.coerceScalarToText(textValue)
+        if (text instanceof CellError) {
+          return text
+        }
 
         const colDelimiters = this.delimitersFromArg(colDelimiterArg, colDelimiterSlotIsEmpty)
         if (colDelimiters instanceof CellError) {
@@ -781,7 +796,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     ifNotFound: Maybe<InternalScalarValue>,
     extractText: (match: DelimiterMatch) => string,
   ): InternalScalarValue {
-    const delimiters = this.flattenArgToStrings(delimiterArg)
+    const delimiters = this.flattenArgToTexts(delimiterArg)
     if (delimiters instanceof CellError) {
       return delimiters
     }
@@ -865,13 +880,13 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     if (arg === undefined || (arg === EmptyValue && slotIsEmpty)) {
       return []
     }
-    return this.flattenArgToStrings(arg === EmptyValue ? '' : arg)
+    return this.flattenArgToTexts(arg === EmptyValue ? '' : arg)
   }
 
   /**
    * Finds the instance-th occurrence of any of the delimiters in text.
-   * A positive instance scans from the start of text, a negative one scans backwards from the end;
-   * in both directions, occurrences do not overlap.
+   * A positive instance scans from the start of text, and occurrences do not overlap; a negative one scans backwards
+   * from the end, as described in `findBackwardMatches`.
    * When matchEnd is set and text holds exactly one occurrence too few, the end of text
    * (or its start, for a negative instance) is returned as a zero-length occurrence.
    *
@@ -928,8 +943,12 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
   }
 
   /**
-   * Finds up to maxCount non-overlapping occurrences of the delimiters, scanning text backwards from the end.
-   * When several delimiters end at the same position, the longest one wins.
+   * Finds up to maxCount occurrences of the delimiters, scanning text backwards from the end: each
+   * occurrence is the one that starts last, among those that start no later than the start of the previous
+   * occurrence minus its length (the end of text, for the first one). When several delimiters start at the same
+   * position, the longest one wins. So an occurrence of a shorter delimiter can be followed by an overlapping one of a
+   * longer delimiter that ends at the same place: in `abcbc` with `bc` and `c`, they are `c` at 4, `bc` at 3 and `bc`
+   * at 1.
    *
    * @param {string} text - The text to search
    * @param {string[]} delimiters - The delimiters to look for
@@ -939,17 +958,16 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    */
   private static findBackwardMatches(text: string, delimiters: string[], ignoreCase: boolean, maxCount: number): DelimiterMatch[] {
     const matches: DelimiterMatch[] = []
-    let end = text.length
+    let start = text.length - 1
 
-    while (end >= 0 && matches.length < maxCount) {
-      const length = TextPlugin.longestDelimiterLength(delimiters, delimiter =>
-        delimiter.length <= end && TextPlugin.matchesAt(text, end - delimiter.length, delimiter, ignoreCase))
+    while (start >= 0 && matches.length < maxCount) {
+      const length = TextPlugin.longestDelimiterLength(delimiters, delimiter => TextPlugin.matchesAt(text, start, delimiter, ignoreCase))
       if (length === undefined) {
-        end--
+        start--
         continue
       }
-      matches.push({start: end - length, end})
-      end -= Math.max(length, 1)
+      matches.push({start, end: start + length})
+      start -= length
     }
 
     return matches
@@ -1048,11 +1066,11 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       return node.value
     }
     if (node.type === AstNodeType.NUMBER) {
-      return node.value.toString()
+      return TextPlugin.numberToText(node.value)
     }
     const signed = TextPlugin.signedNumberLiteral(node)
     if (signed !== undefined) {
-      return signed.toString()
+      return TextPlugin.numberToText(signed)
     }
     return undefined
   }
@@ -1164,6 +1182,29 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
   }
 
   /**
+   * Flattens a delimiter argument of TEXTBEFORE, TEXTAFTER or TEXTSPLIT into texts, converting each value with
+   * `coerceScalarToText`, so that a number is written to 15 significant digits, as in the text argument.
+   *
+   * @param {InternalScalarValue | SimpleRangeValue} arg - The delimiter argument
+   * @returns {string[] | CellError} - The texts, or the first error encountered
+   */
+  private flattenArgToTexts(arg: InternalScalarValue | SimpleRangeValue): string[] | CellError {
+    const values = arg instanceof SimpleRangeValue ? arg.valuesFromTopLeftCorner() : [arg]
+    const result: string[] = []
+    for (const value of values) {
+      if (value instanceof CellError) {
+        return value
+      }
+      const text = this.coerceScalarToText(value as InternalScalarValue)
+      if (text instanceof CellError) {
+        return text
+      }
+      result.push(text)
+    }
+    return result
+  }
+
+  /**
    * Converts a scalar to its text. A number is written to 15 significant digits, in plain decimal notation as long as
    * that takes at most 20 digits, and in scientific notation with a two-digit exponent otherwise (`1E+20`, `1.5E-20`).
    * Other values are converted like in `coerceScalarToString`.
@@ -1176,7 +1217,16 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       return coerceScalarToString(value)
     }
 
-    const number = getRawValue(value)
+    return TextPlugin.numberToText(getRawValue(value))
+  }
+
+  /**
+   * Writes a number to 15 significant digits, as described in `coerceScalarToText`.
+   *
+   * @param {number} number - The number to write
+   * @returns {string} - The text
+   */
+  private static numberToText(number: number): string {
     if (number === 0) {
       return '0'
     }

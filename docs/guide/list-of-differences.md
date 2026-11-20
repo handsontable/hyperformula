@@ -170,6 +170,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | TRIMRANGE     | =ISREF(TRIMRANGE(A1:C3))                                       | FALSE (returns values, not a reference) | No such function. | TRUE |
 | TRIMRANGE     | =A1:.C10                                                       | ERROR: the trim reference operators (`.:`, `:.`, `.:.`) are not supported. | ERROR: formula parse error. | Same as =TRIMRANGE(A1:C10, 2, 2). |
 | TEXTSPLIT     | =TEXTSPLIT(",,", ",", , TRUE())                               |          N/A |   Not checked |           CALC  |
+| TEXTSPLIT     | =TEXTSPLIT("a,b;c,d", ",", ";", FALSE(), 0, {1})               |            a |   Not checked |           VALUE |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
