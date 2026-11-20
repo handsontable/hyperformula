@@ -286,7 +286,10 @@ function pickSection(sections: string[], value: number): { sectionStr: string, v
  * text (e.g. `"neg"`, an empty section, or a bare `Foo`): render THAT section's
  * literal characters — never the whole format string — so `0.00;"neg"` on a
  * negative renders `neg` (not `0.00;"neg"`) and an empty section renders `''`.
- * A single literal section preserves `format(2, 'Foo')` → `'Foo'`. Never throws.
+ * A single literal section preserves `format(2, 'Foo')` → `'Foo'`. When it is
+ * the only section and the value is negative, the implicit minus goes in front,
+ * as in Excel: `\x` with -5 renders `-x`, and an empty mask renders `-`. Never
+ * throws.
  *
  * @param formatArg the color-stripped format string
  * @param value the numeric value being formatted
@@ -298,7 +301,8 @@ function formatNumberWithSections(formatArg: string, value: number, config: Conf
   const {sectionStr, valueForFormat} = pickSection(sections, value)
   const expression = parseForNumberFormat(stripQuotes(sectionStr))
   if (expression === undefined) {
-    return renderLiteralSection(sectionStr)
+    const sign = sections.length === 1 && value < 0 ? '-' : ''
+    return sign + renderLiteralSection(sectionStr)
   }
   return numberFormat(expression.tokens, valueForFormat, config)
 }
