@@ -42,6 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `DROP` dynamic-array function. [#1796](https://github.com/handsontable/hyperformula/pull/1796)
 - Added the `TRIMRANGE` dynamic-array function. [#1842](https://github.com/handsontable/hyperformula/pull/1842)
 - Added the `WRAPROWS`, `WRAPCOLS` and `EXPAND` dynamic-array functions. [#1830](https://github.com/handsontable/hyperformula/pull/1830)
+- Added `TEXTBEFORE` and `TEXTAFTER`, which return the text before or after a delimiter, and `TEXTSPLIT`, which splits text into rows and columns. `TEXTSPLIT` spills only when every argument but `pad_with` is a constant, because result dimensions are determined before evaluation. [#1792](https://github.com/handsontable/hyperformula/pull/1792)
 
 ### Fixed
 
