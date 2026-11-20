@@ -1,4 +1,5 @@
 ---
+title: "Advanced usage"
 tags:
   - buildEmpty
   - simpleCellAddressFromString
@@ -6,9 +7,7 @@ tags:
   - cross-sheet
 ---
 
-# Advanced usage
-
-::: tip
+:::tip
 By default, cells are identified using a `SimpleCellAddress` which
 consists of a sheet ID, column ID, and row ID, like
 this: `{ sheet: 0, col: 0, row: 0 }`
@@ -31,7 +30,7 @@ the configuration options:
 import { HyperFormula } from 'hyperformula';
 
 const options = {
-    licenseKey: 'gpl-v3'
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
 };
 ```
 
@@ -129,7 +128,7 @@ console.log(winningTeam)
 
 ## Demo
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/advanced-usage/example1.html)
 

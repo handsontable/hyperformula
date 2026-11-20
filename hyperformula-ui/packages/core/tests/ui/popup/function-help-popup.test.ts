@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { FunctionSignature } from "../../../src/engine/types";
 import { CN } from "../../../src/theme/classNames";
+import { DEFAULT_PHRASES } from "../../../src/ui/phrases";
 import { FunctionHelpPopup } from "../../../src/ui/popup/functionHelpPopup";
 import { sel } from "../../helpers";
 
@@ -80,6 +81,32 @@ describe("FunctionHelpPopup rendering", () => {
     const activeParamName = document.body.querySelector(sel(CN.fnHelpParamNameActive));
 
     expect(activeParamName?.textContent).toBe("value1");
+
+    help.destroy();
+  });
+
+  it("labels the sections and the argument notes with the phrases it was given", () => {
+    const help = new FunctionHelpPopup({
+      phrases: {
+        ...DEFAULT_PHRASES,
+        functionExample: "Beispiel",
+        functionDescription: "Info",
+        optionalArgument: "fakultativ",
+        repeatableArgument: "wiederholbar",
+      },
+    });
+
+    help.show(SIGNATURE, 1, { left: 0, top: 0, height: 20, width: 100, direction: "ltr" });
+
+    const labels = Array.from(document.body.querySelectorAll(sel(CN.fnHelpSectionLabel))).map(
+      (el) => el.textContent,
+    );
+    const paramNames = Array.from(document.body.querySelectorAll(sel(CN.fnHelpParamName))).map(
+      (el) => el.textContent,
+    );
+
+    expect(labels).toEqual(["Beispiel", "Info"]);
+    expect(paramNames[1]).toBe("value2... - [fakultativ] wiederholbar");
 
     help.destroy();
   });

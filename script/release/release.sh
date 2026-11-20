@@ -796,7 +796,7 @@ else
   # the new branch, whatever branch it names now (old releases left several
   # behind). Scans docs/guide, docs/index.md and $PKG_README only - the tracked
   # files that carry these URLs. Walking all of docs/ would also descend into the
-  # gitignored generated trees (docs/api, docs/functions, docs/.vuepress/dist),
+  # gitignored generated trees (docs/api, docs/functions, docs/dist),
   # whose built HTML repeats the same URLs but is never committed - it would bury
   # the dry-run preview under hundreds of lines and inflate the reported file
   # count. If you add one here, add it to step 9's ADD_PATHS too.

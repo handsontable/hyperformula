@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 export {AddressPlugin} from './AddressPlugin'
@@ -35,6 +35,7 @@ export {PowerPlugin} from './PowerPlugin'
 export {RadiansPlugin} from './RadiansPlugin'
 export {RadixConversionPlugin} from './RadixConversionPlugin'
 export {RandomPlugin} from './RandomPlugin'
+export {SecuritiesPlugin} from './SecuritiesPlugin'
 export {SequencePlugin} from './SequencePlugin'
 export {UniquePlugin} from './UniquePlugin'
 export {SortPlugin} from './SortPlugin'
@@ -51,3 +52,4 @@ export {StatisticalPlugin} from './StatisticalPlugin'
 export {MathPlugin} from './MathPlugin'
 export {ComplexPlugin} from './ComplexPlugin'
 export {StatisticalAggregationPlugin} from './StatisticalAggregationPlugin'
+export {RegressionPlugin} from './RegressionPlugin'
