@@ -40,7 +40,9 @@ const hf = HyperFormula.buildFromArray([
   ['Revenue', 100],
   ['Cost',     60],
   ['Profit', '=B1-B2'],
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // Pass the spreadsheet tools straight into generateText.
 const result = await generateText({
