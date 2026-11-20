@@ -7,7 +7,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {ApproximateMatchPolicy} from '../Lookup/SearchStrategy'
-import {forceNormalizeString} from './ArithmeticHelper'
+import {collationKey} from './ArithmeticHelper'
 import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue} from './InterpreterValue'
 
 const NOT_FOUND = -1
@@ -37,7 +37,7 @@ const NOT_FOUND = -1
  * descent touches a skipped cell does the search fall back to an O(n) scan that compacts the
  * eligible indices and re-runs the binary search over them.
  *
- * Note: the searchKey must already be normalized; the strings read from the range are normalized here.
+ * Note: a string searchKey must already be a `collationKey`; the strings read from the range are turned into one here.
  *
  * @param {RawNoErrorScalarValue} searchKey - Lookup value.
  * @param {AbsoluteCellRange} range - Sorted one-dimensional cell range.
@@ -68,7 +68,7 @@ export function findLastOccurrenceInOrderedRange(
   const start = range.start[searchCoordinate]
   const end = searchCoordinate === 'col' ? range.effectiveEndColumn(dependencyGraph) : range.effectiveEndRow(dependencyGraph)
 
-  const normalize = (value: RawInterpreterValue) => typeof value === 'string' ? forceNormalizeString(value) : value
+  const normalize = (value: RawInterpreterValue) => typeof value === 'string' ? collationKey(value) : value
 
   const getValueFromIndexFn = searchCoordinate === 'col'
     ? (index: number) => normalize(getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, index, range.start.row))))

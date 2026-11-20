@@ -13,7 +13,7 @@ import {
 } from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {AdvancedFindOptions, ApproximateMatchPolicy, SearchOptions} from './SearchStrategy'
-import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
+import {collationKey, forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {compare, findLastOccurrenceInOrderedRange} from '../interpreter/binarySearch'
 
 const NOT_FOUND = -1
@@ -55,7 +55,7 @@ export abstract class AdvancedFind {
     }
 
     return findLastOccurrenceInOrderedRange(
-      normalizedSearchKey,
+      typeof searchKey === 'string' ? collationKey(searchKey) : searchKey,
       range,
       { searchCoordinate, orderingDirection: ordering, ifNoMatch, approximateMatchPolicy },
       this.dependencyGraph

@@ -61,7 +61,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed numeric aggregations such as `SUM`, `AVERAGE` and `MAX` reading a cell reached through `INDEX`, `CHOOSE`, `IF`, `IFS`, `SWITCH`, `XLOOKUP` or a named expression as a value: as with a direct reference, its text, booleans and blanks are now ignored. [#1768](https://github.com/handsontable/hyperformula/pull/1768)
 - Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is an empty argument slot (e.g. `=ADDRESS(2,3,1,FALSE(),)` now returns `R2C3` instead of `!R2C3`), while an explicit `""` still adds it. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
 - Fixed `IMSUM`, `IMPRODUCT` and `TEXTJOIN` throwing an uncaught `RangeError` for very large ranges, such as `=IMSUM(A1:D40000)`, which stopped the recalculation; they now return a result or an error value in the cell. [#1901](https://github.com/handsontable/hyperformula/pull/1901)
-- Fixed approximate `MATCH`, `VLOOKUP` and `HLOOKUP`, and `XLOOKUP` with `search_mode` 2 or -2, returning the wrong result on text whose letter case differs from the sorted order (e.g. `=MATCH("banana", A1:A4, 1)` over Apple, banana, Cherry, date now returns `2` instead of `3`). [#1806](https://github.com/handsontable/hyperformula/pull/1806)
+- Fixed approximate `MATCH`, `VLOOKUP` and `HLOOKUP`, and `XLOOKUP` with `search_mode` 2 or -2, misordering text that differs in letter case or accents, e.g. `=MATCH("é", A1:A3, 1)` over a, é, f now returns `2` instead of `1`. [#1806](https://github.com/handsontable/hyperformula/pull/1806)
 
 ## [3.5.0] - 2026-10-09
 

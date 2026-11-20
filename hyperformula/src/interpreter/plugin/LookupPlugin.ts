@@ -10,7 +10,7 @@ import { RowSearchStrategy } from '../../Lookup/RowSearchStrategy'
 import { SearchOptions, SearchStrategy } from '../../Lookup/SearchStrategy'
 import { ProcedureAst } from '../../parser'
 import { StatType } from '../../statistics'
-import { forceNormalizeString, zeroIfEmpty } from '../ArithmeticHelper'
+import { collationKey, zeroIfEmpty } from '../ArithmeticHelper'
 import { findLastOccurrenceInOrderedArray } from '../binarySearch'
 import { InterpreterState } from '../InterpreterState'
 import { EmptyValue, getRawValue, InternalScalarValue, InterpreterValue, RawNoErrorScalarValue } from '../InterpreterValue'
@@ -221,7 +221,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    *
    * Finds the last item not greater than `lookup_value` with the binary search of `MATCH(lookup_value, ..., 1)`:
    * only the items of the `lookup_value` type take part in it, so numbers, text and booleans of mixed data are never
-   * compared with each other. A `lookup_vector` that is wider than it is tall is searched along its first row, any
+   * compared with each other. A blank `lookup_value` is read as 0, as in `MATCH`. A `lookup_vector` that is wider than it is tall is searched along its first row, any
    * other along its first column; for a cell range the shape is the range's own, so a whole-column range is
    * searched down its first column. Without `result_vector` the result is read from the last row (or column) of
    * `lookup_vector`; a `result_vector` is read from its first cell onwards and a position past its end is #N/A, so
@@ -231,10 +231,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    * @param state
    */
   public lookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('LOOKUP'), (key: RawNoErrorScalarValue, lookupVector: SimpleRangeValue, resultVector?: SimpleRangeValue) => {
-      if (key === EmptyValue) {
-        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
-      }
+    return this.runFunction(ast.args, state, this.metadata('LOOKUP'), (rawKey: RawNoErrorScalarValue, lookupVector: SimpleRangeValue, resultVector?: SimpleRangeValue) => {
+      const key = zeroIfEmpty(rawKey)
 
       if (resultVector !== undefined && this.isTwoDimensional(resultVector)) {
         return new CellError(ErrorType.NA, ErrorMessage.WrongDimension)
@@ -341,7 +339,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    * than `key`, assuming that the items of that type are sorted ascending; -1 if there is none.
    */
   private findLastNotGreaterOfSameType(key: RawNoErrorScalarValue, values: InternalScalarValue[]): number {
-    const normalize = (value: RawNoErrorScalarValue) => typeof value === 'string' ? forceNormalizeString(value) : value
+    const normalize = (value: RawNoErrorScalarValue) => typeof value === 'string' ? collationKey(value) : value
     const positions: number[] = []
     const comparableValues: RawNoErrorScalarValue[] = []
 

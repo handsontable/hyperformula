@@ -826,6 +826,19 @@ export function forceNormalizeString(str: string): string {
   return normalizeString(str.toLowerCase(), 'nfd').replace(/[\u0300-\u036f]/g, '')
 }
 
+/**
+ * Returns a key that orders strings as the sorted-data lookups compare them: letter case is ignored, and a letter
+ * with an accent sorts right after the same letter without it, so `e` < `é` < `f`. Two strings get the same key only
+ * when they differ in letter case alone.
+ *
+ * The key is the string without case and accents, then a NUL character, then the lower-case string, so comparing
+ * keys compares the strings without accents first and breaks ties by the accents.
+ */
+export function collationKey(str: string): string {
+  const lowerCase = normalizeString(str.toLowerCase(), 'nfd')
+  return lowerCase.replace(/[\u0300-\u036f]/g, '') + '\u0000' + lowerCase
+}
+
 export function coerceRangeToScalar(arg: SimpleRangeValue, state: InterpreterState): Maybe<InternalScalarValue> {
   if (arg.isAdHoc()) {
     return arg.data[0]?.[0]
