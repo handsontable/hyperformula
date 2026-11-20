@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `AVERAGEIFS` function. [#1732](https://github.com/handsontable/hyperformula/pull/1732)
 - Added the `maxParserCacheSize` configuration option to control the number of cached formulas. [#1635](https://github.com/handsontable/hyperformula/issues/1635)
 - Added `DetailedCellError.hasMessage`, so a consumer can tell a cell error that never carried a message (e.g. a custom function that omitted one) apart from one with a deliberately empty message — both previously surfaced identically as `message: ''`. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
-- Added `DetailedCellError.originFunction` and `DetailedCellError.argumentIndex`, which name the function or operator that produced a cell error and, when it failed to coerce an argument, that argument's position as written in the formula. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Added `DetailedCellError.originFunction` and `DetailedCellError.argumentIndex`, which name what produced a cell error (a function, an operator, or a source such as `reference` or `parser`) and, when it failed to coerce an argument, that argument's position as written. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 - Added the `TYPE` and `ERROR.TYPE` information functions: `TYPE` returns the code of a value's type (number, text, boolean, error, array), and `ERROR.TYPE` returns the code of an error, or `#N/A` for any other value. [#1813](https://github.com/handsontable/hyperformula/pull/1813)
 - Added the `emptyAsAbsent` argument-validation option for custom functions, which passes an empty slot of an optional argument to the function as `undefined` instead of the zero value for its type. [#1739](https://github.com/handsontable/hyperformula/pull/1739)
 - Added the `GESTEP` function, which returns 1 when a number is greater than or equal to a step (0 by default) and 0 otherwise. [#1788](https://github.com/handsontable/hyperformula/pull/1788)
@@ -42,6 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed array formulas spilling past the `maxRows` and `maxColumns` limits: they now return `#SPILL!` when their result extends beyond the sheet edge. [#1774](https://github.com/handsontable/hyperformula/pull/1774)
 - Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is an empty argument slot (e.g. `=ADDRESS(2,3,1,FALSE(),)` now returns `R2C3` instead of `!R2C3`), while an explicit `""` still adds it. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
 - Fixed `DetailedCellError.address` for a typed-in error, an unparsable formula, or an overflow such as `=10^308*10`: the cell and every formula reading it now report the error's own cell, instead of none and each reader's own address. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Fixed `#SPILL!` errors reporting no address; their `address` is now the cell whose array result could not spill. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 
 ## [3.5.0] - 2026-10-09
 

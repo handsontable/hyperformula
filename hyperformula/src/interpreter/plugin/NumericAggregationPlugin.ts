@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType} from '../../Cell'
-import {ErrorMessage} from '../../error-message'
+import {ErrorMessage, ErrorOrigin} from '../../error-message'
 import {SheetsNotEqual} from '../../errors'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
@@ -587,14 +587,14 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       range = AbsoluteCellRange.fromAst(ast, state.formulaAddress)
     } catch (err) {
       if (err instanceof SheetsNotEqual) {
-        return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
+        return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin(ErrorOrigin.Reference)
       } else {
         throw err
       }
     }
 
     if (!this.isSheetValid(range)) {
-      return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+      return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin(ErrorOrigin.Reference)
     }
 
     const rangeVertex = this.dependencyGraph.getRange(range.start, range.end)

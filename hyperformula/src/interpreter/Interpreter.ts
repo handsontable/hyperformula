@@ -11,7 +11,7 @@ import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
 import {FormulaVertex} from '../DependencyGraph/FormulaVertex'
-import {ErrorMessage} from '../error-message'
+import {ErrorMessage, ErrorOrigin} from '../error-message'
 import {FunctionCallLicenseGate} from '../license/FunctionCallLicenseGate'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
@@ -95,6 +95,9 @@ export class Interpreter {
     if (val instanceof CellError) {
       val = stampOriginForAstNode(val, ast)
     }
+    if (val instanceof SimpleRangeValue) {
+      val = stampOriginForArrayElements(val, ast)
+    }
     return wrapperForRootVertex(val, state.formulaVertex)
   }
 
@@ -113,11 +116,11 @@ export class Interpreter {
         const address = ast.reference.toSimpleCellAddress(state.formulaAddress)
 
         if (isColOrRowInvalid(address)) {
-          return new CellError(ErrorType.REF, ErrorMessage.BadRef)
+          return new CellError(ErrorType.REF, ErrorMessage.BadRef).withOrigin(ErrorOrigin.Reference)
         }
 
         if (!this.isSheetValid(ast.reference)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin(ErrorOrigin.Reference)
         }
 
         return this.dependencyGraph.getCellValue(address)
@@ -215,16 +218,16 @@ export class Interpreter {
         if (namedExpression) {
           return this.dependencyGraph.getCellValue(namedExpression.address)
         } else {
-          return new CellError(ErrorType.NAME, ErrorMessage.NamedExpressionName(ast.expressionName))
+          return new CellError(ErrorType.NAME, ErrorMessage.NamedExpressionName(ast.expressionName)).withOrigin(ErrorOrigin.Reference)
         }
       }
       case AstNodeType.CELL_RANGE: {
         if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin(ErrorOrigin.Reference)
         }
 
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin(ErrorOrigin.Reference)
         }
 
         const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
@@ -250,22 +253,22 @@ export class Interpreter {
       }
       case AstNodeType.COLUMN_RANGE: {
         if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin(ErrorOrigin.Reference)
         }
 
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin(ErrorOrigin.Reference)
         }
         const range = AbsoluteColumnRange.fromColumnRange(ast, state.formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.ROW_RANGE: {
         if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
-          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef).withOrigin(ErrorOrigin.Reference)
         }
 
         if (!this.rangeSpansOneSheet(ast)) {
-          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
+          return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets).withOrigin(ErrorOrigin.Reference)
         }
         const range = AbsoluteRowRange.fromRowRangeAst(ast, state.formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
@@ -537,6 +540,9 @@ function originNameForAstNode(ast: Ast): Maybe<string> {
   switch (ast.type) {
     case AstNodeType.FUNCTION_CALL:
       return ast.procedureName
+    case AstNodeType.ARRAY:
+      // An array literal with mismatched rows builds its own error before any call sees it.
+      return ErrorOrigin.ArrayLiteral
     case AstNodeType.CONCATENATE_OP:
       return '&'
     case AstNodeType.EQUALS_OP:
@@ -570,6 +576,40 @@ function originNameForAstNode(ast: Ast): Maybe<string> {
     default:
       return undefined
   }
+}
+
+/**
+ * Stamps the origin function on errors sitting inside an array this node produced.
+ *
+ * An error that is one element of a returned array never reaches the scalar branch above, so
+ * without this it would arrive at the enclosing call unclaimed and that call would take it: an
+ * `#N/A` left by a broadcast, or a per-element coercion failure, would be reported as produced by
+ * whichever function happened to read the array. The operation that built the array is the one
+ * that produced them, so it is the one that signs.
+ *
+ * `withOrigin` is first-wins, so an element that already carries an origin keeps it, and the array
+ * is copied only if at least one element actually changes.
+ *
+ * @param {SimpleRangeValue} val - the array this node produced
+ * @param {Ast} ast - the node being evaluated
+ */
+function stampOriginForArrayElements(val: SimpleRangeValue, ast: Ast): SimpleRangeValue {
+  const originName = originNameForAstNode(ast)
+  if (originName === undefined || val.range !== undefined) {
+    // A range-backed value is a view over cells, and an error read out of a cell was already
+    // marked as propagated when it was read, so there is nothing here to claim. Skipping it also
+    // keeps this off the hot path: reading `data` on such a value materialises the whole range.
+    return val
+  }
+
+  // Scan before copying: most arrays hold no error to stamp, and copying them only to throw the
+  // copy away would allocate a second array of the same size on every evaluation.
+  const hasErrorToStamp = val.data.some(row => row.some(cell => cell instanceof CellError && cell.withOrigin(originName) !== cell))
+  if (!hasErrorToStamp) {
+    return val
+  }
+
+  return SimpleRangeValue.onlyValues(val.data.map(row => row.map(cell => cell instanceof CellError ? cell.withOrigin(originName) : cell)))
 }
 
 /**
