@@ -625,11 +625,13 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    *
    * Returns #N/A!
    *
-   * @param _ast
-   * @param _state
+   * @param ast
+   * @param state
    */
-  public na(_ast: ProcedureAst, _state: InterpreterState): CellError {
-    return new CellError(ErrorType.NA, ErrorMessage.NaFunction)
+  public na(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('NA'),
+      () => new CellError(ErrorType.NA, ErrorMessage.NaFunction)
+    )
   }
 
   /**
