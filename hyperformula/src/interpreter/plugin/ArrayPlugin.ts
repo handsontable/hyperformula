@@ -1088,11 +1088,12 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * 1 skips blank cells, 2 skips errors, 3 skips both; it is truncated toward
    * zero. Empty text is not blank and is kept. An empty `array` argument and
    * an `ignore` value outside 0 to 3 return #VALUE!, and a result with no
-   * elements returns #N/A.
+   * elements returns #CALC!.
    *
    * `ignore` and `scan_by_column` are coerced here rather than by the
-   * argument metadata: both reject empty text with #VALUE!, and an error in
-   * `scan_by_column` must not take precedence over an invalid `ignore`.
+   * argument metadata: both reject empty text with #VALUE!, and their errors
+   * come in Excel's order: an `ignore` that is not a number, then an invalid
+   * `scan_by_column`, then an `ignore` outside 0 to 3.
    *
    * @param {ProcedureAst} ast - The parsed TOROW or TOCOL call.
    * @param {InterpreterState} state - The current formula evaluation state.
@@ -1106,7 +1107,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
           return new CellError(ErrorType.VALUE, ErrorMessage.EmptyArg)
         }
 
-        const ignore = this.coerceFlattenIgnore(ignoreArgument)
+        const ignore = this.coerceCount(ignoreArgument)
         if (ignore instanceof CellError) {
           return ignore
         }
@@ -1125,29 +1126,12 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
         const elements = this.collectFlattenElements(source, ignore, scanByColumn)
         if (elements.length === 0) {
-          return new CellError(ErrorType.NA, ErrorMessage.EmptyArray)
+          return new CellError(ErrorType.CALC, ErrorMessage.EmptyArray)
         }
 
         return SimpleRangeValue.onlyValues(functionName === 'TOCOL' ? elements.map(element => [element]) : [elements])
       }
     )
-  }
-
-  /**
-   * Coerces the TOROW or TOCOL `ignore` argument to a number truncated
-   * toward zero. Numeric text, logical values and blank cells convert as for
-   * any number; empty text returns #VALUE!.
-   *
-   * @param {InternalScalarValue} value - The `ignore` argument.
-   * @returns {number | CellError} The truncated number or an error.
-   */
-  private coerceFlattenIgnore(value: InternalScalarValue): number | CellError {
-    if (value === '') {
-      return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
-    }
-
-    const coerced = this.arithmeticHelper.coerceScalarToNumberOrError(value)
-    return coerced instanceof CellError ? coerced : Math.trunc(getRawValue(coerced))
   }
 
   /**
@@ -1659,10 +1643,11 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 
   /**
-   * Coerces a WRAPROWS or WRAPCOLS `wrap_count`, or an EXPAND `rows` or
-   * `columns` value, to a number truncated toward zero. Errors are returned as
-   * they are; numeric text, logical values and blank cells convert as for any
-   * number; empty text returns #VALUE!.
+   * Coerces a WRAPROWS or WRAPCOLS `wrap_count`, an EXPAND `rows` or
+   * `columns` value, or a TOROW or TOCOL `ignore` value, to a number
+   * truncated toward zero. Errors are returned as they are; numeric text,
+   * logical values and blank cells convert as for any number; empty text
+   * returns #VALUE!.
    *
    * @param {InternalScalarValue} value - The count.
    * @returns {number | CellError} The truncated number or an error.

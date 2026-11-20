@@ -95,7 +95,10 @@ a circular reference.
 * `TREND` and `GROWTH` determine their result size before evaluation: from `new_x`, or from `known_y` when `new_x` is omitted. If an input expression returns a different size at evaluation, they return `#VALUE!`.
 
 * `LOGEST` returns the same layout as `LINEST`, and the `LINEST` limitations above apply to it: `stats` must be a constant, and the result width is determined from the predictor dimensions before evaluation.
+
 ### TOROW and TOCOL functions
+
+* A whole-column source spills from the first row only when it is on the formula's own sheet, is computed by a formula (such as `DROP(Sheet2!A:A, 1)`), or keeps blank cells (`ignore` 0 or 2). Below the first row, the formula returns `#SPILL!` because its result would extend beyond the worksheet edge, and two or more such columns return `#SPILL!` in any row. A whole column of another sheet with blank cells skipped, such as `=TOCOL(Sheet2!A:A, 1)`, spills in any row. Inside another function, such as `=TAKE(TOCOL(Sheet2!A:A), 5)`, the result is computed. TOROW behaves the same way with whole rows and the first column.
 
 * When formulas on two sheets flatten each other's whole columns below the first row and skip blank cells, for example `=TOCOL(Sheet2!A:A, 1)` in cell B5 of Sheet1 and `=TOCOL(Sheet1!A:A, 1)` in cell B5 of Sheet2, the space reserved for each result counts toward the size of the other sheet. Both sheets get taller than their data, and taller again each time one of these formulas is entered again. The results stay correct. TOROW behaves the same way with whole rows right of the first column.
 
