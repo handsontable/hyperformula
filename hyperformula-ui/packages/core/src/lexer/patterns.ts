@@ -4,9 +4,9 @@ export const RE_CELL = /(\$?)([A-Za-z]+)(\$?)(\d+)/y;
 export const RE_WHOLE_COL = /(\$?)([A-Za-z]+):(\$?)([A-Za-z]+)/y;
 export const RE_WHOLE_ROW = /(\$?)(\d+):(\$?)(\d+)/y;
 export const RE_IDENT = /[\p{L}_][\p{L}\p{N}_.]*/uy;
-export const RE_SHEET_QUOTED = /'((?:[^']|'')*)'!/y;
 export const RE_SHEET_BARE = /([\p{L}_][\p{L}\p{N}_]*)!/uy;
 export const RE_OP_MULTI = /<>|<=|>=/y;
 export const RE_OP_SINGLE = /[+\-*/^%&=<>:]/y;
 export const RE_COMMENT = /\/\/[^\n]*/y;
-export const RE_ERROR_LITERAL = /#(?:REF!|DIV\/0!|NAME\?|N\/A|NUM!|VALUE!|ERROR!|CYCLE!|SPILL!)/iy;
+export const RE_ERROR_LITERAL =
+  /#(?:REF!|DIV\/0!|NAME\?|N\/A|NUM!|VALUE!|ERROR!|CYCLE!|SPILL!|CALC!)/iy;

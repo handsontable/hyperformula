@@ -156,3 +156,23 @@ describe("FocusTrap", () => {
     expect(trap.hasFocus()).toBe(true);
   });
 });
+
+describe("FocusTrap inside a shadow root", () => {
+  it("reports focus held by an element in the shadow root", () => {
+    const hostEl = document.createElement("div");
+
+    document.body.appendChild(hostEl);
+
+    const shadow = hostEl.attachShadow({ mode: "open" });
+    const root = document.createElement("div");
+    const button = document.createElement("button");
+
+    root.appendChild(button);
+    shadow.appendChild(root);
+    button.focus();
+
+    expect(new FocusTrap(root).hasFocus()).toBe(true);
+
+    hostEl.remove();
+  });
+});

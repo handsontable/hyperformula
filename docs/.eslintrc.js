@@ -15,8 +15,8 @@ module.exports = {
   extends: ['eslint:recommended'],
   overrides: [
     {
-      // The VuePress configuration, plugins and themes, loaded by Node.
-      files: ['.vuepress/**/*.js'],
+      // The build configuration and the typedoc theme, loaded by Node.
+      files: ['build.config.js', 'typedoc-theme/**/*.js'],
       env: {
         worker: false,
         node: true,
@@ -26,18 +26,19 @@ module.exports = {
       },
     },
     {
-      // Bundled into the client by webpack.
-      files: [
-        '.vuepress/enhanceApp.js',
-        '.vuepress/components/**/*.js',
-        '.vuepress/plugins/search-box/match-query.js',
-      ],
+      // The Astro configuration and its Markdown plugins and integrations, loaded by Node as ES modules.
+      files: ['astro.config.mjs', 'src/**/*.mjs'],
+      env: {
+        worker: false,
+        node: true,
+      },
+    },
+    {
+      // Bundled into the pages by Astro.
+      files: ['src/scripts/**/*.mjs'],
       env: {
         node: false,
         browser: true,
-      },
-      parserOptions: {
-        sourceType: 'module',
       },
     },
   ],

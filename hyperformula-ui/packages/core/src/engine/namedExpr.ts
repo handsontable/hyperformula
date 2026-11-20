@@ -24,6 +24,17 @@ export function annotateNamedExprs(tokens: Token[], resolve: NamedExprResolver):
   });
 }
 
+export function sheetDimensions(
+  engine: HyperFormulaLike | undefined,
+  sheetId: number,
+): { width: number; height: number } | undefined {
+  try {
+    return engine?.getSheetDimensions?.(sheetId);
+  } catch {
+    return undefined;
+  }
+}
+
 export function expandWholeSpan(
   engine: HyperFormulaLike | undefined,
   contextSheetId: number,
@@ -44,7 +55,7 @@ export function expandWholeSpan(
     return null;
   }
 
-  const dimensions = engine?.getSheetDimensions?.(sheetId);
+  const dimensions = sheetDimensions(engine, sheetId);
 
   if (!dimensions || dimensions.width <= 0 || dimensions.height <= 0) {
     return null;
