@@ -456,7 +456,7 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
    */
   public erfprecise(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ERF.PRECISE'), (x: InternalScalarValue) => {
-      const value = this.arithmeticHelper.coerceScalarToNumberRejectingBooleanOrError(x)
+      const value = this.arithmeticHelper.coerceScalarToNumberRejectingBooleans(x)
       return value instanceof CellError ? value : erf(getRawValue(value))
     })
   }

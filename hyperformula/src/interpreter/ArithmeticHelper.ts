@@ -227,17 +227,6 @@ export class ArithmeticHelper {
     return this.coerceScalarToNumberOrError(arg)
   }
 
-  /**
-   * Coerces a scalar to a number like `coerceScalarToNumberOrError`, except that a boolean or the empty text is
-   * #VALUE!. Errors are passed on.
-   */
-  public coerceScalarToNumberRejectingBooleanOrError(arg: InternalScalarValue): ExtendedNumber | CellError {
-    if (typeof arg === 'boolean' || arg === '') {
-      return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
-    }
-    return this.coerceScalarToNumberOrError(arg)
-  }
-
   public coerceToMaybeNumber(arg: InternalScalarValue): Maybe<ExtendedNumber> {
     return this.coerceNonDateScalarToMaybeNumber(arg) ?? (
       typeof arg === 'string' ? this.dateTimeHelper.dateStringToDateNumber(arg) : undefined
