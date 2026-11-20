@@ -54,6 +54,7 @@ A monorepo. Three top-level directories hold code; the rest is repository-wide. 
 │   ├── .eslintrc.js  .eslintignore   # its own lint configuration
 │   └── AGENTS.md  CLAUDE.md  README.md
 │
+├── resources/                        # Logos the READMEs load by raw URL from develop, here and in hyperformula-demos; renaming one breaks them
 ├── script/                           # Repository-wide only: the release procedure and the licence gate
 ├── dev-docs/                         # Repository-wide reference (this directory; start at README.md)
 ├── .ai/                              # One sentence pointing at dev-docs/, for agents that look here
