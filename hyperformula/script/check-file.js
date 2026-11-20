@@ -2,6 +2,7 @@ const { resolve } = require('path')
 const assert = require('assert')
 const fs = require('fs')
 const htConfig = require('../ht.config')
+const { TEST_LICENSE_KEY } = require('./test-license-key')
 
 const [ /* node bin */ , /* path to this script */ , fileToCheck] = process.argv;
 
@@ -21,7 +22,7 @@ try {
 
     const engine = HyperFormula.buildFromArray([
         ['42', '=A1 + 2']
-    ], { licenseKey: 'gpl-v3' })
+    ], { licenseKey: TEST_LICENSE_KEY })
 
     const valueA1 = engine.getCellValue({ sheet: 0, row: 0, col: 0 })
     const valueB1 = engine.getCellValue({ sheet: 0, row: 0, col: 1 })

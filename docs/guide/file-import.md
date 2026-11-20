@@ -35,7 +35,9 @@ const { HyperFormula } = require('hyperformula');
 async function run(filename) {
   const xlsxWorkbook = await readXlsxWorkbookFromFile(filename);
   const sheetsAsJavascriptArrays = convertXlsxWorkbookToJavascriptArrays(xlsxWorkbook)
-  const hf = HyperFormula.buildFromSheets(sheetsAsJavascriptArrays, { licenseKey: 'gpl-v3' });
+  const hf = HyperFormula.buildFromSheets(sheetsAsJavascriptArrays, {
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+  });
 
   console.log('Formulas:', hf.getSheetSerialized(0));
   console.log('Values:  ', hf.getSheetValues(0));

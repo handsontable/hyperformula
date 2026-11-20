@@ -38,7 +38,7 @@ Quality assurance is at the heart of our development process:
 Our high test coverage means you can be confident that HyperFormula will behave predictably in your application, even in complex scenarios.
 :::
 
-## Open Source Transparency
+## Source Code Transparency
 
 HyperFormula's **entire source code is available on GitHub**, providing complete transparency that allows you to:
 

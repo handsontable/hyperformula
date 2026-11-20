@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {ArraySize} from '../../ArraySize'
@@ -246,7 +246,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * Joins the text of all arguments, reading every range or array row by row.
    * Numbers are written to 15 significant digits, booleans as TRUE or FALSE, empty cells as nothing.
    * An error in an argument that is not a range (a single-cell reference included) is returned first; otherwise the first
-   * error found reading the ranges in order. Returns #VALUE! if the result exceeds 32,767 characters (Excel cell content limit).
+   * error found reading the ranges in order. Returns #CALC! if the result exceeds 32,767 characters (Excel cell content limit).
    *
    * @param {ProcedureAst} ast - The procedure AST node
    * @param {InterpreterState} state - The interpreter state
@@ -268,7 +268,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       const result = texts.join('')
 
       if (result.length > 32767) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.ResultTooLong)
+        return new CellError(ErrorType.CALC, ErrorMessage.ResultTooLong)
       }
       return result
     })
@@ -566,7 +566,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * Joins text from multiple strings/ranges with a configurable delimiter.
    * Supports array/range delimiters that cycle through gaps between text values.
    * When ignore_empty is TRUE, empty strings are skipped.
-   * Returns #VALUE! if the result exceeds 32,767 characters (Excel cell content limit).
+   * Returns #CALC! if the result exceeds 32,767 characters (Excel cell content limit).
    *
    * @param {ProcedureAst} ast - The procedure AST node
    * @param {InterpreterState} state - The interpreter state
@@ -588,7 +588,9 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
           if (coerced instanceof CellError) {
             return coerced
           }
-          texts.push(...coerced)
+          for (const text of coerced) {
+            texts.push(text)
+          }
         }
 
         const parts = ignoreEmpty ? texts.filter((t) => t !== '') : texts
@@ -602,7 +604,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         , '')
 
         if (result.length > 32767) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.ResultTooLong)
+          return new CellError(ErrorType.CALC, ErrorMessage.ResultTooLong)
         }
         return result
       }
