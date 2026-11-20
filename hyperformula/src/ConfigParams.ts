@@ -106,6 +106,8 @@ export interface ConfigParams {
   /**
    * Sets a decimal separator used for parsing numerical literals.
    *
+   * Also sets the decimal point that the `TEXT` function writes for masks such as `0.00`. See [`TEXT` function formats](/guide/compatibility-with-microsoft-excel.md#text-function-formats).
+   *
    * Can be one of the following:
    * - `.` (period)
    * - `,` (comma)
@@ -295,7 +297,10 @@ export interface ConfigParams {
   /**
    * Sets a function that converts date-time values into strings.
    *
-   * The function should return a string or undefined.
+   * The function should return a string or undefined. For the `TEXT` function, it receives the mask without
+   * color tags (`dd-mm-yyyy` for `[Red]dd-mm-yyyy`), and it is not called for a mask that `TEXT` rejects with
+   * `#VALUE!`: one with an unclosed `[` or `"`, an empty bracket, a bracket that starts with a backslash, or a lone
+   * backslash at its end.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    * @default defaultStringifyDateTime
@@ -305,7 +310,10 @@ export interface ConfigParams {
   /**
    * Sets a function that converts time duration values into strings.
    *
-   * The function should return a string or undefined.
+   * The function should return a string or undefined. For the `TEXT` function, it receives the mask without
+   * color tags (`[hh]:mm` for `[Red][hh]:mm`), and it is not called for a mask that `TEXT` rejects with
+   * `#VALUE!`: one with an unclosed `[` or `"`, an empty bracket, a bracket that starts with a backslash, or a lone
+   * backslash at its end.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    * @default defaultStringifyDuration
@@ -338,6 +346,8 @@ export interface ConfigParams {
   smartRounding: boolean,
   /**
    * Sets the thousands' separator symbol for parsing numerical literals.
+   *
+   * Also sets the grouping character that the `TEXT` function writes for masks such as `#,##0`. See [`TEXT` function formats](/guide/compatibility-with-microsoft-excel.md#text-function-formats).
    *
    * Can be one of the following:
    * - empty

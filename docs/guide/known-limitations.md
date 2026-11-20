@@ -50,6 +50,23 @@ a circular reference.
 * INDEX spills a whole row or column only when `row_num` or `column_num` is a number and the first argument is a range or an array, such as `=INDEX(A1:C3, 0, 2)`. When the `0` comes from a cell reference or a formula, such as `=INDEX(A1:C3, B5, 2)`, or the first argument is a named expression, the result can't spill and the formula returns a `#VALUE!` error; inside another function, such as `=SUM(INDEX(A1:C3, B5, 2))`, it works. A whole row or column of a whole-column or whole-row reference, such as `=INDEX(A:A, 0)`, doesn't spill either.
 * The TEXT function does not accept embedded double-quote literals in the format string. In Excel, `""` inside a format string is an escape sequence for a literal `"` character — e.g. `=TEXT(1234.5, "#,##0.00 ""zł""")` returns `"1,234.50 zł"`. If your application requires this escape sequence, supply a custom [`stringifyCurrency`](currency-handling.md) callback.
 
+### TEXT function
+
+* The built-in number formatter does not implement these Excel number formats, so a mask that uses one returns a different result than in Excel:
+  * percent scaling (`0.00%`),
+  * scaler commas (`0,,`): `=TEXT(5000000, "0,,")` returns `5000000,,`, where Excel returns `5`,
+  * the `?` placeholder,
+  * scientific notation (`0.00E+00`),
+  * `[condition]` comparators,
+  * more than one group of digit placeholders: `=TEXT(5551234567, "(000) 000-0000")` returns `(5551234567) 000-0000`, where Excel returns `(555) 123-4567`,
+  * a mask that starts with the decimal point: `=TEXT(0.5, ".00")` returns `.01`, where Excel returns `.50`,
+  * the `_` padding code: `=TEXT(5, "0_)")` returns `5_)`, where Excel returns `5` followed by a space,
+  * the `@` text placeholder: `=TEXT(5, "@")` returns `@`, where Excel returns `5`.
+* For these number formats, supply a [`stringifyCurrency`](currency-handling.md) callback. See also [`TEXT` function formats](compatibility-with-microsoft-excel.md#text-function-formats).
+* `TEXT` does not check the code inside a bracket, other than a color: `=TEXT(5, "0[x]")` returns `5[x]`, where Excel returns `#VALUE!`.
+* `TEXT` does not check the letters outside brackets and quotes, so a color name after an escaped bracket is still read as a color: `=TEXT(5, "0\[Red]")` returns `5\` and `=TEXT(5, "\[Red]0")` returns `0`, where Excel reads the bracket as text, rejects the letters after it, and returns `#VALUE!` for both.
+* Positive, negative and zero sections apply to number masks only. A date mask is not split into sections: with `dd-mm-yyyy;"neg"` in `A1`, `=TEXT(-5, A1)` returns `25-12-1899;"neg"`, where Excel returns `neg`.
+
 ### UNIQUE function
 
 * Comparison of values follows HyperFormula's own equality rules, which honor the `caseSensitive` and `accentSensitive` configuration options. By default comparison is case-insensitive.
