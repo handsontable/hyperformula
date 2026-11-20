@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {ArrayFormulaVertex, CellVertex, ScalarFormulaVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
@@ -40,6 +40,9 @@ export enum ErrorType {
 
   /** Array spill error. */
   SPILL = 'SPILL',
+
+  /** Calculation error, e.g. an empty array result. */
+  CALC = 'CALC',
 
   /** Invalid/missing licence error. */
   LIC = 'LIC',

@@ -28,6 +28,15 @@ To start a local HyperFormula docs server:
    ```
 5. In your browser, go to: http://localhost:4321/docs/hyperformula/. Search works only in a full build (`npm run docs:build`), which indexes the pages with [Pagefind](https://pagefind.app/).
 
+The live examples load HyperFormula from the CDN, and HyperFormula checks the license key everywhere except on handsontable.com. On `localhost`, an example shows `#LIC!` once the CDN serves a version that needs a key. `npm run docs:dev` can't give the examples a key. To run them locally with the internal test key, build with the opt-in and serve the build:
+
+```bash
+DOCS_TEST_LICENSE_KEY=true npm run docs:build
+npm run docs:dev:cf
+```
+
+Never deploy a build made with `DOCS_TEST_LICENSE_KEY=true` to production. A build without it fails if the key is anywhere in its output, and `npm run docs:deploy:cf` refuses to deploy a built site that holds the key.
+
 ## What is generated
 
 `guide/built-in-functions.md` and the whole of `api/` are produced by a build step and git-ignored. Never edit or commit them: change the function metadata catalogue in `hyperformula/src/interpreter/functionMetadata/categories/` or the JSDoc in `hyperformula/src/`, and regenerate. Both are regenerated as the first step of `docs:dev` and `docs:build`, so a missing `api/` folder only means it has not been built yet.
@@ -86,11 +95,26 @@ Deploying by hand is only needed for debugging; regular deployments go through W
 ```bash
 npm run docs:build:cf     # build the documentation and prepare the asset directory
 npm run docs:dev:cf       # serve the built site locally at http://localhost:8787
-npm run docs:preview:cf   # upload a preview version (does not touch production)
-npm run docs:deploy:cf    # deploy to production
+npm run docs:preview:cf   # write the internal test key into the built site, then upload a preview version
+npm run docs:deploy:cf    # deploy to production; refuses a built site that holds the key
 ```
 
+`docs:preview:cf` changes the built site in place. Run `docs:build:cf` again before `docs:deploy:cf`, and never promote a preview version to production from the Cloudflare dashboard: it holds the internal test key.
+
 When changing the asset routing, verify it with browser navigation headers, not plain requests: `curl -H "Sec-Fetch-Mode: navigate" -H "Sec-Fetch-Dest: document"`. The asset router treats navigation requests differently from other requests, so a plain `curl` check can pass while browsers get a 404.
+
+## Docs assistant
+
+The **Ask AI** button in the header opens the docs assistant, the same chat panel as the Handsontable docs. It answers from a knowledge base that includes the HyperFormula guides, and it is served by the same backend as the Handsontable docs' assistant.
+
+- `src/components/DocsAssistant/` is the React widget and `src/scripts/docs-assistant-bootstrap.ts` mounts it on every page (loaded from the `Header` override). `constants.ts` holds the HyperFormula values: starter questions, storage keys and the backend fallback.
+- Everything else is copied from the Handsontable docs (`docs/src/` in handsontable/handsontable). To refresh it, copy all of these again, not just the widget folder:
+  - `components/DocsAssistant/`, except `constants.ts`, and keep our fix in `MarkdownRendererSimple.tsx` (it finds links before escaping the text, so a URL's `&` isn't escaped twice) until theirs has it;
+  - `scripts/docs-assistant-bootstrap.ts`;
+  - `lib/supports-modern-regex.mjs`, which `MarkdownRenderer.tsx` imports;
+  - the inline `vite:preloadError` guard, which is in their `Head.astro` and in our `Header.astro`.
+- The copied files' comments name the Handsontable docs' files. Their `Head.astro` is our `Header.astro`: we have no `Head` override, so the bootstrap and the preload guard are loaded from the header.
+- On handsontable.com the panel calls `/docs-assistant/api/chat` on its own origin, which the handsontable.com Worker relays to the backend. Anywhere else (Workers Builds previews, `npm run docs:dev`) it calls the backend directly at `PUBLIC_CHAT_API_URL`, falling back to the backend's workers.dev address. The backend only answers the origins it allowlists: `npm run docs:dev` on `http://localhost:4321` is one of them, a Workers Builds preview is not, so on a preview the panel opens but a question fails.
 
 ## Built-in functions guide page
 
@@ -119,9 +143,10 @@ docs                            # All documentation files
 ├── public                      # Static files served as they are: images, downloads, favicons
 ├── script                      # The built-in functions page generator and the Worker asset step
 ├── src
-│   ├── components              # Overrides of Starlight components: page title, Markdown content
+│   ├── components              # Overrides of Starlight components, and the docs assistant (DocsAssistant/)
+│   ├── lib                     # Browser helpers the docs assistant imports
 │   ├── md-companions           # Writes the .md companions and llms-full.txt (see below)
-│   ├── scripts                 # Browser scripts, e.g. the coding-agent wizard
+│   ├── scripts                 # Browser scripts, e.g. the coding-agent wizard and the docs assistant's bootstrap
 │   ├── styles                  # The site's CSS on top of Starlight's
 │   ├── api-sidebar.mjs         # The API pages' sidebar groups, with a link to each section
 │   ├── content.config.mjs      # The content collection the pages are read into
@@ -145,5 +170,5 @@ docs                            # All documentation files
 
 * **HTML + Markdown per page** &mdash; every guide page is built as both an `.html` page and a companion `.md` file with the same content, via the `md-companions` integration (`src/md-companions/`). The API reference has companions too, and a `README.md` source gets `index.md` (`api/index.md`). The companion lives next to its HTML page, e.g. `guide/basic-usage.html` and `guide/basic-usage.md`.
 * **`llms-full.txt`** &mdash; all pages concatenated into one Markdown file at the docs root (`/docs/hyperformula/llms-full.txt`, served at https://handsontable.com/docs/hyperformula/llms-full.txt), so an agent can fetch the whole corpus in a single request instead of crawling page by page.
-* **"View as Markdown" link** &mdash; every guide page shows a small link near the top of its content that navigates to that page's `.md` companion (rendered by the `PageTitle` override in `src/components/`).
+* **Page actions** &mdash; below the table of contents (the `PageSidebar` override in `src/components/`), every page offers Copy Markdown and View as Markdown (its `.md` companion), Ask AI about this page, Print this page, and Open in ChatGPT or Claude (a new conversation that starts by reading the page). On narrower screens, where that sidebar is hidden, the `PageTitle` override shows View as Markdown near the top of the page.
 * **"Set up your coding agent" page** &mdash; [`guide/setup-coding-agent.md`](guide/setup-coding-agent.md) explains how to point Claude Code, Cursor, Copilot, and other agents at these machine-readable docs, and embeds the `<hf-coding-agent-wizard>` custom element (`src/scripts/coding-agent-wizard.mjs`): an interactive picker that shows the right setup instructions for the agent you choose.

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 /**
@@ -48,7 +48,7 @@ export interface LicenseExpiry {
  */
 export interface LicenseEntitlement {
   /**
-   * `true` for every key that restricts nothing: classic keys, `gpl-v3`, and any key that blocks
+   * `true` for every key that restricts nothing: classic and literal keys, and any key that blocks
    * evaluation (a missing or invalid key, an expired classic key, or a trial past its grace
    * period). An entitlement key that has expired but keeps evaluating is not one of them: it keeps
    * its own grants.
@@ -74,7 +74,7 @@ export interface LicenseEntitlement {
 }
 
 /**
- * The unrestricted entitlement: classic keys, `gpl-v3`, and every key that blocks evaluation (a
+ * The unrestricted entitlement: classic and literal keys, and every key that blocks evaluation (a
  * missing or invalid key, an expired classic key, or a trial past its grace period) resolve to
  * this. An entitlement key that has expired but keeps evaluating does not: it keeps its own grants.
  *

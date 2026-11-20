@@ -7,6 +7,7 @@ import {Config} from '../../src/Config'
 import {enGB} from '../../src/i18n/languages'
 import * as plugins from '../../src/interpreter/plugin'
 import {toContainEqualMatcher, toEqualErrorMatcher, toMatchObjectMatcher} from './matchers'
+import {TEST_LICENSE_KEY} from './testLicenseKey'
 
 function unregisterAllLanguages() {
   for (const langCode of HyperFormula.getRegisteredLanguagesCodes()) {
@@ -17,7 +18,7 @@ function unregisterAllLanguages() {
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   functionPlugins: [],
   useStats: true,
-  licenseKey: 'gpl-v3',
+  licenseKey: TEST_LICENSE_KEY,
 })
 
 const jestPresent = (() => {
