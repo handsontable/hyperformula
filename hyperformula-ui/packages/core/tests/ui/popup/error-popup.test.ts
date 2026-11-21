@@ -401,6 +401,85 @@ describe("ErrorPopup DOM rendering", () => {
     cell.remove();
   });
 
+  it("appends the popup id to the cell's aria-describedby while open and restores it on close", () => {
+    popup.attach(document.body);
+    const cell = document.createElement("div");
+    cell.dataset.hfeError = "#NAME";
+    cell.setAttribute("aria-describedby", "col-header-2");
+    document.body.appendChild(cell);
+    cell.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+
+    const popupRoot = document.body.querySelector(sel(CN.errorPopup)) as HTMLElement;
+
+    expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupRoot.id}`);
+
+    cell.dispatchEvent(new MouseEvent("mouseout", { bubbles: true, relatedTarget: document.body }));
+    expect(cell.getAttribute("aria-describedby")).toBe("col-header-2");
+
+    popup.detach();
+    cell.remove();
+  });
+
+  it("removes aria-describedby on close when the popup id was its only token", () => {
+    popup.attach(document.body);
+    const cell = document.createElement("div");
+    cell.dataset.hfeError = "#NAME";
+    document.body.appendChild(cell);
+    cell.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+
+    const popupRoot = document.body.querySelector(sel(CN.errorPopup)) as HTMLElement;
+
+    expect(cell.getAttribute("aria-describedby")).toBe(popupRoot.id);
+
+    popup.detach();
+    expect(cell.hasAttribute("aria-describedby")).toBe(false);
+    cell.remove();
+  });
+
+  it("drops the popup id from the previous cell's aria-describedby when hopping between error cells", () => {
+    popup.attach(document.body);
+    const cellA = document.createElement("div");
+    const cellB = document.createElement("div");
+
+    cellA.dataset.hfeError = "#NAME";
+    cellA.tabIndex = 0;
+    cellA.setAttribute("aria-describedby", "col-header-1");
+    cellB.dataset.hfeError = "#REF!";
+    cellB.tabIndex = 0;
+    document.body.append(cellA, cellB);
+    cellA.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    cellA.dispatchEvent(new FocusEvent("focusout", { bubbles: true, relatedTarget: cellB }));
+    cellB.dispatchEvent(new FocusEvent("focusin", { bubbles: true, relatedTarget: cellA }));
+
+    const popupRoot = document.body.querySelector(sel(CN.errorPopup)) as HTMLElement;
+
+    expect(cellA.getAttribute("aria-describedby")).toBe("col-header-1");
+    expect(cellB.getAttribute("aria-describedby")).toBe(popupRoot.id);
+
+    popup.detach();
+    cellA.remove();
+    cellB.remove();
+  });
+
+  it("does not repeat the popup id when focus and hover anchor the same cell", () => {
+    popup.attach(document.body);
+    const cell = document.createElement("div");
+    cell.dataset.hfeError = "#NAME";
+    cell.tabIndex = 0;
+    cell.setAttribute("aria-describedby", "col-header-2");
+    document.body.appendChild(cell);
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    cell.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+
+    const popupRoot = document.body.querySelector(sel(CN.errorPopup)) as HTMLElement;
+
+    expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupRoot.id}`);
+
+    popup.detach();
+    expect(cell.getAttribute("aria-describedby")).toBe("col-header-2");
+    cell.remove();
+  });
+
   it("does not open when the hovered element has no data-hfe-error", () => {
     popup.attach(document.body);
     const cell = document.createElement("div");
@@ -971,6 +1050,91 @@ describe("ErrorPopup syncCell", () => {
   function pressEscape(): void {
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
   }
+
+  function repaint(target: HTMLElement, message: string | null): void {
+    for (const name of target.getAttributeNames()) {
+      if (name.startsWith("aria-")) {
+        target.removeAttribute(name);
+      }
+    }
+
+    remark(target, message);
+
+    if (!target.hasAttribute("aria-describedby")) {
+      target.setAttribute("aria-describedby", "col-header-2");
+    }
+  }
+
+  function mutationsDelivered(): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve));
+  }
+
+  function popupId(): string | undefined {
+    return document.body.querySelector(sel(CN.errorPopup))?.id;
+  }
+
+  it("restores the popup association after a repaint that strips aria attributes and keeps the error", async () => {
+    cell.setAttribute("aria-describedby", "col-header-2");
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    repaint(cell, "#DIV/0!");
+    await mutationsDelivered();
+
+    expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupId()}`);
+    expect(cell.getAttribute("aria-errormessage")).toBe(popupId());
+  });
+
+  it("restores the popup association when the host rewrites the cell's aria attributes without calling syncCell", async () => {
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    cell.removeAttribute("aria-errormessage");
+    cell.setAttribute("aria-describedby", "col-header-2");
+    await mutationsDelivered();
+
+    expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupId()}`);
+    expect(cell.getAttribute("aria-errormessage")).toBe(popupId());
+  });
+
+  it("stops restoring the popup association once the popup closes", async () => {
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    cell.dispatchEvent(new FocusEvent("focusout", { bubbles: true, relatedTarget: document.body }));
+    cell.setAttribute("aria-describedby", "col-header-2");
+    await mutationsDelivered();
+
+    expect(cell.getAttribute("aria-describedby")).toBe("col-header-2");
+    expect(cell.getAttribute("aria-errormessage")).toBeNull();
+  });
+
+  it("keeps the host's aria-describedby id when a repaint changes the anchored cell's error", async () => {
+    cell.setAttribute("aria-describedby", "col-header-2");
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    repaint(cell, "#REF!");
+    await mutationsDelivered();
+
+    expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupId()}`);
+    expect(cell.getAttribute("aria-errormessage")).toBe(popupId());
+  });
+
+  it("keeps the host's aria-describedby id when a repaint reopens the tooltip on a focused cell", async () => {
+    cell.setAttribute("aria-describedby", "col-header-2");
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    repaint(cell, null);
+    await mutationsDelivered();
+    repaint(cell, "#REF!");
+    await mutationsDelivered();
+
+    expect(popup.isVisible()).toBe(true);
+    expect(cell.getAttribute("aria-describedby")).toBe(`col-header-2 ${popupId()}`);
+    expect(cell.getAttribute("aria-errormessage")).toBe(popupId());
+  });
+
+  it("leaves only the host's aria-describedby id when a repaint clears the anchored cell's error", async () => {
+    cell.setAttribute("aria-describedby", "col-header-2");
+    cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    repaint(cell, null);
+    await mutationsDelivered();
+
+    expect(cell.getAttribute("aria-describedby")).toBe("col-header-2");
+    expect(cell.getAttribute("aria-errormessage")).toBeNull();
+  });
 
   it("closes the tooltip when the anchored cell's error is cleared", () => {
     cell.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
