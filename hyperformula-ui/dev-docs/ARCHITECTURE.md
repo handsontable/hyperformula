@@ -761,6 +761,13 @@ inside their host-specific renderers, because each host renders cells differentl
 - Plain table: the host's own `renderCell` (the plain table has no host library, so its grid
   scaffolding is example code — see "Adapter scope" below)
 
+`markCell` also keeps the tooltip in step with the mark, through `ErrorPopup.syncCell(cell,
+previousMessage)`. Hosts repaint often (Handsontable on every draw), so a repaint that leaves
+the message unchanged does nothing. When the message changes on the cell the tooltip shows,
+the tooltip closes (error cleared) or shows the new text. When it changes on a cell that still
+holds the pointer or focus while no tooltip shows, the tooltip opens there. A change also
+lifts that cell's Escape suppression, since the dismissed content is gone.
+
 The error tooltip itself is Esc-dismissible: `ErrorPopup` owns a window-level `keydown`
 (capture) listener, registered while attached; it consumes Escape only while the tooltip is
 visible AND no builder surface holds focus (`builderSurfaceHasFocus()` —
@@ -777,8 +784,8 @@ pointer/focus position, which Esc does not move), which is what lets `suppressed
 keep suppression while pointer or focus still rest on the dismissed cell; were they cleared,
 the next unrelated `focusout` would fall through `handleLeave` and drop `suppressedCell`,
 letting an in-cell `mouseover` reopen the dismissed tooltip (a 1.4.13 violation). Suppression
-clears only once both pointer and focus have left the cell (`handleLeave`), or on
-`detach()` — so re-entering the cell after leaving shows the tooltip again; re-entering the
+clears once both pointer and focus have left the cell (`handleLeave`), when `markCell`
+changes or clears that cell's error (`syncCell`), or on `detach()` — so re-entering the cell after leaving shows the tooltip again; re-entering the
 suppressed cell while the tooltip shows a DIFFERENT cell's error closes that stale tooltip
 instead of leaving it anchored to the other cell (`handleEnter`'s suppressed branch). Because this
 listener sits at the window in capture phase, it would otherwise consume Escape before the
