@@ -1202,14 +1202,30 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 
   /**
+   * Tells whether the TOROW or TOCOL `scan_by_column` argument is a literal
+   * that evaluates to an error: text other than "TRUE" or "FALSE", such as
+   * `"abc"` or `""`, or an error literal.
+   *
+   * @param {Ast | undefined} argument - The `scan_by_column` argument, if any.
+   * @returns {boolean} Whether the literal is invalid.
+   */
+  private isInvalidLiteralScanByColumn(argument: Ast | undefined): boolean {
+    if (argument?.type === AstNodeType.ERROR || argument?.type === AstNodeType.ERROR_WITH_RAW_INPUT) {
+      return true
+    }
+
+    return argument?.type === AstNodeType.STRING && this.coerceFlattenScanByColumn(argument.value) instanceof CellError
+  }
+
+  /**
    * Calculates the spilled array size of TOROW or TOCOL: one row or column
    * holding every source element. That is exact when `ignore` is 0 and the
    * upper bound otherwise, because `ignore` can only remove elements; the
    * cells a shorter result leaves unused stay blank. An invalid literal
-   * `ignore` is reported as an invalid size, so the formula evaluates to its
-   * #VALUE! error instead of reserving space. So is a source with no
-   * elements, such as a whole column of an empty sheet, because an array
-   * result cannot be reserved with no cells.
+   * `ignore` or `scan_by_column` is reported as an invalid size, so the
+   * formula evaluates to its error instead of reserving space. So is a
+   * source with no elements, such as a whole column of an empty sheet,
+   * because an array result cannot be reserved with no cells.
    *
    * A whole-column source of TOCOL (a whole-row source of TOROW) runs along
    * the result and is measured by its effective size. While blank cells may
@@ -1224,6 +1240,15 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * as `A:A+0`, has no sheet to check and is measured by the configured sheet
    * limits, so it follows the same rule.
    *
+   * A whole-column source of TOROW runs across the result instead. While
+   * blank cells may be kept, the result is as long as the sheet is tall,
+   * which no row holds (Excel returns a spill error too), so the width stays
+   * unbounded in any column. The same applies whatever `ignore` is when the
+   * source is on the formula's own sheet or computed: a TOROW over a column
+   * and a TOCOL over a row of one sheet would otherwise make each other's
+   * source grow on every prediction. A whole-row source of TOCOL is not
+   * limited this way, because a column holds a whole row.
+   *
    * @param {ProcedureAst} ast - The parsed TOROW or TOCOL call.
    * @param {InterpreterState} state - The formula state whose address anchors the spill.
    * @param {FlattenFunction} functionName - The function whose metadata and orientation apply.
@@ -1235,7 +1260,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     }
 
     const ignore = this.parseFlattenLiteralIgnore(ast.args[1])
-    if (ignore.kind === 'invalid') {
+    if (ignore.kind === 'invalid' || this.isInvalidLiteralScanByColumn(ast.args[2])) {
       return ArraySize.error()
     }
 
@@ -1263,6 +1288,11 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       if (anchor !== 0) {
         return toColumn ? new ArraySize(1, Number.POSITIVE_INFINITY) : new ArraySize(Number.POSITIVE_INFINITY, 1)
       }
+    }
+
+    const isWholeColumnAcrossRow = !toColumn && !Number.isFinite(sourceSize.height)
+    if ((mayKeepBlanks || isComputedOrOnFormulaSheet) && isWholeColumnAcrossRow) {
+      return new ArraySize(Number.POSITIVE_INFINITY, 1)
     }
 
     const length = height * width
