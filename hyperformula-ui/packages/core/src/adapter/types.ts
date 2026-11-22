@@ -291,14 +291,21 @@ export interface GridEditLifecycle {
    */
   selectFirstCell(): void;
 
-  /** Selects `address` without starting an edit, via the same path as `selectFirstCell`. */
-  setActiveCell(address: CellAddress): void;
+  /**
+   * Selects `address` without starting an edit, via the same path as `selectFirstCell`.
+   * Returns `false` when the host could not select it (a filtered-out row, a hidden column);
+   * the address box then rejects the typed address. Returning nothing counts as success.
+   */
+  // biome-ignore lint/suspicious/noConfusingVoidType: adapters written before the boolean result return void
+  setActiveCell(address: CellAddress): boolean | void;
 
   /**
    * Selects the given range. Selection gestures (mouse drag, shift+click, shift+arrows) are
-   * host-owned — core and adapters carry the data contract only.
+   * host-owned — core and adapters carry the data contract only. Returns `false` when the host
+   * could not select the range; returning nothing counts as success.
    */
-  setSelection(range: CellRange): void;
+  // biome-ignore lint/suspicious/noConfusingVoidType: adapters written before the boolean result return void
+  setSelection(range: CellRange): boolean | void;
 
   /**
    * Fires when a cell editor opens. `mount` is the overlay element the shared editor attaches
@@ -317,6 +324,13 @@ export interface GridEditLifecycle {
    * post-commit selection move (Enter → down, Tab → right, …).
    */
   commit(value: string, direction?: Direction): void;
+
+  /**
+   * Commits `value` to every selected cell (Ctrl/Cmd+Enter). Optional: when absent,
+   * Ctrl/Cmd+Enter inserts a newline. Like `commit`, it must write to the engine before
+   * returning.
+   */
+  commitFill?(value: string): void;
 
   /** Cancels the current edit without committing. */
   cancel(): void;

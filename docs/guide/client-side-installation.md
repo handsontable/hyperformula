@@ -1,10 +1,9 @@
 ---
+title: "Client-side installation"
 tags:
   - jsDelivr
   - script tag
 ---
-
-# Client-side installation
 
 ### Install with npm or Yarn
 

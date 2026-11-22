@@ -1,7 +1,7 @@
 import type { EventScope } from "../../events/eventManager";
 import { CN } from "../../theme/classNames";
-import { createEl } from "../dom";
-import type { IconsOptions } from "../types";
+import { createEl, deepActiveElement, isHTMLElement, isShadowRoot, viewOf } from "../dom";
+import type { IconsOptions, Phrases } from "../types";
 import { BasePopup } from "./basePopup";
 import { EndViewportAnchoredStrategy } from "./positionStrategy";
 import type { BoundsRect, ErrorOptions, LayoutDirection } from "./types";
@@ -11,6 +11,7 @@ export interface ErrorPopupOptions {
   options?: ErrorOptions;
   direction?: LayoutDirection;
   icons?: IconsOptions;
+  phrases?: Phrases;
 }
 
 let errorPopupIdCounter = 0;
@@ -33,12 +34,13 @@ export class ErrorPopup extends BasePopup {
   private readonly onScroll = (): void => this.scheduleScrollReposition();
   private readonly onKeydown = (event: KeyboardEvent): void => this.handleEscape(event);
 
-  constructor({ container, options, direction, icons }: ErrorPopupOptions) {
+  constructor({ container, options, direction, icons, phrases }: ErrorPopupOptions) {
     super({
       strategy: new EndViewportAnchoredStrategy(),
       container,
       showClose: options?.showClose ?? false,
       ...(icons !== undefined && { icons }),
+      ...(phrases !== undefined && { phrases }),
     });
     this.direction = direction ?? "ltr";
     errorPopupIdCounter += 1;
@@ -79,16 +81,13 @@ export class ErrorPopup extends BasePopup {
   }
 
   private builderSurfaceHasFocus(): boolean {
-    const active = document.activeElement;
+    const active = deepActiveElement(this.root.ownerDocument);
 
-    return (
-      active instanceof HTMLElement &&
-      active.closest(`.${CN.editor}, .${CN.fnHelp}, .${CN.formulaBar}`) !== null
-    );
+    return active?.closest(`.${CN.editor}, .${CN.fnHelp}, .${CN.formulaBar}`) != null;
   }
 
   private markerFrom(target: EventTarget | null): HTMLElement | null {
-    const element = target instanceof HTMLElement ? target : null;
+    const element = isHTMLElement(target) ? target : null;
 
     if (!element) {
       return null;
@@ -101,7 +100,7 @@ export class ErrorPopup extends BasePopup {
     }
 
     for (const child of element.children) {
-      if (child instanceof HTMLElement && child.dataset.hfeError !== undefined) {
+      if (isHTMLElement(child) && child.dataset.hfeError !== undefined) {
         return child;
       }
     }
@@ -223,7 +222,7 @@ export class ErrorPopup extends BasePopup {
 
     const suppressedStillHeld =
       this.suppressedCell !== null &&
-      (this.suppressedCell.contains(document.activeElement) ||
+      (this.suppressedCell.contains(deepActiveElement(this.suppressedCell.ownerDocument)) ||
         this.pointerCell === this.suppressedCell ||
         this.focusCell === this.suppressedCell);
 
@@ -281,8 +280,15 @@ export class ErrorPopup extends BasePopup {
     this.containerScope.listen(container, "focusout", this.onFocusOut);
     this.containerScope.listen(this.root, "mouseout", this.onOut);
     this.containerScope.listen(this.root, "focusout", this.onFocusOut);
-    this.containerScope.listen(window, "scroll", this.onScroll, { capture: true });
-    this.containerScope.listen(window, "keydown", this.onKeydown, { capture: true });
+    this.containerScope.listen(viewOf(container), "scroll", this.onScroll, { capture: true });
+
+    const containerRoot = container.getRootNode();
+
+    if (isShadowRoot(containerRoot)) {
+      this.containerScope.listen(containerRoot, "scroll", this.onScroll, { capture: true });
+    }
+
+    this.containerScope.listen(viewOf(container), "keydown", this.onKeydown, { capture: true });
     this.containerScope.activate();
   }
 

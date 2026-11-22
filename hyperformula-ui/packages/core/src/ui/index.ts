@@ -18,6 +18,7 @@ export {
   HighlightLayer,
 } from "./highlight";
 export { LiveRegion } from "./liveRegion";
+export { DEFAULT_PHRASES } from "./phrases";
 export type {
   ErrorOptions,
   ErrorPopupOptions,
@@ -42,4 +43,4 @@ export {
   withSharedClose,
 } from "./popup";
 export { RichInput, VisualOverlay } from "./text";
-export type { IconName, IconsOptions } from "./types";
+export type { IconName, IconsOptions, Phrases } from "./types";

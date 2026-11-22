@@ -3,17 +3,20 @@ import { formatWholeRef } from "../adapter/refFormat";
 import type { CellAddress, CellRange, EditorGridAdapter, HeaderAxis } from "../adapter/types";
 import { EngineBridge } from "../engine/engineBridge";
 import { annotateNamedExprs } from "../engine/namedExpr";
-import { EventManager } from "../events/eventManager";
+import { EventManager, type EventScope } from "../events/eventManager";
+import { runAll } from "../events/runAll";
 import { commentsToN, nToComments } from "../kernel/commentTransform";
 import { Kernel } from "../kernel/kernel";
 import type { LexerOptions } from "../lexer/types";
 import { CN } from "../theme/classNames";
 import { injectStyles, releaseStyles } from "../theme/injectStyles";
-import { createEl } from "../ui/dom";
+import { createEl, isHTMLElement, isNode, isShadowRoot, viewOf } from "../ui/dom";
+import { resolvePhrases } from "../ui/phrases";
 import { FunctionHelpPopup } from "../ui/popup/functionHelpPopup";
 import { SuggestionsPopup } from "../ui/popup/suggestionsPopup";
 import { RichInput } from "../ui/text/richInput";
 import { VisualOverlay } from "../ui/text/visualOverlay";
+import type { Phrases } from "../ui/types";
 import { isFormula } from "./editorContext";
 import { EditorSizeController } from "./editorSizeController";
 import { HighlightController } from "./highlightController";
@@ -41,6 +44,7 @@ export class FormulaEditor {
   readonly kernel: Kernel;
   readonly engine: EngineBridge;
   readonly adapter: EditorGridAdapter;
+  private readonly resolvedPhrases: Phrases;
   private readonly separators: LexerOptions;
   private readonly refOpeners: string;
   private readonly rootEl: HTMLDivElement;
@@ -64,6 +68,9 @@ export class FormulaEditor {
   private destroyed = false;
   private focused = false;
   private reparenting = false;
+  private viewScope: EventScope | null = null;
+  private listenedView: Window | null = null;
+  private listenedShadowRoot: ShadowRoot | null = null;
 
   constructor(container: HTMLElement, opts: FormulaEditorOptions) {
     if (typeof document === "undefined") {
@@ -97,7 +104,8 @@ export class FormulaEditor {
     this.adapter = opts.adapter;
 
     const inputScope = this.events.createScope("editor-input");
-    this.input = new RichInput(inputScope);
+    this.resolvedPhrases = resolvePhrases(opts.phrases);
+    this.input = new RichInput(inputScope, this.resolvedPhrases.formulaEditor);
     inputScope.activate();
     this.knownFunctions = new Set(this.engine.getFunctionNames().map((name) => name.toUpperCase()));
     this.overlay = new VisualOverlay({ knownFunctions: this.knownFunctions });
@@ -114,6 +122,7 @@ export class FormulaEditor {
       },
       opts.popupCtx.portal,
       opts.icons,
+      this.resolvedPhrases,
     );
     this.fnHelp = new FunctionHelpPopup({
       onExplicitClose: () => {
@@ -132,6 +141,7 @@ export class FormulaEditor {
       container: opts.popupCtx.portal,
       ...(opts.fnHelpOptions !== undefined && { options: opts.fnHelpOptions }),
       ...(opts.icons !== undefined && { icons: opts.icons }),
+      phrases: this.resolvedPhrases,
     });
 
     this.rootEl = createEl("div", { class: CN.editor });
@@ -220,7 +230,7 @@ export class FormulaEditor {
   }
 
   private restoreBlurTarget(relatedTarget: EventTarget | null): void {
-    if (relatedTarget instanceof HTMLElement && relatedTarget.isConnected) {
+    if (isHTMLElement(relatedTarget) && relatedTarget.isConnected) {
       relatedTarget.focus();
     }
   }
@@ -264,7 +274,7 @@ export class FormulaEditor {
         return;
       }
 
-      if (!focused && relatedTarget instanceof Node && this.fnHelp.contains(relatedTarget)) {
+      if (!focused && isNode(relatedTarget) && this.fnHelp.contains(relatedTarget)) {
         return;
       }
 
@@ -279,6 +289,25 @@ export class FormulaEditor {
     this.input.on("keydown", (event) => this.keyboard.handleKeydown(event));
     this.scroll.attach();
     this.size.attach();
+    this.listenToView();
+  }
+
+  private listenToView(): void {
+    const view = viewOf(this.rootEl);
+    const rootNode = this.rootEl.getRootNode();
+    const shadowRoot = isShadowRoot(rootNode) ? rootNode : null;
+
+    if (view === this.listenedView && shadowRoot === this.listenedShadowRoot) {
+      return;
+    }
+
+    this.viewScope?.dispose();
+    this.viewScope = this.events.createScope("editor-view");
+    this.scroll.listenToView(this.viewScope, view, shadowRoot);
+    this.size.listenToView(this.viewScope, view, shadowRoot);
+    this.viewScope.activate();
+    this.listenedView = view;
+    this.listenedShadowRoot = shadowRoot;
   }
 
   private wireAdapter(): void {
@@ -311,7 +340,11 @@ export class FormulaEditor {
     this.keyboard.setHostToggleDelegate(delegate);
   }
 
-  /** Whether a picked ref would currently be inserted at the caret. */
+  /**
+   * Whether a picked ref would currently be inserted at the caret as a new reference: the
+   * caret follows a ref opener. A caret inside an existing reference reports `false` here,
+   * because a pick then replaces that reference (see {@link isRefSelectionActive}).
+   */
   canInsertRef(): boolean {
     return this.refs.canInsertRef();
   }
@@ -321,7 +354,11 @@ export class FormulaEditor {
     return this.focused;
   }
 
-  /** Whether ref-selection is currently eligible (grid picks would insert refs). */
+  /**
+   * Whether ref-selection is currently eligible: a grid pick would insert a reference at the
+   * caret, or replace the pending reference or the cell or range reference the caret sits in
+   * (at either end included).
+   */
   isRefSelectionActive(): boolean {
     return this.refs.isRefSelectionActive();
   }
@@ -342,6 +379,11 @@ export class FormulaEditor {
     this.highlights.suppress();
   }
 
+  /** The phrases in effect: the `phrases` option over the English defaults. */
+  get phrases(): Phrases {
+    return this.resolvedPhrases;
+  }
+
   /** Function names known to the engine, used to seed idle colored-formula views. */
   get knownFunctionNames(): ReadonlySet<string> {
     return this.knownFunctions;
@@ -353,7 +395,7 @@ export class FormulaEditor {
     append = false,
     wholeAxis?: HeaderAxis,
   ): string {
-    const replacingToken = append ? undefined : (this.refs.pendingRefRange() ?? undefined);
+    const replacingToken = append ? undefined : (this.refs.replacedRefRange() ?? undefined);
 
     if (wholeAxis && "start" in target) {
       const refStr = formatWholeRef({
@@ -382,6 +424,7 @@ export class FormulaEditor {
     const internal = nToComments(text, this.separators);
     const caretOffset = Math.min(options?.caret ?? internal.length, internal.length);
 
+    this.engine.invalidateNamedExpressionCache();
     this.point.exit();
     this.keyboard.resetRangeMode();
     this.refs.resetLastRef();
@@ -454,6 +497,11 @@ export class FormulaEditor {
 
     try {
       container.appendChild(this.rootEl);
+
+      if (this.viewScope !== null) {
+        this.listenToView();
+      }
+
       this.size.resetManualSize();
       this.size.invalidateCache();
       this.popupCtrl?.invalidateClipCache();
@@ -520,27 +568,24 @@ export class FormulaEditor {
       return;
     }
 
-    this.events.disposeAll();
     this.destroyed = true;
-    this.engine.destroy();
-    this.suggestions.destroy();
-    this.fnHelp.destroy();
-    this.scroll.detach();
-    this.size.detach();
 
-    for (const unsub of this.adapterUnsubs) {
-      unsub();
-    }
+    const adapterUnsubs = this.adapterUnsubs;
 
     this.adapterUnsubs = [];
-    this.adapter.setHighlights([]);
-    this.adapter.clearHighlights();
-    this.kernel.bus.clear();
-
-    if (this.rootEl.parentNode) {
-      this.rootEl.parentNode.removeChild(this.rootEl);
-    }
-
-    releaseStyles();
+    runAll([
+      () => this.events.disposeAll(),
+      () => this.engine.destroy(),
+      () => this.suggestions.destroy(),
+      () => this.fnHelp.destroy(),
+      () => this.scroll.detach(),
+      () => this.size.detach(),
+      ...adapterUnsubs,
+      () => this.adapter.setHighlights([]),
+      () => this.adapter.clearHighlights(),
+      () => this.kernel.bus.clear(),
+      () => this.rootEl.remove(),
+      () => releaseStyles(),
+    ]);
   }
 }

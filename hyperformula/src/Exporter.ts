@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {CellError, ErrorType, SimpleCellAddress} from './Cell'
@@ -99,7 +99,7 @@ export class Exporter implements ChangeExporter<ExportedChange> {
     } else if (value instanceof CellError) {
       return this.detailedError(value)
     } else if (value === EmptyValue) {
-      return null
+      return this.config.evaluateNullToZero ? 0 : null
     } else {
       return getRawValue(value)
     }
