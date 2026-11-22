@@ -34,13 +34,7 @@ export class DeltaPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * as Excel does, so an error or a type error in it wins over one in the first argument.
    */
   private strictNumber(value: InternalScalarValue): number | CellError {
-    if (value instanceof CellError) {
-      return value
-    }
-    if (typeof value === 'boolean' || value === '') {
-      return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
-    }
-    const coerced = this.coerceScalarToNumberOrError(value)
+    const coerced = this.coerceScalarToNumberRejectingBooleans(value)
     return coerced instanceof CellError ? coerced : getRawValue(coerced)
   }
 

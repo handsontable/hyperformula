@@ -431,13 +431,7 @@ export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginT
    * accepted, while a boolean or the empty text is #VALUE!. Errors are passed on.
    */
   private strictNumber(value: InternalScalarValue): number | CellError {
-    if (value instanceof CellError) {
-      return value
-    }
-    if (typeof value === 'boolean' || value === '') {
-      return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
-    }
-    const coerced = this.coerceScalarToNumberOrError(value)
+    const coerced = this.coerceScalarToNumberRejectingBooleans(value)
     return coerced instanceof CellError ? coerced : getRawValue(coerced)
   }
 
