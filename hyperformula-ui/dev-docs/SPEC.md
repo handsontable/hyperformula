@@ -25,7 +25,7 @@ hyperformula-ui/
 │   └── core/                        # hyperformula-ui (rspack + sass + tsc)
 ├── scripts/                         # shared build scripts (generateCssText.mjs, generateApiDocs.mjs)
 ├── demo/
-│   ├── shared/                      # @hfe-demo/shared: datasets + shared.css only, no hyperformula-ui or framework imports
+│   ├── shared/                      # @hfe-demo/shared: datasets, shared.css and test-license-key.ts only, no hyperformula-ui or framework imports
 │   └── js/                          # demo-js, port 5173: basic (editor only)
 ├── e2e/                             # Playwright specs against the demo server (map: e2e/COVERAGE.md)
 ├── dev-docs/                        # this spec, ARCHITECTURE.md, and the other internals pages

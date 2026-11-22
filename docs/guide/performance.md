@@ -67,7 +67,7 @@ You can tune this setting to balance memory usage and CPU overhead:
 
 ```javascript
 const hf = HyperFormula.buildEmpty({
-  licenseKey: 'gpl-v3',
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
   maxPendingLazyTransformations: 100,
 })
 ```
