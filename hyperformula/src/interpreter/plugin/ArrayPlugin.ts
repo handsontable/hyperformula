@@ -1103,7 +1103,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   private flatten(ast: ProcedureAst, state: InterpreterState, functionName: FlattenFunction): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata(functionName),
       (source: SimpleRangeValue, ignoreArgument: InternalScalarValue, scanByColumnArgument: InternalScalarValue) => {
-        if (ast.args[0].type === AstNodeType.EMPTY) {
+        if (this.isOmittedArgument(ast.args[0])) {
           return new CellError(ErrorType.VALUE, ErrorMessage.EmptyArg)
         }
 
@@ -1188,7 +1188,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * @internal
    */
   private parseFlattenLiteralIgnore(argument: Ast | undefined): LiteralCount {
-    if (argument === undefined || argument.type === AstNodeType.EMPTY) {
+    if (this.isOmittedArgument(argument)) {
       return {kind: 'value', value: IGNORE_NOTHING}
     }
 
@@ -1264,11 +1264,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       return ArraySize.error()
     }
 
-    const metadata = this.metadata(functionName)
-    const sourceSize = this.arraySizeForAst(
-      ast.args[0],
-      new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
-    )
+    const sourceSize = this.predictSourceSize(ast.args[0], state, functionName)
     const effectiveSourceSize = this.effectiveSourceSize(ast.args[0], state)
     const height = Number.isFinite(sourceSize.height) ? sourceSize.height : effectiveSourceSize.height
     const width = Number.isFinite(sourceSize.width) ? sourceSize.width : effectiveSourceSize.width
@@ -1632,15 +1628,15 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 
   /**
-   * Predicts the size of a WRAPROWS, WRAPCOLS or EXPAND source, with array
-   * arithmetic enabled for it as the function's metadata requests.
+   * Predicts the size of a WRAPROWS, WRAPCOLS, EXPAND, TOROW or TOCOL source,
+   * with array arithmetic enabled for it as the function's metadata requests.
    *
    * @param {Ast} source - The source expression.
    * @param {InterpreterState} state - The formula state.
-   * @param {WrapFunctionName | 'EXPAND'} functionName - The function whose metadata drives the array-arithmetic flag.
+   * @param {WrapFunctionName | 'EXPAND' | FlattenFunction} functionName - The function whose metadata drives the array-arithmetic flag.
    * @returns {ArraySize} The predicted source size.
    */
-  private predictSourceSize(source: Ast, state: InterpreterState, functionName: WrapFunctionName | 'EXPAND'): ArraySize {
+  private predictSourceSize(source: Ast, state: InterpreterState, functionName: WrapFunctionName | 'EXPAND' | FlattenFunction): ArraySize {
     const metadata = this.metadata(functionName)
     return this.arraySizeForAst(
       source,
