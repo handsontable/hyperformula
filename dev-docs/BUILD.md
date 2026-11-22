@@ -26,7 +26,7 @@ The generator lives in `docs/script/` rather than beside the engine build script
 
 Both are git-ignored, and both are regenerated as the first step of `docs:dev` and `docs:build`. `docs:generate-function-docs` is a gate, not a formatter: it fails the build on a missing catalogue entry or a `'Custom'` category. See [`FUNCTION-CATALOGUE.md`](../hyperformula/dev-docs/FUNCTION-CATALOGUE.md).
 
-After `docs:build`, the `build-docs` workflow runs `npm run check:citation-markers`. It fails when a citation marker from a draft document (the patterns are listed in the script) appears in the engine's build output or in `docs/api/` and `docs/guide/`, and when one of those directories is missing or empty.
+After `docs:build`, the `build-docs` workflow runs `npm run check:citation-markers`. It fails when a citation marker from a draft document (the patterns are listed in the script) appears in the engine's build output, in `docs/api/`, `docs/guide/` and `docs/examples/`, or in the published files `CHANGELOG.md`, `hyperformula/README.md` and `docs/index.md`, and when one of those paths is missing or a folder is empty.
 
 ## Deploying the portal
 

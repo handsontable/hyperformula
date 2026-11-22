@@ -9,9 +9,14 @@
  * and the `sourcesContent` of the source maps in `dist/`, so every file of the
  * output is scanned, not only the minified bundles.
  *
+ * The published files outside those folders are scanned as well: `CHANGELOG.md`
+ * and `hyperformula/README.md` ship in the npm package, `docs/index.md` is the
+ * portal's home page, and the guides embed the code in `docs/examples/`.
+ *
  * Run it after `npm run docs:build`, which builds both the engine and the docs.
- * A path that is missing or holds no files fails the check instead of being
- * skipped, so a moved output directory cannot turn it into a scan of nothing.
+ * A path that is missing, or a folder that holds no files, fails the check
+ * instead of being skipped, so a moved output cannot turn it into a scan of
+ * nothing.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
@@ -19,15 +24,19 @@ import { fileURLToPath } from 'node:url'
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
-/** The engine's build output and the documentation, relative to the repository root. */
+/** The engine's build output and the documentation, folders and files, relative to the repository root. */
 const SCANNED = [
   'hyperformula/commonjs',
   'hyperformula/dist',
   'hyperformula/es',
   'hyperformula/languages',
   'hyperformula/typings',
+  'hyperformula/README.md',
+  'CHANGELOG.md',
   'docs/api',
   'docs/guide',
+  'docs/examples',
+  'docs/index.md',
 ]
 
 const MARKER = /\[(?:V\d+|(?:vrf|dec|con|que|wrg|crf)_\d+)\]|§\s*AuditSources/g
@@ -76,21 +85,21 @@ for (const sample of MUST_NOT_MATCH) {
 const hits = []
 let fileCount = 0
 for (const relative of SCANNED) {
-  const dir = path.join(REPO_ROOT, relative)
-  let isDirectory = false
+  const target = path.join(REPO_ROOT, relative)
+  let stats
   try {
-    isDirectory = statSync(dir).isDirectory()
+    stats = statSync(target)
   } catch {
     abort(`${relative} does not exist. Build the engine and the docs first: npm run docs:build`)
   }
-  if (!isDirectory) {
-    abort(`${relative} is not a directory`)
+  if (!stats.isDirectory() && !stats.isFile()) {
+    abort(`${relative} is neither a folder nor a file`)
   }
-  const files = listFiles(dir)
+  const files = stats.isDirectory() ? listFiles(target) : [target]
   if (files.length === 0) {
     abort(`${relative} contains no files`)
   }
-  console.log(`${relative}: ${files.length} files`)
+  console.log(`${relative}: ${files.length} ${files.length === 1 ? 'file' : 'files'}`)
   fileCount += files.length
   for (const file of files) {
     const text = readFileSync(file, 'utf8')
