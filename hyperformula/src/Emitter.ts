@@ -27,7 +27,9 @@ export interface Listeners {
    *
    * @example
    * ```js
-   * const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+   * const hfInstance = HyperFormula.buildEmpty({
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // define a function to be called when the event occurs
    * const handler = (addedSheetDisplayName) => { console.log('baz') }
@@ -64,7 +66,9 @@ export interface Listeners {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
    *   MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // define a function to be called when the event occurs
    * const handler = (removedSheetDisplayName, changes) => { console.log('baz') }
@@ -101,7 +105,9 @@ export interface Listeners {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['=SUM(MySheet2!A1:A2)'] ],
    *   MySheet2: [ ['10'] ],
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // define a function to be called when the event occurs
    * const handler = (oldName, newName) => { console.log(`Sheet ${oldName} was renamed to ${newName}`) }
@@ -137,7 +143,9 @@ export interface Listeners {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // define a function to be called when the event occurs
    * const handler = (namedExpressionName, changes) => { console.log('baz') }
@@ -173,7 +181,9 @@ export interface Listeners {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['42'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // define a function to be called when the event occurs
    * const handler = (namedExpressionName, changes) => { console.log('baz') }
@@ -212,7 +222,9 @@ export interface Listeners {
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
    *   ['1', '2', '=A1'],
-   * ], { licenseKey: 'gpl-v3' });
+   * ], {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // define a function to be called when the event occurs
    * const handler = (changes) => { console.log('baz') }
@@ -246,7 +258,9 @@ export interface Listeners {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['1'] ],
    *   MySheet2: [ ['10'] ]
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // define a function to be called when the event occurs
    * const handler = ( ) => { console.log('baz') }
@@ -285,7 +299,9 @@ export interface Listeners {
    * const hfInstance = HyperFormula.buildFromSheets({
    *   MySheet1: [ ['1'] ],
    *   MySheet2: [ ['10'] ]
-   * }, { licenseKey: 'gpl-v3' });
+   * }, {
+   *   // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+   * });
    *
    * // define a function to be called when the event occurs
    * const handler = (changes) => { console.log('baz') }

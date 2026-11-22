@@ -464,8 +464,9 @@ export class LicenseCapabilityMissingError extends Error {
    */
   constructor(feature: FeatureId, blockingState?: LicenseKeyValidityState) {
     super(blockingState === undefined
-      ? `Feature ${feature} is not included in your license.`
-      : `License key is ${blockingState}. Feature ${feature} is not available.`)
+      ? `Feature ${feature} is not included in your license. If you need any help, contact us at sales@handsontable.com.`
+      : `License key is ${blockingState}. Feature ${feature} is not available.` +
+        ' If you need any help, contact us at sales@handsontable.com.')
     this.feature = feature
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Not a verbatim copy of the Handsontable docs' file (handsontable/handsontable at 71be5d4,
+ * Not a verbatim copy of the Handsontable docs' file (handsontable/handsontable at 58bd74d,
  * docs/src/components/DocsAssistant/): its storage keys, starter questions and backend fallback are HyperFormula's.
  * The other files are copies, except for one fix in `MarkdownRendererSimple.tsx` (see `docs/README.md`).
  */
@@ -10,6 +10,11 @@ export const STORAGE_KEYS = {
   open: 'hf-docs-chat-open',
   width: 'hf-docs-chat-width',
   threadId: 'hf-docs-chat-thread-id',
+  /**
+   * localStorage: what the panel needs to poll for a Support reply in the current conversation
+   * (thread id, its token, the last reply shown). Cleared with the thread.
+   */
+  agentReplies: 'hf-docs-chat-agent-replies',
   /**
    * localStorage: set once the reader closes the proactive bubble, which then never shows again.
    */
@@ -91,6 +96,24 @@ export const API_URL = resolveApiBase();
 
 export const CHAT_ENDPOINT = `${API_URL.replace(/\/$/, '')}/api/chat`;
 export const FEEDBACK_ENDPOINT = `${API_URL.replace(/\/$/, '')}/api/feedback`;
+export const AGENT_REPLIES_ENDPOINT = `${API_URL.replace(/\/$/, '')}/api/agent-replies`;
+
+/** The label above a reply a teammate wrote from Slack, so a reader can tell it from the bot. */
+export const AGENT_LABEL = 'Handsontable Support';
+
+/** Text of the controls a reader uses to answer Support instead of the bot (SU-1118). */
+export const SUPPORT_UI = {
+  replyButton: 'Reply to Support',
+  chip: 'To Support',
+  chipRemove: 'Stop writing to Support',
+  placeholder: 'Write to Support...',
+  composerLabel: 'Write to Support',
+  sentNote: 'Sent to Support. Please wait for a reply.',
+  backToBot: 'You are replying to the bot again',
+} as const;
+
+/** How long the "replying to the bot again" notice stays under the input. */
+export const BACK_TO_BOT_NOTICE_MS = 4000;
 
 export const SHIKI_LANGS = ['js', 'ts', 'html', 'css', 'json', 'bash'] as const;
 export const SHIKI_THEMES = { light: 'github-light', dark: 'github-dark' } as const;
