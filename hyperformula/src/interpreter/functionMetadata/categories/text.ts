@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {FunctionDoc} from '../FunctionDescription'
@@ -30,6 +30,13 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'text', description: 'The text whose first character\'s numeric code is returned.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=CODE("A")', '=CODE(A1)'],
+  },
+  CONCAT: {
+    category: 'Text',
+    shortDescription: 'Joins the text of all arguments into one string, reading each range or array row by row.',
+    parameters: [{name: 'text1', description: 'A text value, cell reference, range, or array to include in the joined string. Further values can be passed as additional arguments and are appended in order.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=CONCAT("Hello", " ", "World")', '=CONCAT(A1:C3)'],
   },
   CONCATENATE: {
     category: 'Text',
@@ -145,7 +152,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
   },
   TEXTJOIN: {
     category: 'Text',
-    shortDescription: 'Joins text from multiple strings and/or ranges with a delimiter. Supports array/range delimiters that cycle through gaps. When ignore_empty is TRUE, empty strings are skipped. Returns #VALUE! if result exceeds 32,767 characters.',
+    shortDescription: 'Joins text from multiple strings and/or ranges with a delimiter. Supports array/range delimiters that cycle through gaps. When ignore_empty is TRUE, empty strings are skipped. Returns #CALC! if result exceeds 32,767 characters.',
     parameters: [{name: 'delimiter', description: 'The text (or range/array of texts, cycled through the gaps) inserted between joined values.'}, {name: 'ignore_empty', description: 'When TRUE, empty strings among the joined values are skipped instead of producing an extra delimiter.'}, {name: 'text1', description: 'A text value, cell reference, or range to join. Further text values or ranges can be passed as additional arguments and are appended in order.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=TEXTJOIN(", ", TRUE(), A1:A3)', '=TEXTJOIN("-", FALSE(), "a", "b", "c")'],
@@ -184,5 +191,12 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'text', description: 'The text to parse as a number, date, time, datetime, currency, or percentage.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=VALUE("123")', '=VALUE("50%")', '=VALUE(A1)'],
+  },
+  VALUETOTEXT: {
+    category: 'Text',
+    shortDescription: 'Returns a value as text. Errors are returned as text instead of being propagated.',
+    parameters: [{name: 'value', description: 'The value to convert to text.'}, {name: 'format', description: 'The output format: 0 (default) returns concise text, 1 returns strict text, in which text is wrapped in double quotes. The value is rounded down to an integer; any other result gives #VALUE!.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=VALUETOTEXT(A1)', '=VALUETOTEXT("Hello", 1)'],
   },
 }

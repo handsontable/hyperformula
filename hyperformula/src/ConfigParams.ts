@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
@@ -119,6 +119,10 @@ export interface ConfigParams {
   decimalSeparator: '.' | ',',
   /**
    * When set to `true`, formulas evaluating to `null` evaluate to `0` instead.
+   *
+   * The same applies to an empty cell read through the API: `getCellValue()`, `getSheetValues()` and the
+   * other methods that return cell values, as well as the changes passed to the `valuesUpdated` event,
+   * give `0` for it instead of `null`. `ISBLANK` still treats the cell as blank.
    * @default false
    * @category Engine
    */
@@ -171,9 +175,7 @@ export interface ConfigParams {
   /**
    * Sets your HyperFormula license key.
    *
-   * To use HyperFormula on the GPLv3 license terms, set this option to `gpl-v3`.
-   *
-   * To use HyperFormula with your proprietary license, set this option to your valid license key string.
+   * Set this option to your valid license key string.
    *
    * For more information, go [here](/guide/license-key.md).
    * @default undefined
@@ -433,6 +435,22 @@ export interface ConfigParams {
    * @category Engine
    */
   maxPendingLazyTransformations: number,
+  /**
+   * Maximum number of parsed formula entries retained in the parser cache.
+   * Must be a non-negative safe integer. Set to `0` to disable parser caching,
+   * or to `Number.MAX_SAFE_INTEGER` to keep every entry.
+   *
+   * Least recently used entries are discarded when the limit is reached.
+   * Smaller limits can reduce cache memory but may increase parsing work. They
+   * can also increase total memory when many cells reuse the same formulas,
+   * because those cells share parts of a cached syntax tree, and all of it once
+   * a structural change rewrites them. This does not limit formulas retained by
+   * cells, named expressions, undo/redo or the clipboard.
+   *
+   * @default 10000
+   * @category Engine
+   */
+  maxParserCacheSize: number,
   /**
    * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) are allowed to use regular expressions.
    * @default false

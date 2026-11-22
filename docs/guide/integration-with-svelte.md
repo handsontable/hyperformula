@@ -1,4 +1,5 @@
 ---
+title: "Integration with Svelte"
 tags:
   - SSR
   - onMount
@@ -7,13 +8,11 @@ tags:
   - lifecycle
 ---
 
-# Integration with Svelte
-
 The HyperFormula API is identical in a Svelte app and in plain JavaScript. This guide demonstrates how HyperFormula integrates with the Svelte component's lifecycle and how you bridge its values into Svelte's reactivity.
 
 Install with `npm install hyperformula`. For other options, see the [client-side installation](client-side-installation.md) section.
 
-::: warning SvelteKit SSR
+:::caution[SvelteKit SSR]
 The primary snippet below assumes a browser environment. If you use SvelteKit with default SSR, skip to [Server-side rendering](#server-side-rendering-sveltekit) — `HyperFormula.buildFromArray` at `<script>` top level will run on every server render, which is unnecessary work.
 :::
 
@@ -32,7 +31,7 @@ Declare the engine at the top of `<script>` so it lives for the component's life
   ];
 
   const hf = HyperFormula.buildFromArray(data, {
-    licenseKey: 'gpl-v3',
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
     // more configuration options go here
   });
 
@@ -98,7 +97,9 @@ In SvelteKit, top-level statements in `<script>` run on the server too. HyperFor
         [1, 2, '=A1+B1'],
         // your data rows go here
       ],
-      { licenseKey: 'gpl-v3' }
+      {
+        // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+      }
     );
   });
 
@@ -132,4 +133,4 @@ In SvelteKit, top-level statements in `<script>` run on the server too. HyperFor
 
 ## Demo
 
-For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/svelte-demo?v=' + $page.buildDateURIEncoded">Svelte demo on Stackblitz</a>.
+For a more advanced example, check out the [Svelte demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/svelte-demo?v={{$page.buildDateURIEncoded}}).

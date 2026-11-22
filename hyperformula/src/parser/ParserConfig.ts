@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {TranslatableErrorType} from '../Cell'
@@ -16,4 +16,5 @@ export interface ParserConfig {
   errorMapping: Record<string, TranslatableErrorType>,
   maxColumns: number,
   maxRows: number,
+  maxParserCacheSize: number,
 }

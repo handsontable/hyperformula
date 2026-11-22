@@ -134,6 +134,46 @@ describe("FormulaEditor ref preview color", () => {
     editor.destroy();
   });
 
+  it("does not count the typed ref the caret sits in when previewing its replacement", () => {
+    const adapter = makeAdapter();
+    const host = document.createElement("div");
+    const editor = new FormulaEditor(host, { adapter, popupCtx: new PopupContext() });
+
+    editor.focus();
+    editor.setValue("=(D1-C1)*B2", { caret: "=(D1-C1)*B".length });
+
+    const replacementRange = {
+      start: { sheet: "", col: 4, row: 4 },
+      end: { sheet: "", col: 4, row: 4 },
+    };
+
+    expect(editor.getRefPreviewColor(replacementRange)).toBe(REF_PALETTE[2]);
+
+    adapter.pickCell({ sheet: "", col: 4, row: 4 });
+
+    expect(editor.getValue()).toBe("=(D1-C1)*E5");
+
+    editor.destroy();
+  });
+
+  it("previews the next-new-ref color when appending beside the typed ref the caret sits in", () => {
+    const adapter = makeAdapter();
+    const host = document.createElement("div");
+    const editor = new FormulaEditor(host, { adapter, popupCtx: new PopupContext() });
+
+    editor.focus();
+    editor.setValue("=(D1-C1)*B2", { caret: "=(D1-C1)*B".length });
+
+    const appendRange = {
+      start: { sheet: "", col: 4, row: 4 },
+      end: { sheet: "", col: 4, row: 4 },
+    };
+
+    expect(editor.getRefPreviewColor(appendRange, true)).toBe(REF_PALETTE[3]);
+
+    editor.destroy();
+  });
+
   it("previews the next-new-ref color, not the pending ref's slot, when appending alongside it", () => {
     const adapter = makeAdapter();
     const host = document.createElement("div");

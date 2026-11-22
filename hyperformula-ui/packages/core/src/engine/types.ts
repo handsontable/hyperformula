@@ -68,9 +68,11 @@ export interface HyperFormulaLike {
   on?(event: "valuesUpdated", listener: (changes: unknown[]) => void): void;
   on?(event: "namedExpressionAdded", listener: (name: string) => void): void;
   on?(event: "namedExpressionRemoved", listener: (name: string) => void): void;
+  on?(event: "sheetRemoved", listener: (sheetName: string) => void): void;
   off?(event: "valuesUpdated", listener: (changes: unknown[]) => void): void;
   off?(event: "namedExpressionAdded", listener: (name: string) => void): void;
   off?(event: "namedExpressionRemoved", listener: (name: string) => void): void;
+  off?(event: "sheetRemoved", listener: (sheetName: string) => void): void;
 }
 
 export type NamedExprResolution =

@@ -14,6 +14,7 @@ import {
 
 interface KeyboardHarnessOptions {
   onCommit?: (value: string, direction?: Direction) => void;
+  onCommitFill?: (value: string) => void;
   onCancel?: () => void;
   hyperformula?: HyperFormulaLike;
 }
@@ -226,6 +227,37 @@ describe("newline insertion", () => {
     expect(editor.getValue()).toBe("=1\n");
     expect(requireTextarea(host).selectionStart).toBe(3);
     expect(onCommit).not.toHaveBeenCalled();
+    destroy();
+  });
+
+  it("Alt+Enter inserts a newline at the caret", () => {
+    const onCommitFill = vi.fn();
+    const { host, editor, destroy } = createKeyboardHarness({ onCommitFill });
+
+    typeInto(host, "=1");
+    press(host, "Enter", { altKey: true });
+
+    expect(editor.getValue()).toBe("=1\n");
+    expect(onCommitFill).not.toHaveBeenCalled();
+    destroy();
+  });
+});
+
+describe("fill commit", () => {
+  it.each([
+    ["Ctrl+Enter", { ctrlKey: true }],
+    ["Cmd+Enter", { metaKey: true }],
+  ])("%s commits the value to every selected cell when the host supports it", (_name, init) => {
+    const onCommit = vi.fn();
+    const onCommitFill = vi.fn();
+    const { host, editor, destroy } = createKeyboardHarness({ onCommit, onCommitFill });
+
+    typeInto(host, "=SUM(A1");
+    press(host, "Enter", init);
+
+    expect(onCommitFill).toHaveBeenCalledWith("=SUM(A1)");
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(editor.getValue()).toBe("=SUM(A1)");
     destroy();
   });
 });

@@ -1,0 +1,13 @@
+---
+import Default from '@astrojs/starlight/components/MarkdownContent.astro';
+
+// The `tags` frontmatter lists search keywords that are not in the text. They are indexed with the page but not shown.
+const { tags } = Astro.locals.starlightRoute.entry.data;
+---
+
+<Default><slot /></Default>
+{tags?.length && <div hidden data-pagefind-weight="5">{tags.join(' ')}</div>}
+
+<script>
+  import '../scripts/coding-agent-wizard.mjs';
+</script>

@@ -2,7 +2,7 @@
   "name": "hyperformula-monorepo",
   "description": "Monorepo for HyperFormula, its UI components, and its documentation portal.",
   "private": true,
-  "license": "GPL-3.0-only",
+  "license": "SEE LICENSE IN LICENSE.txt",
   "repository": {
     "type": "git",
     "url": "https://github.com/handsontable/hyperformula.git"

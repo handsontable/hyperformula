@@ -1,6 +1,6 @@
 import { CN } from "../theme/classNames";
 import { activeCallContext, currentFunctionPrefix } from "../ui/caret/tokenContext";
-import { findAncestor } from "../ui/dom";
+import { findAncestor, viewOf } from "../ui/dom";
 import { orderSuggestionItems } from "../ui/popup/suggestionsPopup";
 import type { AnchorRect, SuggestionItem, SuggestionsAriaState } from "../ui/popup/types";
 import { isFormula } from "./editorContext";
@@ -70,7 +70,9 @@ export class PopupController {
       return { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right };
     }
 
-    return { top: 0, bottom: window.innerHeight, left: 0, right: window.innerWidth };
+    const view = viewOf(this.ctx.rootEl);
+
+    return { top: 0, bottom: view.innerHeight, left: 0, right: view.innerWidth };
   }
 
   invalidateClipCache(): void {
