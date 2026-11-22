@@ -866,7 +866,7 @@ export class Operations {
       const address = formulaVertex.getAddress(this.lazilyTransformingAstService)
 
       if (formulaVertex instanceof ArrayFormulaVertex || !this.arraySizePredictor.checkArraySize(ast, address).isScalar()) {
-        this.setFormulaToCellFromCache(this.parser.computeHashFromAst(ast), address)
+        this.setFormulaToCellFromAst(ast, address)
       }
     }
   }
