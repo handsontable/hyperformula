@@ -9,6 +9,7 @@ import { satteri } from '@astrojs/markdown-satteri';
 import { DOCS_DATA } from './src/docs-data.mjs';
 import { docsMarkdownPlugin, legacyAnchorsPlugin, tableWrapperPlugin } from './src/markdown-plugins.mjs';
 import { mdCompanions } from './src/md-companions/index.mjs';
+import { previewLicenseKey } from './src/preview-license-key.mjs';
 import { apiPageGroup } from './src/api-sidebar.mjs';
 
 // CommonJS, because the Worker and `script/prepare-cf-assets.js` read it too.
@@ -50,7 +51,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: `HyperFormula (v${DOCS_DATA.version})`,
-      description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
+      description: 'HyperFormula is a high-performance calculation engine for spreadsheets and web applications.',
       // The header, sidebar, footer, code blocks and styles follow the Handsontable docs, so both portals look the same
       // (see `src/styles/custom.css`).
       logo: {
@@ -221,6 +222,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             { label: 'Migrating from 0.6 to 1.0', slug: 'guide/migration-from-0.6-to-1.0' },
             { label: 'Migrating from 1.x to 2.0', slug: 'guide/migration-from-1.x-to-2.0' },
             { label: 'Migrating from 2.x to 3.0', slug: 'guide/migration-from-2.x-to-3.0' },
+            { label: 'Migrating from 3.x to 4.0', slug: 'guide/migration-from-3.x-to-4.0' },
           ],
         },
         {
@@ -266,5 +268,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       },
     }),
     mdCompanions({ base, hostname }),
+    // Last, so it reads everything the build wrote.
+    previewLicenseKey(process.env),
   ],
 });

@@ -17,6 +17,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import {HyperFormula} from '../../hyperformula/src'
+import {TEST_LICENSE_KEY} from '../../hyperformula/test/_setupFiles/testLicenseKey'
 import {renderBuiltinFunctionsMarkdown, spliceBuiltinFunctionsMarkdown} from './renderBuiltinFunctionsTable'
 
 const DOCS_ROOT = path.resolve(__dirname, '..')
@@ -24,12 +25,12 @@ const TEMPLATE_PATH = path.join(DOCS_ROOT, 'guide/built-in-functions.tmpl.md')
 const DOC_PATH = path.join(DOCS_ROOT, 'guide/built-in-functions.md')
 const LANGUAGE = 'enGB'
 /**
- * The GPLv3 key, which restricts nothing. The metadata API is instance-scoped and an engine reports only the
+ * The internal test key, which grants every function and feature. The metadata API is instance-scoped and an engine reports only the
  * functions its key grants, so this page has to be generated with a fully entitled key: the published reference
  * must always document the complete function set. The key also keeps the build quiet, because constructing an
  * engine without one logs "The license key for HyperFormula is missing."
  */
-const LICENSE_KEY = 'gpl-v3'
+const LICENSE_KEY = TEST_LICENSE_KEY
 
 /** Reads the committed template and returns the page with both generated regions spliced in. */
 function buildUpdatedFile(): string {
