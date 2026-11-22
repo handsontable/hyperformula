@@ -47,7 +47,7 @@ const tableData = [['Jan 31 00', 'Jun 2 01', '=B1-A1']];
 const hf = HyperFormula.buildEmpty({
   parseDateTime: customParseDate,
   dateFormats: ['MMM D YY'],
-  licenseKey: 'gpl-v3',
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
 });
 
 // Add a new sheet and get its id.

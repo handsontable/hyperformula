@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import { ArraySize } from '../../ArraySize'
@@ -98,11 +98,15 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
         const numRows = Math.trunc(rows)
         const numCols = Math.trunc(cols)
 
-        if (!SequencePlugin.isValidDimension(numRows) || !SequencePlugin.isValidDimension(numCols)) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+        if (numRows > this.config.maxRows) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
         }
 
-        if (numRows > this.config.maxRows || numCols > this.config.maxColumns) {
+        if (!SequencePlugin.isValidDimension(numRows) || !SequencePlugin.isValidDimension(numCols)) {
+          return new CellError(ErrorType.CALC, ErrorMessage.LessThanOne)
+        }
+
+        if (numCols > this.config.maxColumns) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
         }
 
