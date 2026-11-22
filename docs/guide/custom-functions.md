@@ -157,7 +157,9 @@ Now, you're ready to use your GREET function in a formula.
 
 ```js
 // build a HyperFormula instance where you can use your function directly
-const hfInstance = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']], { licenseKey: 'gpl-v3' });
+const hfInstance = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // read the value of cell B1
 const result = hfInstance.getCellValue({ sheet: 0, col: 1, row: 0 });
@@ -337,7 +339,9 @@ it('works for a range of numbers', () => {
 
   const engine = HyperFormula.buildFromArray(
     [[1, '=DOUBLE_RANGE(A1:A3)'], [2], [3]],
-    { licenseKey: 'gpl-v3' }
+    {
+      // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+    }
   );
 
   expect(engine.getCellValue({ sheet: 0, row: 0, col: 1 })).toEqual(2);
@@ -353,7 +357,9 @@ it('returns a VALUE error if the range argument contains a string', () => {
 
   const engine = HyperFormula.buildFromArray(
     [[1, '=DOUBLE_RANGE(A1:A3)'], ['I should not be here'], [3]],
-    { licenseKey: 'gpl-v3' }
+    {
+      // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+    }
   );
 
   expect(engine.getCellValueType({ sheet: 0, row: 0, col: 1 })).toEqual(
@@ -381,7 +387,7 @@ You can set the following options for your function:
 |-------------------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `method` (required)                 | String  | Name of the method that implements the custom function logic.                                                                                                                                                                                 |
 | `parameters`                        | Array   | Specification of the arguments accepted by the function and their [validation options](#argument-validation-options).                                                                                                                         |
-| `sizeOfResultArrayMethod`                   | String  | Name of the method that calculates the size of the result array. Not required for functions that never return an array.                                                                                                                       |
+| `sizeOfResultArrayMethod`                   | String  | Name of the method that calculates the size of the result array. Not required for functions that never return an array. For a function that declares it, `=TYPE(MY_FUNCTION(...))` returns `64` (array) even when the call returns a single value, unless that value is an error (`16`). |
 | `returnNumberType`                  | String  | If the function returns a numeric value, this option indicates how to interpret the returned number.<br/>Possible values: `NUMBER_RAW, NUMBER_DATE, NUMBER_TIME, NUMBER_DATETIME, NUMBER_CURRENCY, NUMBER_PERCENT`.<br/>Default: `NUMBER_RAW` |
 | `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely. Must be a positive integer no larger than the number of `parameters`. A value that is not a positive integer (`0`, a negative number, a fraction, `NaN`, or `Infinity`) is ignored, and the function keeps a fixed number of arguments. A value larger than the number of `parameters` is not supported and must not be used: the function then accepts an erratic set of argument counts instead of a repeating one (with one parameter and `repeatLastArgs: 5`, calls with 1, 2, 4, or 5 arguments are accepted, while 3 and 8 return `#N/A!`).<br/>Default: `0`                                                                                                                |
 | `expandRanges`                      | Boolean | `true`: ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.<br/>Default: `false`                                                                                                                          |
@@ -433,6 +439,7 @@ You can set the following argument validation options:
 | `lessThan`                | Number                                    | If set: numerical argument needs to be less than `lessThan`.                                                                                                                                                                                       |
 | `greaterThan`             | Number                                    | If set: numerical argument needs to be greater than `greaterThan`.                                                                                                                                                                                 |
 | `emptyAsDefault`          | Boolean                                   | `true`: an empty argument (e.g., `=FUNC(1,,3)`) is treated as missing and falls back to `defaultValue`. By default (`false`), empty arguments are coerced to the zero-value for their type (`0`, `FALSE`, or `""`). Requires `defaultValue` to be set. |
+| `emptyAsAbsent`           | Boolean                                   | `true`: an empty optional argument (e.g., `=FUNC(1,,3)`) is passed to the function as `undefined`, exactly as if it had not been written at all. Use it when the function must distinguish an absent argument from one whose value is empty — `ADDRESS` uses it for `sheetName`: `=ADDRESS(2,3,1,FALSE(),)` returns `R2C3`, while `=ADDRESS(2,3,1,FALSE(),"")` returns `!R2C3`. Applies only to an argument with `optionalArg: true` and no `defaultValue`, so it never competes with `emptyAsDefault`. |
 
 In your function plugin, in the static `implementedFunctions` property, add an
 array called `parameters`:

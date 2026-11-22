@@ -34,7 +34,7 @@ this:
 
 ```javascript
 const options = {
-    licenseKey: 'gpl-v3'
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
 };
 ```
 
