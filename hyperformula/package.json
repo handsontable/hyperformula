@@ -47,7 +47,7 @@
     "last 2 and_qq versions",
     "last 2 op_mob versions"
   ],
-  "license": "GPL-3.0-only",
+  "license": "SEE LICENSE IN LICENSE.txt",
   "type": "commonjs",
   "module": "es/index.mjs",
   "main": "commonjs/index.js",
@@ -95,8 +95,7 @@
     "clean": "rimraf coverage/ commonjs/ dist/ es/ languages/ lib/ typings/ test-jasmine/",
     "check:license-key-parser-drift": "node script/check-license-key-parser-drift.js",
     "compile": "tsc",
-    "tsnode": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"}",
-    "postinstall": "node script/postinstall-skills-message.js"
+    "tsnode": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"}"
   },
   "dependencies": {
     "chevrotain": "^6.5.0",

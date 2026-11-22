@@ -1,4 +1,5 @@
 import { HyperFormula } from "hyperformula";
+import { TEST_LICENSE_KEY } from "./test-license-key";
 
 export const ROWS = 100;
 export const COLS = 18;
@@ -42,7 +43,7 @@ export function seedNamedExpressions(engine: HyperFormula, sheetName = "Sheet1")
 
 export function buildHyperFormula(): HyperFormula {
   const engine = HyperFormula.buildFromArray(makeSampleData(), {
-    licenseKey: "gpl-v3",
+    licenseKey: TEST_LICENSE_KEY,
   });
 
   seedNamedExpressions(engine);

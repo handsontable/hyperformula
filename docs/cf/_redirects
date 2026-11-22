@@ -1,0 +1,30 @@
+# Cloudflare Workers static-asset redirects.
+# Copied to the root of the asset directory by `docs/script/prepare-cf-assets.js`.
+#
+# The documentation is built under `/docs/hyperformula/`, so the asset root
+# itself holds no document. Send it to the documentation entry point instead of
+# a 404 - this makes preview URLs
+# (`https://<branch>-hyperformula-docs.<subdomain>.workers.dev`) usable without
+# manually appending the path.
+#
+# The documentation's former addresses (`/docs/*` outside the new base) are
+# redirected by `worker/index.js`, not here: a `/docs/*` rule in this file
+# would also match `/docs/hyperformula/*`, and redirects here apply even when
+# an asset matches.
+/ /docs/hyperformula/ 302
+
+# The sitemap is split into `sitemap-index.xml` and its parts; keep the former
+# single-file address working for search consoles and robots.txt.
+/docs/hyperformula/sitemap.xml /docs/hyperformula/sitemap-index.xml 301
+
+# The API reference overview is built as `api.html`. Its former file name
+# (which `worker/index.js` also requests for `/api/`), and the TypeDoc readme
+# input that used to be published as a page of its own, lead there.
+/docs/hyperformula/api/index.html /docs/hyperformula/api.html 301
+/docs/hyperformula/api-ref-readme.html /docs/hyperformula/api.html 301
+/docs/hyperformula/api-ref-readme.md /docs/hyperformula/api/index.md 301
+
+# The guides have no index page of their own; their section address leads to
+# the documentation's home page.
+/docs/hyperformula/guide/ /docs/hyperformula/ 301
+/docs/hyperformula/guide /docs/hyperformula/ 301

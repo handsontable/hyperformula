@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {SimpleCellAddress} from './Cell'
@@ -92,8 +92,7 @@ export class LazilyTransformingAstService {
     for (let v = Math.max(version, this.versionOffset); v < currentVersion; v++) {
       const transformation = this.transformations[v - this.versionOffset]
       if (transformation.isIrreversible()) {
-        this.undoRedo!.storeDataForVersion(v, address, this.parser!.computeHashFromAst(ast))
-        this.parser!.rememberNewAst(ast)
+        this.undoRedo!.storeDataForVersion(v, address, ast)
       }
 
       const [newAst, newAddress] = transformation.transformSingleAst(ast, address)
