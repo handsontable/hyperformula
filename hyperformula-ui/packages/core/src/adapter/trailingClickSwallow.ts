@@ -1,3 +1,5 @@
+import { eventOrigin, isElement } from "../ui/dom";
+
 /**
  * Swallows the single click that trails a header-drag mouseup so the host grid does not
  * treat it as a header selection: captures the next `click` on `swallowTarget` and, when
@@ -17,9 +19,9 @@ export function armTrailingClickSwallow(
   const handleTrailingClick = (event: MouseEvent): void => {
     disarm();
 
-    const target = event.target;
+    const target = eventOrigin(event);
 
-    if (target instanceof Element && shouldSwallow(target)) {
+    if (isElement(target) && shouldSwallow(target)) {
       event.preventDefault();
       event.stopImmediatePropagation();
     }

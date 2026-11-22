@@ -1,4 +1,5 @@
 ---
+title: "Sorting data"
 tags:
   - setRowOrder
   - setColumnOrder
@@ -8,8 +9,6 @@ tags:
   - permutation
   - sort by column
 ---
-
-# Sorting data
 
 In HyperFormula, you can sort data by reordering rows and columns.
 
@@ -36,17 +35,19 @@ const hfInstance = HyperFormula.buildFromArray([
  ['A'],
  ['B'],
  ['C'],
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // we'll set the row order to [1, 2, 0] in the next steps
 // the resulting sheet will be: [['C'], ['A'], ['B']]
 ```
 
-::: tip
+:::tip
 The [`setRowOrder`](../api/classes/hyperformula.md#setroworder) method accepts an array of numbers, so you can implement any function that returns an array with your required row order.
 :::
 
-::: warning
+:::caution
 The permutation array maps **current positions** to **new positions**, not the other way around. The value at index `i` tells HyperFormula where to move the row currently at index `i`, *not* which row should end up at index `i`.
 
 For example, `[1, 2, 0]` means "move row 0 to position 1, row 1 to position 2, row 2 to position 0". It does **not** mean "the new row 0 comes from position 1, the new row 1 comes from position 2, ...".
@@ -65,7 +66,9 @@ const hfInstance = HyperFormula.buildFromArray([
  ['A'],
  ['B'],
  ['C'],
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // a variable to carry the user message
 let messageUsedInUI;
@@ -88,7 +91,9 @@ const hfInstance = HyperFormula.buildFromArray([
  ['A'],
  ['B'],
  ['C'],
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 let messageUsedInUI;
 
@@ -132,17 +137,19 @@ For example, if you want to move the last column to the front of a 3-column shee
 // a HyperFormula instance with example data
 const hfInstance = HyperFormula.buildFromArray([
  ['A', 'B', 'C']
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // we'll set the column order to [1, 2, 0] in the next steps
 // the resulting sheet will be: [['C', 'A', 'B']]
 ```
 
-::: tip
+:::tip
 The [`setColumnOrder`](../api/classes/hyperformula.md#setcolumnorder) method accepts an array of numbers, so you can implement any function that returns an array with your required column order.
 :::
 
-::: warning
+:::caution
 The permutation array maps **current positions** to **new positions**, not the other way around. The value at index `i` tells HyperFormula where to move the column currently at index `i`, *not* which column should end up at index `i`.
 :::
 
@@ -157,7 +164,9 @@ Use the [`isItPossibleToSetColumnOrder`](../api/classes/hyperformula.md#isitposs
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['A', 'B', 'C']
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // a variable to carry the user message
 let messageUsedInUI;
@@ -178,7 +187,9 @@ If your specified column number permutation is valid, change the column order:
 ```js
 const hfInstance = HyperFormula.buildFromArray([
  ['A', 'B', 'C']
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 let messageUsedInUI;
 
@@ -211,7 +222,7 @@ if (!isColumnOrderOk) {
 
 The demo below shows how to sort rows in ascending and descending order, based on the results (calculated values) of the cells in the second column.
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/sorting-data/example1.html)
 

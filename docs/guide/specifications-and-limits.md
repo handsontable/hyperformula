@@ -1,4 +1,5 @@
 ---
+title: "Specifications and limits"
 tags:
   - maxRows
   - maxColumns
@@ -9,8 +10,6 @@ tags:
   - iterative calculation
   - floating point
 ---
-
-# Specifications and limits
 
 The following table presents the limits of features. Many of them
 are bounded only by system resources. This means the actual

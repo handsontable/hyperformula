@@ -1,4 +1,5 @@
 ---
+title: "Date and time handling"
 tags:
   - dates
   - dateFormats
@@ -9,8 +10,6 @@ tags:
   - nullYear
   - date parsing
 ---
-
-# Date and time handling
 
 The formats for the default date and time parsing functions can be set using configuration options:
 - [`dateFormats`](../api/interfaces/configparams.md#dateformats),
@@ -33,6 +32,67 @@ To use the US date and time formats, set:
 ```javascript
 dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'], // US date formats
 timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
+```
+
+## Dates in function arguments and `#VALUE!` errors
+
+Functions that expect a date, such as `XIRR`, `YEARFRAC`, and `DATEDIF`, need real date values. HyperFormula returns `#VALUE!` when you pass them text that only looks like a date, such as the ISO 8601 string `2026-01-01`.
+
+### Use real date values
+
+Use one of the following options:
+
+1. Build each date with the `DATE` function, for example `'=DATE(2026, 1, 1)'`.
+2. Write each date in a format listed in [`dateFormats`](../api/interfaces/configparams.md#dateformats), for example `'01/01/2026'` with the default settings.
+3. Add the format you use to [`dateFormats`](../api/interfaces/configparams.md#dateformats). Setting this option replaces the default list, so keep the default formats if you still need them.
+
+HyperFormula's `DATEVALUE` function takes text, such as `=DATEVALUE("01/01/2026")`. A cell whose content matches `dateFormats` (options 2 and 3) already holds a date and needs no `DATEVALUE`: passing it such a cell, or a `DATE` result, returns `#VALUE!`.
+
+Option 3 covers date-only ISO strings such as `2026-01-01`. For full ISO timestamps such as `2026-01-01T00:00:00.000Z`, remove the time part before you pass the data (for example, `value.slice(0, 10)`), or parse the timestamps with a custom [`parseDateTime`](#custom-date-and-time-handling) function.
+
+This example uses option 3. HyperFormula's `XIRR` function returns about `0.7222`:
+
+```javascript
+import { HyperFormula } from 'hyperformula';
+
+const hfInstance = HyperFormula.buildFromArray([
+  [-10000, '2026-01-01'],
+  [2750, '2026-03-01'],
+  [4250, '2026-06-01'],
+  [3250, '2026-09-01'],
+  [3000, '2026-12-01'],
+  ['=XIRR(A1:A5, B1:B5)'],
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+  dateFormats: ['DD/MM/YYYY', 'DD/MM/YY', 'YYYY-MM-DD'],
+});
+
+// about 0.7222
+const result = hfInstance.getCellValue({ sheet: 0, row: 5, col: 0 });
+```
+
+### Why ISO date strings return `#VALUE!`
+
+HyperFormula treats a string as a date only if it matches one of the [`dateFormats`](../api/interfaces/configparams.md#dateformats). With the default settings, those are `DD/MM/YYYY` and `DD/MM/YY`. A string with a different layout, such as an ISO 8601 date (year first), stays plain text. Functions that expect a date can't use that text, so they return `#VALUE!` instead of a result.
+
+In this example, the dates in column B are ISO strings and the `dateFormats` option is not set, so HyperFormula's `XIRR` function returns `#VALUE!`:
+
+```javascript
+import { HyperFormula } from 'hyperformula';
+
+const hfInstance = HyperFormula.buildFromArray([
+  [-10000, '2026-01-01'],
+  [2750, '2026-03-01'],
+  [4250, '2026-06-01'],
+  [3250, '2026-09-01'],
+  [3000, '2026-12-01'],
+  ['=XIRR(A1:A5, B1:B5)'],
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
+
+// #VALUE!, because B1:B5 contains text, not dates
+const result = hfInstance.getCellValue({ sheet: 0, row: 5, col: 0 });
 ```
 
 ## Custom date and time handling
@@ -112,7 +172,7 @@ For currency formatting in the `TEXT` function (locale-aware grouping, non-`$` s
 
 ## Demo
 
-::: example #example1 --html 1 --css 2 --js 3 --ts 4
+:::example{#example1}
 
 @[code](@/docs/examples/date-time/example1.html)
 

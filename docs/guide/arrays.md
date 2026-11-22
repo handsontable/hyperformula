@@ -1,4 +1,5 @@
 ---
+title: "Array formulas"
 tags:
   - ARRAYFORMULA
   - useArrayArithmetic
@@ -7,8 +8,6 @@ tags:
   - arrayRowSeparator
   - arrayColumnSeparator
 ---
-
-# Array formulas
 
 Use array formulas to perform an operation (or call a function) on multiple cells at a time.
 
@@ -32,7 +31,7 @@ An inline array is defined by curly braces: `{ }`. It can contain one or more ro
   
 Every row must be of equal length.
 
-::: tip
+:::tip
 **Inline arrays are not recomputed after initialization.**
 
 If an inline array contains a cell reference, and the cell's value changes, the array is not updated.
@@ -87,7 +86,7 @@ Thanks to HyperFormula's built-in array features, you can:
 
 You can also:
 * Use the `FILTER` function to [filter an array](#filtering-an-array), based on boolean arrays
-* Use the `ARRAY_CONSTRAIN` function to [constrain an array's size](#constraining-an-array-s-size)
+* Use the `ARRAY_CONSTRAIN` function to [constrain an array's size](#constraining-an-arrays-size)
 
 ### Operating on arrays
 
@@ -156,6 +155,16 @@ If your specified output array size is smaller than the input array size, only t
 If your specified output array size is larger or equal to the input array size, no change is made.
 
 ## Array rules
+
+### Array size limits
+
+An array result that spills must fit the sheet, whose size is set by the [`maxRows`](../api/interfaces/configparams.md#maxrows) and [`maxColumns`](../api/interfaces/configparams.md#maxcolumns) configuration options. If its spill area extends beyond the sheet edge, HyperFormula returns `#SPILL!` (`No space for array result.`). Move the formula to a position with enough space or reduce its output dimensions. For example, with `maxRows` set to `4`, `=SEQUENCE(4)` fits at `A1` but returns `#SPILL!` at `A2`, and `=VSTACK(SEQUENCE(3), SEQUENCE(2))` returns `#SPILL!` wherever it is placed. A scalar formula such as `=SUM(SEQUENCE(4))` can be placed at `A2` because its result occupies only one cell.
+
+An array computed inside a formula and not spilled, for example a `VSTACK` result passed to `SUM`, is not limited by the sheet size, because its size follows from its arguments. `SEQUENCE`, which creates an array from its size arguments, is limited by `maxRows` and `maxColumns`, and returns `#VALUE!` (`Value too large.`) beyond them.
+
+An array formula that returns `#SPILL!` does not spill again on its own when space becomes available, for example after the rows above it are removed or a blocking value is cleared. Re-enter the formula to recalculate it. See [#1785](https://github.com/handsontable/hyperformula/issues/1785).
+
+These limits apply to each dimension separately. They do not impose a separate limit on the total number of cells in an array, so an array within both limits can still be very large: at the default limits, `=SEQUENCE(40000, 18278)` has over 731 million cells and can exhaust the available memory.
 
 ### With the array arithmetic mode enabled
 

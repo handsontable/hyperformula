@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {FunctionDoc} from '../FunctionDescription'
@@ -37,6 +37,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'range', description: 'The range of cells tested against the criteria.'}, {name: 'criteria', description: 'The condition that selects which cells are averaged, e.g. ">5", "apples", or a cell reference.'}, {name: 'average_range', description: 'The range of cells to average. When omitted, the cells in range are averaged instead.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=AVERAGEIF(A1:A10, ">5")', '=AVERAGEIF(B1:B10, "apples", C1:C10)'],
+  },
+  AVERAGEIFS: {
+    category: 'Statistical',
+    shortDescription: 'Returns the arithmetic mean of the cells in a range that meet a set of criteria.',
+    parameters: [{name: 'average_range', description: 'The range of cells to average.'}, {name: 'criteria_range1', description: 'A range of cells tested against the paired criterion. Further range/criterion pairs can be passed as additional arguments, and only cells meeting every criterion are considered.'}, {name: 'criteria1', description: 'The condition applied to the preceding range, e.g. ">5", "apples", or a cell reference.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=AVERAGEIFS(C1:C10, A1:A10, ">5")', '=AVERAGEIFS(C1:C10, A1:A10, ">5", B1:B10, "apples")'],
   },
   'BETA.DIST': {
     category: 'Statistical',
@@ -241,6 +248,17 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=FISHERINV(0.5)'],
   },
+  'FORECAST.LINEAR': {
+    category: 'Statistical',
+    shortDescription: 'Returns the value at `x` of the least-squares line through the pairs of `known_y` and `known_x`. Pairs with a non-numeric value are skipped.',
+    parameters: [
+      {name: 'x', description: 'The value of the independent variable at which to predict a value.'},
+      {name: 'known_y', description: 'The range of dependent (y) values.'},
+      {name: 'known_x', description: 'The range of independent (x) values, with the same number of cells as `known_y`.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=FORECAST.LINEAR(7, A1:A6, B1:B6)'],
+  },
   GAMMA: {
     category: 'Statistical',
     shortDescription: 'Returns value of Gamma function.',
@@ -283,6 +301,18 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=GEOMEAN(1, 2, 3)', '=GEOMEAN(A1:A10)'],
   },
+  GROWTH: {
+    category: 'Statistical',
+    shortDescription: 'Returns values of the exponential curve y = b·m^x fitted by least squares to `known_y`, at the points `new_x`. `known_y` values must be positive.',
+    parameters: [
+      {name: 'known_y', description: 'A numeric range of observed dependent values.'},
+      {name: 'known_x', description: 'Optional numeric predictors. If omitted, uses sequential values starting at 1 with the shape of `known_y`.'},
+      {name: 'new_x', description: 'Optional points at which to predict values, with one column (or row) per predictor. If omitted, uses `known_x`.'},
+      {name: 'const', description: 'Whether to fit the constant b. Defaults to TRUE; FALSE sets b to 1.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=GROWTH(A1:A6, B1:B6, B7:B9)', '=GROWTH(A1:A6, B1:C6, B7:C9, FALSE())'],
+  },
   HARMEAN: {
     category: 'Statistical',
     shortDescription: 'Returns the harmonic average.',
@@ -297,12 +327,46 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=HYPGEOM.DIST(1, 4, 8, 20, FALSE())', '=HYPGEOM.DIST(1, 4, 8, 20, TRUE())'],
   },
+  INTERCEPT: {
+    category: 'Statistical',
+    shortDescription: 'Returns the intercept of the least-squares line through the pairs of `known_y` and `known_x`. Pairs with a non-numeric value are skipped.',
+    parameters: [
+      {name: 'known_y', description: 'The range of dependent (y) values.'},
+      {name: 'known_x', description: 'The range of independent (x) values, with the same number of cells as `known_y`.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=INTERCEPT(A1:A10, B1:B10)'],
+  },
   LARGE: {
     category: 'Statistical',
     shortDescription: 'Returns k-th largest value in a range.',
     parameters: [{name: 'range', description: 'The range of values to evaluate.'}, {name: 'k', description: 'The position, from the largest, of the value to return; 1 returns the largest value.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=LARGE(A1:A10, 1)', '=LARGE(A1:A10, 3)'],
+  },
+  LINEST: {
+    category: 'Statistical',
+    shortDescription: 'Returns linear regression coefficients and optional statistics.',
+    parameters: [
+      {name: 'known_y', description: 'A numeric range of observed dependent values.'},
+      {name: 'known_x', description: 'Optional numeric predictors. If omitted, uses sequential values starting at 1 with the shape of known_y.'},
+      {name: 'const', description: 'Whether to fit an intercept. Defaults to TRUE; FALSE fits through zero.'},
+      {name: 'stats', description: 'Whether to return five rows including regression statistics. Defaults to FALSE. Must be a constant; cell references and computed expressions are unsupported.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=LINEST(A1:A10, B1:C10)', '=LINEST(A1:A10, B1:C10, TRUE(), TRUE())'],
+  },
+  LOGEST: {
+    category: 'Statistical',
+    shortDescription: 'Returns the bases and constant of the exponential curve y = b·m1^x1·…·mk^xk fitted by least squares, and optional statistics. `known_y` values must be positive.<br>`stats` must be a constant: a cell reference or a calculated `stats` returns `#VALUE!`; see the [known limitations](https://hyperformula.handsontable.com/docs/guide/known-limitations.html#trend-growth-and-logest-functions).',
+    parameters: [
+      {name: 'known_y', description: 'A numeric range of observed dependent values.'},
+      {name: 'known_x', description: 'Optional numeric predictors. If omitted, uses sequential values starting at 1 with the shape of `known_y`.'},
+      {name: 'const', description: 'Whether to fit the constant b. Defaults to TRUE; FALSE sets b to 1.'},
+      {name: 'stats', description: 'Whether to return five rows including regression statistics of the fit to the natural logarithm of `known_y`. Defaults to FALSE. Must be a constant; cell references and computed expressions are unsupported.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=LOGEST(A1:A10, B1:C10)', '=LOGEST(A1:A10, B1:C10, TRUE(), TRUE())'],
   },
   'LOGNORM.DIST': {
     category: 'Statistical',
@@ -444,6 +508,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=QUARTILE.INC(A1:A10, 3)'],
   },
+  'RANK.EQ': {
+    category: 'Statistical',
+    shortDescription: 'Returns the rank of a number in a range; tied numbers share the top rank.',
+    parameters: [{name: 'number', description: 'The number whose rank to find.'}, {name: 'ref', description: 'The range of numbers to rank against; text, logical values and empty cells are ignored, and an error in the range is returned.'}, {name: 'order', description: 'Optional. 0 or omitted ranks in descending order; any other value ranks in ascending order.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=RANK.EQ(A1, A1:A10)', '=RANK.EQ(A1, A1:A10, 1)'],
+  },
   RSQ: {
     category: 'Statistical',
     shortDescription: 'Returns the squared correlation coefficient between two data sets.',
@@ -569,6 +640,18 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'degrees', description: 'The number of degrees of freedom.'}, {name: 'tails', description: 'The number of distribution tails to return: 1 for right-tailed, or 2 for two-tailed.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=TDIST(1, 10, 1)', '=TDIST(1, 10, 2)'],
+  },
+  TREND: {
+    category: 'Statistical',
+    shortDescription: 'Returns values of the least-squares line fitted to `known_y`, at the points `new_x`.',
+    parameters: [
+      {name: 'known_y', description: 'A numeric range of observed dependent values.'},
+      {name: 'known_x', description: 'Optional numeric predictors. If omitted, uses sequential values starting at 1 with the shape of `known_y`.'},
+      {name: 'new_x', description: 'Optional points at which to predict values, with one column (or row) per predictor. If omitted, uses `known_x`.'},
+      {name: 'const', description: 'Whether to fit an intercept. Defaults to TRUE; FALSE fits through zero.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TREND(A1:A6, B1:B6, B7:B9)', '=TREND(A1:A6, B1:C6, B7:C9, FALSE())'],
   },
   'VAR.P': {
     category: 'Statistical',

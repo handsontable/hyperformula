@@ -1,4 +1,5 @@
 ---
+title: "Code of conduct"
 tags:
   - CoC
   - Contributor Covenant
@@ -7,8 +8,6 @@ tags:
   - unacceptable behavior
   - community guidelines
 ---
-
-# Code of conduct
 
 ## Our Pledge
 

@@ -1,3 +1,5 @@
+import { TokenType } from "../lexer/tokens";
+import type { Token } from "../lexer/types";
 import { isFormula } from "./editorContext";
 import { applyEditorEdit } from "./editorEdit";
 import type { HighlightController } from "./highlightController";
@@ -106,6 +108,28 @@ export class RefController {
       return;
     }
 
+    const token = this.refTokenAtCaret();
+
+    if (token && append) {
+      const joined = `${this.ctx.argSeparator}${refStr}`;
+
+      this.commitLastRef(
+        token.end,
+        token.end,
+        joined,
+        token.end + this.ctx.argSeparator.length,
+        refStr,
+      );
+
+      return;
+    }
+
+    if (token) {
+      this.commitLastRef(token.start, token.end, refStr, token.start, refStr);
+
+      return;
+    }
+
     if (!force && !this.canInsertRef()) {
       return;
     }
@@ -113,6 +137,24 @@ export class RefController {
     const start = this.ctx.input.getCaret();
 
     this.commitLastRef(start, this.ctx.input.getSelectionEnd(), refStr, start, refStr);
+  }
+
+  refTokenAtCaret(): Token | null {
+    if (!isFormula(this.ctx.kernel)) {
+      return null;
+    }
+
+    const caret = this.ctx.input.getCaret();
+    const token = this.ctx.kernel
+      .getTokens()
+      .find(
+        (candidate) =>
+          (candidate.type === TokenType.CELL_REF || candidate.type === TokenType.RANGE_REF) &&
+          caret >= candidate.start &&
+          caret <= candidate.end,
+      );
+
+    return token ?? null;
   }
 
   canInsertRef(): boolean {
@@ -135,7 +177,10 @@ export class RefController {
   }
 
   isRefSelectionActive(): boolean {
-    return this.refActive && (this.canInsertRef() || this.hasPendingRefAtCaret());
+    return (
+      this.refActive &&
+      (this.canInsertRef() || this.hasPendingRefAtCaret() || this.refTokenAtCaret() !== null)
+    );
   }
 
   pendingRefRange(): { start: number; end: number } | null {
@@ -146,5 +191,17 @@ export class RefController {
     }
 
     return { start: lr.start, end: lr.end };
+  }
+
+  replacedRefRange(): { start: number; end: number } | null {
+    const pending = this.pendingRefRange();
+
+    if (pending) {
+      return pending;
+    }
+
+    const token = this.refTokenAtCaret();
+
+    return token ? { start: token.start, end: token.end } : null;
   }
 }

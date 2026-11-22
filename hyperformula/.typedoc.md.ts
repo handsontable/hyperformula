@@ -1,6 +1,6 @@
 module.exports = {
   ...require('./.typedoc.ts'),
-  "theme": "../docs/.vuepress/subtheme",
+  "theme": "../docs/typedoc-theme",
   "out": "../docs/api",
   "name": "API Reference Overview",
   "categorizeByGroup": true,

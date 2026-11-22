@@ -1,12 +1,11 @@
 ---
+title: "Order of precedence"
 tags:
   - operator precedence
   - order of operations
   - parenthesis
   - brackets
 ---
-
-# Order of precedence
 
 HyperFormula supports multiple [operators](types-of-operators.md) that
 can be used to perform mathematical operations in a formula. These

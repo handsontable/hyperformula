@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import {AbsoluteCellRange, SimpleCellRange, simpleCellRange} from '../AbsoluteCellRange'
@@ -472,7 +472,7 @@ export class DependencyGraph {
 
   public isThereSpaceForArray(arrayVertex: ArrayFormulaVertex): boolean {
     const range = arrayVertex.getRangeOrUndef()
-    if (range === undefined) {
+    if (range === undefined || range.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
       return false
     }
     for (const address of range.addresses(this)) {
@@ -1164,13 +1164,23 @@ export class DependencyGraph {
 
   private exchangeOrAddFormulaVertex(vertex: FormulaVertex): void {
     const address = vertex.getAddress(this.lazilyTransformingAstService)
-    const range = AbsoluteCellRange.spanFrom(address, vertex.width, vertex.height)
+    const range = AbsoluteCellRange.spanFromOrUndef(address, vertex.width, vertex.height)
     const oldNode = this.shrinkPossibleArrayAndGetCell(address)
-    if (vertex instanceof ArrayFormulaVertex) {
+    if (vertex instanceof ArrayFormulaVertex && range !== undefined) {
       this.setArray(range, vertex)
     }
     this.exchangeOrAddGraphNode(oldNode, vertex)
     this.addressMapping.setCell(address, vertex)
+
+    if (range === undefined) {
+      // An unbounded result that cannot be placed never gets space. Marking it
+      // now, rather than at evaluation, keeps the vertex at its corner cell, so
+      // overwriting it while evaluation is suspended can still clean it up.
+      if (vertex instanceof ArrayFormulaVertex) {
+        vertex.setNoSpace()
+      }
+      return
+    }
 
     if (vertex instanceof ArrayFormulaVertex) {
       const spaceForArray = this.isThereSpaceForArray(vertex)

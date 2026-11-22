@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 import { AbsoluteCellRange } from './AbsoluteCellRange'
@@ -52,7 +52,7 @@ import {
   NamedExpressions
 } from './NamedExpressions'
 import { NamedExpressionDependency, ParserWithCaching, ParsingErrorType, RelativeDependency } from './parser'
-import { ParsingError } from './parser/Ast'
+import { Ast, ParsingError } from './parser/Ast'
 import { ParsingResult } from './parser/ParserWithCaching'
 import { ColumnsSpan, RowsSpan } from './Span'
 import { Statistics, StatType } from './statistics'
@@ -528,7 +528,7 @@ export class Operations {
     for (const [address, clipboardCell] of cells) {
       this.restoreCell(address, clipboardCell)
       if (clipboardCell.type === ClipboardCellType.FORMULA) {
-        const { dependencies } = this.parser.fetchCachedResult(clipboardCell.hash)
+        const { dependencies } = this.parser.fetchCachedResultForAst(clipboardCell.ast)
         addedNamedExpressions.push(...this.updateNamedExpressionsForTargetAddress(sourceSheetId, address, dependencies))
       }
     }
@@ -550,7 +550,7 @@ export class Operations {
         // formula shrinks on restore (e.g. undoing an overwrite-expand), the vacated spill
         // values are dropped from the index. The removeRows / version-restore
         // callers deliberately ignore the return value and keep their own index bookkeeping.
-        const changes = this.setFormulaToCellFromCache(clipboardCell.hash, address)
+        const changes = this.setFormulaToCellFromAst(clipboardCell.ast, address)
         this.columnSearch.applyChanges(changes.getChanges())
         break
       }
@@ -575,7 +575,7 @@ export class Operations {
     } else if (vertex instanceof FormulaVertex) {
       return [vertex.getAddress(this.lazilyTransformingAstService), {
         type: ClipboardCellType.FORMULA,
-        hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService))
+        ast: vertex.getFormula(this.lazilyTransformingAstService)
       }]
     } else if (vertex instanceof ParsingErrorVertex) {
       return [address, { type: ClipboardCellType.PARSING_ERROR, rawInput: vertex.rawInput, errors: vertex.errors }]
@@ -600,7 +600,7 @@ export class Operations {
     } else if (vertex instanceof ScalarFormulaVertex) {
       return {
         type: ClipboardCellType.FORMULA,
-        hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService))
+        ast: vertex.getFormula(this.lazilyTransformingAstService)
       }
     } else if (vertex instanceof ParsingErrorVertex) {
       return { type: ClipboardCellType.PARSING_ERROR, rawInput: vertex.rawInput, errors: vertex.errors }
@@ -811,13 +811,14 @@ export class Operations {
     this.changes.addChange(EmptyValue, address)
   }
 
-  public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress): ContentChanges {
+  /** Restores a retained formula without depending on its parsing cache entry. */
+  public setFormulaToCellFromAst(formula: Ast, address: SimpleCellAddress): ContentChanges {
     const {
       ast,
       hasVolatileFunction,
       hasStructuralChangeFunction,
       dependencies
-    } = this.parser.fetchCachedResult(formulaHash)
+    } = this.parser.fetchCachedResultForAst(formula)
     const absoluteDependencies = absolutizeDependencies(dependencies, address)
     const [cleanedAst] = new CleanOutOfScopeDependenciesTransformer(address.sheet).transformSingleAst(ast, address)
     this.parser.rememberNewAst(cleanedAst)
@@ -954,7 +955,7 @@ export class Operations {
         continue
       }
       // Capture the array's footprint BEFORE re-placing it, to tell apart two kinds of
-      // ContentChanges that setFormulaToCellFromCache returns below:
+      // ContentChanges that setFormulaToCellFromAst returns below:
       // - genuinely NEW occupants a grown array just claimed (overwrite mode, outside this range)
       // - the routine shrink-then-recreate artifact of re-placing an array in the same spot
       //   (cleanAddressMappingUnderArray clears the array's OWN previous cells every time an array
@@ -965,11 +966,10 @@ export class Operations {
       const oldRange = arrayVertex.getRangeOrUndef()
       const ast = arrayVertex.getFormula(this.lazilyTransformingAstService)
       const address = arrayVertex.getAddress(this.lazilyTransformingAstService)
-      const hash = this.parser.computeHashFromAst(ast)
       if (this.dependencyGraph.isOverwritingDataAllowed()) {
         overwrittenCells.push(...this.snapshotOverwrittenOccupants(address, this.arraySizePredictor.checkArraySize(ast, address)))
       }
-      const changes = this.setFormulaToCellFromCache(hash, address)
+      const changes = this.setFormulaToCellFromAst(ast, address)
       const overwriteChanges = changes.getChanges()
         .filter(change => oldRange === undefined || !oldRange.addressInRange(change.address))
       this.columnSearch.applyChanges(overwriteChanges)
@@ -992,9 +992,9 @@ export class Operations {
       if (clipboardCell.type !== ClipboardCellType.FORMULA) {
         return [addressBeforeSpan(address, addedSpan), clipboardCell]
       }
-      const [ast, addressBefore] = removal.transformSingleAst(this.parser.fetchCachedResult(clipboardCell.hash).ast, address)
+      const [ast, addressBefore] = removal.transformSingleAst(clipboardCell.ast, address)
       const cachedAst = this.parser.rememberNewAst(ast)
-      return [addressBefore, {type: ClipboardCellType.FORMULA, hash: this.parser.computeHashFromAst(cachedAst)}]
+      return [addressBefore, {type: ClipboardCellType.FORMULA, ast: cachedAst}]
     })
   }
 
