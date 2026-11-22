@@ -82,7 +82,9 @@ report none.
 ```javascript
 const hf = HyperFormula.buildFromArray(
   [['=SUM(SQRT(-1))'], ['=DATE(2000, "x", 1)'], ['=SUM(A99999999999:A99999999999)']],
-  { licenseKey: 'gpl-v3' }
+  {
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+  }
 );
 
 hf.getCellValue({ sheet: 0, row: 0, col: 0 }).originFunction; // 'SQRT', not 'SUM'
