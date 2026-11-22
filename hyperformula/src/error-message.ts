@@ -7,6 +7,8 @@
  * This is a class for detailed error messages across HyperFormula.
  */
 export class ErrorMessage {
+  public static PositiveValues = 'Values need to be positive.'
+  public static ZeroVariance = 'Values cannot all be equal.'
   public static LinestStaticSize = 'LINEST requires input dimensions that determine a fixed result size.'
   public static LinestStaticStats = 'LINEST requires a constant stats argument to determine its result size.'
   public static LinestNoInterceptError = 'The intercept is fixed at 0, so it has no standard error.'
@@ -32,6 +34,10 @@ export class ErrorMessage {
   public static IntegerExpected = 'Value needs to be an integer.'
   public static BadMode = 'Mode not recognized.'
   public static DateBounds = 'Date outside of bounds.'
+  public static CouponFrequency = 'Frequency must be 1, 2 or 4.'
+  public static FirstCouponDate = 'First coupon date is not a coupon date of the maturity date.'
+  public static OddPeriodLength = 'Odd first period has the length of a regular coupon period.'
+  public static NoDaysToMaturity = 'No days from settlement to maturity under the day-count basis.'
   public static OutOfSheet = 'Resulting reference is out of the sheet.'
   public static WrongType = 'Wrong type of argument.'
   public static NaN = 'NaN or infinite value encountered.'
@@ -95,6 +101,10 @@ export class ErrorMessage {
   public static ResultTooLong = 'Result exceeds the maximum allowed length.'
   public static FunctionName = (arg: string) => `Function name ${arg} not recognized.`
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
-  public static LicenseKey = (arg: string) => `License key is ${arg}.`
-  public static LicenseCapability = (functionName: string) => `Function ${functionName} is not included in your license.`
+  public static LicenseKey = (arg: string) => `License key is ${arg}.` +
+    ' If you need any help, contact us at sales@handsontable.com.'
+  public static LicenseCapability = (functionName: string) => `Function ${functionName} is not included in your license.` +
+    ' If you need any help, contact us at sales@handsontable.com.'
+  public static StaticResultSize = (functionName: string) => `${functionName} requires input dimensions that determine a fixed result size.`
+  public static StaticStats = (functionName: string) => `${functionName} requires a constant stats argument to determine its result size.`
 }
