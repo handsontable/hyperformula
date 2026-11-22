@@ -1,4 +1,5 @@
 ---
+title: "Integration with Vue"
 tags:
   - Vue 3
   - Vue.js
@@ -10,13 +11,11 @@ tags:
   - licenseKeyValidityState
 ---
 
-# Integration with Vue
-
 The HyperFormula API is identical in a Vue 3 app and in plain JavaScript. This guide demonstrates how HyperFormula integrates with the Vue reactivity system and how to surface its values in the template.
 
 Install with `npm install hyperformula`. For other options, see the [client-side installation](client-side-installation.md) section.
 
-::: tip TypeScript
+:::tip[TypeScript]
 All examples use TypeScript. Remove the type annotations to use plain JavaScript.
 :::
 
@@ -35,7 +34,9 @@ const hf = markRaw(
       [1, 2, "=A1+B1"],
       // your data rows go here
     ],
-    { licenseKey: "gpl-v3" },
+    {
+      // licenseKey: "your-license-key", // get a key at https://handsontable.com/pricing/?tab=hyperformula
+    },
   ),
 );
 
@@ -89,7 +90,7 @@ import { HyperFormula } from "hyperformula";
 
 const hf = markRaw(
   HyperFormula.buildEmpty({
-    licenseKey: "gpl-v3",
+    // licenseKey: "your-license-key", // get a key at https://handsontable.com/pricing/?tab=hyperformula
   }),
 );
 ```
@@ -105,8 +106,8 @@ const hf = markRaw(
 
 ## Demo
 
-For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/vue-3-demo?v=' + $page.buildDateURIEncoded">Vue 3 demo on Stackblitz</a>.
+For a more advanced example, check out the [Vue 3 demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/vue-3-demo?v={{$page.buildDateURIEncoded}}).
 
-::: tip
+:::tip
 This demo uses the [Vue 3](https://v3.vuejs.org/) framework. If you are looking for an example using Vue 2, check out the [code on GitHub](https://github.com/handsontable/hyperformula-demos/tree/2.5.x/vue-demo).
 :::

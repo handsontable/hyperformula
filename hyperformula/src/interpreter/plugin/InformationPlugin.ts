@@ -1,16 +1,84 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
+import {ArraySize} from '../../ArraySize'
+import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../../Cell'
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../../error-message'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {Maybe} from '../../Maybe'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import {ArrayPlugin} from './ArrayPlugin'
+import {FunctionArgumentType, FunctionMetadata, FunctionPlugin, FunctionPluginDefinition, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import {LookupPlugin} from './LookupPlugin'
+import {MatrixPlugin} from './MatrixPlugin'
+
+const TYPE_CODE_NUMBER = 1
+const TYPE_CODE_TEXT = 2
+const TYPE_CODE_BOOLEAN = 4
+const TYPE_CODE_ERROR = 16
+const TYPE_CODE_ARRAY = 64
+
+/**
+ * Codes returned by ERROR.TYPE. #NULL! (code 1) has no counterpart in HyperFormula. `#CYCLE!`, `#ERROR!` and `#LIC!`,
+ * which are HyperFormula's own errors, have no code and give `#N/A`.
+ */
+const ERROR_TYPE_CODES: Partial<Record<ErrorType, number>> = {
+  [ErrorType.DIV_BY_ZERO]: 2,
+  [ErrorType.VALUE]: 3,
+  [ErrorType.REF]: 4,
+  [ErrorType.NAME]: 5,
+  [ErrorType.NUM]: 6,
+  [ErrorType.NA]: 7,
+  [ErrorType.SPILL]: 9,
+  [ErrorType.CALC]: 14,
+}
+
+/**
+ * Functions that declare `sizeOfResultArrayMethod` but return the kind of their only argument: an array stays an
+ * array, while a single cell or a scalar stays a value.
+ */
+const FUNCTIONS_KEEPING_ARGUMENT_KIND = new Set(['ARRAYFORMULA', 'TRANSPOSE'])
+
+/**
+ * Functions that declare `sizeOfResultArrayMethod` but return a plain value or a reference when they find a single cell.
+ */
+const FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS = new Set(['INDEX', 'XLOOKUP'])
+
+/**
+ * Returns the expression inside any number of enclosing parentheses.
+ *
+ * @param {Ast} ast - the expression, possibly in parentheses
+ */
+function withoutParentheses(ast: Ast): Ast {
+  while (ast.type === AstNodeType.PARENTHESIS) {
+    ast = ast.expression
+  }
+  return ast
+}
+
+/**
+ * Returns the TYPE code of a single (non-array) value.
+ *
+ * @param value
+ */
+function valueTypeCode(value: InterpreterValue): number {
+  if (value instanceof CellError) {
+    return TYPE_CODE_ERROR
+  }
+  if (typeof value === 'string') {
+    return TYPE_CODE_TEXT
+  }
+  if (typeof value === 'boolean') {
+    return TYPE_CODE_BOOLEAN
+  }
+  return TYPE_CODE_NUMBER
+}
 
 /**
  * Interpreter plugin containing information functions
@@ -34,6 +102,12 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
+    },
+    'ERROR.TYPE': {
+      method: 'errortype',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR}
+      ]
     },
     'ISBINARY': {
       method: 'isbinary',
@@ -106,11 +180,14 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     },
     'INDEX': {
       method: 'index',
+      sizeOfResultArrayMethod: 'indexArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
-      ]
+      ],
+      vectorizationForbidden: true,
     },
     'NA': {
       method: 'na',
@@ -149,7 +226,125 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       ],
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
+    },
+    'TYPE': {
+      method: 'type',
+      parameters: [
+        {argumentType: FunctionArgumentType.ANY}
+      ],
+      vectorizationForbidden: true,
+      enableArrayArithmeticForArguments: true,
     }
+  }
+
+  /**
+   * Corresponds to ERROR.TYPE(value)
+   *
+   * Returns the number of an error type (2-7, 9 and 14), or #N/A when the value is not an error or the error has no code
+   *
+   * @param ast
+   * @param state
+   */
+  public errortype(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ERROR.TYPE'), (arg: InternalScalarValue) => {
+      if (!(arg instanceof CellError)) {
+        return new CellError(ErrorType.NA)
+      }
+      return ERROR_TYPE_CODES[arg.type] ?? new CellError(ErrorType.NA)
+    })
+  }
+
+  /**
+   * Corresponds to TYPE(value)
+   *
+   * Returns the type of a value: 1 for numbers and empty cells, 2 for text, 4 for booleans, 16 for errors
+   * and 64 for arrays of any size and multi-cell ranges. Errors are classified, not propagated.
+   *
+   * @param ast
+   * @param state
+   */
+  public type(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+    }
+    if (withoutParentheses(ast.args[0]).type === AstNodeType.ARRAY) {
+      // An array constant is an array whatever it holds, a single error included.
+      return TYPE_CODE_ARRAY
+    }
+    const value = this.evaluateAst(ast.args[0], state)
+    if (value instanceof SimpleRangeValue) {
+      return TYPE_CODE_ARRAY
+    }
+    if (!(value instanceof CellError) && (this.isRowOrColumnOfSeveralRowsOrColumns(ast.args[0], state) || this.isArrayExpression(ast.args[0]))) {
+      return TYPE_CODE_ARRAY
+    }
+    return valueTypeCode(value)
+  }
+
+  /**
+   * Whether the expression gives an array even when the array holds a single value. The interpreter turns
+   * a one-by-one array into its only value before TYPE receives it, so `{1}` and `SEQUENCE(1)` arrive as the
+   * number 1, and TYPE tells them apart from a plain 1 by the formula: an array constant, or a call to a function
+   * that the registry declares with `sizeOfResultArrayMethod`.
+   *
+   * @param {Ast} ast - the argument of TYPE
+   */
+  private isArrayExpression(ast: Ast): boolean {
+    ast = withoutParentheses(ast)
+    if (ast.type === AstNodeType.ARRAY) {
+      return true
+    }
+    if (ast.type !== AstNodeType.FUNCTION_CALL) {
+      return false
+    }
+    if (FUNCTIONS_KEEPING_ARGUMENT_KIND.has(ast.procedureName) && this.isBuiltIn(ast.procedureName)) {
+      return ast.args.length === 1 && this.isArrayExpression(ast.args[0])
+    }
+    if (FUNCTIONS_NOT_ALWAYS_RETURNING_ARRAYS.has(ast.procedureName) && this.isBuiltIn(ast.procedureName)) {
+      return false
+    }
+    return this.interpreter.functionRegistry.getMetadata(ast.procedureName)?.sizeOfResultArrayMethod !== undefined
+  }
+
+  /**
+   * Whether the function registered under the name is the built-in one that a name-based rule of TYPE describes.
+   * A function registered over it is classified by its value and its metadata only.
+   *
+   * @param {string} functionId - the name of a function that a rule of TYPE names
+   */
+  private isBuiltIn(functionId: string): boolean {
+    const builtIn: Record<string, FunctionPluginDefinition> = {
+      ARRAYFORMULA: ArrayPlugin,
+      COLUMN: InformationPlugin,
+      INDEX: InformationPlugin,
+      ROW: InformationPlugin,
+      TRANSPOSE: MatrixPlugin,
+      XLOOKUP: LookupPlugin,
+    }
+    return builtIn[functionId] !== undefined && this.interpreter.functionRegistry.getFunctionPlugin(functionId) === builtIn[functionId]
+  }
+
+  /**
+   * ROW and COLUMN evaluate to a single number here, but TYPE reads ROW over more than one row, or COLUMN over more
+   * than one column, as an array. It is called only after the call evaluated to a value that is not an error.
+   *
+   * @param ast
+   * @param state
+   */
+  private isRowOrColumnOfSeveralRowsOrColumns(ast: Ast, state: InterpreterState): boolean {
+    ast = withoutParentheses(ast)
+    if (ast.type !== AstNodeType.FUNCTION_CALL || (ast.procedureName !== 'ROW' && ast.procedureName !== 'COLUMN') || ast.args.length !== 1 || !this.isBuiltIn(ast.procedureName)) {
+      return false
+    }
+    const arg = withoutParentheses(ast.args[0])
+    if (arg.type !== AstNodeType.CELL_RANGE && arg.type !== AstNodeType.COLUMN_RANGE && arg.type !== AstNodeType.ROW_RANGE) {
+      return false
+    }
+    const range = AbsoluteCellRange.fromAstOrUndef(arg, state.formulaAddress)
+    if (range === undefined) {
+      return false
+    }
+    return ast.procedureName === 'ROW' ? range.height() > 1 : range.width() > 1
   }
 
   /**
@@ -413,23 +608,197 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
   }
 
   /**
-   * Corresponds to INDEX
+   * Corresponds to INDEX(array, row_num, [column_num], [area_num])
    *
-   * Returns specific position in 2d array.
+   * Returns the cell at `row_num` and `column_num` of `array`. A `row_num` of 0 returns the whole column, a
+   * `column_num` of 0 the whole row, and both 0 the whole of `array`; such results spill.
    *
-   * @param ast
-   * @param state
+   * In array arithmetic mode, an array as `row_num`, `column_num` or `area_num` is evaluated element by element,
+   * as in Microsoft Excel. Each element returns one value: an element that selects a whole row or column returns
+   * its top-left cell, and a position that a shorter index array doesn't reach returns #N/A.
+   *
+   * @param {ProcedureAst} ast - The parsed function call AST node.
+   * @param {InterpreterState} state - Current interpreter evaluation state.
    */
   public index(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('INDEX'), (rangeValue: SimpleRangeValue, row: number, col: number) => {
-      if (col < 1 || row < 1) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+    const elementwise = this.hasArrayIndexArgument(ast, state)
+    const metadata = elementwise ? this.elementwiseIndexMetadata() : this.metadata('INDEX')
+    return this.runFunction(ast.args, state, metadata, (source: SimpleRangeValue, row: number, column: Maybe<number>, areaArgument: Maybe<number>) => {
+      if (elementwise && (row === undefined || (column === undefined && ast.args.length > 2) || (areaArgument === undefined && ast.args.length > 3))) {
+        return new CellError(ErrorType.NA, ErrorMessage.WrongDimension)
       }
-      if (col > rangeValue.width() || row > rangeValue.height()) {
-        return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+      const area = areaArgument ?? 1
+
+      const range = source.range
+      const height = range !== undefined && !Number.isFinite(range.height()) ? this.config.maxRows : source.height()
+      const width = range !== undefined && !Number.isFinite(range.width()) ? this.config.maxColumns : source.width()
+
+      const target = InformationPlugin.indexTarget(height, width, range !== undefined, row, column, area)
+      if (target instanceof CellError) {
+        return target
       }
-      return rangeValue?.data?.[row - 1]?.[col - 1] ?? rangeValue?.data?.[0]?.[0] ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+      const targetRow = elementwise ? Math.max(target[0], 1) : target[0]
+      const targetColumn = elementwise ? Math.max(target[1], 1) : target[1]
+
+      if (range === undefined) {
+        const rows = targetRow === 0 ? source.data : [source.data[targetRow - 1]]
+        const result: InternalScalarValue[][] = targetColumn === 0 ? rows : rows.map(rowValues => [rowValues[targetColumn - 1]])
+        return result.length === 1 && result[0].length === 1 ? result[0][0] : SimpleRangeValue.onlyValues(result)
+      }
+
+      const topLeftCorner = simpleCellAddress(
+        range.sheet,
+        range.start.col + Math.max(targetColumn - 1, 0),
+        range.start.row + Math.max(targetRow - 1, 0),
+      )
+      const resultRange = AbsoluteCellRange.spanFrom(
+        topLeftCorner,
+        targetColumn === 0 ? range.width() : 1,
+        targetRow === 0 ? range.height() : 1,
+      )
+      return resultRange.width() === 1 && resultRange.height() === 1
+        ? this.dependencyGraph.getScalarValue(topLeftCorner)
+        : SimpleRangeValue.onlyRange(resultRange, this.dependencyGraph)
     })
+  }
+
+  /**
+   * Predicts the size of the INDEX result at parse time.
+   *
+   * In array arithmetic mode, an array index is evaluated element by element, so the result has the size of the
+   * largest index array. Otherwise the size is known only when `row_num`, `column_num` and `area_num` are number
+   * literals or empty, and INDEX is sized as a single cell for any other index, so a computed 0 index cannot spill.
+   *
+   * @param {ProcedureAst} ast - The parsed function call AST node.
+   * @param {InterpreterState} state - Current interpreter evaluation state.
+   */
+  public indexArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 2 || ast.args.length > 4) {
+      return ArraySize.scalar()
+    }
+
+    if (this.hasArrayIndexArgument(ast, state)) {
+      const indexSizes = ast.args.slice(1).map(arg => this.arraySizeForAst(arg, state))
+      return new ArraySize(Math.max(...indexSizes.map(size => size.width)), Math.max(...indexSizes.map(size => size.height)))
+    }
+
+    const row = InformationPlugin.literalIndex(ast.args[1])
+    const column = ast.args.length > 2 ? InformationPlugin.literalIndex(ast.args[2]) : undefined
+    const area = ast.args.length > 3 ? InformationPlugin.literalIndex(ast.args[3]) : 1
+    if (row === undefined || area === undefined || (ast.args.length > 2 && column === undefined)) {
+      return ArraySize.scalar()
+    }
+
+    const source = this.arraySizeForAst(ast.args[0], state)
+    const height = Number.isFinite(source.height) ? source.height : this.config.maxRows
+    const width = Number.isFinite(source.width) ? source.width : this.config.maxColumns
+    const target = InformationPlugin.indexTarget(height, width, InformationPlugin.isReferenceSource(ast.args[0]), row, column, area)
+    if (target instanceof CellError) {
+      return ArraySize.scalar()
+    }
+
+    const [targetRow, targetColumn] = target
+    const resultHeight = targetRow === 0 ? source.height : 1
+    const resultWidth = targetColumn === 0 ? source.width : 1
+    if (!Number.isFinite(resultHeight) || !Number.isFinite(resultWidth)) {
+      return ArraySize.scalar()
+    }
+    return new ArraySize(resultWidth, resultHeight)
+  }
+
+  /**
+   * Returns the INDEX metadata for element-by-element evaluation: vectorized, and without the `area_num` default, so
+   * that a position a shorter `area_num` array doesn't reach arrives as `undefined` rather than as 1.
+   */
+  private elementwiseIndexMetadata(): FunctionMetadata {
+    const metadata = this.metadata('INDEX')
+    const parameters = [...(metadata.parameters ?? [])]
+    parameters[3] = {argumentType: FunctionArgumentType.NUMBER, optionalArg: true}
+    return {...metadata, parameters, vectorizationForbidden: false}
+  }
+
+  /**
+   * Tells whether INDEX is evaluated element by element: in array arithmetic mode, when `row_num`, `column_num` or
+   * `area_num` is an array.
+   */
+  private hasArrayIndexArgument(ast: ProcedureAst, state: InterpreterState): boolean {
+    return state.arraysFlag && ast.args.slice(1).some(arg => {
+      const size = this.arraySizeForAst(arg, state)
+      return size.width > 1 || size.height > 1
+    })
+  }
+
+  /**
+   * Resolves the INDEX arguments against a source of the given size, following Microsoft Excel.
+   *
+   * Returns the 1-based row and column, where 0 stands for the whole column or row, or the error to return.
+   * Without `column_num`, the index counts along a one-row or one-column source; for a two-dimensional source
+   * it selects a row of an array and is an error for a reference.
+   */
+  private static indexTarget(height: number, width: number, isReference: boolean, row: number, column: Maybe<number>, area: number): CellError | [number, number] {
+    const areaNumber = Math.trunc(area)
+    if (areaNumber < 1) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+    }
+    if (row < 0 || (column !== undefined && column < 0)) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.Negative)
+    }
+    if (areaNumber > 1) {
+      return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
+    }
+
+    let targetRow = Math.trunc(row)
+    let targetColumn: number
+    if (column !== undefined) {
+      targetColumn = Math.trunc(column)
+    } else if (height === 1) {
+      targetColumn = targetRow
+      targetRow = 1
+    } else if (width === 1) {
+      targetColumn = 1
+    } else if (isReference) {
+      return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
+    } else {
+      targetColumn = 0
+    }
+
+    if (targetRow > height || targetColumn > width) {
+      return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
+    }
+    return [targetRow, targetColumn]
+  }
+
+  /**
+   * Tells whether an INDEX source evaluates to a reference: a range, a cell, or the result of INDEX on one.
+   * Matches `index`, which treats a source that carries a range as a reference.
+   */
+  private static isReferenceSource(ast: Ast): boolean {
+    switch (ast.type) {
+      case AstNodeType.CELL_RANGE:
+      case AstNodeType.COLUMN_RANGE:
+      case AstNodeType.ROW_RANGE:
+      case AstNodeType.CELL_REFERENCE:
+        return true
+      case AstNodeType.PARENTHESIS:
+        return InformationPlugin.isReferenceSource(ast.expression)
+      case AstNodeType.FUNCTION_CALL:
+        return ast.procedureName === 'INDEX' && ast.args.length > 0 && InformationPlugin.isReferenceSource(ast.args[0])
+      default:
+        return false
+    }
+  }
+
+  /**
+   * Returns the value of an INDEX argument known at parse time: a number literal, or 0 for an empty argument.
+   */
+  private static literalIndex(ast: Ast): Maybe<number> {
+    if (ast.type === AstNodeType.NUMBER) {
+      return ast.value
+    }
+    if (ast.type === AstNodeType.EMPTY) {
+      return 0
+    }
+    return undefined
   }
 
   /**

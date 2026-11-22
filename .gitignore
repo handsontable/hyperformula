@@ -6,9 +6,8 @@
 /hyperformula/doc/
 /docs/api/
 /docs/functions/
-/docs/.vuepress/dist/
-/docs/.vuepress/api-sidebar-relative.json
-/docs/.vuepress/api-sidebar.json
+/docs/dist/
+/docs/.astro/
 /hyperformula/typedoc/
 /hyperformula/es/
 /hyperformula/languages/

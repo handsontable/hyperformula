@@ -1,10 +1,13 @@
 # Anchored to this directory: an unanchored pattern matches a directory of that
 # name at any depth.
 node_modules
-# ESLint skips dot-folders by default; the portal's own code lives in this one.
-!/.vuepress/
-/.vuepress/dist/
+/dist/
+/.astro/
 # Formatted by code-examples-generator.sh with examples/eslintrc.examples.js.
 /examples/
 # Build scripts, not linted.
 /script/
+# The docs assistant, copied from the Handsontable docs and linted there. TypeScript, which this
+# configuration does not parse.
+/src/components/DocsAssistant/
+/src/scripts/docs-assistant-bootstrap.ts

@@ -1,6 +1,7 @@
 import type { EventScope } from "../../events/eventManager";
 import { CN } from "../../theme/classNames";
 import { createEl } from "../dom";
+import { DEFAULT_PHRASES } from "../phrases";
 
 let inputIdCounter = 0;
 
@@ -16,7 +17,10 @@ export class RichInput {
   private readonly handlers: Partial<RichInputEventMap> = {};
   private composing = false;
 
-  constructor(private readonly scope: EventScope) {
+  constructor(
+    private readonly scope: EventScope,
+    label = DEFAULT_PHRASES.formulaEditor,
+  ) {
     inputIdCounter += 1;
     this.textarea = createEl("textarea", {
       class: CN.editorInput,
@@ -28,7 +32,7 @@ export class RichInput {
       wrap: "soft",
       dir: "ltr",
       rows: "1",
-      "aria-label": "Formula editor",
+      "aria-label": label,
       "aria-autocomplete": "list",
       role: "combobox",
       "aria-haspopup": "listbox",

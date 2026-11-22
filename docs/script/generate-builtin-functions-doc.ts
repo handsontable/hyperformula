@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2025 Handsoncode. All rights reserved.
+ * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
 /**
@@ -17,6 +17,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import {HyperFormula} from '../../hyperformula/src'
+import {TEST_LICENSE_KEY} from '../../hyperformula/test/_setupFiles/testLicenseKey'
 import {renderBuiltinFunctionsMarkdown, spliceBuiltinFunctionsMarkdown} from './renderBuiltinFunctionsTable'
 
 const DOCS_ROOT = path.resolve(__dirname, '..')
@@ -24,16 +25,16 @@ const TEMPLATE_PATH = path.join(DOCS_ROOT, 'guide/built-in-functions.tmpl.md')
 const DOC_PATH = path.join(DOCS_ROOT, 'guide/built-in-functions.md')
 const LANGUAGE = 'enGB'
 /**
- * The GPLv3 key, which restricts nothing. The metadata API is instance-scoped and an engine reports only the
+ * The internal test key, which grants every function and feature. The metadata API is instance-scoped and an engine reports only the
  * functions its key grants, so this page has to be generated with a fully entitled key: the published reference
  * must always document the complete function set. The key also keeps the build quiet, because constructing an
  * engine without one logs "The license key for HyperFormula is missing."
  */
-const LICENSE_KEY = 'gpl-v3'
+const LICENSE_KEY = TEST_LICENSE_KEY
 
 /** Reads the committed template and returns the page with both generated regions spliced in. */
 function buildUpdatedFile(): string {
-  // Deliberately a default-config engine, matching the one `docs/.vuepress/config.js` builds for the function total
+  // Deliberately a default-config engine, matching the one `docs/src/docs-data.mjs` builds for the function total
   // printed above the table: same `getAvailableFunctions` call, same language, same license key. Restricting this
   // engine with `functionPlugins` would give the table a different function set from that total. The two engines are
   // still separate call sites — keep the options here and there in step.
@@ -50,7 +51,7 @@ function buildUpdatedFile(): string {
  * also returned by `getFunctionDetails` and pinned by the hyperformula-tests suite
  * (`unit/function-metadata-api.spec.ts`), so they change with a release. On this page they become links relative to
  * the docs root instead, which follow the docs wherever the build serves them (`base` in
- * `docs/.vuepress/build.config.js`) and open as in-site navigation.
+ * `docs/build.config.js`) and open as in-site navigation.
  */
 const FORMER_DOCS_ROOT = /https:\/\/hyperformula\.handsontable\.com\/docs\//g
 
