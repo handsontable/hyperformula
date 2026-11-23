@@ -137,7 +137,6 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | CHOOSECOLS    | =CHOOSECOLS(Data!A:A, 1)                                      | Spills to the source sheet's current height from row 1; returns SPILL below row 1. | Spills the whole column when space is available. | Spills all 1,048,576 rows from row 1, with blank source cells as 0; returns SPILL below row 1. |
 | CHOOSECOLS    | =CHOOSECOLS(1:1, -1)<br>where A1:C1: 1, 2, 3                    | 3 (counts back from the last used column) | Empty cell (counts back from the last column of the sheet) | 0 (counts back from the last column of the sheet) |
 | CHOOSECOLS    | =CHOOSECOLS(1:1, 5)<br>where A1:C1: 1, 2, 3                     | VALUE (column 5 is past the last used column) | Empty cell | 0 |
-| CHOOSECOLS    | =SUM(CHOOSECOLS(Data!A:A, 1))<br>where the Data sheet is empty   | N/A | 0 | 0 |
 | CHOOSECOLS    | =COLUMNS(CHOOSECOLS(A1:C3, E1:F1))<br>where E1:F1: 1, 2         | VALUE (column indexes must be separate arguments) | 2 | 2 |
 | CHOOSECOLS    | =COLUMNS(CHOOSECOLS(A1:C3, {1,2}))                              | 1 (only the first index of an array is used) | 2 | 2 |
 | CHOOSEROWS    | =CHOOSEROWS(Data!1:1, 1)                                      | Spills the source sheet's used columns from column A; returns SPILL outside column A. | Returns every column of the source sheet's row. | Returns all 16,384 columns of the row. |

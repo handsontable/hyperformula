@@ -685,10 +685,6 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         const sourceWidth = range.width()
         const sourceHeight = range.height()
 
-        if (sourceHeight === 0 || sourceWidth === 0) {
-          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
-        }
-
         const chosenLength = axis === 'columns' ? sourceWidth : sourceHeight
         const indexes = indexNumbers.map(indexNumber => Math.trunc(indexNumber))
 
@@ -857,10 +853,6 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
         if (requestedRows === 0 || requestedColumns === 0) {
           return new CellError(ErrorType.CALC, ErrorMessage.ZeroRowOrColumnCount)
-        }
-
-        if (sourceHeight === 0 || sourceWidth === 0) {
-          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
         }
 
         const rowsToTake = Math.min(Math.abs(requestedRows), sourceHeight)
@@ -1094,8 +1086,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * #VALUE!, and more than 1,048,576 rows return #NUM!. A result larger than
    * the configured sheet size (`maxRows`, `maxColumns`) returns #VALUE!,
    * checked before the result is built, as for SEQUENCE. An array or a range
-   * as `pad_with` returns #VALUE!, and so does an empty result (a kept
-   * dimension of a whole column or row with no data).
+   * as `pad_with` returns #VALUE!.
    *
    * @param {ProcedureAst} ast - The parsed EXPAND call.
    * @param {InterpreterState} state - The current formula evaluation state.
@@ -1128,10 +1119,6 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
         if (rows > this.config.maxRows || columns > this.config.maxColumns) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
-        }
-
-        if (rows === 0 || columns === 0) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.EmptyRange)
         }
 
         const result = array.data.map(row => this.padRowToWidth(row, columns, padWith))
@@ -1233,7 +1220,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         }
 
         const elements = vector.height() === 1 ? vector.data[0] : vector.data.map(row => row[0])
-        if (elements.length === 0 || (elements.length === 1 && elements[0] === EmptyValue)) {
+        if (elements.length === 1 && elements[0] === EmptyValue) {
           return new CellError(ErrorType.VALUE, this.isOmittedArgument(ast.args[0]) ? ErrorMessage.EmptyArg : ErrorMessage.EmptyRange)
         }
 
