@@ -58,7 +58,56 @@ function percentileExclusive(sortedVals: number[], k: number): number | CellErro
 }
 
 /**
- * Interpreter plugin for percentile and quartile statistical functions.
+ * Computes the inclusive percent rank of `x` in the sorted values, the inverse of {@link percentileInclusive}:
+ * the rank is `index / (n - 1)`, where `index` is the position of the first element equal to `x`, or the
+ * linearly interpolated position when `x` falls between two elements.
+ * Assumes sortedVals is non-empty and x lies within [first, last].
+ *
+ * @param sortedVals - pre-sorted array of numeric values (ascending)
+ * @param x - the value to rank
+ * @returns the rank in [0, 1], before truncation to the requested significance
+ */
+function percentRankInclusive(sortedVals: number[], x: number): number {
+  const n = sortedVals.length
+  if (n === 1) {
+    return 1
+  }
+  const upperIndex = sortedVals.findIndex(value => value >= x)
+  if (sortedVals[upperIndex] === x) {
+    return upperIndex / (n - 1)
+  }
+  const lowerIndex = upperIndex - 1
+  const fraction = (x - sortedVals[lowerIndex]) / (sortedVals[upperIndex] - sortedVals[lowerIndex])
+  return (lowerIndex + fraction) / (n - 1)
+}
+
+/** Beyond this many digits a double holds nothing more to keep. */
+const MAX_SIGNIFICANT_DIGITS = 15
+
+/**
+ * Truncates (does not round) `value` to the given number of decimal digits. The value is first rounded to
+ * 15 significant digits, so a rank that the division leaves a hair below a decimal, such as 0.29 computed as
+ * 0.28999999999999998, is truncated as 0.29, while a rank that is below the decimal at 15 digits, such as
+ * 0.2999999999, is truncated to 0.2 at one digit. The digits are cut from the decimal text, not from a scaled
+ * double, so no error of `value * 10 ** digits` reaches the result.
+ *
+ * @param value - a number in [0, 1]
+ * @param digits - the number of decimal digits to keep
+ * @returns the truncated value
+ */
+function truncateToDigits(value: number, digits: number): number {
+  const [mantissa, exponentText] = value.toExponential(MAX_SIGNIFICANT_DIGITS - 1).split('e')
+  const significantDigits = mantissa.replace('.', '')
+  const exponent = Number(exponentText)
+  const plain = exponent >= 0
+    ? `${significantDigits.slice(0, exponent + 1)}.${significantDigits.slice(exponent + 1)}`
+    : `0.${'0'.repeat(-exponent - 1)}${significantDigits}`
+  const [integerPart, fraction] = plain.split('.')
+  return Number(`${integerPart}.${fraction.slice(0, digits)}`)
+}
+
+/**
+ * Interpreter plugin for percentile, percent rank and quartile statistical functions.
  *
  * Implements inclusive (INC) and exclusive (EXC) interpolation variants.
  * QUARTILE functions delegate to PERCENTILE by converting quart index to
@@ -81,6 +130,14 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
         {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, lessThan: 1},
       ],
     },
+    'PERCENTRANK.INC': {
+      method: 'percentrank',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1, defaultValue: 3, emptyAsDefault: true},
+      ],
+    },
     'QUARTILE.INC': {
       method: 'quartile',
       parameters: [
@@ -99,6 +156,7 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
 
   public static aliases = {
     PERCENTILE: 'PERCENTILE.INC',
+    PERCENTRANK: 'PERCENTRANK.INC',
     QUARTILE: 'QUARTILE.INC',
   }
 
@@ -140,6 +198,33 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
           return vals
         }
         return percentileExclusive(vals, k)
+      }
+    )
+  }
+
+  /**
+   * Corresponds to PERCENTRANK(array, x, [significance]) and PERCENTRANK.INC(array, x, [significance]).
+   *
+   * Returns the rank of `x` within the numbers of `array` as a fraction in [0, 1], truncated (not rounded)
+   * to `significance` digits (3 by default, also when the argument is empty; a fractional value is truncated to an integer).
+   * Returns #N/A when `array` holds no numbers or `x` lies outside of them, #NUM! when `significance` is below 1.
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   * @returns the truncated percent rank, or CellError on invalid input
+   */
+  public percentrank(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('PERCENTRANK.INC'),
+      (range: SimpleRangeValue, x: number, significance: number) => {
+        const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if (vals instanceof CellError) {
+          return vals
+        }
+        vals.sort((a, b) => a - b)
+        if (vals.length === 0 || x < vals[0] || x > vals[vals.length - 1]) {
+          return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+        }
+        return truncateToDigits(percentRankInclusive(vals, x), Math.trunc(significance))
       }
     )
   }
