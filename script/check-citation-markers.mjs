@@ -16,7 +16,8 @@
  * Run it after `npm run docs:build`, which builds both the engine and the docs.
  * A path that is missing, or a folder that holds no files, fails the check
  * instead of being skipped, so a moved output cannot turn it into a scan of
- * nothing.
+ * nothing. Any other read error also exits 2, never 1, so a scan that could not
+ * run is not reported as a marker.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
@@ -89,20 +90,33 @@ for (const relative of SCANNED) {
   let stats
   try {
     stats = statSync(target)
-  } catch {
-    abort(`${relative} does not exist. Build the engine and the docs first: npm run docs:build`)
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      abort(`${relative} does not exist. Build the engine and the docs first: npm run docs:build`)
+    }
+    abort(`cannot read ${relative}: ${error.message}`)
   }
   if (!stats.isDirectory() && !stats.isFile()) {
     abort(`${relative} is neither a folder nor a file`)
   }
-  const files = stats.isDirectory() ? listFiles(target) : [target]
+  let files = []
+  try {
+    files = stats.isDirectory() ? listFiles(target) : [target]
+  } catch (error) {
+    abort(`cannot list ${relative}: ${error.message}`)
+  }
   if (files.length === 0) {
     abort(`${relative} contains no files`)
   }
   console.log(`${relative}: ${files.length} ${files.length === 1 ? 'file' : 'files'}`)
   fileCount += files.length
   for (const file of files) {
-    const text = readFileSync(file, 'utf8')
+    let text = ''
+    try {
+      text = readFileSync(file, 'utf8')
+    } catch (error) {
+      abort(`cannot read ${path.relative(REPO_ROOT, file)}: ${error.message}`)
+    }
     for (const match of text.matchAll(MARKER)) {
       const line = text.slice(0, match.index).split('\n').length
       hits.push(`${path.relative(REPO_ROOT, file)}:${line}: ${match[0]}`)
