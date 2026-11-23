@@ -344,6 +344,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=INTERCEPT(A1:A10, B1:B10)'],
   },
+  KURT: {
+    category: 'Statistical',
+    shortDescription: 'Returns the sample excess kurtosis of a set of numbers.',
+    parameters: [{name: 'number1', description: 'A number, cell reference, or range included in the calculation; at least four numbers with a non-zero spread are needed. Further numbers or ranges can be passed as additional arguments.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=KURT(1, 2, 3, 10)', '=KURT(A1:A10)'],
+  },
   LARGE: {
     category: 'Statistical',
     shortDescription: 'Returns k-th largest value in a range.',
@@ -445,6 +452,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=MINIFS(A1:A10, B1:B10, ">5")', '=MINIFS(A1:A10, B1:B10, ">5", C1:C10, "apples")'],
   },
+  'MODE.SNGL': {
+    category: 'Statistical',
+    shortDescription: 'Returns the most frequently occurring number; on a tie, the one that occurs first.',
+    parameters: [{name: 'number1', description: 'A number, cell reference, or range to search; text and boolean values are ignored, whether in a range or typed as an argument. Further numbers or ranges can be passed as additional arguments.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=MODE.SNGL(1, 2, 2, 3)', '=MODE.SNGL(A1:A10)'],
+  },
   'NEGBINOM.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of negative binomial distribution.',
@@ -493,6 +507,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'data', description: 'The range of values to evaluate.'}, {name: 'k', description: 'The percentile to return, inclusive of 0 and 1, e.g. 0.9.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=PERCENTILE.INC(A1:A10, 0.9)'],
+  },
+  'PERCENTRANK.EXC': {
+    category: 'Statistical',
+    shortDescription: 'Returns the rank of a value in a data set as a fraction between 0 and 1.',
+    parameters: [{name: 'data', description: 'The range of values to evaluate.'}, {name: 'x', description: 'The value to rank; it must lie between the smallest and the largest value in `data`. A value between two elements is interpolated.'}, {name: 'significance', description: 'The number of decimal places the result is truncated to; defaults to 3.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=PERCENTRANK.EXC(A1:A10, 5)', '=PERCENTRANK.EXC(A1:A10, 5.5, 4)'],
   },
   'PERCENTRANK.INC': {
     category: 'Statistical',
@@ -680,6 +701,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     ],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=TREND(A1:A6, B1:B6, B7:B9)', '=TREND(A1:A6, B1:C6, B7:C9, FALSE())'],
+  },
+  TRIMMEAN: {
+    category: 'Statistical',
+    shortDescription: 'Returns the mean of the values left after trimming the given fraction of the smallest and largest ones.',
+    parameters: [{name: 'data', description: 'The range of values to average.'}, {name: 'percent', description: 'The fraction of values to exclude, at least 0 and less than 1; the excluded count is rounded down to an even number, split equally between both ends.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TRIMMEAN(A1:A10, 0.2)'],
   },
   'VAR.P': {
     category: 'Statistical',
