@@ -27,13 +27,28 @@ function pageLinks(entries, groupLabel) {
   });
 }
 
+/**
+ * The `{{ $page.* }}` values (`src/docs-data.mjs`), passed in by `astro.config.mjs`: this module is bundled, so it
+ * can't import `docs-data.mjs`, which finds the engine relative to itself.
+ */
+const DOCS_DATA = import.meta.env.HF_DOCS_DATA ?? {};
+
+/**
+ * Fills in the `{{ $page.* }}` values, like `substituteDocsData` in `src/docs-data.mjs`; an unknown one is left as is.
+ * @param {string} text
+ * @returns {string}
+ */
+function substituteDocsData(text) {
+  return text.replace(/\{\{\s*\$page\.(\w+)\s*\}\}/g, (match, key) => DOCS_DATA[key] ?? match);
+}
+
 /** The longest description kept; search engines cut longer ones. */
 const MAX_DESCRIPTION = 160;
 
 /**
  * The first prose paragraph of a page's Markdown body, as plain text, or `''` if there is none.
  * Skips headings, HTML, images, admonitions (`:::` blocks, with their content), code fences, tables, lists
- * and `{{ … }}` placeholders.
+ * and lines with an unresolved `{{ … }}` placeholder (the caller fills in the known ones first).
  * @param {string} body the page's Markdown, without frontmatter
  * @returns {string}
  */
@@ -94,7 +109,8 @@ function shorten(text) {
  */
 function setDescription(route) {
   if (route.entry.data.description) return;
-  const body = route.entry.body ?? '';
+  // `{{ $page.* }}` values filled in, so a placeholder doesn't cut the paragraph short.
+  const body = substituteDocsData(route.entry.body ?? '');
   const intro = route.id.startsWith('api/') ? body.split(/^## /m)[0] : body;
   const description = shorten(firstParagraph(intro));
   if (!description) return;
