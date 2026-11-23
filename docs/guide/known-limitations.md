@@ -79,7 +79,7 @@ a circular reference.
 
 * The `SortOrder` argument must be exactly `1` (ascending) or `-1` (descending). Any other value returns a `#VALUE!` error.
 
-* Ordering (including mixed types, empty cells, and text collation) follows HyperFormula's own comparison rules, which honor the `caseSensitive` and `accentSensitive` configuration options. Numbers sort before text, and text before logical values.
+* Ordering (including mixed types, empty cells, and text collation) follows HyperFormula's own comparison rules, which honor the [`caseSensitive`](../api/interfaces/configparams.md#casesensitive) and [`accentSensitive`](../api/interfaces/configparams.md#accentsensitive) configuration options. By default, both are `false`, so text comparison ignores case and accents (`"a"`, `"A"`, and `"á"` sort as equal). Numbers sort before text, and text before logical values.
 
 ### LINEST function
 
