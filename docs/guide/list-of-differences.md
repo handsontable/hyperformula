@@ -181,6 +181,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | RANK.EQ       | =RANK.EQ(10, A1:A3*1)<br>where A1:A3: 10, 30, 20; `useArrayArithmetic: true` |            3 |   Not checked |    Not accepted |
 | RANK.EQ       | =RANK.EQ(2, A1:B2, "12")<br>where A1:B2: 1, 3, 2, 4            |            2 |   Not checked |           VALUE |
 | ERF.PRECISE   | =ERF.PRECISE(A1:B1) in A5<br>where A1 = 0.5, B1 = 1            |       0.5205 |  Not measured |           VALUE |
+| ERF.PRECISE   | =ERF.PRECISE(A1:A3) in A4<br>where A1:A3: 0, 1, 2; `useArrayArithmetic: true` | Spills 0, 0.8427, 0.9953 |  Not measured |           VALUE |
 
 A few of the rows above share a root cause worth stating once:
 
