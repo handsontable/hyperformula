@@ -59,6 +59,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed numeric aggregations such as `SUM`, `AVERAGE` and `MAX` reading a cell reached through `INDEX`, `CHOOSE`, `IF`, `IFS`, `SWITCH`, `XLOOKUP` or a named expression as a value: as with a direct reference, its text, booleans and blanks are now ignored. [#1768](https://github.com/handsontable/hyperformula/pull/1768)
 - Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is an empty argument slot (e.g. `=ADDRESS(2,3,1,FALSE(),)` now returns `R2C3` instead of `!R2C3`), while an explicit `""` still adds it. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
 - Fixed `IMSUM`, `IMPRODUCT` and `TEXTJOIN` throwing an uncaught `RangeError` for very large ranges, such as `=IMSUM(A1:D40000)`, which stopped the recalculation; they now return a result or an error value in the cell. [#1901](https://github.com/handsontable/hyperformula/pull/1901)
+- Fixed a named range evaluating to the `#VALUE!` error instead of spilling when passed to an array-returning function, or used as an operand with `useArrayArithmetic` enabled: `=TRANSPOSE(myRange)` now gives the same result as `=TRANSPOSE(A1:A5)`. [#1772](https://github.com/handsontable/hyperformula/pull/1772)
 
 ## [3.5.0] - 2026-10-09
 
