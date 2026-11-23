@@ -56,11 +56,13 @@ export function firstParagraph(body = '') {
     if (lines.length) break;
   }
   return lines.join(' ')
-    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1') // links and images: keep the text
+    // Links and images: keep the text. The URL may hold balanced parentheses, e.g. `Function_(mathematics)`.
+    .replace(/!?\[([^\]]*)\]\((?:[^()]|\([^()]*\))*\)/g, '$1')
+    // Escaped markers (`\*`, `\_`, `` \` ``) are literal text: the next three steps skip them.
+    .replace(/(?<!\\)`/g, '')
+    .replace(/(?<!\\)(\*\*?)(\S(?:.*?[^\s\\])??)\1/g, '$2') // emphasis
+    .replace(/(?<![\w\\])(__?)(\S(?:.*?[^\s\\])??)\1(?!\w)/g, '$2') // emphasis; `_` inside a name such as `row_num` stays
     .replace(/\\([\\`*_{}[\]()#+\-.!|])/g, '$1') // Markdown escapes, e.g. TypeDoc's `\+`
-    .replace(/`/g, '')
-    .replace(/(\*\*?)(\S(?:.*?\S)??)\1/g, '$2') // emphasis
-    .replace(/(?<!\w)(__?)(\S(?:.*?\S)??)\1(?!\w)/g, '$2') // emphasis; `_` inside a name such as `row_num` stays
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -81,8 +83,9 @@ function shorten(text) {
  */
 function setDescription(route) {
   if (route.entry.data.description) return;
-  const body = route.id.startsWith('api/') ? route.entry.body.split(/^## /m)[0] : route.entry.body;
-  const description = shorten(firstParagraph(body));
+  const body = route.entry.body ?? '';
+  const intro = route.id.startsWith('api/') ? body.split(/^## /m)[0] : body;
+  const description = shorten(firstParagraph(intro));
   if (!description) return;
   for (const tag of route.head) {
     const key = tag.attrs?.name ?? tag.attrs?.property;
