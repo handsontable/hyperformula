@@ -2,7 +2,7 @@
   "name": "hyperformula-docs",
   "private": true,
   "description": "The HyperFormula documentation portal.",
-  "license": "GPL-3.0-only",
+  "license": "SEE LICENSE IN ../LICENSE.txt",
   "engines": {
     "node": ">=22.22.0"
   },
@@ -12,9 +12,9 @@
     "build": "astro build && node script/prepare-cf-assets.js",
     "build:cf": "rimraf dist && npm run build",
     "dev:cf": "wrangler dev",
-    "deploy:cf": "wrangler deploy",
+    "deploy:cf": "node script/check-no-preview-license-key.mjs && wrangler deploy",
     "lint": "eslint . --ext .js,.mjs,.ts",
-    "preview:cf": "wrangler versions upload",
+    "preview:cf": "DOCS_TEST_LICENSE_KEY=true node script/inject-preview-license-key.mjs && wrangler versions upload",
     "code-examples:generate-js": "bash code-examples-generator.sh",
     "code-examples:generate-all-js": "bash code-examples-generator.sh --generateAll",
     "code-examples:format-all-ts": "bash code-examples-generator.sh --formatAllTsExamples"
@@ -39,7 +39,12 @@
     "github-slugger": "^2.0.0",
     "moment": "^2.30.1",
     "prettier": "^3.9.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.1.0",
+    "remark-gfm": "^4.0.1",
     "rimraf": "^6.0.1",
+    "shiki": "^1.29.2",
     "starlight-theme-rapide": "^0.6.0",
     "ts-node": "^10.9.2",
     "typescript": "^4.0.8",
