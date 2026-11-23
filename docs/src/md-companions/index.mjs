@@ -95,7 +95,7 @@ function readPage(source) {
 /**
  * Astro integration: after the build, write a clean `.md` companion next to each
  * page (`guide/basic-usage.html` gets `guide/basic-usage.md`; a `README.md`
- * source gets `index.md`), plus an aggregate `llms-full.txt`.
+ * source gets `index.md`), plus an aggregate `llms-full.txt` and an `llms.txt` index.
  * @param {{ base: string, hostname: string }} options the site base and origin
  * @returns {import('astro').AstroIntegration}
  */
@@ -112,6 +112,8 @@ export function mdCompanions({ base, hostname }) {
           '> Each page below is also served as clean Markdown — append `.md` to a docs page URL.',
           '',
         ];
+        // Index entries for `llms.txt`: one link per page, grouped by section.
+        const index = { home: [], guide: [], api: [] };
 
         for (const source of pageSources()) {
           try {
@@ -126,6 +128,10 @@ export function mdCompanions({ base, hostname }) {
             // The per-page `.md` keeps relative links (resolve within the companion
             // tree); the aggregated corpus needs absolute links (single-file URL).
             corpus.push('---', '', `## ${title || id}`, '', `URL: ${url}`, '', absolutizeLinks(clean, url), '');
+
+            const mdUrl = hostname + base + source.replace(/(^|\/)README\.md$/, '$1index.md');
+            const section = id === 'index' ? 'home' : id.split('/')[0];
+            (index[section] || index.guide).push(`- [${title || id}](${mdUrl})`);
           } catch (err) {
             logger.warn(`skipping ${source}: ${err.message}`);
           }
@@ -139,10 +145,53 @@ export function mdCompanions({ base, hostname }) {
           logger.warn(`failed to write llms-full.txt: ${err.message}`);
         }
 
+        // `llms.txt` (https://llmstxt.org): a short index that agents read first. It lists every
+        // page by title and links to its `.md` companion, so an agent can fetch only the pages it
+        // needs instead of the whole `llms-full.txt` corpus.
+        const llms = [
+          '# HyperFormula',
+          '',
+          '> HyperFormula is a headless spreadsheet calculation engine for JavaScript and TypeScript.',
+          '> It parses and evaluates Excel-compatible formulas, with no UI.',
+          '',
+          `Full documentation as a single Markdown file: ${hostname}${base}llms-full.txt`,
+          '',
+          ...index.home,
+          '',
+          '## AI and agent resources',
+          '',
+          '- [Docs MCP server](https://docs-assistant.handsontable.com/mcp): first-party MCP server (streamable HTTP) with search over the HyperFormula and Handsontable docs, API reference, release notes and GitHub issues',
+          '- [AI Docs Assistant](https://handsontable.com/docs/javascript-data-grid/ai-docs-assistant/): answers questions about HyperFormula and Handsontable, with citations from the docs',
+          `- [Set up your coding agent](${hostname}${base}guide/setup-coding-agent.md): skills, MCP and rules-file setup for Claude Code, Cursor, Copilot and other agents`,
+          '- [Agent skills](https://github.com/handsontable/handsontable-skills): official Claude Code skills for HyperFormula and Handsontable',
+          '',
+          '## Guides',
+          '',
+          ...index.guide,
+          '',
+          '## API reference',
+          '',
+          ...index.api,
+          '',
+          '## Source and licensing',
+          '',
+          '- [GitHub repository](https://github.com/handsontable/hyperformula): source code, issues, releases',
+          '- [npm package](https://www.npmjs.com/package/hyperformula): published package',
+          `- [License key guide](${hostname}${base}guide/license-key.md): how to set a license key`,
+          '- [Pricing](https://handsontable.com/pricing): commercial licenses',
+          '- [Contact sales](https://handsontable.com/get-a-quote): quote for commercial use',
+          '',
+        ];
+        try {
+          await fs.promises.writeFile(path.join(outDir, 'llms.txt'), llms.join('\n'), 'utf8');
+        } catch (err) {
+          logger.warn(`failed to write llms.txt: ${err.message}`);
+        }
+
         // The docs site is served under base `/docs/hyperformula/`, so its corpus
-        // lives at `/docs/hyperformula/llms-full.txt`. The domain-root `/llms.txt`
-        // belongs to handsontable.com (it advertises more than just the docs), so
-        // this integration deliberately does NOT write to the served root.
+        // and index live at `/docs/hyperformula/llms-full.txt` and `/docs/hyperformula/llms.txt`.
+        // The domain-root `/llms.txt` belongs to handsontable.com (it advertises more
+        // than just the docs), so this integration deliberately does NOT write to the served root.
       },
     },
   };
