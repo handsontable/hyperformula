@@ -46,6 +46,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `DROP` dynamic-array function. [#1796](https://github.com/handsontable/hyperformula/pull/1796)
 - Added the `TRIMRANGE` dynamic-array function. [#1842](https://github.com/handsontable/hyperformula/pull/1842)
 - Added the `WRAPROWS`, `WRAPCOLS` and `EXPAND` dynamic-array functions. [#1830](https://github.com/handsontable/hyperformula/pull/1830)
+- Added the `PERCENTRANK.INC` (with its `PERCENTRANK` alias), `MODE.MULT`, `FREQUENCY` and `PROB` statistical functions. [#1818](https://github.com/handsontable/hyperformula/pull/1818)
 
 ### Fixed
 
