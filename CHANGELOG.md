@@ -42,6 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `DROP` dynamic-array function. [#1796](https://github.com/handsontable/hyperformula/pull/1796)
 - Added the `TRIMRANGE` dynamic-array function. [#1842](https://github.com/handsontable/hyperformula/pull/1842)
 - Added the `WRAPROWS`, `WRAPCOLS` and `EXPAND` dynamic-array functions. [#1830](https://github.com/handsontable/hyperformula/pull/1830)
+- Added the `MUNIT`, `MDETERM` and `MINVERSE` matrix functions: the identity matrix, the determinant and the inverse of a square matrix. [#1817](https://github.com/handsontable/hyperformula/pull/1817)
 
 ### Fixed
 
@@ -59,6 +60,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed numeric aggregations such as `SUM`, `AVERAGE` and `MAX` reading a cell reached through `INDEX`, `CHOOSE`, `IF`, `IFS`, `SWITCH`, `XLOOKUP` or a named expression as a value: as with a direct reference, its text, booleans and blanks are now ignored. [#1768](https://github.com/handsontable/hyperformula/pull/1768)
 - Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is an empty argument slot (e.g. `=ADDRESS(2,3,1,FALSE(),)` now returns `R2C3` instead of `!R2C3`), while an explicit `""` still adds it. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
 - Fixed `IMSUM`, `IMPRODUCT` and `TEXTJOIN` throwing an uncaught `RangeError` for very large ranges, such as `=IMSUM(A1:D40000)`, which stopped the recalculation; they now return a result or an error value in the cell. [#1901](https://github.com/handsontable/hyperformula/pull/1901)
+- Fixed `SEQUENCE` returning `#VALUE!` for a number of rows or columns written in parentheses: `=SEQUENCE((3))` now returns 1, 2 and 3 in one column instead of `#VALUE!`. [#1817](https://github.com/handsontable/hyperformula/pull/1817)
 
 ## [3.5.0] - 2026-10-09
 

@@ -63,6 +63,7 @@ A single cell that holds an error, passed as `known_x` or `new_x`, returns that 
 | TYPE of ROW or COLUMN in an expression | =TYPE(ROW(A1:A2)+0) | `ROW` over more than one row and `COLUMN` over more than one column count as arrays only when passed to `TYPE` directly, so the example gives `1`. | Not checked. | Returns `64`. |
 | TYPE of a one-by-one array | =TYPE({1}+0)<br>=TYPE(IF(TRUE(), {1}))<br>=TYPE(VSTACK(A1))<br>where A1 holds an error | An array that holds a single value counts as an array (`64`) only when it is the argument itself: an array constant, a call to a function that returns arrays, such as `FILTER`, `SEQUENCE` or `VSTACK`, or `TRANSPOSE` of such an array. Passed through an operator or another function first, it is reduced to its value, so the first two examples give `1`. When such a function call has an error as its single value, `TYPE` gives `16`, as in the third example. | Not checked. | Returns `64` for all three examples. |
 | ERROR.TYPE function | =ERROR.TYPE(#NULL!)<br>=ERROR.TYPE(#GETTING_DATA) | HyperFormula has no `#NULL!` or `#GETTING_DATA` error, so the codes 1 and 8 are never returned and the literals do not parse. `#CYCLE!`, `#ERROR!` and `#LIC!`, which are HyperFormula's own errors, have no code and give `#N/A`. | Not checked. | Returns `1` for `#NULL!` and `8` for `#GETTING_DATA`. |
+| MINVERSE function | =MINVERSE(A1:B3)<br>where A1:B3 = 1, 2; 3, 4; 5, 6 | `#VALUE!` in each cell of the argument's 3x2 area, because the result is sized from the argument before evaluation; `#SPILL!` when a cell of that area holds a value. | Not checked. | A single `#VALUE!` cell. |
 
 ## Built-in functions
 
@@ -180,6 +181,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | RANK.EQ       | =RANK.EQ(5, 5)                                                 |            1 |   Not checked |    Not accepted |
 | RANK.EQ       | =RANK.EQ(10, A1:A3*1)<br>where A1:A3: 10, 30, 20; `useArrayArithmetic: true` |            3 |   Not checked |    Not accepted |
 | RANK.EQ       | =RANK.EQ(2, A1:B2, "12")<br>where A1:B2: 1, 3, 2, 4            |            2 |   Not checked |           VALUE |
+| MUNIT         | =ROWS(MUNIT(A1:A2))<br>where A1:A2: 3, 2                       |        VALUE |   Not checked |               2 |
 
 A few of the rows above share a root cause worth stating once:
 
