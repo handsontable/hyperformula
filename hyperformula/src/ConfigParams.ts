@@ -106,7 +106,7 @@ export interface ConfigParams {
   /**
    * Sets a decimal separator used for parsing numerical literals.
    *
-   * Also sets the decimal point that the `TEXT` function writes for masks such as `0.00`. See [`TEXT` function formats](/guide/compatibility-with-microsoft-excel.md#text-function-formats).
+   * Also sets the decimal point of a `TEXT` mask: the `TEXT` function reads this character as the decimal point in the mask and writes it in the result, so with `,` the mask is `0,00`. See [`TEXT` function formats](/guide/compatibility-with-microsoft-excel.md#text-function-formats).
    *
    * Can be one of the following:
    * - `.` (period)
@@ -347,7 +347,7 @@ export interface ConfigParams {
   /**
    * Sets the thousands' separator symbol for parsing numerical literals.
    *
-   * Also sets the grouping character that the `TEXT` function writes for masks such as `#,##0`. See [`TEXT` function formats](/guide/compatibility-with-microsoft-excel.md#text-function-formats).
+   * Also sets the grouping character of a `TEXT` mask: the `TEXT` function reads this character as thousands grouping in the mask and writes it in the result, so with ` ` the mask is `# ##0`. When it is empty, `,` groups if [decimalSeparator](/api/interfaces/configparams.md#decimalseparator) is `.` (`#,##0`), and no character groups if it is `,`. See [`TEXT` function formats](/guide/compatibility-with-microsoft-excel.md#text-function-formats).
    *
    * Can be one of the following:
    * - empty

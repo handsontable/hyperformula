@@ -8,25 +8,59 @@ import {Maybe} from '../Maybe'
 const dateFormatRegex = /(\\.|dd|DD|d|D|mm|MM|m|M|YYYY|YY|yyyy|yy|HH|hh|H|h|ss(\.(0+|s+))?|s|AM\/PM|am\/pm|A\/P|a\/p|\[mm]|\[MM]|\[hh]|\[HH])/g
 
 /**
- * Number-format tokenizer regex.
+ * Builds the number-format tokenizer regex for the given separators.
  *
- * The class is intentionally FLAT — `[#0,]+(\.[#0]*)?` — admitting the grouping
- * comma alongside the `#`/`0` placeholders. Whether a comma means "group
- * thousands", a "trailing scaler", or neither is decided later by string
+ * A number token starts with a `#`/`0` placeholder, goes on with placeholders and
+ * grouping characters, and may end with the decimal separator and more
+ * placeholders: `[#0][#0,]*(\.[#0]*)?` for `.` and `,`. A grouping character
+ * before the first placeholder is text, as in Excel, where ` 0` gives ` 5` when
+ * the grouping character is a space. Whether a grouping character means "group
+ * thousands", a trailing scaler, or neither is decided later by string
  * inspection in `format.ts`, never by regex structure.
  *
  * Synchronous catastrophic backtracking is not catchable by jest/jasmine
- * wall-clock timeouts, so this pattern MUST NOT be rewritten
- * into a nested-quantifier form such as `([#0]+,)*[#0]+`. Its shape is pinned
- * by a white-box test via {@link NUMBER_FORMAT_REGEX_SOURCE}.
+ * wall-clock timeouts, so this pattern MUST NOT be rewritten into a
+ * nested-quantifier form such as `([#0]+,)*[#0]+`.
+ *
+ * @param decimalSeparator the character that marks the decimal point in a mask
+ * @param groupingSeparator the character that marks thousands grouping in a mask, or `''` for none
+ * @returns a new global regex that matches backslash escapes and number tokens
  */
-const numberFormatRegex = /(\\.|[#0,]+(\.[#0]*)?)/g
+export function buildNumberFormatRegex(decimalSeparator: string, groupingSeparator: string): RegExp {
+  const decimal = escapeRegExpSpecialCharacters(decimalSeparator)
+  const grouping = escapeRegExpSpecialCharacters(groupingSeparator)
+  return new RegExp(`(\\\\.|[#0][#0${grouping}]*(${decimal}[#0]*)?)`, 'g')
+}
 
 /**
- * The `source` of {@link numberFormatRegex}, exported for the white-box ReDoS
- * shape assertion. Not re-exported from `src/index.ts` — test-only internal.
+ * Escapes the characters that have a special meaning in a regex.
+ *
+ * @param text the text to match literally
+ * @returns the text with each special character escaped
  */
-export const NUMBER_FORMAT_REGEX_SOURCE = numberFormatRegex.source
+function escapeRegExpSpecialCharacters(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const numberFormatRegexCache = new Map<string, RegExp>()
+
+/**
+ * Returns the number-format tokenizer regex for the given separators, built once
+ * per pair of separators.
+ *
+ * @param decimalSeparator the character that marks the decimal point in a mask
+ * @param groupingSeparator the character that marks thousands grouping in a mask, or `''` for none
+ * @returns the cached global regex
+ */
+function numberFormatRegex(decimalSeparator: string, groupingSeparator: string): RegExp {
+  const key = decimalSeparator + groupingSeparator
+  let regex = numberFormatRegexCache.get(key)
+  if (regex === undefined) {
+    regex = buildNumberFormatRegex(decimalSeparator, groupingSeparator)
+    numberFormatRegexCache.set(key, regex)
+  }
+  return regex
+}
 
 export enum TokenType {
   FORMAT = 'FORMAT',
@@ -72,20 +106,15 @@ function matchDateFormat(str: string): RegExpExecArray[] {
   return tokens
 }
 
-function matchNumberFormat(str: string): RegExpExecArray[] {
-  numberFormatRegex.lastIndex = 0
+function matchNumberFormat(str: string, decimalSeparator: string, groupingSeparator: string): RegExpExecArray[] {
+  const regex = numberFormatRegex(decimalSeparator, groupingSeparator)
+  regex.lastIndex = 0
 
-  // A run admitted by the flat class is only a genuine number token if it
-  // contains at least one `#`/`0` placeholder. A run that is punctuation-only
-  // (e.g. a lone grouping `,`, now inside the class) or an escape token is NOT
-  // a number token — Excel treats a placeholder-less segment as a literal — so
-  // skip it and keep scanning for the first placeholder-bearing run. Without
-  // this guard a mask such as `,` or `a,b` would splice the value into free
-  // text (`,` → `5,`); with it, `matchNumberFormat` still returns a single
-  // token (the first real placeholder run), preserving the tokenizer contract.
+  // The first number token is the one the value is written into; escapes before
+  // it are text. Only that token is returned, so the rest of the mask is text.
   let match
-  while ((match = numberFormatRegex.exec(str)) !== null) {
-    if (!isEscapeToken(match) && /[#0]/.test(match[0])) {
+  while ((match = regex.exec(str)) !== null) {
+    if (!isEscapeToken(match)) {
       return [match]
     }
   }
@@ -135,8 +164,16 @@ export function parseForDateTimeFormat(str: string): Maybe<FormatExpression> {
   }
 }
 
-export function parseForNumberFormat(str: string): Maybe<FormatExpression> {
-  const numberFormatTokens = matchNumberFormat(str)
+/**
+ * Tokenizes a number-format mask read with the given separators.
+ *
+ * @param str the mask, without quotes
+ * @param decimalSeparator the character that marks the decimal point in the mask
+ * @param groupingSeparator the character that marks thousands grouping in the mask, or `''` for none
+ * @returns the tokens, or `undefined` when the mask has no digit placeholder
+ */
+export function parseForNumberFormat(str: string, decimalSeparator: string, groupingSeparator: string): Maybe<FormatExpression> {
+  const numberFormatTokens = matchNumberFormat(str, decimalSeparator, groupingSeparator)
   if (numberFormatTokens.every((elem) => isEscapeToken(elem))) {
     return undefined
   } else {
@@ -148,7 +185,7 @@ export function parseForNumberFormat(str: string): Maybe<FormatExpression> {
 }
 
 export function parse(str: string): FormatExpression {
-  return parseForDateTimeFormat(str) ?? parseForNumberFormat(str) ?? {
+  return parseForDateTimeFormat(str) ?? parseForNumberFormat(str, '.', ',') ?? {
     type: FormatExpressionType.STRING,
     tokens: [{
       type: TokenType.FREE_TEXT,

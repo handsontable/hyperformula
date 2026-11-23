@@ -125,20 +125,21 @@ A Polish or Turkish formula with an old name now calls `DURATION` or `PRICE`, wh
 
 HyperFormula 4.0 changes how the `TEXT` function reads its number format mask, the second argument. Some formulas that returned text in 3.x return a different text, or `#VALUE!`, in 4.0.
 
-In a mask, `.` is always the decimal point and `,` is always thousands grouping, whatever separators you configure.
+### Separators in the mask and the result
 
-### Separators in the result
-
-`TEXT` writes the decimal point from the [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) option and groups thousands with the [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator) option. In 3.x, it always wrote `.`.
+`TEXT` reads the [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) character as the decimal point of the mask and the [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator) character as thousands grouping, and writes them in the result. When `thousandSeparator` is empty, as by default, `,` is the grouping character if `decimalSeparator` is `.`, and no character groups if it is `,`. A `.` or `,` that is neither separator is text. In 3.x, `TEXT` always read `.` as the decimal point of the mask and wrote `.` in the result.
 
 With `decimalSeparator: ','`, `thousandSeparator: ' '` and `functionArgSeparator: ';'`:
 
 | Formula | 3.x | 4.0 |
 |:--------|:----|:----|
-| `=TEXT(1,5; "0.00")` | `1.50` | `1,50` |
-| `=TEXT(1,5; "0,00")` | `2,00` | `002` |
+| `=TEXT(1,5; "0,00")` | `2,00` | `1,50` |
+| `=TEXT(1,5; "0.00")` | `1.50` | `2.00` |
+| `=TEXT(1234,5; "# ##0,00")` | `1235 ##0,00` | `1 234,50` |
 
-To keep `.` in the result, keep the default `decimalSeparator: '.'`, or replace the separator in the result: `=SUBSTITUTE(TEXT(1,5; "0.00"); ","; ".")` returns `1.50`. Write the decimal point of a mask as `.`: `"0,00"` is a grouping mask, not a mask with two decimal places.
+With `decimalSeparator: ','` and the default empty `thousandSeparator`, `=TEXT(5; "0,000")` returns `5,000`, as in 3.x, because `,` is the decimal point.
+
+Write the decimal point and grouping of a mask with the separators you configure: with `decimalSeparator: ','`, replace `"0.00"` with `"0,00"`. To keep `.` in the result, keep the default `decimalSeparator: '.'`, or replace the separator in the result: `=SUBSTITUTE(TEXT(1,5; "0,00"); ","; ".")` returns `1.50`.
 
 ### Masks that return `#VALUE!`
 
@@ -156,15 +157,15 @@ To write one of these characters as text, put `\` before it, or close the quoted
 
 ### Masks with `,` and `#`
 
-`TEXT` reads `,` between digit placeholders as thousands grouping, and `#` as a digit that is written only when it is significant. Masks that used these characters in other ways return a different result:
+On the default config, `TEXT` reads `,` between digit placeholders as thousands grouping, and `#` as a digit that is written only when it is significant. Masks that used these characters in other ways return a different result:
 
 | Formula | 3.x | 4.0 | To get the 3.x result |
 |:--------|:----|:----|:----------------------|
-| `=TEXT(5, "0,000")` | `5,000` | `0005` | `=TEXT(5, "0")&",000"` |
+| `=TEXT(5, "0,000")` | `5,000` | `0,005` | `=TEXT(5, "0")&",000"` |
 | `=TEXT(0.5, "#.00")` | `0.50` | `.50` | `=TEXT(0.5, "0.00")` |
 | `=TEXT(0, "#")` | `0` | The empty text | `=TEXT(0, "0")` |
 
-`=TEXT(5, "0,000")` returns `0005` because the default `thousandSeparator` is the empty text, so grouping writes no character. With `thousandSeparator: ','` and `functionArgSeparator: ';'`, `=TEXT(5; "0,000")` returns `0,005`.
+These are results on the default config, where `.` is the decimal point and `,` groups thousands. With other separators, use the configured characters in place of `.` and `,`.
 
 ### Custom `stringifyDateTime` and `stringifyDuration` callbacks
 

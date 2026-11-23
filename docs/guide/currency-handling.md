@@ -75,9 +75,9 @@ console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })); // "1234.50 zł"
 Configure `stringifyCurrency` when your formula corpus needs more advanced currency formats. E.g.:
 
 - LCID-tagged symbols (`"[$€-2] #,##0.00"`, `"[$zł-415] #,##0.00"`), which the built-in formatter does not interpret,
-- separators other than the configured [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) and [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator), which are the ones the built-in formatter writes, such as the Polish `"1 234,50 zł"` pattern in an instance with the default separators.
+- separators other than the configured [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) and [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator), which are the ones the built-in formatter reads in the mask and writes in the result, such as the Polish `"1 234,50 zł"` pattern in an instance with the default separators.
 
-The built-in formatter groups thousands (`"$#,##0.00"`) only when `thousandSeparator` is set, and it picks the section of an accounting format (`"$#,##0.00;($#,##0.00)"`) by the sign of the value. See [`TEXT` function formats](compatibility-with-microsoft-excel.md#text-function-formats).
+The built-in formatter groups thousands (`"$#,##0.00"` on the default config), and it picks the section of an accounting format (`"$#,##0.00;($#,##0.00)"`) by the sign of the value. See [`TEXT` function formats](compatibility-with-microsoft-excel.md#text-function-formats).
 
 ### Custom currency formatting
 
@@ -116,11 +116,11 @@ Side-by-side comparison of the default formatter and the docs adapter from the s
 |---|---|---|
 | `"$0.00"` | `"$1234.50"` | `"$1234.50"` |
 | `"$#.00"` | `"$1234.50"` | `"$1234.50"` |
-| `"$#,##0.00"` | `"$1234.50"` (no grouping glyph) | `"$1,234.50"` |
-| `"[$€-2] #,##0.00"` | `"[$€-2] 1234.50"` (tag not interpreted, no grouping glyph) | `"1.234,50 €"` |
-| `"$#,##0.00;($#,##0.00)"` (value `-1234.5`) | `"($1234.50)"` (no grouping glyph) | `"($1,234.50)"` |
+| `"$#,##0.00"` | `"$1,234.50"` | `"$1,234.50"` |
+| `"[$€-2] #,##0.00"` | `"[$€-2] 1,234.50"` (tag not interpreted) | `"1.234,50 €"` |
+| `"$#,##0.00;($#,##0.00)"` (value `-1234.5`) | `"($1,234.50)"` | `"($1,234.50)"` |
 
-The "Without callback" column uses the default config, where `thousandSeparator` is empty, so the built-in formatter writes no grouping glyph.
+The "Without callback" column uses the default config, where the mask's `.` is the decimal point and its `,` groups thousands.
 
 #### Error behavior
 

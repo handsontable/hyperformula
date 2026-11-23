@@ -54,7 +54,7 @@ a circular reference.
 
 * The built-in number formatter does not implement these Excel number formats, so a mask that uses one returns a different result than in Excel:
   * percent scaling (`0.00%`),
-  * scaler commas (`0,,`): `=TEXT(5000000, "0,,")` returns `5000000,,`, where Excel returns `5`,
+  * scaling by a grouping character at the end of the number (`0,,`): `=TEXT(5000000, "0,,")` returns `5000000,,`, where Excel returns `5`,
   * the `?` placeholder,
   * scientific notation (`0.00E+00`),
   * `[condition]` comparators,
@@ -63,6 +63,7 @@ a circular reference.
   * the `_` padding code: `=TEXT(5, "0_)")` returns `5_)`, where Excel returns `5` followed by a space,
   * the `@` text placeholder: `=TEXT(5, "@")` returns `@`, where Excel returns `5`.
 * For these number formats, supply a [`stringifyCurrency`](currency-handling.md) callback. See also [`TEXT` function formats](compatibility-with-microsoft-excel.md#text-function-formats).
+* A `.` or `,` in a mask that is neither the decimal nor the grouping separator is text: with `decimalSeparator: ','` and `functionArgSeparator: ';'`, `=TEXT(1,5; "0.00")` returns `2.00`, where Excel with a locale whose decimal point is `,` returns `#VALUE!`.
 * `TEXT` does not check the code inside a bracket, other than a color: `=TEXT(5, "0[x]")` returns `5[x]`, where Excel returns `#VALUE!`.
 * `TEXT` does not check the letters outside brackets and quotes, so a color name after an escaped bracket is still read as a color: `=TEXT(5, "0\[Red]")` returns `5\` and `=TEXT(5, "\[Red]0")` returns `0`, where Excel reads the bracket as text, rejects the letters after it, and returns `#VALUE!` for both.
 * Positive, negative and zero sections apply to number masks only. A date mask is not split into sections: with `dd-mm-yyyy;"neg"` in `A1`, `=TEXT(-5, A1)` returns `25-12-1899;"neg"`, where Excel returns `neg`.

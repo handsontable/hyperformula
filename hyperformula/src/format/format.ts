@@ -299,12 +299,42 @@ function pickSection(sections: string[], value: number): { sectionStr: string, v
 function formatNumberWithSections(formatArg: string, value: number, config: Config): RawScalarValue {
   const sections = splitIntoSections(formatArg)
   const {sectionStr, valueForFormat} = pickSection(sections, value)
-  const expression = parseForNumberFormat(stripQuotes(sectionStr))
+  const separators = numberFormatSeparators(config)
+  const expression = parseForNumberFormat(stripQuotes(sectionStr), separators.decimal, separators.grouping)
   if (expression === undefined) {
     const sign = sections.length === 1 && value < 0 ? '-' : ''
     return sign + renderLiteralSection(sectionStr)
   }
-  return numberFormat(expression.tokens, valueForFormat, config)
+  return numberFormat(expression.tokens, valueForFormat, separators)
+}
+
+/**
+ * The characters that mark the decimal point and thousands grouping in a number
+ * mask. `TEXT` reads the mask with them and writes the same characters in the
+ * result, as Excel does with the separators of the workbook locale.
+ */
+interface NumberFormatSeparators {
+  decimal: string,
+  grouping: string,
+}
+
+/**
+ * Reads the number-mask separators from the config: the decimal point is
+ * `decimalSeparator` and the grouping character is `thousandSeparator`. When
+ * `thousandSeparator` is empty, the grouping character is `,` if the decimal
+ * point is `.`, as in Excel with the en-US locale, so `#,##0.00` groups on the
+ * default config. With a `,` decimal point and an empty `thousandSeparator`,
+ * no character marks grouping.
+ *
+ * @param config the live HyperFormula config
+ * @returns the decimal point and the grouping character, `''` when there is none
+ */
+function numberFormatSeparators(config: Config): NumberFormatSeparators {
+  const decimal = config.decimalSeparator
+  if (config.thousandSeparator !== '') {
+    return {decimal, grouping: config.thousandSeparator}
+  }
+  return {decimal, grouping: decimal === '.' ? ',' : ''}
 }
 
 /**
@@ -349,7 +379,7 @@ function resolveEscapes(code: string): string {
  * pure-digit string and `separator` is non-empty.
  *
  * @param digits a pure-digit integer string
- * @param separator the grouping glyph (from `config.thousandSeparator`)
+ * @param separator the grouping character (see `numberFormatSeparators`)
  * @returns the grouped digit string
  */
 function insertGrouping(digits: string, separator: string): string {
@@ -397,21 +427,20 @@ function countChars(text: string, char: string) {
  * `pickSection`. Free text around the placeholders has its backslash escapes
  * resolved, as in a literal section (`0\x` with 5 → `5x`).
  *
- * Per integer-format token:
- * - a *trailing* comma run (Excel's scaler) is peeled off
+ * Per number token, read with the separators of `numberFormatSeparators`:
+ * - a *trailing* run of grouping characters (Excel's scaler) is peeled off
  *   and re-emitted as a literal so the output is recognizably un-scaled rather
  *   than silently mis-scaled;
- * - grouping is requested when an *interior* comma exists (`#,##0`), and the
- *   grouping glyph is `config.thousandSeparator` (empty on default config → no
- *   visible glyph);
- * - the decimal glyph is `config.decimalSeparator`.
+ * - grouping is requested when a grouping character sits between two digit
+ *   placeholders (`#,##0`), and the result is grouped with that character;
+ * - the decimal point of the result is the decimal separator of the mask.
  *
  * @param tokens the tokenized number-format section
  * @param value the sign-adjusted numeric value to render
- * @param config the live config (grouping / decimal separators)
+ * @param separators the decimal point and grouping character of the mask
  * @returns the rendered section string
  */
-function numberFormat(tokens: FormatToken[], value: number, config: Config): RawScalarValue {
+function numberFormat(tokens: FormatToken[], value: number, separators: NumberFormatSeparators): RawScalarValue {
   const negative = value < 0
   const absValue = Math.abs(value)
   let result = ''
@@ -424,19 +453,18 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
       continue
     }
 
-    const tokenParts = token.value.split('.')
+    const tokenParts = token.value.split(separators.decimal)
     const rawIntegerFormat = tokenParts[0]
     const decimalFormat = tokenParts[1] || ''
-    const separator = tokenParts[1] ? config.decimalSeparator : ''
+    const separator = tokenParts[1] ? separators.decimal : ''
 
-    /* peel off a trailing comma run (Excel scaler — kept as a visible literal) */
-    const trailingScalerMatch = /,+$/.exec(rawIntegerFormat)
-    const trailingScaler = trailingScalerMatch ? trailingScalerMatch[0] : ''
-    const coreIntegerFormat = rawIntegerFormat.slice(0, rawIntegerFormat.length - trailingScaler.length)
+    /* peel off a trailing run of grouping characters (Excel scaler — kept as a visible literal) */
+    const coreIntegerFormat = trimEnd(rawIntegerFormat, separators.grouping)
+    const trailingScaler = rawIntegerFormat.slice(coreIntegerFormat.length)
 
-    /* grouping requested iff a comma sits between two digit placeholders */
-    const grouping = /[#0],[#0]/.test(coreIntegerFormat)
-    const integerSkeleton = coreIntegerFormat.replace(/,/g, '')
+    /* every placeholder in the core is a digit, so a grouping character left in it sits between two of them */
+    const integerSkeleton = coreIntegerFormat.split(separators.grouping).join('')
+    const grouping = integerSkeleton.length < coreIntegerFormat.length
 
     /* get fixed-point digits (huge magnitudes expanded — see stringifyMagnitude) */
     let {integerPart, decimalPart} = stringifyMagnitude(absValue, decimalFormat.length)
@@ -458,11 +486,11 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
       integerPart = padLeft(integerPart, padSizeInteger + integerPart.length)
     }
 
-    /* group only after padding, only with a configured glyph, only on pure digits
-     * (defensive: huge magnitudes arrive pre-expanded from scientific notation by
-     * stringifyMagnitude, but a non-finite value still stringifies as `Infinity`) */
-    if (grouping && config.thousandSeparator !== '' && /^\d+$/.test(integerPart)) {
-      integerPart = insertGrouping(integerPart, config.thousandSeparator)
+    /* group only after padding, only on pure digits (defensive: huge magnitudes
+     * arrive pre-expanded from scientific notation by stringifyMagnitude, but a
+     * non-finite value still stringifies as `Infinity`) */
+    if (grouping && /^\d+$/.test(integerPart)) {
+      integerPart = insertGrouping(integerPart, separators.grouping)
     }
 
     const padSizeDecimal = countChars(decimalFormat.substr(decimalPart.length, decimalFormat.length - decimalPart.length), '0')
@@ -475,6 +503,21 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
    * zero after rounding (`TEXT(-0.4,"0")` → `0`, not `-0`); an explicit `-`
    * literal in the mask is FREE_TEXT and has already been emitted above. */
   return negative && hasNonZeroDigit ? '-' + result : result
+}
+
+/**
+ * Removes every trailing occurrence of a character from a string.
+ *
+ * @param text the string to trim
+ * @param char the single character to remove from the end, or `''` to remove nothing
+ * @returns the string without its trailing run of `char`
+ */
+function trimEnd(text: string, char: string): string {
+  let end = text.length
+  while (end > 0 && text[end - 1] === char) {
+    end--
+  }
+  return text.slice(0, end)
 }
 
 /** The most decimal places `Number#toFixed` accepts. */
