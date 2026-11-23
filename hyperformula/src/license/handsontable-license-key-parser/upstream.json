@@ -14,9 +14,9 @@
   ],
   "repository": "handsontable/license-key",
   "directory": "vendor/entitlement-key-reader",
-  "tag": "6.1.0",
-  "commit": "824cfd4bc478619b0f994001f087650a5f7366ae",
-  "taken_on": "2026-10-25",
+  "tag": "6.4.0",
+  "commit": "774136dea1428ecac2757f33a4b60eb05c420058",
+  "taken_on": "2026-11-23",
   "own_files": [
     "PROVENANCE.md",
     "upstream.json"

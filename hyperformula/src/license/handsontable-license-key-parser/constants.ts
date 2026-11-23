@@ -71,6 +71,36 @@ export const NO_UI_WARNS_FLAG = 'no-ui-warns';
 export const CUSTOM_FLAG = 'custom';
 
 /**
+ * Says the entry's `capabilities` list is complete: the license grants the
+ * tokens it lists and nothing else. The issuer sets it per product entry; no
+ * contract type or mode implies it.
+ *
+ * The reader does not act on it - `getLicenseGrants` lists the tokens either
+ * way. The product decides what an entry WITHOUT it means. A product that
+ * gated no feature when its first keys were issued reads such an entry as
+ * granting everything, so a new gate never takes a feature away from a key
+ * already in the field. A product that has always gated on its tokens ignores
+ * the flag.
+ *
+ * @type {string}
+ */
+export const LISTED_CAPABILITIES_FLAG = 'listed-capabilities';
+
+/**
+ * Says the licensee agreed to show the product's "Powered by" bar - usually
+ * the term of a sponsored license. The issuer sets it per product entry; no
+ * contract type or mode implies it.
+ *
+ * It is not a channel, and no channel closes it: the bar is branding, not a
+ * warning, so a product renders it outside the `ui` channel gate, with or
+ * without `no-ui-warns`. The reader does not act on it - the product checks
+ * the entry's flags. A product with no bar ignores it.
+ *
+ * @type {string}
+ */
+export const BADGE_FLAG = 'badge';
+
+/**
  * The number of milliseconds in a day, used to walk from one UTC midnight to
  * the next.
  *

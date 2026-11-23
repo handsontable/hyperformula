@@ -107,7 +107,7 @@ This is a Handsontable license key for Acme Corp, issued on 2026-08-12. It inclu
 | `release_until` | Builds released on or before this day may run forever. Measured against your build date, never the clock. A perpetual license. |
 | `notice` | Days of advance warning before `usage_until`. `0` means no warning. |
 | `grace` | Days of soft stop after `usage_until` before the hard stop. |
-| `flags` | `trial`, `no-console-warns`, `no-ui-warns`, `custom`. Present or absent - there is no `false`. |
+| `flags` | `trial`, `no-console-warns`, `no-ui-warns`, `custom`, `listed-capabilities`, `badge`. Present or absent - there is no `false`. |
 
 Exactly **one** of `usage_until` / `release_until` is present. There is no contract type, tier, package name or holder in the payload - "subscription" or "perpetual" is only visible as which date is present.
 
@@ -192,7 +192,9 @@ export function checkLicense(rawKey: unknown): LicenseGrants {
   // 4. Act on the lifecycle state, through the channels the key leaves open.
   notify(license.lifecycle, license.channels);
 
-  // 5. Gate features by capability token.
+  // 5. Gate features by capability token. A product that gated nothing when its
+  // first keys were issued returns grantsOf(license) here instead - see
+  // "What each product supplies".
   return license.grants;
 }
 
@@ -242,6 +244,8 @@ The two flags close channels, per product:
 
 Both are set on keys issued for external, end-user-facing use, so your license messages never reach your customer's own users.
 
+**`badge` is not a channel, and no channel closes it.** It says the licensee agreed to show your product's "Powered by" bar - usually the term of a sponsored license, issued free of charge. The bar is branding, not a warning, so render it **outside** the `channels.ui` gate: `no-ui-warns` closes warnings only, and a sponsored product that redistributes yours (a free plugin, say) carries `no-ui-warns` and must still show the bar. The reader does not act on the flag; check it on the entry yourself (`license.licensed && license.entitlement.flags.indexOf(BADGE_FLAG) !== -1` - an unlicensed result has no entry). Whether a trial also shows the bar is your product's decision - the flag only covers keys that carry it. A product with no bar ignores it.
+
 The specification's message text (§4.1, §4.2). Replace `{PRODUCT}` with your product's display name. Print `usage_until` dates with the ` (UTC)` marker and `release_until` dates without it:
 
 | State | Message |
@@ -285,9 +289,28 @@ Each of these has broken a real implementation, or a specification fixture exist
 
 **Tokens that stand for more than themselves are the product's to expand.** A HyperFormula key issued today carries `["core", "fun:all", "feat:all"]`. `hasCapability(grants, 'hyperformula', 'feat:crud')` answers `false` for it - the key does not contain `feat:crud`, it contains `feat:all`. Gate on what the product's own registry makes of the tokens (`getProductCapabilities` returns them; it returns `null` for unrestricted grants, which unlock everything, and for a product the key does not grant): HyperFormula resolves `fun:all`, `feat:all` and group tokens such as `fun:math.a` in its own capability table. Asking `hasCapability` for one feature's token would lock out a customer who bought all of them. Do not gate on `core` either: HyperFormula ignores it, and HyperFormula keys issued by license-key 5.2.0, or from a schema without the default, carry none.
 
+**`listed-capabilities` says the token list is complete - check it before any gate reads the grants (`hasCapability` or `getProductCapabilities`).** A product that gated nothing when its first keys were issued cannot read those keys' lists as complete: every Handsontable key issued before the flag lists only `core`. Such a product reads its entry **without** the flag as granting everything, and gates on tokens only when the entry carries it. The reader does not do this for you. `getLicenseGrants` lists the tokens either way: `hasCapability` answers `false` for every token an entry does not list, and `getProductCapabilities` returns `['core']` for such a key, flag or not. So a gate that skips the flag takes every gated feature away from every key without it. Turn the license into grants once, at step 5 of the integration, and every gate behind it stays right:
+
+```ts
+import { UNRESTRICTED_GRANTS, LISTED_CAPABILITIES_FLAG } from './entitlementKeyReader';
+import type { EntitlementLicense, LicenseGrants } from './entitlementKeyReader';
+
+// Step 5, for a product that gated nothing when its first keys were issued:
+// an entry without the flag unlocks everything, like a key outside the format.
+export function grantsOf(license: EntitlementLicense): LicenseGrants {
+  if (license.licensed && license.entitlement.flags.indexOf(LISTED_CAPABILITIES_FLAG) === -1) {
+    return UNRESTRICTED_GRANTS;
+  }
+
+  return license.grants;                              // the listed tokens - or UNRESTRICTED_GRANTS for an unlicensed key
+}
+```
+
+A product that has always gated on its tokens (HyperFormula) ignores the flag and returns `license.grants` as the integration does. The flag closes no channel and adds no token.
+
 Pass **every** literal key the product accepts today, including the ones shaped like a legacy key: checked first, they never reach the legacy validator. The lists above are what each product accepted when this reader was written - check the product's own validator before copying them.
 
-A new product needs the same five things: a product name agreed with my.handsontable.com, a build date, its literal keys (maybe none), its capability tokens, and a decision about its legacy keys (maybe none).
+A new product needs the same six things: a product name agreed with my.handsontable.com, a build date, its literal keys (maybe none), its capability tokens, a decision about its legacy keys (maybe none), and a decision about an entry without `listed-capabilities` - whether it grants everything (`grantsOf`) or only what it lists.
 
 Handsontable already ships an earlier port of this reader in `handsontable/src/utils/entitlementLicenseKey/` (DEV-2562). This directory is that port made general, with the same state names and window rules. The differences, when switching Handsontable over:
 
@@ -310,7 +333,9 @@ The windows are evaluated in this directory and are already covered by `license-
 - each literal key, a legacy key, a missing key and an unreadable key reach the right path,
 - each of the ten states produces the right message on the right surface, and nothing when the matching channel is closed,
 - the trial hard stop blocks even with `no-ui-warns`,
+- if your product has a bar: a key with `badge` shows it, with and without `no-ui-warns`, and a key without `badge` does not,
 - a key for another product only reports an invalid key,
+- if you read an entry without `listed-capabilities` as granting everything: a real key issued without the flag unlocks every gated feature, and a flagged one unlocks only what it lists,
 - the build date constant reaches `readEntitlementLicense` in your real bundle, not only in tests,
 - pin `now` (or mock `Date.now`) in every test - never rely on the real clock.
 
@@ -401,7 +426,7 @@ Which channels the entry's flags leave open.
 
 ### Constants
 
-`TRIAL_FLAG`, `NO_CONSOLE_WARNS_FLAG`, `NO_UI_WARNS_FLAG`, `CUSTOM_FLAG`.
+`TRIAL_FLAG`, `NO_CONSOLE_WARNS_FLAG`, `NO_UI_WARNS_FLAG`, `CUSTOM_FLAG`, `LISTED_CAPABILITIES_FLAG`, `BADGE_FLAG`.
 
 ## Files
 
