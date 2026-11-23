@@ -181,7 +181,6 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | RANK.EQ       | =RANK.EQ(10, A1:A3*1)<br>where A1:A3: 10, 30, 20; `useArrayArithmetic: true` |            3 |   Not checked |    Not accepted |
 | RANK.EQ       | =RANK.EQ(2, A1:B2, "12")<br>where A1:B2: 1, 3, 2, 4            |            2 |   Not checked |           VALUE |
 | TRIMMEAN      | =TRIMMEAN({1,2,3},"0.5")                                       |       2.0000 |   Not checked |           VALUE |
-| PERCENTRANK.EXC | =PERCENTRANK.EXC({1,2,3},2,1e21)                             |          NUM |   Not checked |           DIV/0 |
 
 A few of the rows above share a root cause worth stating once:
 

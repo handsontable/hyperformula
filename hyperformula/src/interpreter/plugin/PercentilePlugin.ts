@@ -156,7 +156,8 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
    * Corresponds to PERCENTRANK.EXC(array, x, [significance]).
    *
    * Returns the exclusive rank of x in the array, i.e. the inverse of PERCENTILE.EXC, truncated (not rounded)
-   * to the given number of decimal places. Values between two array elements are linearly interpolated.
+   * to the given number of decimal places. Values between two array elements are linearly interpolated. A significance
+   * below 1 gives #NUM!; a significance of 309 or more, where 10^significance is not a finite number, gives #DIV/0!.
    *
    * @param ast - procedure AST node
    * @param state - interpreter state
@@ -182,11 +183,16 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
         if (digits < 1) {
           return new CellError(ErrorType.NUM, ErrorMessage.LessThanOne)
         }
+        const scale = Math.pow(10, digits)
+        // From 309 digits on, 10^digits overflows to Infinity and the truncation below would give NaN. Excel returns
+        // #DIV/0! for a significance this large, as for 1e21.
+        if (!Number.isFinite(scale)) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
         const upperIndex = vals.findIndex(val => val >= x)
         const rank = vals[upperIndex] === x
           ? upperIndex + 1
           : upperIndex + (x - vals[upperIndex - 1]) / (vals[upperIndex] - vals[upperIndex - 1])
-        const scale = Math.pow(10, digits)
         // A quotient that is exactly a truncation step can come out one unit in the last place below it, e.g. for
         // x = 1.2 in {1, 2}: 1.2 / 3 * 1000 = 399.99999999999994. Rounding the scaled quotient to 15 significant
         // digits before truncating keeps it on the step (0.4, not 0.399), whatever the significance.
