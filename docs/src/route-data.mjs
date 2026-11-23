@@ -56,8 +56,12 @@ export function firstParagraph(body = '') {
     if (lines.length) break;
   }
   // Code spans are literal: set aside before the Markdown is stripped, put back (without backticks) at the end.
+  // As in CommonMark, a span closes on a backtick run as long as its opening one, so ``a`b`` is the text a`b.
   const code = [];
-  const text = lines.join(' ').replace(/(?<!\\)`([^`]*)`/g, (_, content) => `\uE000${code.push(content) - 1}\uE000`);
+  const text = lines.join(' ').replace(
+    /(?<![\\`])(`+)(?!`)(.*?[^`])\1(?!`)/g,
+    (_, fence, content) => `\uE000${code.push(content.replace(/^ (.*) $/, '$1')) - 1}\uE000`,
+  );
   return text
     // Links and images: keep the text. The URL may hold balanced parentheses, e.g. `Function_(mathematics)`.
     .replace(/!?\[([^\]]*)\]\((?:[^()]|\([^()]*\))*\)/g, '$1')
@@ -67,6 +71,7 @@ export function firstParagraph(body = '') {
     .replace(/(?<![\w\\])__(\S(?:.*?[^\s\\])??)__(?!\w)/g, '$1')
     .replace(/(?<!\\)\*(\S(?:.*?[^\s\\])??)\*/g, '$1')
     .replace(/(?<![\w\\])_(\S(?:.*?[^\s\\])??)_(?!\w)/g, '$1')
+    .replace(/(?<!\\)`+/g, '') // a backtick no span closes
     .replace(/\\([\\`*_{}[\]()#+\-.!|])/g, '$1') // Markdown escapes, e.g. TypeDoc's `\+`
     .replace(/\uE000(\d+)\uE000/g, (_, index) => code[index])
     .replace(/\s+/g, ' ')
