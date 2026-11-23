@@ -175,9 +175,7 @@ export interface ConfigParams {
   /**
    * Sets your HyperFormula license key.
    *
-   * To use HyperFormula on the GPLv3 license terms, set this option to `gpl-v3`.
-   *
-   * To use HyperFormula with your proprietary license, set this option to your valid license key string.
+   * Set this option to your valid license key string.
    *
    * For more information, go [here](/guide/license-key.md).
    * @default undefined
