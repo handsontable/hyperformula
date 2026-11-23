@@ -339,8 +339,9 @@ try {
 
 ## isItPossibleTo* methods
 
-There are also methods that you may find useful to call in pair with
-the above-mentioned operations. These methods are prefixed with
+Most sheet, row, column, and cell operations on this page (for example,
+`addSheet`, `removeRows`, or `moveCells`) have a matching method that
+checks whether the operation can be performed. These methods are prefixed with
 `isItPossibleTo*` whose sole purpose is to check if the desired
 operation is possible. They all return a simple `boolean` value.
 You will find it handy when you want to give the user a more generic
