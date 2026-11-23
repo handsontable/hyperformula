@@ -6,13 +6,42 @@ tags:
   - upgrade
   - breaking changes
   - v4.0
-  - "#CALC!"
+  - "#LIC!"
   - language packs
-  - INDEX
-  - FILTER
 ---
 
 To upgrade your HyperFormula version from 3.x.x to 4.0.0, follow this guide.
+
+## The `gpl-v3` license key no longer works
+
+HyperFormula 4.0.0 is available only under a commercial license. It no longer accepts the `gpl-v3` license key.
+For the background of this change, see [HyperFormula is moving from GPLv3 to a proprietary license](https://github.com/handsontable/hyperformula/issues/1888).
+
+With `licenseKey: 'gpl-v3'`, HyperFormula 4.0.0 reads the key as invalid:
+
+* Every function call evaluates to a `#LIC!` error, except `VERSION()` and `OFFSET()`.
+* License-gated API methods throw a `LicenseCapabilityMissingError`.
+* You see a warning in the console.
+
+For details, see [Invalid license key](license-key.md#invalid-license-key).
+
+### Get a license key
+
+For a commercial license key or a free trial, contact us via [handsontable.com/pricing](https://handsontable.com/pricing/?tab=hyperformula).
+
+Then, in your [configuration options](configuration-options.md), replace `gpl-v3` with your license key:
+
+```js
+const hf = HyperFormula.buildEmpty({
+  // replace 'your-license-key' with your license key
+  licenseKey: 'your-license-key',
+});
+```
+
+### Keep using `gpl-v3`
+
+To keep using the `gpl-v3` license key, don't upgrade: stay on HyperFormula 3.5.0, which won't be maintained any more.
+HyperFormula 3.5.0 and earlier versions remain available under the GNU General Public License v3.0 (GPLv3).
 
 ## The `#CALC!` error
 
@@ -75,3 +104,16 @@ HyperFormula 4.0 reads the `include` argument of `FILTER`, its second argument, 
 | An error, such as `#DIV/0!` | The row is dropped | The error |
 
 If a condition column can hold text, for example `=IF(B1>0, TRUE(), "")`, return `FALSE()` instead of `""`. Conditions after `include`, which HyperFormula accepts in addition to Excel, still drop such rows.
+
+## Function names in the Polish and Turkish language packs
+
+HyperFormula 4.0 changes two function names to the ones Microsoft Excel uses:
+
+| Language pack | Name | 3.x | 4.0 |
+|:--------------|:-----|:----|:----|
+| `plPL` | `ROCZ.PRZYCH` | `PDURATION` | `DURATION` |
+| `plPL` | `O.CZAS.TRWANIA` | `#NAME?` | `PDURATION` |
+| `trTR` | `DEĞER` | `VALUE` | `PRICE` |
+| `trTR` | `SAYIYAÇEVİR` | `#NAME?` | `VALUE` |
+
+A Polish or Turkish formula with an old name now calls `DURATION` or `PRICE`, which take different arguments, so it returns `#N/A`. In the formulas you store in these languages, replace `ROCZ.PRZYCH` with `O.CZAS.TRWANIA`, and `DEĞER` with `SAYIYAÇEVİR`. Formulas in other languages are not affected.

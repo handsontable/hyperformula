@@ -7,6 +7,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { TEST_LICENSE_KEY } from './test-license-key.mjs';
 
 const ENGINE_ROOT = resolve(fileURLToPath(new URL('.', import.meta.url)), '../../hyperformula');
 const HyperFormula = createRequire(import.meta.url)(join(ENGINE_ROOT, 'dist/hyperformula.full.js'));
@@ -84,9 +85,9 @@ assertReadmeLanguages(languagesCount);
 /**
  * The function total, from `getAvailableFunctions` on a default-config engine: the same call and options as
  * `docs/script/generate-builtin-functions-doc.ts`, so the total and the table it heads describe the same set.
- * The GPLv3 key only keeps the build quiet.
+ * The internal test key grants every function, so the total counts them all, and keeps the build quiet.
  */
-const functionsCount = HyperFormula.buildEmpty({ language: 'enGB', licenseKey: 'gpl-v3' }).getAvailableFunctions().length;
+const functionsCount = HyperFormula.buildEmpty({ language: 'enGB', licenseKey: TEST_LICENSE_KEY }).getAvailableFunctions().length;
 
 /** @type {Record<string, string>} */
 export const DOCS_DATA = {
