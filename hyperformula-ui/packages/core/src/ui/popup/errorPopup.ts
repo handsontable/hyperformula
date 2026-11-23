@@ -16,6 +16,29 @@ export interface ErrorPopupOptions {
 
 let errorPopupIdCounter = 0;
 
+function addIdRef(element: HTMLElement, attribute: string, id: string): void {
+  const ids = element.getAttribute(attribute)?.split(/\s+/).filter(Boolean) ?? [];
+
+  if (!ids.includes(id)) {
+    element.setAttribute(attribute, [...ids, id].join(" "));
+  }
+}
+
+function removeIdRef(element: HTMLElement, attribute: string, id: string): void {
+  const ids = element.getAttribute(attribute)?.split(/\s+/).filter(Boolean) ?? [];
+  const remaining = ids.filter((token) => token !== id);
+
+  if (remaining.length === ids.length) {
+    return;
+  }
+
+  if (remaining.length === 0) {
+    element.removeAttribute(attribute);
+  } else {
+    element.setAttribute(attribute, remaining.join(" "));
+  }
+}
+
 export class ErrorPopup extends BasePopup {
   private container: HTMLElement | null = null;
   private containerScope: EventScope | null = null;
@@ -33,6 +56,7 @@ export class ErrorPopup extends BasePopup {
     this.handleLeave(event.relatedTarget, false);
   private readonly onScroll = (): void => this.scheduleScrollReposition();
   private readonly onKeydown = (event: KeyboardEvent): void => this.handleEscape(event);
+  private readonly associationObserver = new MutationObserver(() => this.restoreErrorAssociation());
 
   constructor({ container, options, direction, icons, phrases }: ErrorPopupOptions) {
     super({
@@ -109,7 +133,28 @@ export class ErrorPopup extends BasePopup {
   }
 
   private clearErrorAssociation(): void {
-    this.activeCell?.removeAttribute("aria-errormessage");
+    this.associationObserver.disconnect();
+
+    if (!this.activeCell) {
+      return;
+    }
+
+    this.activeCell.removeAttribute("aria-errormessage");
+    removeIdRef(this.activeCell, "aria-describedby", this.root.id);
+  }
+
+  private restoreErrorAssociation(): void {
+    const cell = this.activeCell;
+
+    if (!cell || !this.isVisible()) {
+      return;
+    }
+
+    if (cell.getAttribute("aria-errormessage") !== this.root.id) {
+      cell.setAttribute("aria-errormessage", this.root.id);
+    }
+
+    addIdRef(cell, "aria-describedby", this.root.id);
   }
 
   private handleEnter(target: EventTarget | null, viaPointer: boolean): void {
@@ -142,7 +187,7 @@ export class ErrorPopup extends BasePopup {
     this.anchorTo(cell, message);
   }
 
-  private anchorTo(cell: HTMLElement, message: string): void {
+  private anchorTo(cell: HTMLElement, message: string, duringHostRender = false): void {
     this.pendingMessage = message;
     this.clearErrorAssociation();
     this.activeCell = cell;
@@ -154,7 +199,15 @@ export class ErrorPopup extends BasePopup {
       width: rect.width,
       direction: this.direction,
     });
+    this.associationObserver.observe(cell, {
+      attributes: true,
+      attributeFilter: ["aria-errormessage", "aria-describedby"],
+    });
     cell.setAttribute("aria-errormessage", this.root.id);
+
+    if (!duringHostRender) {
+      addIdRef(cell, "aria-describedby", this.root.id);
+    }
   }
 
   private anchorToRemainingCell(): boolean {
@@ -292,6 +345,32 @@ export class ErrorPopup extends BasePopup {
     this.containerScope.activate();
   }
 
+  syncCell(cell: HTMLElement, previousMessage: string | undefined): void {
+    const message = cell.dataset.hfeError;
+
+    if (message === previousMessage) {
+      return;
+    }
+
+    if (cell === this.suppressedCell) {
+      this.suppressedCell = null;
+    }
+
+    if (this.isVisible() && cell === this.activeCell) {
+      if (message) {
+        this.anchorTo(cell, message, true);
+      } else {
+        this.close();
+      }
+
+      return;
+    }
+
+    if (message && !this.isVisible() && (cell === this.pointerCell || cell === this.focusCell)) {
+      this.anchorTo(cell, message, true);
+    }
+  }
+
   protected override onVisibilityChanged(visible: boolean): void {
     if (!visible) {
       this.pruneDetachedCells();
@@ -324,6 +403,7 @@ export class ErrorPopup extends BasePopup {
   }
 
   override destroy(): void {
+    this.associationObserver.disconnect();
     this.cancelScrollReposition();
     super.destroy();
   }
