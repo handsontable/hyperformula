@@ -154,7 +154,7 @@ docs                            # All documentation files
 │   ├── markdown-plugins.mjs    # Links, values, live examples and the old VuePress heading anchors in the pages
 │   ├── page-id.mjs             # Which Markdown files are pages, and each page's id
 │   ├── page-section.mjs        # Which header tab (Guides, API, Updates) a page belongs to
-│   └── route-data.mjs          # Fixes the section links and keeps them out of prev/next
+│   └── route-data.mjs          # Sets each page's meta description, fixes the section links and keeps them out of prev/next
 ├── typedoc-theme               # The TypeDoc theme the API reference is generated with
 ├── worker                      # The Cloudflare Worker serving the site
 ├── api-ref-readme.md           # The API reference welcome page (TypeDoc input)

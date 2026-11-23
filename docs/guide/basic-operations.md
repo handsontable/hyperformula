@@ -1,5 +1,6 @@
 ---
 title: "Basic operations"
+description: Add, remove, move, and reorder sheets, rows, columns, and cells in HyperFormula, and read the changes each operation returns.
 tags:
   - CRUD
   - insert rows

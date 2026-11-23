@@ -1,4 +1,11 @@
 /**
+ * Per-page meta description:
+ *
+ * - A page's frontmatter `description` is used as is (Starlight puts it in the head).
+ * - A page without one gets its first paragraph, instead of the site-wide description, so search
+ *   engines and AI agents can tell the pages apart. On an API page, only the introduction above the
+ *   first `##` heading counts: below it are signatures and member descriptions, not the page's topic.
+ *
  * The API pages' section links (`page.html#section`, see `src/api-sidebar.mjs`):
  *
  * - Starlight appends `.html` to every sidebar link that doesn't end in it, after the `#section` too, so it's removed there.
@@ -20,7 +27,74 @@ function pageLinks(entries, groupLabel) {
   });
 }
 
+/** The longest description kept; search engines cut longer ones. */
+const MAX_DESCRIPTION = 160;
+
+/**
+ * The first prose paragraph of a page's Markdown body, as plain text, or `''` if there is none.
+ * Skips headings, HTML, images, admonitions (`:::` blocks, with their content), code fences, tables, lists
+ * and `{{ … }}` placeholders.
+ * @param {string} body the page's Markdown, without frontmatter
+ * @returns {string}
+ */
+export function firstParagraph(body = '') {
+  let inFence = false;
+  let inComment = false;
+  let inAdmonition = false;
+  const lines = [];
+  for (const raw of body.split('\n')) {
+    const line = raw.trim();
+    if (/^(```|~~~)/.test(line)) { inFence = !inFence; continue; }
+    if (inFence) continue;
+    if (inComment) { if (line.includes('-->')) inComment = false; continue; }
+    if (line.startsWith('<!--')) { if (!line.includes('-->')) inComment = true; continue; }
+    // `:::tip` opens an admonition and a bare `:::` closes it.
+    if (line.startsWith(':::')) { inAdmonition = line !== ':::'; continue; }
+    if (inAdmonition) continue;
+    const isProse = line && !/^(#|<|\||[-*+] |\d+\. |>|@\[|!\[)/.test(line) && !line.includes('{{');
+    if (isProse) { lines.push(line); continue; }
+    if (lines.length) break;
+  }
+  return lines.join(' ')
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1') // links and images: keep the text
+    .replace(/\\([\\`*_{}[\]()#+\-.!|])/g, '$1') // Markdown escapes, e.g. TypeDoc's `\+`
+    .replace(/`/g, '')
+    .replace(/(\*\*?)(\S(?:.*?\S)??)\1/g, '$2') // emphasis
+    .replace(/(?<!\w)(__?)(\S(?:.*?\S)??)\1(?!\w)/g, '$2') // emphasis; `_` inside a name such as `row_num` stays
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Cuts a description at a word boundary.
+ * @param {string} text
+ * @returns {string}
+ */
+function shorten(text) {
+  if (text.length <= MAX_DESCRIPTION) return text;
+  return `${text.slice(0, MAX_DESCRIPTION - 1).replace(/\s+\S*$/, '')}…`;
+}
+
+/**
+ * Replaces the site-wide description in the head with the page's first paragraph.
+ * @param {object} route `locals.starlightRoute`
+ */
+function setDescription(route) {
+  if (route.entry.data.description) return;
+  const body = route.id.startsWith('api/') ? route.entry.body.split(/^## /m)[0] : route.entry.body;
+  const description = shorten(firstParagraph(body));
+  if (!description) return;
+  for (const tag of route.head) {
+    const key = tag.attrs?.name ?? tag.attrs?.property;
+    if (tag.tag === 'meta' && (key === 'description' || key === 'og:description' || key === 'twitter:description')) {
+      tag.attrs.content = description;
+    }
+  }
+}
+
 export const onRequest = defineRouteMiddleware(({ locals }) => {
+  setDescription(locals.starlightRoute);
+
   const { pagination, sidebar } = locals.starlightRoute;
   const links = pageLinks(sidebar);
   const current = links.findIndex((link) => link.isCurrent);
