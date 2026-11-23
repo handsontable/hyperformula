@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.7] - 2026-11-23
+
 ### Added
 - Added the `#CALC!` error literal to the formula lexer, so the editor no longer marks a formula that uses it as invalid. [#1889](https://github.com/handsontable/hyperformula/pull/1889)
 
