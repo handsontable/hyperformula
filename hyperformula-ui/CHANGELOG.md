@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added the `#CALC!` error literal to the formula lexer, so the editor no longer marks a formula that uses it as invalid. [#1889](https://github.com/handsontable/hyperformula/pull/1889)
 
+### Fixed
+- Fixed the error popup staying open with the old error after `markCell()` cleared the cell's error, and showing the old message after `markCell()` changed it. A cell whose error was dismissed with Escape now shows its next error again. [#1899](https://github.com/handsontable/hyperformula/pull/1899)
+
 ## [0.3.6] - 2026-10-26
 
 ### Added
