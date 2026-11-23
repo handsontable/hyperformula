@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Breaking change**: Changed the `INDEX` function to match Microsoft Excel. A row or column past the range now returns `#REF!` instead of `#NUM!`, a fractional row or column is truncated, and a row or column of `0` returns the whole column or row, which spills. Without a column number, `INDEX` returns `#REF!` for a range with more than one row and column instead of using its first column, returns the whole row of an array with more than one row and column, and counts along a one-row range. `INDEX` also accepts the `area_num` argument. See the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html). [#1544](https://github.com/handsontable/hyperformula/issues/1544)
 - **Breaking change**: Changed the `FILTER` function to return `#VALUE!` for text in its `include` argument, including the empty text and `"TRUE"`, and to return an error found there, as in Microsoft Excel. Before, it dropped those rows, or kept them for `"TRUE"`. For example, a condition column of `=IF(B1>0, TRUE(), "")` now makes `FILTER` return `#VALUE!`; return `FALSE()` instead of `""`. See the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html). [#1891](https://github.com/handsontable/hyperformula/pull/1891)
 - **Breaking change**: Changed the Polish name of `PDURATION` from `ROCZ.PRZYCH` to `O.CZAS.TRWANIA` and the Turkish name of `VALUE` from `DEĞER` to `SAYIYAÇEVİR`, as in Microsoft Excel, which uses `ROCZ.PRZYCH` for `DURATION` and `DEĞER` for `PRICE`. A Polish or Turkish formula with an old name now calls `DURATION` or `PRICE`; use the new names instead. See the [migration guide](https://hyperformula.handsontable.com/docs/guide/migration-from-3.x-to-4.0.html). [#1848](https://github.com/handsontable/hyperformula/pull/1848)
+- Changed the `DELTA`, `ERF` and `ERFC` functions to return `#VALUE!` for a boolean or an empty text argument, as Excel does; to keep the previous result, pass the argument through `N()`, as in `=DELTA(N(TRUE()))`. [#1836](https://github.com/handsontable/hyperformula/pull/1836)
 
 ### Added
 
@@ -42,10 +43,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `DROP` dynamic-array function. [#1796](https://github.com/handsontable/hyperformula/pull/1796)
 - Added the `TRIMRANGE` dynamic-array function. [#1842](https://github.com/handsontable/hyperformula/pull/1842)
 - Added the `WRAPROWS`, `WRAPCOLS` and `EXPAND` dynamic-array functions. [#1830](https://github.com/handsontable/hyperformula/pull/1830)
-
-### Changed
-
-- Changed the `DELTA`, `ERF` and `ERFC` functions to return `#VALUE!` for a boolean or an empty text argument, as Excel does; to keep the previous result, pass the argument through `N()`, as in `=DELTA(N(TRUE()))`. [#1836](https://github.com/handsontable/hyperformula/pull/1836)
 
 ### Fixed
 
