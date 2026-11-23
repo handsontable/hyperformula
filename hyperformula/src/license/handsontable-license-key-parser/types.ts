@@ -98,8 +98,8 @@ export interface LicenseLifecycle {
  *
  * `ui` governs warnings only. A trial hard-stop block is enforcement and is
  * applied regardless - see `NO_UI_WARNS_FLAG` in `./constants`. So is the
- * "Powered by" bar a `badge` key asks for: it is branding, not a warning - see
- * `BADGE_FLAG`. A new surface reading this field has to decide which of the
+ * "Powered by" bar an `attribution-bar` key asks for: it is branding, not a warning - see
+ * `ATTRIBUTION_BAR_FLAG`. A new surface reading this field has to decide which of the
  * three it is before honoring it.
  */
 export interface LicenseChannels {

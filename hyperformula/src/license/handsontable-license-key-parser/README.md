@@ -107,7 +107,7 @@ This is a Handsontable license key for Acme Corp, issued on 2026-08-12. It inclu
 | `release_until` | Builds released on or before this day may run forever. Measured against your build date, never the clock. A perpetual license. |
 | `notice` | Days of advance warning before `usage_until`. `0` means no warning. |
 | `grace` | Days of soft stop after `usage_until` before the hard stop. |
-| `flags` | `trial`, `no-console-warns`, `no-ui-warns`, `custom`, `listed-capabilities`, `badge`. Present or absent - there is no `false`. |
+| `flags` | `trial`, `no-console-warns`, `no-ui-warns`, `custom`, `listed-capabilities`, `attribution-bar`. Present or absent - there is no `false`. |
 
 Exactly **one** of `usage_until` / `release_until` is present. There is no contract type, tier, package name or holder in the payload - "subscription" or "perpetual" is only visible as which date is present.
 
@@ -244,7 +244,7 @@ The two flags close channels, per product:
 
 Both are set on keys issued for external, end-user-facing use, so your license messages never reach your customer's own users.
 
-**`badge` is not a channel, and no channel closes it.** It says the licensee agreed to show your product's "Powered by" bar - usually the term of a sponsored license, issued free of charge. The bar is branding, not a warning, so render it **outside** the `channels.ui` gate: `no-ui-warns` closes warnings only, and a sponsored product that redistributes yours (a free plugin, say) carries `no-ui-warns` and must still show the bar. The reader does not act on the flag; check it on the entry yourself (`license.licensed && license.entitlement.flags.indexOf(BADGE_FLAG) !== -1` - an unlicensed result has no entry). Whether a trial also shows the bar is your product's decision - the flag only covers keys that carry it. A product with no bar ignores it.
+**`attribution-bar` is not a channel, and no channel closes it.** It says the licensee agreed to show your product's "Powered by" bar - usually the term of a sponsored license, issued free of charge. The bar is branding, not a warning, so render it **outside** the `channels.ui` gate: `no-ui-warns` closes warnings only, and a sponsored product that redistributes yours (a free plugin, say) carries `no-ui-warns` and must still show the bar. The reader does not act on the flag; check it on the entry yourself (`license.licensed && license.entitlement.flags.indexOf(ATTRIBUTION_BAR_FLAG) !== -1` - an unlicensed result has no entry). Whether a trial also shows the bar is your product's decision - the flag only covers keys that carry it. A product with no bar ignores it.
 
 The specification's message text (§4.1, §4.2). Replace `{PRODUCT}` with your product's display name. Print `usage_until` dates with the ` (UTC)` marker and `release_until` dates without it:
 
@@ -333,7 +333,7 @@ The windows are evaluated in this directory and are already covered by `license-
 - each literal key, a legacy key, a missing key and an unreadable key reach the right path,
 - each of the ten states produces the right message on the right surface, and nothing when the matching channel is closed,
 - the trial hard stop blocks even with `no-ui-warns`,
-- if your product has a bar: a key with `badge` shows it, with and without `no-ui-warns`, and a key without `badge` does not,
+- if your product has a bar: a key with `attribution-bar` shows it, with and without `no-ui-warns`, and a key without `attribution-bar` does not,
 - a key for another product only reports an invalid key,
 - if you read an entry without `listed-capabilities` as granting everything: a real key issued without the flag unlocks every gated feature, and a flagged one unlocks only what it lists,
 - the build date constant reaches `readEntitlementLicense` in your real bundle, not only in tests,
@@ -426,7 +426,7 @@ Which channels the entry's flags leave open.
 
 ### Constants
 
-`TRIAL_FLAG`, `NO_CONSOLE_WARNS_FLAG`, `NO_UI_WARNS_FLAG`, `CUSTOM_FLAG`, `LISTED_CAPABILITIES_FLAG`, `BADGE_FLAG`.
+`TRIAL_FLAG`, `NO_CONSOLE_WARNS_FLAG`, `NO_UI_WARNS_FLAG`, `CUSTOM_FLAG`, `LISTED_CAPABILITIES_FLAG`, `ATTRIBUTION_BAR_FLAG`.
 
 ## Files
 

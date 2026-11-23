@@ -98,7 +98,7 @@ export const LISTED_CAPABILITIES_FLAG = 'listed-capabilities';
  *
  * @type {string}
  */
-export const BADGE_FLAG = 'badge';
+export const ATTRIBUTION_BAR_FLAG = 'attribution-bar';
 
 /**
  * The number of milliseconds in a day, used to walk from one UTC midnight to
