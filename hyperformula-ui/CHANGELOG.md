@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.7] - 2026-11-23
+
 ### Added
 - Added the `#CALC!` error literal to the formula lexer, so the editor no longer marks a formula that uses it as invalid. [#1889](https://github.com/handsontable/hyperformula/pull/1889)
+
+### Fixed
+- Fixed the error popup staying open with the old error after `markCell()` cleared the cell's error, and showing the old message after `markCell()` changed it. A cell whose error was dismissed with Escape now shows its next error again. [#1899](https://github.com/handsontable/hyperformula/pull/1899)
+- Fixed axe reporting `aria-valid-attr-value` on an error cell while its error popup is open. The cell's `aria-describedby` now lists the popup, so screen readers read the error message as the cell's description, and the ids the grid already put there are kept. [#1897](https://github.com/handsontable/hyperformula/pull/1897)
 
 ## [0.3.6] - 2026-10-26
 
