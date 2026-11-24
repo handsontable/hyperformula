@@ -280,7 +280,9 @@ function pickSection(sections: string[], value: number): { sectionStr: string, v
 
 /**
  * Number path of the dispatcher: split the format into sign-selected sections,
- * pick the section for the value, tokenize it and render.
+ * pick the section for the value, tokenize it, scale the value by 100 for each
+ * of the section's percent signs, and render. A scaled value too large for a
+ * number returns `#VALUE!`.
  *
  * When the SELECTED section carries no `#`/`0` placeholder it is pure literal
  * text (e.g. `"neg"`, an empty section, or a bare `Foo`): render THAT section's
@@ -294,7 +296,7 @@ function pickSection(sections: string[], value: number): { sectionStr: string, v
  * @param formatArg the color-stripped format string
  * @param value the numeric value being formatted
  * @param config the live HyperFormula config (separators)
- * @returns the formatted string
+ * @returns the formatted string, or `#VALUE!` when the scaled value overflows
  */
 function formatNumberWithSections(formatArg: string, value: number, config: Config): RawScalarValue {
   const sections = splitIntoSections(formatArg)
@@ -305,7 +307,56 @@ function formatNumberWithSections(formatArg: string, value: number, config: Conf
     const sign = sections.length === 1 && value < 0 ? '-' : ''
     return sign + renderLiteralSection(sectionStr)
   }
-  return numberFormat(expression.tokens, valueForFormat, separators)
+  const scaledValue = shiftDecimalPoint(valueForFormat, 2 * countPercentOperators(sectionStr))
+  if (!Number.isFinite(scaledValue)) {
+    return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
+  }
+  return numberFormat(expression.tokens, scaledValue, separators)
+}
+
+/**
+ * Counts the `%` signs of a format section that scale the value, as in Excel:
+ * each one multiplies the value by 100. A `%` inside a quoted literal or after
+ * a backslash is literal text and does not count. Only the section selected
+ * for the value is counted, so `0.00%;0.00` scales positive values only.
+ *
+ * @param section the raw (unstripped) format section
+ * @returns the number of scaling `%` signs
+ */
+function countPercentOperators(section: string): number {
+  let count = 0
+  let inQuotes = false
+  for (let i = 0; i < section.length; i++) {
+    const ch = section[i]
+    if (ch === '"') {
+      inQuotes = !inQuotes
+    } else if (inQuotes) {
+      continue
+    } else if (ch === '\\') {
+      i++
+    } else if (ch === '%') {
+      count++
+    }
+  }
+  return count
+}
+
+/**
+ * Multiplies a value by `10 ** places` by moving the decimal point of its
+ * shortest decimal representation, so `0.285` becomes exactly `28.5`. A binary
+ * multiplication would give `28.499999999999996` and round half-way values one
+ * lower than Excel (`TEXT(0.285,"0%")` is `29%`).
+ *
+ * @param value the value to scale
+ * @param places how many places to move the decimal point to the right
+ * @returns the scaled value; `Infinity` when it overflows
+ */
+function shiftDecimalPoint(value: number, places: number): number {
+  if (places === 0) {
+    return value
+  }
+  const [mantissa, exponent = '0'] = value.toString().split('e')
+  return Number(`${mantissa}e${Number(exponent) + places}`)
 }
 
 /**
