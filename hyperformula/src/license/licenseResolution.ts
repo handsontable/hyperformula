@@ -23,6 +23,16 @@ import {LicenseState, ProductEntitlement} from './handsontable-license-key-parse
 export const HYPERFORMULA_PRODUCT_NAME = 'hyperformula'
 
 /**
+ * Whether the page runs on handsontable.com or one of its one-label subdomains, where the license
+ * check is skipped so the live documentation examples run without a key. The same test as
+ * Handsontable's (`handsontable/src/helpers/mixed.ts`, `_ignored`): `location.host`, so a port
+ * never matches, and no match at all where there is no `location` (Node).
+ */
+export function isLicenseCheckSkipped(): boolean {
+  return typeof location !== 'undefined' && /^([a-z0-9-]+\.)?handsontable\.com$/i.test(location.host)
+}
+
+/**
  * What one lifecycle state of a licensed entitlement key means for this build: the validity state it
  * reports, and whether it blocks evaluation.
  */
@@ -127,10 +137,13 @@ function entitlementOf(entry: ProductEntitlement, isTrial: boolean, silent: bool
 /**
  * Resolves a license key into both gates' inputs.
  *
+ * On handsontable.com and its one-label subdomains ({@link isLicenseCheckSkipped}) the key is not
+ * read: every key resolves as valid and unrestricted, with no console message.
+ *
  * Routing follows the vendored {@link detectLicenseKeyFormat}, whose test order is normative: the
  * literals, then the trailing bracketed block that marks an
  * entitlement key, then the legacy 25-character shape. Everything that is not an entitlement key
- * — `gpl-v3`, a legacy key, an empty string — falls through to {@link checkLicenseKeyValidity}
+ * — a literal key, a legacy key, an empty string — falls through to {@link checkLicenseKeyValidity}
  * completely unchanged, which is what keeps this from touching existing behavior. A string that
  * carries a bracketed block routes here even when the block is garbage: such a key is INVALID,
  * not a legacy key that happens to contain brackets.
@@ -163,6 +176,12 @@ function entitlementOf(entry: ProductEntitlement, isTrial: boolean, silent: bool
  * once-per-page-load flag, so they cannot double-print regardless of this parameter.
  */
 export function resolveLicense(licenseKey: string, notifyConsole: boolean = true): ResolvedLicense {
+  // The skip applies to the whole license state, not just the messages, as in Handsontable: every
+  // key, including a missing or invalid one, reads as valid and restricts nothing, and prints nothing.
+  if (isLicenseCheckSkipped()) {
+    return {validityState: LicenseKeyValidityState.VALID, blocksEvaluation: false, entitlement: unrestrictedEntitlement()}
+  }
+
   if (detectLicenseKeyFormat(licenseKey) !== 'entitlement') {
     const validityState = checkLicenseKeyValidity(licenseKey)
 
@@ -183,9 +202,9 @@ export function resolveLicense(licenseKey: string, notifyConsole: boolean = true
 
   if (!license.licensed) {
     // `unreadable` (a broken block, or edited or missing prose) and `product_missing` (a key for other products only) both
-    // resolve to an invalid key that restricts nothing; only their console messages differ.
+    // resolve to an invalid key that restricts nothing, and both print the same invalid-key warning.
     if (notifyConsole) {
-      notifyUnlicensedEntitlementKey(license.reason)
+      notifyUnlicensedEntitlementKey()
     }
 
     return {validityState: LicenseKeyValidityState.INVALID, blocksEvaluation: true, entitlement: unrestrictedEntitlement()}

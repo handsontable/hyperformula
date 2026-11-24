@@ -339,8 +339,9 @@ try {
 
 ## isItPossibleTo* methods
 
-There are also methods that you may find useful to call in pair with
-the above-mentioned operations. These methods are prefixed with
+Most sheet, row, column, and cell operations on this page (for example,
+`addSheet`, `removeRows`, or `moveCells`) have a matching method that
+checks whether the operation can be performed. These methods are prefixed with
 `isItPossibleTo*` whose sole purpose is to check if the desired
 operation is possible. They all return a simple `boolean` value.
 You will find it handy when you want to give the user a more generic
@@ -355,7 +356,9 @@ easily check if that action is allowed, and if it is not, throw an error.
 // an instance with some example data
 const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // a variable used to carry the message for the user
 let messageUsedInUI;
@@ -394,7 +397,9 @@ const hf = HyperFormula.buildFromArray([
   [1],
   ['=SUM(A1:A2)'],
   ['=COUNTBLANK(A1:A3)'],
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // insert an empty row between the row 0 and the row 1
 const changes = hf.addRows(0, [1, 1]);

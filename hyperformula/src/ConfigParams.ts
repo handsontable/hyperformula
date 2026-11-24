@@ -106,6 +106,8 @@ export interface ConfigParams {
   /**
    * Sets a decimal separator used for parsing numerical literals.
    *
+   * Also sets the decimal point of a `TEXT` mask: the `TEXT` function reads this character as the decimal point in the mask and writes it in the result, so with `,` the mask is `0,00`. See [`TEXT` function formats](/guide/compatibility-with-microsoft-excel.md#text-function-formats).
+   *
    * Can be one of the following:
    * - `.` (period)
    * - `,` (comma)
@@ -175,9 +177,7 @@ export interface ConfigParams {
   /**
    * Sets your HyperFormula license key.
    *
-   * To use HyperFormula on the GPLv3 license terms, set this option to `gpl-v3`.
-   *
-   * To use HyperFormula with your proprietary license, set this option to your valid license key string.
+   * Set this option to your valid license key string.
    *
    * For more information, go [here](/guide/license-key.md).
    * @default undefined
@@ -297,7 +297,10 @@ export interface ConfigParams {
   /**
    * Sets a function that converts date-time values into strings.
    *
-   * The function should return a string or undefined.
+   * The function should return a string or undefined. For the `TEXT` function, it receives the mask without
+   * color tags (`dd-mm-yyyy` for `[Red]dd-mm-yyyy`), and it is not called for a mask that `TEXT` rejects with
+   * `#VALUE!`: one with an unclosed `[` or `"`, an empty bracket, a bracket that starts with a backslash, or a lone
+   * backslash at its end.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    * @default defaultStringifyDateTime
@@ -307,7 +310,10 @@ export interface ConfigParams {
   /**
    * Sets a function that converts time duration values into strings.
    *
-   * The function should return a string or undefined.
+   * The function should return a string or undefined. For the `TEXT` function, it receives the mask without
+   * color tags (`[hh]:mm` for `[Red][hh]:mm`), and it is not called for a mask that `TEXT` rejects with
+   * `#VALUE!`: one with an unclosed `[` or `"`, an empty bracket, a bracket that starts with a backslash, or a lone
+   * backslash at its end.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    * @default defaultStringifyDuration
@@ -340,6 +346,8 @@ export interface ConfigParams {
   smartRounding: boolean,
   /**
    * Sets the thousands' separator symbol for parsing numerical literals.
+   *
+   * Also sets the grouping character of a `TEXT` mask: the `TEXT` function reads this character as thousands grouping in the mask and writes it in the result, so with ` ` the mask is `# ##0`. When it is empty, `,` groups if [decimalSeparator](/api/interfaces/configparams.md#decimalseparator) is `.` (`#,##0`), and no character groups if it is `,`. See [`TEXT` function formats](/guide/compatibility-with-microsoft-excel.md#text-function-formats).
    *
    * Can be one of the following:
    * - empty

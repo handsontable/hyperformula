@@ -20,6 +20,7 @@
 
 - **Coerce through `ArithmeticHelper`.** Never write ad-hoc string-to-number or value-to-boolean conversion inside a function; the coercion rules are spreadsheet semantics, not JavaScript semantics, and they are already implemented once.
 - **Errors are values.** Return a `CellError` with a message from `hyperformula/src/error-message.ts`. Do not throw: a thrown error escapes the evaluation of one cell and takes the recalculation with it.
+- **Never spread a range's values into a call.** `push(...values)` and `Math.max(...values)` pass one argument per value, and a range or array of about 125,000 values (Node 24, default stack size) throws `RangeError: Maximum call stack size exceeded` out of the recalculation. Append in a loop.
 - **The registry is keyed by id, not by implementation.** A custom plugin can be registered over a built-in id. Do not assume the plugin you are reading is the one that will answer for that id at run time.
 - **Evaluate each argument once.** Evaluating the same argument twice doubles its cost and, when it contains a volatile function such as `RAND`, can see two different values.
 - **This is the hot path.** `Interpreter.evaluateAst` runs once per formula, and once per cell for array-broadcast arguments. Allocation inside a per-cell loop is measurable.
@@ -80,6 +81,8 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 | `enableArrayArithmeticForArguments` | Array arithmetic mode should apply to its arguments and nested expressions |
 | `sizeOfResultArrayMethod` | **Required** for any function that can return an array |
 | `returnNumberType` | The result is a percent, currency, date, or time |
+
+A `sizeOfResultArrayMethod` that computes the size from its arguments returns `ArraySize.error()` when `this.arraySizePredictor.isSizeKnownBeforeEvaluation(arg, state)` is false for one of them, as for a named expression or a call such as `SEQUENCE(A1)`, or when the size it computes is not finite, as for a whole-column or whole-row range; the formula then takes one cell, and a result of more than one cell is `#VALUE!`. `MODE.MULT` and `FREQUENCY` in `StatisticalAggregationPlugin` follow this rule. A method that skips the check sizes such an argument as one cell: when the size it computes is then more than one cell, as `FREQUENCY` would compute two rows for a named expression as `bins_array`, a larger result returns `#SPILL!`; when it is one cell, as `MODE.MULT` would for a single named expression, a larger result returns `#VALUE!`.
 
 `arrayFunction` and `arraySizeMethod` are still declared on the interface but are **deprecated since 3.1.0**, superseded by `enableArrayArithmeticForArguments` and `sizeOfResultArrayMethod`. Do not carry them forward from an older plugin.
 

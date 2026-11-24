@@ -22,6 +22,11 @@ export const UNRESTRICTED_GRANTS: LicenseGrants = Object.freeze({
  * unrestricted - they unlock only what they name. Frozen, like every result of
  * this module, so the grants a product resolved once cannot be rewritten later.
  *
+ * The `listed-capabilities` flag changes nothing here. A product that reads an
+ * entry without it as granting everything checks the flag itself
+ * (`LISTED_CAPABILITIES_FLAG`) before it reads the grants with `hasCapability`
+ * or `getProductCapabilities`.
+ *
  * @param {EntitlementKeyData} keyData The verified key data.
  * @returns {LicenseGrants}
  */

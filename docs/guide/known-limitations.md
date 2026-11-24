@@ -43,24 +43,43 @@ a circular reference.
 * CHISQ.INV, CHISQ.INV.RT, CHISQ.DIST.RT, CHIDIST, CHIINV and CHISQ.DIST (CHISQ.DIST in CDF mode): Running time grows linearly with the value of the second parameter, degrees_of_freedom (slow for values>1e7).
 * GAMMA.DIST, GAMMA.INV, GAMMADIST, GAMMAINV (GAMMA.DIST and GAMMADIST in CDF mode): Running time grows linearly with the value of the second parameter, alpha (slow for values>1e7). 
 * For certain inputs, the RATE function might have no solutions, or have multiple solutions. Our implementation uses an iterative algorithm (Newton's method) to find an approximation for one of the solutions to within 1e-7. If the approximation is not found after 50 iterations, the RATE function returns the `#NUM!` error.
-* The INDEX function doesn't support returning whole rows or columns of the source range – it always returns the contents of a single cell.
+* The INDEX function returns values, not references: `ISREF(INDEX(A1:C3, 1, 1))` returns `FALSE`, `ROW(INDEX(...))` and `COLUMN(INDEX(...))` return an error, and a range such as `A1:INDEX(A1:C3, 2, 2)` can't be parsed. Its `area_num` argument accepts only `1`, because HyperFormula doesn't support references to more than one area, such as `(A1:B2, D1:D3)`. Unless [array arithmetic mode](arrays.md#array-arithmetic-mode) is on, an array passed as `row_num`, `column_num` or `area_num` is not evaluated element by element; INDEX uses its first value.
 * The FILTER function accepts either single rows of equal width or single columns of equal height. In other words, all arrays passed to the FILTER function must have equal dimensions, and at least one of those dimensions must be 1.
 * Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
 * `FILTER` and `UNIQUE` reserve the size of their source before they are evaluated, because the size of their result is not known until then. Near the sheet edge set by [`maxRows`](../api/interfaces/configparams.md#maxrows) and [`maxColumns`](../api/interfaces/configparams.md#maxcolumns), they return `#SPILL!` when that reserved area does not fit, even if the result itself would. For example, with `maxRows` set to `4` and 1 to 4 in `A1:A4`, `=FILTER(A1:A4, A1:A4>2)` in `B3` returns `#SPILL!`.
+* INDEX spills a whole row or column only when `row_num` or `column_num` is a number and the first argument is a range or an array, such as `=INDEX(A1:C3, 0, 2)`. When the `0` comes from a cell reference or a formula, such as `=INDEX(A1:C3, B5, 2)`, or the first argument is a named expression, the result can't spill and the formula returns a `#VALUE!` error; inside another function, such as `=SUM(INDEX(A1:C3, B5, 2))`, it works. A whole row or column of a whole-column or whole-row reference, such as `=INDEX(A:A, 0)`, doesn't spill either.
+* `MODE.MULT` and `FREQUENCY` reserve their result area before evaluation, from the size of every argument of `MODE.MULT` and of the `bins_array` of `FREQUENCY`: `MODE.MULT` half as many rows as values passed to it, rounded down, and at least one, `FREQUENCY` one row per cell of `bins_array` plus one. Rows the result does not fill stay empty, and a value in any reserved cell makes the formula return `#SPILL!`. When one of these arguments has no fixed size before evaluation, the formula takes a single cell, and a result of more than one cell is `#VALUE!`. This is the case for a whole-column or whole-row range such as `A:A` or `2:2`, a named expression, and a function whose result size depends on cell values, such as `SEQUENCE(A1)`. Use a bounded range such as `A1:A100` instead.
 * The TEXT function does not accept embedded double-quote literals in the format string. In Excel, `""` inside a format string is an escape sequence for a literal `"` character — e.g. `=TEXT(1234.5, "#,##0.00 ""zł""")` returns `"1,234.50 zł"`. If your application requires this escape sequence, supply a custom [`stringifyCurrency`](currency-handling.md) callback.
+
+### TEXT function
+
+* The built-in number formatter does not implement these Excel number formats, so a mask that uses one returns a different result than in Excel:
+  * percent scaling (`0.00%`),
+  * scaling by a grouping character at the end of the number (`0,,`): `=TEXT(5000000, "0,,")` returns `5000000,,`, where Excel returns `5`,
+  * the `?` placeholder,
+  * scientific notation (`0.00E+00`),
+  * `[condition]` comparators,
+  * more than one group of digit placeholders: `=TEXT(5551234567, "(000) 000-0000")` returns `(5551234567) 000-0000`, where Excel returns `(555) 123-4567`,
+  * a mask that starts with the decimal point: `=TEXT(0.5, ".00")` returns `.01`, where Excel returns `.50`,
+  * the `_` padding code: `=TEXT(5, "0_)")` returns `5_)`, where Excel returns `5` followed by a space,
+  * the `@` text placeholder: `=TEXT(5, "@")` returns `@`, where Excel returns `5`.
+* For these number formats, supply a [`stringifyCurrency`](currency-handling.md) callback. See also [`TEXT` function formats](compatibility-with-microsoft-excel.md#text-function-formats).
+* A `.` or `,` in a mask that is neither the decimal nor the grouping separator is text: with `decimalSeparator: ','` and `functionArgSeparator: ';'`, `=TEXT(1,5; "0.00")` returns `2.00`, where Excel in a pl-PL workbook returns `#VALUE!` for that mask.
+* `TEXT` does not check the code inside a bracket, other than a color: `=TEXT(5, "0[x]")` returns `5[x]`, where Excel returns `#VALUE!`.
+* `TEXT` does not check the letters outside brackets and quotes, so a color name after an escaped bracket is still read as a color: `=TEXT(5, "0\[Red]")` returns `5\` and `=TEXT(5, "\[Red]0")` returns `0`, where Excel reads the bracket as text, rejects the letters after it, and returns `#VALUE!` for both.
+* Positive, negative and zero sections apply to number masks only. A date mask is not split into sections: with `dd-mm-yyyy;"neg"` in `A1`, `=TEXT(-5, A1)` returns `25-12-1899;"neg"`, where Excel returns `neg`.
 
 ### UNIQUE function
 
 * Comparison of values follows HyperFormula's own equality rules, which honor the `caseSensitive` and `accentSensitive` configuration options. By default comparison is case-insensitive.
 
-* When `ExactlyOnce` is TRUE and no row or column occurs exactly once, `UNIQUE` returns a `#N/A` error (the result would otherwise be empty).
 ### SORT function
 
 * The `SortIndex` argument accepts a single key only. Multi-key sorting through an array constant (for example `=SORT(A1:B9, {1,2})`) is not supported; sort by one column or row at a time.
 
 * The `SortOrder` argument must be exactly `1` (ascending) or `-1` (descending). Any other value returns a `#VALUE!` error.
 
-* Ordering (including mixed types, empty cells, and text collation) follows HyperFormula's own comparison rules, which honor the `caseSensitive` and `accentSensitive` configuration options. Numbers sort before text, and text before logical values.
+* Ordering (including mixed types, empty cells, and text collation) follows HyperFormula's own comparison rules, which honor the [`caseSensitive`](../api/interfaces/configparams.md#casesensitive) and [`accentSensitive`](../api/interfaces/configparams.md#accentsensitive) configuration options. By default, both are `false`, so text comparison ignores case and accents (`"a"`, `"A"`, and `"á"` sort as equal). Numbers sort before text, and text before logical values.
 
 ### LINEST function
 
@@ -89,6 +108,12 @@ a circular reference.
 * HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal row-index expression can therefore be reported as `#SPILL!`. Errors in literal row indexes are detected before spill allocation.
 
 * A named expression, or a function whose result size depends on cell values, passed directly as the source returns `#VALUE!` when the result has more than one cell, because its size cannot be predicted before evaluation.
+
+### TREND, GROWTH and LOGEST functions
+
+* `TREND` and `GROWTH` determine their result size before evaluation: from `new_x`, or from `known_y` when `new_x` is omitted. If an input expression returns a different size at evaluation, they return `#VALUE!`.
+
+* `LOGEST` returns the same layout as `LINEST`, and the `LINEST` limitations above apply to it: `stats` must be a constant, and the result width is determined from the predictor dimensions before evaluation.
 
 ### OFFSET function
 
@@ -120,6 +145,8 @@ HyperFormula resolves the OFFSET function at parse time rather than during evalu
 * OFFSET is resolved at parse time, so `getCellFormula` returns the computed reference, not the original `OFFSET` call.
 
   ```js
-  const hf = HyperFormula.buildFromArray([[1, 45, '=OFFSET(A1, 0, 1)']], { licenseKey: 'gpl-v3' });
+  const hf = HyperFormula.buildFromArray([[1, 45, '=OFFSET(A1, 0, 1)']], {
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+  });
   hf.getCellFormula({ sheet: 0, row: 0, col: 2 }); // '=B1'
   ```
