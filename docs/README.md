@@ -145,7 +145,7 @@ docs                            # All documentation files
 ├── src
 │   ├── components              # Overrides of Starlight components, and the docs assistant (DocsAssistant/)
 │   ├── lib                     # Browser helpers the docs assistant imports
-│   ├── md-companions           # Writes the .md companions and llms-full.txt (see below)
+│   ├── md-companions           # Writes the .md companions, llms-full.txt and llms.txt (see below)
 │   ├── scripts                 # Browser scripts, e.g. the coding-agent wizard and the docs assistant's bootstrap
 │   ├── styles                  # The site's CSS on top of Starlight's
 │   ├── api-sidebar.mjs         # The API pages' sidebar groups, with a link to each section
@@ -170,5 +170,6 @@ docs                            # All documentation files
 
 * **HTML + Markdown per page** &mdash; every guide page is built as both an `.html` page and a companion `.md` file with the same content, via the `md-companions` integration (`src/md-companions/`). The API reference has companions too, and a `README.md` source gets `index.md` (`api/index.md`). The companion lives next to its HTML page, e.g. `guide/basic-usage.html` and `guide/basic-usage.md`.
 * **`llms-full.txt`** &mdash; all pages concatenated into one Markdown file at the docs root (`/docs/hyperformula/llms-full.txt`, served at https://handsontable.com/docs/hyperformula/llms-full.txt), so an agent can fetch the whole corpus in a single request instead of crawling page by page.
+* **`llms.txt`** &mdash; the index agents read first ([llmstxt.org](https://llmstxt.org/)), at `/docs/hyperformula/llms.txt` (served at https://handsontable.com/docs/hyperformula/llms.txt). It links to `llms-full.txt`, lists every page by title with a link to its `.md` companion (grouped into guides and API reference), and adds fixed links to the AI and agent resources and to the source and licensing pages. The page list comes from the same sources as `llms-full.txt`, so it can't fall out of date. Like `llms-full.txt`, it is not written to the domain root: `/llms.txt` there belongs to handsontable.com.
 * **Page actions** &mdash; below the table of contents (the `PageSidebar` override in `src/components/`), every page offers Copy Markdown and View as Markdown (its `.md` companion), Ask AI about this page, Print this page, and Open in ChatGPT or Claude (a new conversation that starts by reading the page). On narrower screens, where that sidebar is hidden, the `PageTitle` override shows View as Markdown near the top of the page.
 * **"Set up your coding agent" page** &mdash; [`guide/setup-coding-agent.md`](guide/setup-coding-agent.md) explains how to point Claude Code, Cursor, Copilot, and other agents at these machine-readable docs, and embeds the `<hf-coding-agent-wizard>` custom element (`src/scripts/coding-agent-wizard.mjs`): an interactive picker that shows the right setup instructions for the agent you choose.
