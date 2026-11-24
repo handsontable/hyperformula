@@ -436,7 +436,10 @@ UI (ui/) — split by concern: popup/, text/, caret/, highlight/, plus shared do
 │   │                         FunctionHelpPopupOptions (single-consumer, inlined here)
 │   ├── errorPopup.ts       — error tooltip (extends BasePopup); lifecycle owned by FormulaBuilder;
 │   │                         also exports ErrorPopupOptions (single-consumer, inlined here)
-│   ├── cellError.ts        — cellErrorMessage / setCellError adapter-facing cell-marking utils
+│   ├── errorDescriptions.ts — ErrorDescriptions (internal, owned by ErrorPopup): links every
+│   │                         error cell under the grid root to a hidden short-text node in the portal
+│   ├── cellError.ts        — cellErrorMessage / setCellError adapter-facing cell-marking utils;
+│   │                         toErrorDescription (internal) shortens a message for the description
 │   ├── popupContext.ts     — PopupContext class; owns the shared <div> portal that all
 │   │                         popups for one adapter instance are appended to; constructed
 │   │                         and owned exclusively by FormulaBuilder, not part of the
@@ -515,7 +518,7 @@ All popup-style overlays share a common base class `BasePopup`
 - **Document and portal parent:** `FormulaBuilder`'s `portalParent` option (default
   `rootDocument.body`) is where the portal and the `LiveRegion` go; both are created in the
   parent's own document. A host inside a shadow root passes that shadow root, so the
-  textarea's `aria-controls`/`aria-activedescendant` and a cell's `aria-errormessage` resolve
+  textarea's `aria-controls`/`aria-activedescendant` and a cell's `aria-describedby` resolve
   in one tree, and an axe scan of that root sees the popups. `rootDocument` (default the portal
   parent's document, else the global `document`, so passing only an iframe's `body` is enough) is
   the document selector options are resolved against, the detached mount is created in, and the
@@ -684,7 +687,7 @@ Understanding the DOM lifecycle is critical before subclassing `BasePopup`:
   fired only on real transitions: after `open()` when the popup was not previously visible,
   and at the end of `close()` when it was. Subclasses override it for visibility side
   effects (SuggestionsPopup re-emits ARIA state on hide, FunctionHelpPopup forwards to its
-  `onVisibilityChange` option, ErrorPopup clears `activeCell` + its aria-errormessage link —
+  `onVisibilityChange` option, ErrorPopup clears `activeCell` —
   deliberately NOT its `pointerCell`/`focusCell` tracking, which mirrors physical pointer/focus
   position and is owned by the enter/leave handlers) instead of overriding `close()` —
   `open()`/`close()` overrides that duplicate the `wasVisible` bookkeeping are the historical
@@ -768,21 +771,42 @@ the tooltip closes (error cleared) or shows the new text. When it changes on a c
 holds the pointer or focus while no tooltip shows, the tooltip opens there. A change also
 lifts that cell's Escape suppression, since the dismissed content is gone.
 
-While the tooltip is open, the cell carries `aria-errormessage` and the popup id in its
-`aria-describedby`, appended to the ids already there. A host can rewrite either attribute
-at any time: Handsontable strips every `aria-*` attribute on each draw, and a React grid
-writes its own value when a prop changes. So `ErrorPopup` keeps a `MutationObserver` on those
-two attributes of the anchored cell while the tooltip is open, and puts the association back
-whenever it is missing. It needs no call from the host, so it also covers a host that never
-calls `markCell`. The observer is disconnected whenever the association is cleared.
+Every error cell is described whether the tooltip is open or not, so a screen reader that
+reaches the cell after Escape, or in browse mode without focus, still hears the error. The
+tooltip is visual only: `ErrorPopup` writes no ARIA attribute on the cell. Its
+`ErrorDescriptions` (`ui/popup/errorDescriptions.ts`) keeps one `MutationObserver` on the grid
+root (`subtree`, `childList`, and the attributes `data-hfe-error` and `aria-describedby`), and
+makes one pass over the existing `[data-hfe-error]` elements on `attach()`. For each element
+with a non-empty `data-hfe-error`, it takes the message body after ` — `, cut to its first
+sentence of at most 120 characters (`toErrorDescription` in `cellError.ts`; a parse error's list
+of expected tokens is dropped). The code is left out because the cell shows it, so it is the
+cell's accessible name already. A bare code with no body gets no description. It finds or
+creates one `<span id="hfe-error-<n>-description-<k>" hidden>` per distinct text in the popup
+portal and appends that id to the cell's `aria-describedby`, after the ids already there. It
+writes only when the id is missing, so its own writes do not loop the observer. The `childList`
+part covers hosts that create the cell element, set `data-hfe-error` on it, and insert it
+afterwards (React grids, new rows).
+
+It never writes `aria-errormessage`: that attribute must not reference a hidden element (axe
+`aria-valid-attr-value`), and `aria-describedby` already carries the text. `aria-invalid` comes
+from `setCellError`, and an `aria-errormessage` the host wrote is left alone.
+
+Because the observer needs no call from the host, it covers hosts that call `markCell` and
+hosts that write `data-hfe-error` in their own render. It also repairs the link after a host
+rewrites the attributes: Handsontable strips every `aria-*` attribute on each draw, and a React
+grid writes its own value when a prop changes. When `data-hfe-error` is removed or emptied (a
+reused cell element now shows a value), or its text changes, it removes only its own id from
+`aria-describedby`; ids the host wrote stay. A text node that no cell uses any more, and a cell that left the document, are
+dropped after each batch of records. `detach()` and `destroy()` remove every node and every id
+it wrote.
 
 One case needs care. Some hosts add their own id only when `aria-describedby` is still empty
-after the renderer returns (Handsontable's column-header id). When `syncCell` anchors the
-tooltip from inside a render, it therefore writes only `aria-errormessage` and leaves
-`aria-describedby` to the observer, which runs after the host has finished the cell.
+after the renderer returns (Handsontable's column-header id). So nothing writes
+`aria-describedby` synchronously from `markCell` or `syncCell`: the observer runs after the
+host has finished the cell, which keeps the host's id first.
 
 happy-dom delivers observer records on a timer, not in a microtask as browsers do, so a unit
-test waits one timer tick before it checks the restored attributes.
+test waits one timer tick before it checks the description attributes.
 
 The error tooltip itself is Esc-dismissible: `ErrorPopup` owns a window-level `keydown`
 (capture) listener, registered while attached; it consumes Escape only while the tooltip is
@@ -816,14 +840,13 @@ re-render clears that identity, so a re-render after Esc-dismiss can make the to
 even though pointer/focus never logically left the cell. Accepted as a documented limitation;
 re-keying by logical cell would need a host render hook — future work if it bites.
 
-`markCell` does not write `aria-description`: the host owns the cell's accessible
-description and its accessibility settings, so it adds the error message itself (the external
-Handsontable plugin writes it from `data-hfe-error`, only under its `ariaTags` setting, and keeps
-an application's own description). A package-side write would override both.
+`markCell` does not write `aria-description`. The package's description goes through
+`aria-describedby` (above), which keeps the ids the host wrote; a browser that computes the
+accessible description uses `aria-describedby` before `aria-description`.
 
 While a hovered/focused error cell surfaces its message via `ErrorPopup` and
-`aria-invalid`/`aria-errormessage` (the popup root carries a generated id, associated onto the
-cell for the screen reader to resolve on demand), committing a formula moves focus away before
+`aria-invalid` plus the `aria-describedby` description (for the screen reader to read on
+demand), committing a formula moves focus away before
 that association is useful — the primary a11y gap this closes is the commit itself, not
 revisiting the cell later. `FormulaBuilder` owns a `LiveRegion` (`aria-live="polite"`) and wraps
 `commitHandler`: it captures `adapter.getActiveCell()` before the write, runs the commit inside

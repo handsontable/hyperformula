@@ -3,6 +3,7 @@ import { CN } from "../../theme/classNames";
 import { createEl, deepActiveElement, isHTMLElement, isShadowRoot, viewOf } from "../dom";
 import type { IconsOptions, Phrases } from "../types";
 import { BasePopup } from "./basePopup";
+import { ErrorDescriptions } from "./errorDescriptions";
 import { EndViewportAnchoredStrategy } from "./positionStrategy";
 import type { BoundsRect, ErrorOptions, LayoutDirection } from "./types";
 
@@ -15,29 +16,6 @@ export interface ErrorPopupOptions {
 }
 
 let errorPopupIdCounter = 0;
-
-function addIdRef(element: HTMLElement, attribute: string, id: string): void {
-  const ids = element.getAttribute(attribute)?.split(/\s+/).filter(Boolean) ?? [];
-
-  if (!ids.includes(id)) {
-    element.setAttribute(attribute, [...ids, id].join(" "));
-  }
-}
-
-function removeIdRef(element: HTMLElement, attribute: string, id: string): void {
-  const ids = element.getAttribute(attribute)?.split(/\s+/).filter(Boolean) ?? [];
-  const remaining = ids.filter((token) => token !== id);
-
-  if (remaining.length === ids.length) {
-    return;
-  }
-
-  if (remaining.length === 0) {
-    element.removeAttribute(attribute);
-  } else {
-    element.setAttribute(attribute, remaining.join(" "));
-  }
-}
 
 export class ErrorPopup extends BasePopup {
   private container: HTMLElement | null = null;
@@ -56,7 +34,7 @@ export class ErrorPopup extends BasePopup {
     this.handleLeave(event.relatedTarget, false);
   private readonly onScroll = (): void => this.scheduleScrollReposition();
   private readonly onKeydown = (event: KeyboardEvent): void => this.handleEscape(event);
-  private readonly associationObserver = new MutationObserver(() => this.restoreErrorAssociation());
+  private readonly descriptions: ErrorDescriptions;
 
   constructor({ container, options, direction, icons, phrases }: ErrorPopupOptions) {
     super({
@@ -69,6 +47,7 @@ export class ErrorPopup extends BasePopup {
     this.direction = direction ?? "ltr";
     errorPopupIdCounter += 1;
     this.root.id = `${CN.errorPopup}-${errorPopupIdCounter}`;
+    this.descriptions = new ErrorDescriptions(container, this.root.id);
   }
 
   protected createRoot(): HTMLElement {
@@ -132,31 +111,6 @@ export class ErrorPopup extends BasePopup {
     return null;
   }
 
-  private clearErrorAssociation(): void {
-    this.associationObserver.disconnect();
-
-    if (!this.activeCell) {
-      return;
-    }
-
-    this.activeCell.removeAttribute("aria-errormessage");
-    removeIdRef(this.activeCell, "aria-describedby", this.root.id);
-  }
-
-  private restoreErrorAssociation(): void {
-    const cell = this.activeCell;
-
-    if (!cell || !this.isVisible()) {
-      return;
-    }
-
-    if (cell.getAttribute("aria-errormessage") !== this.root.id) {
-      cell.setAttribute("aria-errormessage", this.root.id);
-    }
-
-    addIdRef(cell, "aria-describedby", this.root.id);
-  }
-
   private handleEnter(target: EventTarget | null, viaPointer: boolean): void {
     const cell = this.markerFrom(target);
 
@@ -187,9 +141,8 @@ export class ErrorPopup extends BasePopup {
     this.anchorTo(cell, message);
   }
 
-  private anchorTo(cell: HTMLElement, message: string, duringHostRender = false): void {
+  private anchorTo(cell: HTMLElement, message: string): void {
     this.pendingMessage = message;
-    this.clearErrorAssociation();
     this.activeCell = cell;
     const rect = cell.getBoundingClientRect();
     this.open({
@@ -199,15 +152,6 @@ export class ErrorPopup extends BasePopup {
       width: rect.width,
       direction: this.direction,
     });
-    this.associationObserver.observe(cell, {
-      attributes: true,
-      attributeFilter: ["aria-errormessage", "aria-describedby"],
-    });
-    cell.setAttribute("aria-errormessage", this.root.id);
-
-    if (!duringHostRender) {
-      addIdRef(cell, "aria-describedby", this.root.id);
-    }
   }
 
   private anchorToRemainingCell(): boolean {
@@ -230,7 +174,6 @@ export class ErrorPopup extends BasePopup {
 
   private pruneDetachedCells(): void {
     if (this.activeCell && !this.activeCell.isConnected) {
-      this.clearErrorAssociation();
       this.activeCell = null;
     }
 
@@ -283,7 +226,6 @@ export class ErrorPopup extends BasePopup {
       this.suppressedCell = null;
     }
 
-    this.clearErrorAssociation();
     this.activeCell = null;
     this.close();
   }
@@ -343,6 +285,7 @@ export class ErrorPopup extends BasePopup {
 
     this.containerScope.listen(viewOf(container), "keydown", this.onKeydown, { capture: true });
     this.containerScope.activate();
+    this.descriptions.attach(container);
   }
 
   syncCell(cell: HTMLElement, previousMessage: string | undefined): void {
@@ -358,7 +301,7 @@ export class ErrorPopup extends BasePopup {
 
     if (this.isVisible() && cell === this.activeCell) {
       if (message) {
-        this.anchorTo(cell, message, true);
+        this.anchorTo(cell, message);
       } else {
         this.close();
       }
@@ -367,14 +310,13 @@ export class ErrorPopup extends BasePopup {
     }
 
     if (message && !this.isVisible() && (cell === this.pointerCell || cell === this.focusCell)) {
-      this.anchorTo(cell, message, true);
+      this.anchorTo(cell, message);
     }
   }
 
   protected override onVisibilityChanged(visible: boolean): void {
     if (!visible) {
       this.pruneDetachedCells();
-      this.clearErrorAssociation();
       this.activeCell = null;
     }
   }
@@ -394,7 +336,7 @@ export class ErrorPopup extends BasePopup {
     this.containerScope?.dispose();
     this.containerScope = null;
     this.container = null;
-    this.clearErrorAssociation();
+    this.descriptions.detach();
     this.activeCell = null;
     this.pointerCell = null;
     this.focusCell = null;
@@ -403,7 +345,7 @@ export class ErrorPopup extends BasePopup {
   }
 
   override destroy(): void {
-    this.associationObserver.disconnect();
+    this.descriptions.destroy();
     this.cancelScrollReposition();
     super.destroy();
   }

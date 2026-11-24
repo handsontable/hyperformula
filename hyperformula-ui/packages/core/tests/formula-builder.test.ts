@@ -1129,6 +1129,30 @@ describe("FormulaBuilder document and portal parent", () => {
     builder.destroy();
   });
 
+  it("keeps a marked cell's error description in the shadow root, so its id resolves from the cell", async () => {
+    const shadow = shadowHost();
+    const rootEl = document.createElement("div");
+    const cell = document.createElement("td");
+
+    rootEl.appendChild(cell);
+    shadow.append(rootEl);
+
+    const builder = new FormulaBuilder({ rootEl, portalParent: shadow });
+
+    builder.markCell(cell, { type: "REF", value: "#REF!", message: "Invalid reference." });
+    await new Promise((resolve) => setTimeout(resolve));
+
+    const id = cell.getAttribute("aria-describedby") ?? "";
+
+    expect(shadow.getElementById(id)?.textContent).toBe("Invalid reference.");
+    expect(document.getElementById(id)).toBeNull();
+
+    builder.destroy();
+
+    expect(cell.hasAttribute("aria-describedby")).toBe(false);
+    expect(shadow.getElementById(id)).toBeNull();
+  });
+
   it("resolves container selectors inside the portal parent's shadow root", () => {
     const shadow = shadowHost();
     const rootEl = document.createElement("div");
