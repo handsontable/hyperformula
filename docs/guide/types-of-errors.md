@@ -1,5 +1,6 @@
 ---
 title: "Types of errors"
+description: "The error values HyperFormula returns, such as #DIV/0! and #REF!, and what causes each one."
 tags:
   - "#REF!"
   - "#VALUE!"

@@ -1,5 +1,6 @@
 ---
 title: "Migrating from 3.x to 4.0"
+description: "Upgrade HyperFormula from version 3.x to 4.0, which requires a commercial license key."
 tags:
   - migration
   - migrate

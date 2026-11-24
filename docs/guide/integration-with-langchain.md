@@ -1,5 +1,6 @@
 ---
 title: "Integration with LangChain/LangGraph"
+description: "Preview of a planned LangChain.js and LangGraph tool that gives AI agents deterministic spreadsheet computation with HyperFormula."
 tags:
   - AI agents
   - LLM

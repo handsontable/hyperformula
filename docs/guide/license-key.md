@@ -1,5 +1,6 @@
 ---
 title: "License key"
+description: "Get a HyperFormula license key and set it with the licenseKey configuration option."
 tags:
   - licenseKey
   - gpl-v3

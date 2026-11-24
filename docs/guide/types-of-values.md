@@ -1,5 +1,6 @@
 ---
 title: "Types of values"
+description: "The types of values HyperFormula handles, such as numbers, text, dates, errors, and currency, and how functions treat them."
 tags:
   - boolean
   - logical

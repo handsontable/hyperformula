@@ -1,5 +1,6 @@
 ---
 title: "Cell references"
+description: "Reference cells in HyperFormula formulas with relative, absolute, mixed, range, and cross-sheet references in A1 notation."
 tags:
   - A1 notation
   - dollar sign

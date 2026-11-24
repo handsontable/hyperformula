@@ -1,5 +1,6 @@
 ---
 title: "Migrating from 2.x to 3.0"
+description: "Upgrade HyperFormula from version 2.x to 3.0."
 tags:
   - migration
   - migrate

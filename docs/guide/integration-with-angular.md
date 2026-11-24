@@ -1,5 +1,6 @@
 ---
 title: "Integration with Angular"
+description: "Use HyperFormula in an Angular app as an injectable service, and bridge its values into change detection."
 tags:
   - SSR
   - signals

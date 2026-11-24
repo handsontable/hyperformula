@@ -1,5 +1,6 @@
 ---
 title: "Integration with React"
+description: "Use HyperFormula in a React app and map its lifecycle to React hooks."
 tags:
   - SSR
   - React hooks
