@@ -500,7 +500,7 @@ export class DependencyGraph {
   }
 
   /**
-   * True when `arrayFunctionResultOverwritesData` is on and no row or column move is running
+   * True when `arrayFunctionResultOverwritesData` is on and no row or column move or undo is running
    * (see `withoutOverwritingData`).
    */
   public isOverwritingDataAllowed(): boolean {
@@ -513,6 +513,9 @@ export class DependencyGraph {
    * Used for row and column moves. A move first adds the moved rows or columns at the target and only
    * then removes them at the source, so an array that reads them grows for a moment. Overwriting the
    * cells it reaches in that moment would clear data that the array does not cover once the move ends.
+   *
+   * Also used for undo, which restores a state where an array either owned its whole spill range or
+   * returned `#SPILL!`, so a restored array never has a reason to clear another cell.
    */
   public withoutOverwritingData<T>(operation: () => T): T {
     const wasSuspended = this.isOverwritingDataSuspended

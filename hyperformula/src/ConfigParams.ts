@@ -416,7 +416,8 @@ export interface ConfigParams {
    * an array does not overwrite:
    * - another array: that spill still returns `#SPILL!` and leaves the other array intact,
    * - data declared in the same `buildFromArray` call as the array,
-   * - cells it would reach while rows or columns are moved with `moveRows` or `moveColumns`.
+   * - cells it would reach while rows or columns are moved with `moveRows` or `moveColumns`,
+   * - cells it would reach when `undo()` brings back an array that returned `#SPILL!`.
    * @default false
    * @category Engine
    */

@@ -335,6 +335,13 @@ export class Operations {
     return this.dependencyGraph.withoutOverwritingData(() => this.doMoveColumns(sheet, startColumn, numberOfColumns, targetColumn))
   }
 
+  /**
+   * Runs `operation` as if `arrayFunctionResultOverwritesData` were off (see `DependencyGraph.withoutOverwritingData`).
+   */
+  public withoutOverwritingData<T>(operation: () => T): T {
+    return this.dependencyGraph.withoutOverwritingData(operation)
+  }
+
   private doMoveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): number {
     const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, targetRow, numberOfRows)
     this.lazilyTransformingAstService.beginCombinedMode(sheet)

@@ -939,8 +939,13 @@ export class UndoRedo {
     ])
   }
 
+  /**
+   * Undoes one entry with overwriting suspended (see `Operations.withoutOverwritingData`). Undo
+   * returns to a state that existed before, where an array either owned its whole spill range or
+   * returned `#SPILL!`, so a restored array must not claim the cells of another occupant.
+   */
   private undoEntry(operation: UndoEntry) {
-    operation.doUndo(this)
+    this.operations.withoutOverwritingData(() => operation.doUndo(this))
   }
 
   private restoreOperationOldContent(oldContent: [SimpleCellAddress, ClipboardCell][]) {

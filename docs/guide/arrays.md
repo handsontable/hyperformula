@@ -210,4 +210,4 @@ hfInstance.undo();
 hfInstance.getCellValue({ sheet: 0, col: 0, row: 2 }); // 'old value'
 ```
 
-With the option enabled, an array overwrites cells when you enter it and when it grows because rows or columns were added inside the range it reads. It never overwrites another array: that spill still returns `#SPILL!`. Data declared in the same `buildFromArray` call as the array, and cells an array would reach while you move rows or columns, keep their content too.
+With the option enabled, an array overwrites cells when you enter it and when it grows because rows or columns were added inside the range it reads. It never overwrites another array: that spill still returns `#SPILL!`. Data declared in the same `buildFromArray` call as the array, cells an array would reach while you move rows or columns, and cells that block an array brought back by `undo()` keep their content too.
