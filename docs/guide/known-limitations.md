@@ -51,6 +51,24 @@ a circular reference.
 * `MODE.MULT` and `FREQUENCY` reserve their result area before evaluation, from the size of every argument of `MODE.MULT` and of the `bins_array` of `FREQUENCY`: `MODE.MULT` half as many rows as values passed to it, rounded down, and at least one, `FREQUENCY` one row per cell of `bins_array` plus one. Rows the result does not fill stay empty, and a value in any reserved cell makes the formula return `#SPILL!`. When one of these arguments has no fixed size before evaluation, the formula takes a single cell, and a result of more than one cell is `#VALUE!`. This is the case for a whole-column or whole-row range such as `A:A` or `2:2`, a named expression, and a function whose result size depends on cell values, such as `SEQUENCE(A1)`. Use a bounded range such as `A1:A100` instead.
 * The TEXT function does not accept embedded double-quote literals in the format string. In Excel, `""` inside a format string is an escape sequence for a literal `"` character — e.g. `=TEXT(1234.5, "#,##0.00 ""zł""")` returns `"1,234.50 zł"`. If your application requires this escape sequence, supply a custom [`stringifyCurrency`](currency-handling.md) callback.
 
+### TEXT function
+
+* The built-in number formatter does not implement these Excel number formats, so a mask that uses one returns a different result than in Excel:
+  * percent scaling (`0.00%`),
+  * scaling by a grouping character at the end of the number (`0,,`): `=TEXT(5000000, "0,,")` returns `5000000,,`, where Excel returns `5`,
+  * the `?` placeholder,
+  * scientific notation (`0.00E+00`),
+  * `[condition]` comparators,
+  * more than one group of digit placeholders: `=TEXT(5551234567, "(000) 000-0000")` returns `(5551234567) 000-0000`, where Excel returns `(555) 123-4567`,
+  * a mask that starts with the decimal point: `=TEXT(0.5, ".00")` returns `.01`, where Excel returns `.50`,
+  * the `_` padding code: `=TEXT(5, "0_)")` returns `5_)`, where Excel returns `5` followed by a space,
+  * the `@` text placeholder: `=TEXT(5, "@")` returns `@`, where Excel returns `5`.
+* For these number formats, supply a [`stringifyCurrency`](currency-handling.md) callback. See also [`TEXT` function formats](compatibility-with-microsoft-excel.md#text-function-formats).
+* A `.` or `,` in a mask that is neither the decimal nor the grouping separator is text: with `decimalSeparator: ','` and `functionArgSeparator: ';'`, `=TEXT(1,5; "0.00")` returns `2.00`, where Excel in a pl-PL workbook returns `#VALUE!` for that mask.
+* `TEXT` does not check the code inside a bracket, other than a color: `=TEXT(5, "0[x]")` returns `5[x]`, where Excel returns `#VALUE!`.
+* `TEXT` does not check the letters outside brackets and quotes, so a color name after an escaped bracket is still read as a color: `=TEXT(5, "0\[Red]")` returns `5\` and `=TEXT(5, "\[Red]0")` returns `0`, where Excel reads the bracket as text, rejects the letters after it, and returns `#VALUE!` for both.
+* Positive, negative and zero sections apply to number masks only. A date mask is not split into sections: with `dd-mm-yyyy;"neg"` in `A1`, `=TEXT(-5, A1)` returns `25-12-1899;"neg"`, where Excel returns `neg`.
+
 ### UNIQUE function
 
 * Comparison of values follows HyperFormula's own equality rules, which honor the `caseSensitive` and `accentSensitive` configuration options. By default comparison is case-insensitive.

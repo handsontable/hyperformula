@@ -27,6 +27,7 @@ export class ErrorMessage {
   public static NumberExpected = 'Number argument expected.'
   public static IntegerExpected = 'Value needs to be an integer.'
   public static BadMode = 'Mode not recognized.'
+  public static BadFormat = 'Format not recognized.'
   public static DateBounds = 'Date outside of bounds.'
   public static CouponFrequency = 'Frequency must be 1, 2 or 4.'
   public static FirstCouponDate = 'First coupon date is not a coupon date of the maturity date.'
