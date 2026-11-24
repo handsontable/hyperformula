@@ -275,7 +275,9 @@ export class CrudOperations {
         this.clipboardOperations.abortCut()
         const {oldContent, overwrittenCells: overwritten} = this.operations.setCellContent(address, newContent)
         oldContents.push({address, newContent, oldContent})
-        overwrittenCells.push(...overwritten)
+        for (const overwrittenCell of overwritten) {
+          overwrittenCells.push(overwrittenCell)
+        }
       }
     }
 
