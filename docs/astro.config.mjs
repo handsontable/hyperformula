@@ -101,6 +101,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         // Google Search Console
         { tag: 'meta', attrs: { name: 'google-site-verification', content: 'MZpSOa8SNvFLRRGwUQpYVZ78kIHQoPVdVbafHhJ_d4Q' } },
+        // Social preview image. Starlight emits og:title, og:description, and twitter:card=summary_large_image but no
+        // image, so LinkedIn, Slack, and X show a blank card. This is the handsontable.com default card, which carries
+        // the HyperFormula mark. Absolute URL: crawlers don't resolve relative og:image paths.
+        { tag: 'meta', attrs: { property: 'og:image', content: 'https://handsontable.com/og/default.png' } },
+        { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
+        { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
+        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Handsontable DataGrid and HyperFormula' } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://handsontable.com/og/default.png' } },
         // Sentry
         {
           tag: 'script',
