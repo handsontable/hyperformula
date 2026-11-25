@@ -15,8 +15,8 @@ export class DeltaPlugin extends FunctionPlugin implements FunctionPluginTypeche
     'DELTA': {
       method: 'delta',
       parameters: [
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: 0},
       ]
     },
     'GESTEP': {
@@ -28,9 +28,26 @@ export class DeltaPlugin extends FunctionPlugin implements FunctionPluginTypeche
     },
   }
 
+  /**
+   * Converts an argument the way Excel does for these functions: numbers, dates, numeric text and empty cells are
+   * accepted, while a boolean or the empty text is #VALUE!. Errors are passed on. The second argument is checked first,
+   * as Excel does, so an error or a type error in it wins over one in the first argument.
+   */
+  private strictNumber(value: InternalScalarValue): number | CellError {
+    const coerced = this.coerceScalarToNumberRejectingBooleans(value)
+    return coerced instanceof CellError ? coerced : getRawValue(coerced)
+  }
+
   public delta(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DELTA'),
-      (left: number, right: number) => (left === right ? 1 : 0)
+      (left: InternalScalarValue, right: InternalScalarValue) => {
+        const b = this.strictNumber(right)
+        const a = this.strictNumber(left)
+        if (b instanceof CellError) {
+          return b
+        }
+        return a instanceof CellError ? a : (a === b ? 1 : 0)
+      }
     )
   }
 
