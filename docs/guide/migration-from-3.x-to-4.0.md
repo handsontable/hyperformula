@@ -74,8 +74,9 @@ If Microsoft Excel shows the error under a different name in your language, use 
 | `FILTER` | No value meets the conditions. | `#N/A` | `#CALC!` |
 | `UNIQUE` | No row or column is kept: `exactly_once` is `TRUE` and every row or column occurs more than once. | `#N/A` | `#CALC!` |
 | `SEQUENCE` | The number of rows or columns is 0 or truncates to 0, for example `0`, `0.5`, `FALSE()` or an empty cell. | `#VALUE!` | `#CALC!` |
-| `CONCAT` | The result is longer than 32,767 characters. | `#VALUE!` | `#CALC!` |
 | `TEXTJOIN` | The result is longer than 32,767 characters. | `#VALUE!` | `#CALC!` |
+
+`CONCAT`, new in 4.0, also returns `#CALC!` when the result is longer than 32,767 characters.
 
 Formulas that handle these errors with `IFNA()` or `ISNA()` no longer catch them. Use `IFERROR()` or `ISERROR()` instead. Likewise, if your code checks a cell's error type, check for `ErrorType.CALC` in these cases.
 
