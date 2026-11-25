@@ -248,6 +248,63 @@ describe("ErrorPopup error descriptions", () => {
     expect(descriptionOf(cell)?.textContent).toBe("Invalid reference.");
   });
 
+  it("keeps the description of a cell in a grid root that is inserted into the document later", async () => {
+    popup.detach();
+    grid.remove();
+
+    const cell = addCell(REF_ERROR);
+
+    popup.attach(grid);
+    await mutationsDelivered();
+    document.body.appendChild(grid);
+    await mutationsDelivered();
+
+    expect(descriptionOf(cell)?.textContent).toBe("Invalid reference.");
+  });
+
+  it("describes a cell marked while its grid root is out of the document", async () => {
+    grid.remove();
+
+    const cell = addCell(REF_ERROR);
+
+    await mutationsDelivered();
+    document.body.appendChild(grid);
+    await mutationsDelivered();
+
+    expect(descriptionOf(cell)?.textContent).toBe("Invalid reference.");
+  });
+
+  it("keeps a stable description while its grid root is out of the document", async () => {
+    grid.remove();
+
+    const cell = addCell(REF_ERROR);
+
+    await mutationsDelivered();
+    await mutationsDelivered();
+
+    const writes: MutationRecord[] = [];
+    const watcher = new MutationObserver((records) => writes.push(...records));
+
+    watcher.observe(cell, { attributes: true, attributeFilter: ["aria-describedby"] });
+    await mutationsDelivered();
+    await mutationsDelivered();
+    watcher.disconnect();
+
+    expect(writes).toHaveLength(0);
+    expect(descriptionOf(cell)?.textContent).toBe("Invalid reference.");
+  });
+
+  it("drops a cell removed from the grid root", async () => {
+    const cell = addCell(REF_ERROR);
+
+    await mutationsDelivered();
+    cell.remove();
+    await mutationsDelivered();
+
+    expect(packageIds(cell)).toEqual([]);
+    expect(descriptionNodes()).toHaveLength(0);
+  });
+
   it("removes only its own ids when the error is cleared", async () => {
     const cell = document.createElement("div");
 

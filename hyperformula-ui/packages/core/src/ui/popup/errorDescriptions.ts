@@ -36,6 +36,7 @@ export class ErrorDescriptions {
   private readonly cellIds = new Map<HTMLElement, string>();
   private readonly nodes = new Map<string, HTMLElement>();
   private nodeCounter = 0;
+  private container: HTMLElement | null = null;
 
   constructor(
     private readonly portal: HTMLElement,
@@ -130,7 +131,7 @@ export class ErrorDescriptions {
 
   private prune(): void {
     for (const [cell, id] of this.cellIds) {
-      if (!cell.isConnected) {
+      if (!this.container?.contains(cell)) {
         this.unlink(cell, id);
       } else if (!idRefs(cell, DESCRIBEDBY).includes(id)) {
         this.cellIds.delete(cell);
@@ -149,6 +150,7 @@ export class ErrorDescriptions {
 
   attach(container: HTMLElement): void {
     this.detach();
+    this.container = container;
     this.observer.observe(container, {
       subtree: true,
       childList: true,
@@ -165,6 +167,7 @@ export class ErrorDescriptions {
 
   detach(): void {
     this.observer.disconnect();
+    this.container = null;
 
     for (const [cell, id] of this.cellIds) {
       this.unlink(cell, id);

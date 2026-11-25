@@ -796,8 +796,11 @@ hosts that write `data-hfe-error` in their own render. It also repairs the link 
 rewrites the attributes: Handsontable strips every `aria-*` attribute on each draw, and a React
 grid writes its own value when a prop changes. When `data-hfe-error` is removed or emptied (a
 reused cell element now shows a value), or its text changes, it removes only its own id from
-`aria-describedby`; ids the host wrote stay. A text node that no cell uses any more, and a cell that left the document, are
-dropped after each batch of records. `detach()` and `destroy()` remove every node and every id
+`aria-describedby`; ids the host wrote stay. A text node that no cell uses any more, and a cell that left the grid root, are
+dropped after each batch of records. A cell counts as gone when it leaves the grid root, not
+the document: a grid root that is not in the document yet keeps its cells' descriptions, and
+an `isConnected` check there would remove each id, see its own removal, and add it back in an
+endless loop of observer callbacks. `detach()` and `destroy()` remove every node and every id
 it wrote.
 
 One case needs care. Some hosts add their own id only when `aria-describedby` is still empty
