@@ -1,5 +1,6 @@
 /* start:skip-in-compilation */
 import HyperFormula from 'hyperformula';
+import frFR from 'hyperformula/es/i18n/languages/frFR';
 
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
@@ -7,9 +8,9 @@ console.log(
 );
 
 /* end:skip-in-compilation */
-/* start:skip-in-sandbox */
+/* start:skip-in-source */
 const frFR = HyperFormula.languages.frFR;
-/* end:skip-in-sandbox */
+/* end:skip-in-source */
 /**
  * Initial table data.
  */

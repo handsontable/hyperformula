@@ -113,6 +113,8 @@ export default defineConfig({
         { tag: 'script', attrs: { src: 'https://cdn.jsdelivr.net/npm/hyperformula/dist/languages/enUS.js' } },
         { tag: 'script', attrs: { src: 'https://cdn.jsdelivr.net/npm/hyperformula/dist/languages/frFR.js' } },
         { tag: 'script', attrs: { src: 'https://cdn.jsdelivr.net/npm/moment/moment.min.js' } },
+        // Builds the "Source code" tabs of the live examples and toggles them (a copy of the Handsontable docs' script).
+        { tag: 'script', attrs: { src: `${base}example-tabs.js`, defer: true } },
         // Google Tag Manager
         {
           tag: 'script',

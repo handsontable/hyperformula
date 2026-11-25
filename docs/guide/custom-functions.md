@@ -374,11 +374,21 @@ it('returns a VALUE error if the range argument contains a string', () => {
 
 ## Working demo
 
-Explore the full working example on [Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/custom-functions?v={{$page.buildDateURIEncoded}}).
-
 This demo contains the implementation of both the
 [`GREET`](#add-a-simple-custom-function) and
 [`DOUBLE_RANGE`](#advanced-custom-function-example) custom functions.
+
+:::example{#example1}
+
+@[code](@/docs/examples/custom-functions/example1.html)
+
+@[code](@/docs/examples/custom-functions/example1.css)
+
+@[code](@/docs/examples/custom-functions/example1.js)
+
+@[code](@/docs/examples/custom-functions/example1.ts)
+
+:::
 
 ## Function options
 

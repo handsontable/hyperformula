@@ -29,8 +29,11 @@ repo. Guide pages live at `docs/guide/<slug>.md`; the landing page is
 TSDoc — do not hand-edit it**, improve the code comments instead.
 - **Toolchain:** Astro with the Starlight documentation theme. Pages support YAML
 frontmatter, `:::tip / caution / danger` asides, and fenced code blocks.
-- **Runnable demos:** hosted on StackBlitz (`handsontable/hyperformula-demos`),
-linked per version branch (e.g. `3.3.x`).
+- **Runnable demos:** small ones are live examples on the page, with their code under a
+"Source code" toggle. Larger ones, such as the framework demos, live in
+`handsontable/hyperformula-demos` and are linked on GitHub per version branch (e.g. `4.0.x`).
+Nothing links to StackBlitz: off handsontable.com, the engine checks the license key, so a demo
+there would return `#LIC!`.
 
 ---
 
@@ -169,13 +172,13 @@ and hallucinate the parts you omit.
 4. **Use consistent, correct API shapes.** Cell addresses use a fixed property order
   every time — `{ sheet, row, col }` — don't reorder it between examples. Prefer the
     real method names (`setCellContents`, `getCellValue`, `addSheet`, `getSheetId`,
-    `addNamedExpression`). When a runnable demo exists, link the StackBlitz for the
+    `addNamedExpression`). When a runnable demo exists, link it on GitHub for the
     matching version branch.
 5. **Show the correct way; show a wrong way only when it prevents a frequent
   mistake.** If you include an anti-pattern, label it clearly ("Don't do this —
     it throws because…") so it can't be mistaken for a recommendation.
 6. **Framework guides quote the demo.** A snippet in an integration guide is an exact
-  fragment of the StackBlitz demo it links, written in idiomatic modern code for that
+  fragment of the demo it links, written in idiomatic modern code for that
     framework (Angular `@for`, React 18/19, Svelte 5 runes, Vue 3).
 
 ---
@@ -225,8 +228,13 @@ no space after the colons, and a title in brackets when it needs one (`:::tip[Ty
 Put essential steps in the body, not hidden inside a tip.
 - Embed a live example with `:::example{#example1}` and its four files, each on its own
 line as `@[code](@/docs/examples/<guide>/example1.html)`, and the same for the `.css`,
-`.js` and `.ts`. The page runs the HTML, CSS and JavaScript; "Open in StackBlitz" opens
-the TypeScript.
+`.js` and `.ts`. The page runs the HTML, CSS and JavaScript against the CDN build's global
+`HyperFormula`, and its "Source code" toggle shows all four files. Write the `.ts` and generate
+the `.js` with `npm run docs:code-examples:generate-js -- examples/<guide>/example1.ts`. Put the
+imports between `/* start:skip-in-compilation */` and `/* end:skip-in-compilation */`: the page
+drops them. Put what only the page needs, such as `const { FunctionPlugin } = HyperFormula;`,
+between `/* start:skip-in-source */` and `/* end:skip-in-source */`: the "Source code" toggle
+drops it.
 - Use **relative links** between guide pages (`./named-expressions.md`) and to API pages
 (`../api/classes/hyperformula.md#buildfromarray`); the build points them at the built
 pages. Link files in `docs/public/` root-relative (`/hf_logo.png`).

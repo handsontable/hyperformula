@@ -1,5 +1,15 @@
 /* HyperFormula-specific rules on top of the Handsontable docs styles (`custom.css`). */
 
+/* The focus ring of the live examples' toolbar (`interactive-example.css`). The Handsontable docs define it in
+   `base/variables.css`, after the version copied here; drop these once that copy is refreshed. */
+:root {
+  --sl-color-focus-ring: #3b82f6;
+}
+
+:root[data-theme='light'] {
+  --sl-color-focus-ring: var(--sl-color-accent);
+}
+
 /* A page with a `<div class="widePage"></div>` holds tables too wide for the reading column. */
 :root:has(.widePage) {
   --sl-content-width: 75rem;
@@ -19,16 +29,6 @@
   vertical-align: middle;
 }
 
-/* Live examples (`:::example{#id}`). The example's own stylesheet styles what is inside `.example`. */
-.hf-example {
-  margin-block: 1.5rem;
-}
-
-.hf-example__stackblitz {
-  margin-top: 0.75rem;
-}
-
-.hf-example__stackblitz button,
 .hf-agent-wizard__choice,
 .hf-agent-wizard__copy,
 .hf-agent-wizard__back {
@@ -41,7 +41,6 @@
   font-size: var(--sl-text-sm);
 }
 
-.hf-example__stackblitz button:hover,
 .hf-agent-wizard__choice:hover,
 .hf-agent-wizard__copy:hover,
 .hf-agent-wizard__back:hover {
@@ -49,9 +48,11 @@
   color: var(--sl-color-accent-high);
 }
 
-/* Live examples in dark mode. Each example's own stylesheet (`examples/<name>/example1.css`, which StackBlitz opens
-   too) is written for a light page; on a dark one its fixed colors turn the striped rows and the inputs into white
-   bars. These swap them for the theme's. `.hf-example` outranks the example's selectors, which load later. */
+/* Live examples (`:::example{#id}`) in dark mode. The frame, the toolbar and the "Source code" tabs come from
+   `interactive-example.css`; the example's own stylesheet (`examples/<name>/example1.css`, which the "Source code" tabs
+   show too) styles what is inside `.example`. It is written for a light page; on a dark one its fixed colors turn the
+   striped rows and the inputs into white bars. These swap them for the theme's. `.hf-example` outranks the example's
+   selectors, which load later. */
 :root[data-theme='dark'] .hf-example .example {
   color: var(--sl-color-gray-2);
 }
