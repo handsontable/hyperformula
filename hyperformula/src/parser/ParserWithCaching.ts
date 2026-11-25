@@ -222,16 +222,16 @@ export class ParserWithCaching {
 
   /**
    * Error nodes that print the same, such as `#REF!`, can stand for different errors: one typed into
-   * the formula, another left where a removed row or column was referenced. The suffix keeps their
-   * cache entries apart, so a cache hit never gives a formula the message of another formula's error.
-   * It is empty for an error typed into the formula, whose hash then equals the hash computed from
-   * the formula's tokens.
+   * the formula, another left where a removed row or column was referenced, another from an `OFFSET`
+   * that points outside the sheet. The suffix keeps their cache entries apart, so a cache hit never
+   * gives a formula the message or the origin function of another formula's error. It is empty for
+   * an error typed into the formula, whose hash then equals the hash computed from the formula's tokens.
    */
   private static errorMessageHashSuffix(error?: CellError): string {
     if (error === undefined || error.message === ErrorMessage.ErrorLiteral) {
       return ''
     }
-    return `\u0000${error.message ?? ''}`
+    return `\u0000${error.message ?? ''}\u0000${error.originFunction ?? ''}`
   }
 
   public computeHashFromTokens(tokens: IToken[], baseAddress: SimpleCellAddress): string {

@@ -697,10 +697,15 @@ export class DependencyGraph {
    * A cached error read from a static-error cell carries its origin address together with the
    * version that address is true at (see {@link getCellValue}). Its address is moved to the current
    * version here too; once the transformations are discarded it could no longer be moved.
+   *
+   * Range vertices cache aggregate results, which can be such an error, in shapes this method does
+   * not walk. Their caches are cleared instead, so the next read recomputes them from the cells.
    */
   public forceApplyPostponedTransformations() {
     for (const vertex of this.graph.getNodes()) {
-      if (vertex instanceof ScalarFormulaVertex) {
+      if (vertex instanceof RangeVertex) {
+        vertex.clearCache()
+      } else if (vertex instanceof ScalarFormulaVertex) {
         vertex.ensureRecentData(this.lazilyTransformingAstService)
         const value = vertex.valueOrUndef()
         if (value instanceof CellError) {

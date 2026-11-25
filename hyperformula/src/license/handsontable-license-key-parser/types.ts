@@ -97,8 +97,10 @@ export interface LicenseLifecycle {
  * external, end-user-facing use.
  *
  * `ui` governs warnings only. A trial hard-stop block is enforcement and is
- * applied regardless - see `NO_UI_WARNS_FLAG` in `./constants`. A new surface
- * reading this field has to decide which of the two it is before honoring it.
+ * applied regardless - see `NO_UI_WARNS_FLAG` in `./constants`. So is the
+ * "Powered by" bar an `attribution-bar` key asks for: it is branding, not a warning - see
+ * `ATTRIBUTION_BAR_FLAG`. A new surface reading this field has to decide which of the
+ * three it is before honoring it.
  */
 export interface LicenseChannels {
   readonly console: boolean;
@@ -111,6 +113,10 @@ export interface LicenseChannels {
  * entitlement format (unlock everything) and entitlement keys (unlock exactly
  * the tokens the payload lists) without the caller branching on the key
  * family.
+ *
+ * An entitlement entry lists its tokens whether or not it carries the
+ * `listed-capabilities` flag. What an entry without the flag unlocks is the
+ * product's decision - see `LISTED_CAPABILITIES_FLAG` in `./constants`.
  */
 export interface LicenseGrants {
   readonly unrestricted: boolean;
