@@ -1,6 +1,6 @@
 ---
 title: "Types of values"
-description: "The types of values HyperFormula handles, such as numbers, text, dates, errors, and currency, and how functions treat them."
+description: "The types of values HyperFormula handles, such as numbers, text, dates, errors, and currency, and how it determines a cell's value type."
 tags:
   - boolean
   - logical

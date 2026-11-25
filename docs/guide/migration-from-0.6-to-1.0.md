@@ -1,6 +1,6 @@
 ---
 title: "Migrating from 0.6 to 1.0"
-description: "Upgrade HyperFormula from version 0.6.x to 1.0.x."
+description: "Upgrade HyperFormula from 0.6.x to 1.0.x: the new license key, sheetName to sheetId, and the matrix to array renames."
 tags:
   - migration
   - migrate
