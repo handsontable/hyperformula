@@ -1,5 +1,6 @@
 ---
 title: "Date and time handling"
+description: "Set the date and time formats HyperFormula parses, or provide your own date and time parsing functions."
 tags:
   - dates
   - dateFormats

@@ -1,5 +1,6 @@
 ---
 title: "Migrating from 3.x to 4.0"
+description: "Upgrade HyperFormula from version 3.x to 4.0, which requires a commercial license key."
 tags:
   - migration
   - migrate
@@ -8,6 +9,9 @@ tags:
   - v4.0
   - "#LIC!"
   - language packs
+  - INDEX
+  - FILTER
+  - TEXT
 ---
 
 To upgrade your HyperFormula version from 3.x.x to 4.0.0, follow this guide.
@@ -117,3 +121,61 @@ HyperFormula 4.0 changes two function names to the ones Microsoft Excel uses:
 | `trTR` | `SAYIYAÇEVİR` | `#NAME?` | `VALUE` |
 
 A Polish or Turkish formula with an old name now calls `DURATION` or `PRICE`, which take different arguments, so it returns `#N/A`. In the formulas you store in these languages, replace `ROCZ.PRZYCH` with `O.CZAS.TRWANIA`, and `DEĞER` with `SAYIYAÇEVİR`. Formulas in other languages are not affected.
+
+## The `TEXT` function
+
+HyperFormula 4.0 changes how the `TEXT` function reads its number format mask, the second argument. Some formulas that returned text in 3.x return a different text, or `#VALUE!`, in 4.0.
+
+### Separators in the mask and the result
+
+`TEXT` reads the [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) character as the decimal point of the mask and the [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator) character as thousands grouping, and writes them in the result. When `thousandSeparator` is empty, as by default, `,` is the grouping character if `decimalSeparator` is `.`, and no character groups if it is `,`. A `.` or `,` that is neither separator is text. In 3.x, `TEXT` always read `.` as the decimal point of the mask and wrote `.` in the result.
+
+With `decimalSeparator: ','`, `thousandSeparator: ' '` and `functionArgSeparator: ';'`:
+
+| Formula | 3.x | 4.0 |
+|:--------|:----|:----|
+| `=TEXT(1,5; "0,00")` | `2,00` | `1,50` |
+| `=TEXT(1,5; "0.00")` | `1.50` | `2.00` |
+| `=TEXT(1234,5; "# ##0,00")` | `1235 ##0,00` | `1 234,50` |
+
+With `decimalSeparator: ','` and the default empty `thousandSeparator`, `=TEXT(5; "0,000")` returns `5,000`, as in 3.x, because `,` is the decimal point.
+
+Write the decimal point and grouping of a mask with the separators you configure: with `decimalSeparator: ','`, replace `"0.00"` with `"0,00"`. To keep `.` in the result, keep the default `decimalSeparator: '.'`, or replace the separator in the result: `=SUBSTITUTE(TEXT(1,5; "0,00"); ","; ".")` returns `1.50`.
+
+### Masks that return `#VALUE!`
+
+A mask with an unclosed `[` or `"`, an empty bracket `[]`, a bracket that starts with `\`, or `\` as its last character, returns `#VALUE!`. In 3.x, `TEXT` wrote these characters as text.
+
+| Mask | Formula | 3.x | 4.0 |
+|:-----|:--------|:----|:----|
+| `0[` | `=TEXT(5, "0[")` | `5[` | `#VALUE!` |
+| `0"x`, in `B1` | `=TEXT(5, B1)` | `5"x` | `#VALUE!` |
+| `0\`, in `B1` | `=TEXT(5, B1)` | `5\` | `#VALUE!` |
+| `0[]` | `=TEXT(5, "0[]")` | `5[]` | `#VALUE!` |
+| `0[\]`, in `B1` | `=TEXT(5, B1)` | `5[\]` | `#VALUE!` |
+
+To write one of these characters as text, put `\` before it, or close the quoted text. In 4.0, `=TEXT(5, "0\[")` returns `5[`, and the mask `0"x"` returns `5x`.
+
+### Masks with `,` and `#`
+
+On the default config, `TEXT` reads `,` between digit placeholders as thousands grouping, and `#` as a digit that is written only when it is significant. Masks that used these characters in other ways return a different result:
+
+| Formula | 3.x | 4.0 | To get the 3.x result |
+|:--------|:----|:----|:----------------------|
+| `=TEXT(5, "0,000")` | `5,000` | `0,005` | `=TEXT(5, "0")&",000"` |
+| `=TEXT(0.5, "#.00")` | `0.50` | `.50` | `=TEXT(0.5, "0.00")` |
+| `=TEXT(0, "#")` | `0` | The empty text | `=TEXT(0, "0")` |
+
+These are results on the default config, where `.` is the decimal point and `,` groups thousands. With other separators, use the configured characters in place of `.` and `,`.
+
+### Custom `stringifyDateTime` and `stringifyDuration` callbacks
+
+A [`stringifyDateTime`](../api/interfaces/configparams.md#stringifydatetime) or [`stringifyDuration`](../api/interfaces/configparams.md#stringifyduration) callback receives the mask without its color tag, such as `[Red]`. HyperFormula does not call either callback for a mask that returns `#VALUE!`.
+
+| Mask | 3.x: the callback receives | 4.0: the callback receives |
+|:-----|:---------------------------|:---------------------------|
+| `[Red]dd-mm-yyyy` | `[Red]dd-mm-yyyy` | `dd-mm-yyyy` |
+| `[Blue][h]:mm` | `[Blue][h]:mm` | `[h]:mm` |
+| `dd-mm-yyyy[` | `dd-mm-yyyy[` | Nothing: the callback is not called, and `TEXT` returns `#VALUE!` |
+
+A callback that removed color tags itself keeps working. A callback that read the color from the mask no longer receives it.

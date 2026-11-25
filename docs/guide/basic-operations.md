@@ -1,6 +1,6 @@
 ---
 title: "Basic operations"
-description: Add, remove, move, and reorder sheets, rows, columns, and cells in HyperFormula, and read the changes each operation returns.
+description: "Add, remove, move, and update cells, rows, columns, and sheets in HyperFormula, with references updated automatically."
 tags:
   - CRUD
   - insert rows
@@ -340,8 +340,9 @@ try {
 
 ## isItPossibleTo* methods
 
-There are also methods that you may find useful to call in pair with
-the above-mentioned operations. These methods are prefixed with
+Most sheet, row, column, and cell operations on this page (for example,
+`addSheet`, `removeRows`, or `moveCells`) have a matching method that
+checks whether the operation can be performed. These methods are prefixed with
 `isItPossibleTo*` whose sole purpose is to check if the desired
 operation is possible. They all return a simple `boolean` value.
 You will find it handy when you want to give the user a more generic

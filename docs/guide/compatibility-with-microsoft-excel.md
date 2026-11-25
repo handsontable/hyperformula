@@ -1,5 +1,6 @@
 ---
 title: "Compatibility with Microsoft Excel"
+description: "Configure HyperFormula for nearly full compatibility with Microsoft Excel formulas and calculation results."
 tags:
   - MS Excel
   - missing Excel functions
@@ -166,7 +167,10 @@ Options related to date and time formats:
 
 ### `TEXT` function formats
 
-Excel's `TEXT` function supports a wide range of date, time, and currency formats. To cover the full range in HyperFormula, supply both [`stringifyDateTime()`](../api/interfaces/configparams.md#stringifydatetime) (for dates and durations) and [`stringifyCurrency()`](../api/interfaces/configparams.md#stringifycurrency) (for currency formats — locale-aware grouping, non-`$` symbols, accounting two-section patterns). See [Currency handling](currency-handling.md) for an `Intl.NumberFormat`-based example.
+Excel's `TEXT` function supports a wide range of date, time, and number formats. The built-in number formatter handles digit placeholders (`#`, `0`), thousands grouping (`#,##0`), and positive/negative/zero sections (`0.00;(0.00);0.0`). Two nuances apply:
+
+- Separators come from the instance config, not the runtime locale, as Excel takes them from the workbook locale. `TEXT` reads the mask with [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) as the decimal point and [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator) as the grouping character, and writes the same characters in the result. With `decimalSeparator: ','`, `thousandSeparator: ' '` and `functionArgSeparator: ';'`, `=TEXT(1234,5; "# ##0,00")` returns `1 234,50`. When `thousandSeparator` is empty, as by default, `,` is the grouping character if the decimal point is `.`, so `=TEXT(1234.5, "#,##0.00")` returns `1,234.50`, as in Excel with the en-US locale. With `decimalSeparator: ','` and an empty `thousandSeparator`, no character groups: `,` is the decimal point. A `.` or `,` in a mask that is neither separator is text.
+- The built-in formatter does not implement every Excel number format; [Known limitations](known-limitations.md#text-function) lists the ones it does not support. For those, and for locale-aware currency formats, supply [`stringifyDateTime()`](../api/interfaces/configparams.md#stringifydatetime) (for dates and durations) and [`stringifyCurrency()`](../api/interfaces/configparams.md#stringifycurrency) (for currency). See [Currency handling](currency-handling.md) for an `Intl.NumberFormat`-based example.
 
 ## Full configuration
 

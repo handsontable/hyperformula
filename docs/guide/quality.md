@@ -1,5 +1,6 @@
 ---
 title: "Quality & Security"
+description: "How HyperFormula is researched, tested, secured, and supported."
 tags:
   - audits
   - OWASP

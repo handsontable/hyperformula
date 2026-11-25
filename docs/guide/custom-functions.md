@@ -1,5 +1,6 @@
 ---
 title: "Custom functions"
+description: "Extend HyperFormula with your own functions by creating, registering, and testing a function plugin."
 tags:
   - registerFunctionPlugin
   - implementedFunctions

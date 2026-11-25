@@ -21,6 +21,29 @@ const normalizeBase = (base) => `/${base.replace(/^\/+|\/+$/g, '')}/`.replace(/^
 const base = normalizeBase(process.env.DOCS_BASE || buildConfig.base);
 const hostname = process.env.DOCS_HOSTNAME || buildConfig.hostname;
 
+/**
+ * The image that link previews show for every docs page. Starlight emits `og:title`, `og:description`, and
+ * `twitter:card=summary_large_image` by itself, but no image. This is the handsontable.com default card, which carries
+ * the HyperFormula mark. The URL is absolute because crawlers don't resolve a relative `og:image`, and `width` and
+ * `height` must match the file.
+ */
+const SOCIAL_IMAGE = {
+  url: 'https://handsontable.com/og/default.png',
+  width: 1200,
+  height: 630,
+  alt: 'Handsontable DataGrid and HyperFormula',
+};
+
+/** The Starlight `head` entries for {@link SOCIAL_IMAGE}. */
+const socialImageHead = () => [
+  { tag: 'meta', attrs: { property: 'og:image', content: SOCIAL_IMAGE.url } },
+  { tag: 'meta', attrs: { property: 'og:image:width', content: String(SOCIAL_IMAGE.width) } },
+  { tag: 'meta', attrs: { property: 'og:image:height', content: String(SOCIAL_IMAGE.height) } },
+  { tag: 'meta', attrs: { property: 'og:image:alt', content: SOCIAL_IMAGE.alt } },
+  { tag: 'meta', attrs: { name: 'twitter:image', content: SOCIAL_IMAGE.url } },
+  { tag: 'meta', attrs: { name: 'twitter:image:alt', content: SOCIAL_IMAGE.alt } },
+];
+
 export default defineConfig({
   site: hostname,
   base,
@@ -102,6 +125,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         // Google Search Console
         { tag: 'meta', attrs: { name: 'google-site-verification', content: 'MZpSOa8SNvFLRRGwUQpYVZ78kIHQoPVdVbafHhJ_d4Q' } },
+        // Social preview image for link previews (LinkedIn, Slack, X). See README.md, "Social preview image".
+        ...socialImageHead(),
         // Sentry
         {
           tag: 'script',

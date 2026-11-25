@@ -1,5 +1,6 @@
 ---
 title: "Clipboard operations"
+description: "Copy, cut, and paste cells with HyperFormula clipboard methods, which keep the data in memory rather than the system clipboard."
 tags:
   - clearClipboard
   - isClipboardEmpty
