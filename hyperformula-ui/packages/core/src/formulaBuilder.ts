@@ -460,7 +460,10 @@ export class FormulaBuilder {
    * host-specific renderers — the host renders the error, core never does.
    */
   markCell(cellEl: HTMLElement, value: unknown): void {
+    const previousMessage = cellEl.dataset.hfeError;
+
     setCellError(cellEl, cellErrorMessage(value));
+    this.errorPopup.syncCell(cellEl, previousMessage);
   }
 
   /** The single shared editor instance this builder owns. */
