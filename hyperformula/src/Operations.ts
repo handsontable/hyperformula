@@ -974,7 +974,9 @@ export class Operations {
       const ast = arrayVertex.getFormula(this.lazilyTransformingAstService)
       const address = arrayVertex.getAddress(this.lazilyTransformingAstService)
       if (this.dependencyGraph.isOverwritingDataAllowed()) {
-        overwrittenCells.push(...this.snapshotOverwrittenOccupants(address, this.arraySizePredictor.checkArraySize(ast, address)))
+        for (const overwrittenCell of this.snapshotOverwrittenOccupants(address, this.arraySizePredictor.checkArraySize(ast, address))) {
+          overwrittenCells.push(overwrittenCell)
+        }
       }
       const changes = this.setFormulaToCellFromAst(ast, address)
       const overwriteChanges = changes.getChanges()
