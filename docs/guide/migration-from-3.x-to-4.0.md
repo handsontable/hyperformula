@@ -12,6 +12,7 @@ tags:
   - INDEX
   - FILTER
   - TEXT
+  - evaluateNullToZero
 ---
 
 To upgrade your HyperFormula version from 3.x.x to 4.0.0, follow this guide.
@@ -179,3 +180,58 @@ A [`stringifyDateTime`](../api/interfaces/configparams.md#stringifydatetime) or 
 | `dd-mm-yyyy[` | `dd-mm-yyyy[` | Nothing: the callback is not called, and `TEXT` returns `#VALUE!` |
 
 A callback that removed color tags itself keeps working. A callback that read the color from the mask no longer receives it.
+
+## Empty cells with `evaluateNullToZero`
+
+This section applies only if you set the [`evaluateNullToZero`](../api/interfaces/configparams.md#evaluatenulltozero) option to `true`. With the default `false`, nothing changes.
+
+In 3.x, `evaluateNullToZero` made formulas read an empty cell as `0`, but the HyperFormula API still returned `null` for the empty cell itself. HyperFormula 4.0 returns `0` for it, so the API gives the same value that formulas see.
+
+### What changes
+
+With `evaluateNullToZero: true`, `B1` empty, and `A2:C2` holding `1`, `2` and `3`:
+
+```js
+const hf = HyperFormula.buildFromArray([
+  [1],
+  [1, 2, 3],
+], {
+  licenseKey: 'your-license-key',
+  evaluateNullToZero: true,
+});
+```
+
+| Call | 3.x | 4.0 |
+|:-----|:----|:----|
+| `hf.getCellValue({ sheet: 0, row: 0, col: 1 })` | `null` | `0` |
+| `hf.getCellValue()` for an address outside the sheet's used area | `null` | `0` |
+| `hf.getSheetValues(0)` | `[[1], [1, 2, 3]]` | `[[1, 0, 0], [1, 2, 3]]` |
+| `hf.getAllSheetsValues()` | `{ Sheet1: [[1], [1, 2, 3]] }` | `{ Sheet1: [[1, 0, 0], [1, 2, 3]] }` |
+| `hf.getRangeValues()` for `A1:B1` | `[[1, null]]` | `[[1, 0]]` |
+| `hf.calculateFormula('=A1:C1', 0)` | `[[1, null, null]]` | `[[1, 0, 0]]` |
+| The `newValue` of a cell cleared with `setCellContents()`, in the returned changes and the `valuesUpdated` event | `null` | `0` |
+
+`getSheetValues()` and `getAllSheetsValues()` fill each row with `0` up to the width of the sheet, instead of ending the row at its last non-empty cell.
+
+These stay the same in 4.0:
+
+* `hf.getCellSerialized()` returns `null` for an empty cell.
+* `hf.isCellEmpty()` returns `true`, and `hf.getCellType()` returns `CellType.EMPTY`, for an empty cell.
+* `=ISBLANK(B1)` returns `TRUE`.
+* Formulas that read an empty cell get `0`, as in 3.x.
+
+### Update your code
+
+In 4.0, with `evaluateNullToZero: true`, a value of `0` can mean either an empty cell or a cell that holds `0`. Code that checks for `null` to find empty cells no longer finds them.
+
+To find empty cells, use [`isCellEmpty()`](../api/classes/hyperformula.md#iscellempty) instead of comparing the value with `null`:
+
+```js
+// 3.x
+const isEmpty = hf.getCellValue(address) === null;
+
+// 4.0
+const isEmpty = hf.isCellEmpty(address);
+```
+
+If your code reads the rows of `getSheetValues()` or `getAllSheetsValues()`, expect every row to be as wide as the sheet. To tell the padding apart from a `0` in a cell, use `isCellEmpty()` or [`getCellSerialized()`](../api/classes/hyperformula.md#getcellserialized), which still returns `null` for an empty cell.
