@@ -13,7 +13,7 @@ console.log(
 );
 
 /* end:skip-in-compilation */
-/* start:skip-in-source */
+/* start:skip-in-source
 const {
   ArraySize,
   CellError,
@@ -21,8 +21,7 @@ const {
   FunctionPlugin,
   SimpleRangeValue,
 } = HyperFormula;
-
-/* end:skip-in-source */
+end:skip-in-source */
 /**
  * Custom function plugin.
  */

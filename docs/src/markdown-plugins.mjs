@@ -108,21 +108,27 @@ function resolveUrl(url, fileURL, base) {
 }
 
 /**
+ * The lines only the page needs, kept in a comment so the example files stay valid modules:
+ * `/* start:skip-in-source` ... `end:skip-in-source *\/`. They stand in for imports, which the page cannot run.
+ */
+const SKIP_IN_SOURCE = /\/\*\s*start:skip-in-source\r?\n(.*?)end:skip-in-source\s*\*\/\r?\n/gs;
+
+/**
  * The script the page runs. The engine is the CDN build's global `HyperFormula`, so the imports between the
- * `skip-in-compilation` markers go; so do the markers.
+ * `skip-in-compilation` markers go, and the lines in the `skip-in-source` comment take their place.
  */
 const previewCode = (code) => code
   .replace(/\/\*(\s+)?(start|end):skip-in-preview(\s+)?\*\/\r?\n/gm, '')
-  .replace(/\/\*(\s+)?(start|end):skip-in-source(\s+)?\*\/\r?\n/gm, '')
+  .replace(SKIP_IN_SOURCE, '$1')
   .replace(/\/\*(\s+)?start:skip-in-compilation(\s+)?\*\/\r?\n.*?\/\*(\s+)?end:skip-in-compilation(\s+)?\*\/\r?\n/gms, '')
   .replace(/\/\* end-file \*\//gm, '');
 
 /**
- * The code the "Source code" toggle shows: the example as a reader would write it, with its imports, without the lines
- * between the `skip-in-source` markers, which only the page needs, and without any marker.
+ * The code the "Source code" toggle shows: the example as a reader would write it, with its imports, without the
+ * `skip-in-source` comment and without any marker.
  */
 const sourceCode = (code) => code
-  .replace(/\/\*(\s+)?start:skip-in-source(\s+)?\*\/\r?\n.*?\/\*(\s+)?end:skip-in-source(\s+)?\*\/\r?\n\r?\n?/gms, '')
+  .replace(new RegExp(`${SKIP_IN_SOURCE.source}(\\r?\\n)?`, 'gs'), '')
   .replace(/\/\*(\s+)?(start|end):skip-in-preview(\s+)?\*\/\r?\n/gm, '')
   .replace(/\/\*(\s+)?(start|end):skip-in-compilation(\s+)?\*\/\r?\n/gm, '')
   .replace(/\/\* end-file \*\//gm, '')

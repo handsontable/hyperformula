@@ -7,9 +7,9 @@ console.log(
 );
 
 /* end:skip-in-compilation */
-/* start:skip-in-source */
+/* start:skip-in-source
 const NothingToPasteError = HyperFormula.NothingToPasteError;
-/* end:skip-in-source */
+end:skip-in-source */
 /**
  * Initial table data.
  */

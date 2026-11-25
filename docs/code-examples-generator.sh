@@ -39,11 +39,8 @@ generate() {
   input_filename="$1"
   output_filename=$(build_output_filename "$input_filename")
   
-  # --preserveValueImports keeps every import of the .ts in the .js. Without it, tsc drops an import that a
-  # `skip-in-source` block redeclares from the global `HyperFormula`, and the .js the "Source code" tabs show
-  # would use names it never imports.
   if [[ "$input_filename" == *.ts ]]; then
-    tsc --target esnext --skipLibCheck --preserveValueImports --isolatedModules "$input_filename" > /dev/null
+    tsc --target esnext --skipLibCheck "$input_filename" > /dev/null
   elif [[ "$input_filename" == *.tsx ]]; then
     tsc --target esnext --jsx preserve --skipLibCheck "$input_filename" > /dev/null
   else

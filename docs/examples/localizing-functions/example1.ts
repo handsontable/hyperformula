@@ -8,9 +8,9 @@ console.log(
 );
 /* end:skip-in-compilation */
 
-/* start:skip-in-source */
+/* start:skip-in-source
 const frFR = HyperFormula.languages.frFR;
-/* end:skip-in-source */
+end:skip-in-source */
 
 /**
  * Initial table data.

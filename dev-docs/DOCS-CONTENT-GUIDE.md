@@ -232,9 +232,11 @@ line as `@[code](@/docs/examples/<guide>/example1.html)`, and the same for the `
 `HyperFormula`, and its "Source code" toggle shows all four files. Write the `.ts` and generate
 the `.js` with `npm run docs:code-examples:generate-js -- examples/<guide>/example1.ts`. Put the
 imports between `/* start:skip-in-compilation */` and `/* end:skip-in-compilation */`: the page
-drops them. Put what only the page needs, such as `const { FunctionPlugin } = HyperFormula;`,
-between `/* start:skip-in-source */` and `/* end:skip-in-source */`: the "Source code" toggle
-drops it.
+drops them. Put what only the page needs in their place, such as
+`const { FunctionPlugin } = HyperFormula;`, inside a comment that starts with
+`/* start:skip-in-source` and ends with `end:skip-in-source */`: the page runs it, and the
+"Source code" toggle drops it. As a comment, it doesn't redeclare the imported names, so the
+files stay valid modules and the generated `.js` keeps every import.
 - Use **relative links** between guide pages (`./named-expressions.md`) and to API pages
 (`../api/classes/hyperformula.md#buildfromarray`); the build points them at the built
 pages. Link files in `docs/public/` root-relative (`/hf_logo.png`).
