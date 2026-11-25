@@ -272,7 +272,7 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
         // From 309 digits on, 10^digits overflows to Infinity and the truncation below would give NaN. Excel returns
         // #DIV/0! for a significance this large, as for 1e21.
         if (!Number.isFinite(scale)) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         const upperIndex = vals.findIndex(val => val >= x)
         const rank = vals[upperIndex] === x
