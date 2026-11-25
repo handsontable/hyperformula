@@ -10,7 +10,8 @@ import {Ast, ProcedureAst} from '../../parser'
  * For a call to `IF`, `IFS`, `SWITCH`, `CHOOSE` or `XLOOKUP`, the argument that its last evaluation returned. A
  * call that returned none of its arguments, such as one whose selector is an error or out of range, one where no
  * condition, case or lookup value matched and no fallback was given, one that returned the default value of an
- * omitted argument, or one that built an array cell by cell from different arguments, has no entry.
+ * omitted argument, or one that built an array cell by cell from different arguments, has no entry. An `XLOOKUP`
+ * with an array of lookup values keeps the entry for `if_not_found` when every lookup returned it.
  */
 const selectedArguments = new WeakMap<ProcedureAst, Ast>()
 
