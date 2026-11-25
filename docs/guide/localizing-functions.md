@@ -1,5 +1,6 @@
 ---
 title: "Localizing functions"
+description: "Translate HyperFormula function names and error messages by registering one of its language packs."
 tags:
   - translations
   - translate

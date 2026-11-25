@@ -1,5 +1,6 @@
 ---
 title: "Basic operations"
+description: "Add, remove, move, and update cells, rows, columns, and sheets in HyperFormula, with references updated automatically."
 tags:
   - CRUD
   - insert rows

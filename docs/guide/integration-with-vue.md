@@ -1,5 +1,6 @@
 ---
 title: "Integration with Vue"
+description: "Use HyperFormula in a Vue 3 app and show its values through Vue reactivity."
 tags:
   - Vue 3
   - Vue.js

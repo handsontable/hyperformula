@@ -1,5 +1,6 @@
 ---
 title: "File import"
+description: "Import XLSX and CSV files into HyperFormula with third-party parsers and its factory methods."
 tags:
   - ExcelJS
   - SheetJS

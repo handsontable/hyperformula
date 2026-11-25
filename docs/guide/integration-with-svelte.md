@@ -1,5 +1,6 @@
 ---
 title: "Integration with Svelte"
+description: "Use HyperFormula in a Svelte app and bridge its values into Svelte reactivity."
 tags:
   - SSR
   - onMount
