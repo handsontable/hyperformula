@@ -15,7 +15,7 @@ import { InterpreterState } from '../InterpreterState'
 import { EmptyValue, InternalScalarValue, InterpreterValue, RawNoErrorScalarValue } from '../InterpreterValue'
 import { SimpleRangeValue } from '../../SimpleRangeValue'
 import { FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions } from './FunctionPlugin'
-import { forgetSelectedArgument, recordSelectedArgument } from './SelectedArgument'
+import { forgetSelectedArgument, recordSelectedArgument, selectedArgument } from './SelectedArgument'
 import { ArraySize } from '../../ArraySize'
 
 export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LookupPlugin> {
@@ -133,12 +133,17 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   /**
    * Corresponds to XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found], [match_mode], [search_mode])
    *
+   * With an array of lookup values, the result keeps `if_not_found` as its returned argument only when every
+   * lookup returned it: as in Excel, a result taken from `if_not_found` stays a reference, while a result taken
+   * from `return_array` for one of several keys is a value.
+   *
    * @param ast
    * @param state
    */
   public xlookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     forgetSelectedArgument(ast)
     let lookups = 0
+    let lookupsReturningIfNotFound = 0
     const result = this.runFunction(ast.args, state, this.metadata('XLOOKUP'), (key: RawNoErrorScalarValue, lookupRangeValue: SimpleRangeValue, returnRangeValue: SimpleRangeValue, notFoundFlag: any, matchMode: number, searchMode: number) => {
       lookups++
       if (![0, -1, 1, 2].includes(matchMode)) {
@@ -163,9 +168,14 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
             : 'returnNotFound'
       }
 
-      return this.doXlookup(ast, zeroIfEmpty(key), lookupRange, returnRange, notFoundFlag, isWildcardMatchMode, searchOptions)
+      forgetSelectedArgument(ast)
+      const value = this.doXlookup(ast, zeroIfEmpty(key), lookupRange, returnRange, notFoundFlag, isWildcardMatchMode, searchOptions)
+      if (ast.args[3] !== undefined && selectedArgument(ast) === ast.args[3]) {
+        lookupsReturningIfNotFound++
+      }
+      return value
     })
-    if (lookups > 1) {
+    if (lookups > 1 && lookupsReturningIfNotFound < lookups) {
       forgetSelectedArgument(ast)
     }
     return result
