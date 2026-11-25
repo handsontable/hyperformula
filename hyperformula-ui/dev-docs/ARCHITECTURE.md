@@ -761,6 +761,29 @@ inside their host-specific renderers, because each host renders cells differentl
 - Plain table: the host's own `renderCell` (the plain table has no host library, so its grid
   scaffolding is example code — see "Adapter scope" below)
 
+`markCell` also keeps the tooltip in step with the mark, through `ErrorPopup.syncCell(cell,
+previousMessage)`. Hosts repaint often (Handsontable on every draw), so a repaint that leaves
+the message unchanged leaves the tooltip and the suppression alone. When the message changes on the cell the tooltip shows,
+the tooltip closes (error cleared) or shows the new text. When it changes on a cell that still
+holds the pointer or focus while no tooltip shows, the tooltip opens there. A change also
+lifts that cell's Escape suppression, since the dismissed content is gone.
+
+While the tooltip is open, the cell carries `aria-errormessage` and the popup id in its
+`aria-describedby`, appended to the ids already there. A host can rewrite either attribute
+at any time: Handsontable strips every `aria-*` attribute on each draw, and a React grid
+writes its own value when a prop changes. So `ErrorPopup` keeps a `MutationObserver` on those
+two attributes of the anchored cell while the tooltip is open, and puts the association back
+whenever it is missing. It needs no call from the host, so it also covers a host that never
+calls `markCell`. The observer is disconnected whenever the association is cleared.
+
+One case needs care. Some hosts add their own id only when `aria-describedby` is still empty
+after the renderer returns (Handsontable's column-header id). When `syncCell` anchors the
+tooltip from inside a render, it therefore writes only `aria-errormessage` and leaves
+`aria-describedby` to the observer, which runs after the host has finished the cell.
+
+happy-dom delivers observer records on a timer, not in a microtask as browsers do, so a unit
+test waits one timer tick before it checks the restored attributes.
+
 The error tooltip itself is Esc-dismissible: `ErrorPopup` owns a window-level `keydown`
 (capture) listener, registered while attached; it consumes Escape only while the tooltip is
 visible AND no builder surface holds focus (`builderSurfaceHasFocus()` —
@@ -777,8 +800,8 @@ pointer/focus position, which Esc does not move), which is what lets `suppressed
 keep suppression while pointer or focus still rest on the dismissed cell; were they cleared,
 the next unrelated `focusout` would fall through `handleLeave` and drop `suppressedCell`,
 letting an in-cell `mouseover` reopen the dismissed tooltip (a 1.4.13 violation). Suppression
-clears only once both pointer and focus have left the cell (`handleLeave`), or on
-`detach()` — so re-entering the cell after leaving shows the tooltip again; re-entering the
+clears once both pointer and focus have left the cell (`handleLeave`), when `markCell`
+changes or clears that cell's error (`syncCell`), or on `detach()` — so re-entering the cell after leaving shows the tooltip again; re-entering the
 suppressed cell while the tooltip shows a DIFFERENT cell's error closes that stale tooltip
 instead of leaving it anchored to the other cell (`handleEnter`'s suppressed branch). Because this
 listener sits at the window in capture phase, it would otherwise consume Escape before the
