@@ -55,7 +55,7 @@ export class DependencyGraph {
    * copy (see `getCellValue`). Keyed by the vertex because a parsing-error vertex builds a new error
    * on every read.
    */
-  private readonly stampedStaticErrors = new WeakMap<CellVertex, { source: CellError, stamped: CellError }>()
+  private stampedStaticErrors = new WeakMap<CellVertex, { source: CellError, stamped: CellError }>()
 
   public readonly graph: Graph<Vertex>
   private changes: ContentChanges = ContentChanges.empty()
@@ -648,15 +648,29 @@ export class DependencyGraph {
     if (
       cached !== undefined
       && (vertex instanceof ParsingErrorVertex || cached.source === value)
-      && cached.stamped.originAddressVersion === version
-      && cached.stamped.originAddress !== undefined
-      && equalSimpleCellAddress(cached.stamped.originAddress, address)
+      && this.stampedAddressStillHolds(cached.stamped, address, version)
     ) {
       return cached.stamped
     }
     const stamped = value.withOriginAddress(address, version).asPropagated()
     this.stampedStaticErrors.set(vertex, {source: value, stamped})
     return stamped
+  }
+
+  /**
+   * Whether a stamped error still names `address`: the address it was stamped with, carried through
+   * the transformations since its version, is `address`. Exporter carries it the same way, so the
+   * old stamp reports the right cell and can be reused across row and column changes.
+   */
+  private stampedAddressStillHolds(stamped: CellError, address: SimpleCellAddress, version: number): boolean {
+    const {originAddress, originAddressVersion} = stamped
+    if (originAddress === undefined || originAddressVersion === undefined) {
+      return false
+    }
+    const current = originAddressVersion === version
+      ? originAddress
+      : this.lazilyTransformingAstService.applyTransformationsToAddress(originAddress, originAddressVersion)
+    return current !== undefined && equalSimpleCellAddress(current, address)
   }
 
   public getRawValue(address: SimpleCellAddress): RawCellContent {
@@ -725,6 +739,7 @@ export class DependencyGraph {
    * not walk. Their caches are cleared instead, so the next read recomputes them from the cells.
    */
   public forceApplyPostponedTransformations() {
+    this.stampedStaticErrors = new WeakMap()
     for (const vertex of this.graph.getNodes()) {
       if (vertex instanceof RangeVertex) {
         vertex.clearCache()
