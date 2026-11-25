@@ -6,7 +6,7 @@
 import {AbsoluteCellRange, SimpleCellRange, simpleCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
 import {ArraySize} from '../ArraySize'
-import {CellError, ErrorType, isSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {CellError, equalSimpleCellAddress, ErrorType, isSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
@@ -50,6 +50,13 @@ import {TopSortResult} from './TopSort'
 import { findBoundaries } from '../Sheet'
 
 export class DependencyGraph {
+  /**
+   * Per vertex that holds a static error, the error last read from it and its stamped, propagated
+   * copy (see `getCellValue`). Keyed by the vertex because a parsing-error vertex builds a new error
+   * on every read.
+   */
+  private readonly stampedStaticErrors = new WeakMap<CellVertex, { source: CellError, stamped: CellError }>()
+
   public readonly graph: Graph<Vertex>
   private changes: ContentChanges = ContentChanges.empty()
   public readonly sheetReferenceRegistrar: SheetReferenceRegistrar
@@ -630,10 +637,26 @@ export class DependencyGraph {
     // recomputed by a row or column change that merely shifts it, so the address alone would go
     // stale; the version lets Exporter replay the intervening transformations over it.
     const vertex = this.addressMapping.getCell(address)
-    const holdsAStaticError = vertex instanceof ParsingErrorVertex || vertex instanceof ValueCellVertex
-    return holdsAStaticError
-      ? value.withOriginAddress(address, this.lazilyTransformingAstService.version()).asPropagated()
-      : value.asPropagated()
+    if (!(vertex instanceof ParsingErrorVertex || vertex instanceof ValueCellVertex)) {
+      return value.asPropagated()
+    }
+    // Reuse the stamped copy while the address and the version still hold: the evaluator reports a
+    // cell as changed when its new value is a different object, so a fresh copy per read would report
+    // a formula that reads the same error again as changed.
+    const version = this.lazilyTransformingAstService.version()
+    const cached = this.stampedStaticErrors.get(vertex)
+    if (
+      cached !== undefined
+      && (vertex instanceof ParsingErrorVertex || cached.source === value)
+      && cached.stamped.originAddressVersion === version
+      && cached.stamped.originAddress !== undefined
+      && equalSimpleCellAddress(cached.stamped.originAddress, address)
+    ) {
+      return cached.stamped
+    }
+    const stamped = value.withOriginAddress(address, version).asPropagated()
+    this.stampedStaticErrors.set(vertex, {source: value, stamped})
+    return stamped
   }
 
   public getRawValue(address: SimpleCellAddress): RawCellContent {
