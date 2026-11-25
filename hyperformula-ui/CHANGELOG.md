@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fixed screen readers not reading a formula error after its error popup closed, and reading the error code twice and the full engine message while it was open. An error cell's `aria-describedby` now always lists a hidden node with the first sentence of the message, for example `Function name FOO not recognized.`, and the cell no longer gets `aria-errormessage`. [#1914](https://github.com/handsontable/hyperformula/pull/1914)
+
 ## [0.3.7] - 2026-11-23
 
 ### Added
