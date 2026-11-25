@@ -149,6 +149,14 @@ export const getCellValueFormat = (cellValue: InterpreterValue): string | undefi
   }
 }
 
+/**
+ * The propagated copy of each error, made once. Every read of a cell that holds an error goes through
+ * `asPropagated`, and the evaluator reports a cell as changed when its new value is a different
+ * object, so a fresh copy per read would report an unchanged error as a change. A `WeakMap` rather
+ * than a field keeps the error's own properties, which equality checks compare, unchanged.
+ */
+const propagatedCopies = new WeakMap<CellError, CellError>()
+
 export class CellError {
   constructor(
     public readonly type: ErrorType,
@@ -218,7 +226,12 @@ export class CellError {
     if (this.propagated) {
       return this
     }
-    return new CellError(this.type, this.message, this.root, this.originFunction, this.argumentIndex, true, this.originAddress, this.originAddressVersion)
+    let copy = propagatedCopies.get(this)
+    if (copy === undefined) {
+      copy = new CellError(this.type, this.message, this.root, this.originFunction, this.argumentIndex, true, this.originAddress, this.originAddressVersion)
+      propagatedCopies.set(this, copy)
+    }
+    return copy
   }
 
   /**
