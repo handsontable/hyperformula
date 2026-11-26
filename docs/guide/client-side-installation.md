@@ -1,5 +1,6 @@
 ---
 title: "Client-side installation"
+description: "Install HyperFormula in a browser app with npm, Yarn, or a CDN, and import it as a module or a script."
 tags:
   - jsDelivr
   - script tag

@@ -1,5 +1,6 @@
 ---
 title: "Internationalization features"
+description: "Configure HyperFormula function names, errors, number formats, and date formats for your users' languages and regions."
 tags:
   - i18n
   - localization

@@ -1,5 +1,6 @@
 ---
 title: "Known limitations"
+description: "The known limitations of HyperFormula at its current stage of development."
 tags:
   - unsupported features
   - multiple workbooks

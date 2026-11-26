@@ -1,5 +1,6 @@
 ---
 title: "Integration with Svelte"
+description: "Use HyperFormula in a Svelte app and bridge its values into Svelte reactivity."
 tags:
   - SSR
   - onMount
@@ -133,4 +134,4 @@ In SvelteKit, top-level statements in `<script>` run on the server too. HyperFor
 
 ## Demo
 
-For a more advanced example, check out the [Svelte demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/svelte-demo?v={{$page.buildDateURIEncoded}}).
+For a more advanced example, check out the [Svelte demo on GitHub](https://github.com/handsontable/hyperformula-demos/tree/4.0.x/svelte-demo).
