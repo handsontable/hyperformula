@@ -1,6 +1,10 @@
 // For a detailed explanation regarding each configuration property, visit:
 // https://jestjs.io/docs/en/configuration.html
 
+// The TypeScript the engine itself builds with: resolved from the engine's
+// directory, so a newer copy hoisted to the repository root is never used.
+const engineTypescript = require.resolve('typescript', { paths: [__dirname] });
+
 module.exports = {
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   collectCoverageFrom: [
@@ -21,7 +25,8 @@ module.exports = {
   // A set of global variables that need to be available in all test environments
   globals: {
     "ts-jest": {
-      "tsconfig": "./test/tsconfig.json"
+      "tsconfig": "./test/tsconfig.json",
+      "compiler": engineTypescript
     }
   },
 

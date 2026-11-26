@@ -1,5 +1,20 @@
 const path = require('path');
 
+// Lint with the TypeScript the engine itself builds with. @typescript-eslint
+// has no option to choose the compiler: the parser, the plugin and tsutils
+// each call require('typescript') and get the copy hoisted to the repository
+// root, which can be newer than the engine's. Pointing that copy's
+// require-cache entry at the engine's module, before the parser loads, makes
+// every one of those calls return the engine's TypeScript.
+const engineTypescript = require.resolve('typescript', { paths: [__dirname] });
+require(engineTypescript);
+for (const consumer of ['@typescript-eslint/parser', '@typescript-eslint/eslint-plugin']) {
+  const consumerTypescript = require.resolve('typescript', { paths: [require.resolve(consumer, { paths: [__dirname] })] });
+  if (consumerTypescript !== engineTypescript) {
+    require.cache[consumerTypescript] = require.cache[engineTypescript];
+  }
+}
+
 module.exports = {
   root: true,
   ignorePatterns: ['.eslintrc.js'],

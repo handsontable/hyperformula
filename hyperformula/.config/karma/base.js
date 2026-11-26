@@ -1,4 +1,9 @@
+const path = require('path');
 const webpackConfigFactory = require('../../webpack.config');
+
+// The TypeScript the engine itself builds with: resolved from the engine's
+// directory, so a newer copy hoisted to the repository root is never used.
+const engineTypescript = require.resolve('typescript', { paths: [path.resolve(__dirname, '../..')] });
 
 module.exports.create = function(config) {
   return {
@@ -77,7 +82,8 @@ module.exports.create = function(config) {
       config.module.rules[0].use.push({
         loader: 'ts-loader',
         options: {
-          configFile: 'tsconfig.test.json'
+          configFile: 'tsconfig.test.json',
+          compiler: engineTypescript,
         }
       });
 
