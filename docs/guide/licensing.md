@@ -1,5 +1,6 @@
 ---
 title: "Licensing"
+description: "HyperFormula license terms and how to get a license."
 tags:
   - commercial licence
   - proprietary

@@ -1,5 +1,6 @@
 ---
 title: "Built-in functions"
+description: "Browse the full list of HyperFormula built-in functions, grouped by category, with syntax and descriptions."
 editUrl: false
 tags:
   - supported functions

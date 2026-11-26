@@ -1,5 +1,6 @@
 ---
 title: "Order of precedence"
+description: "The order in which HyperFormula evaluates operators in a formula, and how parentheses change it."
 tags:
   - operator precedence
   - order of operations
