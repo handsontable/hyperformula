@@ -5,9 +5,9 @@
  * - Links and images keep working under the `/docs/hyperformula/` base: a link to a page's Markdown source
  *   (`basic-usage.md`, `/guide/basic-usage.md`, `../api/README.md`) becomes the URL of the page built from it, and a
  *   root-relative URL (`/hf_logo.png`) gets the base.
- * - `:::example{#id}` blocks become live examples: the HTML, CSS and compiled JS they include render on the page,
- *   and the TypeScript opens in StackBlitz. A preview build writes the internal test license key into the script
- *   each example runs, once the pages are written (`preview-license-key.mjs`).
+ * - `:::example{#id}` blocks become live examples: the HTML, CSS and compiled JS they include render on the page, and
+ *   a "Source code" toggle under each one shows its files. A preview build writes the internal test license key into
+ *   the script each example runs, once the pages are written (`preview-license-key.mjs`).
  * - A heading whose VuePress anchor differs from its new one keeps the old anchor too (`legacyAnchorsPlugin`).
  */
 import { readFileSync } from 'node:fs';
@@ -72,7 +72,7 @@ export function docsMarkdownPlugin(base) {
         return;
       }
 
-      ctx.replaceNode(node, { type: 'html', value: renderExample(node, ctx) });
+      ctx.replaceNode(node, renderExample(node, ctx));
     },
   };
 }
@@ -107,108 +107,115 @@ function resolveUrl(url, fileURL, base) {
   return url;
 }
 
-/** Removes the markers that only matter to the code generator and StackBlitz. */
+/**
+ * The lines only the page needs, kept in a comment so the example files stay valid modules:
+ * `/* start:skip-in-source` ... `end:skip-in-source *\/`. They stand in for imports, which the page cannot run.
+ */
+const SKIP_IN_SOURCE = /\/\*\s*start:skip-in-source\r?\n(.*?)end:skip-in-source\s*\*\/\r?\n/gs;
+
+/**
+ * The script the page runs. The engine is the CDN build's global `HyperFormula`, so the imports between the
+ * `skip-in-compilation` markers go, and the lines in the `skip-in-source` comment take their place.
+ */
 const previewCode = (code) => code
   .replace(/\/\*(\s+)?(start|end):skip-in-preview(\s+)?\*\/\r?\n/gm, '')
-  .replace(/\/\*(\s+)?(start|end):skip-in-sandbox(\s+)?\*\/\r?\n/gm, '')
+  .replace(SKIP_IN_SOURCE, '$1')
   .replace(/\/\*(\s+)?start:skip-in-compilation(\s+)?\*\/\r?\n.*?\/\*(\s+)?end:skip-in-compilation(\s+)?\*\/\r?\n/gms, '')
   .replace(/\/\* end-file \*\//gm, '');
 
-/** Keeps what StackBlitz needs (the imports), drops what only the page needs. */
-const sandboxCode = (code) => code
-  .replace(/\/\*(\s+)?start:skip-in-sandbox(\s+)?\*\/\r?\n.*?\/\*(\s+)?end:skip-in-sandbox(\s+)?\*\/\r?\n/gms, '')
+/**
+ * The code the "Source code" toggle shows: the example as a reader would write it, with its imports, without the
+ * `skip-in-source` comment and without any marker.
+ */
+const sourceCode = (code) => code
+  .replace(new RegExp(`${SKIP_IN_SOURCE.source}(\\r?\\n)?`, 'gs'), '')
   .replace(/\/\*(\s+)?(start|end):skip-in-preview(\s+)?\*\/\r?\n/gm, '')
-  .replace(/\/\*(\s+)?(start|end):skip-in-compilation(\s+)?\*\/\r?\n/gm, '');
+  .replace(/\/\*(\s+)?(start|end):skip-in-compilation(\s+)?\*\/\r?\n/gm, '')
+  .replace(/\/\* end-file \*\//gm, '')
+  .trimEnd();
 
 const escapeHtml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-/**
- * The StackBlitz project runs off handsontable.com, so the engine checks the license key there, and the example shows
- * only the placeholder. Without this module, the first blocked call throws an uncaught `LicenseCapabilityMissingError`
- * and the preview stays empty. Imported before the example, it shows a banner that says to add a license key when the
- * engine warns about the key or throws that error.
- */
-const SANDBOX_LICENSE_NOTICE = `import { LicenseCapabilityMissingError } from 'hyperformula';
+/** The files an example shows, in the order of the Handsontable docs: the scripts, then the markup and the styles. */
+const SOURCE_FILES = [
+  { ext: 'js', lang: 'js', label: 'JavaScript', script: true },
+  { ext: 'ts', lang: 'ts', label: 'TypeScript', script: true },
+  { ext: 'html', lang: 'html', label: 'HTML', script: false },
+  { ext: 'css', lang: 'css', label: 'CSS', script: false },
+];
 
-const showLicenseNotice = () => {
-  if (document.getElementById('license-notice')) {
-    return;
-  }
-
-  const notice = document.createElement('p');
-
-  notice.id = 'license-notice';
-  notice.style.cssText = 'padding: 8px 12px; background: #fff4e5; border: 1px solid #f0b429; font-family: sans-serif;';
-  notice.innerHTML = 'This example needs a HyperFormula license key. In <code>index.ts</code>, uncomment the '
-    + '<code>licenseKey</code> line and replace <code>your-license-key</code> with your key. '
-    + '<a href="https://handsontable.com/pricing/?tab=hyperformula" target="_blank">Get a license key</a>.';
-  document.body.prepend(notice);
-};
-
-const warn = console.warn.bind(console);
-
-console.warn = (...args: unknown[]) => {
-  if (String(args[0]).startsWith('The license key for HyperFormula')) {
-    showLicenseNotice();
-  }
-
-  warn(...args);
-};
-
-window.addEventListener('error', (event) => {
-  if (event.error instanceof LicenseCapabilityMissingError) {
-    showLicenseNotice();
-  }
-});
-`;
+// The icons of the Handsontable docs' example toolbar (`buildExampleHtml()` in `docs/src/plugins/framework-loader.mjs`).
+const ICON_CODE = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>';
+const ICON_CHEVRON = '<svg class="hot-example-source-chevron" aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6 -6"/></svg>';
+const ICON_GITHUB = '<svg aria-hidden="true" width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
 
 /**
- * Renders an example from the files its `@[code](@/docs/examples/...)` lines name.
+ * Renders an example from the files its `@[code](@/docs/examples/...)` lines name, with the markup and behavior of the
+ * Handsontable docs' examples: the live preview, a toolbar with a "Source code" toggle and a "See on GitHub" link, and
+ * the files as code blocks that Expressive Code highlights. `public/example-tabs.js` moves the code blocks, which follow
+ * the example between two markers, into it as tabs, hidden until the toggle opens them.
  *
  * @param {object} node The `example` container directive.
  * @param {object} ctx The visitor context.
- * @returns {string} The example's HTML.
+ * @returns {object[]} The mdast nodes that replace the directive.
  */
 function renderExample(node, ctx) {
   const id = node.attributes?.id || 'example1';
   const files = {};
+  let exampleDir = '';
 
   collectLinks(node).forEach((url) => {
-    const file = resolve(REPO_ROOT, url.replace(/^@\//, ''));
+    const path = url.replace(/^@\//, '');
 
-    files[file.split('.').pop()] = readFileSync(file, 'utf8');
+    files[path.split('.').pop()] = readFileSync(resolve(REPO_ROOT, path), 'utf8');
+    exampleDir = posix.dirname(path);
   });
 
-  for (const ext of ['html', 'css', 'js', 'ts']) {
+  for (const { ext } of SOURCE_FILES) {
     if (!(ext in files)) {
       throw new Error(`${ctx.fileURL}: the example #${id} includes no .${ext} file.`);
     }
   }
 
-  const sandboxFiles = {
-    'package.json': JSON.stringify({ name: 'hyperformula-demo', version: '1.0.0', main: 'index.html', dependencies: { hyperformula: 'latest', moment: 'latest' } }, null, 2),
-    'index.html': `<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset="utf-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n    <title>HyperFormula demo</title>\n  </head>\n\n  <body>\n    ${files.html}\n  </body>\n</html>`,
-    'styles.css': files.css,
-    'license-notice.ts': SANDBOX_LICENSE_NOTICE,
-    'index.ts': `import './styles.css'\nimport './license-notice'\n${sandboxCode(files.ts)}`,
-  };
+  const scripts = SOURCE_FILES.filter((file) => file.script);
+  const others = SOURCE_FILES.filter((file) => !file.script);
+  const tabs = ['JavaScript', ...others.map((file) => file.label)];
+  const githubUrl = `https://github.com/handsontable/hyperformula/tree/develop/${exampleDir}`;
 
   // The script runs in a block of its own, so two examples on one page cannot clash over a top-level name. The
   // `data-hf-example` attribute marks it as the script a preview build gives the license key (`preview-license-key.mjs`).
-  return `<div class="hf-example not-content" id="${escapeHtml(id)}">
+  // The code blocks show the source files, so they keep the placeholder key in every build.
+  const example = `<div class="hot-example hf-example not-content" id="hot-example-${escapeHtml(id)}">
 <style>${files.css}</style>
-<div class="hf-example__preview">${files.html}</div>
+<div class="hot-example-preview">${files.html}</div>
 <script data-hf-example>{
 ${previewCode(files.js)}
 }</script>
-<form class="hf-example__stackblitz" action="https://stackblitz.com/run" method="post" target="_blank">
-${Object.entries(sandboxFiles).map(([name, content]) => `<textarea hidden name="project[files][${name}]" readonly>${escapeHtml(content)}</textarea>`).join('\n')}
-<input type="hidden" name="project[title]" value="hyperformula-demo">
-<input type="hidden" name="project[dependencies]" value="${escapeHtml(JSON.stringify({ hyperformula: 'latest', moment: 'latest' }))}">
-<input type="hidden" name="project[template]" value="typescript">
-<button type="submit">Open in StackBlitz</button>
-</form>
+<div class="hot-example-toolbar">
+  <button class="hot-example-source-btn" type="button" aria-expanded="false" aria-controls="hot-code-${escapeHtml(id)}">
+    ${ICON_CODE} Source code ${ICON_CHEVRON}
+  </button>
+  <div class="hot-example-actions">
+    <a class="hot-example-github-btn" href="${escapeHtml(githubUrl)}" target="_blank" rel="noopener noreferrer" title="See on GitHub" aria-label="See on GitHub">
+      ${ICON_GITHUB}
+    </a>
+  </div>
+</div>
 </div>`;
+  const codeStart = `<div class="hot-example-code-start" data-example="${escapeHtml(id)}" data-tabs="${escapeHtml(tabs.join(','))}" data-script-langs="${escapeHtml(scripts.map((file) => file.label).join(','))}" data-script-count="${scripts.length}"></div>`;
+  const codeBlocks = [...scripts, ...others].map(({ ext, lang, label }) => ({
+    type: 'code',
+    lang,
+    meta: `title="${label}"`,
+    value: ext === 'js' || ext === 'ts' ? sourceCode(files[ext]) : files[ext].trimEnd(),
+  }));
+
+  return [
+    { type: 'html', value: example },
+    { type: 'html', value: codeStart },
+    ...codeBlocks,
+    { type: 'html', value: '<div class="hot-example-code-end"></div>' },
+  ];
 }
 
 /**

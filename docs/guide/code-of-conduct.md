@@ -1,5 +1,6 @@
 ---
 title: "Code of conduct"
+description: "The code of conduct for everyone who takes part in the HyperFormula community."
 tags:
   - CoC
   - Contributor Covenant

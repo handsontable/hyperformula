@@ -150,8 +150,8 @@ describe decisions made from stale refs. The script marks these fetches
    `hyperformula-demos`: sets the HyperFormula version across the demos on
    `develop`, commits and pushes, then gets onto the `M.m.x` branch (creating it
    if needed, fast-forwarding it first if it already exists) and makes sure the
-   version bump is on it. Then, in this repository, repoints every CodeSandbox
-   and StackBlitz demo URL in `docs/guide/`, `docs/index.md` and `hyperformula/README.md` —
+   version bump is on it. Then, in this repository, repoints every
+   `hyperformula-demos` demo URL (a GitHub link today) in `docs/guide/`, `docs/index.md` and `hyperformula/README.md` —
    the tracked files that carry them, so the rewrite never descends into
    generated output like `docs/api/` — at `tree/<M.m.x>`, whatever branch it
    names today; old releases left several behind. URLs for demos that no longer

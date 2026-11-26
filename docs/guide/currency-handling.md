@@ -1,5 +1,6 @@
 ---
 title: "Currency handling"
+description: "Recognize currency values in HyperFormula cell input, and format numbers as currency with the TEXT function."
 tags:
   - stringifyCurrency
   - currencySymbol

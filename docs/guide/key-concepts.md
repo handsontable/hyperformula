@@ -1,5 +1,6 @@
 ---
 title: "Key concepts"
+description: "How HyperFormula parses formulas into ASTs, builds a dependency graph, and evaluates cells."
 tags:
   - architecture
   - internals

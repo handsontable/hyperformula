@@ -1,5 +1,6 @@
 ---
 title: "Integration with React"
+description: "Use HyperFormula in a React app and map its lifecycle to React hooks."
 tags:
   - SSR
   - React hooks
@@ -127,4 +128,4 @@ In the Pages Router, the same `dynamic(..., { ssr: false })` call works directly
 
 ## Demo
 
-For a more advanced example, check out the [React demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/react-demo?v={{$page.buildDateURIEncoded}}).
+For a more advanced example, check out the [React demo on GitHub](https://github.com/handsontable/hyperformula-demos/tree/4.0.x/react-demo).
