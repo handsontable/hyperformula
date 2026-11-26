@@ -444,6 +444,7 @@ export const dictionary: RawTranslationPackage = {
     MODE: 'MODA',
     'MODE.SNGL': 'MODA.UNO',
     TRIMMEAN: 'MEDIA.ACOTADA',
+    'RANK.AVG': 'JERARQUIA.MEDIA',
     QUARTILE: 'CUARTIL',
     'QUARTILE.INC': 'CUARTIL.INC',
     'QUARTILE.EXC': 'CUARTIL.EXC',

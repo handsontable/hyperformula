@@ -444,6 +444,7 @@ const dictionary: RawTranslationPackage = {
     MODE: 'MODALWERT',
     'MODE.SNGL': 'MODUS.EINF',
     TRIMMEAN: 'GESTUTZTMITTEL',
+    'RANK.AVG': 'RANG.MITTELW',
     QUARTILE: 'QUARTILE',
     'QUARTILE.INC': 'QUARTILE.INKL',
     'QUARTILE.EXC': 'QUARTILE.EXKL',

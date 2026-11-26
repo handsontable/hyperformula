@@ -444,6 +444,7 @@ const dictionary: RawTranslationPackage = {
     MODE: 'MÓDUSZ',
     'MODE.SNGL': 'MÓDUSZ.EGY',
     TRIMMEAN: 'RÉSZÁTLAG',
+    'RANK.AVG': 'RANG.ÁTL',
     QUARTILE: 'KVARTILIS',
     'QUARTILE.INC': 'KVARTILIS.TARTALMAZ',
     'QUARTILE.EXC': 'KVARTILIS.KIZÁR',
