@@ -118,3 +118,22 @@ export class ErrorMessage {
   public static StaticResultSize = (functionName: string) => `${functionName} requires input dimensions that determine a fixed result size.`
   public static StaticStats = (functionName: string) => `${functionName} requires a constant stats argument to determine its result size.`
 }
+
+/**
+ * The `originFunction` values of cell errors that no function or operator produced: they name
+ * what built the error before any function read it.
+ */
+export class ErrorOrigin {
+  /** A reference the engine cannot resolve. */
+  public static Reference = 'reference'
+  /** A reference destroyed by removing rows or columns. */
+  public static RemovedReference = 'removed reference'
+  /** A formula that could not be parsed. */
+  public static Parser = 'parser'
+  /** A value written into a cell that is an error or that the engine rejects. */
+  public static UserInput = 'user input'
+  /** An error value written into a formula. */
+  public static Literal = 'literal'
+  /** An array literal whose rows differ in length. */
+  public static ArrayLiteral = 'array literal'
+}

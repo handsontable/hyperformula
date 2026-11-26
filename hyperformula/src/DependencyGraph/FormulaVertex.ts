@@ -131,7 +131,7 @@ export class ArrayFormulaVertex extends FormulaVertex {
     const array = ArrayValue.fromInterpreterValue(value)
     if (array.width() > this.array.width() || array.height() > this.array.height()) {
       // The reserved area is fixed once the formula is evaluated, and spills are not resized on updates.
-      const error = new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult)
+      const error = new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult, this)
       this.setErrorValue(error)
       return error
     }
@@ -183,7 +183,7 @@ export class ArrayFormulaVertex extends FormulaVertex {
   }
 
   setNoSpace(): InterpreterValue {
-    this.array = new ErroredArray(new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult), ArraySize.error())
+    this.array = new ErroredArray(new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult, this), ArraySize.error())
     return this.getCellValue()
   }
 

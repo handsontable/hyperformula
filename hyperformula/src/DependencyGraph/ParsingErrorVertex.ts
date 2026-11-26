@@ -4,6 +4,7 @@
  */
 
 import {CellError} from '../Cell'
+import {ErrorOrigin} from '../error-message'
 import {ParsingError} from '../parser/Ast'
 import {CellVertex} from './CellVertex'
 
@@ -26,7 +27,7 @@ export class ParsingErrorVertex extends CellVertex {
    */
   public getCellValue(): CellError {
     const firstNonemptyMessage = this.errors.map(error => error.message).find((msg) => msg)
-    return CellError.parsingError(firstNonemptyMessage)
+    return CellError.parsingError(firstNonemptyMessage).withOrigin(ErrorOrigin.Parser)
   }
 
   /**
