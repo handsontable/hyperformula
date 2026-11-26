@@ -51,6 +51,7 @@ export const RowRange = createToken({ name: 'RowRange', pattern: new RegExp(`${R
 export const ProcedureName = createToken({ name: 'ProcedureName', pattern: new RegExp(`(?:${EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN})?([${UNICODE_LETTER_PATTERN}][${NON_RESERVED_CHARACTER_PATTERN}]*)\\(`) })
 
 const excelInternalFunctionPrefixRegexp = new RegExp(`^(?:${EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN})`)
+const excelInternalFunctionPrefixAnyCaseRegexp = new RegExp(`^(?:${EXCEL_INTERNAL_FUNCTION_PREFIX_PATTERN})`, 'i')
 const UNDERSCORE_CHAR_CODE = '_'.charCodeAt(0)
 
 /**
@@ -94,11 +95,16 @@ export function canonicalProcedureNameFromToken(image: string, functionMapping: 
  * OffsetProcedureName has no trailing parenthesis to remove (unlike ProcedureName — OFFSET's grammar
  * rule consumes `(` separately) and no translation lookup (the token pattern already embeds the
  * localized OFFSET name), so it needs only the prefix stripped, not the full canonicalization above.
+ * The token accepts the prefix in any case, so it is stripped in any case here: `_XLFN.OFFSET(` and
+ * `OFFSET(` give the same cache key.
  *
  * @param {string} image - image of the OffsetProcedureName token, for example `_xlfn.OFFSET`
  */
 export function canonicalOffsetProcedureNameFromToken(image: string): string {
-  return stripExcelInternalFunctionPrefix(image)
+  if (image.charCodeAt(0) !== UNDERSCORE_CHAR_CODE) {
+    return image
+  }
+  return image.replace(excelInternalFunctionPrefixAnyCaseRegexp, '')
 }
 
 const cellReferenceMatcher = new CellReferenceMatcher()
