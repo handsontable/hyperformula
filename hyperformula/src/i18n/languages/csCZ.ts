@@ -119,6 +119,7 @@ const dictionary: RawTranslationPackage = {
     EOMONTH: 'EOMONTH',
     ERF: 'ERF',
     ERFC: 'ERFC',
+    'ERF.PRECISE': 'ERF.PRECISE',
     'ERROR.TYPE': 'CHYBA.TYP',
     EVEN: 'ZAOKROUHLIT.NA.SUDÉ',
     EXACT: 'STEJNÉ',

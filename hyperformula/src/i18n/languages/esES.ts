@@ -119,6 +119,7 @@ export const dictionary: RawTranslationPackage = {
     EOMONTH: 'FIN.MES',
     ERF: 'FUN.ERROR',
     ERFC: 'FUN.ERROR.COMPL',
+    'ERF.PRECISE': 'FUN.ERROR.EXACTO',
     'ERROR.TYPE': 'TIPO.DE.ERROR',
     EVEN: 'REDONDEA.PAR',
     EXACT: 'IGUAL',

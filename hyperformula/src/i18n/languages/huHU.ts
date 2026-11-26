@@ -119,6 +119,7 @@ const dictionary: RawTranslationPackage = {
     EOMONTH: 'HÓNAP.UTOLSÓ.NAP',
     ERF: 'HIBAF',
     ERFC: 'HIBAF.KOMPLEMENTER',
+    'ERF.PRECISE': 'HIBAF.PONTOS',
     'ERROR.TYPE': 'HIBA.TÍPUS',
     EVEN: 'PÁROS',
     EXACT: 'AZONOS',
