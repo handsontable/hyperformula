@@ -169,7 +169,8 @@ export function findLastOccurrenceInOrderedRange(
     return index - start
   }
 
-  if (foundValue === searchKey) {
+  // Without a candidate, foundValue stands in as EmptyValue; a blank searchKey must not match that.
+  if (foundIndex !== NOT_FOUND && foundValue === searchKey) {
     return foundIndex - start
   }
 
