@@ -1,5 +1,6 @@
 ---
 title: "Compatibility with Google Sheets"
+description: "Configure HyperFormula for nearly full compatibility with Google Sheets formulas and calculation results."
 tags:
   - GSheets
   - Google Spreadsheets

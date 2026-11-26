@@ -9,9 +9,9 @@ console.log(
 );
 /* end:skip-in-compilation */
 
-/* start:skip-in-sandbox */
+/* start:skip-in-source
 const enUS = HyperFormula.languages.enUS;
-/* end:skip-in-sandbox */
+end:skip-in-source */
 
 /**
  * Initial table data.

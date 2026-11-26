@@ -11,3 +11,5 @@ node_modules
 # configuration does not parse.
 /src/components/DocsAssistant/
 /src/scripts/docs-assistant-bootstrap.ts
+# The live examples' "Source code" tabs script, a verbatim copy of the Handsontable docs' and linted there.
+/public/example-tabs.js

@@ -1,5 +1,6 @@
 ---
 title: "Migrating from 1.x to 2.0"
+description: "Upgrade HyperFormula from 1.x to 2.0, which removes the gpujs and gpuMode configuration options."
 tags:
   - migration
   - migrate
