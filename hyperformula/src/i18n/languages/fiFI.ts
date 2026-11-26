@@ -443,6 +443,7 @@ const dictionary: RawTranslationPackage = {
     MODE: 'MOODI',
     'MODE.SNGL': 'MOODI.YKSI',
     TRIMMEAN: 'KESKIARVO.TASATTU',
+    'RANK.AVG': 'ARVON.MUKAAN.KESKIARVO',
     QUARTILE: 'NELJÄNNES',
     'QUARTILE.INC': 'NELJÄNNES.SIS',
     'QUARTILE.EXC': 'NELJÄNNES.ULK',

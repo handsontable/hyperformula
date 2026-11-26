@@ -443,6 +443,7 @@ const dictionary: RawTranslationPackage = {
     MODE: 'MODUS',
     'MODE.SNGL': 'MODUS.SNGL',
     TRIMMEAN: 'TRIMMET.GJENNOMSNITT',
+    'RANK.AVG': 'RANG.GJSN',
     QUARTILE: 'KVARTIL',
     'QUARTILE.INC': 'KVARTIL.INK',
     'QUARTILE.EXC': 'KVARTIL.EKS',

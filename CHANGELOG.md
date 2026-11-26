@@ -50,6 +50,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `PERCENTRANK.INC` (with its `PERCENTRANK` alias), `MODE.MULT`, `FREQUENCY` and `PROB` statistical functions. [#1818](https://github.com/handsontable/hyperformula/pull/1818)
 - Added the statistical functions `KURT`, `MODE.SNGL` (with the `MODE` alias), `PERCENTRANK.EXC` and `TRIMMEAN`. [#1800](https://github.com/handsontable/hyperformula/pull/1800)
 - Added the `PRICEMAT` and `YIELDMAT` functions, which return the price and the yield of securities that pay interest at maturity. [#1811](https://github.com/handsontable/hyperformula/pull/1811)
+- Added the `RANK.AVG` function, which returns the rank of a number among the numbers of a range, tied numbers getting the average of their ranks. [#1787](https://github.com/handsontable/hyperformula/pull/1787)
 
 ### Fixed
 

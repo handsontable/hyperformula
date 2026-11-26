@@ -443,6 +443,7 @@ const dictionary: RawTranslationPackage = {
     MODE: 'ENÇOK_OLAN',
     'MODE.SNGL': 'ENÇOK_OLAN.TEK',
     TRIMMEAN: 'KIRPORTALAMA',
+    'RANK.AVG': 'RANK.ORT',
     QUARTILE: 'DÖRTTEBİRLİK',
     'QUARTILE.INC': 'DÖRTTEBİRLİK.DHL',
     'QUARTILE.EXC': 'DÖRTTEBİRLİK.HRC',

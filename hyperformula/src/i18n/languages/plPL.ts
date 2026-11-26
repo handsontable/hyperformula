@@ -443,6 +443,7 @@ const dictionary: RawTranslationPackage = {
     MODE: 'WYST.NAJCZĘŚCIEJ',
     'MODE.SNGL': 'WYST.NAJCZĘŚCIEJ.WART',
     TRIMMEAN: 'ŚREDNIA.WEWN',
+    'RANK.AVG': 'POZYCJA.ŚR',
     QUARTILE: 'KWARTYL',
     'QUARTILE.INC': 'KWARTYL.PRZEDZ.ZAMK',
     'QUARTILE.EXC': 'KWARTYL.PRZEDZ.OTW',

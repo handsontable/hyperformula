@@ -443,6 +443,7 @@ const dictionary: RawTranslationPackage = {
     MODE: 'HYPPIGST',
     'MODE.SNGL': 'HYPPIGST.ENKELT',
     TRIMMEAN: 'TRIMMIDDELVÆRDI',
+    'RANK.AVG': 'PLADS.GNSN',
     QUARTILE: 'KVARTIL',
     'QUARTILE.INC': 'KVARTIL.MEDTAG',
     'QUARTILE.EXC': 'KVARTIL.UDELAD',
