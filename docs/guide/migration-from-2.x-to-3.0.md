@@ -1,5 +1,6 @@
 ---
 title: "Migrating from 2.x to 3.0"
+description: "Upgrade HyperFormula from 2.x to 3.0: new language import paths, the removed binarySearchThreshold, and the new precisionRounding default."
 tags:
   - migration
   - migrate

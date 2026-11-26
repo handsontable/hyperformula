@@ -1,5 +1,6 @@
 ---
 title: "Dependencies"
+description: "The external libraries HyperFormula depends on, with their licenses and authors."
 tags:
   - bessel
   - Chevrotain
