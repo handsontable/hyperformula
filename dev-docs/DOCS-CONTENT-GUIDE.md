@@ -229,7 +229,7 @@ Put essential steps in the body, not hidden inside a tip.
 - Embed a live example with `:::example{#example1}` and its four files, each on its own
 line as `@[code](@/docs/examples/<guide>/example1.html)`, and the same for the `.css`,
 `.js` and `.ts`. The page runs the HTML, CSS and JavaScript against the CDN build's global
-`HyperFormula`, and its "Source code" toggle shows all four files. Write the `.ts` and generate
+`HyperFormula`, and its "Source code" toggle shows the JavaScript, HTML and CSS. Write the `.ts` and generate
 the `.js` with `npm run docs:code-examples:generate-js -- examples/<guide>/example1.ts`. Put the
 imports between `/* start:skip-in-compilation */` and `/* end:skip-in-compilation */`: the page
 drops them. Put what only the page needs in their place, such as
