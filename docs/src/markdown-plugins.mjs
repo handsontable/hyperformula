@@ -136,10 +136,12 @@ const sourceCode = (code) => code
 
 const escapeHtml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-/** The files an example shows, in the order of the Handsontable docs: the scripts, then the markup and the styles. */
+/**
+ * The files an example shows, in the order of the Handsontable docs: the scripts, then the markup and the styles.
+ * The `.ts` source is not shown: the examples carry no types, so it would repeat the JavaScript under another tab.
+ */
 const SOURCE_FILES = [
   { ext: 'js', lang: 'js', label: 'JavaScript', script: true },
-  { ext: 'ts', lang: 'ts', label: 'TypeScript', script: true },
   { ext: 'html', lang: 'html', label: 'HTML', script: false },
   { ext: 'css', lang: 'css', label: 'CSS', script: false },
 ];
@@ -171,7 +173,8 @@ function renderExample(node, ctx) {
     exampleDir = posix.dirname(path);
   });
 
-  for (const { ext } of SOURCE_FILES) {
+  // The `.ts` is still required: it is the source the `.js` is generated from.
+  for (const ext of [...SOURCE_FILES.map((file) => file.ext), 'ts']) {
     if (!(ext in files)) {
       throw new Error(`${ctx.fileURL}: the example #${id} includes no .${ext} file.`);
     }
