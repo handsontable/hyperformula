@@ -50,6 +50,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `PERCENTRANK.INC` (with its `PERCENTRANK` alias), `MODE.MULT`, `FREQUENCY` and `PROB` statistical functions. [#1818](https://github.com/handsontable/hyperformula/pull/1818)
 - Added the statistical functions `KURT`, `MODE.SNGL` (with the `MODE` alias), `PERCENTRANK.EXC` and `TRIMMEAN`. [#1800](https://github.com/handsontable/hyperformula/pull/1800)
 - Added the `PRICEMAT` and `YIELDMAT` functions, which return the price and the yield of securities that pay interest at maturity. [#1811](https://github.com/handsontable/hyperformula/pull/1811)
+- Added the `arrayFunctionResultOverwritesData` configuration option (default `false`), which lets an array function's result overwrite the occupied cells it spills onto instead of returning a `#SPILL!` error. [#1714](https://github.com/handsontable/hyperformula/pull/1714)
 
 ### Fixed
 
@@ -68,6 +69,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is an empty argument slot (e.g. `=ADDRESS(2,3,1,FALSE(),)` now returns `R2C3` instead of `!R2C3`), while an explicit `""` still adds it. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
 - Fixed `IMSUM`, `IMPRODUCT` and `TEXTJOIN` throwing an uncaught `RangeError` for very large ranges, such as `=IMSUM(A1:D40000)`, which stopped the recalculation; they now return a result or an error value in the cell. [#1901](https://github.com/handsontable/hyperformula/pull/1901)
 - Fixed `AVEDEV`, `DEVSQ`, `GCD`, `GEOMEAN`, `HARMEAN`, `LCM`, `MEDIAN`, `NPV`, `SKEW` and `SKEW.P` stopping the engine from building on a range of about 125,000 cells or more. [#1800](https://github.com/handsontable/hyperformula/pull/1800)
+- Fixed `MATCH` returning a stale position with `useColumnIndex: true` after `undo()` restored an array formula whose spill range is smaller than that of the formula it replaced. [#1714](https://github.com/handsontable/hyperformula/pull/1714)
+- Fixed `undo()` leaving an array formula in the sheet after a single `setCellContents()` call that entered the formula and also wrote into its spill range. [#1714](https://github.com/handsontable/hyperformula/pull/1714)
 
 ## [3.5.0] - 2026-10-09
 
