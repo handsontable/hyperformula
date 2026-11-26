@@ -1,5 +1,6 @@
 ---
 title: "HyperFormula AI SDK for Vercel"
+description: "Preview of a planned Vercel AI SDK tool that gives AI agents deterministic spreadsheet and formula computation with HyperFormula."
 tags:
   - AI agents
   - LLM

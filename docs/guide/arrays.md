@@ -1,5 +1,6 @@
 ---
 title: "Array formulas"
+description: "Use array formulas in HyperFormula to perform an operation or call a function on multiple cells at a time."
 tags:
   - ARRAYFORMULA
   - useArrayArithmetic
