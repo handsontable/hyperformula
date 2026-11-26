@@ -82,6 +82,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed `AVEDEV`, `DEVSQ`, `GCD`, `GEOMEAN`, `HARMEAN`, `LCM`, `MEDIAN`, `NPV`, `SKEW` and `SKEW.P` stopping the engine from building on a range of about 125,000 cells or more. [#1800](https://github.com/handsontable/hyperformula/pull/1800)
 - Fixed `DetailedCellError.address` for a typed-in error, an unparsable formula, or an overflow such as `=10^308*10`: the cell and every formula reading it now report the error's own cell, instead of none and each reader's own address. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
 - Fixed `#SPILL!` errors reporting no address; their `address` is now the cell whose array result could not spill. [#1547](https://github.com/handsontable/hyperformula/issues/1547)
+- Fixed reading a formula cell's value before it was computed throwing a plain `Error` that did not say which cell it was; it now throws `CellValueNotComputedError`, which carries the cell's address. [#444](https://github.com/handsontable/hyperformula/issues/444)
 
 ## [3.5.0] - 2026-10-09
 
