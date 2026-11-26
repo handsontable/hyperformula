@@ -1,5 +1,6 @@
 ---
 title: "Named expressions"
+description: "Give HyperFormula expressions human-friendly names and use them in formulas anywhere in the workbook."
 tags:
   - defined names
   - global scope

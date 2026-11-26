@@ -1,5 +1,6 @@
 ---
 title: "Types of operators"
+description: "The arithmetic, comparison, concatenation, and reference operators HyperFormula supports in formulas."
 tags:
   - modulo
   - caseSensitive
