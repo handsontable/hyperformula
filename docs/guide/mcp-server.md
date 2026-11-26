@@ -1,5 +1,6 @@
 ---
 title: "HyperFormula MCP Server"
+description: "Preview of a planned MCP server that exposes HyperFormula to AI clients such as Claude Desktop, Cursor, and VS Code."
 tags:
   - Model Context Protocol
   - Claude Desktop

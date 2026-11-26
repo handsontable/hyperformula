@@ -1,5 +1,6 @@
 ---
 title: "Undo-redo"
+description: "Undo and redo HyperFormula operations, and set how many actions can be undone."
 tags:
   - undoLimit
   - undo history

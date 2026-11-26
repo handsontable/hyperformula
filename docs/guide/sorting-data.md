@@ -1,5 +1,6 @@
 ---
 title: "Sorting data"
+description: "Sort data in HyperFormula by reordering rows and columns with a permutation of their indexes."
 tags:
   - setRowOrder
   - setColumnOrder
