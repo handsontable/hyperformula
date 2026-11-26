@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-12-01
+
 ### Changed
 
 - **Breaking change**: Changed the license from GPLv3 to a proprietary license. HyperFormula is no longer available under GPLv3; see [`LICENSE.txt`](https://github.com/handsontable/hyperformula/blob/develop/LICENSE.txt) for the new terms. Versions 3.x and earlier remain available under GPLv3. See the [migration guide](https://handsontable.com/docs/hyperformula/guide/migration-from-3.x-to-4.0.html). [#1885](https://github.com/handsontable/hyperformula/pull/1885)
