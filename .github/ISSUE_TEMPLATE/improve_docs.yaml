@@ -7,7 +7,7 @@ body:
     attributes:
       label: Page URL
       description: Which page are you referring to?
-      placeholder: https://hyperformula.handsontable.com/…
+      placeholder: https://handsontable.com/docs/hyperformula/…
   - type: textarea
     id: improvement
     attributes:

@@ -103,7 +103,7 @@ const normalizeBase = (b) => {
 
 const DOCS_BASE = normalizeBase(process.env.DOCS_BASE || buildConfigOverrides.base || '/');
 const DOCS_DEST = process.env.DOCS_DEST || buildConfigOverrides.dest || 'docs/.vuepress/dist';
-const DOCS_HOSTNAME = process.env.DOCS_HOSTNAME || buildConfigOverrides.hostname || 'https://hyperformula.handsontable.com';
+const DOCS_HOSTNAME = process.env.DOCS_HOSTNAME || buildConfigOverrides.hostname || 'https://handsontable.com';
 
 module.exports = {
   // Default page globs, minus the built-in-functions template: it is the INPUT of docs:generate-function-docs,
@@ -189,6 +189,13 @@ module.exports = {
 
         if (searchPattern.test($page.path) || generatedPagePattern.test($page.path)) {
           $page.frontmatter.editLink = false
+        }
+
+        // name the page's address on handsontable.com as canonical (<link rel="canonical">, rendered by
+        // templates/ssr.html), so a copy served under another host (a workers.dev preview, or the old
+        // hyperformula.handsontable.com until it redirects) is never indexed in its place
+        if ($page.path !== '/404.html' && !$page.frontmatter.canonicalUrl) {
+          $page.frontmatter.canonicalUrl = `${DOCS_HOSTNAME}${DOCS_BASE.replace(/\/$/, '')}${$page.path}`
         }
       },
       chainMarkdown (config) {

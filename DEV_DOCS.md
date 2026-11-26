@@ -6,7 +6,7 @@ Canonical reference for everyone working on the HyperFormula source code: mainta
 
 - **[Building, testing, and linting](docs/guide/building.md)** &mdash; all `npm` commands and build outputs
 - **[Test suite](test/README.md)** &mdash; smoke tests and how to attach the private test suite
-- **[Public docs portal](https://hyperformula.handsontable.com/docs)** &mdash; main documentation
+- **[Public docs portal](https://handsontable.com/docs/hyperformula/)** &mdash; main documentation
 - **[Docs README](docs/README.md)** &mdash; how to run the docs portal locally
 - **[Docs content guide](DOCS_CONTENT_GUIDE.md)** &mdash; how to create and edit docs content
 - **[Changelog](CHANGELOG.md)**

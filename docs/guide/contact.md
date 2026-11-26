@@ -32,4 +32,4 @@ or submit your inquiry through the
 
 ## Looking for technical support?
 
-[Learn more about support options &#8594;](https://hyperformula.handsontable.com/#pricing)
+[Learn more about support options &#8594;](https://handsontable.com/support)
