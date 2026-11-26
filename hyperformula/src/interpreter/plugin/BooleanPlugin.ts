@@ -278,9 +278,9 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    * @param {Ast[]} args - the arguments of the call
    * @param {InterpreterState} state - interpreter state
    * @param {FunctionMetadata} metadata - metadata of the function
-   * @returns {[InterpreterValue, boolean, boolean][]} what {@link FunctionPlugin} returns
+   * @returns {[InterpreterValue, boolean, boolean, number?][]} what {@link FunctionPlugin} returns
    */
-  protected evaluateArguments(args: Ast[], state: InterpreterState, metadata: FunctionMetadata): [InterpreterValue, boolean, boolean][] {
+  protected evaluateArguments(args: Ast[], state: InterpreterState, metadata: FunctionMetadata): [InterpreterValue, boolean, boolean, number?][] {
     const evaluated = super.evaluateArguments(args, state, metadata)
     this.lastEvaluatedArguments = evaluated.map(([value]) => value)
     return evaluated
