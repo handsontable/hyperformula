@@ -1,5 +1,6 @@
 ---
 title: "Contributing"
+description: "Contribute to HyperFormula by reporting bugs, adding functions and features, and improving the code and documentation."
 tags:
   - CLA
   - Contributor License Agreement

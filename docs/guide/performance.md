@@ -1,5 +1,6 @@
 ---
 title: "Performance"
+description: "Speed up HyperFormula by loading sheets in one call and tuning lookup, address mapping, parser cache, and recalculation settings."
 tags:
   - speed
   - slow

@@ -1,5 +1,6 @@
 ---
 title: "Specifications and limits"
+description: "The maximum sheet, cell, and calculation limits of HyperFormula."
 tags:
   - maxRows
   - maxColumns
