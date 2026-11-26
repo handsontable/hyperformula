@@ -1,5 +1,6 @@
 ---
 title: "Compatibility with Microsoft Excel"
+description: "Configure HyperFormula for nearly full compatibility with Microsoft Excel formulas and calculation results."
 tags:
   - MS Excel
   - missing Excel functions

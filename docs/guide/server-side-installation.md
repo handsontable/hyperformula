@@ -1,5 +1,6 @@
 ---
 title: "Server-side installation"
+description: "Install and run HyperFormula on a server with Node.js."
 tags:
   - Node.js version
   - full-icu

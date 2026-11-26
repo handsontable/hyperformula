@@ -1,5 +1,6 @@
 ---
 title: "Contact"
+description: "Contact the HyperFormula team about pricing, licensing, support, and security, or report a security vulnerability."
 tags:
   - pricing
   - get a quote

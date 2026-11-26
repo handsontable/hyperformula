@@ -1,5 +1,6 @@
 ---
 title: "List of differences with other spreadsheets"
+description: "Differences in functions and general functionality between HyperFormula, Microsoft Excel, and Google Sheets."
 tags:
   - Microsoft Excel
   - Google Sheets

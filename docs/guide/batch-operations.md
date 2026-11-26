@@ -1,5 +1,6 @@
 ---
 title: "Batch operations"
+description: "Combine multiple HyperFormula data changes into a single operation to recalculate once and improve performance."
 tags:
   - batching
   - isEvaluationSuspended
