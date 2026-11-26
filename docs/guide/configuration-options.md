@@ -1,5 +1,6 @@
 ---
 title: "Configuration options"
+description: "Customize HyperFormula with configuration options passed when you create an instance, including the required license key."
 tags:
   - settings
   - configure

@@ -55,7 +55,7 @@ export class DependencyGraph {
    * copy (see `getCellValue`). Keyed by the vertex because a parsing-error vertex builds a new error
    * on every read.
    */
-  private stampedStaticErrors = new WeakMap<CellVertex, { source: CellError, stamped: CellError }>()
+  private stampedStaticErrors = new WeakMap<CellVertex, { source: CellError, stamped: CellError, address: SimpleCellAddress, version: number }>()
 
   public readonly graph: Graph<Vertex>
   private changes: ContentChanges = ContentChanges.empty()
@@ -648,28 +648,24 @@ export class DependencyGraph {
     if (
       cached !== undefined
       && (vertex instanceof ParsingErrorVertex || cached.source === value)
-      && this.stampedAddressStillHolds(cached.stamped, address, version)
+      && this.stampedAddressStillHolds(cached, address, version)
     ) {
       return cached.stamped
     }
     const stamped = value.withOriginAddress(address, version).asPropagated()
-    this.stampedStaticErrors.set(vertex, {source: value, stamped})
+    this.stampedStaticErrors.set(vertex, {source: value, stamped, address, version})
     return stamped
   }
 
   /**
-   * Whether a stamped error still names `address`: the address it was stamped with, carried through
+   * Whether a stamp still names `address`: the address it was stamped with, carried through
    * the transformations since its version, is `address`. Exporter carries it the same way, so the
    * old stamp reports the right cell and can be reused across row and column changes.
    */
-  private stampedAddressStillHolds(stamped: CellError, address: SimpleCellAddress, version: number): boolean {
-    const {originAddress, originAddressVersion} = stamped
-    if (originAddress === undefined || originAddressVersion === undefined) {
-      return false
-    }
-    const current = originAddressVersion === version
-      ? originAddress
-      : this.lazilyTransformingAstService.applyTransformationsToAddress(originAddress, originAddressVersion)
+  private stampedAddressStillHolds(stamp: { address: SimpleCellAddress, version: number }, address: SimpleCellAddress, version: number): boolean {
+    const current = stamp.version === version
+      ? stamp.address
+      : this.lazilyTransformingAstService.applyTransformationsToAddress(stamp.address, stamp.version)
     return current !== undefined && equalSimpleCellAddress(current, address)
   }
 

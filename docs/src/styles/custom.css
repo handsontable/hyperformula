@@ -1,9 +1,10 @@
 /*
  * The Handsontable docs' styles, so both portals look the same. Every file this imports except
- * `hyperformula.css` is a verbatim copy of `docs/src/styles/` in handsontable/handsontable (at e2726d5):
+ * `hyperformula.css` is a verbatim copy of `docs/src/styles/` in handsontable/handsontable (at e2726d5;
+ * `interactive-example.css`, the live examples' frame, toolbar and "Source code" tabs, at 5fe429eaae):
  * update them by copying the files again, not by editing them here. Their rules for markup only the
- * Handsontable docs have (example frames, the icon catalog) match nothing here, and stay so the copies
- * stay identical. The stylesheets for features the HyperFormula portal does not have (dropdowns,
+ * Handsontable docs have (the icon catalog, the example loader and controls) match nothing here, and stay
+ * so the copies stay identical. The stylesheets for features the HyperFormula portal does not have (dropdowns,
  * option levels, the 404 game, example overrides) are not copied.
  */
 
@@ -51,6 +52,7 @@
 @import './components/code.css';
 @import './components/asides.css';
 @import './components/pagination.css';
+@import './interactive-example.css';
 
 /* Mobile */
 @import './mobile/subbar.css';

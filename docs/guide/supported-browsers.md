@@ -1,5 +1,6 @@
 ---
 title: "Supported browsers"
+description: "The desktop and mobile browsers HyperFormula is tested on and supports."
 tags:
   - full-icu
   - IE11

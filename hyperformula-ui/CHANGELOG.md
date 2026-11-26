@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Changed the `hyperformula` peer dependency from `^3.0.0` to `>=3.0.0`, so `hyperformula-ui` installs next to HyperFormula 4. [#1919](https://github.com/handsontable/hyperformula/pull/1919)
+
 ## [0.3.7] - 2026-11-23
 
 ### Added
