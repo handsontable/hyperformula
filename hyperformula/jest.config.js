@@ -46,6 +46,12 @@ module.exports = {
     "<rootDir>/test/**/*spec.(ts|js)"
   ],
 
+  // The private suite's compatibility tools run in Node with their own dependencies and Jest config
+  testPathIgnorePatterns: [
+    "/node_modules/",
+    "<rootDir>/test/hyperformula-tests/compatibility/"
+  ],
+
   silent: true,
 
   // A map from regular expressions to paths to transformers

@@ -8,6 +8,6 @@
   },
   "extends": "./tsconfig",
   "include": ["src", "test"],
-  /* Exclude files that are specific for jest setup */
-  "exclude": ["test/_setupFiles/jest"]
+  /* Exclude files that are specific for jest setup, and the private suite's Node-only compatibility tools */
+  "exclude": ["test/_setupFiles/jest", "test/hyperformula-tests/compatibility"]
 }

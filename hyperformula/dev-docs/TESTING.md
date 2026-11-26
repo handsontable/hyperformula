@@ -69,6 +69,8 @@ Performance tests stay separate from correctness tests: the benchmarks live in `
 
 `npm run test:browser` builds the `dist` bundle and runs the same specs in headless Chrome and Firefox, because the library ships to both.
 
+`karma.starter.ts` bundles every `*.spec.ts` under `hyperformula/test/` except the private suite's `compatibility/` directory, which Jest and `tsconfig.test.json` skip too. The tools there run in Node only, with their own dependencies and their own Jest config, so a spec that imports `fs` or calls `jest.*` stops the whole browser run before any test executes.
+
 Karma's `client.clearContext` must stay `true` in `.config/karma/base.js`. With it `false`, Chrome reports `Some of your tests did a full page reload!` *after* every spec has already passed, and the run exits non-zero — intermittently when the browsers run in parallel, and every single time when they run in sequence. The one place it belongs is `.config/karma/debug.js`, which sets it back to `false` so the kjhtml results page stays on screen between watch runs.
 
 `npm run test:browser.debug` is that interactive config: Chrome only, no `singleRun`, watching for changes.
