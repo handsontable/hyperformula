@@ -1,5 +1,6 @@
 ---
 title: "Dependency graph"
+description: "Learn how HyperFormula builds a dependency graph to evaluate cells in the right order."
 tags:
   - getCellPrecedents
   - getCellDependents

@@ -1,5 +1,6 @@
 ---
 title: "Basic usage"
+description: "Create a HyperFormula instance from an array, from sheets, or empty, and calculate your first formula."
 tags:
   - getting started
   - quickstart
