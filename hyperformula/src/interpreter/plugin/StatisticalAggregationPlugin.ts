@@ -453,7 +453,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
           return coerced
         }
         if (coerced.length === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         const avg = mean(coerced)
         return coerced.reduce((a, b) => a + Math.abs(b - avg), 0) / coerced.length
@@ -608,7 +608,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
           return new CellError(ErrorType.NA, ErrorMessage.OneValue)
         }
         if (sigma === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         return 1 - normal.cdf((mean(vals) - x) / (sigma / Math.sqrt(n)), 0, 1)
       }
@@ -627,12 +627,12 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
           return arrY
         }
         if (arrX.length <= 1 || arrY.length <= 1) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues)
         }
         const vx = variance(arrX, true)
         const vy = variance(arrY, true)
         if (vx === 0 || vy === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         const r = vx / vy
         const v = centralF.cdf(r, arrX.length - 1, arrY.length - 1)
@@ -737,7 +737,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         let sum = 0
         for (let i = 0; i < ret[0].length; i++) {
           if (ret[1][i] === 0) {
-            return new CellError(ErrorType.DIV_BY_ZERO)
+            return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
           }
           sum += Math.pow(ret[0][i] - ret[1][i], 2) / ret[1][i]
         }
@@ -774,7 +774,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
           }
           const s = stdev(sub, true)
           if (s === 0) {
-            return new CellError(ErrorType.DIV_BY_ZERO)
+            return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
           }
           const t = Math.abs(Math.sqrt(n) * mean(sub) / s)
           return tails * (1 - studentt.cdf(t, n - 1))
@@ -784,7 +784,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
           }
           const s = (sumsqerr(arrX) + sumsqerr(arrY)) / (n + m - 2)
           if (s === 0) {
-            return new CellError(ErrorType.DIV_BY_ZERO)
+            return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
           }
           const t = Math.abs((mean(arrX) - mean(arrY)) / Math.sqrt(s * (1 / n + 1 / m)))
           return tails * (1 - studentt.cdf(t, n + m - 2))
@@ -795,7 +795,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
           const sx = variance(arrX, true)
           const sy = variance(arrY, true)
           if (sx === 0 && sy === 0) {
-            return new CellError(ErrorType.DIV_BY_ZERO)
+            return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
           }
           const t = Math.abs((mean(arrX) - mean(arrY)) / Math.sqrt(sx / n + sy / m))
           const v = Math.pow(sx / n + sy / m, 2) / (Math.pow(sx / n, 2) / (n - 1) + Math.pow(sy / m, 2) / (m - 1))
@@ -818,7 +818,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         const avg = mean(coerced)
         const s = stdev(coerced, true)
         if (s === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         return coerced.reduce((a, b) => a + Math.pow((b - avg) / s, 3), 0) * n / (n - 1) / (n - 2)
       })
@@ -838,7 +838,7 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         const avg = mean(coerced)
         const s = stdev(coerced, false)
         if (s === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         return coerced.reduce((a, b) => a + Math.pow((b - avg) / s, 3), 0) / n
       })
@@ -865,8 +865,11 @@ export class StatisticalAggregationPlugin extends FunctionPlugin implements Func
         }
         const avg = mean(coerced)
         const s = stdev(coerced, true)
-        if (s === 0 || !Number.isFinite(s)) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+        if (s === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.ZeroVariance)
+        }
+        if (!Number.isFinite(s)) {
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         const fourthMoment = coerced.reduce((a, b) => a + Math.pow((b - avg) / s, 4), 0)
         return fourthMoment * n * (n + 1) / ((n - 1) * (n - 2) * (n - 3)) - 3 * Math.pow(n - 1, 2) / ((n - 2) * (n - 3))

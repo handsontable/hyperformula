@@ -278,7 +278,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -288,7 +288,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -306,7 +306,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -316,7 +316,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -416,7 +416,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     }
-    return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+    return result.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
   }
 
   private doVarS(args: Ast[], state: InterpreterState): InternalScalarValue {
@@ -425,7 +425,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.varSValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -435,7 +435,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.varPValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -445,7 +445,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.stdevSValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 
@@ -455,7 +455,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (result instanceof CellError) {
       return result
     } else {
-      return result.stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+      return result.stdevPValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
     }
   }
 

@@ -78,7 +78,7 @@ function finalizeAverageResult(averageResult: AverageResult | CellError): number
   if (averageResult instanceof CellError) {
     return averageResult
   } else {
-    return averageResult.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
+    return averageResult.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
   }
 }
 

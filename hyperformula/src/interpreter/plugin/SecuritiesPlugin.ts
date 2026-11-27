@@ -1043,7 +1043,7 @@ export class SecuritiesPlugin extends FunctionPlugin implements FunctionPluginTy
           return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
         }
         if (settlementToMaturityDays === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
+          return new CellError(ErrorType.DIV_BY_ZERO, ErrorMessage.DivisionByZero)
         }
         const valueAtMaturity = 1 + issueToMaturityDays / yearDays * rate
         const valueAtSettlement = price / 100 + accruedDays / yearDays * rate
