@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed the `SUBSTITUTE` function expanding dollar sequences in replacement text when the occurrence argument is omitted. [#1808](https://github.com/handsontable/hyperformula/issues/1808)
+
 ## [3.5.0] - 2026-10-09
 
 ### Added

@@ -318,7 +318,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       const searchRegExp = new RegExp(escapedSearchString, 'g')
 
       if (occurrenceNum === undefined) {
-        return text.replace(searchRegExp, replacementString)
+        return text.replace(searchRegExp, () => replacementString)
       }
 
       if (occurrenceNum < 1) {
