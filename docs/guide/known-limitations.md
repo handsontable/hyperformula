@@ -55,7 +55,6 @@ a circular reference.
 ### TEXT function
 
 * The built-in number formatter does not implement these Excel number formats, so a mask that uses one returns a different result than in Excel:
-  * percent scaling (`0.00%`),
   * scaling by a grouping character at the end of the number (`0,,`): `=TEXT(5000000, "0,,")` returns `5000000,,`, where Excel returns `5`,
   * the `?` placeholder,
   * scientific notation (`0.00E+00`),
