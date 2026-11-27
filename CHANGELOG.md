@@ -54,6 +54,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added a new function: `ERF.PRECISE`. [#1789](https://github.com/handsontable/hyperformula/pull/1789)
 - Added the `PERMUT` and `PERMUTATIONA` functions, which count permutations without and with repetition, and `BINOM.DIST.RANGE`, which returns the binomial probability of a range of successes. [#1790](https://github.com/handsontable/hyperformula/pull/1790)
 - Added `TEXTBEFORE` and `TEXTAFTER`, which return the text before or after a delimiter, and `TEXTSPLIT`, which splits text into rows and columns. `TEXTSPLIT` spills only when every argument but `pad_with` is a constant, because result dimensions are determined before evaluation. [#1792](https://github.com/handsontable/hyperformula/pull/1792)
+- Added the `TOROW` and `TOCOL` dynamic-array functions. [#1828](https://github.com/handsontable/hyperformula/pull/1828)
 
 ### Fixed
 

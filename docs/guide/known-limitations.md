@@ -117,6 +117,14 @@ a circular reference.
 
 * `LOGEST` returns the same layout as `LINEST`, and the `LINEST` limitations above apply to it: `stats` must be a constant, and the result width is determined from the predictor dimensions before evaluation.
 
+### TOROW and TOCOL functions
+
+* When a whole-column source is on the formula's own sheet, is computed by a formula (such as `DROP(Sheet2!A:A, 1)`), or may keep blank cells (`ignore` 0 or 2, or an `ignore` read from a cell or computed by a formula), the result spills from the first row only. Below the first row, the formula returns `#SPILL!` because its result would extend beyond the worksheet edge, and two or more such columns return `#SPILL!` in any row. A whole column of another sheet with blank cells skipped, such as `=TOCOL(Sheet2!A:A, 1)`, spills in any row. Inside another function, such as `=TAKE(TOCOL(Sheet2!A:A), 5)`, the result is computed. TOROW behaves the same way with whole rows and the first column.
+
+* A whole column flattened by TOROW returns `#SPILL!` in any column when it may keep blank cells, because no row holds as many cells as a column, and also with blank cells skipped when it is on the formula's own sheet or computed by a formula. A whole column of another sheet with blank cells skipped, such as `=TOROW(Sheet2!A:A, 1)`, spills its kept values.
+
+* When formulas on two sheets flatten each other's whole columns below the first row and skip blank cells, for example `=TOCOL(Sheet2!A:A, 1)` in cell B5 of Sheet1 and `=TOCOL(Sheet1!A:A, 1)` in cell B5 of Sheet2, the space reserved for each result counts toward the size of the other sheet. Both sheets get taller than their data, and taller again each time one of these formulas is entered again. The results stay correct. TOROW behaves the same way with whole rows right of the first column, and so do `=TOROW(Sheet2!A:A, 1)` in Sheet1 and `=TOCOL(Sheet1!5:5)` in Sheet2.
+
 ### OFFSET function
 
 HyperFormula resolves the OFFSET function at parse time rather than during evaluation. The parser inspects the arguments and rewrites the expression into a plain cell reference or range. This keeps the dependency graph accurate but imposes several restrictions.
