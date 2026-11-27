@@ -1,3 +1,4 @@
+import { TokenType } from "../lexer/tokens";
 import { CN } from "../theme/classNames";
 import { activeCallContext, currentFunctionPrefix } from "../ui/caret/tokenContext";
 import { findAncestor, viewOf } from "../ui/dom";
@@ -192,7 +193,10 @@ export class PopupController {
     this.refs.resetLastRef();
 
     const isNamed = item.kind === "named";
-    const insertText = isNamed ? item.value : `${item.value}()`;
+    const parenFollows = tokens.some(
+      (token) => token.start === offset && token.type === TokenType.LPAREN,
+    );
+    const insertText = isNamed || parenFollows ? item.value : `${item.value}()`;
     const caret = prefixContext.start + item.value.length + (isNamed ? 0 : 1);
 
     applyEditorEdit(this.ctx, this.highlights, {
