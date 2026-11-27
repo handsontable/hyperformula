@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed the `hyperformula` peer dependency from `^3.0.0` to `>=3.0.0`, so `hyperformula-ui` installs next to HyperFormula 4. [#1919](https://github.com/handsontable/hyperformula/pull/1919)
 
 ### Fixed
-- Fixed the editor treating text such as `=CONCATENATEA1` or `=A9999999999999999` as a cell reference, which sent a column or row far past the sheet to the grid's highlights and could hang the grid. A reference past the engine's `maxColumns` or `maxRows` (by default 18,278 columns and 40,000 rows) is no longer colored or highlighted. [#1931](https://github.com/handsontable/hyperformula/pull/1931)
+- Fixed the editor treating text such as `=CONCATENATEA1` or `=A9999999999999999` as a cell reference, which sent a column or row far past the sheet to the grid's highlights and could hang the grid. A reference past the engine's `maxColumns` or `maxRows` is no longer colored or highlighted, in the editor or in the formula bar. `FormulaBarCellOptions.separators` accepts the optional `maxColumns` and `maxRows`, which default to 18,278 and 40,000. [#1931](https://github.com/handsontable/hyperformula/pull/1931)
 
 ## [0.3.7] - 2026-11-23
 
