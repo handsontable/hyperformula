@@ -1,5 +1,6 @@
 ---
 title: "Demo"
+description: "See HyperFormula create a workbook, add data and formulas, and read calculated values in a live demo."
 tags:
   - live demo
   - playground

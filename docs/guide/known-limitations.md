@@ -1,5 +1,6 @@
 ---
 title: "Known limitations"
+description: "The known limitations of HyperFormula at its current stage of development."
 tags:
   - unsupported features
   - multiple workbooks
@@ -49,6 +50,7 @@ a circular reference.
 * `FILTER` and `UNIQUE` reserve the size of their source before they are evaluated, because the size of their result is not known until then. Near the sheet edge set by [`maxRows`](../api/interfaces/configparams.md#maxrows) and [`maxColumns`](../api/interfaces/configparams.md#maxcolumns), they return `#SPILL!` when that reserved area does not fit, even if the result itself would. For example, with `maxRows` set to `4` and 1 to 4 in `A1:A4`, `=FILTER(A1:A4, A1:A4>2)` in `B3` returns `#SPILL!`.
 * INDEX spills a whole row or column only when `row_num` or `column_num` is a number and the first argument is a range or an array, such as `=INDEX(A1:C3, 0, 2)`. When the `0` comes from a cell reference or a formula, such as `=INDEX(A1:C3, B5, 2)`, or the first argument is a named expression, the result can't spill and the formula returns a `#VALUE!` error; inside another function, such as `=SUM(INDEX(A1:C3, B5, 2))`, it works. A whole row or column of a whole-column or whole-row reference, such as `=INDEX(A:A, 0)`, doesn't spill either.
 * `MODE.MULT` and `FREQUENCY` reserve their result area before evaluation, from the size of every argument of `MODE.MULT` and of the `bins_array` of `FREQUENCY`: `MODE.MULT` half as many rows as values passed to it, rounded down, and at least one, `FREQUENCY` one row per cell of `bins_array` plus one. Rows the result does not fill stay empty, and a value in any reserved cell makes the formula return `#SPILL!`. When one of these arguments has no fixed size before evaluation, the formula takes a single cell, and a result of more than one cell is `#VALUE!`. This is the case for a whole-column or whole-row range such as `A:A` or `2:2`, a named expression, and a function whose result size depends on cell values, such as `SEQUENCE(A1)`. Use a bounded range such as `A1:A100` instead.
+* TEXTSPLIT can size its result only when the text, the delimiters, `ignore_empty` and `match_mode` are literals (a number may carry a sign). With any other argument, such as `=TEXTSPLIT(A1, ",")` or `=TEXTSPLIT("a"&",b", ",")`, a result larger than one cell is `#VALUE!`. Inside another function, for example `=INDEX(TEXTSPLIT(A1, ","), 1, 2)`, any argument works, except that a range or array of several cells as the text, `ignore_empty` or `match_mode` is `#VALUE!`.
 * The TEXT function does not accept embedded double-quote literals in the format string. In Excel, `""` inside a format string is an escape sequence for a literal `"` character — e.g. `=TEXT(1234.5, "#,##0.00 ""zł""")` returns `"1,234.50 zł"`. If your application requires this escape sequence, supply a custom [`stringifyCurrency`](currency-handling.md) callback.
 
 ### TEXT function

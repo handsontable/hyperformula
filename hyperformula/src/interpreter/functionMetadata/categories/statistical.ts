@@ -66,6 +66,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=BINOM.DIST(3, 10, 0.5, FALSE())', '=BINOM.DIST(3, 10, 0.5, TRUE())'],
   },
+  'BINOM.DIST.RANGE': {
+    category: 'Statistical',
+    shortDescription: 'Returns the probability of a trial result using a binomial distribution over a range of successes.',
+    parameters: [{name: 'trials', description: 'The total number of independent trials; truncated to an integer.'}, {name: 'probability_s', description: 'The probability of success on a single trial, between 0 and 1.'}, {name: 'number_s', description: 'The lower bound of the number of successes; truncated to an integer.'}, {name: 'number_s2', description: 'The upper bound of the number of successes; truncated to an integer. Defaults to number_s when omitted.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=BINOM.DIST.RANGE(10, 0.5, 5)', '=BINOM.DIST.RANGE(10, 0.5, 3, 7)'],
+  },
   'BINOM.INV': {
     category: 'Statistical',
     shortDescription: 'Returns inverse binomial distribution value.',
@@ -522,6 +529,20 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=PERCENTRANK.INC(A1:A10, 5)', '=PERCENTRANK.INC(A1:A10, 5, 2)'],
   },
+  PERMUT: {
+    category: 'Statistical',
+    shortDescription: 'Returns the number of permutations of a given number of items chosen from a set (without repetitions).',
+    parameters: [{name: 'number', description: 'The total number of items; truncated to an integer.'}, {name: 'number_chosen', description: 'The number of items in each permutation; truncated to an integer and must not exceed number.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=PERMUT(5, 2)', '=PERMUT(10, 3)'],
+  },
+  PERMUTATIONA: {
+    category: 'Statistical',
+    shortDescription: 'Returns the number of permutations of a given number of items chosen from a set (with repetitions).',
+    parameters: [{name: 'number', description: 'The total number of items; truncated to an integer.'}, {name: 'number_chosen', description: 'The number of items in each permutation, where an item may repeat; truncated to an integer.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=PERMUTATIONA(3, 2)', '=PERMUTATIONA(2, 10)'],
+  },
   PHI: {
     category: 'Statistical',
     shortDescription: 'Returns probability density of normal distribution.',
@@ -556,6 +577,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'data', description: 'The range of values to evaluate.'}, {name: 'quart', description: 'The quartile to return, inclusive of 0 and 4, an integer from 0 to 4.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=QUARTILE.INC(A1:A10, 3)'],
+  },
+  'RANK.AVG': {
+    category: 'Statistical',
+    shortDescription: 'Returns the rank of a number in a range of numbers; tied values get the average of their ranks.',
+    parameters: [{name: 'number', description: 'The number whose rank to find.'}, {name: 'ref', description: 'The range of numbers to rank within; text, logical values and empty cells are ignored, and an error in the range is returned.'}, {name: 'order', description: 'Optional. 0 or omitted ranks in descending order; any other number ranks in ascending order.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=RANK.AVG(A2, A1:A10)', '=RANK.AVG(A2, A1:A10, 1)'],
   },
   'RANK.EQ': {
     category: 'Statistical',

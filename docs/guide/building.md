@@ -1,5 +1,6 @@
 ---
 title: "Building"
+description: "Build HyperFormula from source, verify the build, and run its tests, linter, and documentation locally."
 tags:
   - UMD
   - ESM

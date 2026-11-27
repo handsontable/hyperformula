@@ -1,5 +1,6 @@
 ---
 title: "Release notes"
+description: "What changed in each HyperFormula release: new features, changes, and bug fixes."
 tags:
   - changelog
   - version history
