@@ -186,6 +186,8 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | TRIMMEAN      | =TRIMMEAN({1,2,3},"0.5")                                       |       2.0000 |   Not checked |           VALUE |
 | ERF.PRECISE   | =ERF.PRECISE(A1:B1) in A5<br>where A1 = 0.5, B1 = 1            |       0.5205 |  Not measured |           VALUE |
 | ERF.PRECISE   | =ERF.PRECISE(A1:A3) in A4<br>where A1:A3: 0, 1, 2; `useArrayArithmetic: true` | Spills 0, 0.8427, 0.9953 |  Not measured |           VALUE |
+| PERMUT        | =PERMUT(1e21, 2)                                               |        1E+42 |   Not checked |             NUM |
+| PERMUTATIONA  | =PERMUTATIONA(1e21, 2)                                         |        1E+42 |   Not checked |             NUM |
 | RANK.AVG      | =RANK.AVG(2, {1, 2, 3})                                        |            2 |   Not checked |    Not accepted |
 | RANK.AVG      | =RANK.AVG(5, 5)                                                |            1 |   Not checked |    Not accepted |
 | RANK.AVG      | =RANK.AVG(40, A1:C1*2)<br>where A1:C1: 10, 20, 30; `useArrayArithmetic: true` |            2 |   Not checked |    Not accepted |

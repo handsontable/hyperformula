@@ -52,6 +52,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added the `PRICEMAT` and `YIELDMAT` functions, which return the price and the yield of securities that pay interest at maturity. [#1811](https://github.com/handsontable/hyperformula/pull/1811)
 - Added the `RANK.AVG` function, which returns the rank of a number among the numbers of a range, tied numbers getting the average of their ranks. [#1787](https://github.com/handsontable/hyperformula/pull/1787)
 - Added a new function: `ERF.PRECISE`. [#1789](https://github.com/handsontable/hyperformula/pull/1789)
+- Added the `PERMUT` and `PERMUTATIONA` functions, which count permutations without and with repetition, and `BINOM.DIST.RANGE`, which returns the binomial probability of a range of successes. [#1790](https://github.com/handsontable/hyperformula/pull/1790)
 
 ### Fixed
 
