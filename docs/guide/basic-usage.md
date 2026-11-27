@@ -1,5 +1,6 @@
 ---
 title: "Basic usage"
+description: "Create a HyperFormula instance from an array, from sheets, or empty, and calculate your first formula."
 tags:
   - getting started
   - quickstart
@@ -34,7 +35,7 @@ this:
 
 ```javascript
 const options = {
-    licenseKey: 'gpl-v3'
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
 };
 ```
 

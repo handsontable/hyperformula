@@ -1,5 +1,6 @@
 ---
 title: "Named expressions"
+description: "Give HyperFormula expressions human-friendly names and use them in formulas anywhere in the workbook."
 tags:
   - defined names
   - global scope
@@ -165,11 +166,17 @@ const namedExpressions = [
 ];
 
 // Create engine with named expressions
-const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' }, namedExpressions);
+const hfInstance = HyperFormula.buildEmpty({
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+}, namedExpressions);
 // or
-const hfInstance = HyperFormula.buildFromArray(sheetData, { licenseKey: 'gpl-v3' }, namedExpressions);
+const hfInstance = HyperFormula.buildFromArray(sheetData, {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+}, namedExpressions);
 // or  
-const hfInstance = HyperFormula.buildFromSheets(sheetsData, { licenseKey: 'gpl-v3' }, namedExpressions);
+const hfInstance = HyperFormula.buildFromSheets(sheetsData, {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+}, namedExpressions);
 ```
 
 **After engine creation**: You can add a named expression by using the `addNamedExpression` method. It accepts name for the expression, the expression as a raw cell content, and optionally the scope. If you do not define the scope it will be set to global, meaning the expression name will be valid for the whole workbook. If you want to add many of them, it is advised to do so in a [batch](batch-operations.md). This method returns [an array of changed cells](basic-operations.md#changes-array).

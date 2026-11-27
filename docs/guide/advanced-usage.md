@@ -1,5 +1,6 @@
 ---
 title: "Advanced usage"
+description: "Build a multi-sheet HyperFormula workbook, read values across sheets, and convert between A1 notation and cell addresses."
 tags:
   - buildEmpty
   - simpleCellAddressFromString
@@ -30,7 +31,7 @@ the configuration options:
 import { HyperFormula } from 'hyperformula';
 
 const options = {
-    licenseKey: 'gpl-v3'
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
 };
 ```
 

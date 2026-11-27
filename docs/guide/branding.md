@@ -1,5 +1,6 @@
 ---
 title: "Branding"
+description: "Download the HyperFormula logo and brand book, and learn the terms for using them."
 tags:
   - brand book
   - brand guidelines

@@ -1,5 +1,6 @@
 ---
 title: "Integration with LangChain/LangGraph"
+description: "Preview of a planned LangChain.js and LangGraph tool that gives AI agents deterministic spreadsheet computation with HyperFormula."
 tags:
   - AI agents
   - LLM
@@ -37,7 +38,9 @@ const hf = HyperFormula.buildFromArray([
   ['Revenue', 100],
   ['Cost',     60],
   ['Profit', '=B1-B2'],
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 const agent = createReactAgent({
   llm: new ChatOpenAI({ model: 'gpt-4o' }),

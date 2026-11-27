@@ -1,43 +1,14 @@
 ---
 title: "Licensing"
+description: "HyperFormula license terms and how to get a license."
 tags:
   - commercial licence
-  - non-commercial
-  - dual licensing
-  - open source
-  - free
+  - proprietary
   - buy a license
 ---
 
-To make HyperFormula a better fit for different types of projects, the source code is available under different licenses.
+HyperFormula is proprietary software. See [`LICENSE.txt`](https://github.com/handsontable/hyperformula/blob/develop/LICENSE.txt) for the license terms.
 
-## Available licenses
+To get a license, visit [handsontable.com/pricing](https://handsontable.com/pricing/?tab=hyperformula) or email [sales@handsontable.com](mailto:sales@handsontable.com).
 
-HyperFormula is available under the following licenses:
-
-
-| Name                                                                                  | Type        |
-|:--------------------------------------------------------------------------------------|:------------|
-| [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/LICENSE.txt) | Open source |
-| Proprietary license                                                                   | Proprietary |
-
-## GPLv3 license
-
-In a non-commercial or open-source project, you can use [GNU General Public License v3.0](https://github.com/handsontable/hyperformula/blob/master/LICENSE.txt) (GPLv3).
-
-To learn how to use the GPLv3 license, see the [License key](license-key.md#gplv3-license) page.
-
-## Proprietary license
-
-If your project requires a more permissive license than GPLv3, please contact us to purchase a proprietary license with flexible terms and conditions.
-
-Contact our Sales Team:
-
-* Through the [contact form](https://handsontable.com/get-a-quote) on the Handsontable website
-* By email at [sales@handsontable.com](mailto:sales@handsontable.com)
-
-## Entering a license key
-
-To use HyperFormula, you need to specify which license type you use, by entering a license key.
-
-To find out how to enter a license key, see the [License key](license-key.md) page.
+To find out how to enter your license key, see the [License key](license-key.md) page.

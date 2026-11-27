@@ -1,5 +1,6 @@
 ---
 title: "Custom functions"
+description: "Extend HyperFormula with your own functions by creating, registering, and testing a function plugin."
 tags:
   - registerFunctionPlugin
   - implementedFunctions
@@ -157,7 +158,9 @@ Now, you're ready to use your GREET function in a formula.
 
 ```js
 // build a HyperFormula instance where you can use your function directly
-const hfInstance = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']], { licenseKey: 'gpl-v3' });
+const hfInstance = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // read the value of cell B1
 const result = hfInstance.getCellValue({ sheet: 0, col: 1, row: 0 });
@@ -337,7 +340,9 @@ it('works for a range of numbers', () => {
 
   const engine = HyperFormula.buildFromArray(
     [[1, '=DOUBLE_RANGE(A1:A3)'], [2], [3]],
-    { licenseKey: 'gpl-v3' }
+    {
+      // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+    }
   );
 
   expect(engine.getCellValue({ sheet: 0, row: 0, col: 1 })).toEqual(2);
@@ -353,7 +358,9 @@ it('returns a VALUE error if the range argument contains a string', () => {
 
   const engine = HyperFormula.buildFromArray(
     [[1, '=DOUBLE_RANGE(A1:A3)'], ['I should not be here'], [3]],
-    { licenseKey: 'gpl-v3' }
+    {
+      // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+    }
   );
 
   expect(engine.getCellValueType({ sheet: 0, row: 0, col: 1 })).toEqual(
@@ -367,11 +374,21 @@ it('returns a VALUE error if the range argument contains a string', () => {
 
 ## Working demo
 
-Explore the full working example on [Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/custom-functions?v={{$page.buildDateURIEncoded}}).
-
 This demo contains the implementation of both the
 [`GREET`](#add-a-simple-custom-function) and
 [`DOUBLE_RANGE`](#advanced-custom-function-example) custom functions.
+
+:::example{#example1}
+
+@[code](@/docs/examples/custom-functions/example1.html)
+
+@[code](@/docs/examples/custom-functions/example1.css)
+
+@[code](@/docs/examples/custom-functions/example1.js)
+
+@[code](@/docs/examples/custom-functions/example1.ts)
+
+:::
 
 ## Function options
 

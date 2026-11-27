@@ -233,14 +233,17 @@ export class ArithmeticHelper {
     )
   }
 
+  /**
+   * Coerces a scalar value to a number for use in arithmetic and numeric aggregation, without
+   * attempting date-string parsing (see {@link coerceToMaybeNumber} for that extra step).
+   *
+   * A blank cell (`EmptyValue`) reads as `0`. An empty string is text, so like any non-numeric
+   * string it returns `undefined`.
+   */
   public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<ExtendedNumber> {
     if (arg === EmptyValue) {
       return 0
     } else if (typeof arg === 'string') {
-      if (arg === '') {
-        return 0
-      }
-
       const maybePercentNumber = this.coerceStringToMaybePercentNumber(arg)
       if (maybePercentNumber !== undefined) {
         return maybePercentNumber
@@ -322,7 +325,9 @@ export class ArithmeticHelper {
         if (arr instanceof CellError) {
           return arr
         } else {
-          expandedVals.push(...arr)
+          for (const value of arr) {
+            expandedVals.push(value)
+          }
         }
       } else {
         expandedVals.push(val)
@@ -516,8 +521,10 @@ export class ArithmeticHelper {
         const arr = rangeFn(val.valuesFromTopLeftCorner())
         if (arr instanceof CellError) {
           return arr
-        } else {
-          expandedVals.push(...arr)
+        }
+        // A loop rather than push(...arr): spreading a large range as arguments exceeds the call stack.
+        for (const value of arr) {
+          expandedVals.push(value)
         }
       } else {
         expandedVals.push(val)

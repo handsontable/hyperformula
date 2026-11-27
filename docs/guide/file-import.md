@@ -1,5 +1,6 @@
 ---
 title: "File import"
+description: "Import XLSX and CSV files into HyperFormula with third-party parsers and its factory methods."
 tags:
   - ExcelJS
   - SheetJS
@@ -26,7 +27,7 @@ To import XLSX files, use a third-party [XLSX parser](https://www.npmjs.com/sear
 
 This example uses [ExcelJS](https://www.npmjs.com/package/exceljs) to import XLSX files into HyperFormula.
 
-See full example on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/3.5.x/read-excel-file).
+See full example on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/4.0.x/read-excel-file).
 
 ```js
 const ExcelJS = require('exceljs');
@@ -35,7 +36,9 @@ const { HyperFormula } = require('hyperformula');
 async function run(filename) {
   const xlsxWorkbook = await readXlsxWorkbookFromFile(filename);
   const sheetsAsJavascriptArrays = convertXlsxWorkbookToJavascriptArrays(xlsxWorkbook)
-  const hf = HyperFormula.buildFromSheets(sheetsAsJavascriptArrays, { licenseKey: 'gpl-v3' });
+  const hf = HyperFormula.buildFromSheets(sheetsAsJavascriptArrays, {
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+  });
 
   console.log('Formulas:', hf.getSheetSerialized(0));
   console.log('Values:  ', hf.getSheetValues(0));

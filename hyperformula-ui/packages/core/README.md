@@ -10,7 +10,7 @@ It has no UI framework dependency. A grid connects to it through the `IGridAdapt
 npm install hyperformula-ui hyperformula
 ```
 
-`hyperformula` is an optional peer dependency: any 3.x version. Without it, the editor still edits and highlights formulas, but function autocomplete, function help and named-expression highlighting are off. Versions before 3.4.0 lack `getAvailableFunctions` and `getFunctionDetails`, so autocomplete lists function names without descriptions.
+`hyperformula` is an optional peer dependency: version 3.0.0 or newer. Without it, the editor still edits and highlights formulas, but function autocomplete, function help and named-expression highlighting are off. Versions before 3.4.0 lack `getAvailableFunctions` and `getFunctionDetails`, so autocomplete lists function names without descriptions.
 
 ## Use
 
@@ -18,7 +18,9 @@ npm install hyperformula-ui hyperformula
 import { HyperFormula } from "hyperformula";
 import { FormulaBuilder } from "hyperformula-ui";
 
-const hyperformula = HyperFormula.buildEmpty({ licenseKey: "gpl-v3" });
+const hyperformula = HyperFormula.buildEmpty({
+  // licenseKey: "your-license-key", // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 hyperformula.addSheet("Sheet1");
 
 const host = document.getElementById("editor-host")!;

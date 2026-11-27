@@ -1,5 +1,6 @@
 ---
 title: "Volatile functions"
+description: "Which HyperFormula functions are volatile, and which actions make cells that depend on them recalculate."
 tags:
   - recalculation triggers
   - recalculate

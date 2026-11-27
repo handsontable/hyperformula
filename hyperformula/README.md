@@ -1,7 +1,11 @@
 <br>
 <p align="center">
   <a href="https://hyperformula.handsontable.com/">
-    <img src="https://raw.githubusercontent.com/handsontable/hyperformula/master/github-hf-logo-blue.svg" width="350" height="71" alt="HyperFormula - A headless spreadsheet, a parser and evaluator of Excel formulas"/>
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/handsontable/hyperformula/develop/resources/hyperformula-logo-black.svg"/>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/handsontable/hyperformula/develop/resources/hyperformula-logo-white.svg"/>
+      <img width="420" alt="HyperFormula - A headless spreadsheet, a parser and evaluator of Excel formulas" src="https://raw.githubusercontent.com/handsontable/hyperformula/develop/resources/hyperformula-logo-black.svg"/>
+    </picture>
   </a>
 </p>
 
@@ -84,7 +88,7 @@ import { HyperFormula } from 'hyperformula';
 
 // Create a HyperFormula instance
 const hf = HyperFormula.buildEmpty({
-  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
 });
 
 // Add an empty sheet
@@ -103,7 +107,7 @@ hf.setCellContents({ sheet: sheetId, row: 0, col: 0 }, [['Monthly Payment', '=PM
 console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCellValue({ sheet: sheetId, row: 0, col: 1 })}`);
 ```
 
-[Run this code in StackBlitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/mortgage-calculator)
+See full example on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/4.0.x/mortgage-calculator).
 
 HyperFormula ships an official Claude skill and machine-readable docs, so your AI coding agent can scaffold, configure, and debug HyperFormula correctly. To install the skill in Claude Code, or to point Cursor, GitHub Copilot, or another agent at the docs, see [Set up your coding agent](https://handsontable.com/docs/hyperformula/guide/setup-coding-agent.html). You can also connect any MCP-capable agent to the first-party [docs MCP server](https://handsontable.com/docs/javascript-data-grid/docs-mcp-server/) — semantic search over the full HyperFormula and Handsontable knowledge base: docs guides, API reference, code recipes, release notes, blog posts, and GitHub issues, always current with the latest release.
 

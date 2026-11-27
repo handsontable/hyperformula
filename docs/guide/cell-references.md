@@ -1,5 +1,6 @@
 ---
 title: "Cell references"
+description: "Reference cells in HyperFormula formulas with relative, absolute, mixed, range, and cross-sheet references in A1 notation."
 tags:
   - A1 notation
   - dollar sign
@@ -131,7 +132,9 @@ This example shows the change after the move operation was done:
 // build with a simple dataset
 const hfInstance = HyperFormula.buildFromArray([
  ['=B2', '=A1', ''],
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // these are the coordinates for a move operation
 const source = { sheet: 0, col: 1, row: 0 };

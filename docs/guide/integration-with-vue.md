@@ -1,5 +1,6 @@
 ---
 title: "Integration with Vue"
+description: "Use HyperFormula in a Vue 3 app and show its values through Vue reactivity."
 tags:
   - Vue 3
   - Vue.js
@@ -34,7 +35,9 @@ const hf = markRaw(
       [1, 2, "=A1+B1"],
       // your data rows go here
     ],
-    { licenseKey: "gpl-v3" },
+    {
+      // licenseKey: "your-license-key", // get a key at https://handsontable.com/pricing/?tab=hyperformula
+    },
   ),
 );
 
@@ -88,7 +91,7 @@ import { HyperFormula } from "hyperformula";
 
 const hf = markRaw(
   HyperFormula.buildEmpty({
-    licenseKey: "gpl-v3",
+    // licenseKey: "your-license-key", // get a key at https://handsontable.com/pricing/?tab=hyperformula
   }),
 );
 ```
@@ -104,7 +107,7 @@ const hf = markRaw(
 
 ## Demo
 
-For a more advanced example, check out the [Vue 3 demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/vue-3-demo?v={{$page.buildDateURIEncoded}}).
+For a more advanced example, check out the [Vue 3 demo on GitHub](https://github.com/handsontable/hyperformula-demos/tree/4.0.x/vue-3-demo).
 
 :::tip
 This demo uses the [Vue 3](https://v3.vuejs.org/) framework. If you are looking for an example using Vue 2, check out the [code on GitHub](https://github.com/handsontable/hyperformula-demos/tree/2.5.x/vue-demo).

@@ -16,8 +16,13 @@ import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtended
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {AverageResult} from './AverageResult'
 import {MomentsAggregate} from './MomentsAggregate'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginDefinition, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 import {RangeVertex} from '../../DependencyGraph'
+import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
+import {BooleanPlugin} from './BooleanPlugin'
+import {InformationPlugin} from './InformationPlugin'
+import {LookupPlugin} from './LookupPlugin'
+import {selectedArgument} from './SelectedArgument'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
@@ -517,6 +522,12 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
         return acc
       }
 
+      // A parenthesized argument such as `(A1)` arrives as a PARENTHESIS node wrapping the reference.
+      // Unwrap it so that the checks below see the reference and ignore its non-numeric values.
+      while (arg.type === AstNodeType.PARENTHESIS) {
+        arg = arg.expression
+      }
+
       if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
         const val = this.evaluateRange(arg, state, initialAccValue, functionName, reducingFunction, mapFunction, coercionFunction)
         if (val instanceof CellError) {
@@ -549,7 +560,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
               return reducingFunction(left, right)
             }
           }, acc)
-      } else if (arg.type === AstNodeType.CELL_REFERENCE) {
+      } else if (arg.type === AstNodeType.CELL_REFERENCE || this.evaluatesToReference(arg, state)) {
         value = coercionFunction(value)
         if (value === undefined) {
           return acc
@@ -568,6 +579,118 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
 
       return reducingFunction(acc, mapFunction(value))
     }, initialAccValue)
+  }
+
+  /**
+   * Tells whether an argument other than a bare reference or range, which has just been evaluated,
+   * returned the content of a referenced cell, so that the aggregation ignores its non-numeric values
+   * as it does for `A1`.
+   *
+   * That holds for a parenthesized reference, a named expression defined as a reference, `INDEX`
+   * over a reference, and `IF`, `IFS`, `SWITCH`, `CHOOSE` or `XLOOKUP` whose evaluation returned one of these.
+   * These five report the argument they returned, so no argument is evaluated a second time. `XLOOKUP` returns
+   * from its `return_array`, or from `if_not_found` when nothing matches. `IFERROR` and `IFNA` are not among them:
+   * they return the value of the cell, as in Excel. `INDEX`, `IF`, `IFS`, `SWITCH`, `CHOOSE` and `XLOOKUP` count
+   * only while the built-in implementation answers for them, not a custom plugin registered over their ids.
+   *
+   * @param {Ast} arg - the argument of the aggregation, already evaluated
+   * @param {InterpreterState} state - interpreter state
+   * @returns {boolean} whether the value of `arg` is the content of a referenced cell
+   */
+  private evaluatesToReference(arg: Ast, state: InterpreterState): boolean {
+    switch (arg.type) {
+      case AstNodeType.PARENTHESIS:
+        return this.evaluatesToReference(arg.expression, state)
+      case AstNodeType.CELL_REFERENCE:
+      case AstNodeType.CELL_RANGE:
+      case AstNodeType.COLUMN_RANGE:
+      case AstNodeType.ROW_RANGE:
+        return true
+      case AstNodeType.NAMED_EXPRESSION:
+        return this.namedExpressionIsReference(arg.expressionName, state)
+      case AstNodeType.FUNCTION_CALL:
+        return this.functionCallEvaluatesToReference(arg, state)
+      default:
+        return false
+    }
+  }
+
+  /**
+   * The function-call case of {@link evaluatesToReference}: `INDEX` over a reference, and `IF`, `IFS`,
+   * `SWITCH`, `CHOOSE` or `XLOOKUP` that returned a reference.
+   *
+   * @param {ProcedureAst} ast - the function call passed to the aggregation, already evaluated
+   * @param {InterpreterState} state - interpreter state
+   * @returns {boolean} whether the function call returned the content of a referenced cell
+   */
+  private functionCallEvaluatesToReference(ast: ProcedureAst, state: InterpreterState): boolean {
+    switch (ast.procedureName) {
+      case 'INDEX':
+        return this.isBuiltIn('INDEX', InformationPlugin)
+          && ast.args.length >= 1
+          && this.evaluatesToReference(ast.args[0], state)
+      case 'IF':
+      case 'IFS':
+      case 'SWITCH':
+      case 'CHOOSE':
+        return this.isBuiltIn(ast.procedureName, BooleanPlugin) && this.selectedArgumentIsReference(ast, state)
+      case 'XLOOKUP':
+        return this.isBuiltIn('XLOOKUP', LookupPlugin) && this.selectedArgumentIsReference(ast, state)
+      default:
+        return false
+    }
+  }
+
+  /**
+   * Tells whether the argument that a call to `IF`, `IFS`, `SWITCH`, `CHOOSE` or `XLOOKUP` returned, as its
+   * plugin recorded it, evaluates to a reference.
+   *
+   * @param {ProcedureAst} ast - the function call, already evaluated
+   * @param {InterpreterState} state - interpreter state
+   * @returns {boolean} whether the call returned a reference
+   */
+  private selectedArgumentIsReference(ast: ProcedureAst, state: InterpreterState): boolean {
+    const returnedArgument = selectedArgument(ast)
+    return returnedArgument !== undefined && this.evaluatesToReference(returnedArgument, state)
+  }
+
+  /**
+   * Tells whether the built-in plugin answers for a function id, rather than a custom plugin
+   * registered over it.
+   *
+   * @param {string} functionId - the function id
+   * @param {FunctionPluginDefinition} builtInPlugin - the plugin that implements the id by default
+   * @returns {boolean} whether `builtInPlugin` is registered for `functionId`
+   */
+  private isBuiltIn(functionId: string, builtInPlugin: FunctionPluginDefinition): boolean {
+    return this.dependencyGraph.functionRegistry.getFunctionPlugin(functionId) === builtInPlugin
+  }
+
+  /**
+   * Tells whether a named expression, as seen from the formula being evaluated, is defined as a
+   * reference or a range, optionally in parentheses. Other definitions, such as `=""`, are values.
+   *
+   * @param {string} expressionName - the name used in the formula
+   * @param {InterpreterState} state - interpreter state
+   * @returns {boolean} whether the named expression is a reference
+   */
+  private namedExpressionIsReference(expressionName: string, state: InterpreterState): boolean {
+    const namedExpression = this.dependencyGraph.namedExpressions.nearestNamedExpression(expressionName, state.formulaAddress.sheet)
+    if (namedExpression === undefined) {
+      return false
+    }
+    const vertex = this.dependencyGraph.getCell(namedExpression.address)
+    if (!(vertex instanceof FormulaVertex)) {
+      return false
+    }
+    let definition = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
+    while (definition.type === AstNodeType.PARENTHESIS) {
+      definition = definition.expression
+    }
+    return definition.type === AstNodeType.CELL_REFERENCE
+      || definition.type === AstNodeType.CELL_RANGE
+      || definition.type === AstNodeType.COLUMN_RANGE
+      || definition.type === AstNodeType.ROW_RANGE
   }
 
   /**

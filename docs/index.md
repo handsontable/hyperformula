@@ -1,6 +1,6 @@
 ---
 title: "Welcome"
-description: HyperFormula® - An open-source headless spreadsheet for business web apps
+description: HyperFormula® - A headless spreadsheet for business web apps
 ---
 
 <br>
@@ -12,7 +12,7 @@ description: HyperFormula® - An open-source headless spreadsheet for business w
 </p>
 
 <p align="center">
-  <strong>An open-source headless spreadsheet for business web apps</strong>
+  <strong>A headless spreadsheet for business web apps</strong>
 </p>
 
 <p align="center">
@@ -56,7 +56,7 @@ HyperFormula doesn't assume any existing user interface, making it a general-pur
 - [Support for data sorting](guide/sorting-data.md)
 - [Support for formula localization with {{ $page.languagesCount }} built-in languages](guide/i18n-features.md)
 - Easy integration with any front-end or back-end application
-- GPLv3 or a [commercial license](https://handsontable.com/get-a-quote)
+- Available under a [commercial license](https://handsontable.com/get-a-quote)
 - Maintained by the team that stands behind the [Handsontable](https://handsontable.com/) data grid
 
 ## Documentation
@@ -89,7 +89,9 @@ Once installed, you can use it to develop applications tailored to your specific
 import { HyperFormula } from 'hyperformula';
 
 // Create a HyperFormula instance
-const hf = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+const hf = HyperFormula.buildEmpty({
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // Add an empty sheet
 const sheetName = hf.addSheet('Mortgage Calculator');
@@ -107,7 +109,7 @@ hf.setCellContents({ sheet: sheetId, row: 0, col: 0 }, [['Monthly Payment', '=PM
 console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCellValue({ sheet: sheetId, row: 0, col: 1 })}`);
 ```
 
-[Run this code in StackBlitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/mortgage-calculator)
+See full example on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/4.0.x/mortgage-calculator).
 
 HyperFormula ships an official Claude skill and machine-readable docs, so your AI coding agent can scaffold, configure, and debug HyperFormula correctly. To install the skill in Claude Code, or to point Cursor, GitHub Copilot, or another agent at the docs, see [Set up your coding agent](guide/setup-coding-agent.md). You can also connect any MCP-capable agent to the first-party [docs MCP server](https://handsontable.com/docs/javascript-data-grid/docs-mcp-server/) — semantic search over the full HyperFormula and Handsontable knowledge base: docs guides, API reference, code recipes, release notes, blog posts, and GitHub issues, always current with the latest release.
 
@@ -117,6 +119,6 @@ Contributions are welcome, but before you make them, please read the [Contributi
 
 ## License
 
-HyperFormula is available under two different licenses: GPLv3 and proprietary. The proprietary license can be purchased by [contacting our team](https://handsontable.com/get-a-quote) at Handsontable.
+HyperFormula is proprietary software. See [`LICENSE.txt`](https://github.com/handsontable/hyperformula/blob/develop/LICENSE.txt) for the license terms. A commercial license can be purchased by [contacting our team](https://handsontable.com/get-a-quote) at Handsontable.
 
 Copyright (c) Handsoncode

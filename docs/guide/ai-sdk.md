@@ -1,5 +1,6 @@
 ---
 title: "HyperFormula AI SDK for Vercel"
+description: "Preview of a planned Vercel AI SDK tool that gives AI agents deterministic spreadsheet and formula computation with HyperFormula."
 tags:
   - AI agents
   - LLM
@@ -40,7 +41,9 @@ const hf = HyperFormula.buildFromArray([
   ['Revenue', 100],
   ['Cost',     60],
   ['Profit', '=B1-B2'],
-], { licenseKey: 'gpl-v3' });
+], {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // Pass the spreadsheet tools straight into generateText.
 const result = await generateText({

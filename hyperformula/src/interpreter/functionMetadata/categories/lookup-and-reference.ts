@@ -53,6 +53,20 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=COLUMNS(A1:C5)', '=COLUMNS(A1:F1)'],
   },
+  DROP: {
+    category: 'Lookup and reference',
+    shortDescription: 'Removes specified rows or columns from the beginning or end of an array.',
+    parameters: [{name: 'array', description: 'The array or range from which to remove rows or columns.'}, {name: 'rows', description: 'The number of rows to remove; a negative value removes rows from the end. Zero or an empty argument removes no rows.'}, {name: 'columns', description: 'The number of columns to remove; a negative value removes columns from the end. When omitted, empty, or zero, no columns are removed.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=DROP(A1:C5, 2)', '=DROP(A1:C5, -1, -1)', '=DROP(A1:C5, , 1)'],
+  },
+  EXPAND: {
+    category: 'Lookup and reference',
+    shortDescription: 'Expands an array to the given numbers of rows and columns, filling the added cells with a pad value.',
+    parameters: [{name: 'array', description: 'The array or range to expand.'}, {name: 'rows', description: 'The number of rows of the result, truncated to an integer. A value smaller than the number of rows of array returns #VALUE!, and more than 1,048,576 rows return #NUM!. An empty argument keeps the number of rows of array. The size must be resolvable at parse time, so use a literal (e.g. 3); a cell reference or formula yields a #VALUE! error whenever the result would span more than one cell.'}, {name: 'columns', description: 'The number of columns of the result, truncated to an integer; a value smaller than the number of columns of array returns #VALUE!. When omitted or empty, the number of columns of array is kept. Like rows, it must be resolvable at parse time.'}, {name: 'pad_with', description: 'The value of the added cells; #N/A when omitted, blank when empty. An array or a range returns #VALUE!.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=EXPAND(A1:B2, 3, 3)', '=EXPAND(A1:B2, 4, , 0)', '=EXPAND(A1, 2, 2, "-")'],
+  },
   FILTER: {
     category: 'Lookup and reference',
     shortDescription: 'Filters an array, based on multiple conditions (boolean arrays).',
@@ -90,10 +104,10 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
   },
   INDEX: {
     category: 'Lookup and reference',
-    shortDescription: 'Returns the contents of a cell specified by row and column number. The column number is optional and defaults to 1.',
-    parameters: [{name: 'range', description: 'The range from which a value is returned.'}, {name: 'row', description: 'The row number within range (counting from 1) of the value to return.'}, {name: 'column', description: 'The column number within range (counting from 1) of the value to return. Defaults to 1 when omitted.'}],
+    shortDescription: 'Returns the value at a given row and column of a range or array. A row or column number of 0 returns the whole column or row.',
+    parameters: [{name: 'range', description: 'The range or array from which a value is returned.'}, {name: 'row', description: 'The row number within range (counting from 1) of the value to return; 0 returns the whole column.'}, {name: 'column', description: 'The column number within range (counting from 1) of the value to return; 0 returns the whole row. When omitted, row counts along a one-row or one-column range.'}, {name: 'area', description: 'The area of range to use. Must be 1, because range is a single area.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    examples: ['=INDEX(A1:C10, 2, 3)', '=INDEX(A1:A10, 5)'],
+    examples: ['=INDEX(A1:C10, 2, 3)', '=INDEX(A1:A10, 5)', '=SUM(INDEX(A1:C10, 0, 2))'],
   },
   INDIRECT: {
     category: 'Lookup and reference',
@@ -156,6 +170,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=TRANSPOSE(A1:C2)', '=TRANSPOSE(A1:A5)'],
   },
+  TRIMRANGE: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns a range without the blank rows and columns at its edges. The result takes up the size of the range, or of its sheet\'s used area for a whole column or row; the cells the result does not fill stay blank.',
+    parameters: [{name: 'range', description: 'The range or array to trim. In a range, a cell is blank only when it is empty, so a formula is kept even when its value is blank; in an array, an element is blank when it has no value. When every row or column is trimmed away, the result is a REF error.'}, {name: 'trim_rows', description: 'Which blank rows to remove: 0 none, 1 leading, 2 trailing, 3 both. Any other value is a VALUE error. When omitted or empty, 3.'}, {name: 'trim_cols', description: 'Which blank columns to remove, with the same codes as trim_rows. When omitted or empty, 3.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TRIMRANGE(A1:C10)', '=TRIMRANGE(A1:C10, 2, 0)', '=TRIMRANGE(A1:C10, , 1)'],
+  },
   UNIQUE: {
     category: 'Lookup and reference',
     shortDescription: 'Returns the unique rows or columns of an array.',
@@ -176,6 +197,20 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'array1', description: 'A range or array to stack. Further ranges or arrays can be passed as additional arguments; they are stacked top to bottom into one array.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=VSTACK(A1:B2, A3:B4)', '=VSTACK(A1:C1, A2:C2)'],
+  },
+  WRAPCOLS: {
+    category: 'Lookup and reference',
+    shortDescription: 'Wraps a row or column of values into columns of a given length.',
+    parameters: [{name: 'vector', description: 'The row or column of values to wrap. A two-dimensional range or array returns #VALUE!.'}, {name: 'wrap_count', description: 'The number of values in each column, truncated to an integer; a value below 1 returns #NUM!. A value at least the length of vector returns vector in one column. It must be resolvable at parse time, so use a literal (e.g. 3); a cell reference or formula yields a #VALUE! error whenever the result would span more than one cell.'}, {name: 'pad_with', description: 'The value that fills the rest of the last column; #N/A when omitted or empty.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=WRAPCOLS(A1:G1, 3)', '=WRAPCOLS(A1:A7, 3, 0)'],
+  },
+  WRAPROWS: {
+    category: 'Lookup and reference',
+    shortDescription: 'Wraps a row or column of values into rows of a given length.',
+    parameters: [{name: 'vector', description: 'The row or column of values to wrap. A two-dimensional range or array returns #VALUE!.'}, {name: 'wrap_count', description: 'The number of values in each row, truncated to an integer; a value below 1 returns #NUM!. A value at least the length of vector returns vector in one row. It must be resolvable at parse time, so use a literal (e.g. 3); a cell reference or formula yields a #VALUE! error whenever the result would span more than one cell.'}, {name: 'pad_with', description: 'The value that fills the rest of the last row; #N/A when omitted or empty.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=WRAPROWS(A1:G1, 3)', '=WRAPROWS(A1:A7, 3, 0)'],
   },
   XLOOKUP: {
     category: 'Lookup and reference',

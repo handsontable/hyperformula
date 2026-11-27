@@ -1,5 +1,6 @@
 /* start:skip-in-compilation */
 import HyperFormula from 'hyperformula';
+import enUS from 'hyperformula/es/i18n/languages/enUS';
 import moment from 'moment';
 
 console.log(
@@ -8,9 +9,9 @@ console.log(
 );
 
 /* end:skip-in-compilation */
-/* start:skip-in-sandbox */
+/* start:skip-in-source
 const enUS = HyperFormula.languages.enUS;
-/* end:skip-in-sandbox */
+end:skip-in-source */
 /**
  * Initial table data.
  */
@@ -62,7 +63,7 @@ const config = {
   functionArgSeparator: ';',
   currencySymbol: ['$', 'USD'],
   localeLang: 'en-US',
-  licenseKey: 'gpl-v3',
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
 };
 
 if (!HyperFormula.getRegisteredLanguagesCodes().includes('enUS')) {

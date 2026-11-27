@@ -15,6 +15,7 @@ import { InterpreterState } from '../InterpreterState'
 import { EmptyValue, InternalScalarValue, InterpreterValue, RawNoErrorScalarValue } from '../InterpreterValue'
 import { SimpleRangeValue } from '../../SimpleRangeValue'
 import { FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions } from './FunctionPlugin'
+import { forgetSelectedArgument, recordSelectedArgument, selectedArgument } from './SelectedArgument'
 import { ArraySize } from '../../ArraySize'
 
 export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LookupPlugin> {
@@ -132,11 +133,19 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   /**
    * Corresponds to XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found], [match_mode], [search_mode])
    *
+   * With an array of lookup values, the result keeps `if_not_found` as its returned argument only when every
+   * lookup returned it: as in Excel, a result taken from `if_not_found` stays a reference, while a result taken
+   * from `return_array` for one of several keys is a value.
+   *
    * @param ast
    * @param state
    */
   public xlookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('XLOOKUP'), (key: RawNoErrorScalarValue, lookupRangeValue: SimpleRangeValue, returnRangeValue: SimpleRangeValue, notFoundFlag: any, matchMode: number, searchMode: number) => {
+    forgetSelectedArgument(ast)
+    let lookups = 0
+    let lookupsReturningIfNotFound = 0
+    const result = this.runFunction(ast.args, state, this.metadata('XLOOKUP'), (key: RawNoErrorScalarValue, lookupRangeValue: SimpleRangeValue, returnRangeValue: SimpleRangeValue, notFoundFlag: any, matchMode: number, searchMode: number) => {
+      lookups++
       if (![0, -1, 1, 2].includes(matchMode)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
@@ -159,8 +168,17 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
             : 'returnNotFound'
       }
 
-      return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, notFoundFlag, isWildcardMatchMode, searchOptions)
+      forgetSelectedArgument(ast)
+      const value = this.doXlookup(ast, zeroIfEmpty(key), lookupRange, returnRange, notFoundFlag, isWildcardMatchMode, searchOptions)
+      if (ast.args[3] !== undefined && selectedArgument(ast) === ast.args[3]) {
+        lookupsReturningIfNotFound++
+      }
+      return value
     })
+    if (lookups > 1 && lookupsReturningIfNotFound < lookups) {
+      forgetSelectedArgument(ast)
+    }
+    return result
   }
 
   public xlookupArraySize(ast: ProcedureAst): ArraySize {
@@ -282,7 +300,11 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return value === EmptyValue ? 0 : value
   }
 
-  private doXlookup(key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, returnRange: SimpleRangeValue, notFoundFlag: any, isWildcardMatchMode: boolean, searchOptions: SearchOptions): InterpreterValue {
+  /**
+   * Looks the key up for XLOOKUP and records which argument the result comes from: `return_array` when the key is
+   * found, `if_not_found` when it isn't and that argument is given.
+   */
+  private doXlookup(ast: ProcedureAst, key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, returnRange: SimpleRangeValue, notFoundFlag: any, isWildcardMatchMode: boolean, searchOptions: SearchOptions): InterpreterValue {
     const isVerticalSearch = lookupRange.width() === 1 && returnRange.height() === lookupRange.height()
     const isHorizontalSearch = lookupRange.height() === 1 && returnRange.width() === lookupRange.width()
 
@@ -294,8 +316,14 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     const indexFound = this.searchInRange(key, lookupRange, isWildcardMatchMode, searchOptions, searchStrategy)
 
     if (indexFound === -1) {
-      return (notFoundFlag == ErrorType.NA) ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound) : notFoundFlag
+      if (notFoundFlag == ErrorType.NA) {
+        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+      }
+      recordSelectedArgument(ast, 3)
+      return notFoundFlag
     }
+
+    recordSelectedArgument(ast, 2)
 
     const returnValues: InternalScalarValue[][] = isVerticalSearch ? [returnRange.data[indexFound]] : returnRange.data.map((row) => [row[indexFound]])
     const coerced = returnValues.map((row) => row.map((value) => this.zeroIfEmptyResult(value)))

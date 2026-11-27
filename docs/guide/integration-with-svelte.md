@@ -1,5 +1,6 @@
 ---
 title: "Integration with Svelte"
+description: "Use HyperFormula in a Svelte app and bridge its values into Svelte reactivity."
 tags:
   - SSR
   - onMount
@@ -31,7 +32,7 @@ Declare the engine at the top of `<script>` so it lives for the component's life
   ];
 
   const hf = HyperFormula.buildFromArray(data, {
-    licenseKey: 'gpl-v3',
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
     // more configuration options go here
   });
 
@@ -97,7 +98,9 @@ In SvelteKit, top-level statements in `<script>` run on the server too. HyperFor
         [1, 2, '=A1+B1'],
         // your data rows go here
       ],
-      { licenseKey: 'gpl-v3' }
+      {
+        // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+      }
     );
   });
 
@@ -131,4 +134,4 @@ In SvelteKit, top-level statements in `<script>` run on the server too. HyperFor
 
 ## Demo
 
-For a more advanced example, check out the [Svelte demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.5.x/svelte-demo?v={{$page.buildDateURIEncoded}}).
+For a more advanced example, check out the [Svelte demo on GitHub](https://github.com/handsontable/hyperformula-demos/tree/4.0.x/svelte-demo).

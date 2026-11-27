@@ -9,6 +9,7 @@ import { satteri } from '@astrojs/markdown-satteri';
 import { DOCS_DATA } from './src/docs-data.mjs';
 import { docsMarkdownPlugin, legacyAnchorsPlugin, tableWrapperPlugin } from './src/markdown-plugins.mjs';
 import { mdCompanions } from './src/md-companions/index.mjs';
+import { previewLicenseKey } from './src/preview-license-key.mjs';
 import { apiPageGroup } from './src/api-sidebar.mjs';
 
 // CommonJS, because the Worker and `script/prepare-cf-assets.js` read it too.
@@ -19,6 +20,29 @@ const normalizeBase = (base) => `/${base.replace(/^\/+|\/+$/g, '')}/`.replace(/^
 
 const base = normalizeBase(process.env.DOCS_BASE || buildConfig.base);
 const hostname = process.env.DOCS_HOSTNAME || buildConfig.hostname;
+
+/**
+ * The image that link previews show for every docs page. Starlight emits `og:title`, `og:description`, and
+ * `twitter:card=summary_large_image` by itself, but no image. This is the handsontable.com default card, which carries
+ * the HyperFormula mark. The URL is absolute because crawlers don't resolve a relative `og:image`, and `width` and
+ * `height` must match the file.
+ */
+const SOCIAL_IMAGE = {
+  url: 'https://handsontable.com/og/default.png',
+  width: 1200,
+  height: 630,
+  alt: 'Handsontable DataGrid and HyperFormula',
+};
+
+/** The Starlight `head` entries for {@link SOCIAL_IMAGE}. */
+const socialImageHead = () => [
+  { tag: 'meta', attrs: { property: 'og:image', content: SOCIAL_IMAGE.url } },
+  { tag: 'meta', attrs: { property: 'og:image:width', content: String(SOCIAL_IMAGE.width) } },
+  { tag: 'meta', attrs: { property: 'og:image:height', content: String(SOCIAL_IMAGE.height) } },
+  { tag: 'meta', attrs: { property: 'og:image:alt', content: SOCIAL_IMAGE.alt } },
+  { tag: 'meta', attrs: { name: 'twitter:image', content: SOCIAL_IMAGE.url } },
+  { tag: 'meta', attrs: { name: 'twitter:image:alt', content: SOCIAL_IMAGE.alt } },
+];
 
 export default defineConfig({
   site: hostname,
@@ -50,7 +74,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: `HyperFormula (v${DOCS_DATA.version})`,
-      description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
+      description: 'HyperFormula is a high-performance calculation engine for spreadsheets and web applications.',
       // The header, sidebar, footer, code blocks and styles follow the Handsontable docs, so both portals look the same
       // (see `src/styles/custom.css`).
       logo: {
@@ -89,6 +113,8 @@ export default defineConfig({
         { tag: 'script', attrs: { src: 'https://cdn.jsdelivr.net/npm/hyperformula/dist/languages/enUS.js' } },
         { tag: 'script', attrs: { src: 'https://cdn.jsdelivr.net/npm/hyperformula/dist/languages/frFR.js' } },
         { tag: 'script', attrs: { src: 'https://cdn.jsdelivr.net/npm/moment/moment.min.js' } },
+        // Builds the "Source code" tabs of the live examples and toggles them (a copy of the Handsontable docs' script).
+        { tag: 'script', attrs: { src: `${base}example-tabs.js`, defer: true } },
         // Google Tag Manager
         {
           tag: 'script',
@@ -100,6 +126,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         },
         // Google Search Console
         { tag: 'meta', attrs: { name: 'google-site-verification', content: 'MZpSOa8SNvFLRRGwUQpYVZ78kIHQoPVdVbafHhJ_d4Q' } },
+        // Social preview image for link previews (LinkedIn, Slack, X). See README.md, "Social preview image".
+        ...socialImageHead(),
         // Sentry
         {
           tag: 'script',
@@ -221,6 +249,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             { label: 'Migrating from 0.6 to 1.0', slug: 'guide/migration-from-0.6-to-1.0' },
             { label: 'Migrating from 1.x to 2.0', slug: 'guide/migration-from-1.x-to-2.0' },
             { label: 'Migrating from 2.x to 3.0', slug: 'guide/migration-from-2.x-to-3.0' },
+            { label: 'Migrating from 3.x to 4.0', slug: 'guide/migration-from-3.x-to-4.0' },
           ],
         },
         {
@@ -266,5 +295,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       },
     }),
     mdCompanions({ base, hostname }),
+    // Last, so it reads everything the build wrote.
+    previewLicenseKey(process.env),
   ],
 });

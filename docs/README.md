@@ -28,6 +28,15 @@ To start a local HyperFormula docs server:
    ```
 5. In your browser, go to: http://localhost:4321/docs/hyperformula/. Search works only in a full build (`npm run docs:build`), which indexes the pages with [Pagefind](https://pagefind.app/).
 
+The live examples load HyperFormula from the CDN, and HyperFormula checks the license key everywhere except on handsontable.com. On `localhost`, an example shows `#LIC!` once the CDN serves a version that needs a key. `npm run docs:dev` can't give the examples a key. To run them locally with the internal test key, build with the opt-in and serve the build:
+
+```bash
+DOCS_TEST_LICENSE_KEY=true npm run docs:build
+npm run docs:dev:cf
+```
+
+Never deploy a build made with `DOCS_TEST_LICENSE_KEY=true` to production. A build without it fails if the key is anywhere in its output, and `npm run docs:deploy:cf` refuses to deploy a built site that holds the key.
+
 ## What is generated
 
 `guide/built-in-functions.md` and the whole of `api/` are produced by a build step and git-ignored. Never edit or commit them: change the function metadata catalogue in `hyperformula/src/interpreter/functionMetadata/categories/` or the JSDoc in `hyperformula/src/`, and regenerate. Both are regenerated as the first step of `docs:dev` and `docs:build`, so a missing `api/` folder only means it has not been built yet.
@@ -86,9 +95,11 @@ Deploying by hand is only needed for debugging; regular deployments go through W
 ```bash
 npm run docs:build:cf     # build the documentation and prepare the asset directory
 npm run docs:dev:cf       # serve the built site locally at http://localhost:8787
-npm run docs:preview:cf   # upload a preview version (does not touch production)
-npm run docs:deploy:cf    # deploy to production
+npm run docs:preview:cf   # write the internal test key into the built site, then upload a preview version
+npm run docs:deploy:cf    # deploy to production; refuses a built site that holds the key
 ```
+
+`docs:preview:cf` changes the built site in place. Run `docs:build:cf` again before `docs:deploy:cf`, and never promote a preview version to production from the Cloudflare dashboard: it holds the internal test key.
 
 When changing the asset routing, verify it with browser navigation headers, not plain requests: `curl -H "Sec-Fetch-Mode: navigate" -H "Sec-Fetch-Dest: document"`. The asset router treats navigation requests differently from other requests, so a plain `curl` check can pass while browsers get a 404.
 
@@ -134,7 +145,7 @@ docs                            # All documentation files
 ├── src
 │   ├── components              # Overrides of Starlight components, and the docs assistant (DocsAssistant/)
 │   ├── lib                     # Browser helpers the docs assistant imports
-│   ├── md-companions           # Writes the .md companions and llms-full.txt (see below)
+│   ├── md-companions           # Writes the .md companions, llms-full.txt and llms.txt (see below)
 │   ├── scripts                 # Browser scripts, e.g. the coding-agent wizard and the docs assistant's bootstrap
 │   ├── styles                  # The site's CSS on top of Starlight's
 │   ├── api-sidebar.mjs         # The API pages' sidebar groups, with a link to each section
@@ -159,5 +170,15 @@ docs                            # All documentation files
 
 * **HTML + Markdown per page** &mdash; every guide page is built as both an `.html` page and a companion `.md` file with the same content, via the `md-companions` integration (`src/md-companions/`). The API reference has companions too, and a `README.md` source gets `index.md` (`api/index.md`). The companion lives next to its HTML page, e.g. `guide/basic-usage.html` and `guide/basic-usage.md`.
 * **`llms-full.txt`** &mdash; all pages concatenated into one Markdown file at the docs root (`/docs/hyperformula/llms-full.txt`, served at https://handsontable.com/docs/hyperformula/llms-full.txt), so an agent can fetch the whole corpus in a single request instead of crawling page by page.
+* **`llms.txt`** &mdash; the index agents read first ([llmstxt.org](https://llmstxt.org/)), at `/docs/hyperformula/llms.txt` (served at https://handsontable.com/docs/hyperformula/llms.txt). It links to `llms-full.txt`, lists every page by title with a link to its `.md` companion (grouped into guides and API reference), and adds fixed links to the AI and agent resources and to the source and licensing pages. The page list comes from the same sources as `llms-full.txt`, so it can't fall out of date. Like `llms-full.txt`, it is not written to the domain root: `/llms.txt` there belongs to handsontable.com.
 * **Page actions** &mdash; below the table of contents (the `PageSidebar` override in `src/components/`), every page offers Copy Markdown and View as Markdown (its `.md` companion), Ask AI about this page, Print this page, and Open in ChatGPT or Claude (a new conversation that starts by reading the page). On narrower screens, where that sidebar is hidden, the `PageTitle` override shows View as Markdown near the top of the page.
 * **"Set up your coding agent" page** &mdash; [`guide/setup-coding-agent.md`](guide/setup-coding-agent.md) explains how to point Claude Code, Cursor, Copilot, and other agents at these machine-readable docs, and embeds the `<hf-coding-agent-wizard>` custom element (`src/scripts/coding-agent-wizard.mjs`): an interactive picker that shows the right setup instructions for the agent you choose.
+
+## Social preview image
+
+Starlight emits `og:title`, `og:description`, and a `summary_large_image` Twitter card for every page, but no image, so a docs link shared on LinkedIn, Slack, or X shows a blank card unless the site adds one. `SOCIAL_IMAGE` in `astro.config.mjs` names the image, and `socialImageHead()` turns it into the `og:image*` and `twitter:image*` entries in the Starlight `head`.
+
+* **The image is the handsontable.com default card** (`https://handsontable.com/og/default.png`, 1200x630), which carries the HyperFormula mark. The docs have no card of their own. To use one, put it in `public/` and change `url`, `width`, `height`, and `alt` together.
+* **The URL is absolute,** because crawlers don't resolve a relative `og:image`. A branch preview therefore shows the production image.
+* **Every page gets the same image.** A page can override it with a `head` entry in its frontmatter: Starlight replaces a config `meta` tag that has the same `name` or `property`.
+* **Nothing checks the tags automatically.** After changing them, open a page on the branch preview and confirm the `og:image` tags are there.

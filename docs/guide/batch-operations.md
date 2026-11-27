@@ -1,5 +1,6 @@
 ---
 title: "Batch operations"
+description: "Combine multiple HyperFormula data changes into a single operation to recalculate once and improve performance."
 tags:
   - batching
   - isEvaluationSuspended
@@ -29,7 +30,9 @@ operation together with their absolute addresses and new values.
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ],
-}, { licenseKey: 'gpl-v3' });
+}, {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // multiple operations in a single callback will trigger evaluation only once
 // and only one set of changes will be returned as a combined result of all
@@ -57,7 +60,9 @@ operation together with their absolute addresses and new values.
 const hfInstance = HyperFormula.buildFromSheets({
   MySheet1: [ ['1'] ],
   MySheet2: [ ['10'] ],
-}, { licenseKey: 'gpl-v3' });
+}, {
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // suspend the evaluation
 hfInstance.suspendEvaluation();
@@ -81,7 +86,9 @@ When you need to check if the evaluation is suspended you can
 call the [`isEvaluationSuspended`](../api/classes/hyperformula.md#isevaluationsuspended) method.
 
 ```javascript
-const hfInstance = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
+const hfInstance = HyperFormula.buildEmpty({
+  // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+});
 
 // suspend the evaluation
 hfInstance.suspendEvaluation();
