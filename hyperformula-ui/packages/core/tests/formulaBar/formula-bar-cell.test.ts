@@ -42,6 +42,19 @@ describe("FormulaBarCell", () => {
     expect(container.querySelectorAll("[data-ref-index]")).toHaveLength(0);
   });
 
+  it("does not color a reference past referenceLimits in the idle view", () => {
+    const formulaCell = new FormulaBarCell({
+      knownFunctions: new Set(["SUM"]),
+      onActivate: vi.fn(),
+      referenceLimits: { maxRows: 10 },
+    });
+
+    formulaCell.renderValue("=A10+A11");
+
+    const marks = formulaCell.root.querySelectorAll("[data-ref-index]");
+    expect(Array.from(marks, (mark) => mark.textContent)).toEqual(["A10"]);
+  });
+
   it("marks unknown functions", () => {
     const { container, formulaCell } = cell(new Set(["SUM"]));
 
