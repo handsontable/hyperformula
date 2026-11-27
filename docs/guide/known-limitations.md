@@ -96,7 +96,7 @@ a circular reference.
 
 * Column indexes must be supplied as separate scalar arguments. When an array of indexes is passed, only its first index is used: `=CHOOSECOLS(A1:C3, {1,2})` returns column A only. A range of indexes returns `#VALUE!`.
 
-* A whole-column source can spill when the formula is in the first row, regardless of whether the source is on the same sheet. Below the first row, the formula returns `#SPILL!` because its result would extend beyond the worksheet edge; inside another function, such as `=SUM(CHOOSECOLS(A:A, 1))`, it is computed. In the first row, or inside another function, an empty source returns `#N/A` because its effective range is empty. Finite-height sources are supported.
+* A whole-column source can spill when the formula is in the first row, regardless of whether the source is on the same sheet. Below the first row, the formula returns `#SPILL!` because its result would extend beyond the worksheet edge; inside another function, such as `=SUM(CHOOSECOLS(A:A, 1))`, it is computed. Finite-height sources are supported.
 
 * HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal column-index expression can therefore be reported as `#SPILL!`. For a source of finite width, errors in literal column indexes are detected before spill allocation.
 
@@ -104,7 +104,7 @@ a circular reference.
 
 * Row indexes must be supplied as separate scalar arguments. Passing multiple indexes through an array or range argument is not supported.
 
-* A whole-row source can spill when the formula is in the first column, regardless of whether the source is on the same sheet. A formula outside the first column returns `#SPILL!` because its result would extend beyond the worksheet edge. An empty source returns `#N/A` because its effective range is empty. Finite-width sources are supported.
+* A whole-row source can spill when the formula is in the first column, regardless of whether the source is on the same sheet. A formula outside the first column returns `#SPILL!` because its result would extend beyond the worksheet edge. Finite-width sources are supported.
 
 * HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal row-index expression can therefore be reported as `#SPILL!`. Errors in literal row indexes are detected before spill allocation.
 

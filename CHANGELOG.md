@@ -56,6 +56,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- Fixed formulas that refer to a whole column or row of a sheet with no cells, such as `=VSTACK(Sheet2!A:A)` or `=TAKE(Sheet2!A:A, 1)`, throwing an exception or returning an error. Such a column or row now reads as one blank cell, as it does on a sheet with one row or column, so other formulas that read it change too (e.g. `=COUNTBLANK(Sheet2!A:A)` now returns `1` instead of `#N/A`, and `=-Sheet2!A:A` returns `0` instead of `#VALUE!`). [#1908](https://github.com/handsontable/hyperformula/pull/1908)
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
 - Fixed the `TEXT` function mishandling masks with thousands grouping (`#,##0`) or with positive, negative and zero sections: `=TEXT(-1.5, "0.00;(0.00)")` now returns `(1.50)` instead of `-1.50;(0.00)`. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
 - Fixed approximate `XLOOKUP` ignoring values of a different type in some search modes, and approximate `MATCH`, `VLOOKUP`, and `HLOOKUP` taking such values into account for non-range arrays, single-cell ranges, and binary search over sorted cell ranges; both now behave the same in linear and binary search, consistent with Microsoft Excel. [#1755](https://github.com/handsontable/hyperformula/pull/1755)

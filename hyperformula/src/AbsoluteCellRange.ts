@@ -487,7 +487,7 @@ export class AbsoluteCellRange implements SimpleCellRange {
   }
 
   /**
-   * Maps each address in the range (clipped to the sheet's effective bounds) through a callback and returns the results in row-major 2D form.
+   * Maps each address in the range (clipped to its effective width and height) through a callback and returns the results in row-major 2D form.
    * @param {DependencyGraph} dependencyGraph - Graph used to resolve effective sheet bounds
    * @param {(arg: SimpleCellAddress) => T} op - Callback invoked for each address
    * @returns {T[][]} Mapped values indexed by `[row][column]`
@@ -495,11 +495,13 @@ export class AbsoluteCellRange implements SimpleCellRange {
    */
   public addressesArrayMap<T>(dependencyGraph: DependencyGraph, op: (arg: SimpleCellAddress) => T): T[][] {
     const ret = []
+    const limitRow = this.start.row + this.effectiveHeight(dependencyGraph) - 1
+    const limitColumn = this.start.col + this.effectiveWidth(dependencyGraph) - 1
     let currentRow = this.start.row
-    while (currentRow <= this.effectiveEndRow(dependencyGraph)) {
+    while (currentRow <= limitRow) {
       let currentColumn = this.start.col
       const tmp = []
-      while (currentColumn <= this.effectiveEndColumn(dependencyGraph)) {
+      while (currentColumn <= limitColumn) {
         tmp.push(op(simpleCellAddress(this.start.sheet, currentColumn, currentRow)))
         currentColumn++
       }
@@ -776,21 +778,23 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
   }
 
   /**
-   * Returns the effective last row, taken from the sheet's current height.
+   * Returns the effective last row, taken from the sheet's current height. It bounds the addresses the range depends
+   * on, so a column of a sheet with no cells has none.
    * @param {DependencyGraph} dependencyGraph - Graph used to resolve sheet height
-   * @returns {number} Last populated row index of the sheet
+   * @returns {number} Last populated row index of the sheet, or -1 when the sheet has no cells
    */
   public effectiveEndRow(dependencyGraph: DependencyGraph): number {
-    return this.effectiveHeight(dependencyGraph) - 1
+    return dependencyGraph.getSheetHeight(this.sheet) - 1
   }
 
   /**
-   * Returns the effective height, taken from the sheet's current height.
+   * Returns the effective height, taken from the sheet's current height. A range value is never empty, so the column
+   * of a sheet with no cells reads as one blank cell, as the column of a sheet with one row does.
    * @param {DependencyGraph} dependencyGraph - Graph used to resolve sheet height
-   * @returns {number} Current sheet height in rows
+   * @returns {number} Current sheet height in rows, at least 1
    */
   public effectiveHeight(dependencyGraph: DependencyGraph): number {
-    return dependencyGraph.getSheetHeight(this.sheet)
+    return Math.max(1, dependencyGraph.getSheetHeight(this.sheet))
   }
 
   /**
@@ -890,21 +894,23 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
   }
 
   /**
-   * Returns the effective last column, taken from the sheet's current width.
+   * Returns the effective last column, taken from the sheet's current width. It bounds the addresses the range depends
+   * on, so a row of a sheet with no cells has none.
    * @param {DependencyGraph} dependencyGraph - Graph used to resolve sheet width
-   * @returns {number} Last populated column index of the sheet
+   * @returns {number} Last populated column index of the sheet, or -1 when the sheet has no cells
    */
   public effectiveEndColumn(dependencyGraph: DependencyGraph): number {
-    return this.effectiveWidth(dependencyGraph) - 1
+    return dependencyGraph.getSheetWidth(this.sheet) - 1
   }
 
   /**
-   * Returns the effective width, taken from the sheet's current width.
+   * Returns the effective width, taken from the sheet's current width. A range value is never empty, so the row of a
+   * sheet with no cells reads as one blank cell, as the row of a sheet with one column does.
    * @param {DependencyGraph} dependencyGraph - Graph used to resolve sheet width
-   * @returns {number} Current sheet width in columns
+   * @returns {number} Current sheet width in columns, at least 1
    */
   public effectiveWidth(dependencyGraph: DependencyGraph): number {
-    return dependencyGraph.getSheetWidth(this.sheet)
+    return Math.max(1, dependencyGraph.getSheetWidth(this.sheet))
   }
 
   /**
