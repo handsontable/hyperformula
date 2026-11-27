@@ -21,9 +21,11 @@ export interface FormulaBarCellOptions {
   onActivate: () => void;
 
   /**
-   * Lexer separator overrides matching the engine's locale.
+   * Lexer separator overrides matching the engine's locale, plus the engine's `maxColumns` and
+   * `maxRows`: text past them is not colored as a reference.
    *
-   * @defaultValue the lexer defaults (`,` argument separator, `.` decimal separator)
+   * @defaultValue the lexer defaults (`,` argument separator, `.` decimal separator, and
+   * HyperFormula's default `maxColumns` and `maxRows`)
    */
   separators?: Partial<LexerOptions>;
 

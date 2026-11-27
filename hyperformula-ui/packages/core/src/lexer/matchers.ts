@@ -1,5 +1,14 @@
 import { RE_CELL, RE_SHEET_BARE } from "./patterns";
 import { colLettersToIndex } from "./tokens";
+import type { ReferenceLimits } from "./types";
+
+/**
+ * HyperFormula's default `maxColumns` and `maxRows`, used when no engine config sets them.
+ */
+export const DEFAULT_REFERENCE_LIMITS: ReferenceLimits = {
+  maxColumns: 18_278,
+  maxRows: 40_000,
+};
 
 export interface CellMatch {
   text: string;
@@ -26,7 +35,25 @@ export function matchSticky(pattern: RegExp, text: string, pos: number): RegExpE
   return pattern.exec(text);
 }
 
-export function matchCell(text: string, pos: number): CellMatch | null {
+/**
+ * Tells whether a zero-based column index is below `limits.maxColumns`.
+ */
+export function isColumnInLimits(col: number, limits: ReferenceLimits): boolean {
+  return col < limits.maxColumns;
+}
+
+/**
+ * Tells whether a zero-based row index is below `limits.maxRows`.
+ */
+export function isRowInLimits(row: number, limits: ReferenceLimits): boolean {
+  return row < limits.maxRows;
+}
+
+/**
+ * Matches an A1 cell reference at `pos`. Returns `null` when nothing matches, or when the column
+ * or the row is past `limits`, so text such as `CONCATENATEA1` falls through to an identifier.
+ */
+export function matchCell(text: string, pos: number, limits: ReferenceLimits): CellMatch | null {
   const match = matchSticky(RE_CELL, text, pos);
 
   if (!match || match.index !== pos) {
@@ -36,6 +63,10 @@ export function matchCell(text: string, pos: number): CellMatch | null {
   const [whole, absCol, letters, absRow, digits] = match;
   const col = colLettersToIndex(letters ?? "");
   const row = Number.parseInt(digits ?? "0", 10) - 1;
+
+  if (!isColumnInLimits(col, limits) || !isRowInLimits(row, limits)) {
+    return null;
+  }
 
   return {
     text: whole,

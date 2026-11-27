@@ -1,6 +1,7 @@
 import { expandWholeRange } from "../adapter/range";
 import type { CellRange } from "../adapter/types";
-import type { LexerOptions, RangeRefMeta } from "../lexer/types";
+import { DEFAULT_REFERENCE_LIMITS } from "../lexer/matchers";
+import type { LexerSeparators, RangeRefMeta, ReferenceLimits } from "../lexer/types";
 import { FunctionCatalog } from "./functionCatalog";
 import { sheetDimensions } from "./namedExpr";
 import { NamedExpressions } from "./namedExpressions";
@@ -13,7 +14,7 @@ import type {
   NamedExprResolution,
 } from "./types";
 
-const DEFAULT_SEPARATORS: LexerOptions = {
+const DEFAULT_SEPARATORS: LexerSeparators = {
   decimalSeparator: ".",
   argSeparator: ",",
   arrayColumnSeparator: ",",
@@ -51,7 +52,7 @@ export class EngineBridge {
     return address.sheet === this.sheetId;
   }
 
-  getSeparators(): LexerOptions {
+  getSeparators(): LexerSeparators {
     const config = this.engine?.getConfig?.();
 
     if (!config) {
@@ -63,6 +64,19 @@ export class EngineBridge {
       argSeparator: config.functionArgSeparator ?? DEFAULT_SEPARATORS.argSeparator,
       arrayColumnSeparator: config.arrayColumnSeparator ?? DEFAULT_SEPARATORS.arrayColumnSeparator,
       arrayRowSeparator: config.arrayRowSeparator ?? DEFAULT_SEPARATORS.arrayRowSeparator,
+    };
+  }
+
+  /**
+   * Reads the engine's `maxColumns` and `maxRows`, the sheet size past which the lexer stops
+   * treating text as a reference. Falls back to HyperFormula's defaults without an engine.
+   */
+  getReferenceLimits(): ReferenceLimits {
+    const config = this.engine?.getConfig?.();
+
+    return {
+      maxColumns: config?.maxColumns ?? DEFAULT_REFERENCE_LIMITS.maxColumns,
+      maxRows: config?.maxRows ?? DEFAULT_REFERENCE_LIMITS.maxRows,
     };
   }
 

@@ -107,7 +107,10 @@ export class FormulaBar {
     });
     this.formulaCell = new FormulaBarCell({
       knownFunctions: options.knownFunctions,
-      separators: options.editor.engine.getSeparators(),
+      separators: {
+        ...options.editor.engine.getSeparators(),
+        ...options.editor.engine.getReferenceLimits(),
+      },
       tokenPostProcess: (tokens) =>
         annotateNamedExprs(tokens, (name) => options.editor.engine.resolveNamedExpression(name)),
       onActivate: () => this.activateFromIdle(),

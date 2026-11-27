@@ -303,7 +303,8 @@ Kernel (kernel/)
 └── types.ts            — FormulaState, CursorPosition, KernelEventMap
 Lexer (lexer/)
 ├── lexer.ts            — hand-written stateless scanner; tokenizes partial/invalid input live;
-│                         locale-configurable separators (decimal/arg/array)
+│                         locale-configurable separators (decimal/arg/array) and reference
+│                         limits (the engine's maxColumns/maxRows)
 ├── tokens.ts           — TokenType + colLettersToIndex/indexToColLetters
 ├── types.ts            — Token + ref/comment/named-expr meta interfaces, LexerOptions
 ├── matchers.ts         — per-token-kind match helpers used by the scanner loop
@@ -311,7 +312,7 @@ Lexer (lexer/)
 └── additiveContext.ts  — marks each COMMENT token contextOk (legal + N(...) slot) for the
                           comments boundary
 EngineBridge (engine/)
-├── engineBridge.ts          — EngineBridge facade: separators, config reads, sheet-boundary
+├── engineBridge.ts          — EngineBridge facade: separators, reference limits, config reads, sheet-boundary
 │                              queries (isOwnSheet / expandWholeRange); delegates the function
 │                              catalog to FunctionCatalog and named-expression resolution to
 │                              NamedExpressions. The ONLY HyperFormula access point outside

@@ -3,6 +3,9 @@ import {
   buildNumberPattern,
   buildQuotedSheetEnds,
   type CellMatch,
+  DEFAULT_REFERENCE_LIMITS,
+  isColumnInLimits,
+  isRowInLimits,
   matchCell,
   matchSheetPrefix,
   matchSticky,
@@ -26,6 +29,7 @@ const DEFAULT_LEXER_OPTIONS: LexerOptions = {
   argSeparator: ",",
   arrayColumnSeparator: ",",
   arrayRowSeparator: ";",
+  ...DEFAULT_REFERENCE_LIMITS,
 };
 
 export class Lexer {
@@ -50,20 +54,19 @@ export class Lexer {
 
     if (columnMatch && columnMatch.index === startPos) {
       const [whole, startAbs, startLetters, endAbs, endLetters] = columnMatch;
+      const startCol = colLettersToIndex(startLetters ?? "");
+      const endCol = colLettersToIndex(endLetters ?? "");
+
+      if (!isColumnInLimits(startCol, this.options) || !isColumnInLimits(endCol, this.options)) {
+        return null;
+      }
+
       const end = startPos + whole.length;
       const meta: RangeRefMeta = {
         ...(sheet === undefined ? {} : { sheet }),
         whole: "column",
-        start: {
-          col: colLettersToIndex(startLetters ?? ""),
-          row: 0,
-          abs: { col: startAbs === "$", row: false },
-        },
-        end: {
-          col: colLettersToIndex(endLetters ?? ""),
-          row: 0,
-          abs: { col: endAbs === "$", row: false },
-        },
+        start: { col: startCol, row: 0, abs: { col: startAbs === "$", row: false } },
+        end: { col: endCol, row: 0, abs: { col: endAbs === "$", row: false } },
       };
 
       return {
@@ -82,20 +85,19 @@ export class Lexer {
 
     if (rowMatch && rowMatch.index === startPos) {
       const [whole, startAbs, startDigits, endAbs, endDigits] = rowMatch;
+      const startRow = Number.parseInt(startDigits ?? "1", 10) - 1;
+      const endRow = Number.parseInt(endDigits ?? "1", 10) - 1;
+
+      if (!isRowInLimits(startRow, this.options) || !isRowInLimits(endRow, this.options)) {
+        return null;
+      }
+
       const end = startPos + whole.length;
       const meta: RangeRefMeta = {
         ...(sheet === undefined ? {} : { sheet }),
         whole: "row",
-        start: {
-          col: 0,
-          row: Number.parseInt(startDigits ?? "1", 10) - 1,
-          abs: { col: false, row: startAbs === "$" },
-        },
-        end: {
-          col: 0,
-          row: Number.parseInt(endDigits ?? "1", 10) - 1,
-          abs: { col: false, row: endAbs === "$" },
-        },
+        start: { col: 0, row: startRow, abs: { col: false, row: startAbs === "$" } },
+        end: { col: 0, row: endRow, abs: { col: false, row: endAbs === "$" } },
       };
 
       return {
@@ -126,7 +128,7 @@ export class Lexer {
       return null;
     }
 
-    const secondCell = matchCell(text, afterFirst + 1);
+    const secondCell = matchCell(text, afterFirst + 1, this.options);
 
     if (!secondCell) {
       return null;
@@ -243,7 +245,7 @@ export class Lexer {
 
       if (sheet) {
         const afterSheet = pos + sheet.length;
-        const firstCell = matchCell(text, afterSheet);
+        const firstCell = matchCell(text, afterSheet, this.options);
 
         if (firstCell) {
           const rangeAttempt = this.tryConsumeRange(
@@ -295,7 +297,7 @@ export class Lexer {
         continue;
       }
 
-      const cell = matchCell(text, pos);
+      const cell = matchCell(text, pos, this.options);
 
       if (cell) {
         const rangeAttempt = this.tryConsumeRange(text, pos, cell);

@@ -37,9 +37,27 @@ export interface Token {
   meta?: CellRefMeta | RangeRefMeta | CommentMeta | NamedExprMeta | Record<string, unknown>;
 }
 
-export interface LexerOptions {
+/**
+ * The sheet size a reference must fit in to lex as a reference, matching the engine's
+ * `maxColumns` and `maxRows` config.
+ */
+export interface ReferenceLimits {
+  /**
+   * The number of columns: a column index at or past it is not a reference.
+   */
+  maxColumns: number;
+
+  /**
+   * The number of rows: a row index at or past it is not a reference.
+   */
+  maxRows: number;
+}
+
+export interface LexerSeparators {
   decimalSeparator: string;
   argSeparator: string;
   arrayColumnSeparator: string;
   arrayRowSeparator: string;
 }
+
+export interface LexerOptions extends LexerSeparators, ReferenceLimits {}

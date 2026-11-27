@@ -34,6 +34,14 @@ describe("FormulaBarCell", () => {
     expect(container.textContent).toContain("=C2*C3");
   });
 
+  it("does not color '=CONCATENATEA1' as a reference in the idle view", () => {
+    const { container, formulaCell } = cell();
+
+    formulaCell.renderValue("=CONCATENATEA1");
+
+    expect(container.querySelectorAll("[data-ref-index]")).toHaveLength(0);
+  });
+
   it("marks unknown functions", () => {
     const { container, formulaCell } = cell(new Set(["SUM"]));
 
