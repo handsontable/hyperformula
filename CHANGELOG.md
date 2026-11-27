@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Breaking change**: Changed the `FILTER` function to return `#VALUE!` for text in its `include` argument, including the empty text and `"TRUE"`, and to return an error found there, as in Microsoft Excel. Before, it dropped those rows, or kept them for `"TRUE"`. For example, a condition column of `=IF(B1>0, TRUE(), "")` now makes `FILTER` return `#VALUE!`; return `FALSE()` instead of `""`. See the [migration guide](https://handsontable.com/docs/hyperformula/guide/migration-from-3.x-to-4.0.html). [#1891](https://github.com/handsontable/hyperformula/pull/1891)
 - **Breaking change**: Changed the Polish name of `PDURATION` from `ROCZ.PRZYCH` to `O.CZAS.TRWANIA` and the Turkish name of `VALUE` from `DEĞER` to `SAYIYAÇEVİR`, as in Microsoft Excel, which uses `ROCZ.PRZYCH` for `DURATION` and `DEĞER` for `PRICE`. A Polish or Turkish formula with an old name now calls `DURATION` or `PRICE`; use the new names instead. See the [migration guide](https://handsontable.com/docs/hyperformula/guide/migration-from-3.x-to-4.0.html). [#1848](https://github.com/handsontable/hyperformula/pull/1848)
 - **Breaking change**: Changed `getCellValue()`, `getSheetValues()` and the other methods that export cell values to follow the `evaluateNullToZero` option: with the option on, they now return `0` for an empty cell instead of `null`, and `getSheetValues()` fills each row with `0` up to the sheet's width. The changes passed to the `valuesUpdated` event also report `0` for a cleared cell. To check whether a cell is empty, use `isCellEmpty()`. See the [migration guide](https://handsontable.com/docs/hyperformula/guide/migration-from-3.x-to-4.0.html). [#1738](https://github.com/handsontable/hyperformula/pull/1738)
+- Changed `XLOOKUP` with `search_mode` 2 or -2 to find more exact matches in a range that is not sorted, e.g. 3 in 5, 1, 3, 2, 4, where it returned no match before. The result on unsorted data is still not guaranteed. [#1806](https://github.com/handsontable/hyperformula/pull/1806)
 
 ### Added
 
@@ -54,6 +55,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added a new function: `ERF.PRECISE`. [#1789](https://github.com/handsontable/hyperformula/pull/1789)
 - Added the `PERMUT` and `PERMUTATIONA` functions, which count permutations without and with repetition, and `BINOM.DIST.RANGE`, which returns the binomial probability of a range of successes. [#1790](https://github.com/handsontable/hyperformula/pull/1790)
 - Added `TEXTBEFORE` and `TEXTAFTER`, which return the text before or after a delimiter, and `TEXTSPLIT`, which splits text into rows and columns. `TEXTSPLIT` spills only when every argument but `pad_with` is a constant, because result dimensions are determined before evaluation. [#1792](https://github.com/handsontable/hyperformula/pull/1792)
+- Added the `SORTBY`, `XMATCH` and `LOOKUP` functions. [#1806](https://github.com/handsontable/hyperformula/pull/1806)
 
 ### Fixed
 
@@ -72,6 +74,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is an empty argument slot (e.g. `=ADDRESS(2,3,1,FALSE(),)` now returns `R2C3` instead of `!R2C3`), while an explicit `""` still adds it. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
 - Fixed `IMSUM`, `IMPRODUCT` and `TEXTJOIN` throwing an uncaught `RangeError` for very large ranges, such as `=IMSUM(A1:D40000)`, which stopped the recalculation; they now return a result or an error value in the cell. [#1901](https://github.com/handsontable/hyperformula/pull/1901)
 - Fixed `AVEDEV`, `DEVSQ`, `GCD`, `GEOMEAN`, `HARMEAN`, `LCM`, `MEDIAN`, `NPV`, `SKEW` and `SKEW.P` stopping the engine from building on a range of about 125,000 cells or more. [#1800](https://github.com/handsontable/hyperformula/pull/1800)
+- Fixed approximate `MATCH`, `VLOOKUP` and `HLOOKUP`, and `XLOOKUP` with `search_mode` 2 or -2, misordering text that differs in letter case or accents, e.g. `=MATCH("é", A1:A3, 1)` over a, é, f now returns `2` instead of `1`. [#1806](https://github.com/handsontable/hyperformula/pull/1806)
 
 ## [3.5.0] - 2026-10-09
 

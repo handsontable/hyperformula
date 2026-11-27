@@ -7,6 +7,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {ApproximateMatchPolicy} from '../Lookup/SearchStrategy'
+import {collationKey} from './ArithmeticHelper'
 import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue} from './InterpreterValue'
 
 const NOT_FOUND = -1
@@ -36,7 +37,7 @@ const NOT_FOUND = -1
  * descent touches a skipped cell does the search fall back to an O(n) scan that compacts the
  * eligible indices and re-runs the binary search over them.
  *
- * Note: this function does not normalize input strings.
+ * Note: a string searchKey must already be a `collationKey`; the strings read from the range are turned into one here.
  *
  * @param {RawNoErrorScalarValue} searchKey - Lookup value.
  * @param {AbsoluteCellRange} range - Sorted one-dimensional cell range.
@@ -67,9 +68,11 @@ export function findLastOccurrenceInOrderedRange(
   const start = range.start[searchCoordinate]
   const end = searchCoordinate === 'col' ? range.effectiveEndColumn(dependencyGraph) : range.effectiveEndRow(dependencyGraph)
 
+  const normalize = (value: RawInterpreterValue) => typeof value === 'string' ? collationKey(value) : value
+
   const getValueFromIndexFn = searchCoordinate === 'col'
-    ? (index: number) => getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, index, range.start.row)))
-    : (index: number) => getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col, index)))
+    ? (index: number) => normalize(getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, index, range.start.row))))
+    : (index: number) => normalize(getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col, index))))
 
   const compareFn = orderingDirection === 'asc'
     ? (left: RawNoErrorScalarValue, right: RawInterpreterValue) => compare(left, right)
@@ -166,7 +169,8 @@ export function findLastOccurrenceInOrderedRange(
     return index - start
   }
 
-  if (foundValue === searchKey) {
+  // Without a candidate, foundValue stands in as EmptyValue; a blank searchKey must not match that.
+  if (foundIndex !== NOT_FOUND && foundValue === searchKey) {
     return foundIndex - start
   }
 
@@ -218,7 +222,27 @@ export function findLastOccurrenceInOrderedRange(
     return returnApproximateResult(nextIndex)
   }
 
-  // ifNoMatch === 'returnNotFound'
+  // ifNoMatch === 'returnNotFound': on a range that is not actually sorted the descent above can miss a
+  // value that is present, so look for an exact hit with a plain bisection
+  let low = start
+  let high = end
+
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2)
+    const middleValue = getValueFromIndexFn(middle)
+    const comparison = compareFn(searchKey, middleValue)
+
+    if (comparison === 0 && middleValue === searchKey) {
+      return middle - start
+    }
+
+    if (comparison > 0) {
+      low = middle + 1
+    } else {
+      high = middle - 1
+    }
+  }
+
   return NOT_FOUND
 }
 
