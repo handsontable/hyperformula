@@ -4,6 +4,12 @@ import { currentFunctionPrefix } from "../../../src/ui/caret/tokenContext";
 
 const lex = new Lexer();
 
+function lexAtCaret(marked: string) {
+  const offset = marked.indexOf("|");
+
+  return { offset, tokens: lex.tokenize(marked.slice(0, offset) + marked.slice(offset + 1)) };
+}
+
 describe("currentFunctionPrefix", () => {
   it("detects mid-identifier prefix", () => {
     const text = "=SU";
@@ -31,8 +37,7 @@ describe("currentFunctionPrefix", () => {
     ["=S| A1", "S", 1],
     ['=S|"x"', "S", 1],
   ])("returns the prefix before a non-name character in %s", (marked, prefix, start) => {
-    const offset = marked.indexOf("|");
-    const tokens = lex.tokenize(marked.replace("|", ""));
+    const { offset, tokens } = lexAtCaret(marked);
 
     expect(currentFunctionPrefix(tokens, offset)).toEqual({ prefix, start });
   });
@@ -47,8 +52,7 @@ describe("currentFunctionPrefix", () => {
     "=S|Sheet1!A1",
     "=S|A:A",
   ])("returns null when the letters join the next token in %s", (marked) => {
-    const offset = marked.indexOf("|");
-    const tokens = lex.tokenize(marked.replace("|", ""));
+    const { offset, tokens } = lexAtCaret(marked);
 
     expect(currentFunctionPrefix(tokens, offset)).toBeNull();
   });
