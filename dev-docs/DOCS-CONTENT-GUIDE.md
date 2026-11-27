@@ -94,7 +94,8 @@ Treat **every page as page one.**
   finish, that information belongs on the page, not behind the link.
 5. **Author the frontmatter.** Every page gets a specific `title` and a one-sentence
   `description` that names the concept (this becomes the meta description and helps
-    scoping). Titles describe the *thing*, not the category: "WebSocket configuration"
+    scoping). A page without one gets its first prose paragraph, cut at 160 characters
+    (`docs/src/route-data.mjs`), which is rarely as precise. Titles describe the *thing*, not the category: "WebSocket configuration"
     → good; "Configuration" → bad. Give the file a meaningful slug
     (`custom-functions.md`, not `page3.md`).
 

@@ -56,10 +56,11 @@ export default defineConfig({
     assets: 'assets',
   },
   vite: {
-    // Components get the engine's version from here: their code is bundled and moved by the build, so
-    // `src/docs-data.mjs`, which finds the engine relative to itself, cannot be imported from them.
+    // Components and `src/route-data.mjs` get the engine's values from here: their code is bundled and moved by the
+    // build, so `src/docs-data.mjs`, which finds the engine relative to itself, cannot be imported from them.
     define: {
       'import.meta.env.PUBLIC_HF_VERSION': JSON.stringify(DOCS_DATA.version),
+      'import.meta.env.HF_DOCS_DATA': JSON.stringify(DOCS_DATA),
     },
     // The docs assistant (`src/components/DocsAssistant/`) is React, mounted in the browser by
     // `src/scripts/docs-assistant-bootstrap.ts`: its `.tsx` files use the automatic JSX runtime.
