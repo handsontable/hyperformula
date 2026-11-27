@@ -4,7 +4,7 @@
  * The live examples run the engine from the CDN and show the license key placeholder, so they run without a key.
  * On handsontable.com the engine skips the license check; on a preview URL it does not, and every example would
  * return `#LIC!`. A preview build therefore writes the internal test key into the script each example runs, never
- * into the code a page shows or the StackBlitz project, and a production build never gets it.
+ * into the code a page shows, its "Source code" tabs included, and a production build never gets it.
  *
  * Handsontable does the same in its own docs (`docs/src/plugins/preview-license-key.mjs`), on bundled example
  * modules. Here `renderExample()` (`markdown-plugins.mjs`) pastes each example into its page as an inline script, so
@@ -80,9 +80,9 @@ export function injectLicenseKey(code, key) {
 const EXAMPLE_SCRIPT = /(<script data-hf-example(?:="")?>)([\s\S]*?)(<\/script>)/g;
 
 /**
- * Writes the key into the live example scripts of every page under `distDir`. The code a page shows and the
- * StackBlitz project are outside them, so they keep the placeholder. Running it again on pages it already injected
- * changes nothing.
+ * Writes the key into the live example scripts of every page under `distDir`. The code a page shows, the "Source
+ * code" tabs of the examples included, is outside them, so it keeps the placeholder. Running it again on pages it
+ * already injected changes nothing.
  *
  * @param {string} distDir The build output directory.
  * @param {string} key The license key.

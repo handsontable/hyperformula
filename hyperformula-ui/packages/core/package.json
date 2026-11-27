@@ -46,7 +46,7 @@
     "lint:fix": "biome check --write . ../../scripts ../../rspack.base.mjs ../../vitest.base.ts ../../biome.json ../../tsconfig.base.json ../../tsconfig.package.json ../../tsconfig.test.json"
   },
   "peerDependencies": {
-    "hyperformula": "^3.0.0"
+    "hyperformula": ">=3.0.0"
   },
   "peerDependenciesMeta": {
     "hyperformula": {
@@ -60,7 +60,7 @@
     "@rspack/core": "^1.1.0",
     "@types/node": "^22.10.0",
     "happy-dom": "^15.11.0",
-    "hyperformula": "^3.4.0",
+    "hyperformula": ">=3.4.0",
     "sass": "^1.100.0",
     "typescript": "^5.6.3",
     "vitest": "^2.1.5"

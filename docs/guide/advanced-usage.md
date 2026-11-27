@@ -1,5 +1,6 @@
 ---
 title: "Advanced usage"
+description: "Build a multi-sheet HyperFormula workbook, read values across sheets, and convert between A1 notation and cell addresses."
 tags:
   - buildEmpty
   - simpleCellAddressFromString
