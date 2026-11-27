@@ -21,4 +21,35 @@ describe("currentFunctionPrefix", () => {
 
     expect(currentFunctionPrefix(tokens, 3)).toBeNull();
   });
+
+  it.each([
+    ["=S|()A1", "S", 1],
+    ["=S|(A1)", "S", 1],
+    ["=S|+A1", "S", 1],
+    ["=SUM(S|,A1)", "S", 5],
+    ["=SUM(A1,S|)", "S", 8],
+    ["=S| A1", "S", 1],
+    ['=S|"x"', "S", 1],
+  ])("returns the prefix before a non-name character in %s", (marked, prefix, start) => {
+    const offset = marked.indexOf("|");
+    const tokens = lex.tokenize(marked.replace("|", ""));
+
+    expect(currentFunctionPrefix(tokens, offset)).toEqual({ prefix, start });
+  });
+
+  it.each([
+    "=S|$A$1",
+    "=S|SUM(A1)",
+    "=S|UM",
+    "=SU|M(A1)",
+    "=S|1",
+    "=S|A1",
+    "=S|Sheet1!A1",
+    "=S|A:A",
+  ])("returns null when the letters join the next token in %s", (marked) => {
+    const offset = marked.indexOf("|");
+    const tokens = lex.tokenize(marked.replace("|", ""));
+
+    expect(currentFunctionPrefix(tokens, offset)).toBeNull();
+  });
 });

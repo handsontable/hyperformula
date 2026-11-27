@@ -173,6 +173,29 @@ describe("PopupController", () => {
     destroy();
   });
 
+  it("opens suggestions for letters typed in front of parentheses", () => {
+    const { host, destroy } = createPopupHarness();
+
+    typeInto(host, "=SU()A1");
+    moveCaretTo(host, 3);
+
+    expect(suggestionsVisible()).toBe(true);
+    expect(suggestionLabels()).toEqual(["SUM", "SUMIF"]);
+
+    destroy();
+  });
+
+  it("keeps suggestions closed when the letters join a cell reference", () => {
+    const { host, destroy } = createPopupHarness();
+
+    typeInto(host, "=SUA1");
+    moveCaretTo(host, 3);
+
+    expect(suggestionsVisible()).toBe(false);
+
+    destroy();
+  });
+
   it("keeps both popups closed for non-formula text", () => {
     const { host, destroy } = createPopupHarness();
 
@@ -390,6 +413,19 @@ describe("PopupController", () => {
     expect(editor.getCaretOffset()).toBe(5);
     expect(suggestionsVisible()).toBe(false);
     expect(onCommit).not.toHaveBeenCalled();
+
+    destroy();
+  });
+
+  it("reuses the opening paren after the caret when accepting a function suggestion", () => {
+    const { host, editor, destroy } = createPopupHarness();
+
+    typeInto(host, "=SU(A1");
+    moveCaretTo(host, 3);
+    press(host, "Enter");
+
+    expect(editor.getValue()).toBe("=SUM(A1");
+    expect(editor.getCaretOffset()).toBe(5);
 
     destroy();
   });

@@ -60,26 +60,24 @@ export function activeCallContext(tokens: Token[], offset: number): CallContext 
   return null;
 }
 
+const RE_NAME_CONTINUATION = /[\p{L}\p{N}_.$]/u;
+
 export function currentFunctionPrefix(tokens: Token[], offset: number): FunctionPrefix | null {
-  for (let index = tokens.length - 1; index >= 0; index--) {
-    const token = tokens[index];
+  const token = tokens.find(
+    (candidate) =>
+      candidate.end === offset &&
+      (candidate.type === TokenType.IDENT || candidate.type === TokenType.FUNCTION),
+  );
 
-    if (!token) {
-      continue;
-    }
-
-    if (token.end < offset) {
-      return null;
-    }
-
-    if (offset >= token.start && offset <= token.end) {
-      if (token.type === TokenType.IDENT) {
-        return { prefix: token.value.slice(0, offset - token.start), start: token.start };
-      }
-
-      return null;
-    }
+  if (!token) {
+    return null;
   }
 
-  return null;
+  const next = tokens.find((candidate) => candidate.start === offset);
+
+  if (next && RE_NAME_CONTINUATION.test(next.value.charAt(0))) {
+    return null;
+  }
+
+  return { prefix: token.value, start: token.start };
 }
