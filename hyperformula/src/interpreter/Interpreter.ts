@@ -279,10 +279,14 @@ export class Interpreter {
             const height = arr.height()
             if (rowHeight === undefined) {
               rowHeight = height
-              rowRet.push(...arr.data)
+              for (const dataRow of arr.data) {
+                rowRet.push(dataRow)
+              }
             } else if (rowHeight === height) {
               for (let i = 0; i < height; i++) {
-                rowRet[i].push(...arr.data[i])
+                for (const value of arr.data[i]) {
+                  rowRet[i].push(value)
+                }
               }
             } else {
               return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
@@ -291,9 +295,13 @@ export class Interpreter {
           const width = rowRet[0].length
           if (totalWidth === undefined) {
             totalWidth = width
-            ret.push(...rowRet)
+            for (const retRow of rowRet) {
+              ret.push(retRow)
+            }
           } else if (totalWidth === width) {
-            ret.push(...rowRet)
+            for (const retRow of rowRet) {
+              ret.push(retRow)
+            }
           } else {
             return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
           }

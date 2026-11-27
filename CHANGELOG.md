@@ -56,6 +56,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- Fixed array literals (e.g. `={VSTACK(A1:A40000,A1:A40000,A1:A40000,A1:A40000)}`) throwing a `RangeError: Maximum call stack size exceeded` from `buildFromArray()` and `setCellContents()` when an element holds more than about 125,000 rows or columns. [#1878](https://github.com/handsontable/hyperformula/issues/1878)
 - Fixed the `EDATE` function returning the 28th of February instead of the 29th when the shifted date falls in February of a leap year (e.g. `=EDATE(DATE(2028, 1, 31), 1)` now returns `2028-02-29` instead of `2028-02-28`). [#1781](https://github.com/handsontable/hyperformula/pull/1781)
 - Fixed the `TEXT` function mishandling masks with thousands grouping (`#,##0`) or with positive, negative and zero sections: `=TEXT(-1.5, "0.00;(0.00)")` now returns `(1.50)` instead of `-1.50;(0.00)`. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
 - Fixed approximate `XLOOKUP` ignoring values of a different type in some search modes, and approximate `MATCH`, `VLOOKUP`, and `HLOOKUP` taking such values into account for non-range arrays, single-cell ranges, and binary search over sorted cell ranges; both now behave the same in linear and binary search, consistent with Microsoft Excel. [#1755](https://github.com/handsontable/hyperformula/pull/1755)
