@@ -1,7 +1,7 @@
 import { EventManager } from "../events";
 import { nToComments } from "../kernel/commentTransform";
 import { Lexer } from "../lexer";
-import type { LexerOptions, Token } from "../lexer/types";
+import type { LexerSeparators, ReferenceLimits, Token } from "../lexer/types";
 import { CN } from "../theme/classNames";
 import { createEl, createIcon } from "../ui/dom";
 import { DEFAULT_PHRASES } from "../ui/phrases";
@@ -25,7 +25,15 @@ export interface FormulaBarCellOptions {
    *
    * @defaultValue the lexer defaults (`,` argument separator, `.` decimal separator)
    */
-  separators?: Partial<LexerOptions>;
+  separators?: Partial<LexerSeparators>;
+
+  /**
+   * The engine's `maxColumns` and `maxRows`. Text whose column or row is past them is not colored
+   * as a reference in the idle view.
+   *
+   * @defaultValue HyperFormula's defaults (`maxColumns` 18,278, `maxRows` 40,000)
+   */
+  referenceLimits?: Partial<ReferenceLimits>;
 
   /** Host factories replacing the built-in icons; the cell renders the `function` icon. */
   icons?: IconsOptions;
@@ -55,7 +63,7 @@ export class FormulaBarCell {
   readonly root: HTMLElement;
   private readonly events = new EventManager();
   private readonly lexer: Lexer;
-  private readonly separators: Partial<LexerOptions> | undefined;
+  private readonly separators: Partial<LexerSeparators> | undefined;
   private readonly tokenPostProcess: ((tokens: Token[], text: string) => Token[]) | undefined;
   private lastValue = "";
   private readonly idleOverlay: VisualOverlay;
@@ -67,7 +75,7 @@ export class FormulaBarCell {
   constructor(options: FormulaBarCellOptions) {
     this.separators = options.separators;
     this.tokenPostProcess = options.tokenPostProcess;
-    this.lexer = new Lexer(options.separators);
+    this.lexer = new Lexer({ ...options.separators, ...options.referenceLimits });
     this.root = createEl("div", { class: `${CN.formulaBarCell} ${CN.formulaBarCellFormula}` });
     this.fxIcon = createIcon("function", options.icons);
     this.fxIcon.classList.add(CN.formulaBarFxIcon);

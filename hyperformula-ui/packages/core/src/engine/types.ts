@@ -42,6 +42,8 @@ interface HyperFormulaConfig {
   functionArgSeparator?: string;
   arrayColumnSeparator?: string;
   arrayRowSeparator?: string;
+  maxColumns?: number;
+  maxRows?: number;
 }
 
 /**

@@ -185,4 +185,33 @@ describe("FormulaEditor grid highlight recompute (HighlightController)", () => {
     });
     destroy();
   });
+
+  it("pushes no grid highlight for '=CONCATENATEA1' or '=A9999999999999999'", () => {
+    const { host, adapter, destroy } = createEditorHarness();
+
+    typeInto(host, "=CONCATENATEA1");
+    expect(adapter.highlights).toEqual([]);
+
+    typeInto(host, "=A9999999999999999");
+    expect(adapter.highlights).toEqual([]);
+
+    destroy();
+  });
+
+  it("pushes no grid highlight for a reference past the engine's maxRows", () => {
+    class SmallHF {
+      getConfig() {
+        return { maxColumns: 5, maxRows: 10 };
+      }
+    }
+    const { host, adapter, destroy } = createEditorHarness({ hyperformula: new SmallHF() });
+
+    typeInto(host, "=A10");
+    expect(adapter.highlights).toHaveLength(1);
+
+    typeInto(host, "=A11");
+    expect(adapter.highlights).toEqual([]);
+
+    destroy();
+  });
 });

@@ -1491,3 +1491,35 @@ describe("FormulaBar address box when the grid cannot select", () => {
     harness.editor.destroy();
   });
 });
+
+describe("FormulaBar reference limits", () => {
+  it("does not color a reference past the engine's maxRows in the idle view", () => {
+    class SmallHF {
+      getConfig() {
+        return { maxColumns: 5, maxRows: 10 };
+      }
+    }
+    const container = document.createElement("div");
+    const { adapter } = makeBarAdapter({
+      getActiveCell: activeCellAtOrigin,
+      getCellFormula: () => "=A10+A11",
+    });
+    const editor = new FormulaEditorImpl(document.createElement("div"), {
+      popupCtx: sharedPopupCtx,
+      adapter,
+      hyperformula: new SmallHF(),
+      onCommit: (value) => adapter.commit(value),
+      onCancel: () => adapter.cancel(),
+    });
+    const controller = makeFormulaBar(container, {
+      adapter,
+      editor,
+      knownFunctions: new Set(["SUM"]),
+    });
+
+    expect(Object.keys(refIndexByText(placeholderEl(container)))).toEqual(["A10"]);
+
+    controller.destroy();
+    editor.destroy();
+  });
+});

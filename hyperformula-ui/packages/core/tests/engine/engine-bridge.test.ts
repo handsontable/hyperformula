@@ -58,6 +58,23 @@ describe("EngineBridge", () => {
       arrayRowSeparator: "|",
     });
   });
+
+  it("returns the HyperFormula default reference limits without HF", () => {
+    const bridge = new EngineBridge();
+
+    expect(bridge.getReferenceLimits()).toEqual({ maxColumns: 18_278, maxRows: 40_000 });
+  });
+
+  it("reads maxColumns and maxRows from the HyperFormula config", () => {
+    class SizedHF {
+      getConfig() {
+        return { maxColumns: 16_384, maxRows: 1_048_576 };
+      }
+    }
+    const bridge = new EngineBridge({ hyperformula: new SizedHF() as never });
+
+    expect(bridge.getReferenceLimits()).toEqual({ maxColumns: 16_384, maxRows: 1_048_576 });
+  });
 });
 
 describe("EngineBridge catalog cache isolation", () => {

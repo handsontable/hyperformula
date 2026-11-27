@@ -7,6 +7,8 @@ import {
   matchSticky,
 } from "../../src/lexer/matchers";
 
+const LIMITS = { maxColumns: 16_384, maxRows: 1_048_576 };
+
 describe("buildNumberPattern", () => {
   it("matches an integer with the dot separator", () => {
     const pattern = buildNumberPattern(".");
@@ -85,7 +87,7 @@ describe("matchSticky", () => {
 
 describe("matchCell", () => {
   it("matches a relative A1 reference", () => {
-    expect(matchCell("A1", 0)).toEqual({
+    expect(matchCell("A1", 0, LIMITS)).toEqual({
       text: "A1",
       length: 2,
       meta: { col: 0, row: 0, abs: { col: false, row: false } },
@@ -93,7 +95,7 @@ describe("matchCell", () => {
   });
 
   it("matches a fully absolute $A$1 reference", () => {
-    expect(matchCell("$A$1", 0)).toEqual({
+    expect(matchCell("$A$1", 0, LIMITS)).toEqual({
       text: "$A$1",
       length: 4,
       meta: { col: 0, row: 0, abs: { col: true, row: true } },
@@ -101,19 +103,19 @@ describe("matchCell", () => {
   });
 
   it("matches a column-absolute $A1 reference", () => {
-    const result = matchCell("$A1", 0);
+    const result = matchCell("$A1", 0, LIMITS);
 
     expect(result?.meta.abs).toEqual({ col: true, row: false });
   });
 
   it("matches a row-absolute A$1 reference", () => {
-    const result = matchCell("A$1", 0);
+    const result = matchCell("A$1", 0, LIMITS);
 
     expect(result?.meta.abs).toEqual({ col: false, row: true });
   });
 
   it("matches a lowercase reference and keeps the original text", () => {
-    expect(matchCell("b3", 0)).toEqual({
+    expect(matchCell("b3", 0, LIMITS)).toEqual({
       text: "b3",
       length: 2,
       meta: { col: 1, row: 2, abs: { col: false, row: false } },
@@ -121,36 +123,44 @@ describe("matchCell", () => {
   });
 
   it("resolves multi-letter columns", () => {
-    const result = matchCell("AA10", 0);
+    const result = matchCell("AA10", 0, LIMITS);
 
     expect(result?.meta.col).toBe(26);
     expect(result?.meta.row).toBe(9);
   });
 
   it("resolves the XFD1048576 corner cell", () => {
-    const result = matchCell("XFD1048576", 0);
+    const result = matchCell("XFD1048576", 0, LIMITS);
 
     expect(result?.meta.col).toBe(16383);
     expect(result?.meta.row).toBe(1048575);
   });
 
   it("returns null for letters without a row number", () => {
-    expect(matchCell("SUM", 0)).toBeNull();
+    expect(matchCell("SUM", 0, LIMITS)).toBeNull();
   });
 
   it("returns null when digits precede the column letters", () => {
-    expect(matchCell("1A", 0)).toBeNull();
+    expect(matchCell("1A", 0, LIMITS)).toBeNull();
   });
 
   it("returns null when the reference starts after pos", () => {
-    expect(matchCell("=A1", 0)).toBeNull();
+    expect(matchCell("=A1", 0, LIMITS)).toBeNull();
   });
 
   it("matches a reference in the middle of a formula", () => {
-    const result = matchCell("=A1+B2", 4);
+    const result = matchCell("=A1+B2", 4, LIMITS);
 
     expect(result?.text).toBe("B2");
     expect(result?.meta).toEqual({ col: 1, row: 1, abs: { col: false, row: false } });
+  });
+
+  it("returns null when the column is at or past maxColumns", () => {
+    expect(matchCell("XFE1", 0, LIMITS)).toBeNull();
+  });
+
+  it("returns null when the row is at or past maxRows", () => {
+    expect(matchCell("A1048577", 0, LIMITS)).toBeNull();
   });
 });
 

@@ -7,7 +7,7 @@ import { EventManager, type EventScope } from "../events/eventManager";
 import { runAll } from "../events/runAll";
 import { commentsToN, nToComments } from "../kernel/commentTransform";
 import { Kernel } from "../kernel/kernel";
-import type { LexerOptions } from "../lexer/types";
+import type { LexerSeparators } from "../lexer/types";
 import { CN } from "../theme/classNames";
 import { injectStyles, releaseStyles } from "../theme/injectStyles";
 import { createEl, isHTMLElement, isNode, isShadowRoot, viewOf } from "../ui/dom";
@@ -45,7 +45,7 @@ export class FormulaEditor {
   readonly engine: EngineBridge;
   readonly adapter: EditorGridAdapter;
   private readonly resolvedPhrases: Phrases;
-  private readonly separators: LexerOptions;
+  private readonly separators: LexerSeparators;
   private readonly refOpeners: string;
   private readonly rootEl: HTMLDivElement;
   private readonly layersEl: HTMLDivElement;
@@ -97,7 +97,7 @@ export class FormulaEditor {
     const separators = this.engine.getSeparators();
 
     this.separators = separators;
-    this.kernel = new Kernel(separators);
+    this.kernel = new Kernel({ ...separators, ...this.engine.getReferenceLimits() });
     this.refOpeners = `=+-*/^&<>(:${separators.argSeparator}${separators.arrayRowSeparator}`;
     this.kernel.tokenPostProcess = (tokens) =>
       annotateNamedExprs(tokens, (name) => this.engine.resolveNamedExpression(name));
