@@ -41,3 +41,6 @@ jobs:
 
       - name: Build docs
         run: npm run docs:build
+
+      - name: Check the build output and the docs for citation markers
+        run: npm run check:citation-markers
