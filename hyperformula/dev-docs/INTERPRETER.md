@@ -56,6 +56,8 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 
 `runFunctionWithReferenceArgument` is the variant for functions that take a reference rather than a value (`ROW`, `COLUMN`, `SHEET`, `ISFORMULA`). It takes a no-argument, a reference, and a non-reference callback.
 
+Its optional last argument, `referenceExpected`, gives the reference callback the top-left cell of the reference that INDIRECT returns, as if the reference were written in the formula; its cells are not read and not recorded as dependencies. Other functions return values, as in Google Sheets: a range returned by ARRAYFORMULA is not a reference. `ROW`, `COLUMN`, `SHEET`, `SHEETS`, `FORMULATEXT` and `ISFORMULA` set it; set it only when the reference callback does not use the cell's value: the cell is not a dependency of the formula, as for a reference written in the argument of a function with `doesNotNeedArgumentsToBeComputed`. `ROWS` and `COLUMNS` get the same through `Interpreter.evaluateReference`.
+
 ### Argument metadata
 
 | Field | Meaning |
@@ -75,7 +77,7 @@ Pass the raw args, the state, `this.metadata('ID')`, and a plain implementation 
 | `repeatLastArgs` | The function is variadic — how many trailing arguments repeat |
 | `expandRanges` | Range arguments should be inlined into scalar arguments |
 | `isVolatile` | It must recalculate every time (`RAND`, `NOW`) |
-| `isDependentOnSheetStructureChange` | It must recalculate when rows or columns are added or removed |
+| `isDependentOnSheetStructureChange` | It must recalculate when the sheet structure changes: rows or columns added or removed, a sheet added, renamed, cleared or removed, a named expression added, changed or removed |
 | `doesNotNeedArgumentsToBeComputed` | Reference and range arguments create no dependency |
 | `vectorizationForbidden` | It returns an array, or is otherwise special |
 | `enableArrayArithmeticForArguments` | Array arithmetic mode should apply to its arguments and nested expressions |

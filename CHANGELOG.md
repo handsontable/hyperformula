@@ -54,6 +54,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added a new function: `ERF.PRECISE`. [#1789](https://github.com/handsontable/hyperformula/pull/1789)
 - Added the `PERMUT` and `PERMUTATIONA` functions, which count permutations without and with repetition, and `BINOM.DIST.RANGE`, which returns the binomial probability of a range of successes. [#1790](https://github.com/handsontable/hyperformula/pull/1790)
 - Added `TEXTBEFORE` and `TEXTAFTER`, which return the text before or after a delimiter, and `TEXTSPLIT`, which splits text into rows and columns. `TEXTSPLIT` spills only when every argument but `pad_with` is a constant, because result dimensions are determined before evaluation. [#1792](https://github.com/handsontable/hyperformula/pull/1792)
+- Added the `INDIRECT` function. [#1843](https://github.com/handsontable/hyperformula/pull/1843)
 
 ### Fixed
 
@@ -72,6 +73,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed the `ADDRESS` function adding the sheet separator (`!`) when the `sheetName` argument is an empty argument slot (e.g. `=ADDRESS(2,3,1,FALSE(),)` now returns `R2C3` instead of `!R2C3`), while an explicit `""` still adds it. [#1641](https://github.com/handsontable/hyperformula/issues/1641)
 - Fixed `IMSUM`, `IMPRODUCT` and `TEXTJOIN` throwing an uncaught `RangeError` for very large ranges, such as `=IMSUM(A1:D40000)`, which stopped the recalculation; they now return a result or an error value in the cell. [#1901](https://github.com/handsontable/hyperformula/pull/1901)
 - Fixed `AVEDEV`, `DEVSQ`, `GCD`, `GEOMEAN`, `HARMEAN`, `LCM`, `MEDIAN`, `NPV`, `SKEW` and `SKEW.P` stopping the engine from building on a range of about 125,000 cells or more. [#1800](https://github.com/handsontable/hyperformula/pull/1800)
+- Fixed the `ROW` and `COLUMN` functions returning a `#VALUE!` error for a named range and a `#N/A` error for a named cell, and throwing an error for a named whole column, and the `ROWS` and `COLUMNS` functions counting only the rows or columns that hold data for a named whole column or row. They now return what the same range typed into the formula returns (e.g. `=ROW(myRange)`, where `myRange` refers to `Sheet1!$B$2:$C$3`, now returns `2` instead of a `#VALUE!` error). [#1843](https://github.com/handsontable/hyperformula/pull/1843)
 
 ## [3.5.0] - 2026-10-09
 

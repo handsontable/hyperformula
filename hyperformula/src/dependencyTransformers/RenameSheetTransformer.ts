@@ -3,7 +3,8 @@
  * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
-import {SimpleCellAddress} from '../Cell'
+import {simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {DependencyGraph} from '../DependencyGraph'
 import {CellAddress} from '../parser'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
@@ -95,6 +96,16 @@ export class RenameSheetTransformer extends Transformer {
    */
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {
     return address
+  }
+
+  /**
+   * Moves the recorded addresses of runtime dependencies on cells of the merged placeholder sheet to the kept sheet,
+   * where the graph has moved those cells.
+   */
+  protected moveRuntimeDependencyAddresses(graph: DependencyGraph): void {
+    graph.moveRuntimeDependencyAddresses(address => address.sheet === this.sheetBeingMerged
+      ? simpleCellAddress(this.sheetIdToKeep, address.col, address.row)
+      : address)
   }
 
   /**

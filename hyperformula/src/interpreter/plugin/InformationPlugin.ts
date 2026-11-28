@@ -3,7 +3,7 @@
  * Copyright (c) Handsoncode sp. z o.o. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
+import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../../AbsoluteCellRange'
 import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../../Cell'
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
@@ -11,6 +11,7 @@ import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
+import {namedReference} from '../namedReference'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {ArrayPlugin} from './ArrayPlugin'
@@ -403,7 +404,9 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       (reference: SimpleCellAddress) => {
         const vertex = this.dependencyGraph.addressMapping.getCell(reference)
         return vertex instanceof FormulaVertex
-      }
+      },
+      undefined,
+      true,
     )
   }
 
@@ -512,10 +515,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param state
    */
   public column(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('COLUMN'),
-      () => state.formulaAddress.col + 1,
-      (reference: SimpleCellAddress) => reference.col + 1
-    )
+    return this.positionOfReference(ast, state, this.metadata('COLUMN'), (address: SimpleCellAddress) => address.col + 1)
   }
 
   /**
@@ -544,9 +544,9 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     } else if (argAst.type === AstNodeType.ROW_RANGE) {
       return this.config.maxColumns
     } else {
-      const val = this.evaluateAst(argAst, state)
+      const val = this.interpreter.evaluateReference(argAst, state)
       if (val instanceof SimpleRangeValue) {
-        return val.width()
+        return this.numberOfColumns(val)
       } else if (val instanceof CellError) {
         return val
       } else {
@@ -564,10 +564,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param state
    */
   public row(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('ROW'),
-      () => state.formulaAddress.row + 1,
-      (reference: SimpleCellAddress) => reference.row + 1
-    )
+    return this.positionOfReference(ast, state, this.metadata('ROW'), (address: SimpleCellAddress) => address.row + 1)
   }
 
   /**
@@ -596,9 +593,9 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     } else if (argAst.type === AstNodeType.COLUMN_RANGE) {
       return this.config.maxRows
     } else {
-      const val = this.evaluateAst(argAst, state)
+      const val = this.interpreter.evaluateReference(argAst, state)
       if (val instanceof SimpleRangeValue) {
-        return val.height()
+        return this.numberOfRows(val)
       } else if (val instanceof CellError) {
         return val
       } else {
@@ -832,7 +829,8 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
         } else {
           return new CellError(ErrorType.NA, ErrorMessage.SheetRef)
         }
-      }
+      },
+      true,
     )
   }
 
@@ -849,7 +847,43 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('SHEETS'),
       () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument
       () => 1, // return 1 for valid reference
-      () => new CellError(ErrorType.VALUE, ErrorMessage.CellRefExpected) // error otherwise
+      () => new CellError(ErrorType.VALUE, ErrorMessage.CellRefExpected), // error otherwise
+      true,
     )
+  }
+
+  /**
+   * Runs ROW or COLUMN: returns the position of the formula's cell without an argument, or else of the top-left cell
+   * of the reference in the argument: one written in the formula, a named cell or range, or one returned by INDIRECT,
+   * which is used without reading its cells.
+   */
+  private positionOfReference(ast: ProcedureAst, state: InterpreterState, metadata: FunctionMetadata, positionOf: (address: SimpleCellAddress) => number): InterpreterValue {
+    const arg = ast.args.length === 1 ? withoutParentheses(ast.args[0]) : undefined
+    const namedRange = arg?.type === AstNodeType.NAMED_EXPRESSION ? namedReference(this.dependencyGraph, arg.expressionName, state.formulaAddress.sheet, true) : undefined
+    if (namedRange !== undefined) {
+      return positionOf(namedRange.start)
+    }
+    return this.runFunctionWithReferenceArgument(ast.args, state, metadata,
+      () => positionOf(state.formulaAddress),
+      positionOf,
+      undefined,
+      true,
+    )
+  }
+
+  /**
+   * Returns the number of columns of a range passed as a value, e.g., by INDIRECT, without reading its cells. Whole
+   * rows are maxColumns wide, like the literal 2:2, whatever the width of the sheet.
+   */
+  private numberOfColumns(value: SimpleRangeValue): number {
+    return value.rangeWithoutReading() instanceof AbsoluteRowRange ? this.config.maxColumns : value.width()
+  }
+
+  /**
+   * Returns the number of rows of a range passed as a value, e.g., by INDIRECT, without reading its cells. Whole
+   * columns are maxRows high, like the literal B:B, whatever the height of the sheet.
+   */
+  private numberOfRows(value: SimpleRangeValue): number {
+    return value.rangeWithoutReading() instanceof AbsoluteColumnRange ? this.config.maxRows : value.height()
   }
 }

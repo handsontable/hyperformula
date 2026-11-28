@@ -141,6 +141,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'ЕСНД',
     IFS: 'УСЛОВИЯ',
     INDEX: 'ИНДЕКС',
+    INDIRECT: 'ДВССЫЛ',
     INT: 'ЦЕЛОЕ',
     INTERVAL: 'INTERVAL', //FIXME
     INTRATE: 'ИНОРМА',

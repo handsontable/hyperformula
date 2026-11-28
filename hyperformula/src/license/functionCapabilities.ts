@@ -41,8 +41,8 @@ const FUNCTION_GROUPS: ReadonlyMap<string, readonly string[]> = new Map([
   ['fun:math.b', ['RAND', 'RANDBETWEEN', 'SUMIF', 'SUMIFS']],
   ['fun:stat.b', ['AVERAGEIF', 'COUNTIF', 'STDEV.S']],
   ['fun:lookup.c', [
-    'ADDRESS', 'CHOOSE', 'COLUMN', 'COLUMNS', 'FILTER', 'HLOOKUP', 'HSTACK', 'HYPERLINK', 'INDEX', 'MATCH',
-    'ROW', 'ROWS', 'SORT', 'TRANSPOSE', 'UNIQUE', 'VLOOKUP', 'VSTACK', 'XLOOKUP',
+    'ADDRESS', 'CHOOSE', 'COLUMN', 'COLUMNS', 'FILTER', 'HLOOKUP', 'HSTACK', 'HYPERLINK', 'INDEX', 'INDIRECT',
+    'MATCH', 'ROW', 'ROWS', 'SORT', 'TRANSPOSE', 'UNIQUE', 'VLOOKUP', 'VSTACK', 'XLOOKUP',
   ]],
   ['fun:math.c', [
     'ACOS', 'ASIN', 'ATAN', 'ATAN2', 'CEILING', 'COS', 'EVEN', 'EXP', 'FLOOR', 'INT', 'LN', 'MROUND', 'ODD',

@@ -142,6 +142,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'JIKA.NA',
     IFS: 'JIKAS',
     INDEX: 'INDEKS',
+    INDIRECT: 'INDIRECT',
     INT: 'BULAT.BAWAH',
     INTERVAL: 'INTERVAL',
     INTRATE: 'INTRATE',

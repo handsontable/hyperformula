@@ -141,6 +141,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'WENNNV',
     IFS: 'WENNS',
     INDEX: 'INDEX',
+    INDIRECT: 'INDIREKT',
     INT: 'GANZZAHL',
     INTERVAL: 'INTERVAL', //FIXME
     INTRATE: 'ZINSSATZ',

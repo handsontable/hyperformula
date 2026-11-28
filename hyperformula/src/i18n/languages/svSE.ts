@@ -141,6 +141,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'IFNA',
     IFS: 'IFS',
     INDEX: 'INDEX',
+    INDIRECT: 'INDIREKT',
     INT: 'HELTAL',
     INTERVAL: 'INTERVAL', //FIXME
     INTRATE: 'ÅRSRÄNTA',

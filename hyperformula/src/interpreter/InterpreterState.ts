@@ -11,6 +11,12 @@ export class InterpreterState {
     public formulaAddress: SimpleCellAddress,
     public arraysFlag: boolean,
     public formulaVertex?: FormulaVertex,
+    /**
+     * True if the function being called is the argument of a function that uses a reference, not the values of its
+     * cells (ROW, COLUMN, ROWS, COLUMNS, SHEET, SHEETS, FORMULATEXT, ISFORMULA). INDIRECT then returns the reference
+     * without reading it. Set only for that function, not for its own arguments; see `Interpreter.evaluateReference`.
+     */
+    public referenceExpected?: boolean,
   ) {
   }
 }

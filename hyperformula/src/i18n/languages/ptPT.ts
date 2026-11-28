@@ -141,6 +141,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'SENA',
     IFS: 'SE.S',
     INDEX: 'ÍNDICE',
+    INDIRECT: 'INDIRETO',
     INT: 'INT',
     INTERVAL: 'INTERVAL', //FIXME
     INTRATE: 'TAXAJUROS',

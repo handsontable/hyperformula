@@ -141,6 +141,7 @@ const dictionary: RawTranslationPackage = {
     IFNA: 'ALS.NB',
     IFS: 'ALS.VOORWAARDEN',
     INDEX: 'INDEX',
+    INDIRECT: 'INDIRECT',
     INT: 'INTEGER',
     INTERVAL: 'INTERVAL', //FIXME
     INTRATE: 'RENTEPERCENTAGE',

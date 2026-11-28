@@ -35,7 +35,9 @@ export class FormulaTextPlugin extends FunctionPlugin implements FunctionPluginT
   public formulatext(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('FORMULATEXT'),
       () => new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber),
-      (cellReference: SimpleCellAddress) => this.serialization.getCellFormula(cellReference) ?? new CellError(ErrorType.NA, ErrorMessage.Formula)
+      (cellReference: SimpleCellAddress) => this.serialization.getCellFormula(cellReference) ?? new CellError(ErrorType.NA, ErrorMessage.Formula),
+      undefined,
+      true,
     )
   }
 }
