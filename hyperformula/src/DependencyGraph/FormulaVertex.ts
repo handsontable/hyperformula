@@ -22,7 +22,11 @@ import {RangeVertex} from './RangeVertex'
  * from the formula's AST.
  */
 export interface RuntimeDependency {
-  /** Address or range read by the formula. Informational: the vertex is the source of truth. */
+  /**
+   * Address of the cell read by the formula, kept current through structural changes while its vertex is in the graph
+   * (except for a cell in removed rows or columns, which the formula reads again), or the range it read, whose vertex
+   * holds the current range.
+   */
   address: SimpleCellAddress | SimpleCellRange,
   /** Vertex that was read: a cell, or the range vertex of a range. The graph has an edge from it to the formula vertex. */
   vertex: CellVertex | RangeVertex,
@@ -105,9 +109,10 @@ export abstract class FormulaVertex extends CellVertex {
   public abstract isComputed(): boolean
 
   /**
-   * Points runtime dependencies on oldVertex to newVertex, when a cell vertex is replaced by another one.
+   * Points runtime dependencies on oldVertex to newVertex, when a cell vertex is replaced by another one, or a range
+   * vertex is merged into an equal one after rows or columns are removed.
    */
-  public replaceRuntimeDependencyVertex(oldVertex: CellVertex, newVertex: CellVertex): void {
+  public replaceRuntimeDependencyVertex(oldVertex: CellVertex | RangeVertex, newVertex: CellVertex | RangeVertex): void {
     if (this.runtimeDependencies === undefined) {
       return
     }

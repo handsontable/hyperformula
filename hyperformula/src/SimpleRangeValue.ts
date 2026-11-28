@@ -54,7 +54,7 @@ export class SimpleRangeValue {
 
   /**
    * Returns the address of the range without running the function given to {@link onlyRangeWithReadHook}. For
-   * functions that use only the position or the size of the range, not its cells, e.g., ROW and ROWS.
+   * functions that use the range, not the values of its cells, e.g., ROW and ROWS.
    *
    * @internal
    */
@@ -252,9 +252,6 @@ export class SimpleRangeValue {
   }
 
   /**
-   * Computes the range data if it is not computed yet.
-   */
-  /**
    * Runs the function given to {@link onlyRangeWithReadHook} unless it has already run.
    *
    * @internal
@@ -266,6 +263,9 @@ export class SimpleRangeValue {
     }
   }
 
+  /**
+   * Computes the range data if it is not computed yet.
+   */
   private ensureThatComputed(): void {
     if (this._data !== undefined) {
       return

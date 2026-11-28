@@ -165,7 +165,9 @@ A reference that INDIRECT returns behaves like the same reference typed into the
   const hf = HyperFormula.buildFromArray([
     [null, null],
     [null, 42],
-  ], { licenseKey: 'gpl-v3' });
+  ], {
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+  });
 
   hf.setCellContents({ sheet: 0, row: 0, col: 0 }, '=INDIRECT("R2C2", FALSE())');
   console.log(hf.getCellValue({ sheet: 0, row: 0, col: 0 })); // 42, the value of B2
@@ -180,7 +182,9 @@ A reference that INDIRECT returns behaves like the same reference typed into the
   ```js
   import { HyperFormula } from 'hyperformula';
 
-  const hf = HyperFormula.buildFromArray([[1], [2], [3]], { licenseKey: 'gpl-v3' });
+  const hf = HyperFormula.buildFromArray([[1], [2], [3]], {
+    // licenseKey: 'your-license-key', // get a key at https://handsontable.com/pricing/?tab=hyperformula
+  });
 
   // C2 reads A1:C3, which contains C2
   hf.setCellContents({ sheet: 0, row: 1, col: 2 }, '=INDEX(INDIRECT("A1:C3"), 1, 1)');

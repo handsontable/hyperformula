@@ -10,7 +10,7 @@
  */
 export class EvaluationDeferred extends Error {
   constructor() {
-    super('Evaluation deferred to a later pass.')
+    super('Evaluation deferred until the cell it reads is computed.')
     this.name = 'EvaluationDeferred'
   }
 }

@@ -8,7 +8,7 @@ import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import {ProcedureAst} from '../../parser'
 import {
   simpleCellAddressFromString,
   simpleCellRangeFromString,
@@ -19,6 +19,7 @@ import {RANGE_OPERATOR} from '../../parser/parser-consts'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {EVALUATION_DEFERRED} from '../EvaluationDeferred'
 import {InterpreterState} from '../InterpreterState'
+import {namedReference} from '../namedReference'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
@@ -132,7 +133,7 @@ export class IndirectPlugin extends FunctionPlugin implements FunctionPluginType
       const resolveSheet = (sheetName: string) => this.dependencyGraph.sheetMapping.getSheetId(sheetName)
 
       if (!a1) {
-        const range = this.r1c1Reference(refText, state.formulaAddress) ?? this.namedReference(refText, state.formulaAddress.sheet)
+        const range = this.r1c1Reference(refText, state.formulaAddress) ?? namedReference(this.dependencyGraph, refText, state.formulaAddress.sheet)
         return this.readReference(range, state)
       }
 
@@ -145,7 +146,7 @@ export class IndirectPlugin extends FunctionPlugin implements FunctionPluginType
       const range = simpleCellRangeFromString(resolveSheet, refText, state.formulaAddress.sheet)
         ?? simpleColumnRangeFromString(resolveSheet, refText, state.formulaAddress.sheet)
         ?? simpleRowRangeFromString(resolveSheet, refText, state.formulaAddress.sheet)
-        ?? this.namedReference(refText, state.formulaAddress.sheet)
+        ?? namedReference(this.dependencyGraph, refText, state.formulaAddress.sheet)
       return this.readReference(range, state)
     })
   }
@@ -155,7 +156,7 @@ export class IndirectPlugin extends FunctionPlugin implements FunctionPluginType
    * rows have an infinite end row or column, as in {@link AbsoluteColumnRange} and {@link AbsoluteRowRange}.
    * Returns #REF! if there is no reference or it leaves the existing sheets or the sheet limits.
    *
-   * If the caller uses only the position or the size of the reference (see {@link InterpreterState.referenceExpected}),
+   * If the caller uses the reference, not the values of its cells (see {@link InterpreterState.referenceExpected}),
    * returns it as a range, even for one cell, without reading its cells or recording them as dependencies: the
    * caller does not depend on their values, so a cell that refers back to the formula is no cycle.
    */
@@ -218,35 +219,10 @@ export class IndirectPlugin extends FunctionPlugin implements FunctionPluginType
   }
 
   /**
-   * Returns the cell, range, or whole columns or rows a named expression refers to, as a range (a single cell is a
-   * one-cell range), or undefined if there is no such name in scope or it is not a reference (e.g., =5).
-   */
-  private namedReference(name: string, sheet: number): Maybe<AbsoluteCellRange> {
-    const namedExpression = this.dependencyGraph.namedExpressions.nearestNamedExpression(name, sheet)
-    if (namedExpression === undefined) {
-      return undefined
-    }
-    const vertex = this.dependencyGraph.addressMapping.getCell(namedExpression.address)
-    if (!(vertex instanceof FormulaVertex)) {
-      return undefined
-    }
-    const ast = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-    const baseAddress = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-    if (ast.type === AstNodeType.CELL_REFERENCE) {
-      const address = ast.reference.toSimpleCellAddress(baseAddress)
-      return new AbsoluteCellRange(address, address)
-    }
-    if (ast.type === AstNodeType.CELL_RANGE || ast.type === AstNodeType.COLUMN_RANGE || ast.type === AstNodeType.ROW_RANGE) {
-      return AbsoluteCellRange.fromAstOrUndef(ast, baseAddress)
-    }
-    return undefined
-  }
-
-  /**
    * Returns the range as a reference. Its cells are read lazily, when their values or its `range` are first used (SUM,
    * lookups, criteria, an operator, the whole formula), and the range is recorded as a runtime dependency of the
    * evaluated formula only then. Pending cells are requested and the evaluation is deferred. Its size and
-   * `rangeWithoutReading`, which ROW, COLUMN, ROWS and COLUMNS use, record nothing.
+   * `rangeWithoutReading`, which functions that use only the reference call (e.g., ROW and ROWS), record nothing.
    */
   private readRange(range: AbsoluteCellRange, state: InterpreterState): SimpleRangeValue {
     const pass = this.interpreter.evaluationPass

@@ -596,10 +596,13 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
    * Runs a function whose argument is a reference: the formula's own cell without an argument, the top-left cell of a
    * reference written in the formula, or any other value given to `nonReferenceCallback`.
    *
-   * If `referenceExpected` is true, a function call in the argument is evaluated with
-   * {@link InterpreterState.referenceExpected} set, so a reference it returns, e.g., from INDIRECT, reaches
-   * `nonReferenceCallback` as a range whose cells are not read and not recorded as dependencies. Set it only if
-   * `nonReferenceCallback` uses the position or the size of a range, never its values.
+   * If `referenceExpected` is true, an INDIRECT call in the argument is evaluated with
+   * {@link InterpreterState.referenceExpected} set, so the top-left cell of the reference it returns reaches
+   * `referenceCallback` as if the reference were written in the formula, and its cells are not read or recorded as
+   * dependencies. An error it returns is the result. Other functions return values, not references, as in Google
+   * Sheets: a range returned by ARRAYFORMULA goes to `nonReferenceCallback`. Set it only if `referenceCallback` does
+   * not use the value of the cell: the cell is not a dependency of the formula, as for a reference written in the
+   * argument of a function with `doesNotNeedArgumentsToBeComputed`.
    */
   protected runFunctionWithReferenceArgument = (
     args: Ast[],
@@ -637,9 +640,11 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       return this.returnNumberWrapper(referenceCallback(cellReference), metadata.returnNumberType)
     }
 
-    if (referenceExpected && arg.type === AstNodeType.FUNCTION_CALL) {
+    if (referenceExpected && arg.type === AstNodeType.FUNCTION_CALL && arg.procedureName === 'INDIRECT') {
+      // INDIRECT returns a reference or an error
       const value = this.interpreter.evaluateReference(arg, state)
-      return value instanceof CellError ? value : this.returnNumberWrapper(nonReferenceCallback(value), metadata.returnNumberType)
+      const reference = value instanceof SimpleRangeValue ? value.rangeWithoutReading() : undefined
+      return reference === undefined ? value : this.returnNumberWrapper(referenceCallback(reference.start), metadata.returnNumberType)
     }
 
     return this.runFunction(args, state, metadata, nonReferenceCallback)

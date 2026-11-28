@@ -54,14 +54,13 @@ export class DependencyGraph {
   private changes: ContentChanges = ContentChanges.empty()
   public readonly sheetReferenceRegistrar: SheetReferenceRegistrar
   /**
-   * Number of runtime dependency edges added to the graph so far. Lets the evaluator check that each pass that defers
-   * a formula makes progress.
-   */
-  public runtimeEdgesAdded = 0
-  /**
    * Vertices that lost a runtime dependent during evaluation, with the address they were read at. See {@link removeUnusedRuntimeVertices}.
    */
   private readonly runtimeVerticesToRemoveIfUnused = new Map<RangeVertex | EmptyCellVertex, SimpleCellAddress | SimpleCellRange>()
+  /**
+   * Formulas that have runtime dependencies, whose addresses {@link moveRuntimeDependencyAddresses} keeps current.
+   */
+  private readonly formulasWithRuntimeDependencies = new Set<FormulaVertex>()
 
   constructor(
     public readonly addressMapping: AddressMapping,
@@ -294,22 +293,24 @@ export class DependencyGraph {
     const { vertex, id } = this.fetchCellOrCreateEmpty(address)
     if (!this.graph.existsEdge(vertex, dependent)) {
       this.graph.addEdge(id ?? vertex, dependent)
-      this.runtimeEdgesAdded++
     }
     return vertex
   }
 
   /**
    * Adds an edge from the range vertex of a range to a formula that read the range during evaluation.
-   * Creates the range vertex, with its edges from the cells, if the graph does not have it.
+   * Creates the range vertex, with its edges from the cells, if the graph does not have it. A range vertex already in
+   * the graph has its edges, so its cells are not visited again: a formula reads its range at every evaluation.
    *
    * @returns {{rangeVertex: RangeVertex, created: boolean}} the range vertex, and whether this call created it
    */
   public addRuntimeRangeDependency(dependent: FormulaVertex, range: AbsoluteCellRange): { rangeVertex: RangeVertex, created: boolean } {
-    const ensured = this.ensureRangeVertex(range)
+    const existing = this.getRange(range.start, range.end)
+    const ensured = existing !== undefined && this.graph.hasNode(existing)
+      ? {rangeVertex: existing, created: false}
+      : this.ensureRangeVertex(range)
     if (!this.graph.existsEdge(ensured.rangeVertex, dependent)) {
       this.graph.addEdge(ensured.rangeVertex, dependent)
-      this.runtimeEdgesAdded++
     }
     return ensured
   }
@@ -336,7 +337,7 @@ export class DependencyGraph {
       })
     }
 
-    dependent.runtimeDependencies = recorded.length > 0 ? recorded : undefined
+    this.setRuntimeDependencies(dependent, recorded.length > 0 ? recorded : undefined)
   }
 
   /**
@@ -348,7 +349,7 @@ export class DependencyGraph {
     }
     const stored = (dependent.runtimeDependencies ?? []).filter(dependency => this.graph.hasNode(dependency.vertex))
     const storedVertices = new Set(stored.map(dependency => dependency.vertex))
-    dependent.runtimeDependencies = [...stored, ...recorded.filter(dependency => !storedVertices.has(dependency.vertex))]
+    this.setRuntimeDependencies(dependent, [...stored, ...recorded.filter(dependency => !storedVertices.has(dependency.vertex))])
   }
 
   /**
@@ -358,7 +359,7 @@ export class DependencyGraph {
    */
   public clearRuntimeDependencies(dependent: FormulaVertex): boolean {
     const stored = dependent.runtimeDependencies
-    dependent.runtimeDependencies = undefined
+    this.setRuntimeDependencies(dependent, undefined)
     if (stored === undefined) {
       return false
     }
@@ -377,6 +378,22 @@ export class DependencyGraph {
       }
     })
     return removedAny
+  }
+
+  /**
+   * Updates the addresses of the cells that formulas read at runtime after a structural change moved the cells, so
+   * that a vertex left without dependents is found at its address and removed. Called by the change's transformer,
+   * which gives the address each cell moves to, once the graph has moved the cells; {@link moveCells} updates the
+   * addresses itself, cell by cell.
+   */
+  public moveRuntimeDependencyAddresses(moveAddress: (address: SimpleCellAddress) => SimpleCellAddress): void {
+    for (const formula of this.formulasWithRuntimeDependencies) {
+      for (const dependency of formula.runtimeDependencies ?? []) {
+        if (isSimpleCellAddress(dependency.address)) {
+          dependency.address = moveAddress(dependency.address)
+        }
+      }
+    }
   }
 
   public removeRows(removedRows: RowsSpan): EagerChangesGraphChangeResult {
@@ -624,7 +641,13 @@ export class DependencyGraph {
             this.graph.addEdge(emptyVertex, adjacentNode)
             this.graph.removeEdge(sourceVertex, adjacentNode)
           } else if (adjacentNode instanceof FormulaVertex && adjacentNode.runtimeDependencies?.some(dependency => dependency.vertex === sourceVertex)) {
-            // A runtime dependency comes from an address that does not move with the cell, so the formula reads it again
+            // A runtime dependency comes from an address that does not move with the cell, so the formula reads it again.
+            // Until then the vertex is found at the address it moved to.
+            for (const dependency of adjacentNode.runtimeDependencies) {
+              if (dependency.vertex === sourceVertex) {
+                dependency.address = targetAddress
+              }
+            }
             this.graph.markNodeAsDirty(adjacentNode)
           }
         }
@@ -1455,6 +1478,9 @@ export class DependencyGraph {
    * Also cleans up placeholder sheets that have no remaining vertices (not needed anymore)
    */
   private removeVertexAndCleanupDependencies(inputVertex: Vertex) {
+    if (inputVertex instanceof FormulaVertex) {
+      this.formulasWithRuntimeDependencies.delete(inputVertex)
+    }
     const dependencies = new Set(this.graph.removeNode(inputVertex))
     const affectedSheets = new Set<number>()
 
@@ -1496,13 +1522,28 @@ export class DependencyGraph {
       ? addressKey(address)
       : `${addressKey(address.start)}:${addressKey(address.end)}`
     const keys = new Set(addresses.map(key))
-    for (const {address, vertex: dependencyVertex} of runtimeDependencies) {
+    for (const dependency of runtimeDependencies) {
+      const {vertex: dependencyVertex} = dependency
+      // a range vertex holds its current range; the recorded one may predate a structural change
+      const address = dependencyVertex instanceof RangeVertex ? simpleCellRange(dependencyVertex.range.start, dependencyVertex.range.end) : dependency.address
       if (this.graph.hasNode(dependencyVertex) && !keys.has(key(address))) {
         keys.add(key(address))
         addresses.push(address)
       }
     }
     return addresses
+  }
+
+  /**
+   * Stores the runtime dependencies of a formula and keeps track of the formulas that have any.
+   */
+  private setRuntimeDependencies(dependent: FormulaVertex, dependencies: Maybe<RuntimeDependency[]>): void {
+    dependent.runtimeDependencies = dependencies
+    if (dependencies === undefined) {
+      this.formulasWithRuntimeDependencies.delete(dependent)
+    } else {
+      this.formulasWithRuntimeDependencies.add(dependent)
+    }
   }
 
   /**
@@ -1571,7 +1612,10 @@ export class DependencyGraph {
    * Points a formula's runtime dependencies on oldVertex to newVertex.
    */
   private replaceRuntimeDependencyVertex(dependent: Vertex, oldVertex: Vertex, newVertex: Vertex): void {
-    if (dependent instanceof FormulaVertex && oldVertex instanceof CellVertex && newVertex instanceof CellVertex) {
+    if (!(dependent instanceof FormulaVertex)) {
+      return
+    }
+    if ((oldVertex instanceof CellVertex && newVertex instanceof CellVertex) || (oldVertex instanceof RangeVertex && newVertex instanceof RangeVertex)) {
       dependent.replaceRuntimeDependencyVertex(oldVertex, newVertex)
     }
   }

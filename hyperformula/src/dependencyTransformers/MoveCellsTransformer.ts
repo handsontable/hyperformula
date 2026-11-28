@@ -44,6 +44,13 @@ export class MoveCellsTransformer extends Transformer {
     return simpleCellAddress(this.toSheet, address.col + this.toRight, address.row + this.toBottom)
   }
 
+  /**
+   * Does nothing: this transformation runs before the graph moves the cells, and `DependencyGraph.moveCells` moves the
+   * addresses as it moves each cell.
+   */
+  protected moveRuntimeDependencyAddresses(): void {
+  }
+
   protected transformCellAddress<T extends CellAddress>(dependencyAddress: T, formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {
     return this.transformAddress(dependencyAddress, formulaAddress)
   }

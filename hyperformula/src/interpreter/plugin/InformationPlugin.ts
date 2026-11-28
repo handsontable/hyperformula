@@ -11,6 +11,7 @@ import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
+import {namedReference} from '../namedReference'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {ArrayPlugin} from './ArrayPlugin'
@@ -88,7 +89,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'COLUMN': {
       method: 'column',
       parameters: [
-        {argumentType: FunctionArgumentType.ANY, optionalArg: true}
+        {argumentType: FunctionArgumentType.NOERROR, optionalArg: true}
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
@@ -196,7 +197,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'ROW': {
       method: 'row',
       parameters: [
-        {argumentType: FunctionArgumentType.ANY, optionalArg: true}
+        {argumentType: FunctionArgumentType.NOERROR, optionalArg: true}
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
@@ -403,7 +404,9 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       (reference: SimpleCellAddress) => {
         const vertex = this.dependencyGraph.addressMapping.getCell(reference)
         return vertex instanceof FormulaVertex
-      }
+      },
+      undefined,
+      true,
     )
   }
 
@@ -826,7 +829,8 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
         } else {
           return new CellError(ErrorType.NA, ErrorMessage.SheetRef)
         }
-      }
+      },
+      true,
     )
   }
 
@@ -843,23 +847,26 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('SHEETS'),
       () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument
       () => 1, // return 1 for valid reference
-      () => new CellError(ErrorType.VALUE, ErrorMessage.CellRefExpected) // error otherwise
+      () => new CellError(ErrorType.VALUE, ErrorMessage.CellRefExpected), // error otherwise
+      true,
     )
   }
 
   /**
    * Runs ROW or COLUMN: returns the position of the formula's cell without an argument, or else of the top-left cell
-   * of the reference in the argument. A reference returned by a function, e.g., INDIRECT, is used without reading its
-   * cells. An error passes through; any other value is #N/A.
+   * of the reference in the argument: one written in the formula, a named cell or range, or one returned by INDIRECT,
+   * which is used without reading its cells.
    */
   private positionOfReference(ast: ProcedureAst, state: InterpreterState, metadata: FunctionMetadata, positionOf: (address: SimpleCellAddress) => number): InterpreterValue {
+    const arg = ast.args.length === 1 ? withoutParentheses(ast.args[0]) : undefined
+    const namedRange = arg?.type === AstNodeType.NAMED_EXPRESSION ? namedReference(this.dependencyGraph, arg.expressionName, state.formulaAddress.sheet, true) : undefined
+    if (namedRange !== undefined) {
+      return positionOf(namedRange.start)
+    }
     return this.runFunctionWithReferenceArgument(ast.args, state, metadata,
       () => positionOf(state.formulaAddress),
       positionOf,
-      (value: InterpreterValue) => {
-        const start = value instanceof SimpleRangeValue ? value.rangeWithoutReading()?.start : undefined
-        return start === undefined ? new CellError(ErrorType.NA, ErrorMessage.CellRefExpected) : positionOf(start)
-      },
+      undefined,
       true,
     )
   }

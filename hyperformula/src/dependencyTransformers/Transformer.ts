@@ -38,6 +38,7 @@ export abstract class Transformer implements FormulaTransformer {
       node.setFormula(cachedAst)
       node.setAddress(newAddress)
     }
+    this.moveRuntimeDependencyAddresses(graph)
   }
 
   public transformSingleAst(ast: Ast, address: SimpleCellAddress): [Ast, SimpleCellAddress] {
@@ -47,6 +48,14 @@ export abstract class Transformer implements FormulaTransformer {
   }
 
   public abstract isIrreversible(): boolean
+
+  /**
+   * Moves the recorded addresses of runtime dependencies with their cells, e.g., one row down for a cell below an
+   * inserted row. Runs once the graph has moved the cells.
+   */
+  protected moveRuntimeDependencyAddresses(graph: DependencyGraph): void {
+    graph.moveRuntimeDependencyAddresses(address => this.fixNodeAddress(address))
+  }
 
   protected transformAst(ast: Ast, address: SimpleCellAddress): Ast {
     switch (ast.type) {

@@ -6,11 +6,6 @@
 export interface TopSortResult<T> {
   sorted: T[],
   cycled: T[],
-  /**
-   * Nodes that still have to be recomputed in another pass. Always empty: a node that reads a pending node is
-   * retried in the same pass, after the pending node is computed.
-   */
-  deferred: T[],
 }
 
 /**
@@ -228,7 +223,7 @@ export class TopSort<T> {
       }
     }
 
-    return {sorted: this.sorted, cycled: this.cycled, deferred: []}
+    return {sorted: this.sorted, cycled: this.cycled}
   }
 
   /**

@@ -89,8 +89,8 @@ export class Interpreter {
   }
 
   /**
-   * Evaluates the argument of a function that uses only the position or the size of a reference, not the values of
-   * its cells: ROW, COLUMN, ROWS and COLUMNS. A function in the argument is called with
+   * Evaluates the argument of a function that uses a reference, not the values of its cells: ROW, COLUMN, ROWS,
+   * COLUMNS, SHEET, SHEETS, FORMULATEXT and ISFORMULA. A function in the argument is called with
    * {@link InterpreterState.referenceExpected} set, and the reference it returns, e.g., from INDIRECT, is not reduced
    * to the value of its cell even if it has one cell. Any other value is the same as from {@link evaluateAst}.
    */
@@ -336,8 +336,8 @@ export class Interpreter {
    *
    * @param {ProcedureAst} ast - the function call
    * @param {InterpreterState} state - the state of the evaluation the call is part of
-   * @param {boolean} referenceExpected - whether the caller uses only the position or the size of the reference the
-   * function returns; see {@link InterpreterState.referenceExpected}
+   * @param {boolean} referenceExpected - whether the caller uses the reference the function returns, not the values
+   * of its cells; see {@link InterpreterState.referenceExpected}
    */
   private callFunction(ast: ProcedureAst, state: InterpreterState, referenceExpected: boolean): InterpreterValue {
     const licenseError = this.functionCallLicenseGate.stoppedCallError(ast.procedureName)

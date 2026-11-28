@@ -12,10 +12,6 @@ export type NodeId = number
 export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | SimpleCellRange), Node][]
 
 /**
- * Interface for nodes that can be stored in the Graph.
- * The idInGraph property is managed by the Graph class and should not be set externally.
- */
-/**
  * View of a running top-sort pass, passed to the operating function together with the node.
  */
 export interface TopSortPass<Node> {
@@ -30,6 +26,10 @@ export interface TopSortPass<Node> {
   requestPull(node: Node): void,
 }
 
+/**
+ * Interface for nodes that can be stored in the Graph.
+ * The idInGraph property is managed by the Graph class and should not be set externally.
+ */
 export interface GraphNode {
   idInGraph?: NodeId,
 }

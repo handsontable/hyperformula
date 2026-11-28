@@ -98,7 +98,7 @@ export class Evaluator {
     while (nextSeeds.length > 0) {
       const retrySeeds: Vertex[] = []
       let evaluationPass: Maybe<EvaluationPass> = undefined
-      const {deferred} = this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(nextSeeds,
+      this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(nextSeeds,
         (vertex: Vertex, topSortPass: TopSortPass<Vertex>) => {
           evaluationPass = evaluationPass ?? new EvaluationPass(this.dependencyGraph, topSortPass)
           return operatingFunction(vertex, evaluationPass)
@@ -111,7 +111,7 @@ export class Evaluator {
           }
         },
       )
-      nextSeeds = [...deferred, ...retrySeeds]
+      nextSeeds = retrySeeds
     }
     this.dependencyGraph.removeUnusedRuntimeVertices()
   }
